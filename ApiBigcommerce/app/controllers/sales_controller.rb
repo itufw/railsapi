@@ -354,8 +354,8 @@
 
         customer_ids = @customer_stats.reduce(&:merge).keys
 
-        customer_id_name_map = Customer.where(id: customer_ids).pluck("id, actual_name").to_h
-
+        customer_id_name_array = Customer.includes(:staff).where(id: customer_ids).pluck("customers.id, actual_name, staffs.nickname")
+        customer_id_name_map = Hash[customer_id_name_array.map {|id, name, staff| [id, [name, staff]]}]
         @customer_id_name_map_sorted = Hash[customer_id_name_map.sort_by { |k,v| v }]
    
         @page_header = "Customers who ordered Product : #{@product_name}"

@@ -6,14 +6,16 @@
 
 	<tr class="info">
 		<th>Customer Name</th>
+		<th>Sales Rep</th>
 		<% @time_periods.each do |t| %>
 			<th><%= t.name %></th>
 		<% end %>
 	</tr>
 
-	<% @customer_id_name_map_sorted.each do |id, name| %>
+	<% @customer_id_name_map_sorted.each do |id, value| %>
 		<tr>
-			<td><%= link_to name, action: 'view_orders_for_product_and_customer', product_id: @product_id, product_name: @product_name, customer_id: id, customer_name: name %></td>
+			<td><%= link_to value[0], action: 'view_orders_for_product_and_customer', product_id: @product_id, product_name: @product_name, customer_id: id, customer_name: value[0] %></td>
+			<td><%= value[1] %></td>
 			<% values = check_id_in_map(@customer_stats, id) %>
 			<% values.each do |v| %>
 				<td class="num"><%= v %></td>
