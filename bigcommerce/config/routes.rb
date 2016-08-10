@@ -40,7 +40,7 @@ Rails.application.routes.draw do
   
   get 'admin/scrape'
 
-  #root 'sales#view_sales_dashboard'
+  root 'sales#view_sales_dashboard'
   #post 'admin/update'
 
   match ':controller(/:action(/:id))', via: [:get, :post]
