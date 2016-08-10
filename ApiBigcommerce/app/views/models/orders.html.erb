@@ -1,0 +1,36 @@
+<%
+=begin
+%>
+<h3><center>Orders</center></h3>
+
+<table class = "table table-striped table-bordered table-hover table-responsive">
+	<tr>
+		<th>Sales Rep</th>
+		<th>Date</th>
+		<th>Order Id</th>
+		<th>Customer</th>
+		<th>Status</th>
+		<th>Qty</th>
+		<th>Total</th>
+	</tr>
+
+	<% @orders.each do |o| %>
+
+		<tr>
+
+			<td class = "text"><%= o.customer.staff.nickname %></td>
+			<td class = "text"><%= o.date_created.to_date %></td>
+			<td class = "text"><%= link_to o.id, controller: "sales", action: "view_products_for_orderid", order_id: o.id %></td>
+			<td class = "text"><%= link_to get_customer_name(o.customer), controller: "sales", action: "view_orders_for_customer", customer_id: o.customer_id %></td>
+			<td class = "text"><%= o.status.name %></td>
+			<td class = "num"><%= o.qty %></td>
+			<td class = "num"><%= number_with_delimiter(number_with_precision(o.total_inc_tax, precision: 2)) %></td>
+
+		</tr>
+
+	<% end %>
+
+</table>
+<%
+=end
+%>
