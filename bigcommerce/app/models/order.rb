@@ -72,8 +72,8 @@ class Order < ActiveRecord::Base
 					#move row to history, update this one
 
 					# Insert into Order History tables
-					last_insert_id = OrderHistory.new.insert(o.id)
-					OrderProductHistory.new.insert(last_insert_id, o.id)
+					#last_insert_id = OrderHistory.new.insert(o.id)
+					#OrderProductHistory.new.insert(last_insert_id, o.id)
 
 					# Update Order Table
 					insert_or_update(o, 0)

@@ -1,0 +1,9 @@
+I, [2016-08-08T07:17:54.927476 #4422]  INFO -- : Refreshing Gem list
+I, [2016-08-08T07:17:57.474459 #4422]  INFO -- : listening on addr=/home/deploy/UntappedCMS/ApiBigcommerce/shared/sockets/unicorn.sock fd=11
+I, [2016-08-08T07:17:57.474686 #4422]  INFO -- : worker=0 spawning...
+I, [2016-08-08T07:17:57.477360 #4422]  INFO -- : worker=1 spawning...
+I, [2016-08-08T07:17:57.480209 #4426]  INFO -- : worker=0 spawned pid=4426
+I, [2016-08-08T07:17:57.480491 #4426]  INFO -- : worker=0 ready
+I, [2016-08-08T07:17:57.483495 #4422]  INFO -- : master process ready
+I, [2016-08-08T07:17:57.490275 #4429]  INFO -- : worker=1 spawned pid=4429
+I, [2016-08-08T07:17:57.490550 #4429]  INFO -- : worker=1 ready

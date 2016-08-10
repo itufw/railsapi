@@ -15,7 +15,7 @@ default: &default
   pool: 5
   username: untappe7_hinam
   password: H123occult!!
-  host: untappedwines.net
+  host: 192.163.204.51
 
 development:
   <<: *default
