@@ -1,0 +1,88 @@
+/* line 5, /Users/hinammehra/Dropbox/IT PROJECTS/UntappedCMS/ApiBigcommerce/app/assets/stylesheets/sales.scss */
+.num {
+  text-align: right;
+}
+
+/* line 9, /Users/hinammehra/Dropbox/IT PROJECTS/UntappedCMS/ApiBigcommerce/app/assets/stylesheets/sales.scss */
+.text {
+  text-align: left;
+}
+
+/* line 13, /Users/hinammehra/Dropbox/IT PROJECTS/UntappedCMS/ApiBigcommerce/app/assets/stylesheets/sales.scss */
+a:link, a:visited {
+  color: inherit;
+}
+
+/* line 17, /Users/hinammehra/Dropbox/IT PROJECTS/UntappedCMS/ApiBigcommerce/app/assets/stylesheets/sales.scss */
+a:hover {
+  color: blue;
+}
+
+/* line 21, /Users/hinammehra/Dropbox/IT PROJECTS/UntappedCMS/ApiBigcommerce/app/assets/stylesheets/sales.scss */
+.blank-row {
+  height: 30px;
+  background-color: white;
+}
+
+/* line 27, /Users/hinammehra/Dropbox/IT PROJECTS/UntappedCMS/ApiBigcommerce/app/assets/stylesheets/sales.scss */
+.button {
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  background-color: black;
+}
+
+/* line 40, /Users/hinammehra/Dropbox/IT PROJECTS/UntappedCMS/ApiBigcommerce/app/assets/stylesheets/sales.scss */
+#orders-view-button {
+  background-color: #e7e7e7;
+  /* Gray */
+  color: black;
+}
+
+/* line 45, /Users/hinammehra/Dropbox/IT PROJECTS/UntappedCMS/ApiBigcommerce/app/assets/stylesheets/sales.scss */
+#products-view-button {
+  background-color: #4CAF50;
+}
+
+/* line 49, /Users/hinammehra/Dropbox/IT PROJECTS/UntappedCMS/ApiBigcommerce/app/assets/stylesheets/sales.scss */
+.orders-view {
+  display: none;
+}
+
+/* line 53, /Users/hinammehra/Dropbox/IT PROJECTS/UntappedCMS/ApiBigcommerce/app/assets/stylesheets/sales.scss */
+h3 {
+  text-align: center;
+}
+
+/* line 57, /Users/hinammehra/Dropbox/IT PROJECTS/UntappedCMS/ApiBigcommerce/app/assets/stylesheets/sales.scss */
+.dropdown-toggle {
+  background-color: black;
+}
+
+/* line 61, /Users/hinammehra/Dropbox/IT PROJECTS/UntappedCMS/ApiBigcommerce/app/assets/stylesheets/sales.scss */
+.italics {
+  font-style: italic;
+}
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
+ * or any plugin's vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any styles
+ * defined in the other CSS/SCSS files in this directory. It is generally better to create a new
+ * file per style scope.
+ *
+
+
+ */
+
+

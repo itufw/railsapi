@@ -1,0 +1,59 @@
+
+<h3><center>Customer Stats</center></h3>
+<table class = "table table-striped table-bordered table-hover table-responsive">
+
+	<tr class="info">
+		<th></th>
+		<% @time_periods.each do |t| %>
+			<th><%= t.name %></th>
+		<% end %>
+	</tr>
+
+	<tr>
+		<td class="text">Total</td>
+		<% @sum_per_time_period.each do |s| %>
+
+				<td class="num"><%= number_with_delimiter(number_with_precision(s, precision: 2)) %></td>
+
+		<% end %>
+	</tr>
+
+	<tr>
+		<td class="text"> <%= @average_name %> Average</td>
+		<% @avg_per_time_period.each do |av| %>
+			
+				<td class="num"><%= number_with_delimiter(number_with_precision(av, precision: 2)) %></td>
+		<% end %>
+	</tr>
+</table>
+
+<center><button class="button "><%= link_to "View Top Rated Products for Customer", action: "view_product_stats_for_customer", customer_id: @customer_id, customer_name: @customer_name %></button></center> 
+<br/><br/>
+
+<h3><center><%= @page_header %></center></h3>
+
+<table class = "table table-striped table-bordered table-hover table-responsive">
+	<tr>
+		<th>Sales Rep</th>
+		<th>Date</th>
+		<th>Order Id</th>
+		<th>Customer</th>
+		<th>Status</th>
+		<th>Qty</th>
+		<th>Total</th>
+	</tr>
+
+
+	<% @orders.each do |o| %>
+		<tr>
+			<td><%= o.customer.staff.nickname %></td>
+			<td><%= o.date_created.to_date %></td>
+			<td><%= link_to o.id, action: "view_products_for_orderid", order_id: o.id %></td> 
+			<td><%= link_to @customer_name, action: "view_orders_for_customer", customer_id: @customer_id %></td>	
+			<td><%= o.status.name %></td>
+			<td class="num"><%= link_to o.qty, action: "view_products_for_orderid", order_id: o.id %></td>
+			<td class="num"><%= link_to number_with_delimiter(number_with_precision(o.total_inc_tax, precision: 2)), action: "view_products_for_orderid", order_id: o.id %></td>
+		</tr>
+	<% end %>
+</table>
+
