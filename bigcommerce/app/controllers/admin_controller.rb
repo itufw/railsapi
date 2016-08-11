@@ -43,6 +43,7 @@ class AdminController < ApplicationController
   end
 
   def update_products
+    Revision.new.insert
     update_time = Revision.order("created_at").last.next_update_time.iso8601
     Product.new.update_from_api(update_time)
     @success = "Yay! Products Updated"
