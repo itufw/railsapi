@@ -1,11 +1,12 @@
 namespace :updates do
 	desc "Rake task to update data"
 	task :cron => :environment do
-	  AdminController.update_products
+	  admin = AdminController.new
+	  admin.update_products
 	  puts "Updated Products"
-	  AdminController.update_customers
+	  admin.update_customers
 	  puts "Updated Customers"
-	  AdminController.update_orders
+	  admin.update_orders
 	  puts "Updated Orders"
 	end
 end
