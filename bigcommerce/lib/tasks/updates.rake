@@ -1,7 +1,8 @@
 namespace :updates do
 	desc "Rake task to update data"
 	task :cron => :environment do
-	  puts "#{Time.now} started"
+	  start_time = Time.now
+	  puts "#{start_time} started"
 	  admin = AdminController.new
 	  admin.update_products
 	  puts "Updated Products"
@@ -9,6 +10,7 @@ namespace :updates do
 	  puts "Updated Customers"
 	  admin.update_orders
 	  puts "Updated Orders"
+	  Revision.new.insert("", start_time)
 	  puts "#{Time.now} ended"
 	end
 end
