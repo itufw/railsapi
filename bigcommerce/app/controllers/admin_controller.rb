@@ -12,8 +12,15 @@ class AdminController < ApplicationController
   # Address - scrape - Shipping Address
   # Coupon - scrape - also from inside order
 
+  # def initialize
+  #   @update_time = nil
+  #   @start_time = nil
+
+  # end
+
   def index
   end
+
 
   def scrape
 
@@ -32,29 +39,31 @@ class AdminController < ApplicationController
   end
 
   def update
-    @update_time = Revision.order("created_at").last.next_update_time.iso8601
-    #update_time = "2016-07-18T00:00:00Z"
-    Time.zone = "GMT"
-    start_time = Time.current
-    update_products
-    #models_update = [Customer.new, Order.new]
 
-    # models_update.each do |m|
-    #    m.update(update_time)
-    # end
-    Revision.new.insert("", start_time)
   end
 
   def update_products
-    Product.new.update_from_api(@update_time)
+    Revision.new.insert
+    update_time = Revision.order("created_at").last.next_update_time.iso8601
+    Product.new.update_from_api(update_time)
+    @success = "Yay! Products Updated"
+    render 'update'
   end
 
   def update_customers
-    Customer.new.update_from_api(@update_time)
+    update_time = Revision.order("created_at").last.next_update_time.iso8601
+
+    Customer.new.update_from_api(update_time)
+    @success = "Yay! Customers Updated"
+    render 'update'
   end
 
   def update_orders
-    Order.new.update_from_api(@update_time)
+    update_time = Revision.order("created_at").last.next_update_time.iso8601
+
+    Order.new.update_from_api(update_time)
+    @success = "Yay! Orders Updated"
+    render 'update'
   end
 
   def import_from_csv
