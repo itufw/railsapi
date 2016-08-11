@@ -312,3 +312,56 @@ Started GET "/assets/application.self-89655ea40500a342dad2ac571974c28abab3e3897c
 [1720] - Goodbye!
 >>>>>>> c8efb0f3ded7b605cf8a4a67980058c2682fc2df
 Exiting
+=== puma startup: 2016-08-11 11:50:28 +1000 ===
+[1845] * Starting control server on unix:///var/folders/rh/jjhmp__n6_x9ym0dln7yflhw0000gn/T/puma-status-1470880228810-1845
+[1845] - Worker 0 (pid: 1846) booted, phase: 0
+
+
+Started GET "/" for ::1 at 2016-08-11 11:50:31 +1000
+  [1m[36mActiveRecord::SchemaMigration Load (187.8ms)[0m  [1mSELECT `schema_migrations`.* FROM `schema_migrations`[0m
+Processing by SalesController#view_sales_dashboard as HTML
+  [1m[35m (373.6ms)[0m  SELECT SUM(`orders`.`total_inc_tax`) AS sum_total_inc_tax, DATE(date_created) AS date_date_created FROM `orders` LEFT OUTER JOIN `statuses` ON `statuses`.`id` = `orders`.`status_id` WHERE (date_created >= '2016-08-08 00:00:00' and date_created < '2016-08-14 00:00:00' and statuses.valid_order = 1) GROUP BY DATE(date_created)
+  [1m[36m (242.9ms)[0m  [1mSELECT SUM(orders.total_inc_tax) AS sum_orders_total_inc_tax, customers.staff_id AS customers_staff_id, DATE(orders.date_created) AS date_orders_date_created FROM `orders` LEFT OUTER JOIN `customers` ON `customers`.`id` = `orders`.`customer_id` LEFT OUTER JOIN `statuses` ON `statuses`.`id` = `orders`.`status_id` WHERE (orders.date_created >= '2016-08-08 00:00:00' and orders.date_created < '2016-08-14 00:00:00' and statuses.valid_order = 1) GROUP BY customers.staff_id, DATE(orders.date_created)[0m
+  [1m[35mStaff Load (188.5ms)[0m  SELECT `staffs`.* FROM `staffs` WHERE (active = 1 and user_type LIKE "Sales%")
+  [1m[36m (226.1ms)[0m  [1mSELECT SUM(`orders`.`total_inc_tax`) AS sum_total_inc_tax, DATE(date_created) AS date_date_created FROM `orders` LEFT OUTER JOIN `statuses` ON `statuses`.`id` = `orders`.`status_id` WHERE (date_created >= '2016-08-01 00:00:00' and date_created < '2016-08-07 00:00:00' and statuses.valid_order = 1) GROUP BY DATE(date_created)[0m
+  Rendered sales/view_sales_dashboard.html.erb within layouts/application (93.5ms)
+Completed 200 OK in 3656ms (Views: 465.9ms | ActiveRecord: 3031.2ms)
+
+
+Started GET "/admin/update" for ::1 at 2016-08-11 11:50:43 +1000
+Processing by AdminController#update as HTML
+  Rendered admin/update.html.erb within layouts/application (1.1ms)
+Completed 200 OK in 26ms (Views: 25.8ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/admin/update_products" for ::1 at 2016-08-11 11:50:44 +1000
+Processing by AdminController#update_products as HTML
+  [1m[35mRevision Load (187.7ms)[0m  SELECT  `revisions`.* FROM `revisions`  ORDER BY created_at DESC LIMIT 1
+  [1m[36m (187.5ms)[0m  [1mSELECT COUNT(*) FROM `products` WHERE `products`.`id` = 758[0m
+  [1m[35m (198.6ms)[0m  UPDATE products SET inventory = '92' WHERE id = '758'
+  [1m[36m (187.0ms)[0m  [1mSELECT COUNT(*) FROM `products` WHERE `products`.`id` = 1885[0m
+  [1m[35m (190.5ms)[0m  UPDATE products SET inventory = '0' WHERE id = '1885'
+  [1m[36m (187.1ms)[0m  [1mSELECT COUNT(*) FROM `products` WHERE `products`.`id` = 2060[0m
+  [1m[35m (192.0ms)[0m  UPDATE products SET inventory = '108' WHERE id = '2060'
+  [1m[36m (187.2ms)[0m  [1mSELECT COUNT(*) FROM `products` WHERE `products`.`id` = 2088[0m
+  [1m[35m (191.9ms)[0m  UPDATE products SET inventory = '48' WHERE id = '2088'
+  [1m[36m (187.2ms)[0m  [1mSELECT COUNT(*) FROM `products` WHERE `products`.`id` = 2244[0m
+  [1m[35m (401.6ms)[0m  UPDATE products SET inventory = '144' WHERE id = '2244'
+  [1m[36m (186.9ms)[0m  [1mSELECT COUNT(*) FROM `products` WHERE `products`.`id` = 2260[0m
+  [1m[35m (314.8ms)[0m  UPDATE products SET inventory = '354' WHERE id = '2260'
+  [1m[36m (188.2ms)[0m  [1mSELECT COUNT(*) FROM `products` WHERE `products`.`id` = 2376[0m
+  [1m[35m (190.7ms)[0m  UPDATE products SET inventory = '79' WHERE id = '2376'
+  [1m[36m (187.5ms)[0m  [1mSELECT COUNT(*) FROM `products` WHERE `products`.`id` = 2378[0m
+  [1m[35m (343.7ms)[0m  UPDATE products SET inventory = '183' WHERE id = '2378'
+  [1m[36m (187.6ms)[0m  [1mSELECT COUNT(*) FROM `products` WHERE `products`.`id` = 2429[0m
+  [1m[35m (287.8ms)[0m  UPDATE products SET inventory = '238' WHERE id = '2429'
+  [1m[36m (187.2ms)[0m  [1mSELECT COUNT(*) FROM `products` WHERE `products`.`id` = 2446[0m
+  [1m[35m (803.1ms)[0m  UPDATE products SET inventory = '673' WHERE id = '2446'
+  [1m[36m (187.0ms)[0m  [1mSELECT COUNT(*) FROM `products` WHERE `products`.`id` = 2592[0m
+  [1m[35m (457.2ms)[0m  UPDATE products SET inventory = '162' WHERE id = '2592'
+  Rendered admin/update.html.erb within layouts/application (1.8ms)
+Completed 200 OK in 10123ms (Views: 52.7ms | ActiveRecord: 6621.5ms)
+[1845] - Gracefully shutting down workers...
+[1845] === puma shutdown: 2016-08-11 11:50:59 +1000 ===
+[1845] - Goodbye!
+Exiting
