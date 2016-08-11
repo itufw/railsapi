@@ -46,24 +46,24 @@ class AdminController < ApplicationController
     update_time = Revision.order("created_at").last.next_update_time.iso8601
     Revision.new.insert
     Product.new.update_from_api(update_time)
-    @success = "Yay! Products Updated"
-    render 'update'
+    #@success = "Yay! Products Updated"
+    #render 'update'
   end
 
   def update_customers
     update_time = Revision.order("created_at").last.next_update_time.iso8601
 
     Customer.new.update_from_api(update_time)
-    @success = "Yay! Customers Updated"
-    render 'update'
+    #@success = "Yay! Customers Updated"
+    #render 'update'
   end
 
   def update_orders
     update_time = Revision.order("created_at").last.next_update_time.iso8601
 
     Order.new.update_from_api(update_time)
-    @success = "Yay! Orders Updated"
-    render 'update'
+    #@success = "Yay! Orders Updated"
+    #render 'update'
   end
 
   def import_from_csv
