@@ -77,3 +77,6 @@ Completed 200 OK in 1160ms (Views: 103.0ms | ActiveRecord: 1045.2ms)
 [1600] === puma shutdown: 2016-08-11 11:09:50 +1000 ===
 [1600] - Goodbye!
 Exiting
+=== puma startup: 2016-08-11 01:12:40 +0000 ===
+[29275] * Starting control server on unix:///tmp/puma-status-1470877960839-29275
+[29275] - Worker 0 (pid: 29323) booted, phase: 0
