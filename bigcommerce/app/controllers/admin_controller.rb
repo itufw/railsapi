@@ -35,26 +35,32 @@ class AdminController < ApplicationController
     @update_time = Revision.order("created_at").last.next_update_time.iso8601
     #update_time = "2016-07-18T00:00:00Z"
     Time.zone = "GMT"
-    start_time = Time.current
-    update_products
+    @start_time = Time.current
     #models_update = [Customer.new, Order.new]
 
     # models_update.each do |m|
     #    m.update(update_time)
     # end
-    Revision.new.insert("", start_time)
+    #Revision.new.insert("", start_time)
   end
 
   def update_products
     Product.new.update_from_api(@update_time)
+    @success = "Yay!"
+    render 'update'
   end
 
   def update_customers
     Customer.new.update_from_api(@update_time)
+    @success = "Yay!"
+    render 'update'
   end
 
   def update_orders
     Order.new.update_from_api(@update_time)
+    Revision.new.insert("", @start_time)
+    @success = "Yay!"
+    render 'update'
   end
 
   def import_from_csv
