@@ -80,10 +80,235 @@ Exiting
 === puma startup: 2016-08-11 01:12:40 +0000 ===
 [29275] * Starting control server on unix:///tmp/puma-status-1470877960839-29275
 [29275] - Worker 0 (pid: 29323) booted, phase: 0
+<<<<<<< HEAD
 === puma startup: 2016-08-11 01:17:36 +0000 ===
 [29396] * Starting control server on unix:///tmp/puma-status-1470878256520-29396
 [29396] - Worker 0 (pid: 29440) booted, phase: 0
 [29396] - Gracefully shutting down workers...
 [29396] === puma shutdown: 2016-08-11 01:18:03 +0000 ===
 [29396] - Goodbye!
+=======
+=== puma startup: 2016-08-11 11:18:14 +1000 ===
+[1697] * Starting control server on unix:///var/folders/rh/jjhmp__n6_x9ym0dln7yflhw0000gn/T/puma-status-1470878294216-1697
+[1697] - Worker 0 (pid: 1698) booted, phase: 0
+
+
+Started GET "/" for ::1 at 2016-08-11 11:18:16 +1000
+  [1m[36mActiveRecord::SchemaMigration Load (192.7ms)[0m  [1mSELECT `schema_migrations`.* FROM `schema_migrations`[0m
+Processing by SalesController#view_sales_dashboard as HTML
+  [1m[35m (234.6ms)[0m  SELECT SUM(`orders`.`total_inc_tax`) AS sum_total_inc_tax, DATE(date_created) AS date_date_created FROM `orders` LEFT OUTER JOIN `statuses` ON `statuses`.`id` = `orders`.`status_id` WHERE (date_created >= '2016-08-08 00:00:00' and date_created < '2016-08-14 00:00:00' and statuses.valid_order = 1) GROUP BY DATE(date_created)
+  [1m[36m (294.2ms)[0m  [1mSELECT SUM(orders.total_inc_tax) AS sum_orders_total_inc_tax, customers.staff_id AS customers_staff_id, DATE(orders.date_created) AS date_orders_date_created FROM `orders` LEFT OUTER JOIN `customers` ON `customers`.`id` = `orders`.`customer_id` LEFT OUTER JOIN `statuses` ON `statuses`.`id` = `orders`.`status_id` WHERE (orders.date_created >= '2016-08-08 00:00:00' and orders.date_created < '2016-08-14 00:00:00' and statuses.valid_order = 1) GROUP BY customers.staff_id, DATE(orders.date_created)[0m
+  [1m[35mStaff Load (193.2ms)[0m  SELECT `staffs`.* FROM `staffs` WHERE (active = 1 and user_type LIKE "Sales%")
+  [1m[36m (310.0ms)[0m  [1mSELECT SUM(`orders`.`total_inc_tax`) AS sum_total_inc_tax, DATE(date_created) AS date_date_created FROM `orders` LEFT OUTER JOIN `statuses` ON `statuses`.`id` = `orders`.`status_id` WHERE (date_created >= '2016-08-01 00:00:00' and date_created < '2016-08-07 00:00:00' and statuses.valid_order = 1) GROUP BY DATE(date_created)[0m
+  Rendered sales/view_sales_dashboard.html.erb within layouts/application (73.6ms)
+Completed 200 OK in 3392ms (Views: 439.3ms | ActiveRecord: 2798.4ms)
+
+
+Started GET "/assets/access.self-8ab0e073da5be0298bb05e7877a65af5193d0a6c26c2d2bb3cad84f792e2827a.css?body=1" for ::1 at 2016-08-11 11:18:21 +1000
+
+
+Started GET "/assets/admin.self-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css?body=1" for ::1 at 2016-08-11 11:18:21 +1000
+
+
+Started GET "/assets/models.self-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css?body=1" for ::1 at 2016-08-11 11:18:22 +1000
+
+
+Started GET "/assets/sales.self-39b9a982f5283081789c5f8b1c04150dc6f0b7c9e721049b52111fd1c02d3d03.css?body=1" for ::1 at 2016-08-11 11:18:22 +1000
+
+
+Started GET "/assets/application.self-c4991312985bccd133f1f21ab2f6a5d0129a8416a91037313b14f05d7d2e7dde.css?body=1" for ::1 at 2016-08-11 11:18:22 +1000
+
+
+Started GET "/assets/turbolinks.self-c37727e9bd6b2735da5c311aa83fead54ed0be6cc8bd9a65309e9c5abe2cbfff.js?body=1" for ::1 at 2016-08-11 11:18:23 +1000
+
+
+Started GET "/assets/access.self-877aef30ae1b040ab8a3aba4e3e309a11d7f2612f44dde450b5c157aa5f95c05.js?body=1" for ::1 at 2016-08-11 11:18:23 +1000
+
+
+Started GET "/assets/admin.self-877aef30ae1b040ab8a3aba4e3e309a11d7f2612f44dde450b5c157aa5f95c05.js?body=1" for ::1 at 2016-08-11 11:18:23 +1000
+
+
+Started GET "/assets/expand.self-75f5225e794f40279045a4172c3052e25114714eccd720e738ff4906b5e0839e.js?body=1" for ::1 at 2016-08-11 11:18:24 +1000
+
+
+Started GET "/assets/models.self-877aef30ae1b040ab8a3aba4e3e309a11d7f2612f44dde450b5c157aa5f95c05.js?body=1" for ::1 at 2016-08-11 11:18:24 +1000
+
+
+Started GET "/assets/sales.self-877aef30ae1b040ab8a3aba4e3e309a11d7f2612f44dde450b5c157aa5f95c05.js?body=1" for ::1 at 2016-08-11 11:18:24 +1000
+
+
+Started GET "/assets/session.self-877aef30ae1b040ab8a3aba4e3e309a11d7f2612f44dde450b5c157aa5f95c05.js?body=1" for ::1 at 2016-08-11 11:18:24 +1000
+
+
+Started GET "/assets/application.self-89655ea40500a342dad2ac571974c28abab3e3897c63fef4c2d06d7564836879.js?body=1" for ::1 at 2016-08-11 11:18:25 +1000
+
+
+Started GET "/admin/update" for ::1 at 2016-08-11 11:18:34 +1000
+Processing by AdminController#update as HTML
+  [1m[35mRevision Load (274.1ms)[0m  SELECT  `revisions`.* FROM `revisions`  ORDER BY created_at DESC LIMIT 1
+  Rendered admin/update.html.erb within layouts/application (1.3ms)
+Completed 200 OK in 709ms (Views: 34.6ms | ActiveRecord: 661.6ms)
+
+
+Started GET "/admin/update" for ::1 at 2016-08-11 11:18:50 +1000
+Processing by AdminController#update as HTML
+  [1m[36mRevision Load (193.0ms)[0m  [1mSELECT  `revisions`.* FROM `revisions`  ORDER BY created_at DESC LIMIT 1[0m
+  Rendered admin/update.html.erb within layouts/application (1.1ms)
+Completed 200 OK in 228ms (Views: 32.9ms | ActiveRecord: 193.0ms)
+
+
+Started GET "/assets/access.self-8ab0e073da5be0298bb05e7877a65af5193d0a6c26c2d2bb3cad84f792e2827a.css?body=1" for ::1 at 2016-08-11 11:18:50 +1000
+
+
+Started GET "/assets/models.self-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css?body=1" for ::1 at 2016-08-11 11:18:50 +1000
+
+
+Started GET "/assets/application.self-c4991312985bccd133f1f21ab2f6a5d0129a8416a91037313b14f05d7d2e7dde.css?body=1" for ::1 at 2016-08-11 11:18:51 +1000
+
+
+Started GET "/assets/admin.self-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css?body=1" for ::1 at 2016-08-11 11:18:51 +1000
+
+
+Started GET "/assets/sales.self-39b9a982f5283081789c5f8b1c04150dc6f0b7c9e721049b52111fd1c02d3d03.css?body=1" for ::1 at 2016-08-11 11:18:52 +1000
+
+
+Started GET "/assets/turbolinks.self-c37727e9bd6b2735da5c311aa83fead54ed0be6cc8bd9a65309e9c5abe2cbfff.js?body=1" for ::1 at 2016-08-11 11:18:52 +1000
+
+
+Started GET "/assets/access.self-877aef30ae1b040ab8a3aba4e3e309a11d7f2612f44dde450b5c157aa5f95c05.js?body=1" for ::1 at 2016-08-11 11:18:52 +1000
+
+
+Started GET "/assets/admin.self-877aef30ae1b040ab8a3aba4e3e309a11d7f2612f44dde450b5c157aa5f95c05.js?body=1" for ::1 at 2016-08-11 11:18:53 +1000
+
+
+Started GET "/assets/expand.self-75f5225e794f40279045a4172c3052e25114714eccd720e738ff4906b5e0839e.js?body=1" for ::1 at 2016-08-11 11:18:53 +1000
+
+
+Started GET "/assets/models.self-877aef30ae1b040ab8a3aba4e3e309a11d7f2612f44dde450b5c157aa5f95c05.js?body=1" for ::1 at 2016-08-11 11:18:53 +1000
+
+
+Started GET "/assets/sales.self-877aef30ae1b040ab8a3aba4e3e309a11d7f2612f44dde450b5c157aa5f95c05.js?body=1" for ::1 at 2016-08-11 11:18:54 +1000
+
+
+Started GET "/assets/session.self-877aef30ae1b040ab8a3aba4e3e309a11d7f2612f44dde450b5c157aa5f95c05.js?body=1" for ::1 at 2016-08-11 11:18:54 +1000
+
+
+Started GET "/assets/application.self-89655ea40500a342dad2ac571974c28abab3e3897c63fef4c2d06d7564836879.js?body=1" for ::1 at 2016-08-11 11:18:54 +1000
+[1697] - Gracefully shutting down workers...
+[1697] === puma shutdown: 2016-08-11 11:19:02 +1000 ===
+[1697] - Goodbye!
+Exiting
+=== puma startup: 2016-08-11 11:19:53 +1000 ===
+[1720] * Starting control server on unix:///var/folders/rh/jjhmp__n6_x9ym0dln7yflhw0000gn/T/puma-status-1470878393194-1720
+[1720] - Worker 0 (pid: 1721) booted, phase: 0
+
+
+Started GET "/admin/update_products" for ::1 at 2016-08-11 11:19:55 +1000
+  [1m[36mActiveRecord::SchemaMigration Load (188.6ms)[0m  [1mSELECT `schema_migrations`.* FROM `schema_migrations`[0m
+Processing by AdminController#update_products as HTML
+Completed 500 Internal Server Error in 2422ms (ActiveRecord: 589.0ms)
+
+Bigcommerce::BadRequest ([{"status":400,"message":"The field 'min_date_modified' is invalid.","details":{"invalid_reason":"The provided value '' is not a valid RFC-2822 or ISO-8601 date."}}]):
+  app/models/product.rb:118:in `update_from_api'
+  app/controllers/admin_controller.rb:48:in `update_products'
+
+
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/actionpack-4.2.4/lib/action_dispatch/middleware/templates/rescues/_source.erb (7.5ms)
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/actionpack-4.2.4/lib/action_dispatch/middleware/templates/rescues/_trace.html.erb (6.4ms)
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/actionpack-4.2.4/lib/action_dispatch/middleware/templates/rescues/_request_and_response.html.erb (1.1ms)
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/actionpack-4.2.4/lib/action_dispatch/middleware/templates/rescues/diagnostics.html.erb within rescues/layout (85.2ms)
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/web-console-2.3.0/lib/web_console/templates/_markup.html.erb (0.6ms)
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/web-console-2.3.0/lib/web_console/templates/_inner_console_markup.html.erb within layouts/inlined_string (0.5ms)
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/web-console-2.3.0/lib/web_console/templates/_prompt_box_markup.html.erb within layouts/inlined_string (3.3ms)
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/web-console-2.3.0/lib/web_console/templates/style.css.erb within layouts/inlined_string (0.4ms)
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/web-console-2.3.0/lib/web_console/templates/console.js.erb within layouts/javascript (76.0ms)
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/web-console-2.3.0/lib/web_console/templates/main.js.erb within layouts/javascript (0.6ms)
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/web-console-2.3.0/lib/web_console/templates/error_page.js.erb within layouts/javascript (0.5ms)
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/web-console-2.3.0/lib/web_console/templates/index.html.erb (157.7ms)
+
+
+Started GET "/admin/update_products" for ::1 at 2016-08-11 11:20:00 +1000
+Processing by AdminController#update_products as HTML
+Completed 500 Internal Server Error in 951ms (ActiveRecord: 0.0ms)
+
+Bigcommerce::BadRequest ([{"status":400,"message":"The field 'min_date_modified' is invalid.","details":{"invalid_reason":"The provided value '' is not a valid RFC-2822 or ISO-8601 date."}}]):
+  app/models/product.rb:118:in `update_from_api'
+  app/controllers/admin_controller.rb:48:in `update_products'
+
+
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/actionpack-4.2.4/lib/action_dispatch/middleware/templates/rescues/_source.erb (6.7ms)
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/actionpack-4.2.4/lib/action_dispatch/middleware/templates/rescues/_trace.html.erb (3.6ms)
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/actionpack-4.2.4/lib/action_dispatch/middleware/templates/rescues/_request_and_response.html.erb (0.9ms)
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/actionpack-4.2.4/lib/action_dispatch/middleware/templates/rescues/diagnostics.html.erb within rescues/layout (69.1ms)
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/web-console-2.3.0/lib/web_console/templates/_markup.html.erb (0.3ms)
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/web-console-2.3.0/lib/web_console/templates/_inner_console_markup.html.erb within layouts/inlined_string (0.4ms)
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/web-console-2.3.0/lib/web_console/templates/_prompt_box_markup.html.erb within layouts/inlined_string (0.4ms)
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/web-console-2.3.0/lib/web_console/templates/style.css.erb within layouts/inlined_string (0.4ms)
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/web-console-2.3.0/lib/web_console/templates/console.js.erb within layouts/javascript (58.0ms)
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/web-console-2.3.0/lib/web_console/templates/main.js.erb within layouts/javascript (0.3ms)
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/web-console-2.3.0/lib/web_console/templates/error_page.js.erb within layouts/javascript (0.5ms)
+  Rendered /Users/hinammehra/.rvm/gems/ruby-2.3.0/gems/web-console-2.3.0/lib/web_console/templates/index.html.erb (121.9ms)
+
+
+Started GET "/admin/update" for ::1 at 2016-08-11 11:27:41 +1000
+Processing by AdminController#update as HTML
+  [1m[35mRevision Load (336.8ms)[0m  SELECT  `revisions`.* FROM `revisions`  ORDER BY created_at DESC LIMIT 1
+  Rendered admin/update.html.erb (2.0ms)
+Completed 200 OK in 921ms (Views: 5.9ms | ActiveRecord: 901.0ms)
+
+
+Started GET "/admin/update" for ::1 at 2016-08-11 11:27:45 +1000
+Processing by AdminController#update as HTML
+  [1m[36mRevision Load (187.2ms)[0m  [1mSELECT  `revisions`.* FROM `revisions`  ORDER BY created_at DESC LIMIT 1[0m
+  Rendered admin/update.html.erb (1.6ms)
+Completed 200 OK in 195ms (Views: 4.4ms | ActiveRecord: 187.2ms)
+
+
+Started GET "/admin/update" for ::1 at 2016-08-11 11:28:09 +1000
+Processing by AdminController#update as HTML
+  Rendered admin/update.html.erb within layouts/application (1.1ms)
+Completed 200 OK in 318ms (Views: 317.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/assets/access.self-8ab0e073da5be0298bb05e7877a65af5193d0a6c26c2d2bb3cad84f792e2827a.css?body=1" for ::1 at 2016-08-11 11:28:11 +1000
+
+
+Started GET "/assets/admin.self-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css?body=1" for ::1 at 2016-08-11 11:28:12 +1000
+
+
+Started GET "/assets/models.self-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css?body=1" for ::1 at 2016-08-11 11:28:12 +1000
+
+
+Started GET "/assets/sales.self-39b9a982f5283081789c5f8b1c04150dc6f0b7c9e721049b52111fd1c02d3d03.css?body=1" for ::1 at 2016-08-11 11:28:13 +1000
+
+
+Started GET "/assets/application.self-c4991312985bccd133f1f21ab2f6a5d0129a8416a91037313b14f05d7d2e7dde.css?body=1" for ::1 at 2016-08-11 11:28:13 +1000
+
+
+Started GET "/assets/turbolinks.self-c37727e9bd6b2735da5c311aa83fead54ed0be6cc8bd9a65309e9c5abe2cbfff.js?body=1" for ::1 at 2016-08-11 11:28:13 +1000
+
+
+Started GET "/assets/access.self-877aef30ae1b040ab8a3aba4e3e309a11d7f2612f44dde450b5c157aa5f95c05.js?body=1" for ::1 at 2016-08-11 11:28:13 +1000
+
+
+Started GET "/assets/admin.self-877aef30ae1b040ab8a3aba4e3e309a11d7f2612f44dde450b5c157aa5f95c05.js?body=1" for ::1 at 2016-08-11 11:28:14 +1000
+
+
+Started GET "/assets/expand.self-75f5225e794f40279045a4172c3052e25114714eccd720e738ff4906b5e0839e.js?body=1" for ::1 at 2016-08-11 11:28:14 +1000
+
+
+Started GET "/assets/models.self-877aef30ae1b040ab8a3aba4e3e309a11d7f2612f44dde450b5c157aa5f95c05.js?body=1" for ::1 at 2016-08-11 11:28:14 +1000
+
+
+Started GET "/assets/sales.self-877aef30ae1b040ab8a3aba4e3e309a11d7f2612f44dde450b5c157aa5f95c05.js?body=1" for ::1 at 2016-08-11 11:28:14 +1000
+
+
+Started GET "/assets/session.self-877aef30ae1b040ab8a3aba4e3e309a11d7f2612f44dde450b5c157aa5f95c05.js?body=1" for ::1 at 2016-08-11 11:28:14 +1000
+
+
+Started GET "/assets/application.self-89655ea40500a342dad2ac571974c28abab3e3897c63fef4c2d06d7564836879.js?body=1" for ::1 at 2016-08-11 11:28:15 +1000
+[1720] - Gracefully shutting down workers...
+[1720] === puma shutdown: 2016-08-11 11:30:34 +1000 ===
+[1720] - Goodbye!
+>>>>>>> c8efb0f3ded7b605cf8a4a67980058c2682fc2df
 Exiting
