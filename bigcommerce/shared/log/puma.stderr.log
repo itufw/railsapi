@@ -23595,3 +23595,4 @@
 	from /home/deploy/.rbenv/versions/2.2.3/lib/ruby/gems/2.2.0/gems/bundler-1.12.5/exe/bundle:19:in `<top (required)>'
 	from /home/deploy/.rbenv/versions/2.2.3/bin/bundle:23:in `load'
 	from /home/deploy/.rbenv/versions/2.2.3/bin/bundle:23:in `<main>'
+=== puma startup: 2016-08-11 11:09:09 +1000 ===

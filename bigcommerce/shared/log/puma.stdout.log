@@ -7,3 +7,73 @@
 === puma startup: 2016-08-10 05:13:15 +0000 ===
 [14430] * Starting control server on unix:///tmp/puma-status-1470805995845-14430
 [14430] - Worker 0 (pid: 16400) booted, phase: 0
+=== puma startup: 2016-08-11 11:09:09 +1000 ===
+[1600] * Starting control server on unix:///var/folders/rh/jjhmp__n6_x9ym0dln7yflhw0000gn/T/puma-status-1470877749405-1600
+[1600] - Worker 0 (pid: 1601) booted, phase: 0
+
+
+Started GET "/" for ::1 at 2016-08-11 11:09:20 +1000
+  [1m[36mActiveRecord::SchemaMigration Load (192.4ms)[0m  [1mSELECT `schema_migrations`.* FROM `schema_migrations`[0m
+Processing by SalesController#view_sales_dashboard as HTML
+Redirected to http://localhost:3000/access/login
+Filter chain halted as :confirm_logged_in rendered or redirected
+Completed 302 Found in 14ms (ActiveRecord: 0.0ms)
+
+
+Started GET "/" for ::1 at 2016-08-11 11:09:21 +1000
+Processing by SalesController#view_sales_dashboard as HTML
+Redirected to http://localhost:3000/access/login
+Filter chain halted as :confirm_logged_in rendered or redirected
+Completed 302 Found in 1ms (ActiveRecord: 0.0ms)
+
+
+Started GET "/access/login" for ::1 at 2016-08-11 11:09:22 +1000
+Processing by AccessController#login as HTML
+  Rendered access/login.html.erb within layouts/login (9999.1ms)
+Completed 200 OK in 10087ms (Views: 10086.4ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/assets/access.self-8ab0e073da5be0298bb05e7877a65af5193d0a6c26c2d2bb3cad84f792e2827a.css?body=1" for ::1 at 2016-08-11 11:09:32 +1000
+
+
+Started GET "/assets/sales.self-39b9a982f5283081789c5f8b1c04150dc6f0b7c9e721049b52111fd1c02d3d03.css?body=1" for ::1 at 2016-08-11 11:09:32 +1000
+
+
+Started POST "/access/attempt_login" for ::1 at 2016-08-11 11:09:41 +1000
+Processing by AccessController#attempt_login as HTML
+  Parameters: {"utf8"=>"✓", "authenticity_token"=>"B2VCaLG55YYTirbvOIJbZJdjDTEyiyWM/kE6J7r+fOYlJSabhTWPyiaj5/xsjLGh9F2vwcKBNKjpssYx1OWwbg==", "username"=>"it@untappedwines.com", "password"=>"[FILTERED]", "commit"=>"Log In"}
+  [1m[35mStaff Load (192.0ms)[0m  SELECT  `staffs`.* FROM `staffs` WHERE `staffs`.`logon_details` = 'it@untappedwines.com'  ORDER BY `staffs`.`id` ASC LIMIT 1
+Redirected to http://localhost:3000/sales/view_sales_dashboard
+Completed 302 Found in 987ms (ActiveRecord: 836.9ms)
+
+
+Started GET "/sales/view_sales_dashboard" for ::1 at 2016-08-11 11:09:42 +1000
+Processing by SalesController#view_sales_dashboard as HTML
+  [1m[36m (237.1ms)[0m  [1mSELECT SUM(`orders`.`total_inc_tax`) AS sum_total_inc_tax, DATE(date_created) AS date_date_created FROM `orders` LEFT OUTER JOIN `statuses` ON `statuses`.`id` = `orders`.`status_id` WHERE (date_created >= '2016-08-08 00:00:00' and date_created < '2016-08-14 00:00:00' and statuses.valid_order = 1) GROUP BY DATE(date_created)[0m
+  [1m[35m (262.1ms)[0m  SELECT SUM(orders.total_inc_tax) AS sum_orders_total_inc_tax, customers.staff_id AS customers_staff_id, DATE(orders.date_created) AS date_orders_date_created FROM `orders` LEFT OUTER JOIN `customers` ON `customers`.`id` = `orders`.`customer_id` LEFT OUTER JOIN `statuses` ON `statuses`.`id` = `orders`.`status_id` WHERE (orders.date_created >= '2016-08-08 00:00:00' and orders.date_created < '2016-08-14 00:00:00' and statuses.valid_order = 1) GROUP BY customers.staff_id, DATE(orders.date_created)
+  [1m[36mStaff Load (192.4ms)[0m  [1mSELECT `staffs`.* FROM `staffs` WHERE (active = 1 and user_type LIKE "Sales%")[0m
+  [1m[35m (232.5ms)[0m  SELECT SUM(`orders`.`total_inc_tax`) AS sum_total_inc_tax, DATE(date_created) AS date_date_created FROM `orders` LEFT OUTER JOIN `statuses` ON `statuses`.`id` = `orders`.`status_id` WHERE (date_created >= '2016-08-01 00:00:00' and date_created < '2016-08-07 00:00:00' and statuses.valid_order = 1) GROUP BY DATE(date_created)
+  Rendered sales/view_sales_dashboard.html.erb within layouts/application (67.4ms)
+Completed 200 OK in 2078ms (Views: 104.5ms | ActiveRecord: 1809.5ms)
+
+
+Started POST "/access/attempt_login" for ::1 at 2016-08-11 11:09:45 +1000
+Processing by AccessController#attempt_login as HTML
+  Parameters: {"utf8"=>"✓", "authenticity_token"=>"B2VCaLG55YYTirbvOIJbZJdjDTEyiyWM/kE6J7r+fOYlJSabhTWPyiaj5/xsjLGh9F2vwcKBNKjpssYx1OWwbg==", "username"=>"it@untappedwines.com", "password"=>"[FILTERED]", "commit"=>"Log In"}
+  [1m[36mStaff Load (192.0ms)[0m  [1mSELECT  `staffs`.* FROM `staffs` WHERE `staffs`.`logon_details` = 'it@untappedwines.com'  ORDER BY `staffs`.`id` ASC LIMIT 1[0m
+Redirected to http://localhost:3000/sales/view_sales_dashboard
+Completed 302 Found in 295ms (ActiveRecord: 192.0ms)
+
+
+Started GET "/sales/view_sales_dashboard" for ::1 at 2016-08-11 11:09:45 +1000
+Processing by SalesController#view_sales_dashboard as HTML
+  [1m[35m (301.2ms)[0m  SELECT SUM(`orders`.`total_inc_tax`) AS sum_total_inc_tax, DATE(date_created) AS date_date_created FROM `orders` LEFT OUTER JOIN `statuses` ON `statuses`.`id` = `orders`.`status_id` WHERE (date_created >= '2016-08-08 00:00:00' and date_created < '2016-08-14 00:00:00' and statuses.valid_order = 1) GROUP BY DATE(date_created)
+  [1m[36m (305.9ms)[0m  [1mSELECT SUM(orders.total_inc_tax) AS sum_orders_total_inc_tax, customers.staff_id AS customers_staff_id, DATE(orders.date_created) AS date_orders_date_created FROM `orders` LEFT OUTER JOIN `customers` ON `customers`.`id` = `orders`.`customer_id` LEFT OUTER JOIN `statuses` ON `statuses`.`id` = `orders`.`status_id` WHERE (orders.date_created >= '2016-08-08 00:00:00' and orders.date_created < '2016-08-14 00:00:00' and statuses.valid_order = 1) GROUP BY customers.staff_id, DATE(orders.date_created)[0m
+  [1m[35mStaff Load (193.3ms)[0m  SELECT `staffs`.* FROM `staffs` WHERE (active = 1 and user_type LIKE "Sales%")
+  [1m[36m (244.7ms)[0m  [1mSELECT SUM(`orders`.`total_inc_tax`) AS sum_total_inc_tax, DATE(date_created) AS date_date_created FROM `orders` LEFT OUTER JOIN `statuses` ON `statuses`.`id` = `orders`.`status_id` WHERE (date_created >= '2016-08-01 00:00:00' and date_created < '2016-08-07 00:00:00' and statuses.valid_order = 1) GROUP BY DATE(date_created)[0m
+  Rendered sales/view_sales_dashboard.html.erb within layouts/application (67.1ms)
+Completed 200 OK in 1160ms (Views: 103.0ms | ActiveRecord: 1045.2ms)
+[1600] - Gracefully shutting down workers...
+[1600] === puma shutdown: 2016-08-11 11:09:50 +1000 ===
+[1600] - Goodbye!
+Exiting
