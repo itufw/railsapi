@@ -26,7 +26,7 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  #database: untappe7_bigcommerce
+  database: apidata
 
 # As with config/secrets.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -49,12 +49,6 @@ test:
 #
 production:
   #<<: *default
-  adapter: mysql2
-  encoding: utf8
-  pool: 5
-  username: untappe7_hinam
-  password: H123occult!!
-  host: 192.163.204.51
-  database: untappe7_bigcommerce
-  username: untappe7_hinam
-  password: <%= ENV['BIGCOMMERCEAPI_DATABASE_PASSWORD'] %>
+  database: apidata
+  username: website
+  password: <%= ENV['API_DATABASE_PASSWORD'] %>
