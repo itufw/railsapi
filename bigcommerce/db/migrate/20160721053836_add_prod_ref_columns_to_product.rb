@@ -12,7 +12,7 @@ class AddProdRefColumnsToProduct < ActiveRecord::Migration
   	add_column :products, :vintage, :string
   	add_column :products, :order_1, :integer
   	add_column :products, :order_2, :integer
-  	add_column :products, :combined_order, :decimal
+  	add_column :products, :combined_order, :decimal, scale: 2, precision: 6
   	add_column :products, :portfolio_region, :string
   	add_column :products, :case_size, :integer, limit: 2
   	add_column :products, :price_id, :string
