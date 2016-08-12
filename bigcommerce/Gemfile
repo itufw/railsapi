@@ -64,7 +64,6 @@ group :development do
 
 end
 
-gem 'puma'
 gem 'whenever', :require => false
 
 gem 'xeroizer'
