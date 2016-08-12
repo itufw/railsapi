@@ -87,11 +87,11 @@ ActiveRecord::Schema.define(version: 20160729025219) do
     t.integer  "cust_store_id",           limit: 4
     t.datetime "date_created"
     t.datetime "date_modified"
-    t.decimal  "store_credit",                          precision: 20, scale: 2
+    t.decimal  "store_credit",                          precision: 6, scale: 2
     t.text     "registration_ip_address", limit: 255
     t.text     "notes",                   limit: 65535
-    t.datetime "created_at",                                                     null: false
-    t.datetime "updated_at",                                                     null: false
+    t.datetime "created_at",                                                    null: false
+    t.datetime "updated_at",                                                    null: false
     t.integer  "cust_style_id",           limit: 4
     t.string   "region",                  limit: 255
   end
@@ -117,41 +117,41 @@ ActiveRecord::Schema.define(version: 20160729025219) do
   end
 
   create_table "order_histories", force: :cascade do |t|
-    t.integer  "order_id",                   limit: 4,                              null: false
+    t.integer  "order_id",                   limit: 4,                             null: false
     t.datetime "date_created"
-    t.integer  "customer_id",                limit: 4,                              null: false
-    t.integer  "status_id",                  limit: 4,                              null: false
+    t.integer  "customer_id",                limit: 4,                             null: false
+    t.integer  "status_id",                  limit: 4,                             null: false
     t.integer  "staff_id",                   limit: 4
-    t.decimal  "total_inc_tax",                            precision: 20, scale: 2
-    t.decimal  "refunded_amount",                          precision: 20, scale: 2
-    t.integer  "qty",                        limit: 3,                              null: false
+    t.decimal  "total_inc_tax",                            precision: 6, scale: 2
+    t.decimal  "refunded_amount",                          precision: 6, scale: 2
+    t.integer  "qty",                        limit: 3,                             null: false
     t.integer  "items_shipped",              limit: 3
     t.text     "staff_notes",                limit: 65535
     t.text     "customer_notes",             limit: 65535
     t.integer  "billing_address_id",         limit: 4
     t.integer  "coupon_id",                  limit: 4
     t.text     "payment_method",             limit: 255
-    t.decimal  "discount_amount",                          precision: 20, scale: 2
-    t.decimal  "coupon_discount",                          precision: 20, scale: 2
-    t.decimal  "subtotal_ex_tax",                          precision: 20, scale: 2
-    t.decimal  "subtotal_inc_tax",                         precision: 20, scale: 2
-    t.decimal  "subtotal_tax",                             precision: 20, scale: 2
-    t.decimal  "total_ex_tax",                             precision: 20, scale: 2
-    t.decimal  "total_tax",                                precision: 20, scale: 2
-    t.decimal  "base_shipping_cost",                       precision: 20, scale: 2
-    t.decimal  "shipping_cost_ex_tax",                     precision: 20, scale: 2
-    t.decimal  "shipping_cost_inc_tax",                    precision: 20, scale: 2
-    t.decimal  "shipping_cost_tax",                        precision: 20, scale: 2
-    t.decimal  "base_handling_cost",                       precision: 20, scale: 2
-    t.decimal  "handling_cost_ex_tax",                     precision: 20, scale: 2
-    t.decimal  "handling_cost_inc_tax",                    precision: 20, scale: 2
-    t.decimal  "handling_cost_tax",                        precision: 20, scale: 2
-    t.decimal  "base_wrapping_cost",                       precision: 20, scale: 2
-    t.decimal  "wrapping_cost_ex_tax",                     precision: 20, scale: 2
-    t.decimal  "wrapping_cost_inc_tax",                    precision: 20, scale: 2
-    t.decimal  "wrapping_cost_tax",                        precision: 20, scale: 2
-    t.decimal  "store_credit",                             precision: 20, scale: 2
-    t.decimal  "gift_certificate_amount",                  precision: 20, scale: 2
+    t.decimal  "discount_amount",                          precision: 6, scale: 2
+    t.decimal  "coupon_discount",                          precision: 6, scale: 2
+    t.decimal  "subtotal_ex_tax",                          precision: 6, scale: 2
+    t.decimal  "subtotal_inc_tax",                         precision: 6, scale: 2
+    t.decimal  "subtotal_tax",                             precision: 6, scale: 2
+    t.decimal  "total_ex_tax",                             precision: 6, scale: 2
+    t.decimal  "total_tax",                                precision: 6, scale: 2
+    t.decimal  "base_shipping_cost",                       precision: 6, scale: 2
+    t.decimal  "shipping_cost_ex_tax",                     precision: 6, scale: 2
+    t.decimal  "shipping_cost_inc_tax",                    precision: 6, scale: 2
+    t.decimal  "shipping_cost_tax",                        precision: 6, scale: 2
+    t.decimal  "base_handling_cost",                       precision: 6, scale: 2
+    t.decimal  "handling_cost_ex_tax",                     precision: 6, scale: 2
+    t.decimal  "handling_cost_inc_tax",                    precision: 6, scale: 2
+    t.decimal  "handling_cost_tax",                        precision: 6, scale: 2
+    t.decimal  "base_wrapping_cost",                       precision: 6, scale: 2
+    t.decimal  "wrapping_cost_ex_tax",                     precision: 6, scale: 2
+    t.decimal  "wrapping_cost_inc_tax",                    precision: 6, scale: 2
+    t.decimal  "wrapping_cost_tax",                        precision: 6, scale: 2
+    t.decimal  "store_credit",                             precision: 6, scale: 2
+    t.decimal  "gift_certificate_amount",                  precision: 6, scale: 2
     t.integer  "shipping_cost_tax_class_id", limit: 4
     t.integer  "handling_cost_tax_class_id", limit: 4
     t.integer  "wrapping_cost_tax_class_id", limit: 4
@@ -160,8 +160,8 @@ ActiveRecord::Schema.define(version: 20160729025219) do
     t.text     "order_source",               limit: 255
     t.datetime "date_modified"
     t.datetime "date_shipped"
-    t.datetime "created_at",                                                        null: false
-    t.datetime "updated_at",                                                        null: false
+    t.datetime "created_at",                                                       null: false
+    t.datetime "updated_at",                                                       null: false
   end
 
   add_index "order_histories", ["billing_address_id"], name: "index_order_histories_on_billing_address_id", using: :btree
@@ -172,18 +172,18 @@ ActiveRecord::Schema.define(version: 20160729025219) do
   add_index "order_histories", ["status_id"], name: "index_order_histories_on_status_id", using: :btree
 
   create_table "order_product_histories", force: :cascade do |t|
-    t.integer  "order_history_id",  limit: 4,                          null: false
-    t.integer  "order_id",          limit: 4,                          null: false
-    t.integer  "product_id",        limit: 4,                          null: false
-    t.integer  "order_shipping_id", limit: 4,                          null: false
-    t.integer  "qty",               limit: 3,                          null: false
-    t.integer  "qty_shipped",       limit: 3,                          null: false
-    t.decimal  "base_price",                  precision: 20, scale: 2, null: false
-    t.decimal  "price_ex_tax",                precision: 20, scale: 2, null: false
-    t.decimal  "price_inc_tax",               precision: 20, scale: 2, null: false
-    t.decimal  "price_tax",                   precision: 20, scale: 2, null: false
-    t.datetime "created_at",                                           null: false
-    t.datetime "updated_at",                                           null: false
+    t.integer  "order_history_id",  limit: 4,                         null: false
+    t.integer  "order_id",          limit: 4,                         null: false
+    t.integer  "product_id",        limit: 4,                         null: false
+    t.integer  "order_shipping_id", limit: 4,                         null: false
+    t.integer  "qty",               limit: 3,                         null: false
+    t.integer  "qty_shipped",       limit: 3,                         null: false
+    t.decimal  "base_price",                  precision: 6, scale: 2, null: false
+    t.decimal  "price_ex_tax",                precision: 6, scale: 2, null: false
+    t.decimal  "price_inc_tax",               precision: 6, scale: 2, null: false
+    t.decimal  "price_tax",                   precision: 6, scale: 2, null: false
+    t.datetime "created_at",                                          null: false
+    t.datetime "updated_at",                                          null: false
   end
 
   add_index "order_product_histories", ["order_history_id"], name: "index_order_product_histories_on_order_history_id", using: :btree
@@ -192,17 +192,17 @@ ActiveRecord::Schema.define(version: 20160729025219) do
   add_index "order_product_histories", ["product_id"], name: "index_order_product_histories_on_product_id", using: :btree
 
   create_table "order_products", force: :cascade do |t|
-    t.integer  "order_id",          limit: 4,                          null: false
-    t.integer  "product_id",        limit: 4,                          null: false
-    t.integer  "order_shipping_id", limit: 4,                          null: false
-    t.integer  "qty",               limit: 3,                          null: false
-    t.integer  "qty_shipped",       limit: 3,                          null: false
-    t.decimal  "base_price",                  precision: 20, scale: 2, null: false
-    t.decimal  "price_ex_tax",                precision: 20, scale: 2, null: false
-    t.decimal  "price_inc_tax",               precision: 20, scale: 2, null: false
-    t.decimal  "price_tax",                   precision: 20, scale: 2, null: false
-    t.datetime "created_at",                                           null: false
-    t.datetime "updated_at",                                           null: false
+    t.integer  "order_id",          limit: 4,                         null: false
+    t.integer  "product_id",        limit: 4,                         null: false
+    t.integer  "order_shipping_id", limit: 4,                         null: false
+    t.integer  "qty",               limit: 3,                         null: false
+    t.integer  "qty_shipped",       limit: 3,                         null: false
+    t.decimal  "base_price",                  precision: 6, scale: 2, null: false
+    t.decimal  "price_ex_tax",                precision: 6, scale: 2, null: false
+    t.decimal  "price_inc_tax",               precision: 6, scale: 2, null: false
+    t.decimal  "price_tax",                   precision: 6, scale: 2, null: false
+    t.datetime "created_at",                                          null: false
+    t.datetime "updated_at",                                          null: false
   end
 
   add_index "order_products", ["order_id"], name: "index_order_products_on_order_id", using: :btree
@@ -235,39 +235,39 @@ ActiveRecord::Schema.define(version: 20160729025219) do
 
   create_table "orders", force: :cascade do |t|
     t.datetime "date_created"
-    t.integer  "customer_id",                limit: 4,                              null: false
+    t.integer  "customer_id",                limit: 4,                             null: false
     t.integer  "status_id",                  limit: 4
     t.integer  "staff_id",                   limit: 4
-    t.decimal  "total_inc_tax",                            precision: 20, scale: 2
-    t.decimal  "refunded_amount",                          precision: 20, scale: 2
-    t.integer  "qty",                        limit: 3,                              null: false
+    t.decimal  "total_inc_tax",                            precision: 6, scale: 2
+    t.decimal  "refunded_amount",                          precision: 6, scale: 2
+    t.integer  "qty",                        limit: 3,                             null: false
     t.integer  "items_shipped",              limit: 3
     t.text     "staff_notes",                limit: 65535
     t.text     "customer_notes",             limit: 65535
     t.integer  "billing_address_id",         limit: 4
     t.integer  "coupon_id",                  limit: 4
     t.text     "payment_method",             limit: 255
-    t.decimal  "discount_amount",                          precision: 20, scale: 2
-    t.decimal  "coupon_discount",                          precision: 20, scale: 2
-    t.decimal  "subtotal_ex_tax",                          precision: 20, scale: 2
-    t.decimal  "subtotal_inc_tax",                         precision: 20, scale: 2
-    t.decimal  "subtotal_tax",                             precision: 20, scale: 2
-    t.decimal  "total_ex_tax",                             precision: 20, scale: 2
-    t.decimal  "total_tax",                                precision: 20, scale: 2
-    t.decimal  "base_shipping_cost",                       precision: 20, scale: 2
-    t.decimal  "shipping_cost_ex_tax",                     precision: 20, scale: 2
-    t.decimal  "shipping_cost_inc_tax",                    precision: 20, scale: 2
-    t.decimal  "shipping_cost_tax",                        precision: 20, scale: 2
-    t.decimal  "base_handling_cost",                       precision: 20, scale: 2
-    t.decimal  "handling_cost_ex_tax",                     precision: 20, scale: 2
-    t.decimal  "handling_cost_inc_tax",                    precision: 20, scale: 2
-    t.decimal  "handling_cost_tax",                        precision: 20, scale: 2
-    t.decimal  "base_wrapping_cost",                       precision: 20, scale: 2
-    t.decimal  "wrapping_cost_ex_tax",                     precision: 20, scale: 2
-    t.decimal  "wrapping_cost_inc_tax",                    precision: 20, scale: 2
-    t.decimal  "wrapping_cost_tax",                        precision: 20, scale: 2
-    t.decimal  "store_credit",                             precision: 20, scale: 2
-    t.decimal  "gift_certificate_amount",                  precision: 20, scale: 2
+    t.decimal  "discount_amount",                          precision: 6, scale: 2
+    t.decimal  "coupon_discount",                          precision: 6, scale: 2
+    t.decimal  "subtotal_ex_tax",                          precision: 6, scale: 2
+    t.decimal  "subtotal_inc_tax",                         precision: 6, scale: 2
+    t.decimal  "subtotal_tax",                             precision: 6, scale: 2
+    t.decimal  "total_ex_tax",                             precision: 6, scale: 2
+    t.decimal  "total_tax",                                precision: 6, scale: 2
+    t.decimal  "base_shipping_cost",                       precision: 6, scale: 2
+    t.decimal  "shipping_cost_ex_tax",                     precision: 6, scale: 2
+    t.decimal  "shipping_cost_inc_tax",                    precision: 6, scale: 2
+    t.decimal  "shipping_cost_tax",                        precision: 6, scale: 2
+    t.decimal  "base_handling_cost",                       precision: 6, scale: 2
+    t.decimal  "handling_cost_ex_tax",                     precision: 6, scale: 2
+    t.decimal  "handling_cost_inc_tax",                    precision: 6, scale: 2
+    t.decimal  "handling_cost_tax",                        precision: 6, scale: 2
+    t.decimal  "base_wrapping_cost",                       precision: 6, scale: 2
+    t.decimal  "wrapping_cost_ex_tax",                     precision: 6, scale: 2
+    t.decimal  "wrapping_cost_inc_tax",                    precision: 6, scale: 2
+    t.decimal  "wrapping_cost_tax",                        precision: 6, scale: 2
+    t.decimal  "store_credit",                             precision: 6, scale: 2
+    t.decimal  "gift_certificate_amount",                  precision: 6, scale: 2
     t.integer  "shipping_cost_tax_class_id", limit: 4
     t.integer  "handling_cost_tax_class_id", limit: 4
     t.integer  "wrapping_cost_tax_class_id", limit: 4
@@ -276,8 +276,8 @@ ActiveRecord::Schema.define(version: 20160729025219) do
     t.text     "order_source",               limit: 255
     t.datetime "date_modified"
     t.datetime "date_shipped"
-    t.datetime "created_at",                                                        null: false
-    t.datetime "updated_at",                                                        null: false
+    t.datetime "created_at",                                                       null: false
+    t.datetime "updated_at",                                                       null: false
   end
 
   add_index "orders", ["billing_address_id"], name: "index_orders_on_billing_address_id", using: :btree
@@ -354,10 +354,10 @@ ActiveRecord::Schema.define(version: 20160729025219) do
     t.text     "name",                      limit: 255
     t.integer  "inventory",                 limit: 4
     t.datetime "date_created"
-    t.decimal  "weight",                                  precision: 20, scale: 2
-    t.decimal  "height",                                  precision: 20, scale: 2
-    t.decimal  "width",                                   precision: 20, scale: 2
-    t.decimal  "depth",                                   precision: 20, scale: 2
+    t.decimal  "weight",                                  precision: 6, scale: 2
+    t.decimal  "height",                                  precision: 6, scale: 2
+    t.decimal  "width",                                   precision: 6, scale: 2
+    t.decimal  "depth",                                   precision: 6, scale: 2
     t.integer  "visible",                   limit: 1
     t.integer  "featured",                  limit: 1
     t.text     "availability",              limit: 255
@@ -372,9 +372,9 @@ ActiveRecord::Schema.define(version: 20160729025219) do
     t.text     "description",               limit: 65535
     t.text     "meta_description",          limit: 65535
     t.text     "page_title",                limit: 65535
-    t.decimal  "retail_price",                            precision: 20, scale: 2
-    t.decimal  "sale_price",                              precision: 20, scale: 2
-    t.decimal  "calculated_price",                        precision: 20, scale: 2
+    t.decimal  "retail_price",                            precision: 6, scale: 2
+    t.decimal  "sale_price",                              precision: 6, scale: 2
+    t.decimal  "calculated_price",                        precision: 6, scale: 2
     t.integer  "inventory_warning_level",   limit: 4
     t.text     "inventory_tracking",        limit: 65535
     t.text     "keyword_filter",            limit: 65535
@@ -382,8 +382,8 @@ ActiveRecord::Schema.define(version: 20160729025219) do
     t.integer  "related_products",          limit: 4
     t.integer  "rating_total",              limit: 4
     t.integer  "rating_count",              limit: 4
-    t.datetime "created_at",                                                       null: false
-    t.datetime "updated_at",                                                       null: false
+    t.datetime "created_at",                                                      null: false
+    t.datetime "updated_at",                                                      null: false
     t.integer  "producer_id",               limit: 4
     t.integer  "product_type_id",           limit: 4
     t.integer  "warehouse_id",              limit: 4
@@ -400,7 +400,7 @@ ActiveRecord::Schema.define(version: 20160729025219) do
     t.string   "vintage",                   limit: 255
     t.integer  "order_1",                   limit: 4
     t.integer  "order_2",                   limit: 4
-    t.decimal  "combined_order",                          precision: 10
+    t.decimal  "combined_order",                          precision: 6, scale: 2
     t.string   "portfolio_region",          limit: 255
     t.integer  "case_size",                 limit: 2
     t.string   "price_id",                  limit: 255

@@ -11,7 +11,7 @@ class CreateOrderHistories < ActiveRecord::Migration
 
 	  t.integer :staff_id, index: true, unsigned: true
 
-	  t.decimal :total_inc_tax, :refunded_amount, precision: 20, scale: 2
+	  t.decimal :total_inc_tax, :refunded_amount, scale: 2, precision: 6
 	  t.integer :qty, limit: 3, unsigned: true, null: false
 	  t.integer :items_shipped, limit: 3, unsigned: true
 	  t.text :staff_notes, :customer_notes
@@ -26,7 +26,7 @@ class CreateOrderHistories < ActiveRecord::Migration
 	   :subtotal_tax, :total_ex_tax, :total_tax, :base_shipping_cost, :shipping_cost_ex_tax,
 	   :shipping_cost_inc_tax, :shipping_cost_tax, :base_handling_cost, :handling_cost_ex_tax, :handling_cost_inc_tax,
 	   :handling_cost_tax, :base_wrapping_cost, :wrapping_cost_ex_tax, :wrapping_cost_inc_tax,
-	   :wrapping_cost_tax, :store_credit, :gift_certificate_amount, precision: 20, scale: 2
+	   :wrapping_cost_tax, :store_credit, :gift_certificate_amount, scale: 2, precision: 6
 
 	  t.integer :shipping_cost_tax_class_id, :handling_cost_tax_class_id, :wrapping_cost_tax_class_id
 

@@ -11,7 +11,7 @@ class CreateCustomers < ActiveRecord::Migration
 	  t.datetime :date_created
 	  t.datetime :date_modified
 
-	  t.decimal :store_credit, precision: 20, scale: 2
+	  t.decimal :store_credit, scale: 2, precision: 6
 
 	  t.text :registration_ip_address, limit: 32
 	  t.text :notes      
