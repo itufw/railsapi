@@ -48,6 +48,13 @@ test:
 #     url: <%= ENV['DATABASE_URL'] %>
 #
 production:
-  <<: *default
-  username: website
-  password: <%= ENV['API_DATABASE_PASSWORD'] %>
+  #<<: *default
+  adapter: mysql2
+  encoding: utf8
+  pool: 5
+  username: untappe7_hinam
+  password: H123occult!!
+  host: 192.163.204.51
+  database: untappe7_bigcommerce
+  username: untappe7_hinam
+  password: <%= ENV['BIGCOMMERCEAPI_DATABASE_PASSWORD'] %>
