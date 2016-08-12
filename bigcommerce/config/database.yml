@@ -48,7 +48,7 @@ test:
 #     url: <%= ENV['DATABASE_URL'] %>
 #
 production:
-  #<<: *default
+  <<: *default
   username: railsapp
   database: apidata
   password: <%= ENV['API_DATABASE_PASSWORD'] %>

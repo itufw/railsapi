@@ -102,6 +102,7 @@ GEM
       pkg-config (~> 1.1.7)
     oauth (0.5.1)
     pkg-config (1.1.7)
+    puma (3.6.0)
     rack (1.6.4)
     rack-test (0.6.3)
       rack (>= 1.0)
@@ -200,6 +201,7 @@ DEPENDENCIES
   jbuilder (~> 2.0)
   jquery-rails
   mysql2 (~> 0.3.18)
+  puma
   rails (= 4.2.4)
   roo (~> 1.13.2)
   sass-rails (~> 5.0)
