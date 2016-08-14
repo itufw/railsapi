@@ -48,8 +48,5 @@ class ModelsController < ApplicationController
   	return [limit_start, limit_end]
   end
 
-  def active_sales_staff
-    return Staff.where('active = 1 and user_type LIKE "Sales%"')
-  end
 
 end

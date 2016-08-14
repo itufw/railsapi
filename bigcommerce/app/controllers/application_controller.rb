@@ -31,6 +31,20 @@ class ApplicationController < ActionController::Base
 
     helper_method :calculate_product_price
 
+    
+    def active_sales_staff
+      return Staff.where('active = 1 and user_type LIKE "Sales%"')
+    end
+
+    def customer_name(firstname, lastname, actual_name)
+        if actual_name.nil?
+          return firstname + " " + lastname
+        else
+          return actual_name
+        end
+
+    end
+
     private
 
     def confirm_logged_in
