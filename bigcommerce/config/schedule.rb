@@ -25,3 +25,7 @@ set :output, {:error => "log/cron_error_log.log", :standard => "log/cron_log.log
 every '0,15,30,45 * * * *' do
 	rake "updates:cron"
 end
+
+every 1.day, :at => '12:30 am' do
+	rake "updates:timeperiods"
+end

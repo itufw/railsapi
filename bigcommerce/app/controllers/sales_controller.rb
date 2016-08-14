@@ -210,7 +210,18 @@
 
       @all_statuses = Status.all
 
-      @orders = Order.includes([{:customer => :staff}]).where('orders.status_id = ?', @status_id).order('id DESC')
+      @staffs = active_sales_staff
+
+      if params.has_key?(:commit) && !params[:staff][:id].blank?
+        staff_id = params[:staff][:id]
+        @staff = Staff.where(id: staff_id).first
+        @orders = Order.includes([{:customer => :staff}]).where('orders.status_id = ? and staffs.id = ?', @status_id, staff_id).references(:staffs).order('orders.id DESC')
+      else
+        @orders = Order.includes([{:customer => :staff}]).where('orders.status_id = ?', @status_id).order('id DESC')
+      end
+
+
+
 
       # need to reduce these to 1
       num_orders = Order.includes(:order_products).where('orders.status_id = 1').group('order_products.product_id').count('order_products.order_id')
@@ -340,6 +351,8 @@
 
     def view_customer_stats_for_product
 
+        @staffs = active_sales_staff
+
         @product_id = params[:product_id]
         @product_name = params[:product_name]
 
@@ -354,10 +367,18 @@
 
         customer_ids = @customer_stats.reduce(&:merge).keys
 
-        customer_id_name_array = Customer.includes(:staff).where(id: customer_ids).pluck("customers.id, actual_name, staffs.nickname")
-        customer_id_name_map = Hash[customer_id_name_array.map {|id, name, staff| [id, [name, staff]]}]
+        if params.has_key?(:commit) && !params[:staff][:id].blank?
+            staff_id = params[:staff][:id]
+            @staff = Staff.where(id: staff_id).first
+            customer_id_name_array = Customer.includes(:staff).where('customers.id IN (?) and staffs.id = ?', customer_ids, staff_id).references(:staffs).pluck("customers.id, customers.actual_name, customers.firstname, customers.lastname, staffs.nickname")
+        else
+            customer_id_name_array = Customer.includes(:staff).where(id: customer_ids).pluck("customers.id, customers.actual_name, customers.firstname, customers.lastname, staffs.nickname")
+        end
 
-        @customer_id_name_map_sorted = Hash[customer_id_name_map.sort_by { |k,v| v }]
+
+        customer_id_name_map = Hash[customer_id_name_array.map {|id, actual_name, firstname, lastname, staff| [id, [customer_name(firstname, lastname, actual_name), staff]]}]
+
+        @customer_id_name_map_sorted = Hash[customer_id_name_map.sort_by { |k,v| v[0] }]
    
         @page_header = "Customers who ordered Product : #{@product_name}"
 
