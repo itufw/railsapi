@@ -23,9 +23,9 @@ set :environment, "production"
 set :output, {:error => "log/cron_error_log.log", :standard => "log/cron_log.log"}
 
 every '0,15,30,45 * * * *' do
-	rake "updates:cron"
+	rake "updates:models"
 end
 
-every 1.day, :at => '12:30 am' do
+every 1.day, :at => '2:30 pm' do
 	rake "updates:timeperiods"
 end
