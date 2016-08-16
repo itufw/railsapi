@@ -37,17 +37,25 @@ a:hover {
     background-color: black;
 }
 
-#orders-view-button {
+.not-default{
+    display: none;
+}
+
+.default {
+    display: block;
+}
+
+table.default {
+    display:table
+}
+
+button.not-default {
     background-color: #e7e7e7; /* Gray */
     color: black;
 }
 
-#products-view-button {
+button.default {
     background-color: #4CAF50;
-}
-
-.orders-view{
-    display: none;
 }
 
 h3 {
@@ -60,4 +68,8 @@ h3 {
 
 .italics {
     font-style: italic;
+}
+
+.inline {
+    display: inline-block;
 }
