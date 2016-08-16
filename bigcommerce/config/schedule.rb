@@ -26,6 +26,6 @@ every '0,15,30,45 * * * *' do
 	rake "updates:models"
 end
 
-every 1.day do
+every 1.day, :at => '12:00 am' do
 	rake "updates:timeperiods"
 end
