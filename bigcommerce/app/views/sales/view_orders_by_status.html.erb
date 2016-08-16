@@ -11,13 +11,13 @@
 </div>
 
 <div style="margin-top: 50px;" align="center">
-	<button class="button" id="orders-view-button">Orders View</button>
-	<button class="button" id="products-view-button">Products View</button>
+	<button class="button not-default inline orders-view" id="orders-view-button">Orders View</button>
+	<button class="button default inline products-view" id="products-view-button">Products View</button>
 </div>
 <br/><br/>
 
-<h3 id="orders-view-heading" class="orders-view"><%= @page_header_orders %></h3><br/>
-<div class="form-group orders-view" style="margin-left:550px;">
+<h3 id="orders-view-heading" class="orders-view not-default"><%= @page_header_orders %></h3><br/>
+<div class="form-group orders-view not-default" style="margin-left:550px;">
 <%= form_tag({:action => "view_orders_by_status"}, {:method => "get"}) do %>
    <div class="col-xs-3">
    <%= collection_select(:staff, :id, @staffs, :id, :nickname, {:include_blank => 'All Staff'}, {:class => 'form-control'}) %>
@@ -28,7 +28,7 @@
 <% end %>
 </div>
 
-<table class = "table table-striped table-bordered table-hover table-responsive orders-view" id = "orders-view-table">
+<table class = "table table-striped table-bordered table-hover table-responsive orders-view not-default" id = "orders-view-table">
 	<tr>
 		<th>Sales Rep</th>
 		<th>Date</th>
@@ -57,9 +57,9 @@
 
 </table>
 
-<h3 id="products-view-heading" class="products-view" style="text-align: center;"><%= @page_header_products %></h3><br/>
+<h3 id="products-view-heading" class="products-view default" style="text-align: center;"><%= @page_header_products %></h3><br/>
 
-<table class = "table table-striped table-bordered table-hover table-responsive products-view" id = "products-view-table">
+<table class = "table table-striped table-bordered table-hover table-responsive products-view" id = "products-view-table default">
 
 	<tr>
 		<th>Product Name</th>

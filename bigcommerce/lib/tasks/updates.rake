@@ -15,9 +15,8 @@ namespace :updates do
 	end
 
 	task :timeperiods => :environment do
-	  start_time = Time.now
-	  puts "Time Periods Update #{start_time} started"
+	  puts "Staff Time Periods Update #{Time.now} started"
 	  StaffTimePeriod.new.update_all
-	  puts "Time Periods Update #{Time.now} ended"
+	  puts "Staff Time Periods Update #{Time.now} ended"
 	end
 end
