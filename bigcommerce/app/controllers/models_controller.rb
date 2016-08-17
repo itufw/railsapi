@@ -5,6 +5,7 @@ class ModelsController < ApplicationController
   def orders
       @staffs = active_sales_staff
       @statuses = Status.all
+      @page_header = "Orders"
 
       staff_id = nil
       status_id = nil
@@ -20,11 +21,31 @@ class ModelsController < ApplicationController
               @status = Status.where(id: status_id).first
           end
       end
+      if !params[:start_date].nil?
+          @start_date = params[:start_date]
+          start_time = Time.parse(@start_date) 
+      end
+      if !params[:end_date].nil?
+          @end_date = params[:end_date]
+          end_time = Time.parse(@end_date)
+      end
+      
+      if !params[:start_date].nil?
+        if !params[:staff_id].nil?
+          staff_id = params[:staff_id]
+          staff_nickname = params[:staff_nickname]
+          @page_header = "Orders for #{staff_nickname} from #{params[:start_date].to_date.strftime('%A  %d/%m/%y')} - #{params[:end_date].to_date.strftime('%A  %d/%m/%y')}"
+          @staff = Staff.where(id: staff_id).first
+        else
+          @page_header = "Orders from #{params[:start_date].to_date.strftime('%A  %d/%m/%y')} - #{params[:end_date].to_date.strftime('%A  %d/%m/%y')}"
+        end
+      end
+
 
       if !customer_ids.nil?
-          @orders = Order.includes([{:customer => :staff}, :status]).status_staff_filter(status_id, staff_id).where('customers.id IN (?)', customer_ids).references(:customers).page(params[:page]).order('orders.id DESC')
+          @orders = Order.includes([{:customer => :staff}, :status]).status_staff_filter(status_id, staff_id, start_time, end_time).where('customers.id IN (?)', customer_ids).references(:customers).page(params[:page]).order('orders.id DESC')
       else
-          @orders = Order.includes([{:customer => :staff}, :status]).status_staff_filter(status_id, staff_id).page(params[:page]).order('orders.id DESC')
+          @orders = Order.includes([{:customer => :staff}, :status]).status_staff_filter(status_id, staff_id, start_time, end_time).page(params[:page]).order('orders.id DESC')
       end
 
   end

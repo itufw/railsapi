@@ -33,10 +33,10 @@
 
 		<% @dates_this_week.zip(@result_this_week).each do |sum| %>
 			
-			<td class = "num"><%= link_to number_with_delimiter(number_with_precision(sum[1], precision: 2)), action: "view_overall_daily_orders", date: sum[0] %></td>
+			<td class = "num"><%= link_to number_with_delimiter(number_with_precision(sum[1], precision: 2)), controller: "models", action: "orders", start_date: sum[0], end_date: 1.day.since(sum[0]) %></td>
 
 		<% end %>
-			<td class="num"><%= link_to number_with_delimiter(number_with_precision(@result_this_week.last, precision: 2)) %>
+			<td class="num"><%= link_to number_with_delimiter(number_with_precision(@result_this_week.last, precision: 2)), controller: "models", action: "orders", start_date: @dates_this_week.first, end_date: @dates_this_week.last %>
 	
 	</tr>
 	<tr class = "italics">
@@ -45,11 +45,11 @@
 
 		<% @dates_last_week.zip(@result_last_week).each do |sum| %>
 			
-			<td class = "num"><%= link_to number_with_delimiter(number_with_precision(sum[1], precision: 2)), action: "view_overall_daily_orders", date: sum[0] %></td>
+			<td class = "num"><%= link_to number_with_delimiter(number_with_precision(sum[1], precision: 2)), controller: "models", action: "orders", start_date: sum[0], end_date: 1.day.since(sum[0]) %></td>
 
 		<% end %>
 	
-			<td class = "num"><%= number_with_delimiter(number_with_precision(@result_last_week.last, precision: 2)) %></td>
+			<td class = "num"><%= link_to number_with_delimiter(number_with_precision(@result_last_week.last, precision: 2)), controller: "models", action: "orders", start_date: @dates_last_week.first, end_date: @dates_last_week.last %></td>
 	
 	</tr>
 
@@ -61,21 +61,21 @@
 
 			<td class = "text">
 
-				<%= link_to staff[0], action: "view_weekly_orders_for_rep", staff: staff[0], week_start_date: @dates_this_week.first, staff_id: staff[2] %>
+				<%= link_to staff[0],controller: "models", action: "orders", staff_nickname: staff[0], start_date: @dates_this_week.first, end_date: @dates_this_week.last, staff_id: staff[2] %>
 				
 			</td>
 
 			<% @dates_this_week.zip(staff[1]).each do |sum| %>
 
 				<td class = "num">
-					<%= link_to number_with_delimiter(number_with_precision(sum[1], precision: 2)), action: "view_daily_orders_for_rep", staff: staff[0], date: sum[0], staff_id: staff[2] %>
+					<%= link_to number_with_delimiter(number_with_precision(sum[1], precision: 2)), controller: "models", action: "orders", staff_nickname: staff[0], start_date: sum[0], end_date: 1.day.since(sum[0]), staff_id: staff[2] %>
 						
 				</td>
 
 			<% end %>
 
 
-			<td class = "num"><%= link_to number_with_delimiter(number_with_precision(staff[1][-1], precision: 2)), action: "view_weekly_orders_for_rep", staff: staff[0], week_start_date: @dates_this_week.first, staff_id: staff[2] %></td>
+			<td class = "num"><%= link_to number_with_delimiter(number_with_precision(staff[1][-1], precision: 2)), controller: "models", action: "orders", staff_nickname: staff[0], start_date: @dates_this_week.first, end_date: @dates_this_week.last, staff_id: staff[2] %></td>
 
 		</tr>
 
