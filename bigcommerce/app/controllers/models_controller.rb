@@ -19,7 +19,7 @@ class ModelsController < ApplicationController
           end
       end
 
-      @customers = Customer.includes(:staff).staff_search_filter(@search_text, staff_id).order('actual_name ASC')
+      @customers = Customer.includes(:staff).staff_search_filter(@search_text, staff_id).page(params[:page]).order('actual_name ASC')
               
 
   end
@@ -45,7 +45,7 @@ class ModelsController < ApplicationController
         end
       end
 
-    @products = Product.filter(@search_text, producer_country_id, product_sub_type_id).order('name ASC')
+    @products = Product.filter(@search_text, producer_country_id, product_sub_type_id).page(params[:page]).order('name ASC')
 
   end
 
