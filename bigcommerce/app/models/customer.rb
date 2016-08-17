@@ -150,4 +150,9 @@ class Customer < ActiveRecord::Base
 			return nil
 		end
 	end
+
+	def self.staff_search_filter(search_text = nil, staff_id = nil)
+		return where(staff_id: staff_id).search_for(search_text) if staff_id
+		return all.search_for(search_text)
+	end
 end

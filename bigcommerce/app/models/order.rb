@@ -158,5 +158,10 @@ class Order < ActiveRecord::Base
 		ActiveRecord::Base.connection.execute(sql)
 
 	end
+
+	def self.status_staff_filter(status_id = nil, staff_id = nil)
+		return where('orders.status_id = ? and staffs.id = ?', status_id, staff_id).references(:staffs) if status_id && staff_id
+		return where('orders.status_id = ?', status_id) if status_id
+	end
 	
 end

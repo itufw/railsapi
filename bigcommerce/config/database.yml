@@ -13,8 +13,8 @@ default: &default
   adapter: mysql2
   encoding: utf8
   pool: 5
-  username: hinamathome
-  password: H123occult!!
+  username: ufwoffice
+  password: roller!!1311office
   host: 188.166.250.131
 
 development:
