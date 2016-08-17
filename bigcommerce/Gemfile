@@ -67,4 +67,5 @@ end
 gem 'whenever', :require => false
 gem 'puma'
 gem 'xeroizer'
+gem 'will_paginate'
 
