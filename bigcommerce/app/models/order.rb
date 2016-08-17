@@ -160,8 +160,10 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.status_staff_filter(status_id = nil, staff_id = nil)
-		return where('orders.status_id = ? and staffs.id = ?', status_id, staff_id).references(:staffs) if status_id && staff_id
+		return where('orders.status_id = ? and customers.staff_id = ?', status_id, staff_id).references(:customers) if status_id && staff_id
 		return where('orders.status_id = ?', status_id) if status_id
+		return where('customers.staff_id = ?', staff_id).references(:customers) if staff_id
+		return all
 	end
 	
 end
