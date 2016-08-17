@@ -215,25 +215,53 @@
       @staffs = active_sales_staff
       @countries = ProducerCountry.all
       @sub_types = ProductSubType.all
+      product_ids = []
 
-      if params.has_key?(:commit) && !params[:staff][:id].blank?
-        staff_id = params[:staff][:id]
-        @staff = Staff.where(id: staff_id).first
-        @orders = Order.includes([{:customer => :staff}]).where('orders.status_id = ? and staffs.id = ?', @status_id, staff_id).references(:staffs).order('orders.id DESC')
-      else
-        @orders = Order.includes([{:customer => :staff}]).where('orders.status_id = ?', @status_id).order('id DESC')
+      if params.has_key?(:commit)
+        @search_text = params[:search]
+        if !params[:staff][:id].blank?
+            staff_id = params[:staff][:id]
+            @staff = Staff.where(id: staff_id).first
+        end
+        if !params[:producer_country][:id].blank?
+            producer_country_id = params[:producer_country][:id]
+            @producer_country = ProducerCountry.where(id: producer_country_id).first
+        end
+        if !params[:product_sub_type][:id].blank?
+            product_sub_type_id = params[:product_sub_type][:id]
+            @product_sub_type = ProductSubType.where(id: product_sub_type_id).first
+        end
+        product_ids = Product.filter(@search_text, producer_country_id, product_sub_type_id).pluck("id")
       end
+
+      # if params.has_key?(:commit) && !params[:staff][:id].blank?
+      #   staff_id = params[:staff][:id]
+      #   @staff = Staff.where(id: staff_id).first
+      #   @orders = Order.includes([{:customer => :staff}]).where('orders.status_id = ? and staffs.id = ?', @status_id, staff_id).references(:staffs).order('orders.id DESC')
+      # else
+      #   @orders = Order.includes([{:customer => :staff}]).where('orders.status_id = ?', @status_id).order('id DESC')
+      # end
+
+      @orders = Order.status_staff_filter(@status_id, staff_id).includes([{:customer => :staff}, :order_products]).product_filter(product_ids).order('orders.id DESC')
 
 
 
 
       # need to reduce these to 1
-      num_orders = Order.includes(:order_products).where('orders.status_id = 1').group('order_products.product_id').count('order_products.order_id')
-      product_qty = Order.includes(:order_products).where('orders.status_id = 1').group('order_products.product_id').sum('order_products.qty')
-      order_totals = Order.includes(:order_products).where('orders.status_id = 1').group('order_products.product_id').sum('orders.total_inc_tax')
+      num_orders = Order.status_staff_filter(@status_id, staff_id).includes(:order_products).product_filter(product_ids).group('order_products.product_id').count('order_products.order_id')
+      product_qty = Order.status_staff_filter(@status_id, staff_id).includes(:order_products).product_filter(product_ids).group('order_products.product_id').sum('order_products.qty')
+      order_totals = Order.status_staff_filter(@status_id, staff_id).includes(:order_products).product_filter(product_ids).group('order_products.product_id').sum('orders.total_inc_tax')
 
       merge_1 = num_orders.merge(product_qty) { |k, o, n| [o, n] }
       merge_2 = merge_1.merge(order_totals) { |k, o, n| o.push(n)}
+
+      # if !product_ids.empty?
+      #   intersection = product_ids & merge_2.keys
+      #   merged = merge_2.select {|k,_| intersection.include? k } 
+      # else
+      #   intersection = merge_2.keys
+      #   merged = merge_2
+      # end 
 
       product_hash = Product.where(id: merge_2.keys).pluck("id,name").to_h
 
