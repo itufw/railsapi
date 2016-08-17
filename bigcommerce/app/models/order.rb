@@ -159,7 +159,7 @@ class Order < ActiveRecord::Base
 
 	end
 
-	def self.status_staff_filter(status_id = nil, staff_id = nil, start_time, end_time)
+	def self.status_staff_filter(status_id = nil, staff_id = nil, start_time = nil, end_time = nil)
 		return where('orders.date_created >= ? and orders.date_created < ? and orders.status_id = ? and customers.staff_id = ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"), status_id, staff_id).references(:customers) if status_id && staff_id && start_time && end_time
 		return where('orders.status_id = ? and customers.staff_id = ?', status_id, staff_id).references(:customers) if status_id && staff_id
 		return where('orders.status_id = ? and orders.date_created >= ? and orders.date_created < ?', status_id, start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S")) if status_id && start_time && end_time
@@ -167,6 +167,11 @@ class Order < ActiveRecord::Base
 		return where('orders.status_id = ?', status_id) if status_id
 		return where('customers.staff_id = ?', staff_id).references(:customers) if staff_id
 		return where('orders.date_created >= ? and orders.date_created < ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S")) if start_time && end_time
+		return all
+	end
+
+	def self.product_filter(product_ids = nil)
+		return where('order_products.product_id IN (?)', product_ids).references(:order_products) if !product_ids.empty?
 		return all
 	end
 	
