@@ -1,6 +1,6 @@
 class OrderProduct < ActiveRecord::Base
 	belongs_to :order
-	belongs_to :product
+	belongs_to :product, class_name: Product
 
 	belongs_to :order_shipping
 

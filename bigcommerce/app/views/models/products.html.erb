@@ -1,10 +1,17 @@
 <h3><center>Products</center></h3>
-<div class="form-group container-fluid" style="margin-left:300px;">
+<div class="form-group container-fluid">
 <%= form_tag({:action => "products"}, {:method => "get"}) do %>
-	<div class="col-xs-4 col-xs-offset-2">
-   <%= text_field_tag('search', @search_text, placeholder: 'Enter Search Term', class: 'form-control') %>
+	<div class="col-xs-3">
+   <%= text_field_tag('search', @search_text, placeholder: 'Search for Product Name', class: 'form-control') %>
+   </div>
+   <div class="col-xs-2">
+       <%= collection_select(:producer_country, :id, @countries, :id, :name, {:include_blank => 'All Countries'}, {:class => 'form-control'}) %>
+   </div>   
+   <div class="col-xs-2">
+       <%= collection_select(:product_sub_type, :id, @sub_types, :id, :name, {:include_blank => 'All Varietals'}, {:class => 'form-control'}) %>
    </div>
    <%= submit_tag "Filter", class: 'btn btn-primary' %>
+   <button class = "btn btn-primary"><%= link_to "Reset", action: "products" %></button>
 <% end %>
 </div>
 
