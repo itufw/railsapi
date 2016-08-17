@@ -16,7 +16,7 @@
 
         
         end_date = 6.days.since(start_date)
-        @dates_this_week = (start_date..end_date).map
+        @dates_this_week = (start_date..end_date).to_a
         sums_this_week = sum_orders(start_date, end_date)
         @result_this_week = get_daily_totals(@dates_this_week, sums_this_week)
 
@@ -27,7 +27,7 @@
         last_week_start_date = start_date - 7.days
         #last_week_start_date = seven_days_ago.at_beginning_of_week
         last_week_end_date = 6.days.since(last_week_start_date)
-        @dates_last_week = (last_week_start_date..last_week_end_date).map
+        @dates_last_week = (last_week_start_date..last_week_end_date).to_a
         sums_last_week = sum_orders(last_week_start_date, last_week_end_date)
         @result_last_week = get_daily_totals(@dates_last_week, sums_last_week)
 
@@ -99,52 +99,52 @@
 
     end
 
-    def view_daily_orders_for_rep
+    # def view_daily_orders_for_rep
 
-        @staff_nickname = params[:staff]
-        staff_id = params[:staff_id]
+    #     @staff_nickname = params[:staff]
+    #     staff_id = params[:staff_id]
 
-        @date = params[:date]
+    #     @date = params[:date]
 
-        start_time = Time.parse(@date.to_s)
-        end_time = 1.day.since(start_time)
+    #     start_time = Time.parse(@date.to_s)
+    #     end_time = 1.day.since(start_time)
 
-        @daily_orders_for_rep = Order.includes(:customer, :status).where('orders.date_created >= ? and orders.date_created < ? and customers.staff_id = ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"), staff_id).references(:customers).order('orders.id DESC')
+    #     @daily_orders_for_rep = Order.includes(:customer, :status).where('orders.date_created >= ? and orders.date_created < ? and customers.staff_id = ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"), staff_id).references(:customers).order('orders.id DESC')
 
-        @page_header = "Orders for Date : #{@date.to_date.strftime('%A  %d/%m/%y')} and Staff : #{@staff_nickname}"
+    #     @page_header = "Orders for Date : #{@date.to_date.strftime('%A  %d/%m/%y')} and Staff : #{@staff_nickname}"
 
-    end
+    # end
 
-    def view_weekly_orders_for_rep
+    # def view_weekly_orders_for_rep
 
-        @staff_nickname = params[:staff]
-        staff_id = params[:staff_id]
+    #     @staff_nickname = params[:staff]
+    #     staff_id = params[:staff_id]
 
-        @date = params[:week_start_date]
+    #     @date = params[:week_start_date]
 
-        start_time = Time.parse(@date.to_s)
-        end_time = 7.days.since(start_time)
+    #     start_time = Time.parse(@date.to_s)
+    #     end_time = 7.days.since(start_time)
 
-        @daily_orders_for_rep = Order.includes(:customer, :status).where('orders.date_created >= ? and orders.date_created < ? and customers.staff_id = ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"), staff_id).references(:customers).order('orders.id DESC')
+    #     @daily_orders_for_rep = Order.includes(:customer, :status).where('orders.date_created >= ? and orders.date_created < ? and customers.staff_id = ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"), staff_id).references(:customers).order('orders.id DESC')
 
-        @page_header = "This Week's of Staff : #{@staff_nickname}"
+    #     @page_header = "This Week's of Staff : #{@staff_nickname}"
 
-        render "view_daily_orders_for_rep"
+    #     render "view_daily_orders_for_rep"
 
-    end
+    # end
 
-    def view_overall_daily_orders
+    # def view_overall_daily_orders
 
-        @date = params[:date]
+    #     @date = params[:date]
 
-        start_time = Time.parse(@date.to_s)
-        end_time = 1.day.since(start_time)
+    #     start_time = Time.parse(@date.to_s)
+    #     end_time = 1.day.since(start_time)
 
-        @daily_orders = Order.includes([{:customer => :staff}, :status]).where('orders.date_created >= ? and orders.date_created < ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S")).order('id DESC')
+    #     @daily_orders = Order.includes([{:customer => :staff}, :status]).where('orders.date_created >= ? and orders.date_created < ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S")).order('id DESC')
 
-        @page_header = "Orders for Date : #{@date.to_date.strftime('%A  %d/%m/%y')}"
+    #     @page_header = "Orders for Date : #{@date.to_date.strftime('%A  %d/%m/%y')}"
 
-    end
+    # end
 
     def view_orders_for_customer
       @customer_id = params[:customer_id]

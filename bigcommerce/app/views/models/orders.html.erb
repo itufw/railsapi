@@ -1,4 +1,4 @@
-<h3><center>Orders</center></h3>
+<h3><center><%= @page_header %></center></h3><br/>
 <div class="form-group container-fluid">
 <%= form_tag({:action => "orders"}, {:method => "get"}) do %>
 	<div class="col-xs-3 col-xs-offset-2">
@@ -10,10 +10,12 @@
    <div class="col-xs-2">
        <%= collection_select(:status, :id, @statuses, :id, :name, {:include_blank => 'All Statuses'}, {:class => 'form-control'}) %>
    </div>
+   <%= hidden_field_tag :start_date, @start_date %>
+   <%= hidden_field_tag :end_date, @end_date %>
    <%= submit_tag "Filter", class: 'btn btn-primary' %>
    <button class = "btn btn-primary"><%= link_to "Reset", action: "orders" %></button>
 <% end %>
-</div>
+</div><br/>
 
 <table class = "table table-striped table-bordered table-hover table-responsive">
 	<tr>
