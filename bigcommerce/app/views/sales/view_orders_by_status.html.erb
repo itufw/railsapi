@@ -74,7 +74,9 @@
 	<tr>
 		<th>Product Name</th>
 		<th>Number of Orders</th>
-		<th>Product Qty</th>
+		<th>Qty</th>
+		<th><%= @status_name %> Qty</th>
+		<th>Total Qty</th>
 		<th>Invoice Totals</th>
 	</tr>
 
@@ -82,9 +84,11 @@
 
 		<tr>
 
-			<td><%= link_to v[3], action: "view_orders_for_product_and_status", product_id: k, product_name: v[3], status_id: @status_id, status_name: @status_name %></td>
+			<td><%= link_to v[3], action: "view_orders_for_product_and_status", product_id: k, product_name: v[3], status_id: @status_id, status_name: @status_name, num_orders: v[0], qty: v[4], status_qty: v[1], total: v[2] %></td>
 			<td class="num"><%= number_with_delimiter(v[0]) %></td>
+			<td class="num"><%= number_with_delimiter(v[4]) %></td>
 			<td class="num"><%= number_with_delimiter(v[1]) %></td>
+			<td class="num"><%= number_with_delimiter(v[1] + v[4]) %></td>
 			<td class="num"><%= number_with_delimiter(number_with_precision(v[2], precision: 2)) %></td>
 
 
