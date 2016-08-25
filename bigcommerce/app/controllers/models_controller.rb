@@ -88,8 +88,20 @@ class ModelsController < ApplicationController
         end
       end
 
+    @product_pending_count = Product.filter(@search_text, producer_country_id, product_sub_type_id).includes([{:order_products => :order}]).where('orders.status_id = 1').references(:orders).group('order_products.product_id').sum('order_products.qty')
+
     @products = Product.filter(@search_text, producer_country_id, product_sub_type_id).page(params[:page]).order('name ASC')
 
   end
+
+  def return_pending_stock(product_pending_count_map, product_id)
+    if product_pending_count_map.has_key?(product_id)
+      return product_pending_count_map[product_id]
+    else
+      return 0
+    end
+  end
+
+  helper_method :return_pending_stock
 
 end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160729025219) do
+ActiveRecord::Schema.define(version: 20160825032458) do
 
   create_table "addresses", force: :cascade do |t|
     t.integer  "customer_id", limit: 4
@@ -489,5 +489,30 @@ ActiveRecord::Schema.define(version: 20160729025219) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
+
+  create_table "xero_invoices", id: false, force: :cascade do |t|
+    t.string   "invoice_id",      limit: 36,                          null: false
+    t.integer  "order_id",        limit: 4
+    t.string   "contact_id",      limit: 36
+    t.string   "contact_name",    limit: 255
+    t.decimal  "total",                       precision: 6, scale: 2
+    t.decimal  "sub_total",                   precision: 6, scale: 2
+    t.decimal  "total_tax",                   precision: 6, scale: 2
+    t.decimal  "amount_due",                  precision: 6, scale: 2
+    t.decimal  "amount_paid",                 precision: 6, scale: 2
+    t.decimal  "amount_credited",             precision: 6, scale: 2
+    t.datetime "date"
+    t.datetime "due_date"
+    t.datetime "updated_date"
+    t.string   "status",          limit: 255
+    t.string   "type",            limit: 255
+    t.string   "has_attachments", limit: 255
+    t.datetime "created_at",                                          null: false
+    t.datetime "updated_at",                                          null: false
+  end
+
+  add_index "xero_invoices", ["contact_id"], name: "index_xero_invoices_on_contact_id", using: :btree
+  add_index "xero_invoices", ["invoice_id"], name: "index_xero_invoices_on_invoice_id", unique: true, using: :btree
+  add_index "xero_invoices", ["order_id"], name: "index_xero_invoices_on_order_id", using: :btree
 
 end
