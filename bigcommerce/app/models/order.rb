@@ -20,6 +20,8 @@ class Order < ActiveRecord::Base
 
 	belongs_to :order_history
 
+	has_one :xero_invoice
+
 	def scrape
 
 		order_api = Bigcommerce::Order
