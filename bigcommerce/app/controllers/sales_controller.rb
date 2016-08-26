@@ -151,7 +151,7 @@
 
       @orders = Order.includes([{:customer => :staff}, :status]).where('orders.customer_id = ?', @customer_id).order('id DESC')
 
-      @customer_name = get_customer_name(@orders.first.customer)
+      @customer_name = get_customer_name(Customer.where(id: @customer_id).first)
 
       get_customer_stats(@customer_id)
 

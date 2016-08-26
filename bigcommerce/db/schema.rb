@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160825032458) do
+ActiveRecord::Schema.define(version: 20160826054726) do
 
   create_table "addresses", force: :cascade do |t|
     t.integer  "customer_id", limit: 4
@@ -490,17 +490,51 @@ ActiveRecord::Schema.define(version: 20160825032458) do
     t.datetime "updated_at",             null: false
   end
 
-  create_table "xero_invoices", id: false, force: :cascade do |t|
-    t.string   "invoice_id",      limit: 36,                          null: false
-    t.integer  "order_id",        limit: 4
+  create_table "xero_contacts", primary_key: "contact_id", force: :cascade do |t|
+    t.string   "contact_status", limit: 255
+    t.string   "contact_name",   limit: 255
+    t.datetime "updated_date"
+    t.integer  "is_supplier",    limit: 1
+    t.integer  "is_customer",    limit: 1
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+  end
+
+  create_table "xero_credit_notes", primary_key: "credit_note_id", force: :cascade do |t|
+    t.string   "invoice_id",         limit: 36
+    t.string   "contact_id",         limit: 36
+    t.string   "contact_name",       limit: 255
+    t.string   "credit_note_number", limit: 255
+    t.string   "order_id",           limit: 255
+    t.string   "status",             limit: 255
+    t.string   "type",               limit: 255
+    t.datetime "date"
+    t.datetime "updated_date"
+    t.datetime "fully_paid_on_date"
+    t.datetime "date_applied"
+    t.decimal  "remaning_credit",                precision: 8, scale: 2
+    t.decimal  "sub_total",                      precision: 8, scale: 2
+    t.decimal  "total",                          precision: 8, scale: 2
+    t.decimal  "total_tax",                      precision: 8, scale: 2
+    t.decimal  "applied_amount",                 precision: 8, scale: 2
+    t.datetime "created_at",                                             null: false
+    t.datetime "updated_at",                                             null: false
+  end
+
+  add_index "xero_credit_notes", ["contact_id"], name: "index_xero_credit_notes_on_contact_id", using: :btree
+  add_index "xero_credit_notes", ["credit_note_id"], name: "index_xero_credit_notes_on_credit_note_id", using: :btree
+  add_index "xero_credit_notes", ["invoice_id"], name: "index_xero_credit_notes_on_invoice_id", using: :btree
+
+  create_table "xero_invoices", primary_key: "invoice_id", force: :cascade do |t|
+    t.string   "order_id",        limit: 255
     t.string   "contact_id",      limit: 36
     t.string   "contact_name",    limit: 255
-    t.decimal  "total",                       precision: 6, scale: 2
-    t.decimal  "sub_total",                   precision: 6, scale: 2
-    t.decimal  "total_tax",                   precision: 6, scale: 2
-    t.decimal  "amount_due",                  precision: 6, scale: 2
-    t.decimal  "amount_paid",                 precision: 6, scale: 2
-    t.decimal  "amount_credited",             precision: 6, scale: 2
+    t.decimal  "total",                       precision: 8, scale: 2
+    t.decimal  "sub_total",                   precision: 8, scale: 2
+    t.decimal  "total_tax",                   precision: 8, scale: 2
+    t.decimal  "amount_due",                  precision: 8, scale: 2
+    t.decimal  "amount_paid",                 precision: 8, scale: 2
+    t.decimal  "amount_credited",             precision: 8, scale: 2
     t.datetime "date"
     t.datetime "due_date"
     t.datetime "updated_date"
@@ -512,7 +546,6 @@ ActiveRecord::Schema.define(version: 20160825032458) do
   end
 
   add_index "xero_invoices", ["contact_id"], name: "index_xero_invoices_on_contact_id", using: :btree
-  add_index "xero_invoices", ["invoice_id"], name: "index_xero_invoices_on_invoice_id", unique: true, using: :btree
   add_index "xero_invoices", ["order_id"], name: "index_xero_invoices_on_order_id", using: :btree
 
 end
