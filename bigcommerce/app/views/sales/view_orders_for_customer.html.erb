@@ -43,7 +43,7 @@
 		<th>Total</th>
 	</tr>
 
-
+<%  unless @orders.nil? %>
 	<% @orders.each do |o| %>
 		<tr>
 			<td><%= o.customer.staff.nickname %></td>
@@ -55,5 +55,6 @@
 			<td class="num"><%= link_to number_with_delimiter(number_with_precision(o.total_inc_tax, precision: 2)), action: "view_products_for_orderid", order_id: o.id %></td>
 		</tr>
 	<% end %>
+<% end %>
 </table>
 

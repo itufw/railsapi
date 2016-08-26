@@ -20,7 +20,7 @@ class Order < ActiveRecord::Base
 
 	belongs_to :order_history
 
-	has_one :xero_invoice
+	#has_one :xero_invoice
 
 	def scrape
 
