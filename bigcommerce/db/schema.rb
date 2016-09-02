@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160902005127) do
+ActiveRecord::Schema.define(version: 20160902021711) do
 
   create_table "addresses", force: :cascade do |t|
     t.integer  "customer_id", limit: 4
@@ -493,7 +493,6 @@ ActiveRecord::Schema.define(version: 20160902005127) do
   create_table "xero_contacts", primary_key: "xero_contact_id", force: :cascade do |t|
     t.string   "name",                 limit: 255
     t.string   "firstname",            limit: 255
-    t.string   "lastname",             limit: 255
     t.string   "email",                limit: 255
     t.string   "skype_username",       limit: 255
     t.string   "bank_account_details", limit: 255
@@ -516,7 +515,6 @@ ActiveRecord::Schema.define(version: 20160902005127) do
     t.string   "xero_credit_note_id",            limit: 36,                         null: false
     t.string   "xero_invoice_id",                limit: 36,                         null: false
     t.integer  "invoice_number",                 limit: 8
-    t.datetime "date"
     t.decimal  "applied_amount",                            precision: 8, scale: 2
     t.datetime "created_at",                                                        null: false
     t.datetime "updated_at",                                                        null: false
