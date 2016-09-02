@@ -10,7 +10,7 @@ class XeroInvoiceLineItem < ActiveRecord::Base
 		clean = CleanData.new
 		invoice_line_items.each do |li|
 
-			if XeroInvoiceLineItem.where(xero_invoice_line_item_id: li.line_item_id) == 0
+			#if XeroInvoiceLineItem.where(xero_invoice_line_item_id: li.line_item_id) == 0
 
 				time = Time.now.to_s(:db)
 
@@ -24,7 +24,7 @@ class XeroInvoiceLineItem < ActiveRecord::Base
 				'#{li.account_code}', '#{time}', '#{time}')"
 
 				ActiveRecord::Base.connection.execute(sql)
-			end
+			#end
 
 		end
 	end
