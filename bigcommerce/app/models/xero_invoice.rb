@@ -1,18 +1,17 @@
-require 'uuid_helper.rb'
 require 'xero_connection.rb'
 require 'clean_data.rb'
 
 class XeroInvoice < ActiveRecord::Base
-	include UUIDHelper
+	self.primary_key = 'xero_invoice_id'
 
-  	#belongs_to :order
-  	belongs_to :xero_contact, foreign_key: :contact_id
+	belongs_to :xero_contact
+	has_many :xero_over_payment_allocations
+	has_many :xero_invoice_line_items
+	has_many :xero_credit_note_allocations
 
-  	self.primary_key = 'invoice_id'
+	def scrape
 
-  	def scrape
-
-  		xero = XeroConnection.new.connect
+		xero = XeroConnection.new.connect
   		clean = CleanData.new
 
   		page_num = 1
@@ -29,30 +28,36 @@ class XeroInvoice < ActiveRecord::Base
 
 	  	 		contact_name = clean.remove_apostrophe(i.contact_name) unless i.contact_name.nil?
 
-	  			order_id = i.invoice_number.gsub("BC","") unless i.invoice_number.nil?
+	  			order_id = i.invoice_number.gsub("BC","").to_i unless i.invoice_number.nil?
+
+	  			if order_id.nil?
+	  				order_id = 0
+	  			end
 	  			
 	  			time = Time.now.to_s(:db)
 
-	  			if XeroInvoice.where(invoice_id: i.invoice_id).count == 0
+	  			if XeroInvoice.where(invoice_id: i.xero_invoice_id).count == 0
 
-		  			sql = "INSERT INTO xero_invoices (invoice_id, order_id, contact_id, contact_name, total,\
-		  			sub_total, total_tax, amount_due, amount_paid, amount_credited, date, due_date,\
-		  			updated_date, status, type, has_attachments, created_at, updated_at) VALUES ('#{i.invoice_id}',\
-		  			'#{order_id}', '#{i.contact_id}', '#{contact_name}', '#{i.total}', '#{i.sub_total}',\
-		  			'#{i.total_tax}', '#{i.amount_due}', '#{i.amount_paid}', '#{i.amount_credited}', '#{date}',\
-		  			'#{due_date}', '#{updated_date}', '#{i.status}', '#{i.type}', '#{i.has_attachments}',\
-		  			'#{time}', '#{time}')"
+		  			sql = "INSERT INTO xero_invoices (xero_invoice_id, xero_invoice_number,\
+		  			xero_contact_id, xero_contact_name, sub_total, total, total_tax, amount_due,\
+		  			amount_paid, amount_credited, date, due_date, date_modified, status, line_amount_types,
+		  			type, created_at, updated_at) VALUES ('#{i.invoice_id}', '#{order_id}',\
+		  			'#{i.contact_id}', '#{contact_name}', '#{i.sub_total}', '#{i.total}',\
+		  			'#{i.total_tax}', '#{i.amount_due}', '#{i.amount_paid}', '#{i.amount_credited}',\
+		  			'#{date}','#{due_date}', '#{updated_date}', '#{i.status}', '#{i.line_amount_types}',\
+		  			'#{i.type}', '#{time}', '#{time}')"
 
 		  			ActiveRecord::Base.connection.execute(sql)
+
+		  			XeroInvoiceLineItem.new.scrape(i.line_items, i.invoice_id)
 		  		end
 	  		end
 
-	  		page_num += 1
+	  		#page_num += 1
 
-	  		invoices = xero.Invoice.all(page: page_num)
+	  		invoices = xero.Invoice.all(page: 1000)
 
   		end
 
-  	end
-
+	end
 end
