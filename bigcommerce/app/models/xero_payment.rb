@@ -18,14 +18,18 @@ class XeroPayment < ActiveRecord::Base
 
 			time = Time.now.to_s(:db)
 
+			contact_name = clean.remove_apostrophe(p.invoice.contact_name) unless p.invoice.contact_name.nil?
+
 			sql = "INSERT INTO xero_payments (xero_payment_id, xero_invoice_id,\
 			xero_invoice_number, invoice_type, xero_contact_id, xero_account_id,\
 			xero_contact_name, payment_type, status, amount, date,\
 			date_modified, created_at, updated_at) VALUES ('#{p.payment_id}',\
 			'#{p.invoice_id}', '#{p.invoice.invoice_number}', '#{p.invoice.type}',\
-			'#{p.invoice.contact_id}', '#{p.account_id}', '#{p.invoice.name}',\
+			'#{p.invoice.contact_id}', '#{p.account_id}', '#{contact_name}',\
 			'#{p.payment_type}', '#{p.status}', '#{p.amount}', '#{date}', '#{updated_date}',\
 			'#{time}', '#{time}')"
+
+			ActiveRecord::Base.connection.execute(sql)
 		end
 	end
 end
