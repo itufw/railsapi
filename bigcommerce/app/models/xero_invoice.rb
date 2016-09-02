@@ -8,6 +8,7 @@ class XeroInvoice < ActiveRecord::Base
 	has_many :xero_over_payment_allocations
 	has_many :xero_invoice_line_items
 	has_many :xero_credit_note_allocations
+	has_many :xero_payments
 
 	def scrape
 

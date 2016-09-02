@@ -11,11 +11,9 @@ class XeroReceipt < ActiveRecord::Base
 		clean = CleanData.new
 		xero = XeroConnection.new.connect
 
-		#all_receipts = xero.XeroReceipt.all
+		all_receipts = xero.Receipt.all
 
-		r = xero.Receipt.first
-
-		#all_receipts.each do |r|
+		all_receipts.each do |r|
 
 			date = clean.map_date(r.date.to_s)
 			updated_date = clean.map_date(r.updated_date_utc.to_s)
@@ -29,7 +27,7 @@ class XeroReceipt < ActiveRecord::Base
 			'#{r.sub_total}', '#{r.total}', '#{r.total_tax}', '#{time}', '#{time}')"
 
 			ActiveRecord::Base.connection.execute(sql)
-		#end
+		end
 
 	end
 end
