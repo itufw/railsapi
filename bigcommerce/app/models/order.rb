@@ -176,5 +176,40 @@ class Order < ActiveRecord::Base
 		return where('order_products.product_id IN (?)', product_ids).references(:order_products) if !product_ids.empty?
 		return all
 	end
+
+	def self.date_filter(start_date, end_date)
+		start_time = Time.parse(start_date.to_s)
+        end_time = Time.parse(end_date.to_s)
+
+		where('orders.date_created >= ? and orders.date_created <= ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"))
+	end
+
+	def self.valid_order
+		includes(:status).where('statuses.valid_order = 1').references(:statuses)
+	end
+
+	def self.group_by_date_created
+		group('DATE(orders.date_created)')
+	end
+
+	def self.group_by_staff_and_date
+		includes(:customer).group(['customers.staff_id', 'DATE(orders.date_created)']).references(:customers)
+	end
+
+	def self.sum_total
+		sum('orders.total_inc_tax')
+	end
+
+	def self.customer_filter(customer_id)
+		where('orders.customer_id = ?', customer_id)
+	end
+
+	def self.order_by_id
+		order('id DESC')
+	end
+
+	def self.include_customer_staff_status
+		includes([{:customer => :staff}, :status])
+	end
 	
 end

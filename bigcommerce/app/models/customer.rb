@@ -155,4 +155,20 @@ class Customer < ActiveRecord::Base
 		return where(staff_id: staff_id).search_for(search_text) if staff_id
 		return all.search_for(search_text)
 	end
+
+	def self.customer_name(actual_name, firstname, lastname)
+		name = ""	
+		if actual_name.present?
+		  name = actual_name
+		elsif firstname.present? || lastname.present? ||
+		  name = firstname + ' ' + lastname
+		end
+		return name
+	end
+
+	def self.get_customer(id)
+		find(id)
+	end
+
+
 end
