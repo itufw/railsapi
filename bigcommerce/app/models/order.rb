@@ -20,8 +20,6 @@ class Order < ActiveRecord::Base
 
 	belongs_to :order_history
 
-	#has_one :xero_invoice
-
 	def scrape
 
 		order_api = Bigcommerce::Order
@@ -176,5 +174,5 @@ class Order < ActiveRecord::Base
 		return where('order_products.product_id IN (?)', product_ids).references(:order_products) if !product_ids.empty?
 		return all
 	end
-	
+
 end
