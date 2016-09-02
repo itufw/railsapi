@@ -2,54 +2,56 @@
 
   before_action :confirm_logged_in
 
+    # Weekly sales summaries
     def view_sales_dashboard
-        # Current and Last week sales summaries
+
+        # Date selected by user , default is today's date
         date_param = params[:selected_date]
 
         if !date_param.blank?
           date_given = date_param[:selected_date].to_date
           start_date = date_given
         else
+          # if no date selected, then show weekly summaries starting from the beginning of the week
+          # according to today's date
           date_given = Date.today
           start_date = date_given.at_beginning_of_week
         end
 
-        
+        # create an array of dates - 7 elements
         end_date = 6.days.since(start_date)
         @dates_this_week = (start_date..end_date).to_a
+
         sums_this_week = sum_orders(start_date, end_date)
+
+        # get an array of daily sums and total for current week
         @result_this_week = get_daily_totals(@dates_this_week, sums_this_week)
 
-        date_sum_staff_map = sum_orders_by_staff(start_date, end_date)
-        @this_week_staff_totals = get_staff_totals(@dates_this_week, date_sum_staff_map)
-
-
+        # same logic for last week
         last_week_start_date = start_date - 7.days
-        #last_week_start_date = seven_days_ago.at_beginning_of_week
         last_week_end_date = 6.days.since(last_week_start_date)
         @dates_last_week = (last_week_start_date..last_week_end_date).to_a
         sums_last_week = sum_orders(last_week_start_date, last_week_end_date)
         @result_last_week = get_daily_totals(@dates_last_week, sums_last_week)
 
+        # sales summaries divided by sales staff - but only for current week
+        date_sum_staff_map = sum_orders_by_staff(start_date, end_date)
+        @this_week_staff_totals = get_staff_totals(@dates_this_week, date_sum_staff_map)
+
+
     end
 
+    # Sums order totals and groups them by date
     def sum_orders(start_date, end_date)
-        start_time = Time.parse(start_date.to_s)
-        end_time = Time.parse(end_date.to_s)
-
-        date_sum_map = Order.includes(:status).where('date_created >= ? and date_created < ? and statuses.valid_order = 1', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S")).references(:statuses).group('DATE(date_created)').sum('total_inc_tax')
-        
-        return date_sum_map
-
+      return date_sum_map = Order.date_filter(start_date, end_date).valid_order.group_by_date_created.sum_total
     end
 
+    # Sums order totals and groups them by staff and date created
     def sum_orders_by_staff(start_date, end_date)
-        start_time = Time.parse(start_date.to_s)
-        end_time = Time.parse(end_date.to_s)
-        date_sum_staff_map = Order.includes(:customer, :status).where('orders.date_created >= ? and orders.date_created < ? and statuses.valid_order = 1', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S")).references(:statuses).group(['customers.staff_id', 'DATE(orders.date_created)']).references(:customers).sum('orders.total_inc_tax')
-        return date_sum_staff_map
+        return date_sum_staff_map = Order.date_filter(start_date, end_date).valid_order.group_by_staff_and_date.sum_total
     end
 
+    # returns an array of sums and a total
     def get_daily_totals(dates, sums)
         result = []
         total = 0
@@ -69,13 +71,12 @@
         return result
     end
 
+    ## TO DO
     def get_staff_totals(dates, date_sum_staff_map)
 
-        staff_weekly_totals = []
+      staff_weekly_totals = []
 
-        all_active_staffs = Staff.where('active = 1 and user_type LIKE "Sales%"')
-
-        all_active_staffs.each do |as|
+      Staff.active_sales_staff.each do |as|
 
             staff_map_per_id = date_sum_staff_map.select { |key, value| key[0] == as.id }
             if staff_map_per_id.keys.count != 0
@@ -99,63 +100,18 @@
 
     end
 
-    # def view_daily_orders_for_rep
-
-    #     @staff_nickname = params[:staff]
-    #     staff_id = params[:staff_id]
-
-    #     @date = params[:date]
-
-    #     start_time = Time.parse(@date.to_s)
-    #     end_time = 1.day.since(start_time)
-
-    #     @daily_orders_for_rep = Order.includes(:customer, :status).where('orders.date_created >= ? and orders.date_created < ? and customers.staff_id = ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"), staff_id).references(:customers).order('orders.id DESC')
-
-    #     @page_header = "Orders for Date : #{@date.to_date.strftime('%A  %d/%m/%y')} and Staff : #{@staff_nickname}"
-
-    # end
-
-    # def view_weekly_orders_for_rep
-
-    #     @staff_nickname = params[:staff]
-    #     staff_id = params[:staff_id]
-
-    #     @date = params[:week_start_date]
-
-    #     start_time = Time.parse(@date.to_s)
-    #     end_time = 7.days.since(start_time)
-
-    #     @daily_orders_for_rep = Order.includes(:customer, :status).where('orders.date_created >= ? and orders.date_created < ? and customers.staff_id = ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"), staff_id).references(:customers).order('orders.id DESC')
-
-    #     @page_header = "This Week's of Staff : #{@staff_nickname}"
-
-    #     render "view_daily_orders_for_rep"
-
-    # end
-
-    # def view_overall_daily_orders
-
-    #     @date = params[:date]
-
-    #     start_time = Time.parse(@date.to_s)
-    #     end_time = 1.day.since(start_time)
-
-    #     @daily_orders = Order.includes([{:customer => :staff}, :status]).where('orders.date_created >= ? and orders.date_created < ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S")).order('id DESC')
-
-    #     @page_header = "Orders for Date : #{@date.to_date.strftime('%A  %d/%m/%y')}"
-
-    # end
-
     def view_orders_for_customer
       @customer_id = params[:customer_id]
 
-      @orders = Order.includes([{:customer => :staff}, :status]).where('orders.customer_id = ?', @customer_id).order('id DESC')
+      # give all the orders for a customer id
+      @orders = Order.include_customer_staff_status.customer_filter(@customer_id).order_by_id
 
-      @customer_name = get_customer_name(Customer.where(id: @customer_id).first)
+      #get customer name
+      customer = Customer.get_customer(@customer_id)
+      @customer_name = Customer.customer_name(customer.actual_name, customer.firstname, customer.lastname)
 
+      
       get_customer_stats(@customer_id)
-
-      @page_header = "All Orders for #{@customer_name}"
 
     end
 

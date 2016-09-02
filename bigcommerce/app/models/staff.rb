@@ -16,7 +16,7 @@ class Staff < ActiveRecord::Base
 	# Staff.create(name: , email: , password: , password_confirmation: )
 
 	def csv_import
-		CSV.foreach("db/csv/staff.csv", headers: true) do |row|
+	  CSV.foreach("db/csv/staff.csv", headers: true) do |row|
 			row_hash = row.to_hash
 			Staff.create(id: row_hash['id'], firstname: row_hash['FirstName'], lastname: row_hash['LastName'],\
 				nickname: row_hash['NickName'], email: row_hash['Email'], logon_details: row_hash['LogonDetails'],\
@@ -26,4 +26,10 @@ class Staff < ActiveRecord::Base
 				payment_rights: row_hash['PaymentRights'], active: row_hash['Active'])
 		end
 	end
+
+	def self.active_sales_staff
+	  where('active = 1 and user_type LIKE "Sales%"')
+	end
+
+
 end
