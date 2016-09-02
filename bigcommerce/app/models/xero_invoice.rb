@@ -29,9 +29,6 @@ class XeroInvoice < ActiveRecord::Base
 
 	  	 		contact_name = clean.remove_apostrophe(i.contact_name) unless i.contact_name.nil?
 
-	  			if order_id.nil?
-	  				order_id = 0
-	  			end
 	  			
 	  			time = Time.now.to_s(:db)
 

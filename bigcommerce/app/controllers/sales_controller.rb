@@ -98,54 +98,6 @@
         return staff_weekly_totals 
 
     end
-
-    # def view_daily_orders_for_rep
-
-    #     @staff_nickname = params[:staff]
-    #     staff_id = params[:staff_id]
-
-    #     @date = params[:date]
-
-    #     start_time = Time.parse(@date.to_s)
-    #     end_time = 1.day.since(start_time)
-
-    #     @daily_orders_for_rep = Order.includes(:customer, :status).where('orders.date_created >= ? and orders.date_created < ? and customers.staff_id = ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"), staff_id).references(:customers).order('orders.id DESC')
-
-    #     @page_header = "Orders for Date : #{@date.to_date.strftime('%A  %d/%m/%y')} and Staff : #{@staff_nickname}"
-
-    # end
-
-    # def view_weekly_orders_for_rep
-
-    #     @staff_nickname = params[:staff]
-    #     staff_id = params[:staff_id]
-
-    #     @date = params[:week_start_date]
-
-    #     start_time = Time.parse(@date.to_s)
-    #     end_time = 7.days.since(start_time)
-
-    #     @daily_orders_for_rep = Order.includes(:customer, :status).where('orders.date_created >= ? and orders.date_created < ? and customers.staff_id = ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"), staff_id).references(:customers).order('orders.id DESC')
-
-    #     @page_header = "This Week's of Staff : #{@staff_nickname}"
-
-    #     render "view_daily_orders_for_rep"
-
-    # end
-
-    # def view_overall_daily_orders
-
-    #     @date = params[:date]
-
-    #     start_time = Time.parse(@date.to_s)
-    #     end_time = 1.day.since(start_time)
-
-    #     @daily_orders = Order.includes([{:customer => :staff}, :status]).where('orders.date_created >= ? and orders.date_created < ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S")).order('id DESC')
-
-    #     @page_header = "Orders for Date : #{@date.to_date.strftime('%A  %d/%m/%y')}"
-
-    # end
-
     def view_orders_for_customer
       @customer_id = params[:customer_id]
 
