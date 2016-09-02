@@ -7,6 +7,7 @@ class XeroContact < ActiveRecord::Base
 	has_many :xero_credit_notes
 	has_many :xero_invoices
 	has_many :xero_receipts
+	has_many :xero_payments
 
 	def scrape
 		clean = CleanData.new
