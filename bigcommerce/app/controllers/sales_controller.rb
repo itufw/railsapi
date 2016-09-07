@@ -110,9 +110,6 @@
       customer = Customer.get_customer(@customer_id)
       @customer_name = Customer.customer_name(customer.actual_name, customer.firstname, customer.lastname)
 
-      
-      get_customer_stats(@customer_id)
-
     end
 
     def view_products_for_orderid
@@ -251,98 +248,26 @@
 
         @staffs = active_sales_staff
 
+        stats_for_timeperiods("Order.filter_order_products(%s, nil).valid_order" % @product_id, "".to_sym, :sum_order_product_qty)
+
         if params.has_key?(:commit) && !params[:staff][:id].blank?
             staff_id = params[:staff][:id]
-            @staff = Staff.where(id: staff_id).first
-            @orders = Order.includes([{:customer => :staff}, :order_products]).where('orders.status_id = ? and order_products.product_id = ? and customers.staff_id = ?', @status_id, @product_id, staff_id).references(:order_products, :customers)
+            @staff = Staff.filter_by_id(staff_id)
+            @orders = Order.status_filter(@status_id).filter_order_products(@product_id, nil).staff_filter(staff_id)
         else
-            @orders = Order.includes([{:customer => :staff}, :order_products]).where('orders.status_id = ? and order_products.product_id = ?', @status_id, @product_id).references(:order_products)
+            @orders = Order.status_filter(@status_id).filter_order_products(@product_id, nil)
         end
-
-
-        # orders.each do |o|
-        #     rep_nickname = Staff.where('id = ?', o.customer.staff_id).first.nickname
-        #     date_created = o.date_created.to_date
-        #     cust_name = get_customer_name(o.customer)
-        #     cust_id = o.customer_id
-        #     prod_qty = o.order_products.first.qty
-        #     order_qty = o.qty
-        #     order_total = o.total_inc_tax
-
-        #     @result.push([rep_nickname, date_created, o.id, cust_name, prod_qty, order_qty, order_total, cust_id])
-        # end
-
-        @time_periods = StaffTimePeriod.where('display = ?', 1)
-        @average_time_specified = DefaultAveragePeriod.where(staff_id: 19).first
-        @product_stats_sum = []
-        @product_stats_avg = []
-
-        @time_periods.each do |t|
-            start_time = Time.parse(t.start_date.to_s)
-            end_time = Time.parse(t.end_date.to_s)
-            sum = Order.includes(:order_products, :status).where('orders.date_created >= ? and orders.date_created <= ? and statuses.valid_order = 1 and order_products.product_id = ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"), @product_id).references(:statuses, :order_products).sum('order_products.qty')
-            num_days = (t.end_date.to_date - t.start_date.to_date).to_i
-            avg = (sum.to_f/num_days)*(@average_time_specified.days.to_i)
-            @product_stats_sum.push(sum)
-            @product_stats_avg.push(avg)
-        end
-
         @page_header = "#{@status_name} - #{@product_name}"
     end
-
-    def get_customer_stats(customer_id)
-
-        @time_periods = StaffTimePeriod.where('display = ?', 1)
-
-        #@default_average_periods = DefaultAveragePeriod.first
-
-        @sum_per_time_period = []
-        @avg_per_time_period = []
-
-        average_time_specified = DefaultAveragePeriod.where(staff_id: 19).first
-        @average_name = average_time_specified.name
-        #@average_description = DefaultAveragePeriod.where(staff_id: 19).first.name
-
-        @time_periods.each do |t|
-
-            start_time = Time.parse(t.start_date.to_s)
-            end_time = Time.parse(t.end_date.to_s)
-            sum = Order.includes(:status).where('date_created >= ? and date_created <= ? and customer_id = ? and statuses.valid_order = 1', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"), customer_id).references(:statuses).sum(:total_inc_tax)
-            @sum_per_time_period.push(sum)
-
-            num_days = (t.end_date - t.start_date).to_i
-            avg = (sum.to_f/num_days)*(average_time_specified.days.to_i)
-            @avg_per_time_period.push(avg)
-        end
-
-    end
-
 
     def view_product_stats_for_customer
 
         @customer_id = params[:customer_id]
         @customer_name = params[:customer_name]
 
-        @time_periods = StaffTimePeriod.where('display = ?', 1)
-        @product_stats = []
-        
-        # show a grid for all products
+        product_ids = stats_for_timeperiods("Order.customer_filter(%s).valid_order" % @customer_id, :group_by_product_id, :sum_order_product_qty)
 
-        @time_periods.each do |t|
-            
-            start_time = Time.parse(t.start_date.to_s)
-            end_time = Time.parse(t.end_date.to_s)
-            @product_stats.push(Order.includes(:order_products, :status).where('orders.customer_id = ? and orders.date_created >= ? and orders.date_created <= ? and statuses.valid_order = 1', @customer_id, start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S")).references(:statuses).group('order_products.product_id').sum('order_products.qty'))
-            
-        end
-
-        # We have an array of hashes
-        # Each hash represents products ordered in 1 time period
-        # Key - product id, Value - product qty
-        product_ids = @product_stats.reduce(&:merge).keys
-
-        product_id_name_map = Product.where(id: product_ids).pluck("id,name").to_h
-
+        product_id_name_map = Product.get_products(product_ids).pluck("id,name").to_h
         @product_id_name_map_sorted = Hash[product_id_name_map.sort_by { |k,v| v }]
 
     end
@@ -365,56 +290,63 @@
 
     helper_method :check_id_in_map
 
+    def stats_for_timeperiods(where_query, group_by, sum_by)
+      @time_periods = StaffTimePeriod.display
+
+      # CHANGE THIS
+      @average_time_specified = DefaultAveragePeriod.where(staff_id: 19).first
+      # this is the stat per row and column, for eg. This is qty sold for each customer per time period
+      @stats_per_cell = []
+      # this is the stat per column, for eg. this is the total qty sold in one time period
+      @stats_sum_per_t = []
+      @stats_avg_per_t = []
+
+      @time_periods.each do |t| 
+
+        @stats_per_cell.push((eval where_query).date_filter(t.start_date.to_s, t.end_date.to_s).send(group_by).send(sum_by)) if respond_to?(group_by)
+        
+        sum = (eval where_query).date_filter(t.start_date.to_s, t.end_date.to_s).send(sum_by)
+        num_days = (t.end_date.to_date - t.start_date.to_date).to_i
+        avg = (sum.to_f/num_days)*(@average_time_specified.days.to_i)
+        
+        @stats_sum_per_t.push(sum)
+        @stats_avg_per_t.push(avg)
+      end
+
+      return ids = @stats_per_cell.reduce(&:merge).keys unless @stats_per_cell.blank?
+    end
+
     def view_customer_stats_for_product
+      @product_id = params[:product_id]
+      @product_name = params[:product_name]
 
-        @staffs = active_sales_staff
+      customer_ids = stats_for_timeperiods("Order.filter_order_products(%s, nil).valid_order" % @product_id, :group_by_customerid, :sum_order_product_qty)
 
-        @product_id = params[:product_id]
-        @product_name = params[:product_name]
+      ###### CHANGE
+      @staffs = active_sales_staff
 
-        @time_periods = StaffTimePeriod.where('display = ?', 1)
-        @average_time_specified = DefaultAveragePeriod.where(staff_id: 19).first
-        @customer_stats = []
-        @product_stats_sum = []
-        @product_stats_avg = []
+      pluck_string = "customers.id, customers.actual_name, customers.firstname, customers.lastname, staffs.nickname"
 
-        @time_periods.each do |t|
-            start_time = Time.parse(t.start_date.to_s)
-            end_time = Time.parse(t.end_date.to_s)
-            @customer_stats.push(Order.includes(:order_products, :customer, :status).where('order_products.product_id = ? and orders.date_created >= ? and orders.date_created <= ? and statuses.valid_order = 1', @product_id, start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S")).references(:order_products, :statuses).group('customers.id').sum('order_products.qty'))
-            sum = Order.includes(:order_products, :status).where('orders.date_created >= ? and orders.date_created <= ? and statuses.valid_order = 1 and order_products.product_id = ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"), @product_id).references(:statuses, :order_products).sum('order_products.qty')
-            num_days = (t.end_date.to_date - t.start_date.to_date).to_i
-            avg = (sum.to_f/num_days)*(@average_time_specified.days.to_i)
-            @product_stats_sum.push(sum)
-            @product_stats_avg.push(avg)
-        end
+      if params.has_key?(:commit) && !params[:staff][:id].blank?
+        staff_id = params[:staff][:id]
+        @staff = Staff.filter_by_id
+        customer_id_name_array = Customer.staff_search_filter(nil, staff_id).get_customers(customer_ids).pluck(pluck_string)
+      else
+          customer_id_name_array = Customer.includes(:staff).get_customers(customer_ids).pluck(pluck_string)
+      end
 
-        customer_ids = @customer_stats.reduce(&:merge).keys
-
-        if params.has_key?(:commit) && !params[:staff][:id].blank?
-            staff_id = params[:staff][:id]
-            @staff = Staff.where(id: staff_id).first
-            customer_id_name_array = Customer.includes(:staff).where('customers.id IN (?) and staffs.id = ?', customer_ids, staff_id).references(:staffs).pluck("customers.id, customers.actual_name, customers.firstname, customers.lastname, staffs.nickname")
-        else
-            customer_id_name_array = Customer.includes(:staff).where(id: customer_ids).pluck("customers.id, customers.actual_name, customers.firstname, customers.lastname, staffs.nickname")
-        end
-
-
-        customer_id_name_map = Hash[customer_id_name_array.map {|id, actual_name, firstname, lastname, staff| [id, [customer_name(firstname, lastname, actual_name), staff]]}]
-
-        @customer_id_name_map_sorted = Hash[customer_id_name_map.sort_by { |k,v| v[0] }]
+      customer_id_name_map = Hash[customer_id_name_array.map {|id, actual_name, firstname, lastname, staff| [id, [customer_name(firstname, lastname, actual_name), staff]]}]
+      @customer_id_name_map_sorted = Hash[customer_id_name_map.sort_by { |k,v| v[0] }]
    
-        @page_header = "#{@product_name}"
+      @page_header = "#{@product_name}"
+      ######
 
     end
 
     def view_orders_for_product
-
         @product_id = params[:product_id]
         @product_name = params[:product_name]
-
-        @orders = Order.includes([{:customer => :staff}, :status, :order_products]).where('order_products.product_id = ?', @product_id).order('orders.id DESC').references(:order_products)
-
+        @orders = Order.include_customer_staff_status.filter_order_products(@product_id, nil).order_by_id
     end
 
 end

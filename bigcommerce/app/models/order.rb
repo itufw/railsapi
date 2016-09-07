@@ -181,35 +181,60 @@ class Order < ActiveRecord::Base
 		start_time = Time.parse(start_date.to_s)
         end_time = Time.parse(end_date.to_s)
 
-		where('orders.date_created >= ? and orders.date_created <= ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"))
+		return where('orders.date_created >= ? and orders.date_created <= ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"))
 	end
 
 	def self.valid_order
-		includes(:status).where('statuses.valid_order = 1').references(:statuses)
+		return includes(:status).where('statuses.valid_order = 1').references(:statuses)
+	end
+
+	def self.status_filter(status_id)
+		return where(status_id: status_id)
 	end
 
 	def self.group_by_date_created
-		group('DATE(orders.date_created)')
+		return group('DATE(orders.date_created)')
+	end
+
+	def self.group_by_customerid
+		return group('orders.customer_id')
 	end
 
 	def self.group_by_staff_and_date
-		includes(:customer).group(['customers.staff_id', 'DATE(orders.date_created)']).references(:customers)
+		return includes(:customer).group(['customers.staff_id', 'DATE(orders.date_created)']).references(:customers)
+	end
+
+	def self.group_by_product_id
+		return includes(:order_products).group('order_products.product_id')
 	end
 
 	def self.sum_total
-		sum('orders.total_inc_tax')
+		return sum('orders.total_inc_tax')
+	end
+
+	def self.sum_order_product_qty
+		return includes(:order_products).sum('order_products.qty')
 	end
 
 	def self.customer_filter(customer_id)
-		where('orders.customer_id = ?', customer_id)
+		return where('orders.customer_id = ?', customer_id)
 	end
 
+	def self.staff_filter(staff_id)
+		return includes([{:customer => :staff}]).where('customers.staff_id = ?', staff_id).references(:customers)
+	end
+	
 	def self.order_by_id
-		order('id DESC')
+		return order('orders.id DESC')
 	end
 
 	def self.include_customer_staff_status
-		includes([{:customer => :staff}, :status])
+		return includes([{:customer => :staff}, :status])
 	end
-	
+
+	def self.filter_order_products(product_id, order_id)
+		return includes(:order_products).where('order_products.product_id = ?', product_id).references(:order_products) if product_id
+		return includes(:order_product).where('order_products.order_id = ?', order_id)
+	end
+
 end

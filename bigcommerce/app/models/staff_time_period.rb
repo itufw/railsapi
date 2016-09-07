@@ -31,4 +31,8 @@ class StaffTimePeriod < ActiveRecord::Base
 		time_periods.each { |t| StaffTimePeriod.new.send(t.update_function, t, Time.now.in_time_zone("Australia/Melbourne").to_date)}
 	end
 
+	def self.display
+		return where(display: 1)
+	end
+
 end

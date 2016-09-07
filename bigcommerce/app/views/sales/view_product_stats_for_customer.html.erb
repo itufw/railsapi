@@ -11,7 +11,7 @@
 	<% @product_id_name_map_sorted.each do |id, name| %>
 		<tr>
 			<td><%= link_to name, action: "view_orders_for_product_and_customer", customer_id: @customer_id, customer_name: @customer_name, product_name: name, product_id: id %></td>
-			<% values = check_id_in_map(@product_stats, id) %>
+			<% values = check_id_in_map(@stats_per_cell, id) %>
 			<% values.each do |v| %>
 				<td class="num"><%= v %></td>
 			<% end %>

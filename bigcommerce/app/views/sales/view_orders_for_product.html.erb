@@ -14,7 +14,7 @@
 
 	<% @orders.each do |o| %>
 		<tr>
-			<td><%= o.customer.staff.nickname %></td>
+			<td><%= o.customer.staff.nickname if o.customer %></td>
 			<td><%= o.date_created.to_date %></td>
 			<td><%= link_to o.id, action: "view_products_for_orderid", order_id: o.id %></td>
 			<td><%= link_to get_customer_name(o.customer), action: "view_orders_for_customer", customer_id: @customer_id %></td>
