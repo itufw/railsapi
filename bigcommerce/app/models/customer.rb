@@ -152,7 +152,7 @@ class Customer < ActiveRecord::Base
 	end
 
 	def self.staff_search_filter(search_text = nil, staff_id = nil)
-		return where(staff_id: staff_id).search_for(search_text) if staff_id
+		return includes(:staff).where(staff_id: staff_id).search_for(search_text) if staff_id
 		return all.search_for(search_text)
 	end
 
@@ -169,6 +169,11 @@ class Customer < ActiveRecord::Base
 	def self.get_customer(id)
 		find(id)
 	end
+
+	def self.get_customers(ids_array)
+		return where('customers.id IN (?)', ids_array)
+	end
+
 
 
 end

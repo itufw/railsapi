@@ -27,13 +27,13 @@
 
 	<tr>
 		<td>Total Qty</td>
-		<% @product_stats_sum.each do |s| %>
+		<% @stats_sum_per_t.each do |s| %>
 			<td><%= number_with_delimiter(number_with_precision(s, precision: 2)) %></td>
 		<% end %>
 	</tr>
 	<tr>
 		<td><%= @average_time_specified.name %> Average</td>
-		<% @product_stats_avg.each do |a| %>
+		<% @stats_avg_per_t.each do |a| %>
 			<td><%= number_with_delimiter(number_with_precision(a, precision: 2)) %></td>
 		<% end %>
 	</tr>	

@@ -1,4 +1,6 @@
-
+<%
+=begin
+%>
 <h3><center>Customer Stats</center></h3>
 <table class = "table table-striped table-bordered table-hover table-responsive">
 
@@ -26,7 +28,9 @@
 		<% end %>
 	</tr>
 </table>
-
+<%
+=end
+%>
 <center><button class="button "><%= link_to "View Top Rated Products for Customer", action: "view_product_stats_for_customer", customer_id: @customer_id, customer_name: @customer_name %></button></center> 
 <br/><br/>
 

@@ -12,13 +12,13 @@
 
 	<tr>
 		<td>Total Qty</td>
-		<% @product_stats_sum.each do |s| %>
+		<% @stats_sum_per_t.each do |s| %>
 			<td><%= number_with_delimiter(number_with_precision(s, precision: 2)) %></td>
 		<% end %>
 	</tr>
 	<tr>
 		<td><%= @average_time_specified.name %> Average</td>
-		<% @product_stats_avg.each do |a| %>
+		<% @stats_avg_per_t.each do |a| %>
 			<td><%= number_with_delimiter(number_with_precision(a, precision: 2)) %></td>
 		<% end %>
 	</tr>	
@@ -52,7 +52,7 @@
 	<% @customer_id_name_map_sorted.each do |id, value| %>
 		<tr>
 			<td><%= link_to value[0], action: 'view_orders_for_product_and_customer', product_id: @product_id, product_name: @product_name, customer_id: id, customer_name: value[0] %></td>
-			<% values = check_id_in_map(@customer_stats, id) %>
+			<% values = check_id_in_map(@stats_per_cell, id) %>
 			<td><%= value[1] %></td>
 			<% values.each do |v| %>
 				<td class="num"><%= v %></td>

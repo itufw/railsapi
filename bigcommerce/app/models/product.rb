@@ -157,5 +157,9 @@ class Product < ActiveRecord::Base
 		all.search_for(search_text)
 	end
 
+	def self.get_products(ids_array)
+		return where('products.id IN (?)', ids_array)
+	end
+
 
 end
