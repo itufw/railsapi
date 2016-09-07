@@ -172,6 +172,10 @@ class Order < ActiveRecord::Base
 		return all
 	end
 
+	def self.order_filter(order_id)
+		return find(order_id)
+	end
+
 	def self.product_filter(product_ids = nil)
 		return where('order_products.product_id IN (?)', product_ids).references(:order_products) if !product_ids.empty?
 		return all
@@ -223,13 +227,17 @@ class Order < ActiveRecord::Base
 	def self.staff_filter(staff_id)
 		return includes([{:customer => :staff}]).where('customers.staff_id = ?', staff_id).references(:customers)
 	end
-	
+
 	def self.order_by_id
 		return order('orders.id DESC')
 	end
 
 	def self.include_customer_staff_status
 		return includes([{:customer => :staff}, :status])
+	end
+
+	def self.include_all
+		return includes([{:customer => :staff}, :status, {:order_products => :product}])
 	end
 
 	def self.filter_order_products(product_id, order_id)
