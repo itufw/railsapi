@@ -116,14 +116,14 @@
       
       @order_id = params[:order_id]
 
-      @order = Order.includes([{:customer => :staff}, :status, {:order_products => :product}]).where('orders.id = ?', @order_id).first
-
-      #@order_products = OrderProduct.includes(:product).where(order_id: @order_id)
+      @order = Order.include_all.order_filter(@order_id)
 
       @page_header = "Order # #{@order_id}"
 
     end
 
+
+    # WHEN DO WE COME TO THIS PAGE ? - We click on Order ID - then click on any one of the products
     def view_orders_for_product_and_customer
 
         @customer_id = params[:customer_id]
@@ -132,25 +132,12 @@
         @product_name = params[:product_name]
   
         # need to take care - same products multiple times in same order
-        @orders = Order.includes([{:customer => :staff}, :status, :order_products]).where('order_products.product_id = ? and orders.customer_id = ?', @product_id, @customer_id).order('orders.id DESC').references(:order_products)
+        @orders = Order.include_customer_staff_status.filter_order_products(@product_id, nil).customer_filter(@customer_id).order_by_id
 
-        @time_periods = StaffTimePeriod.where('display = ?', 1)
-        @average_time_specified = DefaultAveragePeriod.where(staff_id: 19).first
-        @product_stats_sum = []
-        @product_stats_avg = []
-
-        @time_periods.each do |t|
-            start_time = Time.parse(t.start_date.to_s)
-            end_time = Time.parse(t.end_date.to_s)
-            sum = Order.includes(:order_products, :status).where('orders.customer_id = ? and orders.date_created >= ? and orders.date_created <= ? and statuses.valid_order = 1 and order_products.product_id = ?', @customer_id, start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"), @product_id).references(:statuses, :order_products).sum('order_products.qty')
-            num_days = (t.end_date.to_date - t.start_date.to_date).to_i
-            avg = (sum.to_f/num_days)*(@average_time_specified.days.to_i)
-            @product_stats_sum.push(sum)
-            @product_stats_avg.push(avg)
-        end
-
+        stats_for_timeperiods("Order.filter_order_products(%s, nil).customer_filter(%s)" % [@product_id, @customer_id], "".to_sym, :sum_order_product_qty)
     end
 
+    # TO BE DONE
     def view_orders_by_status
 
       @status_id = params[:status_id]
@@ -160,8 +147,6 @@
         @status_id = 1
         @status_name = "Pending"
       end
-
-      @all_statuses = Status.all
 
       @all_statuses = Status.all
 
@@ -187,18 +172,7 @@
         product_ids = Product.filter(@search_text, producer_country_id, product_sub_type_id).pluck("id")
       end
 
-      # if params.has_key?(:commit) && !params[:staff][:id].blank?
-      #   staff_id = params[:staff][:id]
-      #   @staff = Staff.where(id: staff_id).first
-      #   @orders = Order.includes([{:customer => :staff}]).where('orders.status_id = ? and staffs.id = ?', @status_id, staff_id).references(:staffs).order('orders.id DESC')
-      # else
-      #   @orders = Order.includes([{:customer => :staff}]).where('orders.status_id = ?', @status_id).order('id DESC')
-      # end
-
       @orders = Order.status_staff_filter(@status_id, staff_id).includes([{:customer => :staff}, :order_products]).product_filter(product_ids).order('orders.id DESC')
-
-
-
 
       # need to reduce these to 1
       num_orders = Order.status_staff_filter(@status_id, staff_id).includes(:order_products).product_filter(product_ids).group('order_products.product_id').count('order_products.order_id')
@@ -208,14 +182,6 @@
       merge_1 = num_orders.merge(product_qty) { |k, o, n| [o, n] }
       merge_2 = merge_1.merge(order_totals) { |k, o, n| o.push(n)}
 
-      # if !product_ids.empty?
-      #   intersection = product_ids & merge_2.keys
-      #   merged = merge_2.select {|k,_| intersection.include? k } 
-      # else
-      #   intersection = merge_2.keys
-      #   merged = merge_2
-      # end 
-
       product_array = Product.where(id: merge_2.keys).pluck("id,name,inventory")
       product_hash = Hash[product_array.map{|id,name,inventory| [id,[name,inventory]] if !id.nil?}]
 
@@ -224,13 +190,10 @@
       product_map = merge_2.merge(product_hash) { |k, o, n| o.concat(n) if product_hash.has_key?(k)}
       @product_map_sorted = Hash[product_map.sort_by { |k,v| v[3] }]
 
-
       @page_header_products = "Products with Status: #{@status_name}"
       @page_header_orders = "Orders with Status: #{@status_name}"
 
     end
-
-
 
     # You come here after you click on a product's name on the Status page
     # Status page is the one with the slide bar between orders and products
@@ -272,6 +235,7 @@
 
     end
 
+    # Put this somewhere else
     def check_id_in_map(stats_array, id)
 
         values_for_one_time_periods = []
@@ -290,6 +254,7 @@
 
     helper_method :check_id_in_map
 
+    # Put this somewhere else
     def stats_for_timeperiods(where_query, group_by, sum_by)
       @time_periods = StaffTimePeriod.display
 
