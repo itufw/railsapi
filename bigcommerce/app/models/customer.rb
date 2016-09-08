@@ -171,6 +171,7 @@ class Customer < ActiveRecord::Base
 	end
 
 	def self.get_customers(ids_array)
+		return Customer.all if ids_array.nil?
 		return where('customers.id IN (?)', ids_array)
 	end
 

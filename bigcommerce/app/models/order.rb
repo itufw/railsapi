@@ -200,6 +200,10 @@ class Order < ActiveRecord::Base
 		return group('DATE(orders.date_created)')
 	end
 
+	def self.group_by_date_created_and_staff_id
+		return includes(:customer).group(["customers.staff_id", "DATE(orders.date_created)"])
+	end
+
 	def self.group_by_customerid
 		return group('orders.customer_id')
 	end
