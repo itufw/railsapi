@@ -150,7 +150,7 @@ class Product < ActiveRecord::Base
 	end
 
 
-	def self.filter(search_text = nil, country_id = nil, sub_type_id = nil)
+	def self.search_country_subtype_filter(search_text = nil, country_id = nil, sub_type_id = nil)
 		return where(producer_country_id: country_id, product_sub_type_id: sub_type_id).search_for(search_text) if country_id && sub_type_id
 		return where(producer_country_id: country_id).search_for(search_text) if country_id
 		return where(product_sub_type_id: sub_type_id).search_for(search_text) if sub_type_id
@@ -159,6 +159,7 @@ class Product < ActiveRecord::Base
 
 	def self.get_products(ids_array)
 		return where('products.id IN (?)', ids_array)
+		return all if ids_array.nil?
 	end
 
 
