@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160908054437) do
+ActiveRecord::Schema.define(version: 20160908055653) do
 
   create_table "addresses", force: :cascade do |t|
     t.integer  "customer_id", limit: 4
@@ -569,7 +569,7 @@ ActiveRecord::Schema.define(version: 20160908054437) do
   add_index "xero_invoice_line_items", ["xero_invoice_line_item_id"], name: "index_xero_invoice_line_items_on_xero_invoice_line_item_id", using: :btree
 
   create_table "xero_invoices", primary_key: "xero_invoice_id", force: :cascade do |t|
-    t.integer  "xero_invoice_number",   limit: 8
+    t.string   "xero_invoice_number",   limit: 255
     t.string   "xero_contact_id",       limit: 36,                          null: false
     t.string   "xero_contact_name",     limit: 255
     t.decimal  "sub_total",                         precision: 8, scale: 2
