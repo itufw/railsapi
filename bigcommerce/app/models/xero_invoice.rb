@@ -23,11 +23,11 @@ class XeroInvoice < ActiveRecord::Base
 
 			invoices.each do |i|
 
-				date = clean.map_date(i.date.to_s)
-	  			due_date = clean.map_date(i.due_date.to_s)
-	  			updated_date = clean.map_date(i.updated_date_utc.to_s)
-	  			fully_paid_on_date = clean.map_date(i.fully_paid_on_date.to_s)
-	  			expected_payment_date = clean.map_date(i.expected_payment_date.to_s)
+				date = clean.map_date(i.date)
+	  			due_date = clean.map_date(i.due_date)
+	  			updated_date = clean.map_date(i.updated_date_utc)
+	  			fully_paid_on_date = clean.map_date(i.fully_paid_on_date)
+	  			expected_payment_date = clean.map_date(i.expected_payment_date)
 
 	  	 		contact_name = clean.remove_apostrophe(i.contact_name) unless i.contact_name.nil?
 
