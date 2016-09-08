@@ -26,8 +26,8 @@ class XeroInvoice < ActiveRecord::Base
 				date = clean.map_date(i.date.to_s)
 	  			due_date = clean.map_date(i.due_date.to_s)
 	  			updated_date = clean.map_date(i.updated_date_utc.to_s)
-	  			fully_paid_on_date = clean.map_date(i.fully_paid_on_date)
-	  			expected_payment_date = clean.map_date(i.expected_payment_date)
+	  			fully_paid_on_date = clean.map_date(i.fully_paid_on_date.to_s)
+	  			expected_payment_date = clean.map_date(i.expected_payment_date.to_s)
 
 	  	 		contact_name = clean.remove_apostrophe(i.contact_name) unless i.contact_name.nil?
 
