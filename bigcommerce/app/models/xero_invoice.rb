@@ -44,7 +44,7 @@ class XeroInvoice < ActiveRecord::Base
 		  			VALUES ('#{i.invoice_id}', '#{i.invoice_number}',\
 		  			'#{i.contact_id}', '#{contact_name}', '#{i.sub_total(true)}', '#{i.total_tax(true)}',\
 		  			'#{i.total(true)}', '#{i.amount_due}', '#{i.amount_paid}', '#{i.amount_credited}',\
-		  			#{date}','#{due_date}', '#{fully_paid_on_date}', '#{expected_payment_date}',\
+		  			'#{date}','#{due_date}', '#{fully_paid_on_date}', '#{expected_payment_date}',\
 		  			'#{updated_date}', '#{i.status}', '#{i.line_amount_types}',\
 		  			'#{i.type}', '#{i.reference}', '#{i.currency_code}', '#{i.currency_rate}', '#{time}', '#{time}')"
 
