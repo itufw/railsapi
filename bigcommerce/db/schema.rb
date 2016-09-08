@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160908051343) do
+ActiveRecord::Schema.define(version: 20160908054437) do
 
   create_table "addresses", force: :cascade do |t|
     t.integer  "customer_id", limit: 4
@@ -578,7 +578,6 @@ ActiveRecord::Schema.define(version: 20160908051343) do
     t.decimal  "amount_due",                        precision: 8, scale: 2
     t.decimal  "amount_paid",                       precision: 8, scale: 2
     t.decimal  "amount_credited",                   precision: 8, scale: 2
-    t.decimal  "total_discount",                    precision: 8, scale: 2
     t.datetime "date"
     t.datetime "due_date"
     t.datetime "fully_paid_on_date"
