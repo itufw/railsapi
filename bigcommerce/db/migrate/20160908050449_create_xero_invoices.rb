@@ -5,12 +5,11 @@ class CreateXeroInvoices < ActiveRecord::Migration
       t.integer :xero_invoice_number, limit: 8, unsigned: true, index: true
       t.string :xero_contact_id, limit: 36, null: false, index: true
       t.string :xero_contact_name
-      t.decimal :sub_total, :total, :total_tax, :amount_due, :amount_paid, :amount_credited, precision: 8, scale: 2
-      t.datetime :date, :date_modified
-      t.string :status, :line_amount_types, :type, index: true
-
-
-
+      t.decimal :sub_total, :total_tax, :total, :amount_due, :amount_paid, :amount_credited, :total_discount, precision: 8, scale: 2
+      t.datetime :date, :due_date, :fully_paid_on_date, :expected_payment_date, :updated_date, index: true
+      t.string :status, :line_amount_types, :type, :reference, index: true
+      t.string :currency_code
+      t.decimal :currency_rate, precision: 8, scale: 2
       t.timestamps null: false
     end
     execute "ALTER TABLE xero_invoices ADD PRIMARY KEY (xero_invoice_id);"

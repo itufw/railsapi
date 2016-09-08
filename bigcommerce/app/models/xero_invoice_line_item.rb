@@ -17,10 +17,10 @@ class XeroInvoiceLineItem < ActiveRecord::Base
 				description = clean.remove_apostrophe(li.description)
 
 				sql = "INSERT INTO xero_invoice_line_items (xero_invoice_line_item_id,\
-				xero_invoice_id, item_code, description, unit_amount, line_amount, tax_amount,\
-				qty, tax_type, account_code, created_at, updated_at) VALUES ('#{li.line_item_id}',\
-				'#{invoice_id}', '#{li.item_code}', '#{description}', '#{li.unit_amount}',\
-				'#{li.line_amount}', '#{li.tax_amount}', '#{li.quantity}', '#{li.tax_type}',\
+				xero_invoice_id, item_code, description, quantity, unit_amount, line_amount, discount_rate,\
+				tax_amount, tax_type, account_code, created_at, updated_at) VALUES ('#{li.line_item_id}',\
+				'#{invoice_id}', '#{li.item_code}', '#{description}', '#{li.quantity}', '#{li.unit_amount}',\
+				'#{li.line_amount(true)}', '#{li.discount_rate}', '#{li.tax_amount}', '#{li.tax_type}',\
 				'#{li.account_code}', '#{time}', '#{time}')"
 
 				ActiveRecord::Base.connection.execute(sql)
