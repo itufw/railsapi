@@ -4,10 +4,10 @@ class CleanData
 		return text.gsub("'","''")
 	end
 
-	def map_date(date.to_s)
+	def map_date(date)
 		return_date = "0000-00-00 00:00:00"
-		if !date.nil? && date.strip.length != 0
-			return_date = date.in_time_zone('Melbourne').strftime("%Y-%m-%d %H:%M:%S")
+		if !date.to_s.nil? && date.to_s.strip.length != 0
+			return_date = date.to_s.in_time_zone('Melbourne').strftime("%Y-%m-%d %H:%M:%S")
 		end
 		return return_date
 	end
