@@ -26,22 +26,27 @@ class XeroInvoice < ActiveRecord::Base
 				date = clean.map_date(i.date.to_s)
 	  			due_date = clean.map_date(i.due_date.to_s)
 	  			updated_date = clean.map_date(i.updated_date_utc.to_s)
+	  			fully_paid_on_date = clean.map_date(i.fully_paid_on_date)
+	  			expected_payment_date = clean.map_date(i.expected_payment_date)
 
 	  	 		contact_name = clean.remove_apostrophe(i.contact_name) unless i.contact_name.nil?
 
 	  			
 	  			time = Time.now.to_s(:db)
 
-	  			if XeroInvoice.where(xero_invoice_id: i.invoice_id).count == 0
+	  			if valid_invoice(i) && invoice_doesnt_exist(i.invoice_id)
 
 		  			sql = "INSERT INTO xero_invoices (xero_invoice_id, xero_invoice_number,\
-		  			xero_contact_id, xero_contact_name, sub_total, total, total_tax, amount_due,\
-		  			amount_paid, amount_credited, date, due_date, date_modified, status, line_amount_types,
-		  			type, created_at, updated_at) VALUES ('#{i.invoice_id}', '#{i.invoice_number}',\
-		  			'#{i.contact_id}', '#{contact_name}', '#{i.sub_total}', '#{i.total}',\
-		  			'#{i.total_tax}', '#{i.amount_due}', '#{i.amount_paid}', '#{i.amount_credited}',\
-		  			'#{date}','#{due_date}', '#{updated_date}', '#{i.status}', '#{i.line_amount_types}',\
-		  			'#{i.type}', '#{time}', '#{time}')"
+		  			xero_contact_id, xero_contact_name, sub_total, total_tax, total, amount_due,\
+		  			amount_paid, amount_credited, total_discount, date, due_date, fully_paid_on_date, expected_payment_date\
+		  			updated_date, status, line_amount_types, type, currency_code, currency_rate,\
+		  			created_at, updated_at)\
+		  			VALUES ('#{i.invoice_id}', '#{i.invoice_number}',\
+		  			'#{i.contact_id}', '#{contact_name}', '#{i.sub_total(true)}', '#{i.total_tax(true)}',\
+		  			'#{i.total(true)}', '#{i.amount_due}', '#{i.amount_paid}', '#{i.amount_credited}',\
+		  			'#{i.total_discount}', '#{date}','#{due_date}', '#{fully_paid_on_date}', #{expected_payment_date}\
+		  			'#{updated_date}', '#{i.status}', '#{i.line_amount_types}',\
+		  			'#{i.type}', '#{i.reference}', '#{i.currency_code}', '#{i.currency_rate}', '#{time}', '#{time}')"
 
 		  			ActiveRecord::Base.connection.execute(sql)
 
@@ -56,4 +61,21 @@ class XeroInvoice < ActiveRecord::Base
   		end
 
 	end
+
+	def valid_invoice(invoice)
+		if i.status != 'DELETED' && i.type == 'ACCREC'
+			return true
+	    else
+	    	return false
+	    end
+	end
+
+	def invoice_doesnt_exist(invoice_id)
+        if XeroInvoice.where(xero_invoice_id: invoice_id).count == 0
+  			return true
+  		else
+  			return false
+  	    end
+  	end
+
 end

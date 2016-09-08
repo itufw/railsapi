@@ -4,8 +4,8 @@ class CreateXeroInvoiceLineItems < ActiveRecord::Migration
       t.string :xero_invoice_line_item_id, limit: 36, primary: true, null: false, index: true
       t.string :xero_invoice_id, limit: 36, null: false, index: true
       t.string :item_code, :description
-      t.decimal :unit_amount, :line_amount, :tax_amount, scale: 2, precision: 8
-      t.integer :qty
+      t.decimal :quantity, :unit_amount, :line_amount, :discount_rate, scale: 2, precision: 8
+      t.decimal :tax_amount, scale: 2, precision: 8
       t.string :tax_type, :account_code
 
       t.timestamps null: false
