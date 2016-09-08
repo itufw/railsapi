@@ -68,7 +68,7 @@ gem 'whenever', :require => false
 
 gem 'puma'
 
-gem 'xeroizer'
+gem 'xeroizer', :git => 'https://github.com/hinammehra/xeroizer.git'
 
 gem 'will_paginate'
 
