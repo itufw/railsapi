@@ -1,0 +1,27 @@
+<span style="float:right;margin-right:50px;font-size: 115%;"><%= paginate(orders) %></span>
+<table class = "table table-striped table-bordered table-hover table-responsive">
+	<tr>
+		<th>Sales Rep</th>
+		<th>Date</th>
+		<th>Order Id</th>
+		<th>Customer</th>
+		<th>Status</th>
+		<th>Qty</th>
+		<th>Total</th>
+	</tr>
+
+	<% orders.each do |order| %>
+	<tr>
+		<td><%= staff_nickname(order.customer) %></td>
+		<td><%= date_format_orders(order.date_created) %></td>
+		<td><%= link_to order.id, controller: 'sales', action: 'order_details', order_id: order.id %></td>
+		<% cust_name = customer_name(order.customer) %>
+		<td><%= link_to cust_name, customer_id: order.customer_id, customer_name: cust_name %></td>
+		<td><%= order_status(order.status) %></td>
+		<td class = "num"><%= order.qty %></td>
+		<td class = "num"><%= display_num(order.total_inc_tax) %></td>
+	</tr>
+	<% end %>
+
+</table>
+<span style="float:right;margin-right:50px;font-size: 115%;"><%= paginate(orders) %></span>

@@ -2,6 +2,6 @@
 	<tr>
 	<td><%= nickname %></td>
 	<% sums_dates_h = sums_dates_h_for_staff(id, sums_dates_staffs_h) %>
-	<%= render "daily_sums", sums_dates_h: sums_dates_h, dates: dates %>
+	<%= render "daily_sums", sums_dates_h: sums_dates_h, dates: dates, staff_nickname: nickname, staff_id: id %>
 	</tr>
 <% end %>

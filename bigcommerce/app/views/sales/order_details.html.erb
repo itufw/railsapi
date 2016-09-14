@@ -1,0 +1,5 @@
+<%= title "Order # " + @order_id %>
+<h3>Order #<%= @order_id %></h3>
+
+<%= render "models/order", orders: @order %>
+<%= render "models/order_product", order_products: @order.order_products %>
