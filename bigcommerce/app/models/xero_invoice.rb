@@ -38,12 +38,12 @@ class XeroInvoice < ActiveRecord::Base
 
 		  			sql = "INSERT INTO xero_invoices (xero_invoice_id, xero_invoice_number,\
 		  			xero_contact_id, xero_contact_name, sub_total, total_tax, total, amount_due,\
-		  			amount_paid, amount_credited, date, due_date, fully_paid_on_date, expected_payment_date,\
+		  			amount_paid, amount_credited, total_discount, date, due_date, fully_paid_on_date, expected_payment_date,\
 		  			updated_date, status, line_amount_types, type, reference, currency_code, currency_rate,\
 		  			created_at, updated_at)\
 		  			VALUES ('#{i.invoice_id}', '#{i.invoice_number}',\
 		  			'#{i.contact_id}', '#{contact_name}', '#{i.sub_total(true)}', '#{i.total_tax(true)}',\
-		  			'#{i.total(true)}', '#{i.amount_due}', '#{i.amount_paid}', '#{i.amount_credited}',\
+		  			'#{i.total(true)}', '#{i.amount_due}', '#{i.amount_paid}', '#{i.amount_credited}', '#{i.total_discount}',\
 		  			'#{date}', '#{due_date}', '#{fully_paid_on_date}', '#{expected_payment_date}',\
 		  			'#{updated_date}', '#{i.status}', '#{i.line_amount_types}',\
 		  			'#{i.type}', '#{i.reference}', '#{i.currency_code}', '#{i.currency_rate}', '#{time}', '#{time}')"
