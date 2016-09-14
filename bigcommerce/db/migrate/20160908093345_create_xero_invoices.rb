@@ -5,7 +5,7 @@ class CreateXeroInvoices < ActiveRecord::Migration
       t.string :xero_invoice_number, index: true
       t.string :xero_contact_id, limit: 36, null: false, index: true
       t.string :xero_contact_name
-      t.decimal :sub_total, :total_tax, :total, :amount_due, :amount_paid, :amount_credited, precision: 8, scale: 2
+      t.decimal :sub_total, :total_tax, :total, :amount_due, :amount_paid, :amount_credited, :total_discount, precision: 8, scale: 2
       t.datetime :date, :due_date, :fully_paid_on_date, :expected_payment_date, :updated_date, index: true
       t.string :status, :line_amount_types, :type, :reference, index: true
       t.string :currency_code
