@@ -8,4 +8,4 @@
 	<% end %>
 <% end %>
 
-<td class="num"><%= display_num(sums_dates_h.values.sum) %></td>
+<td class="num"><%= link_to display_num(sums_dates_h.values.sum), controller: 'models', action: 'orders', start_date: dates.first, end_date: dates.last, staff_nickname: staff_nickname, staff_id: staff_id %></td>

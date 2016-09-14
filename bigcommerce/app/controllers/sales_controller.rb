@@ -31,24 +31,21 @@ class SalesController < ApplicationController
     # returns a hashmap like { [staff_id, date] => order_totals }
     @staff_sum_this_week = staff_sum_orders(@dates_this_week[0], @dates_this_week[-1])
     @staff_nicknames = Staff.active_sales_staff.nickname.to_h
-    # Zip staff_id, date
-    # Go into view, write a helper function - If [staff_id, date] exists in this hashmap
-    # Then display value otherwise display nothing
   end
 
 
   # Displays all orders for selected customer
-  # def orders_for_selected_customer
-  #   customer_id = params[:customer_id]
-  #   customer_name = params[:customer_name]
-  #   orders = Order.include_customer_staff_status.customer_filter(customer_id).order_by_id
-  # end
+  def orders_for_selected_customer
+    customer_id = params[:customer_id]
+    @customer_name = params[:customer_name]
+    @orders = Order.include_customer_staff_status.customer_filter(customer_id).order_by_id.page(params[:page])
+  end
 
-  # # Displays all details about an order
-  # def order_details
-  #     order_id = params[:order_id]
-  #     order = Order.include_all.order_filter(order_id)
-  # end
+  # Displays all details about an order
+  def order_details
+      @order_id = params[:order_id]
+      @order = Order.include_all.order_filter(@order_id)
+  end
 
   # def orders_for_selected_product
   #   product_id = params[:product_id]

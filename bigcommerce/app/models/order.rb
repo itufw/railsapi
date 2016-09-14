@@ -15,12 +15,14 @@ class Order < ActiveRecord::Base
 
 	belongs_to :billing_address, class_name: :Address, foreign_key: :billing_address_id
 
-	has_many :order_products
-	has_many :products, through: :order_products
+	#has_many :order_products
+	#has_many :products, through: :order_products
 
 	belongs_to :order_history
 
 	#has_one :xero_invoice
+
+	self.per_page = 15
 
 	def scrape
 
@@ -173,7 +175,7 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.order_filter(order_id)
-		return find(order_id)
+		return where(id: order_id)
 	end
 
 	def self.product_filter(product_ids = nil)
