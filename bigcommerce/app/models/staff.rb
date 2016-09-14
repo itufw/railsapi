@@ -35,5 +35,9 @@ class Staff < ActiveRecord::Base
 	  return find(staff_id)
 	end
 
+	def self.nickname
+		pluck("id, nickname")
+	end
+
 
 end
