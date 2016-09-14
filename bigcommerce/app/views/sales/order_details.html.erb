@@ -1,5 +1,15 @@
 <%= title "Order # " + @order_id %>
 <h3>Order #<%= @order_id %></h3>
 
-<%= render "models/order", orders: @order %>
-<%= render "models/order_product", order_products: @order.order_products %>
+<%= render "partials/order", orders: [@order] %>
+<%= render "partials/order_product", order_products: @order.order_products %>
+
+<div class="well panel-default panel" style="margin-top:20px;margin-left:100px;width:30%;float:left;">
+  <h4 class="panel-heading">Customer Notes</h4>
+  <div class="panel-body"><%= @order.customer_notes %></div>
+</div>
+
+<div class="well panel-default panel" style="margin-top:20px;margin-left:200px;width:30%;float:left;">
+  <h4 class="panel-heading">Staff Notes</h4>
+  <div class="panel-body"><%= @order.staff_notes %></div>
+</div>
