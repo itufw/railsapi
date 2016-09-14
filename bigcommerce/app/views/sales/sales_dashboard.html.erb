@@ -1,0 +1,35 @@
+<%= title "Sales Dashboard" %>
+
+<h3>Weekly Sales Summary</h3>
+<div style="float:right; margin-right: 50px;">
+<%= form_tag({:action => "sales_dashboard"}, {:method => "get"}) do %>
+   Start Date:   <%= date_field( "selected_date", "selected_date", value: @dates_this_week.first ) %>
+   <%= submit_tag "Change Start Date" %>
+<% end %>
+</div>
+
+<table class = "table table-striped table-bordered table-hover table-responsive">
+	<tr>
+		<th></th>
+		<% @dates_this_week.each do |day| %>
+			<th> <%= date_format(day) %></th>
+		<% end %>
+		<th>Total</th>
+	</tr>
+
+	<tr>
+		<td>This Week</td>
+		<%= render "daily_sums", sums_dates_h: @sum_this_week, dates: @dates_this_week %>
+	<tr>
+
+	<tr class = "italics">
+		<td>Last Week</td>
+		<%= render "daily_sums", sums_dates_h: @sum_last_week, dates: @dates_last_week %>
+	<tr>
+
+	<tr class = "blank-row"><td colspan="9"></td><tr>
+
+	<tr>
+		<%= render "staff_sums", sums_dates_staffs_h: @staff_sum_this_week, staffs: @staff_nicknames, dates: @dates_this_week %>
+	</tr>
+</table>

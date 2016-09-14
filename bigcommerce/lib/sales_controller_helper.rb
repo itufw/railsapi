@@ -1,4 +1,4 @@
-module SalesHelper
+module SalesControllerHelper
 
   # If a set date isnt given then start of the week is current week's start
   # if date is given, then start of the week is given date
@@ -113,6 +113,7 @@ module SalesHelper
   end
 
   # Takes hash as its input, returns an array of keys and 0's 
+  # CHANGE THIS
   def check_id_in_map(stats_array, id)
 	values_for_one_time_periods = []
 
