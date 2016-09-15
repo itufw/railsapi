@@ -168,16 +168,16 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.product_filter(product_ids = nil)
-		where('order_products.product_id IN (?)', product_ids).references(:order_products) if !product_ids.empty?
-		all
+		return where('order_products.product_id IN (?)', product_ids).references(:order_products) if !product_ids.empty?
+		return all
 	end
 
 	def self.date_filter(start_date, end_date)
 		start_time = Time.parse(start_date.to_s)
         end_time = Time.parse(end_date.to_s)
 
-		where('orders.date_created >= ? and orders.date_created <= ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S")) if !start_date.nil? && !end_date.nil?
-		all
+		return where('orders.date_created >= ? and orders.date_created <= ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S")) if !start_date.nil? && !end_date.nil?
+		return all
 	end
 
 	def self.valid_order
@@ -185,8 +185,8 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.status_filter(status_id)
-		where(status_id: status_id) if !status_id.nil
-		all
+		return where(status_id: status_id) if !status_id.nil
+		return all
 	end
 
 	def self.group_by_date_created
@@ -222,8 +222,8 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.staff_filter(staff_id)
-		includes([{:customer => :staff}]).where('customers.staff_id = ?', staff_id).references(:customers) if !staff_id.nil?
-		all
+		return includes([{:customer => :staff}]).where('customers.staff_id = ?', staff_id).references(:customers) if !staff_id.nil?
+		return all
 	end
 
 	def self.order_by_id
@@ -239,8 +239,8 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.filter_order_products(product_id, order_id)
-		includes(:order_products).where('order_products.product_id = ?', product_id).references(:order_products) if product_id
-		includes(:order_product).where('order_products.order_id = ?', order_id)
+		return includes(:order_products).where('order_products.product_id = ?', product_id).references(:order_products) if product_id
+		return includes(:order_product).where('order_products.order_id = ?', order_id)
 	end
 
 end
