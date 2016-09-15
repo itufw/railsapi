@@ -160,7 +160,7 @@ class Customer < ActiveRecord::Base
 		name = ""	
 		if actual_name.present?
 		  name = actual_name
-		elsif firstname.present? || lastname.present? ||
+		elsif firstname.present? || lastname.present?
 		  name = firstname + ' ' + lastname
 		end
 		return name
@@ -174,7 +174,5 @@ class Customer < ActiveRecord::Base
 		return Customer.all if ids_array.nil?
 		return where('customers.id IN (?)', ids_array)
 	end
-
-
 
 end
