@@ -163,92 +163,84 @@ class Order < ActiveRecord::Base
 
 	end
 
-	def self.status_staff_filter(status_id = nil, staff_id = nil, start_time = nil, end_time = nil)
-		return where('orders.date_created >= ? and orders.date_created < ? and orders.status_id = ? and customers.staff_id = ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"), status_id, staff_id).references(:customers) if status_id && staff_id && start_time && end_time
-		return where('orders.status_id = ? and customers.staff_id = ?', status_id, staff_id).references(:customers) if status_id && staff_id
-		return where('orders.status_id = ? and orders.date_created >= ? and orders.date_created < ?', status_id, start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S")) if status_id && start_time && end_time
-		return where('customers.staff_id = ? and orders.date_created >= ? and orders.date_created < ?', staff_id, start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S")).references(:customers) if staff_id && start_time && end_time
-		return where('orders.status_id = ?', status_id) if status_id
-		return where('customers.staff_id = ?', staff_id).references(:customers) if staff_id
-		return where('orders.date_created >= ? and orders.date_created < ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S")) if start_time && end_time
-		return all
-	end
-
 	def self.order_filter(order_id)
-		return find(order_id)
+		find(order_id)
 	end
 
 	def self.product_filter(product_ids = nil)
-		return where('order_products.product_id IN (?)', product_ids).references(:order_products) if !product_ids.empty?
-		return all
+		where('order_products.product_id IN (?)', product_ids).references(:order_products) if !product_ids.empty?
+		all
 	end
 
 	def self.date_filter(start_date, end_date)
 		start_time = Time.parse(start_date.to_s)
         end_time = Time.parse(end_date.to_s)
 
-		return where('orders.date_created >= ? and orders.date_created <= ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"))
+		where('orders.date_created >= ? and orders.date_created <= ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S")) if !start_date.nil? && !end_date.nil?
+		all
 	end
 
 	def self.valid_order
-		return includes(:status).where('statuses.valid_order = 1').references(:statuses)
+		includes(:status).where('statuses.valid_order = 1').references(:statuses)
 	end
 
 	def self.status_filter(status_id)
-		return where(status_id: status_id)
+		where(status_id: status_id) if !status_id.nil
+		all
 	end
 
 	def self.group_by_date_created
-		return group('DATE(orders.date_created)')
+		group('DATE(orders.date_created)')
 	end
 
 	def self.group_by_date_created_and_staff_id
-		return includes(:customer).group(["customers.staff_id", "DATE(orders.date_created)"])
+		includes(:customer).group(["customers.staff_id", "DATE(orders.date_created)"])
 	end
 
 	def self.group_by_customerid
-		return group('orders.customer_id')
+		group('orders.customer_id')
 	end
 
 	def self.group_by_staff_and_date
-		return includes(:customer).group(['customers.staff_id', 'DATE(orders.date_created)']).references(:customers)
+		includes(:customer).group(['customers.staff_id', 'DATE(orders.date_created)']).references(:customers)
 	end
 
 	def self.group_by_product_id
-		return includes(:order_products).group('order_products.product_id')
+		includes(:order_products).group('order_products.product_id')
 	end
 
 	def self.sum_total
-		return sum('orders.total_inc_tax')
+		sum('orders.total_inc_tax')
 	end
 
 	def self.sum_order_product_qty
-		return includes(:order_products).sum('order_products.qty')
+		includes(:order_products).sum('order_products.qty')
 	end
 
-	def self.customer_filter(customer_id)
-		return where('orders.customer_id = ?', customer_id)
+	def self.customer_filter(customer_ids)
+		where('orders.customer_id IN (?)', customer_ids)
 	end
 
 	def self.staff_filter(staff_id)
-		return includes([{:customer => :staff}]).where('customers.staff_id = ?', staff_id).references(:customers)
+		includes([{:customer => :staff}]).where('customers.staff_id = ?', staff_id).references(:customers) if !staff_id.nil?
+		all
 	end
 
 	def self.order_by_id
-		return order('orders.id DESC')
+		order('orders.id DESC')
 	end
 
 	def self.include_customer_staff_status
-		return includes([{:customer => :staff}, :status])
+		includes([{:customer => :staff}, :status])
 	end
 
 	def self.include_all
-		return includes([{:customer => :staff}, :status, {:order_products => :product}])
+		includes([{:customer => :staff}, :status, {:order_products => :product}])
 	end
 
 	def self.filter_order_products(product_id, order_id)
-		return includes(:order_products).where('order_products.product_id = ?', product_id).references(:order_products) if product_id
-		return includes(:order_product).where('order_products.order_id = ?', order_id)
+		includes(:order_products).where('order_products.product_id = ?', product_id).references(:order_products) if product_id
+		includes(:order_product).where('order_products.order_id = ?', order_id)
 	end
 
 end
