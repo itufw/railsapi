@@ -128,4 +128,29 @@ module SalesControllerHelper
     return values_for_one_time_periods
   end
 
+  def stats_for_timeperiods(where_query, group_by, sum_by)
+    time_periods = StaffTimePeriod.display
+
+    # this is the stat per row and column, for eg. This is qty sold for each customer per time period
+    stats_per_cell = []
+    # this is the stat per column, for eg. this is the total qty sold in one time period
+    stats_sum_per_t = []
+    stats_avg_per_t = []
+
+    time_periods.each do |t| 
+
+      stats_per_cell.push((eval where_query).date_filter(t.start_date.to_s, t.end_date.to_s).send(group_by).send(sum_by)) if respond_to?(group_by)
+        
+      sum = (eval where_query).date_filter(t.start_date.to_s, t.end_date.to_s).send(sum_by)
+      num_days = (t.end_date.to_date - t.start_date.to_date).to_i
+      avg = (sum.to_f/num_days)*(7)
+        
+      stats_sum_per_t.push(sum)
+      stats_avg_per_t.push(avg)
+    end
+
+    ids = stats_per_cell.reduce(&:merge).keys unless stats_per_cell.blank?
+    [time_periods, stats_per_cell, stats_sum_per_t, stats_avg_per_t, ids]
+  end
+
 end

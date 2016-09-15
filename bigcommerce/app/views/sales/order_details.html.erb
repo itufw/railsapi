@@ -2,7 +2,7 @@
 <h3>Order #<%= @order_id %></h3>
 
 <%= render "partials/order", orders: [@order], display_class: "none" %>
-<%= render "partials/order_product", order_products: @order.order_products %>
+<%= render "partials/order_product", order_products: @order.order_products, cust_id: @order.customer_id, cust_name: customer_name(@order.customer) %>
 
 <div class="well panel-default panel" style="margin-top:20px;margin-left:100px;width:30%;float:left;">
   <h4 class="panel-heading">Customer Notes</h4>

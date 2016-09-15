@@ -72,19 +72,22 @@ class SalesController < ApplicationController
 
   # end
 
-  #   # How do we come to this page ? - We click on Order ID - then click on any one of the products
-  #   # Displays Orders when selected customer ordered selected product and shows overall product stats
-  #   # (money spent on that product by customer)
-  # def orders_for_selected_product_and_selected_customer
-  #   customer_id = params[:customer_id]
-  #   customer_name = params[:customer_name]
+    # How do we come to this page ? - We click on Order ID - then click on any one of the products
+    # Displays Orders when selected customer ordered selected product and shows overall product stats
+    # (money spent on that product by customer)
+  def orders_and_stats_for_selected_product_and_selected_customer
+    customer_id = params[:customer_id]
+    @customer_name = params[:customer_name]
 
-  #   product_id = params[:product_id]
-  #   product_name = params[:product_name]
+    product_id = params[:product_id]
+    @product_name = params[:product_name]
   
-  #   orders = Order.include_customer_staff_status.filter_order_products(product_id, nil).customer_filter(customer_id).order_by_id
-  #   stats_for_timeperiods("Order.filter_order_products(%s, nil).customer_filter(%s)" % [product_id, customer_id], "".to_sym, :sum_order_product_qty)
-  # end
+    @orders = Order.include_customer_staff_status.filter_order_products(product_id, nil).customer_filter(customer_id).order_by_id.page(params[:page])
+    return_val = stats_for_timeperiods("Order.filter_order_products(%s, nil).customer_filter(%s)" % [product_id, customer_id], "".to_sym, :sum_order_product_qty)
+    @time_periods = return_val[0]
+    @sum_stats = return_val[2]
+    @avg_stats = return_val[3]
+  end
 
   # # How do we come to this page ? - We go to 'Pending Orders page' - Click on a product name
   # # Displays Overall Product Stats irrespective of Order's Status and 
