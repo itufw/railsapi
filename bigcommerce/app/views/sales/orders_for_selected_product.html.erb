@@ -1,3 +1,6 @@
 <%= title @product_name %>
 <h3><%= @product_name %></h3>
+<center>
+<button class="button center"><%= link_to "View Stats for Product", controller: 'sales', action: 'product_stats', product_id: @product_id, product_name: @product_name %></button>
+</center>
 <%= render "partials/order", orders: @orders, display_class: "" %>

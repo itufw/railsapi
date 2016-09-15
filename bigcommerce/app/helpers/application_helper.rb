@@ -36,4 +36,12 @@ module ApplicationHelper
     will_paginate model unless model.count < 15
   end
 
+  def exists_in_h(hash, key)
+    if hash.has_key? key
+      return hash[key]
+    else
+      return " "
+    end
+  end
+
 end

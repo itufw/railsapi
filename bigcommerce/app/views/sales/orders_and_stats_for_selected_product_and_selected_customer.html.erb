@@ -1,5 +1,5 @@
 <%= title @product_name + " - " + @customer_name %>
 <h3><%= @product_name %></h3><br/>
 <h3><%= @customer_name %></h3>
-<%= render "partials/overall_stats", time_periods: @time_periods, sum_stats: @sum_stats, avg_stats: @avg_stats %>
+<%= render "partials/overall_stats", time_periods_name: @time_periods_name, sum_stats: @sum_stats, avg_stats: @avg_stats %>
 <%= render "partials/order", orders: @orders, display_class: "" %>
