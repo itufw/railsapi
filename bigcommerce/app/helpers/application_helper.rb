@@ -17,7 +17,11 @@ module ApplicationHelper
   end
 
   def customer_name(customer)
-  	Customer.customer_name(customer.actual_name, customer.firstname, customer.lastname) unless customer.nil?
+    if customer.nil?
+      return " "
+    else
+  	  Customer.customer_name(customer.actual_name, customer.firstname, customer.lastname)
+    end
   end
 
   def order_status(status)

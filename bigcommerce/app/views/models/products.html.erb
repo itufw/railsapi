@@ -19,19 +19,31 @@
 		<th>Product Name</th>
 		<th>Price ( Ex GST )</th>
 		<th>Stock</th>
+<%
+=begin
+%>
 		<th>Pending Stock</th>
 		<th>Total Stock</th>
+<%
+=end
+%>
 	</tr>
 
 	<% @products.each do |p| %>
 
 		<tr>
 
-			<td><%= link_to p.name, controller: 'sales', action: 'view_customer_stats_for_product', product_id: p.id, product_name: p.name %></td>
+			<td><%= link_to p.name, controller: 'sales', action: 'orders_for_selected_product', product_id: p.id, product_name: p.name %></td>
 			<td class="num"><%= number_with_delimiter(number_with_precision(calculate_product_price(p.calculated_price, p.retail_ws), precision: 2)) %></td>
 			<td class="num"><%= p.inventory %></td>
+<%
+=begin
+%>
 			<td class="num"><%= link_to @pending_stock = return_pending_stock(@product_pending_count, p.id), controller: "sales", action: "view_orders_for_product_and_status", product_id: p.id, product_name: p.name, status_id: 1, status_name: "Pending", num_orders: nil, qty: p.inventory, status_qty: @pending_stock, total: nil %></td>
 			<td class="num"><%= @pending_stock + p.inventory %></td>
+<%
+=end
+%>
 		</tr>
 
 	<% end %>

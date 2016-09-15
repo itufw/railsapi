@@ -6,6 +6,7 @@
 		<th>Order Id</th>
 		<th>Customer</th>
 		<th>Status</th>
+        <th class = <%= display_class %> >Selected Prod Qty</th>
 		<th>Qty</th>
 		<th>Total</th>
 	</tr>
@@ -18,6 +19,7 @@
 		<% cust_name = customer_name(order.customer) %>
 		<td><%= link_to cust_name, customer_id: order.customer_id, customer_name: cust_name %></td>
 		<td><%= order_status(order.status) %></td>
+		<td class = <%= display_class %> ><%= order.order_products.first.qty %></th>
 		<td class = "num"><%= order.qty %></td>
 		<td class = "num"><%= display_num(order.total_inc_tax) %></td>
 	</tr>
