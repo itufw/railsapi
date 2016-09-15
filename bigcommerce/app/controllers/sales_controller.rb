@@ -40,7 +40,7 @@ class SalesController < ApplicationController
   def orders_for_selected_customer
     @customer_id = params[:customer_id]
     @customer_name = params[:customer_name]
-    @orders = Order.include_customer_staff_status.customer_filter(@customer_id).order_by_id.page(params[:page])
+    @orders = Order.include_customer_staff_status.customer_filter([@customer_id]).order_by_id.page(params[:page])
   end
 
   # Displays all details about an order
@@ -107,8 +107,8 @@ class SalesController < ApplicationController
     product_id = params[:product_id]
     @product_name = params[:product_name]
   
-    @orders = Order.include_customer_staff_status.filter_order_products(product_id, nil).customer_filter(customer_id).order_by_id.page(params[:page])
-    return_val = stats_for_timeperiods("Order.filter_order_products(%s, nil).customer_filter(%s)" % [product_id, customer_id], "".to_sym, :sum_order_product_qty)
+    @orders = Order.include_customer_staff_status.filter_order_products(product_id, nil).customer_filter([customer_id]).order_by_id.page(params[:page])
+    return_val = stats_for_timeperiods("Order.filter_order_products(%s, nil).customer_filter(%s)" % [product_id, [customer_id]], "".to_sym, :sum_order_product_qty)
     @time_periods_name = return_val[0]
     @sum_stats = return_val[2]
     @avg_stats = return_val[3]
@@ -119,7 +119,7 @@ class SalesController < ApplicationController
     customer_id = params[:customer_id]
     @customer_name = params[:customer_name]
 
-    results_val = stats_for_timeperiods("Order.customer_filter(%s).valid_order" % customer_id, :group_by_product_id, :sum_order_product_qty)
+    results_val = stats_for_timeperiods("Order.customer_filter(%s).valid_order" % [[customer_id]], :group_by_product_id, :sum_order_product_qty)
     @time_periods_name = results_val[0]
     @all_stats = results_val[1]
     @sum_stats = results_val[2]
