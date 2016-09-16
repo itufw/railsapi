@@ -1,0 +1,38 @@
+<%= title @status_name %>
+<div class="dropdown" style="float:left;">
+	<button class="button dropdown-toggle" type="button" data-toggle="dropdown">Change Status
+	<span class="caret"></span></button>
+    <ul class="dropdown-menu">
+      <% @all_statuses.each do |s| %>
+
+      	  <li class="center"><%= link_to s.name, action: "orders_and_products_for_selected_status", status_id: s.id, status_name: s.name %></li>
+
+      <% end %>
+    </ul>
+</div>
+
+<center>
+<div>
+	<button class="button not-default inline orders-view" id="orders-view-button">Orders View</button>
+	<button class="button default inline products-view" id="products-view-button">Products View</button>
+</div>
+</center>
+
+<div class="form-group" style="margin-top:100px;">
+<%= form_tag({:controller => "sales", :action => "orders_and_products_for_selected_status"}, {:method => "get"}) do %>
+   <%= render "partials/product_filter" %>
+   <%= render "partials/staff_filter" %>
+   <%= hidden_field_tag :status_id, @status_id %>
+   <%= hidden_field_tag :status_name, @status_name %>
+   <%= submit_tag "Filter", class: 'btn btn-primary' %>
+   <button class = "btn btn-primary"><%= link_to "Reset", action: "view_orders_by_status" %></button>
+<% end %>
+</div><br/>
+
+<h3 id="orders-view-heading" class="orders-view not-default"><%= @status_name %> Orders</h3>
+
+<%= render "partials/order", orders: @orders, display_class: "none" %>
+
+<h3 id="products-view-heading" class="products-view default" style="text-align: center;"><%= @status_name %> Products</h3>
+
+<%= render "partials/product_status", products: @products %>

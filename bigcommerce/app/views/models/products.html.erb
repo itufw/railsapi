@@ -1,6 +1,12 @@
 <%= title "Products" %>
 <h3>Products</h3>
 
-<%= render "partials/product_filter" %>
+<div class="form-group container-fluid">
+	<%= form_tag({:action => "products"}, {:method => "get"}) do %>
+	<%= render "partials/product_filter" %>
+	<%= submit_tag "Filter", class: 'btn btn-primary' %>
+   <button class = "btn btn-primary"><%= link_to "Reset", action: "products" %></button>
+<% end %>
+</div>
 
 <%= render "partials/product", products: @products, pending_stock_h: @pending_stock_h %>

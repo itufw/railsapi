@@ -167,8 +167,8 @@ class Order < ActiveRecord::Base
 		find(order_id)
 	end
 
-	def self.product_filter(product_ids = nil)
-		return where('order_products.product_id IN (?)', product_ids).references(:order_products) if !product_ids.empty?
+	def self.product_filter(product_ids)
+		return includes(:order_products).where('order_products.product_id IN (?)', product_ids).references(:order_products) if !product_ids.nil?
 		return all
 	end
 
@@ -213,6 +213,10 @@ class Order < ActiveRecord::Base
 		includes(:order_products).group('order_products.product_id')
 	end
 
+	def self.count_order_id_from_order_products
+		count('order_products.order_id')
+	end
+
 	def self.sum_total
 		sum('orders.total_inc_tax')
 	end
@@ -241,11 +245,6 @@ class Order < ActiveRecord::Base
 
 	def self.include_all
 		includes([{:customer => :staff}, :status, {:order_products => :product}])
-	end
-
-	def self.filter_order_products(product_id, order_id)
-		return includes(:order_products).where('order_products.product_id = ?', product_id).references(:order_products) if product_id
-		return includes(:order_product).where('order_products.order_id = ?', order_id)
 	end
 
 end
