@@ -59,13 +59,42 @@ class SalesController < ApplicationController
   def orders_for_selected_product
     @product_id = params[:product_id]
     @product_name = params[:product_name]
-    @orders = Order.include_customer_staff_status.filter_order_products(@product_id, nil).order_by_id.page(params[:page])
+    @orders = Order.include_customer_staff_status.product_filter(@product_ids).order_by_id.page(params[:page])
   end
 
   # Gets orders and products for a selected status on two different pages
   # The same dataset is used, just displays in two formats
   # Thus the dataset can be filtered by 
   def orders_and_products_for_selected_status
+    @status_id = params[:status_id]
+    @status_name = params[:status_name]
+
+    if @status_id.nil?
+      @status_id = 1
+      @status_name = "Pending"
+    end
+
+    @all_statuses = Status.all
+    @staffs = Staff.active_sales_staff
+    @countries = ProducerCountry.all
+    @sub_types = ProductSubType.all
+
+    results_val_product = product_param_filter(params)
+    @producer_country = results_val_product[0]
+    @product_sub_type = results_val_product[1]
+    @search_text = results_val_product[3]
+
+    results_val_staff = staff_params_filter(params)
+    staff_id = results_val_staff[0]
+    @staff = results_val_staff[1]
+
+    product_ids = results_val_product[2].pluck("id")
+
+    # filter orders
+    orders = Order.include_all.status_filter(@status_id).staff_filter(staff_id).product_filter(product_ids).order_by_id.page(params[:page])
+
+    @orders = orders.page(params[:page])
+    @products = products_for_status(@status_id, staff_id, product_ids)
 
   end
 
@@ -85,7 +114,7 @@ class SalesController < ApplicationController
   #     status_qty = params[:status_qty]
   #     total = params[:total] 
 
-  #     stats_for_timeperiods("Order.filter_order_products(%s, nil).valid_order" % product_id, "".to_sym, :sum_order_product_qty)
+  #     stats_for_timeperiods("Order.product_filter(%s).valid_order" % product_id, "".to_sym, :sum_order_product_qty)
 
   #     @staffs = staff_dropdown
 
@@ -105,8 +134,8 @@ class SalesController < ApplicationController
     product_id = params[:product_id]
     @product_name = params[:product_name]
   
-    @orders = Order.include_customer_staff_status.filter_order_products(product_id, nil).customer_filter([customer_id]).order_by_id.page(params[:page])
-    return_val = stats_for_timeperiods("Order.filter_order_products(%s, nil).customer_filter(%s)" % [product_id, [customer_id]], "".to_sym, :sum_order_product_qty)
+    @orders = Order.include_customer_staff_status.product_filter(product_id).customer_filter([customer_id]).order_by_id.page(params[:page])
+    return_val = stats_for_timeperiods("Order.product_filter(%s).customer_filter(%s)" % [product_id, [customer_id]], "".to_sym, :sum_order_product_qty)
     @time_periods_name = return_val[0]
     @sum_stats = return_val[2]
     @avg_stats = return_val[3]
@@ -133,7 +162,7 @@ class SalesController < ApplicationController
     @product_id = params[:product_id]
     @product_name = params[:product_name]
 
-    results_val = stats_for_timeperiods("Order.filter_order_products(%s, nil).valid_order" % @product_id, :group_by_customerid, :sum_order_product_qty)
+    results_val = stats_for_timeperiods("Order.product_filter(%s).valid_order" % @product_id, :group_by_customerid, :sum_order_product_qty)
     @time_periods_name = results_val[0]
     @all_stats = results_val[1]
     @sum_stats = results_val[2]

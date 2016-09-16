@@ -1,0 +1,26 @@
+<table class = "table table-striped table-bordered table-hover table-responsive products-view" id = "products-view-table default">
+
+	<tr>
+		<th>Product Name</th>
+		<th>Number of Orders</th>
+		<th>Qty</th>
+		<th><%= @status_name %> Qty</th>
+		<th>Total Qty</th>
+		<th>Invoice Totals</th>
+	</tr>
+
+	<% products.each do |p| %>
+
+	<tr>
+		<% v = p[1] %>
+		<td><%= v[3] %></td>
+		<td class="num"><%= number_with_delimiter(v[0]) %></td>
+		<td class="num"><%= number_with_delimiter(v[4]) %></td>
+		<td class="num"><%= number_with_delimiter(v[1]) %></td>
+		<td class="num"><%= number_with_delimiter(v[1] + v[4]) %></td>
+		<td class="num"><%= display_num(v[2]) %></td>
+	</tr>	
+
+	<% end %>
+
+</table>
