@@ -96,4 +96,12 @@ module ModelsFilter
     return producer_country, product_sub_type, products, search_text
   end
 
+  def product_filter(product_ids_a)
+    product_h = Product.filter_by_ids(product_ids_a).pluck("id,name").to_h
+
+    product_h_sorted = Hash[product_h.sort_by { |k,v| v }]
+
+    return product_h_sorted
+  end
+
 end
