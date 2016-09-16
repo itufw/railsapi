@@ -165,11 +165,6 @@ class Product < ActiveRecord::Base
 		return search_for(search_text)
 	end
 
-	def self.get_products(ids_array)
-		return where('products.id IN (?)', ids_array)
-		return all if ids_array.nil?
-	end
-
 	def self.filter_by_ids(product_ids_a)
 	    return where('products.id IN (?)', product_ids_a) if !product_ids_a.empty?
 	    return all

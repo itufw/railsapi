@@ -1,14 +1,7 @@
 <%= title "Orders" %>
 <h3><%= orders_page_title(@staff_nickname, @start_date, @end_date) %></h3>
 
-<div class="form-group container-fluid">
-<%= form_tag({:controller => "models", :action => "orders"}, {:method => "get"}) do %>
+
 <%= render "partials/order_filter" %>
-<%= hidden_field_tag :start_date, @start_date %>
-   <%= hidden_field_tag :end_date, @end_date %>
-   <%= submit_tag "Filter", class: 'btn btn-primary' %>
-   <button class = "btn btn-primary"><%= link_to "Reset", action: "orders" %></button>
-<% end %>
-</div>
 
 <%= render "partials/order", orders: @orders, display_class: "none" %>

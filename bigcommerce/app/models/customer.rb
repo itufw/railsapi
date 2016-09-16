@@ -169,11 +169,11 @@ class Customer < ActiveRecord::Base
 		return name
 	end
 
-	def self.get_customer(id)
+	def self.filter_by_id(id)
 		find(id)
 	end
 
-	def self.get_customers(ids_array)
+	def self.filter_by_ids(ids_array)
 		return Customer.all if ids_array.nil?
 		return where('customers.id IN (?)', ids_array)
 	end

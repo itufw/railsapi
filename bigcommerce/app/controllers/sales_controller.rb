@@ -1,10 +1,12 @@
 require 'sales_controller_helper.rb'
+require 'models_filter.rb'
 
 class SalesController < ApplicationController
 
   before_action :confirm_logged_in
 
   include SalesControllerHelper
+  include ModelsFilter
 
   helper_method :check_id_in_map
 
@@ -127,7 +129,7 @@ class SalesController < ApplicationController
     product_ids = results_val[4]
 
     # returns a hash {id => name}
-    @products_h = products_param_filter(nil, nil, nil, nil, product_ids)
+    @products_h = product_filter(product_ids)
   end
 
   # Displays overall stats for products(money gained) and all customers who bought that product
@@ -144,10 +146,11 @@ class SalesController < ApplicationController
 
     @staffs = staff_dropdown
 
-    param_filter_result = customers_param_filter(params, nil, customer_ids)
+    results_val = customer_param_filter(params)
 
-    @staff = param_filter_result[0]
-    @customers_h = param_filter_result[1]
+    @staff = results_val[0]
+    customers_filtered_ids = results_val[1].pluck("id")
+    @customers_h = Customer.filter_by_ids(customers_filtered_ids & customer_ids)
   end
 
 end
