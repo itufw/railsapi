@@ -1,5 +1,5 @@
 <%= title "Orders" %>
-<h3>Orders</h3>
+<h3><%= orders_page_title(@staff_nickname, @start_date, @end_date) %></h3>
 
 <div class="form-group container-fluid">
 <%= form_tag({:controller => "models", :action => "orders"}, {:method => "get"}) do %>

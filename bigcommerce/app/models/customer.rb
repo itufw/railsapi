@@ -13,6 +13,8 @@ class Customer < ActiveRecord::Base
 
 	scoped_search on: [:firstname, :lastname, :company, :actual_name]
 
+	self.per_page = 15
+
 	# mass insert from bigcommerce api
 	def scrape
 
@@ -153,7 +155,8 @@ class Customer < ActiveRecord::Base
 
 	def self.staff_search_filter(search_text = nil, staff_id = nil)
 		return includes(:staff).where(staff_id: staff_id).search_for(search_text) if staff_id
-		return all.search_for(search_text)
+		return search_for(search_text) if search_text
+		return all
 	end
 
 	def self.customer_name(actual_name, firstname, lastname)
@@ -173,6 +176,10 @@ class Customer < ActiveRecord::Base
 	def self.get_customers(ids_array)
 		return Customer.all if ids_array.nil?
 		return where('customers.id IN (?)', ids_array)
+	end
+
+	def self.order_by_name
+		order('actual_name ASC')
 	end
 
 end

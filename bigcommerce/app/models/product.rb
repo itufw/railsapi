@@ -20,6 +20,8 @@ class Product < ActiveRecord::Base
 
 	scoped_search on: [:name, :portfolio_region]
 
+	self.per_page = 15
+
 	def scrape
 
 		product_api = Bigcommerce::Product
@@ -149,12 +151,18 @@ class Product < ActiveRecord::Base
 
 	end
 
+	def self.producer_country_filter(producer_country_id)
+		return where(producer_country_id: producer_country_id) if producer_country_id
+		return all
+	end
 
-	def self.search_country_subtype_filter(search_text = nil, country_id = nil, sub_type_id = nil)
-		return where(producer_country_id: country_id, product_sub_type_id: sub_type_id).search_for(search_text) if country_id && sub_type_id
-		return where(producer_country_id: country_id).search_for(search_text) if country_id
-		return where(product_sub_type_id: sub_type_id).search_for(search_text) if sub_type_id
-		all.search_for(search_text)
+	def self.sub_type_filter(product_sub_type_id)
+		return where(product_sub_type_id: product_sub_type_id) if product_sub_type_id
+		return all
+	end
+
+	def self.search(search_text)
+		return search_for(search_text)
 	end
 
 	def self.get_products(ids_array)
@@ -162,5 +170,21 @@ class Product < ActiveRecord::Base
 		return all if ids_array.nil?
 	end
 
+	def self.filter_by_ids(product_ids_a)
+	    return where('products.id IN (?)', product_ids_a) if !product_ids_a.empty?
+	    return all
+	end
+
+	def self.include_orders
+		includes([{:order_products => :order}])
+	end
+
+	def self.pending_stock(product_ids_a)
+		include_orders.filter_by_ids(product_ids_a).where('orders.status_id = 1').references(:orders).group('order_products.product_id').sum('order_products.qty')
+	end
+
+	def self.order_by_name
+		order('name ASC')
+	end
 
 end

@@ -1,0 +1,16 @@
+<span style="float:right;margin-right:50px;font-size: 115%;"><%= paginate(customers) %></span>
+<table class = "table table-striped table-bordered table-hover table-responsive">
+	<tr>
+		<th>Sales Rep</th>
+		<th>Name</th>
+	</tr>
+
+	<% customers.each do |c| %>
+	<tr>
+		<td><%= c.staff.nickname %></td>
+		<td><%= customer_name(c) %></td>
+	</tr>
+	<% end %>
+	
+</table>
+<span style="float:right;margin-right:50px;font-size: 115%;"><%= paginate(customers) %></span>
