@@ -62,17 +62,13 @@ class SalesController < ApplicationController
     @orders = Order.include_customer_staff_status.filter_order_products(@product_id, nil).order_by_id.page(params[:page])
   end
 
-  # # Displays orders for a given status
-  # def orders_for_selected_status
+  # Gets orders and products for a selected status on two different pages
+  # The same dataset is used, just displays in two formats
+  # Thus the dataset can be filtered by 
+  def orders_and_products_for_selected_status
 
-  # end
+  end
 
-  # # Gets orders for a given status
-  # # Groups that orders' products 
-  # # Displays product name, total qty for that status, qty of that product, sum of order total
-  # def products_for_selected_status
-
-  # end
 
     # # How do we come to this page ? - We go to 'Pending Orders page' - Click on a product name
   # # Displays Overall Product Stats irrespective of Order's Status and 
