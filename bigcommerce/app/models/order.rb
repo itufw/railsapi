@@ -173,10 +173,14 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.date_filter(start_date, end_date)
-		start_time = Time.parse(start_date.to_s)
-        end_time = Time.parse(end_date.to_s)
+		if (!start_date.nil? && !end_date.nil?)
+			if !start_date.to_s.empty? && !end_date.to_s.empty?
+			  start_time = Time.parse(start_date.to_s)
+	          end_time = Time.parse(end_date.to_s)
 
-		return where('orders.date_created >= ? and orders.date_created <= ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S")) if !start_date.nil? && !end_date.nil?
+			  return where('orders.date_created >= ? and orders.date_created <= ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"))
+			end
+		end
 		return all
 	end
 
@@ -185,7 +189,7 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.status_filter(status_id)
-		return where(status_id: status_id) if !status_id.nil
+		return where(status_id: status_id) if !status_id.nil?
 		return all
 	end
 
@@ -218,7 +222,8 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.customer_filter(customer_ids)
-		where('orders.customer_id IN (?)', customer_ids)
+		return where('orders.customer_id IN (?)', customer_ids) if !customer_ids.nil? || !customer_ids.empty?
+		return all
 	end
 
 	def self.staff_filter(staff_id)

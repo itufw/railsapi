@@ -1,5 +1,7 @@
 module SalesHelper
   
+  # Takes input staff id and a Hash like {[staff_id, date] => sum}
+  # Returns a Hash like {staff_id => sum}
   def sums_dates_h_for_staff(staff_id, sums_dates_staffs_h)
   	filter_by_staff = sums_dates_staffs_h.select {|key, sum| key[0] == staff_id}
 
