@@ -79,4 +79,12 @@ module ApplicationHelper
     end
   end
 
+  def sum_order_products_qty(order_products)
+    sum = 0
+    order_products.each do |op|
+      sum += op.qty
+    end
+    return sum
+  end
+
 end
