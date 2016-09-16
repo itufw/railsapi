@@ -71,4 +71,13 @@ module ApplicationHelper
 
   end
 
+  def convert_empty_string_to_int(val)
+    if val.to_s.strip.empty?
+      return 0
+    else
+      return val
+    end
+  end
+
+
 end
