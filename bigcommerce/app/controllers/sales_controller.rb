@@ -102,27 +102,31 @@ class SalesController < ApplicationController
     # # How do we come to this page ? - We go to 'Pending Orders page' - Click on a product name
   # # Displays Overall Product Stats irrespective of Order's Status and 
   # # Orders when selected product was ordered, and they currently have selected status 
-  # def orders_and_stats_for_selected_product_and_selected_status
-  #     product_id = params[:product_id]
-  #     product_name = params[:product_name]
+  def orders_and_stats_for_selected_product_and_selected_status
+      product_id = params[:product_id]
+      @product_name = params[:product_name]
 
-  #     status_id = params[:status_id]
-  #     status_name = params[:status_name]
+      status_id = params[:status_id]
+      @status_name = params[:status_name]
 
-  #     num_orders = params[:num_orders]
-  #     qty = params[:qty]
-  #     status_qty = params[:status_qty]
-  #     total = params[:total] 
+      @num_orders = params[:num_orders]
+      @qty = params[:qty]
+      @status_qty = params[:status_qty]
+      @total = params[:total] 
 
-  #     stats_for_timeperiods("Order.product_filter(%s).valid_order" % product_id, "".to_sym, :sum_order_product_qty)
+      results_val = stats_for_timeperiods("Order.product_filter(%s).valid_order" % product_id, "".to_sym, :sum_order_product_qty)
+      @time_periods_name = results_val[0]
+      @sum_stats = results_val[2]
+      @avg_stats = results_val[3]
 
-  #     @staffs = staff_dropdown
+      @staffs = staff_dropdown
 
-  #     param_filter_result = orders_param_filter(params, status_id, product_id, nil)
+      results_val_staff = staff_params_filter(params)
+      staff_id = results_val_staff[0]
+      @staff = results_val_staff[1]
 
-  #     @staff = param_filter_result[0]
-  #     orders = param_filter_result[1] 
-  #   end
+      @orders = Order.status_filter(status_id).staff_filter(staff_id).product_filter([product_id]).order_by_id.page(params[:page])
+    end
 
     # How do we come to this page ? - We click on Order ID - then click on any one of the products
     # Displays Orders when selected customer ordered selected product and shows overall product stats

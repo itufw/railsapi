@@ -1,0 +1,38 @@
+<%= title @product_name  + " - " + @status_name %>
+<h3><%= @product_name %></h3>
+<h3><%= @status_name %></h3>
+
+<table class = "table table-bordered table-hover table-responsive" style="width:50%;" align="center">
+	<tr>
+		<th>Number of Orders</th>
+		<th>Qty</th>
+		<th><%= @status_name %> Qty</th>
+		<th>Total Qty</th>
+		<th>Invoice Totals</th>
+	</tr>
+	<tr>
+		<td class="num"><%= @num_orders %></td>
+		<td class="num"><%= @qty %></td>
+		<td class="num"><%= @status_qty %></td>
+		<td class="num"><%= @status_qty.to_i + @qty.to_i %></td>
+		<td class="num"><%= display_num(@total) %></td>
+</table>
+
+<%= render "partials/overall_stats", time_periods_name: @time_periods_name, sum_stats: @sum_stats, avg_stats: @avg_stats %>
+
+<div class="form-group" style="margin-left:550px;">
+<%= form_tag({:controller => "sales", :action => "orders_and_stats_for_selected_product_and_selected_status"}, {:method => "get"}) do %>
+   <%= render "partials/staff_filter" %>
+   <%= hidden_field_tag :product_id, @product_id %>
+   <%= hidden_field_tag :product_name, @product_name %>
+   <%= hidden_field_tag :status_name, @status_name %>
+   <%= hidden_field_tag :status_id, @status_id %>
+   <%= hidden_field_tag :num_orders, @num_orders %>
+    <%= hidden_field_tag :qty, @qty %>
+   <%= hidden_field_tag :status_qty, @status_qty %>
+   <%= hidden_field_tag :total, @total %>
+   <%= submit_tag "Filter", class: 'btn btn-primary' %>
+<% end %>
+</div>
+
+<%= render "partials/order", orders: @orders, display_class: "" %>
