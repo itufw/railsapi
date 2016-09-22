@@ -62,6 +62,14 @@ module ApplicationHelper
     end
   end
 
+  def exists_in_h_int(hash, key)
+    if hash.has_key? key
+      return hash[key]
+    else
+      return 0
+    end
+  end
+
   def calculate_product_price(product_calculated_price, retail_ws)
     if retail_ws == 'WS'
       return product_calculated_price * 1.29
@@ -85,6 +93,10 @@ module ApplicationHelper
       sum += op.qty
     end
     return sum
+  end
+
+  def next_day(date_today)
+    1.day.since(date_today)
   end
 
 end
