@@ -21,13 +21,14 @@ class ModelsController < ApplicationController
               @status = Status.where(id: status_id).first
           end
       end
-      if !params[:start_date].nil?
+      if !params[:start_date].nil? && !params[:start_date].blank?
           @start_date = params[:start_date]
           start_time = Time.parse(@start_date) 
       end
-      if !params[:end_date].nil?
+      if !params[:end_date].nil? && !params[:end_date].blank?
           @end_date = params[:end_date]
           end_time = Time.parse(@end_date)
+          @page_header = "Orders from #{params[:start_date].to_date.strftime('%A  %d/%m/%y')} - #{params[:end_date].to_date.strftime('%A  %d/%m/%y')}"
       end
       
       if !params[:start_date].nil?
@@ -37,7 +38,7 @@ class ModelsController < ApplicationController
           @page_header = "Orders for #{staff_nickname} from #{params[:start_date].to_date.strftime('%A  %d/%m/%y')} - #{params[:end_date].to_date.strftime('%A  %d/%m/%y')}"
           @staff = Staff.where(id: staff_id).first
         else
-          @page_header = "Orders from #{params[:start_date].to_date.strftime('%A  %d/%m/%y')} - #{params[:end_date].to_date.strftime('%A  %d/%m/%y')}"
+          
         end
       end
 
