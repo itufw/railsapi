@@ -9,9 +9,9 @@ module ModelsHelper
   def orders_page_title(staff_nickname, start_date, end_date)
   	unless start_date.nil? || start_date.blank?
   	  unless staff_nickname.nil?
-  	  	return "Orders for #{staff_nickname} from #{date_format_orders(start_date)} - #{date_format_orders(end_date)}"
+  	  	return "Orders for #{staff_nickname} from #{date_format_orders(start_date)} - #{date_format_orders(end_date.to_date.prev_day)}"
   	  else
-  	  	return "Orders from #{date_format_orders(start_date)} - #{date_format_orders(end_date)}"
+  	  	return "Orders from #{date_format_orders(start_date)} - #{date_format_orders(end_date.to_date.prev_day)}"
   	  end
   	else
   	  return "Orders"
