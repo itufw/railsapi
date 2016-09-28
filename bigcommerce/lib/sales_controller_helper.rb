@@ -1,112 +1,21 @@
 module SalesControllerHelper
 
-  # If a set date isnt given then start of the week is current week's start
-  # if date is given, then start of the week is given date
-
-  # End date in any case is 7 days after the start date
-
-  # Returns an array containing week's date
-  def this_week(date_given)
-
-  	if date_given.blank?
-  	  start_date = (Date.today).at_beginning_of_week
-  	else
-  	  start_date = date_given
-  	end
-
-  	end_date = 6.days.since(start_date)
-
-  	return (start_date..end_date).to_a
-  end
-
-  def last_week(start_date)
-
-  	last_week_start_date = start_date - 7.days
-  	last_week_end_date = 6.days.since(last_week_start_date)
-
-  	return (last_week_start_date..last_week_end_date).to_a
-  end
-
-  def make_daily_dates_map(dates_a)
-    dates_map = {}
-    dates_a.each {|d| dates_map[d] = [d, d.next_day]}
-    return dates_map
-  end
-
-  # def weekly_periods_next(periods, start_date)
-  #   week_start_dates_a = []
-  #   next_date = start_date
-
-  #   periods.times do 
-  #     week_start_dates_a.push(next_date)
-  #     next_date = next_date.next_week
-  #   end
-  #   end_date = next_date.end_of_week
-  #   return start_date, week_start_dates_a.sort, end_date
-  # end
-
-  # def weekly_periods_last(periods, end_date)
-  #   week_start_dates_a = []
-  #   last_date = end_date.beginning_of_week
-
-  #   periods.times do 
-  #     week_start_dates_a.push(last_date)
-  #     last_date = last_date.last_week
-  #   end
-  #   week_start_dates_a = week_start_dates_a.sort
-  #   return week_start_dates_a[0], week_start_dates_a, end_date
-  # end
-
-  def get_last_weeks_date(num_times, end_date)
-    last_weeks_dates = []
-    current_date = end_date
-    num_times.times do
-      last_weeks_dates.push(current_date.last_week)
-      current_date = current_date.last_week
-    end
-    return last_weeks_dates
-  end
-
-  # Gives a sorted array of dates
-  # where first element is the date, number of periods before the end_date
-  # a period can be defined by a function
-  def periods_from_end_date(num_periods, end_date)
-    all_dates = []
-    all_dates.push(end_date.next_day)
-    if end_date.beginning_of_week == end_date
-      # It is a Monday
-      return (all_dates + get_last_weeks_date(num_periods, end_date)).sort
-    else
-      # Not a Monday
-      # That week's monday - given end date will be one period
-      # num_periods - 1 will be normal Weekly periods
-      all_dates.push(end_date.beginning_of_week)
-      return (all_dates + get_last_weeks_date(num_periods - 1, end_date.beginning_of_week)).sort      
-    end
-  end
-
-  # Returns a hash where key is the week number and value is an array of start date and end date
-  def pair_dates(dates_a)
-    paired_dates_a = {}
-    dates_a.each_cons(2) {|date, next_date| paired_dates_a[convert_to_week_num(date)] = [date, next_date] unless date.equal? dates_a.last}
-    return paired_dates_a
-  end
-
-  def convert_to_week_num(date)
-    return date.strftime('%U').to_i
-  end
-
-  # returns a hash where dates are keys and values are positive, non-zero orders totals 
-  def sum_orders(start_date, end_date, group_by_function)
-      return Order.date_filter(start_date, end_date).valid_order.send(group_by_function).sum_total
-  end
-
-  def staff_sum_orders(start_date, end_date, group_by_function)
-  	return Order.date_filter(start_date, end_date).valid_order.send(group_by_function).sum_total
+  # returns a hash where dates (and sometime staff id) are keys and values are positive, 
+  # non-zero orders totals 
+  def sum_orders(start_date, end_date, group_by_function, sum_function)
+      return Order.date_filter(start_date, end_date.next_day).valid_order.send(group_by_function).send(sum_function)
   end
 
   def staff_dropdown
   	return Staff.active_sales_staff
+  end
+
+  def order_sum_param(radio_button_value)
+    if radio_button_value == "Bottles"
+      return :sum_qty, true, false, "Bottles"
+    else
+      return :sum_total, false, true, "Order Totals"
+    end
   end
 
   def stats_for_timeperiods(where_query, group_by, sum_by)

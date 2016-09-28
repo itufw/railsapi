@@ -1,12 +1,19 @@
 <%= title "Sales Dashboard" %>
 
 <h3>Weekly Sales Summary</h3>
-<div style="float:right; margin-right: 50px;">
+
+<div style="margin-right: 50px;margin-top: 30px;">
+
 <%= form_tag({:action => "sales_dashboard"}, {:method => "get"}) do %>
-   Start Date:   <%= date_field( "selected_date", "selected_date", value: @dates_this_week.first ) %>
-   <%= submit_tag "Change Start Date" %>
+   <%= render "partials/dashboard_filter" %>
+   <div style="float:right;">
+	Start Date:   <%= date_field( "selected_date", "selected_date", value: @dates_this_week.first ) %>
+   <%= submit_tag "Change", class: 'btn btn-primary' %>
+   </div>
 <% end %>
 </div>
+
+<br/>
 
 <table class = "table table-striped table-bordered table-hover table-responsive">
 	<tr>
