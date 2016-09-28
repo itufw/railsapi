@@ -17,7 +17,6 @@ module SalesControllerHelper
   	end_date = 6.days.since(start_date)
 
   	return (start_date..end_date).to_a
-
   end
 
   def last_week(start_date)
@@ -26,16 +25,67 @@ module SalesControllerHelper
   	last_week_end_date = 6.days.since(last_week_start_date)
 
   	return (last_week_start_date..last_week_end_date).to_a
+  end
 
+  # def weekly_periods_next(periods, start_date)
+  #   week_start_dates_a = []
+  #   next_date = start_date
+
+  #   periods.times do 
+  #     week_start_dates_a.push(next_date)
+  #     next_date = next_date.next_week
+  #   end
+  #   end_date = next_date.end_of_week
+  #   return start_date, week_start_dates_a.sort, end_date
+  # end
+
+  # def weekly_periods_last(periods, end_date)
+  #   week_start_dates_a = []
+  #   last_date = end_date.beginning_of_week
+
+  #   periods.times do 
+  #     week_start_dates_a.push(last_date)
+  #     last_date = last_date.last_week
+  #   end
+  #   week_start_dates_a = week_start_dates_a.sort
+  #   return week_start_dates_a[0], week_start_dates_a, end_date
+  # end
+
+  def get_last_weeks_date(num_times, end_date)
+    last_weeks_dates = []
+    current_date = end_date
+    num_times.times do
+      last_weeks_dates.push(current_date.last_week)
+      current_date = current_date.last_week
+    end
+    return last_weeks_dates
+  end
+
+  # Gives a sorted array of dates
+  # where first element is the date, number of periods before the end_date
+  # a period can be defined by a function
+  def periods_from_end_date(num_periods, end_date)
+    all_dates = []
+    all_dates.push(end_date)
+    if end_date.beginning_of_week == end_date
+      # It is a Monday
+      return (all_dates + get_last_weeks_date(num_periods, end_date)).sort
+    else
+      # Not a Monday
+      # That week's monday - given end date will be one period
+      # num_periods - 1 will be normal Weekly periods
+      all_dates.push(end_date.beginning_of_week)
+      return (all_dates + get_last_weeks_date(num_periods - 1, end_date.beginning_of_week)).sort      
+    end
   end
 
   # returns a hash where dates are keys and values are positive, non-zero orders totals 
-  def sum_orders(start_date, end_date)
-      return Order.date_filter(start_date, end_date).valid_order.group_by_date_created.sum_total
+  def sum_orders(start_date, end_date, group_by_function)
+      return Order.date_filter(start_date, end_date).valid_order.send(group_by_function).sum_total
   end
 
-  def staff_sum_orders(start_date, end_date)
-  	return Order.date_filter(start_date, end_date).valid_order.group_by_date_created_and_staff_id.sum_total
+  def staff_sum_orders(start_date, end_date, group_by_function)
+  	return Order.date_filter(start_date, end_date).valid_order.send(group_by_function).sum_total
   end
 
   def staff_dropdown
