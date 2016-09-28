@@ -27,6 +27,12 @@ module SalesControllerHelper
   	return (last_week_start_date..last_week_end_date).to_a
   end
 
+  def make_daily_dates_map(dates_a)
+    dates_map = {}
+    dates_a.each {|d| dates_map[d] = [d, d.next_day]}
+    return dates_map
+  end
+
   # def weekly_periods_next(periods, start_date)
   #   week_start_dates_a = []
   #   next_date = start_date
@@ -66,7 +72,7 @@ module SalesControllerHelper
   # a period can be defined by a function
   def periods_from_end_date(num_periods, end_date)
     all_dates = []
-    all_dates.push(end_date)
+    all_dates.push(end_date.next_day)
     if end_date.beginning_of_week == end_date
       # It is a Monday
       return (all_dates + get_last_weeks_date(num_periods, end_date)).sort
@@ -77,6 +83,17 @@ module SalesControllerHelper
       all_dates.push(end_date.beginning_of_week)
       return (all_dates + get_last_weeks_date(num_periods - 1, end_date.beginning_of_week)).sort      
     end
+  end
+
+  # Returns a hash where key is the week number and value is an array of start date and end date
+  def pair_dates(dates_a)
+    paired_dates_a = {}
+    dates_a.each_cons(2) {|date, next_date| paired_dates_a[convert_to_week_num(date)] = [date, next_date] unless date.equal? dates_a.last}
+    return paired_dates_a
+  end
+
+  def convert_to_week_num(date)
+    return date.strftime('%U').to_i
   end
 
   # returns a hash where dates are keys and values are positive, non-zero orders totals 

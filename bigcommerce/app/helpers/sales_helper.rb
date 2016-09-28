@@ -10,4 +10,12 @@ module SalesHelper
   	return sums_dates_h
   end
 
+  def total_cell_start_date(dates_map)
+  	dates_map.values.flatten.first
+  end
+
+  def total_cell_end_date(dates_map)
+  	dates_map.values.flatten.last
+  end
+
 end

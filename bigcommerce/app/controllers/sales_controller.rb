@@ -29,6 +29,9 @@ class SalesController < ApplicationController
     # returns a hashmap like { date => order_totals }
     @sum_this_week = sum_orders(@dates_this_week[0], @dates_this_week[-1], :group_by_date_created)
     @sum_last_week = sum_orders(@dates_last_week[0], @dates_last_week[-1], :group_by_date_created)
+    
+    @dates_paired_this_week = make_daily_dates_map(@dates_this_week)
+    @dates_paired_last_week = make_daily_dates_map(@dates_last_week)
 
     # returns a hashmap like { [staff_id, date] => order_totals }
     @staff_sum_this_week = staff_sum_orders(@dates_this_week[0], @dates_this_week[-1], :group_by_date_created_and_staff_id)
@@ -36,8 +39,13 @@ class SalesController < ApplicationController
   end
 
   def sales_dashboard_detailed
-    @weekly_dates = periods_from_end_date(13, Date.today)
-    @sums_by_periods = sum_orders(@weekly_dates[0], @weekly_dates[-1], :group_by_week_created)
+    weekly_dates = periods_from_end_date(13, Date.today)
+    @sums_by_periods = sum_orders(weekly_dates[0], weekly_dates[-1], :group_by_week_created)
+    @dates_paired = pair_dates(weekly_dates)
+
+    @staff_sum_by_periods = staff_sum_orders(weekly_dates[0], weekly_dates[-1], :group_by_week_created_and_staff_id)
+    @staff_nicknames = Staff.active_sales_staff.nickname.to_h
+
 
   end
 

@@ -99,8 +99,4 @@ module ApplicationHelper
     num_days.days.since(date_today)
   end
 
-  # def convert_to_week_num(date)
-  #   return date.strftime('%U').to_i
-  # end
-
 end
