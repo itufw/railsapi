@@ -197,16 +197,20 @@ class Order < ActiveRecord::Base
 		group('DATE(orders.date_created)')
 	end
 
+	def self.group_by_week_created
+		group('WEEK(orders.date_created)')
+	end
+
 	def self.group_by_date_created_and_staff_id
 		includes(:customer).group(["customers.staff_id", "DATE(orders.date_created)"])
 	end
 
-	def self.group_by_customerid
-		group('orders.customer_id')
+	def self.group_by_week_created_and_staff_id
+		includes(:customer).group(["customers.staff_id", "WEEK(orders.date_created)"])
 	end
 
-	def self.group_by_staff_and_date
-		includes(:customer).group(['customers.staff_id', 'DATE(orders.date_created)']).references(:customers)
+	def self.group_by_customerid
+		group('orders.customer_id')
 	end
 
 	def self.group_by_product_id

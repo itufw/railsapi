@@ -1,5 +1,5 @@
 <% dates.each do |d| %>
-	<td class="num"><%= link_to display_num(exists_in_h_int(sums_dates_h, d)), controller: 'models', action: 'orders', start_date: d, end_date: next_day(d), staff_nickname: staff_nickname, staff_id: staff_id %></td>
+	<td class="num"><%= display_num(exists_in_h_int(sums_dates_h, d)) %></td>
 <% end %>
 
-<td class="num"><%= link_to display_num(sums_dates_h.values.sum), controller: 'models', action: 'orders', start_date: dates.first, end_date: dates.last, staff_nickname: staff_nickname, staff_id: staff_id %></td>
+<td class="num"><%= display_num(sums_dates_h.values.sum) %></td>

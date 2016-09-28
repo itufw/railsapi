@@ -12,7 +12,7 @@ module ApplicationHelper
 
   # Displays a date in the form 'Day of the week, Day/Month/Year'
   def date_format(date)
-  	date.to_date.strftime('%A %d/%m/%y')
+  	date.to_date.strftime('%a %d/%m/%y')
   end
 
   # Displays date in the form Day/Month/Year
@@ -95,8 +95,12 @@ module ApplicationHelper
     return sum
   end
 
-  def next_day(date_today)
-    1.day.since(date_today)
+  def since_days(date_today, num_days)
+    num_days.days.since(date_today)
   end
+
+  # def convert_to_week_num(date)
+  #   return date.strftime('%U').to_i
+  # end
 
 end
