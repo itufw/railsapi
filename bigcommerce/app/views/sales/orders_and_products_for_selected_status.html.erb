@@ -1,11 +1,11 @@
 <%= title @status_name %>
 <div class="dropdown" style="float:left;">
-	<button class="button dropdown-toggle" type="button" data-toggle="dropdown">Change Status
-	<span class="caret"></span></button>
+  <button class="button dropdown-toggle" type="button" data-toggle="dropdown">Change Status
+  <span class="caret"></span></button>
     <ul class="dropdown-menu">
       <% @all_statuses.each do |s| %>
 
-      	  <li class="center"><%= link_to s.name, action: "orders_and_products_for_selected_status", status_id: s.id, status_name: s.name %></li>
+          <li class="center"><%= link_to s.name, action: "orders_and_products_for_selected_status", status_id: s.id, status_name: s.name %></li>
 
       <% end %>
     </ul>

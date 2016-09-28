@@ -12,6 +12,6 @@
 <%= hidden_field_tag :start_date, @start_date %>
    <%= hidden_field_tag :end_date, @end_date %>
    <%= submit_tag "Filter", class: 'btn btn-primary' %>
-   <button class = "btn btn-primary"><%= link_to "Reset", action: "orders" %></button>
+   <%= link_to "Reset", {controller: "models", action: "orders"}, class: "btn btn-primary" %></button>
 <% end %>
 </div>

@@ -225,6 +225,10 @@ class Order < ActiveRecord::Base
 		sum('orders.total_inc_tax')
 	end
 
+	def self.sum_qty
+		sum('orders.qty')
+	end
+
 	def self.sum_order_product_qty
 		includes(:order_products).sum('order_products.qty')
 	end

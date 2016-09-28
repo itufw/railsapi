@@ -1,5 +1,6 @@
 require 'sales_controller_helper.rb'
 require 'models_filter.rb'
+require 'dates_helper.rb'
 
 class SalesController < ApplicationController
 
@@ -7,6 +8,7 @@ class SalesController < ApplicationController
 
   include SalesControllerHelper
   include ModelsFilter
+  include DatesHelper
 
   helper_method :check_id_in_map
 
@@ -14,37 +16,42 @@ class SalesController < ApplicationController
   # Also displays total order sales for this week divided by staff
   def sales_dashboard
     # Date selected by user , default is today's date
-    date_param = params[:selected_date]
-
-    if date_param.blank?
-      date_given = ""
-    else
-      date_given =  date_param[:selected_date].to_date
-    end
-
+    date_given = return_date_given(params)
 
     @dates_this_week = this_week(date_given)
     @dates_last_week = last_week(@dates_this_week[0])
 
+    sum_function, @checked_bottles, @checked_totals = order_sum_param(params[:sum_param])
     # returns a hashmap like { date => order_totals }
-    @sum_this_week = sum_orders(@dates_this_week[0], @dates_this_week[-1], :group_by_date_created)
-    @sum_last_week = sum_orders(@dates_last_week[0], @dates_last_week[-1], :group_by_date_created)
+    @sum_this_week = sum_orders(@dates_this_week[0], @dates_this_week[-1], :group_by_date_created, sum_function)
+    @sum_last_week = sum_orders(@dates_last_week[0], @dates_last_week[-1], :group_by_date_created, sum_function)
     
     @dates_paired_this_week = make_daily_dates_map(@dates_this_week)
     @dates_paired_last_week = make_daily_dates_map(@dates_last_week)
 
     # returns a hashmap like { [staff_id, date] => order_totals }
-    @staff_sum_this_week = staff_sum_orders(@dates_this_week[0], @dates_this_week[-1], :group_by_date_created_and_staff_id)
+    @staff_sum_this_week = sum_orders(@dates_this_week[0], @dates_this_week[-1], :group_by_date_created_and_staff_id, sum_function)
     @staff_nicknames = Staff.active_sales_staff.nickname.to_h
   end
 
   def sales_dashboard_detailed
-    weekly_dates = periods_from_end_date(13, Date.today)
-    @sums_by_periods = sum_orders(weekly_dates[0], weekly_dates[-1], :group_by_week_created)
+    @end_date = return_end_date(return_date_given(params))
+    @num_period = params[:num_period]
+    if params[:num_period]
+      num = params[:num_period].to_i
+    else 
+      num = 13
+    end
+
+    weekly_dates = periods_from_end_date(num, @end_date)
+    sum_function, @checked_bottles, @checked_totals, @param_val = order_sum_param(params[:sum_param])
+    @sums_by_periods = sum_orders(weekly_dates[0], weekly_dates[-1], :group_by_week_created, sum_function)
     @dates_paired = pair_dates(weekly_dates)
 
-    @staff_sum_by_periods = staff_sum_orders(weekly_dates[0], weekly_dates[-1], :group_by_week_created_and_staff_id)
+    @staff_sum_by_periods = sum_orders(weekly_dates[0], weekly_dates[-1], :group_by_week_created_and_staff_id, sum_function)
     @staff_nicknames = Staff.active_sales_staff.nickname.to_h
+
+    @periods = (3..15).to_a
 
 
   end
@@ -93,16 +100,11 @@ class SalesController < ApplicationController
     @countries = ProducerCountry.all
     @sub_types = ProductSubType.all
 
-    results_val_product = product_param_filter(params)
-    @producer_country = results_val_product[0]
-    @product_sub_type = results_val_product[1]
-    @search_text = results_val_product[3]
+    @producer_country, @product_sub_type, products, @search_text = product_param_filter(params)
 
-    results_val_staff = staff_params_filter(params)
-    staff_id = results_val_staff[0]
-    @staff = results_val_staff[1]
+    staff_id, @staff = staff_params_filter(params)
 
-    product_ids = results_val_product[2].pluck("id")
+    product_ids = products.pluck("id")
 
     # filter orders
     orders = Order.include_all.status_filter(@status_id).staff_filter(staff_id).product_filter(product_ids).order_by_id.page(params[:page])
@@ -128,17 +130,12 @@ class SalesController < ApplicationController
       @status_qty = params[:status_qty]
       @total = params[:total] 
 
-      results_val = stats_for_timeperiods("Order.product_filter(%s).valid_order" % product_id, "".to_sym, :sum_order_product_qty)
-      @time_periods_name = results_val[0]
-      @sum_stats = results_val[2]
-      @avg_stats = results_val[3]
+      @time_periods_name, i, @sum_stats, @avg_stats = stats_for_timeperiods("Order.product_filter(%s).valid_order" % product_id, "".to_sym, :sum_order_product_qty)
 
       @staffs = staff_dropdown
 
-      results_val_staff = staff_params_filter(params)
-      staff_id = results_val_staff[0]
-      @staff = results_val_staff[1]
-
+      staff_id, @staff = staff_params_filter(params)
+    
       @orders = Order.status_filter(status_id).staff_filter(staff_id).product_filter([product_id]).order_by_id.page(params[:page])
     end
 
@@ -153,10 +150,8 @@ class SalesController < ApplicationController
     @product_name = params[:product_name]
   
     @orders = Order.include_customer_staff_status.product_filter(product_id).customer_filter([customer_id]).order_by_id.page(params[:page])
-    return_val = stats_for_timeperiods("Order.product_filter(%s).customer_filter(%s)" % [product_id, [customer_id]], "".to_sym, :sum_order_product_qty)
-    @time_periods_name = return_val[0]
-    @sum_stats = return_val[2]
-    @avg_stats = return_val[3]
+    @time_periods_name, i, @sum_stats, @avg_stats = stats_for_timeperiods("Order.product_filter(%s).customer_filter(%s)" % [product_id, [customer_id]], "".to_sym, :sum_order_product_qty)
+
   end
 
   # # Displays Overall Stats for customer(Bottles ordered) and Stats for all the products the customer has ordered
@@ -164,13 +159,8 @@ class SalesController < ApplicationController
     customer_id = params[:customer_id]
     @customer_name = params[:customer_name]
 
-    results_val = stats_for_timeperiods("Order.customer_filter(%s).valid_order" % [[customer_id]], :group_by_product_id, :sum_order_product_qty)
-    @time_periods_name = results_val[0]
-    @all_stats = results_val[1]
-    @sum_stats = results_val[2]
-    @avg_stats = results_val[3]
-    product_ids = results_val[4]
-
+    @time_periods_name, @all_stats, @sum_stats, @avg_stats, product_ids = stats_for_timeperiods("Order.customer_filter(%s).valid_order" % [[customer_id]], :group_by_product_id, :sum_order_product_qty)
+    
     # returns a hash {id => name}
     @products_h = product_filter(product_ids)
   end
@@ -180,12 +170,7 @@ class SalesController < ApplicationController
     @product_id = params[:product_id]
     @product_name = params[:product_name]
 
-    results_val = stats_for_timeperiods("Order.product_filter(%s).valid_order" % @product_id, :group_by_customerid, :sum_order_product_qty)
-    @time_periods_name = results_val[0]
-    @all_stats = results_val[1]
-    @sum_stats = results_val[2]
-    @avg_stats = results_val[3]
-    customer_ids = results_val[4]
+    @time_periods_name, @all_stats, @sum_stats, @avg_stats, customer_ids = stats_for_timeperiods("Order.product_filter(%s).valid_order" % @product_id, :group_by_customerid, :sum_order_product_qty)
 
     @staffs = staff_dropdown
 

@@ -1,17 +1,36 @@
-<%= title "Weekly Sales Dashboard" %>
+<%= title "Detailed Sales Dashboard" %>
 
 <h3>Weekly Sales</h3>
 
+<div style="margin-top: 50px;">
+
+<%= form_tag({:action => "sales_dashboard_detailed"}, {:method => "get"}) do %>
+
+	<div class="col-xs-2" style="float: left;margin-left: 150px;">
+   	<%= select_tag "num_period", options_for_select(@periods.collect{ |p| [p, p]}, selected: @num_period), include_blank: "Number of Periods", class:'form-control' %>
+    </div>
+
+
+   <%= render "partials/dashboard_filter" %>
+
+   <div class="col-xs-4" style="float: left;">
+   End Date:   <%= date_field( "selected_date", "selected_date", value: @end_date) %>
+
+   <%= submit_tag "Change", class: 'btn btn-primary' %>
+   </div>
+<% end %>
+</div>
+<br/><br/>
 <table class = "table table-striped table-bordered table-hover table-responsive">
 	<tr>
-		<th></th>
+		<th>Start Date - End Date</th>
 		<% @dates_paired.each do |week_num, date_pair| %>
 			<th> <%= date_format_orders(date_pair[0]) %> - <%= date_format_orders(date_pair[1].prev_day) %></th>
 		<% end %>
 		<th>Total</th>
 	</tr>
 	<tr>
-		<th></th>
+		<th>Week Num</th>
 		<% @dates_paired.each do |week_num, date_pair| %>
 			<th> <%= week_num %></th>
 		<% end %>
@@ -19,11 +38,11 @@
 	</tr>
 
 	<tr>
-		<td></td>
+		<td><%= @param_val %></td>
 		<%= render "partials/daily_sums", sums_dates_h: @sums_by_periods, dates: @dates_paired.keys, dates_map: @dates_paired, staff_nickname: nil, staff_id: nil %>
 	<tr>
 
-	<tr class = "blank-row"><td colspan="9"></td><tr>
+	<tr class = "blank-row"><td colspan="20"></td><tr>
 
 	<tr>
 		<%= render "partials/staff_sums", sums_dates_staffs_h: @staff_sum_by_periods, staffs: @staff_nicknames, dates: @dates_paired.keys, dates_map: @dates_paired %>
