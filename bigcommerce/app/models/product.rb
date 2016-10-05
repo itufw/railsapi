@@ -20,7 +20,7 @@ class Product < ActiveRecord::Base
 
 	scoped_search on: [:name, :portfolio_region]
 
-	self.per_page = 15
+	self.per_page = 30
 
 	def scrape
 

@@ -1,5 +1,4 @@
 <%= title @customer_name %>
-<h3><%= @customer_name %></h3>
-<%= render "partials/overall_stats", time_periods_name: @time_periods_name, sum_stats: @sum_stats, avg_stats: @avg_stats %>
+<h3>Top Products for <%= @customer_name %> (Bottles)</h3>
 
 <%= render "partials/detailed_stats", time_periods_name: @time_periods_name, column_name: "Product", names: @products_h, stats: @all_stats, display_class: "none", display_class_otherwise: "", column_name_optional: "" %>

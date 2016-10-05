@@ -11,12 +11,13 @@ class ModelsController < ApplicationController
     @staffs = Staff.active_sales_staff
     @statuses = Status.all
 
-    results_val = order_param_filter(params)
+    @staff, @status, orders, @search_text = order_param_filter(params, session[:user_id])
+    @orders = orders.order_by_id.page(params[:page])
 
-    @staff = results_val[0]
-    @status = results_val[1]
-    @orders = results_val[2].order_by_id.page(params[:page])
-    @search_text = results_val[3]
+    # @staff = results_val[0]
+    # @status = results_val[1]
+    # @orders = results_val[2].order_by_id.page(params[:page])
+    # @search_text = results_val[3]
     @start_date = params[:start_date]
     @end_date = params[:end_date]
 

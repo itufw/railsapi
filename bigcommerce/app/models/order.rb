@@ -22,7 +22,7 @@ class Order < ActiveRecord::Base
 
 	#has_one :xero_invoice
 
-	self.per_page = 15
+	self.per_page = 30
 
 	def scrape
 
@@ -165,6 +165,10 @@ class Order < ActiveRecord::Base
 
 	def self.order_filter(order_id)
 		find(order_id)
+	end
+
+	def self.order_filter_by_ids(order_ids)
+		return where('orders.id IN (?)', order_ids).references(:orders)
 	end
 
 	def self.product_filter(product_ids)

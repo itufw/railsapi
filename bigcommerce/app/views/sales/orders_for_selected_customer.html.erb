@@ -1,6 +1,0 @@
-<%= title @customer_name %>
-<h3><%= @customer_name %></h3>
-<center>
-<button class="button center"><%= link_to "View Stats for Customer", controller: 'sales', action: 'customer_stats', customer_id: @customer_id, customer_name: @customer_name %></button>
-</center>
-<%= render "partials/order", orders: @orders, display_class: "none" %>

@@ -8,7 +8,8 @@
 	<% customers.each do |c| %>
 	<tr>
 		<td><%= c.staff.nickname %></td>
-		<td><%= customer_name(c) %></td>
+		<% cust_name = customer_name(c) %>
+		<td><%= link_to cust_name, controller: 'sales', action: 'orders_and_stats_for_customer', customer_id: c.id, customer_name: cust_name %></td>
 	</tr>
 	<% end %>
 	
