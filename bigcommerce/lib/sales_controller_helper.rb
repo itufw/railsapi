@@ -57,7 +57,7 @@ module SalesControllerHelper
     # Now I need to make a hash like from orders
     #{product_id => [number_of_orders, status_qty, orders_dollar_sum, product_name, product_stock]}
 
-    filter_string = "Order.status_filter(%s).staff_filter(nil).product_filter(%s)" % [status_id, return_nil_string(staff_id), product_ids]
+    filter_string = "Order.status_filter(%s).staff_filter(%s).product_filter(%s)" % [status_id, return_nil_string(staff_id), product_ids]
 
     # This returns a hash like {product_id => number_orders}
     num_orders = (eval filter_string).group_by_product_id.count_order_id_from_order_products

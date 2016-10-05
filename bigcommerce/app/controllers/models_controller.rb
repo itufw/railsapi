@@ -27,11 +27,8 @@ class ModelsController < ApplicationController
   def customers
     @staffs = Staff.active_sales_staff
 
-    results_val = customer_param_filter(params)
-
-    @staff = results_val[0]
-    @customers = results_val[1].order_by_name.page(params[:page])
-    @search_text = results_val[2]
+    @staff, customers, @search_text = customer_param_filter(params, session[:user_id])
+    @customers = customers.order_by_name.page(params[:page])
 
   end
 

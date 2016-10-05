@@ -8,7 +8,7 @@
 </center>
 
 <div class="form-group col-xs-offset-5" style="margin-top:50px;">
-<%= form_tag({:action => "product_stats"}, {:method => "get"}) do %>
+<%= form_tag({:action => "stats_and_top_customers_for_product"}, {:method => "get"}) do %>
    <%= render "partials/staff_filter" %>
 
    <%= hidden_field_tag :product_id, @product_id %>
@@ -18,4 +18,4 @@
 <% end %>
 </div>
 
-<%= render "partials/detailed_stats", time_periods_name: @time_periods_name, column_name: "Customer", names: @customers_h_sorted, stats: @all_stats, display_class: "", display_class_otherwise: "none", column_name_optional: "Sales Rep" %>
+<%= render "partials/detailed_stats", time_periods_name: @time_periods_name, column_name: "Customer", names: @customers_h_sorted, stats: @all_stats, display_class: "", display_class_otherwise: "none", column_name_optional: "Sales Rep", customer_id: nil, customer_name: nil, product_id: @product_id, product_name: @product_name %>

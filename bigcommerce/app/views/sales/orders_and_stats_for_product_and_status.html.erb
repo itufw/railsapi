@@ -21,7 +21,7 @@
 <%= render "partials/overall_stats", time_periods_name: @time_periods_name, sum_stats: @sum_stats, avg_stats: @avg_stats %>
 
 <div class="form-group" style="margin-left:550px;">
-<%= form_tag({:controller => "sales", :action => "orders_and_stats_for_selected_product_and_selected_status"}, {:method => "get"}) do %>
+<%= form_tag({:controller => "sales", :action => "orders_and_stats_for_product_and_status"}, {:method => "get"}) do %>
    <%= render "partials/staff_filter" %>
    <%= hidden_field_tag :product_id, @product_id %>
    <%= hidden_field_tag :product_name, @product_name %>

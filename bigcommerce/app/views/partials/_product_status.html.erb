@@ -13,7 +13,7 @@
 
 	<tr>
 		<% v = p[1] %>
-		<td><%= link_to v[3], controller: 'sales', action: 'orders_and_stats_for_selected_product_and_selected_status', status_id: @status_id, status_name: @status_name, product_id: p[0], product_name: v[3] %></td>
+		<td><%= link_to v[3], controller: 'sales', action: 'orders_and_stats_for_product_and_status', status_id: @status_id, status_name: @status_name, product_id: p[0], product_name: v[3], num_orders: v[0], qty: v[4], status_qty: v[1], total: v[2] %></td>
 		<td class="num"><%= number_with_delimiter(v[0]) %></td>
 		<td class="num"><%= number_with_delimiter(v[4]) %></td>
 		<td class="num"><%= number_with_delimiter(v[1]) %></td>
