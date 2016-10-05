@@ -9,12 +9,14 @@
 
 	<% names.each do |id, name| %>
 	<tr>
-		<%#= For Product Stats that have hash like {id => name} %>
-		<td class = <%= display_class_otherwise %> ><%= name %></td>
+		<%#= For Top Products for customers that have hash like {id => name} %>
+		<td class = <%= display_class_otherwise %> ><%= link_to name, controller: 'sales', action: 
+		'orders_and_stats_for_product_and_customer', customer_id: customer_id, customer_name: customer_name, product_id: id, product_name: name %></td>
 
-		<%#= For Customer Stats that have hash like {id => [name, staff]} %>
+		<%#= For Top Customers for Product that have hash like {id => [name, staff]} %>
 		
-		<td class = <%= display_class %> ><%= name[0] %></td>
+		<td class = <%= display_class %> ><%= link_to name[0], controller: 'sales', action: 
+		'orders_and_stats_for_product_and_customer', customer_id: id, customer_name: name[0], product_id: product_id, product_name: product_name %></td>
 		<td class = <%= display_class %> ><%= name[1] %></td>
 		<% stats.each do |time_period_name, hash| %>
 		<td><%= exists_in_h(hash, id) %></td>

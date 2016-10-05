@@ -96,10 +96,10 @@ class SalesController < ApplicationController
 
   # Displays Overall Stats for customer(Bottles ordered) and Stats for all the products the customer has ordered
   def top_products_for_customer
-    customer_id = params[:customer_id]
+    @customer_id = params[:customer_id]
     @customer_name = params[:customer_name]
 
-    @time_periods_name, @all_stats, @sum_stats, @avg_stats, product_ids = stats_for_timeperiods("Order.customer_filter(%s).valid_order" % [[customer_id]], :group_by_product_id, :sum_order_product_qty)
+    @time_periods_name, @all_stats, @sum_stats, @avg_stats, product_ids = stats_for_timeperiods("Order.customer_filter(%s).valid_order" % [[@customer_id]], :group_by_product_id, :sum_order_product_qty)
     
     # returns a hash {id => name}
     @products_h = product_filter(product_ids)
@@ -139,7 +139,7 @@ class SalesController < ApplicationController
 
     @staffs = staff_dropdown
 
-    results_val = customer_param_filter(params)
+    results_val = customer_param_filter(params, 25)
 
     @staff = results_val[0]
     customers_filtered_ids = results_val[1].pluck("id")
@@ -148,7 +148,21 @@ class SalesController < ApplicationController
     customers.map {|c| customers_h[c.id] = [Customer.customer_name(c.actual_name, c.firstname, c.lastname), Staff.filter_by_id(c.staff_id).nickname]}
     @customers_h_sorted = customers_h.sort_by {|id, key| key[0]}
   end
-#---------------------------------------------------------------
+
+  # How do we come to this page ? - We click on Order ID - then click on any one of the products
+  # Displays Orders when selected customer ordered selected product and shows overall product stats
+  # (money spent on that product by customer)
+  def orders_and_stats_for_product_and_customer
+    customer_id = params[:customer_id]
+    @customer_name = params[:customer_name]
+
+    product_id = params[:product_id]
+    @product_name = params[:product_name]
+  
+    @orders = Order.include_customer_staff_status.product_filter(product_id).customer_filter([customer_id]).order_by_id.page(params[:page])
+    @time_periods_name, i, @sum_stats, @avg_stats = stats_for_timeperiods("Order.product_filter(%s).customer_filter(%s).valid_order" % [product_id, [customer_id]], "".to_sym, :sum_order_product_qty)
+  end
+
   # Gets orders and products for a selected status on two different pages
   # The same dataset is used, just displays in two formats
   # Thus the dataset can be filtered by 
@@ -168,7 +182,7 @@ class SalesController < ApplicationController
 
     @producer_country, @product_sub_type, products, @search_text = product_param_filter(params)
 
-    staff_id, @staff = staff_params_filter(params)
+    staff_id, @staff = staff_params_filter(params, session[:user_id])
 
     product_ids = products.pluck("id")
 
@@ -199,24 +213,10 @@ class SalesController < ApplicationController
 
       @staffs = staff_dropdown
 
-      staff_id, @staff = staff_params_filter(params)
+      staff_id, @staff = staff_params_filter(params, session[:user_id])
     
       @orders = Order.status_filter(status_id).staff_filter(staff_id).product_filter([product_id]).order_by_id.page(params[:page])
     end
 
-    # How do we come to this page ? - We click on Order ID - then click on any one of the products
-    # Displays Orders when selected customer ordered selected product and shows overall product stats
-    # (money spent on that product by customer)
-  def orders_and_stats_for_product_and_customer
-    customer_id = params[:customer_id]
-    @customer_name = params[:customer_name]
-
-    product_id = params[:product_id]
-    @product_name = params[:product_name]
-  
-    @orders = Order.include_customer_staff_status.product_filter(product_id).customer_filter([customer_id]).order_by_id.page(params[:page])
-    @time_periods_name, i, @sum_stats, @avg_stats = stats_for_timeperiods("Order.product_filter(%s).customer_filter(%s)" % [product_id, [customer_id]], "".to_sym, :sum_order_product_qty)
-
-  end
 
 end

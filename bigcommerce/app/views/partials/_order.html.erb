@@ -17,7 +17,7 @@
 		<td><%= date_format_orders(order.date_created) %></td>
 		<td><%= link_to order.id, controller: 'sales', action: 'order_details', order_id: order.id %></td>
 		<% cust_name = customer_name(order.customer) %>
-		<td><%= link_to cust_name, controller: 'sales', action: 'orders_for_selected_customer', customer_id: order.customer_id, customer_name: cust_name %></td>
+		<td><%= link_to cust_name, controller: 'sales', action: 'orders_and_stats_for_customer', customer_id: order.customer_id, customer_name: cust_name %></td>
 		<td><%= order_status(order.status) %></td>
 		<td class = <%= display_class + " num " %>  ><%= sum_order_products_qty(order.order_products) %></th>
 		<td class = "num"><%= order.qty %></td>
