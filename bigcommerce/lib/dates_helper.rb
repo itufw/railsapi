@@ -56,45 +56,73 @@ module DatesHelper
   end
 
   # Get an array of last weeks' start dates
-  def get_last_weeks_date(num_times, end_date)
-    last_weeks_dates = []
+  def get_last_periods_date(num_times, end_date, date_function)
+    last_periods_dates = []
     current_date = end_date
     num_times.times do
-      last_weeks_dates.push(current_date.last_week)
-      current_date = current_date.last_week
+      last_periods_dates.push(current_date.send(date_function))
+      current_date = current_date.send(date_function)
     end
-    return last_weeks_dates
+    return last_periods_dates
   end
 
   # Gives a sorted array of dates
   # where first element is the date, number of periods before the end_date
-  # a period can be defined by a function
-  def periods_from_end_date(num_periods, end_date)
+  # a period is defined by a date function
+  # a period_type can be "weekly" or "monthly"
+  def periods_from_end_date(num_periods, end_date, period_type)
     all_dates = []
-    if end_date.beginning_of_week == end_date
-      # It is a Monday
+    beginning_function, last_function = period_date_functions(period_type)
+    if end_date.send(beginning_function) == end_date
+      # It is the start of the week (Monday) or start of the month
+      # This end date won't be included in the calculations or in the final table
+      # We will push this date and not the date before this one because
+      # if I want today's orders I will give orders function start_date - Today at 00:00:00
+      # And tomorrow at 00:00:00
       all_dates.push(end_date)
-      return (all_dates + get_last_weeks_date(num_periods, end_date)).sort
+      return (all_dates + get_last_periods_date(num_periods, end_date, last_function)).sort
     else
-      # Not a Monday
-      # That week's monday - given end date will be one period
-      # num_periods - 1 will be normal Weekly periods
+      # Not a Monday / 1st of month
+      # That periods start ( Monday - end_date or 1st - end_date) will be one period
+      # num_periods - 1 will be other complete periods
+      # like Monday - Sunday or 1st - 30th/31st
       all_dates.push(end_date.next_day)
-      all_dates.push(end_date.beginning_of_week)
-      return (all_dates + get_last_weeks_date(num_periods - 1, end_date.beginning_of_week)).sort      
+      all_dates.push(end_date.send(beginning_function))
+      return (all_dates + get_last_periods_date(num_periods - 1, end_date.send(beginning_function), last_function)).sort      
     end
   end
 
+  # Returns period_type specific values
+  # first value - how to calculate the date of the beginning of a period
+  # second value - how to calculate the start date of last period
+  # third value - string for group_by_date functions
+  # fourth value - function that converts date to period_number 
+  def period_date_functions(period_type)
+    if period_type == "weekly"
+      return ["beginning_of_week".to_sym, "last_week".to_sym, "group_by_week_created", :convert_to_week_num]
+    elsif period_type == "monthly"
+      return ["beginning_of_month".to_sym, "last_month".to_sym, "group_by_month_created", :convert_to_month_num]
+    else
+      return ["".to_sym, "".to_sym]
+    end
+  end
+
+
   # Returns a hash where key is the week number and value is an array of start date and end date
-  def pair_dates(dates_a)
+  def pair_dates(dates_a, period_type)
+    convert_function = period_date_functions(period_type)[3]
     paired_dates_a = {}
-    dates_a.each_cons(2) {|date, next_date| paired_dates_a[convert_to_week_num(date)] = [date, next_date] unless date.equal? dates_a.last}
+    dates_a.each_cons(2) {|date, next_date| paired_dates_a[send(convert_function, date)] = [date, next_date] unless date.equal? dates_a.last}
     return paired_dates_a
   end
 
   # Convert date to week number
   def convert_to_week_num(date)
     return date.strftime('%U').to_i
+  end
+
+  def convert_to_month_num(date)
+    return [date.month.to_i, date.year.to_i]
   end
 
 end

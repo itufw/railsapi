@@ -36,22 +36,47 @@ class SalesController < ApplicationController
 
   def sales_dashboard_detailed
     @end_date = return_end_date(return_date_given(params))
-    @num_period = params[:num_period]
     if params[:num_period]
-      num = params[:num_period].to_i
+      @num_periods = params[:num_period].to_i
     else 
-      num = 13
+      @num_periods = 13
+    end
+    if params[:period_type]
+      @period = params[:period_type]
+    else
+      @period = "weekly"
     end
 
-    weekly_dates = periods_from_end_date(num, @end_date)
+    # periods_from_end_date is defined in Dates Helper
+    # returns an array of all dates - sorted
+    # For example num_periods = 3, end_date = 5th oct and "monthly" as period_type returns
+    # [1st Aug, 1st Sep, 1st Oct, 6th Oct]
+    # 6th Oct is the last date in the array and not 5th oct because
+    # we want to calculate orders including 5th Oct, for that we need to give the next day
+    dates = periods_from_end_date(@num_periods, @end_date, @period)
+
+    # order_sum_param takes into account what the user wants to calculate - Bottles or Order Totals
+    # order_sum_param is defined in Sales Controller Helper
+    # Sum function returns :sum_qty or :sum_total
+    # These functions are defined in the Order model
     sum_function, @checked_bottles, @checked_totals, @param_val = order_sum_param(params[:sum_param])
-    @sums_by_periods = sum_orders(weekly_dates[0], weekly_dates[-1], :group_by_week_created, sum_function)
-    @dates_paired = pair_dates(weekly_dates)
 
-    @staff_sum_by_periods = sum_orders(weekly_dates[0], weekly_dates[-1], :group_by_week_created_and_staff_id, sum_function)
+    # sum_orders returns a hash like {date/week_num/month_num => sum} depending on the date_type
+    # defined in Sales Controller Helper
+
+    # date_type returns group_by_week_created or group_by_month_created
+    date_function = period_date_functions(@period)[2]
+    @sums_by_periods = sum_orders(dates[0], dates[-1], date_function.to_sym, sum_function)
+
+    # returns a hash like {[start_date, end_date] => week_num/month_num}
+    @dates_paired = pair_dates(dates, @period)
+
+    @staff_sum_by_periods = sum_orders(dates[0], dates[-1], (date_function + "_and_staff_id").to_sym, sum_function)
+    
+
     @staff_nicknames = Staff.active_sales_staff.nickname.to_h
-
     @periods = (3..15).to_a
+    @period_types = ["weekly", "monthly"]
 
 
   end
