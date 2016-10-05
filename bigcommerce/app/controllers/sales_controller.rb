@@ -33,7 +33,7 @@ class SalesController < ApplicationController
 
     # returns a hashmap like { [staff_id, date] => order_totals }
 
-    staff_id, @staff_nicknames = display_reports_for_staff(session[:user_id])
+    staff_id, @staff_nicknames = display_reports_for_sales_dashboard(session[:user_id])
     
     @staff_sum_this_week = sum_orders(@dates_this_week[0], @dates_this_week[-1], :group_by_date_created_and_staff_id, sum_function, staff_id)
     #@staff_nicknames = Staff.active_sales_staff.nickname.to_h
