@@ -2,8 +2,8 @@ module SalesControllerHelper
 
   # returns a hash where dates (and sometime staff id) are keys and values are positive, 
   # non-zero orders totals 
-  def sum_orders(start_date, end_date, group_by_date_function, sum_function)
-      return Order.date_filter(start_date, end_date.next_day).valid_order.send(group_by_date_function).send(sum_function)
+  def sum_orders(start_date, end_date, group_by_date_function, sum_function, staff_id)
+      return Order.date_filter(start_date, end_date.next_day).valid_order.staff_filter(staff_id).send(group_by_date_function).send(sum_function)
   end
 
   def staff_dropdown

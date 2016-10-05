@@ -48,7 +48,7 @@ module ApplicationHelper
   # Paginates model unless the number of rows are less than 15
   # 15 is the paginate limit set in every model
   def paginate(model)
-    will_paginate model unless model.count < 15
+    will_paginate model unless model.count < 30
   end
 
   # Checks if key exists in hash

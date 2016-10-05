@@ -1,6 +1,7 @@
 require 'sales_controller_helper.rb'
 require 'models_filter.rb'
 require 'dates_helper.rb'
+require 'display_helper.rb'
 
 class SalesController < ApplicationController
 
@@ -9,6 +10,7 @@ class SalesController < ApplicationController
   include SalesControllerHelper
   include ModelsFilter
   include DatesHelper
+  include DisplayHelper
 
   helper_method :check_id_in_map
 
@@ -23,15 +25,18 @@ class SalesController < ApplicationController
 
     sum_function, @checked_bottles, @checked_totals = order_sum_param(params[:sum_param])
     # returns a hashmap like { date => order_totals }
-    @sum_this_week = sum_orders(@dates_this_week[0], @dates_this_week[-1], :group_by_date_created, sum_function)
-    @sum_last_week = sum_orders(@dates_last_week[0], @dates_last_week[-1], :group_by_date_created, sum_function)
+    @sum_this_week = sum_orders(@dates_this_week[0], @dates_this_week[-1], :group_by_date_created, sum_function, nil)
+    @sum_last_week = sum_orders(@dates_last_week[0], @dates_last_week[-1], :group_by_date_created, sum_function, nil)
     
     @dates_paired_this_week = make_daily_dates_map(@dates_this_week)
     @dates_paired_last_week = make_daily_dates_map(@dates_last_week)
 
     # returns a hashmap like { [staff_id, date] => order_totals }
-    @staff_sum_this_week = sum_orders(@dates_this_week[0], @dates_this_week[-1], :group_by_date_created_and_staff_id, sum_function)
-    @staff_nicknames = Staff.active_sales_staff.nickname.to_h
+
+    staff_id, @staff_nicknames = display_reports_for_staff(session[:user_id])
+    
+    @staff_sum_this_week = sum_orders(@dates_this_week[0], @dates_this_week[-1], :group_by_date_created_and_staff_id, sum_function, staff_id)
+    #@staff_nicknames = Staff.active_sales_staff.nickname.to_h
   end
 
   def sales_dashboard_detailed
@@ -66,52 +71,88 @@ class SalesController < ApplicationController
 
     # date_type returns group_by_week_created or group_by_month_created
     date_function = period_date_functions(@period)[2]
-    @sums_by_periods = sum_orders(dates[0], dates[-1], date_function.to_sym, sum_function)
+    @sums_by_periods = sum_orders(dates[0], dates[-1], date_function.to_sym, sum_function, nil)
 
     # returns a hash like {[start_date, end_date] => week_num/month_num}
     @dates_paired = pair_dates(dates, @period)
 
-    @staff_sum_by_periods = sum_orders(dates[0], dates[-1], (date_function + "_and_staff_id").to_sym, sum_function)
+    staff_id, @staff_nicknames = display_reports_for_staff(session[:user_id])
+    @staff_sum_by_periods = sum_orders(dates[0], dates[-1], (date_function + "_and_staff_id").to_sym, sum_function, staff_id)
     
-
-    @staff_nicknames = Staff.active_sales_staff.nickname.to_h
     @periods = (3..15).to_a
     @period_types = ["weekly", "monthly"]
 
-
   end
-
 
   # Displays all orders for selected customer
   # How do I get to this ? Click on Customer Name anywhere on the site
   # Displays all orders for that customer and a button to view stats
-  def orders_for_selected_customer
+  def orders_and_stats_for_customer
     @customer_id = params[:customer_id]
     @customer_name = params[:customer_name]
     @orders = Order.include_customer_staff_status.customer_filter([@customer_id]).order_by_id.page(params[:page])
+    @time_periods_name, all_stats, @sum_stats, @avg_stats, product_ids = stats_for_timeperiods("Order.customer_filter(%s).valid_order" % [[@customer_id]], :"", :sum_total)
+  end
+
+  # Displays Overall Stats for customer(Bottles ordered) and Stats for all the products the customer has ordered
+  def top_products_for_customer
+    customer_id = params[:customer_id]
+    @customer_name = params[:customer_name]
+
+    @time_periods_name, @all_stats, @sum_stats, @avg_stats, product_ids = stats_for_timeperiods("Order.customer_filter(%s).valid_order" % [[customer_id]], :group_by_product_id, :sum_order_product_qty)
+    
+    # returns a hash {id => name}
+    @products_h = product_filter(product_ids)
   end
 
   # Displays all details about an order
-  # How do I get to this ? Click on a Orde ID anywhere on the site
+  # How do I get to this ? Click on a Order ID anywhere on the site
   def order_details
-      @order_id = params[:order_id]
-      @order = Order.include_all.order_filter(@order_id)
+    @order_id = params[:order_id]
+    @order = Order.include_all.order_filter(@order_id)
   end
 
   # How do I get to this ? - Click on the page that displays all products -
   # Look for your product - Then come to this page
   # Displays All the orders for the selected product, with the selected product qty
   # And displays a button to view stats
-  def orders_for_selected_product
+  def orders_for_product
     @product_id = params[:product_id]
     @product_name = params[:product_name]
-    @orders = Order.include_customer_staff_status.product_filter(@product_ids).order_by_id.page(params[:page])
+
+    @staffs = Staff.active_sales_staff
+    @statuses = Status.all
+
+    @staff, @status, orders_filtered_by_param, @search_text = order_param_filter(params, session[:user_id])
+    orders_filtered_by_product = Order.product_filter(@product_ids).pluck("id")
+    order_ids = orders_filtered_by_param.pluck("id") & orders_filtered_by_product
+    @orders = Order.include_customer_staff_status.order_filter_by_ids(order_ids).order_by_id.page(params[:page])
+    @staff_nickname = params[:staff_nickname]
   end
 
+  # Displays overall stats for products(money gained) and all customers who bought that product
+  def stats_and_top_customers_for_product
+    @product_id = params[:product_id]
+    @product_name = params[:product_name]
+
+    @time_periods_name, @all_stats, @sum_stats, @avg_stats, customer_ids = stats_for_timeperiods("Order.product_filter(%s).valid_order" % @product_id, :group_by_customerid, :sum_order_product_qty)
+
+    @staffs = staff_dropdown
+
+    results_val = customer_param_filter(params)
+
+    @staff = results_val[0]
+    customers_filtered_ids = results_val[1].pluck("id")
+    customers = Customer.filter_by_ids(customers_filtered_ids & customer_ids)
+    customers_h = Hash.new
+    customers.map {|c| customers_h[c.id] = [Customer.customer_name(c.actual_name, c.firstname, c.lastname), Staff.filter_by_id(c.staff_id).nickname]}
+    @customers_h_sorted = customers_h.sort_by {|id, key| key[0]}
+  end
+#---------------------------------------------------------------
   # Gets orders and products for a selected status on two different pages
   # The same dataset is used, just displays in two formats
   # Thus the dataset can be filtered by 
-  def orders_and_products_for_selected_status
+  def orders_and_products_for_status
     @status_id = params[:status_id]
     @status_name = params[:status_name]
 
@@ -139,11 +180,10 @@ class SalesController < ApplicationController
 
   end
 
-
-    # # How do we come to this page ? - We go to 'Pending Orders page' - Click on a product name
-  # # Displays Overall Product Stats irrespective of Order's Status and 
-  # # Orders when selected product was ordered, and they currently have selected status 
-  def orders_and_stats_for_selected_product_and_selected_status
+  # How do we come to this page ? - We go to 'Pending Orders page' - Click on a product name
+  # Displays Overall Product Stats irrespective of Order's Status and 
+  # Orders when selected product was ordered, and they currently have selected status 
+  def orders_and_stats_for_product_and_status
       product_id = params[:product_id]
       @product_name = params[:product_name]
 
@@ -167,7 +207,7 @@ class SalesController < ApplicationController
     # How do we come to this page ? - We click on Order ID - then click on any one of the products
     # Displays Orders when selected customer ordered selected product and shows overall product stats
     # (money spent on that product by customer)
-  def orders_and_stats_for_selected_product_and_selected_customer
+  def orders_and_stats_for_product_and_customer
     customer_id = params[:customer_id]
     @customer_name = params[:customer_name]
 
@@ -177,33 +217,6 @@ class SalesController < ApplicationController
     @orders = Order.include_customer_staff_status.product_filter(product_id).customer_filter([customer_id]).order_by_id.page(params[:page])
     @time_periods_name, i, @sum_stats, @avg_stats = stats_for_timeperiods("Order.product_filter(%s).customer_filter(%s)" % [product_id, [customer_id]], "".to_sym, :sum_order_product_qty)
 
-  end
-
-  # # Displays Overall Stats for customer(Bottles ordered) and Stats for all the products the customer has ordered
-  def customer_stats
-    customer_id = params[:customer_id]
-    @customer_name = params[:customer_name]
-
-    @time_periods_name, @all_stats, @sum_stats, @avg_stats, product_ids = stats_for_timeperiods("Order.customer_filter(%s).valid_order" % [[customer_id]], :group_by_product_id, :sum_order_product_qty)
-    
-    # returns a hash {id => name}
-    @products_h = product_filter(product_ids)
-  end
-
-  # Displays overall stats for products(money gained) and all customers who bought that product
-  def product_stats
-    @product_id = params[:product_id]
-    @product_name = params[:product_name]
-
-    @time_periods_name, @all_stats, @sum_stats, @avg_stats, customer_ids = stats_for_timeperiods("Order.product_filter(%s).valid_order" % @product_id, :group_by_customerid, :sum_order_product_qty)
-
-    @staffs = staff_dropdown
-
-    results_val = customer_param_filter(params)
-
-    @staff = results_val[0]
-    customers_filtered_ids = results_val[1].pluck("id")
-    @customers_h = Customer.filter_by_ids(customers_filtered_ids & customer_ids)
   end
 
 end

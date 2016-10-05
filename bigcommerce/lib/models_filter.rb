@@ -1,13 +1,16 @@
 module ModelsFilter
 
-  def order_param_filter(params)
+  def order_param_filter(params, session_staff_id)
 
   	search_text = params[:search]
     customer_ids = Customer.search_for(search_text).pluck("id")
 
-  	staff_val = staff_params_filter(params)
-  	staff_id = staff_val[0]
-  	staff = staff_val[1]
+    if reports_access_open(session_staff_id) == 1
+      staff_id, staff = staff_params_filter(params)
+    else
+      staff_id = session_staff_id
+      staff = Staff.filter_by_id(session_staff_id)
+    end
 
   	status_val = status_params_filter(params)
   	status_id = status_val[0]
@@ -15,7 +18,6 @@ module ModelsFilter
 
   	start_date = params[:start_date]
   	end_date = params[:end_date]
-
   	orders = Order.include_customer_staff_status.date_filter(start_date, end_date).customer_filter(customer_ids).staff_filter(staff_id).status_filter(status_id)
   	return staff, status, orders, search_text
 
@@ -102,6 +104,11 @@ module ModelsFilter
     product_h_sorted = Hash[product_h.sort_by { |k,v| v }]
 
     return product_h_sorted
+  end
+
+  def reports_access_open(staff_id)
+    display_val = (Staff.display_report(staff_id)).to_i
+    return display_val
   end
 
 end

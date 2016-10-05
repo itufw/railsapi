@@ -11,7 +11,7 @@
 
 	<% products.each do |p| %>
 	<tr>
-		<td><%= p.name %></td>
+		<td><%= link_to p.name, controller: 'sales', action: 'stats_and_top_customers_for_product', product_id: p.id, product_name: p.name %></td>
 		<td class="num"><%= display_num(calculate_product_price(p.calculated_price, p.retail_ws)) %></td>
 		<td class="num"><%= p.inventory %></td>
 
