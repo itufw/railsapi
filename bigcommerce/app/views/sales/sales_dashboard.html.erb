@@ -24,6 +24,10 @@
 		<th>Total</th>
 	</tr>
 
+	<%#= dates_map is a hash like {date => date} when columns are single days, {week_num => [start_date, end_date]} when columns are weeks, {[month_num, year] => [start_date, end_date]} for months %>
+
+	<%#= sums_dates_h are a hash like {[start_date, end_date] => sum} %>
+
 	<tr>
 		<td>This Week</td>
 		<%= render "partials/daily_sums", sums_dates_h: @sum_this_week, dates: @dates_this_week, dates_map: @dates_paired_this_week, staff_nickname: nil, staff_id: nil %>
