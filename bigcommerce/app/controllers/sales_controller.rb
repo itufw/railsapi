@@ -113,24 +113,6 @@ class SalesController < ApplicationController
     @order = Order.include_all.order_filter(@order_id)
   end
 
-  # How do I get to this ? - Click on the page that displays all products -
-  # Look for your product - Then come to this page
-  # Displays All the orders for the selected product, with the selected product qty
-  # And displays a button to view stats
-  def orders_for_product
-    @product_id = params[:product_id]
-    @product_name = params[:product_name]
-
-    @staffs = Staff.active_sales_staff
-    @statuses = Status.all
-
-    @staff, @status, orders_filtered_by_param, @search_text = order_param_filter(params, session[:user_id])
-    orders_filtered_by_product = Order.product_filter(@product_ids).pluck("id")
-    order_ids = orders_filtered_by_param.pluck("id") & orders_filtered_by_product
-    @orders = Order.include_customer_staff_status.order_filter_by_ids(order_ids).order_by_id.page(params[:page])
-    @staff_nickname = params[:staff_nickname]
-  end
-
   # Displays overall stats for products(money gained) and all customers who bought that product
   def stats_and_top_customers_for_product
     @product_id = params[:product_id]
@@ -150,9 +132,29 @@ class SalesController < ApplicationController
     @customers_h_sorted = customers_h.sort_by {|id, key| key[0]}
   end
 
+  # How do I get to this ? - Click on the page that displays all products -
+  # Look for your product - Then come to this page
+  # Displays All the orders for the selected product, with the selected product qty
+  # And displays a button to view stats
+  def orders_for_product
+    @product_id = params[:product_id]
+    @product_name = params[:product_name]
+
+    @staffs = Staff.active_sales_staff
+    @statuses = Status.all
+
+    @staff, @status, orders_filtered_by_param, @search_text = order_param_filter(params, session[:user_id])
+    orders_filtered_by_product = Order.product_filter(@product_ids).pluck("id")
+    order_ids = orders_filtered_by_param.pluck("id") & orders_filtered_by_product
+    @orders = Order.include_customer_staff_status.order_filter_by_ids(order_ids).order_by_id.page(params[:page])
+    @staff_nickname = params[:staff_nickname]
+  end
+
+
   # How do we come to this page ? - We click on Order ID - then click on any one of the products
   # Displays Orders when selected customer ordered selected product and shows overall product stats
   # (money spent on that product by customer)
+  # We also come here from top products for customer and from top customers for product
   def orders_and_stats_for_product_and_customer
     customer_id = params[:customer_id]
     @customer_name = params[:customer_name]
