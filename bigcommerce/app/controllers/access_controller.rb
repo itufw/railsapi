@@ -20,7 +20,7 @@ class AccessController < ApplicationController
   		session[:user_id] = authorized_user.id
   		session[:username] = authorized_user.nickname
   		flash[:success] = "You are now logged in."
-  		redirect_to controller: 'sales', action: 'view_sales_dashboard'
+  		redirect_to controller: 'sales', action: 'sales_dashboard'
   	else
   		flash[:error] = "Invalid username/password combination"
   		redirect_to action: 'login'

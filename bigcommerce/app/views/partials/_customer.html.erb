@@ -1,0 +1,17 @@
+<span style="float:right;margin-right:50px;font-size: 115%;"><%= paginate(customers) %></span>
+<table class = "table table-striped table-bordered table-hover table-responsive">
+	<tr>
+		<th>Sales Rep</th>
+		<th>Name</th>
+	</tr>
+
+	<% customers.each do |c| %>
+	<tr>
+		<td><%= c.staff.nickname %></td>
+		<% cust_name = customer_name(c) %>
+		<td><%= link_to cust_name, controller: 'sales', action: 'orders_and_stats_for_customer', customer_id: c.id, customer_name: cust_name %></td>
+	</tr>
+	<% end %>
+	
+</table>
+<span style="float:right;margin-right:50px;font-size: 115%;"><%= paginate(customers) %></span>

@@ -1,464 +1,223 @@
- class SalesController < ApplicationController
+require 'sales_controller_helper.rb'
+require 'models_filter.rb'
+require 'dates_helper.rb'
+require 'display_helper.rb'
+
+class SalesController < ApplicationController
 
   before_action :confirm_logged_in
 
-    def view_sales_dashboard
-        # Current and Last week sales summaries
-        date_param = params[:selected_date]
+  include SalesControllerHelper
+  include ModelsFilter
+  include DatesHelper
+  include DisplayHelper
 
-        if !date_param.blank?
-          date_given = date_param[:selected_date].to_date
-          start_date = date_given
-        else
-          date_given = Date.today
-          start_date = date_given.at_beginning_of_week
-        end
+  helper_method :check_id_in_map
 
-        
-        end_date = 6.days.since(start_date)
-        @dates_this_week = (start_date..end_date).to_a
-        sums_this_week = sum_orders(start_date, end_date)
-        @result_this_week = get_daily_totals(@dates_this_week, sums_this_week)
+  # Displays this week's and last week's total order sales
+  # Also displays total order sales for this week divided by staff
+  def sales_dashboard
+    # Date selected by user , default is today's date
+    date_given = return_date_given(params)
 
-        date_sum_staff_map = sum_orders_by_staff(start_date, end_date)
-        @this_week_staff_totals = get_staff_totals(@dates_this_week, date_sum_staff_map)
+    @dates_this_week = this_week(date_given)
+    @dates_last_week = last_week(@dates_this_week[0])
 
+    sum_function, @checked_bottles, @checked_totals = order_sum_param(params[:sum_param])
+    # returns a hashmap like { date => order_totals }
+    @sum_this_week = sum_orders(@dates_this_week[0], @dates_this_week[-1], :group_by_date_created, sum_function, nil)
+    @sum_last_week = sum_orders(@dates_last_week[0], @dates_last_week[-1], :group_by_date_created, sum_function, nil)
+    
+    @dates_paired_this_week = make_daily_dates_map(@dates_this_week)
+    @dates_paired_last_week = make_daily_dates_map(@dates_last_week)
 
-        last_week_start_date = start_date - 7.days
-        #last_week_start_date = seven_days_ago.at_beginning_of_week
-        last_week_end_date = 6.days.since(last_week_start_date)
-        @dates_last_week = (last_week_start_date..last_week_end_date).to_a
-        sums_last_week = sum_orders(last_week_start_date, last_week_end_date)
-        @result_last_week = get_daily_totals(@dates_last_week, sums_last_week)
+    # returns a hashmap like { [staff_id, date] => order_totals }
 
+    staff_id, @staff_nicknames = display_reports_for_sales_dashboard(session[:user_id])
+    
+    @staff_sum_this_week = sum_orders(@dates_this_week[0], @dates_this_week[-1], :group_by_date_created_and_staff_id, sum_function, staff_id)
+    #@staff_nicknames = Staff.active_sales_staff.nickname.to_h
+    @staff_sum_this_week
+  end
+
+  def sales_dashboard_detailed
+    @end_date = return_end_date(return_date_given(params))
+    if params[:num_period]
+      @num_periods = params[:num_period].to_i
+    else 
+      @num_periods = 13
+    end
+    if params[:period_type]
+      @period = params[:period_type]
+    else
+      @period = "weekly"
     end
 
-    def sum_orders(start_date, end_date)
-        start_time = Time.parse(start_date.to_s)
-        end_time = Time.parse(end_date.to_s)
+    # periods_from_end_date is defined in Dates Helper
+    # returns an array of all dates - sorted
+    # For example num_periods = 3, end_date = 5th oct and "monthly" as period_type returns
+    # [1st Aug, 1st Sep, 1st Oct, 6th Oct]
+    # 6th Oct is the last date in the array and not 5th oct because
+    # we want to calculate orders including 5th Oct, for that we need to give the next day
+    dates = periods_from_end_date(@num_periods, @end_date, @period)
 
-        date_sum_map = Order.includes(:status).where('date_created >= ? and date_created < ? and statuses.valid_order = 1', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S")).references(:statuses).group('DATE(date_created)').sum('total_inc_tax')
-        
-        return date_sum_map
+    # order_sum_param takes into account what the user wants to calculate - Bottles or Order Totals
+    # order_sum_param is defined in Sales Controller Helper
+    # Sum function returns :sum_qty or :sum_total
+    # These functions are defined in the Order model
+    sum_function, @checked_bottles, @checked_totals, @param_val = order_sum_param(params[:sum_param])
 
-    end
+    # sum_orders returns a hash like {date/week_num/month_num => sum} depending on the date_type
+    # defined in Sales Controller Helper
 
-    def sum_orders_by_staff(start_date, end_date)
-        start_time = Time.parse(start_date.to_s)
-        end_time = Time.parse(end_date.to_s)
-        date_sum_staff_map = Order.includes(:customer, :status).where('orders.date_created >= ? and orders.date_created < ? and statuses.valid_order = 1', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S")).references(:statuses).group(['customers.staff_id', 'DATE(orders.date_created)']).references(:customers).sum('orders.total_inc_tax')
-        return date_sum_staff_map
-    end
+    # date_type returns group_by_week_created or group_by_month_created
+    date_function = period_date_functions(@period)[2]
+    @sums_by_periods = sum_orders(dates[0], dates[-1], date_function.to_sym, sum_function, nil)
 
-    def get_daily_totals(dates, sums)
-        result = []
-        total = 0
+    # returns a hash like {[start_date, end_date] => week_num/month_num}
+    @dates_paired = pair_dates(dates, @period)
 
-        dates.each do |d|
-            if sums.has_key? d
-              day_sum = sums[d]
-              total += day_sum
-            else
-              day_sum = 0
-            end
-            result.push(day_sum)
-        end
+    staff_id, @staff_nicknames = display_reports_for_sales_dashboard(session[:user_id])
+    @staff_sum_by_periods = sum_orders(dates[0], dates[-1], (date_function + "_and_staff_id").to_sym, sum_function, staff_id)
+    
+    @periods = (3..15).to_a
+    @period_types = ["weekly", "monthly"]
 
-        result.push(total)
+  end
 
-        return result
-    end
+  # Displays all orders for selected customer
+  # How do I get to this ? Click on Customer Name anywhere on the site
+  # Displays all orders for that customer and a button to view stats
+  def orders_and_stats_for_customer
+    @customer_id = params[:customer_id]
+    @customer_name = params[:customer_name]
+    @orders = Order.include_customer_staff_status.customer_filter([@customer_id]).order_by_id.page(params[:page])
+    @time_periods_name, all_stats, @sum_stats, @avg_stats, product_ids = stats_for_timeperiods("Order.customer_filter(%s).valid_order" % [[@customer_id]], :"", :sum_total)
+  end
 
-    def get_staff_totals(dates, date_sum_staff_map)
+  # Displays Overall Stats for customer(Bottles ordered) and Stats for all the products the customer has ordered
+  def top_products_for_customer
+    @customer_id = params[:customer_id]
+    @customer_name = params[:customer_name]
 
-        staff_weekly_totals = []
+    @time_periods_name, @all_stats, @sum_stats, @avg_stats, product_ids = stats_for_timeperiods("Order.customer_filter(%s).valid_order" % [[@customer_id]], :group_by_product_id, :sum_order_product_qty)
+    
+    # returns a hash {id => name}
+    @products_h = product_filter(product_ids)
+  end
 
-        all_active_staffs = Staff.where('active = 1 and user_type LIKE "Sales%"')
+  # Displays all details about an order
+  # How do I get to this ? Click on a Order ID anywhere on the site
+  def order_details
+    @order_id = params[:order_id]
+    @order = Order.include_all.order_filter(@order_id)
+  end
 
-        all_active_staffs.each do |as|
+  # How do I get to this ? - Click on the page that displays all products -
+  # Look for your product - Then come to this page
+  # Displays All the orders for the selected product, with the selected product qty
+  # And displays a button to view stats
+  def orders_for_product
+    @product_id = params[:product_id]
+    @product_name = params[:product_name]
 
-            staff_map_per_id = date_sum_staff_map.select { |key, value| key[0] == as.id }
-            if staff_map_per_id.keys.count != 0
-                 day_sum_map = Hash.new
-                 staff_map_per_id.each {|k,v| day_sum_map[k[1]] = v}
-                 sum_array = get_daily_totals(dates, day_sum_map)
-            else
-                 sum_array = [0,0,0,0,0,0,0]
-            end
+    @staffs = Staff.active_sales_staff
+    @statuses = Status.all
 
-             weekly_each_staff_sums = []
-             weekly_each_staff_sums.push(as.nickname)
-             weekly_each_staff_sums.push(sum_array)
-             weekly_each_staff_sums.push(as.id)
+    @staff, @status, orders_filtered_by_param, @search_text = order_param_filter(params, session[:user_id])
+    orders_filtered_by_product = Order.product_filter(@product_ids).pluck("id")
+    order_ids = orders_filtered_by_param.pluck("id") & orders_filtered_by_product
+    @orders = Order.include_customer_staff_status.order_filter_by_ids(order_ids).order_by_id.page(params[:page])
+    @staff_nickname = params[:staff_nickname]
+  end
 
-             staff_weekly_totals.push(weekly_each_staff_sums)
+  # Displays overall stats for products(money gained) and all customers who bought that product
+  def stats_and_top_customers_for_product
+    @product_id = params[:product_id]
+    @product_name = params[:product_name]
 
-        end
+    @time_periods_name, @all_stats, @sum_stats, @avg_stats, customer_ids = stats_for_timeperiods("Order.product_filter(%s).valid_order" % @product_id, :group_by_customerid, :sum_order_product_qty)
 
-        return staff_weekly_totals 
+    @staffs = staff_dropdown
 
-    end
+    results_val = customer_param_filter(params, 25)
 
-    # def view_daily_orders_for_rep
+    @staff = results_val[0]
+    customers_filtered_ids = results_val[1].pluck("id")
+    customers = Customer.filter_by_ids(customers_filtered_ids & customer_ids)
+    customers_h = Hash.new
+    customers.map {|c| customers_h[c.id] = [Customer.customer_name(c.actual_name, c.firstname, c.lastname), Staff.filter_by_id(c.staff_id).nickname]}
+    @customers_h_sorted = customers_h.sort_by {|id, key| key[0]}
+  end
 
-    #     @staff_nickname = params[:staff]
-    #     staff_id = params[:staff_id]
+  # How do we come to this page ? - We click on Order ID - then click on any one of the products
+  # Displays Orders when selected customer ordered selected product and shows overall product stats
+  # (money spent on that product by customer)
+  def orders_and_stats_for_product_and_customer
+    customer_id = params[:customer_id]
+    @customer_name = params[:customer_name]
 
-    #     @date = params[:date]
-
-    #     start_time = Time.parse(@date.to_s)
-    #     end_time = 1.day.since(start_time)
-
-    #     @daily_orders_for_rep = Order.includes(:customer, :status).where('orders.date_created >= ? and orders.date_created < ? and customers.staff_id = ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"), staff_id).references(:customers).order('orders.id DESC')
-
-    #     @page_header = "Orders for Date : #{@date.to_date.strftime('%A  %d/%m/%y')} and Staff : #{@staff_nickname}"
-
-    # end
-
-    # def view_weekly_orders_for_rep
-
-    #     @staff_nickname = params[:staff]
-    #     staff_id = params[:staff_id]
-
-    #     @date = params[:week_start_date]
-
-    #     start_time = Time.parse(@date.to_s)
-    #     end_time = 7.days.since(start_time)
-
-    #     @daily_orders_for_rep = Order.includes(:customer, :status).where('orders.date_created >= ? and orders.date_created < ? and customers.staff_id = ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"), staff_id).references(:customers).order('orders.id DESC')
-
-    #     @page_header = "This Week's of Staff : #{@staff_nickname}"
-
-    #     render "view_daily_orders_for_rep"
-
-    # end
-
-    # def view_overall_daily_orders
-
-    #     @date = params[:date]
-
-    #     start_time = Time.parse(@date.to_s)
-    #     end_time = 1.day.since(start_time)
-
-    #     @daily_orders = Order.includes([{:customer => :staff}, :status]).where('orders.date_created >= ? and orders.date_created < ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S")).order('id DESC')
-
-    #     @page_header = "Orders for Date : #{@date.to_date.strftime('%A  %d/%m/%y')}"
-
-    # end
-
-    def view_orders_for_customer
-      @customer_id = params[:customer_id]
-
-      @orders = Order.includes([{:customer => :staff}, :status]).where('orders.customer_id = ?', @customer_id).order('id DESC')
-
-      @customer_name = get_customer_name(Customer.where(id: @customer_id).first)
-
-      get_customer_stats(@customer_id)
-
-      @page_header = "All Orders for #{@customer_name}"
-
-    end
-
-    def view_products_for_orderid
-      
-      @order_id = params[:order_id]
-
-      @order = Order.includes([{:customer => :staff}, :status, {:order_products => :product}]).where('orders.id = ?', @order_id).first
-
-      #@order_products = OrderProduct.includes(:product).where(order_id: @order_id)
-
-      @page_header = "Order # #{@order_id}"
-
-    end
-
-    def view_orders_for_product_and_customer
-
-        @customer_id = params[:customer_id]
-        @customer_name = params[:customer_name]
-        @product_id = params[:product_id]
-        @product_name = params[:product_name]
+    product_id = params[:product_id]
+    @product_name = params[:product_name]
   
-        # need to take care - same products multiple times in same order
-        @orders = Order.includes([{:customer => :staff}, :status, :order_products]).where('order_products.product_id = ? and orders.customer_id = ?', @product_id, @customer_id).order('orders.id DESC').references(:order_products)
+    @orders = Order.include_customer_staff_status.product_filter(product_id).customer_filter([customer_id]).order_by_id.page(params[:page])
+    @time_periods_name, i, @sum_stats, @avg_stats = stats_for_timeperiods("Order.product_filter(%s).customer_filter(%s).valid_order" % [product_id, [customer_id]], "".to_sym, :sum_order_product_qty)
+  end
 
-        @time_periods = StaffTimePeriod.where('display = ?', 1)
-        @average_time_specified = DefaultAveragePeriod.where(staff_id: 19).first
-        @product_stats_sum = []
-        @product_stats_avg = []
+  # Gets orders and products for a selected status on two different pages
+  # The same dataset is used, just displays in two formats
+  # Thus the dataset can be filtered by 
+  def orders_and_products_for_status
+    @status_id = params[:status_id]
+    @status_name = params[:status_name]
 
-        @time_periods.each do |t|
-            start_time = Time.parse(t.start_date.to_s)
-            end_time = Time.parse(t.end_date.to_s)
-            sum = Order.includes(:order_products, :status).where('orders.customer_id = ? and orders.date_created >= ? and orders.date_created <= ? and statuses.valid_order = 1 and order_products.product_id = ?', @customer_id, start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"), @product_id).references(:statuses, :order_products).sum('order_products.qty')
-            num_days = (t.end_date.to_date - t.start_date.to_date).to_i
-            avg = (sum.to_f/num_days)*(@average_time_specified.days.to_i)
-            @product_stats_sum.push(sum)
-            @product_stats_avg.push(avg)
-        end
-
+    if @status_id.nil?
+      @status_id = 1
+      @status_name = "Pending"
     end
 
-    def view_orders_by_status
+    @all_statuses = Status.all
+    @staffs = Staff.active_sales_staff
+    @countries = ProducerCountry.all
+    @sub_types = ProductSubType.all
 
-      @status_id = params[:status_id]
+    @producer_country, @product_sub_type, products, @search_text = product_param_filter(params)
+
+    staff_id, @staff = staff_params_filter(params, session[:user_id])
+
+    product_ids = products.pluck("id")
+
+    # filter orders
+    orders = Order.include_all.status_filter(@status_id).staff_filter(staff_id).product_filter(product_ids).order_by_id.page(params[:page])
+
+    @orders = orders.page(params[:page])
+    @products = products_for_status(@status_id, staff_id, product_ids)
+
+  end
+
+  # How do we come to this page ? - We go to 'Pending Orders page' - Click on a product name
+  # Displays Overall Product Stats irrespective of Order's Status and 
+  # Orders when selected product was ordered, and they currently have selected status 
+  def orders_and_stats_for_product_and_status
+      product_id = params[:product_id]
+      @product_name = params[:product_name]
+
+      status_id = params[:status_id]
       @status_name = params[:status_name]
 
-      if @status_id.nil?
-        @status_id = 1
-        @status_name = "Pending"
-      end
+      @num_orders = params[:num_orders]
+      @qty = params[:qty]
+      @status_qty = params[:status_qty]
+      @total = params[:total] 
 
-      @all_statuses = Status.all
+      @time_periods_name, i, @sum_stats, @avg_stats = stats_for_timeperiods("Order.product_filter(%s).valid_order" % product_id, "".to_sym, :sum_order_product_qty)
 
-      @all_statuses = Status.all
+      @staffs = staff_dropdown
 
-      @staffs = active_sales_staff
-      @countries = ProducerCountry.all
-      @sub_types = ProductSubType.all
-      product_ids = []
+      staff_id, @staff = staff_params_filter(params, session[:user_id])
+    
+      @orders = Order.status_filter(status_id).staff_filter(staff_id).product_filter([product_id]).order_by_id.page(params[:page])
+  end
 
-      if params.has_key?(:commit)
-        @search_text = params[:search]
-        if !params[:staff][:id].blank?
-            staff_id = params[:staff][:id]
-            @staff = Staff.where(id: staff_id).first
-        end
-        if !params[:producer_country][:id].blank?
-            producer_country_id = params[:producer_country][:id]
-            @producer_country = ProducerCountry.where(id: producer_country_id).first
-        end
-        if !params[:product_sub_type][:id].blank?
-            product_sub_type_id = params[:product_sub_type][:id]
-            @product_sub_type = ProductSubType.where(id: product_sub_type_id).first
-        end
-        product_ids = Product.filter(@search_text, producer_country_id, product_sub_type_id).pluck("id")
-      end
-
-      # if params.has_key?(:commit) && !params[:staff][:id].blank?
-      #   staff_id = params[:staff][:id]
-      #   @staff = Staff.where(id: staff_id).first
-      #   @orders = Order.includes([{:customer => :staff}]).where('orders.status_id = ? and staffs.id = ?', @status_id, staff_id).references(:staffs).order('orders.id DESC')
-      # else
-      #   @orders = Order.includes([{:customer => :staff}]).where('orders.status_id = ?', @status_id).order('id DESC')
-      # end
-
-      @orders = Order.status_staff_filter(@status_id, staff_id).includes([{:customer => :staff}, :order_products]).product_filter(product_ids).order('orders.id DESC')
-
-
-
-
-      # need to reduce these to 1
-      num_orders = Order.status_staff_filter(@status_id, staff_id).includes(:order_products).product_filter(product_ids).group('order_products.product_id').count('order_products.order_id')
-      product_qty = Order.status_staff_filter(@status_id, staff_id).includes(:order_products).product_filter(product_ids).group('order_products.product_id').sum('order_products.qty')
-      order_totals = Order.status_staff_filter(@status_id, staff_id).includes(:order_products).product_filter(product_ids).group('order_products.product_id').sum('orders.total_inc_tax')
-
-      merge_1 = num_orders.merge(product_qty) { |k, o, n| [o, n] }
-      merge_2 = merge_1.merge(order_totals) { |k, o, n| o.push(n)}
-
-      # if !product_ids.empty?
-      #   intersection = product_ids & merge_2.keys
-      #   merged = merge_2.select {|k,_| intersection.include? k } 
-      # else
-      #   intersection = merge_2.keys
-      #   merged = merge_2
-      # end 
-
-      product_array = Product.where(id: merge_2.keys).pluck("id,name,inventory")
-      product_hash = Hash[product_array.map{|id,name,inventory| [id,[name,inventory]] if !id.nil?}]
-
-      #{id => [number_of_orders, status_qty, orders_dollar_sum, product_name, product_stock]}
-      merge_2.select! {|k| product_hash.keys.include? k}
-      product_map = merge_2.merge(product_hash) { |k, o, n| o.concat(n) if product_hash.has_key?(k)}
-      @product_map_sorted = Hash[product_map.sort_by { |k,v| v[3] }]
-
-
-      @page_header_products = "Products with Status: #{@status_name}"
-      @page_header_orders = "Orders with Status: #{@status_name}"
-
-    end
-
-
-
-    # You come here after you click on a product's name on the Status page
-    # Status page is the one with the slide bar between orders and products
-    # this gives all the orders that the order count referred to in that table
-
-    def view_orders_for_product_and_status
-        @product_id = params[:product_id]
-        @status_id = params[:status_id]
-        @status_name = params[:status_name]
-        @product_name = params[:product_name]
-        @num_orders = params[:num_orders]
-        @qty = params[:qty]
-        @status_qty = params[:status_qty]
-        @total = params[:total]
-
-        @staffs = active_sales_staff
-
-        if params.has_key?(:commit) && !params[:staff][:id].blank?
-            staff_id = params[:staff][:id]
-            @staff = Staff.where(id: staff_id).first
-            @orders = Order.includes([{:customer => :staff}, :order_products]).where('orders.status_id = ? and order_products.product_id = ? and customers.staff_id = ?', @status_id, @product_id, staff_id).references(:order_products, :customers)
-        else
-            @orders = Order.includes([{:customer => :staff}, :order_products]).where('orders.status_id = ? and order_products.product_id = ?', @status_id, @product_id).references(:order_products)
-        end
-
-
-        # orders.each do |o|
-        #     rep_nickname = Staff.where('id = ?', o.customer.staff_id).first.nickname
-        #     date_created = o.date_created.to_date
-        #     cust_name = get_customer_name(o.customer)
-        #     cust_id = o.customer_id
-        #     prod_qty = o.order_products.first.qty
-        #     order_qty = o.qty
-        #     order_total = o.total_inc_tax
-
-        #     @result.push([rep_nickname, date_created, o.id, cust_name, prod_qty, order_qty, order_total, cust_id])
-        # end
-
-        @time_periods = StaffTimePeriod.where('display = ?', 1)
-        @average_time_specified = DefaultAveragePeriod.where(staff_id: 19).first
-        @product_stats_sum = []
-        @product_stats_avg = []
-
-        @time_periods.each do |t|
-            start_time = Time.parse(t.start_date.to_s)
-            end_time = Time.parse(t.end_date.to_s)
-            sum = Order.includes(:order_products, :status).where('orders.date_created >= ? and orders.date_created <= ? and statuses.valid_order = 1 and order_products.product_id = ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"), @product_id).references(:statuses, :order_products).sum('order_products.qty')
-            num_days = (t.end_date.to_date - t.start_date.to_date).to_i
-            avg = (sum.to_f/num_days)*(@average_time_specified.days.to_i)
-            @product_stats_sum.push(sum)
-            @product_stats_avg.push(avg)
-        end
-
-        @page_header = "#{@status_name} - #{@product_name}"
-    end
-
-    def get_customer_stats(customer_id)
-
-        @time_periods = StaffTimePeriod.where('display = ?', 1)
-
-        #@default_average_periods = DefaultAveragePeriod.first
-
-        @sum_per_time_period = []
-        @avg_per_time_period = []
-
-        average_time_specified = DefaultAveragePeriod.where(staff_id: 19).first
-        @average_name = average_time_specified.name
-        #@average_description = DefaultAveragePeriod.where(staff_id: 19).first.name
-
-        @time_periods.each do |t|
-
-            start_time = Time.parse(t.start_date.to_s)
-            end_time = Time.parse(t.end_date.to_s)
-            sum = Order.includes(:status).where('date_created >= ? and date_created <= ? and customer_id = ? and statuses.valid_order = 1', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"), customer_id).references(:statuses).sum(:total_inc_tax)
-            @sum_per_time_period.push(sum)
-
-            num_days = (t.end_date - t.start_date).to_i
-            avg = (sum.to_f/num_days)*(average_time_specified.days.to_i)
-            @avg_per_time_period.push(avg)
-        end
-
-    end
-
-
-    def view_product_stats_for_customer
-
-        @customer_id = params[:customer_id]
-        @customer_name = params[:customer_name]
-
-        @time_periods = StaffTimePeriod.where('display = ?', 1)
-        @product_stats = []
-        
-        # show a grid for all products
-
-        @time_periods.each do |t|
-            
-            start_time = Time.parse(t.start_date.to_s)
-            end_time = Time.parse(t.end_date.to_s)
-            @product_stats.push(Order.includes(:order_products, :status).where('orders.customer_id = ? and orders.date_created >= ? and orders.date_created <= ? and statuses.valid_order = 1', @customer_id, start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S")).references(:statuses).group('order_products.product_id').sum('order_products.qty'))
-            
-        end
-
-        # We have an array of hashes
-        # Each hash represents products ordered in 1 time period
-        # Key - product id, Value - product qty
-        product_ids = @product_stats.reduce(&:merge).keys
-
-        product_id_name_map = Product.where(id: product_ids).pluck("id,name").to_h
-
-        @product_id_name_map_sorted = Hash[product_id_name_map.sort_by { |k,v| v }]
-
-    end
-
-    def check_id_in_map(stats_array, id)
-
-        values_for_one_time_periods = []
-
-        stats_array.each do |s|
-            # s - hash of valid ids - values
-            if s.has_key? id
-              values_for_one_time_periods.push(s[id])
-            else
-              values_for_one_time_periods.push(0)
-            end
-        end
-
-        return values_for_one_time_periods
-    end
-
-    helper_method :check_id_in_map
-
-    def view_customer_stats_for_product
-
-        @staffs = active_sales_staff
-
-        @product_id = params[:product_id]
-        @product_name = params[:product_name]
-
-        @time_periods = StaffTimePeriod.where('display = ?', 1)
-        @average_time_specified = DefaultAveragePeriod.where(staff_id: 19).first
-        @customer_stats = []
-        @product_stats_sum = []
-        @product_stats_avg = []
-
-        @time_periods.each do |t|
-            start_time = Time.parse(t.start_date.to_s)
-            end_time = Time.parse(t.end_date.to_s)
-            @customer_stats.push(Order.includes(:order_products, :customer, :status).where('order_products.product_id = ? and orders.date_created >= ? and orders.date_created <= ? and statuses.valid_order = 1', @product_id, start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S")).references(:order_products, :statuses).group('customers.id').sum('order_products.qty'))
-            sum = Order.includes(:order_products, :status).where('orders.date_created >= ? and orders.date_created <= ? and statuses.valid_order = 1 and order_products.product_id = ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"), @product_id).references(:statuses, :order_products).sum('order_products.qty')
-            num_days = (t.end_date.to_date - t.start_date.to_date).to_i
-            avg = (sum.to_f/num_days)*(@average_time_specified.days.to_i)
-            @product_stats_sum.push(sum)
-            @product_stats_avg.push(avg)
-        end
-
-        customer_ids = @customer_stats.reduce(&:merge).keys
-
-        if params.has_key?(:commit) && !params[:staff][:id].blank?
-            staff_id = params[:staff][:id]
-            @staff = Staff.where(id: staff_id).first
-            customer_id_name_array = Customer.includes(:staff).where('customers.id IN (?) and staffs.id = ?', customer_ids, staff_id).references(:staffs).pluck("customers.id, customers.actual_name, customers.firstname, customers.lastname, staffs.nickname")
-        else
-            customer_id_name_array = Customer.includes(:staff).where(id: customer_ids).pluck("customers.id, customers.actual_name, customers.firstname, customers.lastname, staffs.nickname")
-        end
-
-
-        customer_id_name_map = Hash[customer_id_name_array.map {|id, actual_name, firstname, lastname, staff| [id, [customer_name(firstname, lastname, actual_name), staff]]}]
-
-        @customer_id_name_map_sorted = Hash[customer_id_name_map.sort_by { |k,v| v[0] }]
-   
-        @page_header = "#{@product_name}"
-
-    end
-
-    def view_orders_for_product
-
-        @product_id = params[:product_id]
-        @product_name = params[:product_name]
-
-        @orders = Order.includes([{:customer => :staff}, :status, :order_products]).where('order_products.product_id = ?', @product_id).order('orders.id DESC').references(:order_products)
-
-    end
 
 end
