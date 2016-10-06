@@ -1,0 +1,21 @@
+<%= title @product_name %>
+<h3><%= @product_name %></h3>
+
+<%= render "partials/overall_stats", time_periods_name: @time_periods_name, sum_stats: @sum_stats, avg_stats: @avg_stats %>
+
+<center>
+<button class="button center"><%= link_to "View Orders for Product", controller: 'sales', action: 'orders_for_product', product_id: @product_id, product_name: @product_name %></button>
+</center>
+
+<div class="form-group col-xs-offset-5" style="margin-top:50px;">
+<%= form_tag({:action => "stats_and_top_customers_for_product"}, {:method => "get"}) do %>
+   <%= render "partials/staff_filter" %>
+
+   <%= hidden_field_tag :product_id, @product_id %>
+   <%= hidden_field_tag :product_name, @product_name %>
+   
+   <%= submit_tag "Filter", class: 'btn btn-primary' %>
+<% end %>
+</div>
+
+<%= render "partials/detailed_stats", time_periods_name: @time_periods_name, column_name: "Customer", names: @customers_h_sorted, stats: @all_stats, display_class: "", display_class_otherwise: "none", column_name_optional: "Sales Rep", customer_id: nil, customer_name: nil, product_id: @product_id, product_name: @product_name %>

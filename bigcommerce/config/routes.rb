@@ -1,46 +1,46 @@
 Rails.application.routes.draw do
-  get 'access/login'
+  # get 'access/login'
 
-  get 'models/orders'
+  # get 'models/orders'
 
-  get 'models/customers'
+  # get 'models/customers'
 
-  get 'models/products'
+  # get 'models/products'
 
-  get 'sales/view_sales_dashboard'
+  # get 'sales/view_sales_dashboard'
 
-  get 'sales/view_daily_orders_for_rep'
+  # get 'sales/view_daily_orders_for_rep'
 
-  get 'sales/view_weekly_orders_for_rep'
+  # get 'sales/view_weekly_orders_for_rep'
 
-  get 'sales/view_overall_daily_orders'
+  # get 'sales/view_overall_daily_orders'
 
-  get 'sales/view_orders_for_customer'
+  # get 'sales/view_orders_for_customer'
 
-  get 'sales/view_products_for_orderid'
+  # get 'sales/view_products_for_orderid'
 
-  get 'sales/view_orders_for_product_and_customer'
+  # get 'sales/view_orders_for_product_and_customer'
 
-  get 'sales/view_orders_for_product_and_status'
+  # get 'sales/view_orders_for_product_and_status'
 
-  get 'sales/view_orders_by_status'
+  # get 'sales/view_orders_by_status'
 
-  get 'sales/view_product_stats_for_customer'
+  # get 'sales/view_product_stats_for_customer'
 
-  get 'sales/view_customer_stats_for_product'
+  # get 'sales/view_customer_stats_for_product'
 
-  get 'sales/view_orders_for_product'
+  # get 'sales/view_orders_for_product'
 
 
-  get 'admin/index'
+  # get 'admin/index'
 
-  get 'admin/update'
+  # get 'admin/update'
 
-  get 'admin/import_from_csv'
+  # get 'admin/import_from_csv'
   
-  get 'admin/scrape'
+  # get 'admin/scrape'
 
-  root 'sales#view_sales_dashboard'
+  root 'sales#sales_dashboard'
   #post 'admin/update'
 
   match ':controller(/:action(/:id))', via: [:get, :post]

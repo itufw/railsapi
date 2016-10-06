@@ -1,0 +1,7 @@
+<%= title @customer_name %>
+<h3><%= @customer_name %></h3>
+<%= render "partials/overall_stats", time_periods_name: @time_periods_name, sum_stats: @sum_stats, avg_stats: @avg_stats %>
+<center>
+<button class="button center"><%= link_to "View Top Products for Customer", controller: 'sales', action: 'top_products_for_customer', customer_id: @customer_id, customer_name: @customer_name %></button>
+</center>
+<%= render "partials/order", orders: @orders, display_class: "none" %>

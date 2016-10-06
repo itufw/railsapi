@@ -1,0 +1,27 @@
+<table class = "table table-striped table-bordered table-hover table-responsive">
+	<tr class="info">
+		<th><%= column_name %></th>
+		<th class = <%= display_class %> ><%= column_name_optional %></th>
+		<% time_periods_name.each do |t| %>
+			<th><%= t %></th>
+		<% end %>
+	</tr>
+
+	<% names.each do |id, name| %>
+	<tr>
+		<%#= For Top Products for customers that have hash like {id => name} %>
+		<td class = <%= display_class_otherwise %> ><%= link_to name, controller: 'sales', action: 
+		'orders_and_stats_for_product_and_customer', customer_id: customer_id, customer_name: customer_name, product_id: id, product_name: name %></td>
+
+		<%#= For Top Customers for Product that have hash like {id => [name, staff]} %>
+		
+		<td class = <%= display_class %> ><%= link_to name[0], controller: 'sales', action: 
+		'orders_and_stats_for_product_and_customer', customer_id: id, customer_name: name[0], product_id: product_id, product_name: product_name %></td>
+		<td class = <%= display_class %> ><%= name[1] %></td>
+		<% stats.each do |time_period_name, hash| %>
+		<td><%= exists_in_h(hash, id) %></td>
+		<% end %>
+	</tr>
+	<% end %>
+
+</table>
