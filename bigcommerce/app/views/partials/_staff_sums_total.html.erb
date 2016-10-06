@@ -1,0 +1,9 @@
+<tr class="info">
+	<td>Total</td>
+<% dates_total_h = staff_sums_total(dates, sums_dates_h, staffs) %>
+<% dates.each do |d| %>
+
+	<td class="num"><%= display_num(dates_total_h[d]) %></td>
+<% end %>
+	<td class="num"><%= display_num(sum_values_of_hash(dates_total_h)) %></td>
+</tr>

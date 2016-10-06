@@ -99,4 +99,8 @@ module ApplicationHelper
     num_days.days.since(date_today)
   end
 
+  def sum_values_of_hash(hash)
+    return hash.values.sum
+  end
+
 end
