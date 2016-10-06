@@ -15,7 +15,7 @@
 		<td class="num"><%= display_num(calculate_product_price(p.calculated_price, p.retail_ws)) %></td>
 		<td class="num"><%= p.inventory %></td>
 
-		<% pending_stock = exists_in_h(pending_stock_h, p.id) %>
+		<% pending_stock = exists_in_h_int(pending_stock_h, p.id) %>
 		<td class="num"><%= link_to pending_stock, controller: 'sales', action: 'orders_and_stats_for_product_and_status', status_id: 1, status_name: "Pending", product_id: p.id, product_name: p.name, num_orders: nil, qty: p.inventory, status_qty: pending_stock, total: nil %></td>
 		<td class="num"><%= convert_empty_string_to_int(pending_stock) + p.inventory %></td>
 	</tr>

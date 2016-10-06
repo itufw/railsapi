@@ -52,7 +52,7 @@ table.default {
 
 button.not-default {
     background-color: #e7e7e7; /* Gray */
-    color: black;
+    color: black !important;
 }
 
 button.default {
