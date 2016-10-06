@@ -8,5 +8,12 @@
 	<%#= sums_dates_h are a hash like {[start_date, end_date] => sum} %>
 
 	<%= render "partials/daily_sums", sums_dates_h: sums_dates_h, dates: dates, staff_nickname: nickname, staff_id: id, dates_map: dates_map %>
+
 	</tr>
 <% end %>
+
+<tr class="blank-row"></tr>
+<tr>
+<%= render "partials/staff_sums_total", sums_dates_h: sums_dates_staffs_h, dates: dates, staffs: staffs %>
+</tr>
+

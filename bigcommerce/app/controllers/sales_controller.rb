@@ -37,6 +37,7 @@ class SalesController < ApplicationController
     
     @staff_sum_this_week = sum_orders(@dates_this_week[0], @dates_this_week[-1], :group_by_date_created_and_staff_id, sum_function, staff_id)
     #@staff_nicknames = Staff.active_sales_staff.nickname.to_h
+    @staff_sum_this_week
   end
 
   def sales_dashboard_detailed
@@ -76,7 +77,7 @@ class SalesController < ApplicationController
     # returns a hash like {[start_date, end_date] => week_num/month_num}
     @dates_paired = pair_dates(dates, @period)
 
-    staff_id, @staff_nicknames = display_reports_for_staff(session[:user_id])
+    staff_id, @staff_nicknames = display_reports_for_sales_dashboard(session[:user_id])
     @staff_sum_by_periods = sum_orders(dates[0], dates[-1], (date_function + "_and_staff_id").to_sym, sum_function, staff_id)
     
     @periods = (3..15).to_a
