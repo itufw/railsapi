@@ -176,6 +176,11 @@ class Order < ActiveRecord::Base
 		return all
 	end
 
+	# Returns orders whose date created is between the start date and end date
+	# If you want today's orders
+	# Then start date should be Today's date and end date should be Tomorrow's date
+	# Since date_created is stored as datetime in the database, these start and end dates are
+	# converted into datetime values, with 00:00:00 as the time factor.
 	def self.date_filter(start_date, end_date)
 		if (!start_date.nil? && !end_date.nil?)
 			if !start_date.to_s.empty? && !end_date.to_s.empty?
@@ -188,10 +193,12 @@ class Order < ActiveRecord::Base
 		return all
 	end
 
+	# Returns Orders who status has a valid order flag
 	def self.valid_order
 		includes(:status).where('statuses.valid_order = 1').references(:statuses)
 	end
 
+	# Returns orders with a given status id
 	def self.status_filter(status_id)
 		return where(status_id: status_id) if !status_id.nil?
 		return all
