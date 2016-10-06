@@ -216,7 +216,7 @@ class SalesController < ApplicationController
       staff_id, @staff = staff_params_filter(params, session[:user_id])
     
       @orders = Order.status_filter(status_id).staff_filter(staff_id).product_filter([product_id]).order_by_id.page(params[:page])
-    end
+  end
 
 
 end
