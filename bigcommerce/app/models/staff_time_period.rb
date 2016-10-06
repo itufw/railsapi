@@ -26,6 +26,10 @@ class StaffTimePeriod < ActiveRecord::Base
 
 	end
 
+	def set_as_today(time_period, date_today)
+		StaffTimePeriod.update(time_period.id, {"end_date" => date_today.next_day})
+	end
+
 	def update_all
 		time_periods = StaffTimePeriod.all
 		time_periods.each { |t| StaffTimePeriod.new.send(t.update_function, t, Time.now.in_time_zone("Australia/Melbourne").to_date)}
