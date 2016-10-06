@@ -32,7 +32,7 @@
 
 		<tr>
 
-			<td class = "text"><%= o.customer.staff.nickname %></td>
+			<td class = "text"><%= o.customer.staff.nickname unless o.customer.nil? %></td>
 			<td class = "text"><%= o.date_created.to_date %></td>
 			<td class = "text"><%= link_to o.id, controller: "sales", action: "view_products_for_orderid", order_id: o.id %></td>
 			<td class = "text"><%= link_to get_customer_name(o.customer), controller: "sales", action: "view_orders_for_customer", customer_id: o.customer_id %></td>
