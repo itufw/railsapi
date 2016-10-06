@@ -1,10 +1,8 @@
 module DisplayHelper
 
   def display_reports_for_sales_dashboard(staff_id)
-  	display_val = (Staff.display_report(staff_id)).to_i
-
   	# display all staffs
-  	if reports_access_open(staff_id)
+  	if reports_access_open(staff_id) == 1
   	  staffs = Staff.active_sales_staff.nickname.to_h
   	  return nil, staffs
   	# display only the one
