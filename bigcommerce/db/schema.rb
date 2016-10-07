@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161007045224) do
+ActiveRecord::Schema.define(version: 20161007061152) do
 
   create_table "addresses", force: :cascade do |t|
     t.integer  "customer_id", limit: 4
@@ -94,6 +94,7 @@ ActiveRecord::Schema.define(version: 20161007045224) do
     t.datetime "updated_at",                                                    null: false
     t.integer  "cust_style_id",           limit: 4
     t.string   "region",                  limit: 255
+    t.string   "xero_contact_id",         limit: 36
   end
 
   add_index "customers", ["cust_group_id"], name: "index_customers_on_cust_group_id", using: :btree
@@ -540,7 +541,7 @@ ActiveRecord::Schema.define(version: 20161007045224) do
   create_table "xero_credit_notes", primary_key: "xero_credit_note_id", force: :cascade do |t|
     t.string   "credit_note_number", limit: 255
     t.string   "xero_contact_id",    limit: 36,                          null: false
-    t.string   "xero_contact_name",  limit: 255
+    t.string   "contact_name",       limit: 255
     t.string   "status",             limit: 255
     t.string   "line_amount_type",   limit: 255
     t.string   "type",               limit: 255
@@ -559,12 +560,12 @@ ActiveRecord::Schema.define(version: 20161007045224) do
     t.datetime "updated_at",                                             null: false
   end
 
+  add_index "xero_credit_notes", ["contact_name"], name: "index_xero_credit_notes_on_xero_contact_name", using: :btree
   add_index "xero_credit_notes", ["credit_note_number"], name: "index_xero_credit_notes_on_credit_note_number", using: :btree
   add_index "xero_credit_notes", ["line_amount_type"], name: "index_xero_credit_notes_on_line_amount_type", using: :btree
   add_index "xero_credit_notes", ["status"], name: "index_xero_credit_notes_on_status", using: :btree
   add_index "xero_credit_notes", ["type"], name: "index_xero_credit_notes_on_type", using: :btree
   add_index "xero_credit_notes", ["xero_contact_id"], name: "index_xero_credit_notes_on_xero_contact_id", using: :btree
-  add_index "xero_credit_notes", ["xero_contact_name"], name: "index_xero_credit_notes_on_xero_contact_name", using: :btree
   add_index "xero_credit_notes", ["xero_credit_note_id"], name: "index_xero_credit_notes_on_xero_credit_note_id", using: :btree
 
   create_table "xero_op_allocations", primary_key: "xero_op_allocation_id", force: :cascade do |t|

@@ -182,4 +182,10 @@ class Customer < ActiveRecord::Base
 		order('actual_name ASC')
 	end
 
+	def self.insert_xero_contact_id(customer_id, xero_contact_id)
+		customer = filter_by_id(customer_id)
+		customer.xero_contact_id = xero_contact_id
+		customer.save
+	end
+
 end
