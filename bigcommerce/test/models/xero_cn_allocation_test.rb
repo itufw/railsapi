@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class XeroOverPaymentAllocationTest < ActiveSupport::TestCase
+class XeroCnAllocationTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

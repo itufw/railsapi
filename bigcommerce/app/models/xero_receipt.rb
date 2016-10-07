@@ -2,29 +2,31 @@ require 'xero_connection.rb'
 require 'clean_data.rb'
 
 class XeroReceipt < ActiveRecord::Base
+	include CleanData
 	self.primary_key = 'xero_receipt_id'
 
 	belongs_to :xero_contact
 
 	def scrape
 
-		clean = CleanData.new
 		xero = XeroConnection.new.connect
 
 		all_receipts = xero.Receipt.all
 
 		all_receipts.each do |r|
 
-			date = clean.map_date(r.date.to_s)
-			updated_date = clean.map_date(r.updated_date_utc.to_s)
+			date = map_date(r.date.to_s)
+			updated_date = map_date(r.updated_date_utc.to_s)
 
 			time = Time.now.to_s(:db)
 
-			sql = "INSERT INTO xero_receipts (xero_receipt_id, receipt_number, status,\
-			xero_contact_id, xero_contact_name, date, date_modified, sub_total, total,\
-			total_tax, created_at, updated_at) VALUES ('#{r.receipt_id}', '#{r.receipt_number}',\
-			'#{r.status}', '#{r.contact.contact_id}', '#{r.contact.name}', '#{date}', '#{updated_date}',\
-			'#{r.sub_total}', '#{r.total}', '#{r.total_tax}', '#{time}', '#{time}')"
+			sql = "INSERT INTO xero_receipts (xero_receipt_id, xero_contact_id, contact_name,\
+			xero_user_id, user_firstname, user_lastname, receipt_number, sub_total, total_tax,\
+			total, date, updated_date, url, reference, line_amount_types, created_at, updated_at)\
+			VALUES ('#{r.receipt_id}', '#{r.contact_id}', '#{r.contact_name}', '#{r.user_id}',\
+			'#{r.user_firstname}', '#{r.user_lastname}', '#{r.receipt_number}', '#{r.sub_total}',\
+			'#{r.total_tax}', '#{r.total}', '#{date}', '#{updated_date}', '#{r.url}', '#{r.reference}',\
+			'#{r.line_amount_types}', '#{time}', '#{time}')"
 
 			ActiveRecord::Base.connection.execute(sql)
 		end
