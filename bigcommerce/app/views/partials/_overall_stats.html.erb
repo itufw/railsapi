@@ -1,0 +1,21 @@
+<table class = "table table-striped table-bordered table-hover table-responsive">
+	<tr class="info">
+		<th></th>
+		<% time_periods_name.each do |t| %>
+			<th><%= t %></th>
+		<% end %>
+	</tr>
+
+	<tr>
+		<td>Total Qty</td>
+		<% sum_stats.each do |s| %>
+			<td><%= display_num(s) %></td>
+		<% end %>
+	</tr>
+	<tr>
+		<td>Weekly Average</td>
+		<% avg_stats.each do |a| %>
+			<td><%= display_num(a) %></td>
+		<% end %>
+	</tr>	
+</table>

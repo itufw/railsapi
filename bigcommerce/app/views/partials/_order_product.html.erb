@@ -1,0 +1,21 @@
+<table class = "table table-striped table-bordered table-hover table-responsive">
+	<tr>
+		<th>Product Name</th>
+		<th>Quantity</th>
+		<th>List Price Ex Tax</th>
+		<th>Price Inc Tax</th>
+		<th>Total</th>
+	</tr>
+
+
+	<% order_products.each do |op| %>
+	<tr>
+		<td><%= link_to op.product.name, controller: 'sales', action: 'orders_and_stats_for_product_and_customer', product_id: op.product.id, product_name: op.product.name, customer_id: cust_id, customer_name: cust_name %></td>
+		<td class="num"><%= op.qty %></td>
+		<td class="num"><%= op.product.calculated_price %></td>
+		<td class="num"><%= display_num(op.price_inc_tax) %></td>
+		<td class="num"></td>
+	
+	</tr>
+	<% end %>
+</table>

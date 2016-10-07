@@ -14,3 +14,13 @@
  *= require_self
  */
 
+@media print {
+  a[href]:after {
+    content: none !important; 
+  }
+} 
+
+.btn-primary{
+	color: white !important;
+}
+
