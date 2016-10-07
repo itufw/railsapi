@@ -51,7 +51,10 @@ class XeroContact < ActiveRecord::Base
 
 	  		ActiveRecord::Base.connection.execute(sql)
 		end
+    end
 
+    def self.find_by_skype_id(skype_id)
+    	return where(skype_user_name: skype_id)
     end
 
 end
