@@ -1,7 +1,7 @@
-class CleanData
+module CleanData
 
 	def remove_apostrophe(text)
-		return text.gsub("'","''")
+		return text.gsub("'","''") unless text.nil?
 	end
 
 	def map_date(date)

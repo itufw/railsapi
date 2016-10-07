@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class XeroCreditNoteAllocationTest < ActiveSupport::TestCase
+class XeroOpAllocationTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

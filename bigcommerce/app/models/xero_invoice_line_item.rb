@@ -2,6 +2,8 @@ require 'clean_data.rb'
 
 
 class XeroInvoiceLineItem < ActiveRecord::Base
+
+	include CleanData
 	self.primary_key = 'xero_invoice_line_item_id'
 
 	belongs_to :xero_invoice
@@ -14,7 +16,7 @@ class XeroInvoiceLineItem < ActiveRecord::Base
 
 				time = Time.now.to_s(:db)
 
-				description = clean.remove_apostrophe(li.description)
+				description = remove_apostrophe(li.description)
 
 				sql = "INSERT INTO xero_invoice_line_items (xero_invoice_line_item_id,\
 				xero_invoice_id, item_code, description, quantity, unit_amount, line_amount, discount_rate,\
