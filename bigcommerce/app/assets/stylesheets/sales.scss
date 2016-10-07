@@ -3,19 +3,19 @@
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
 .num {
-	text-align: right
+    text-align: right
 }
 
 .text {
-	text-align: left
+    text-align: left
 }
 
 a:link, a:visited {
-	color: inherit;
+    color: inherit;
 }
 
 a:hover {
-	color: blue;
+    color: blue;
 }
 
 .blank-row
@@ -26,7 +26,7 @@ a:hover {
 
 .button {
     border: none;
-    color: white;
+    color: white !important;
     padding: 15px 32px;
     text-align: center;
     text-decoration: none;
@@ -35,6 +35,7 @@ a:hover {
     margin: 4px 2px;
     cursor: pointer;
     background-color: black;
+    margin-top: 50px;
 }
 
 .not-default{
@@ -51,7 +52,7 @@ table.default {
 
 button.not-default {
     background-color: #e7e7e7; /* Gray */
-    color: black;
+    color: black !important;
 }
 
 button.default {
@@ -72,4 +73,12 @@ h3 {
 
 .inline {
     display: inline-block;
+}
+
+table {
+    margin-top: 50px;
+}
+
+.none {
+    display: none;
 }

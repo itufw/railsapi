@@ -1,107 +1,51 @@
+require 'models_filter.rb'
+
 class ModelsController < ApplicationController
 
   before_action :confirm_logged_in
+
+  include ModelsFilter
   
   def orders
-      @staffs = active_sales_staff
-      @statuses = Status.all
-      @page_header = "Orders"
 
-      staff_id = nil
-      status_id = nil
-      if params.has_key?(:commit)
-          @search_text = params[:search]
-          customer_ids = Customer.search_for(@search_text).pluck("id")
-          if !params[:staff][:id].blank?
-              staff_id = params[:staff][:id]
-              @staff = Staff.where(id: staff_id).first
-          end
-          if !params[:status][:id].blank?
-              status_id = params[:status][:id]
-              @status = Status.where(id: status_id).first
-          end
-      end
-      if !params[:start_date].nil?
-          @start_date = params[:start_date]
-          start_time = Time.parse(@start_date) 
-      end
-      if !params[:end_date].nil?
-          @end_date = params[:end_date]
-          end_time = Time.parse(@end_date)
-      end
-      
-      if !params[:start_date].nil?
-        if !params[:staff_id].nil?
-          staff_id = params[:staff_id]
-          staff_nickname = params[:staff_nickname]
-          @page_header = "Orders for #{staff_nickname} from #{params[:start_date].to_date.strftime('%A  %d/%m/%y')} - #{params[:end_date].to_date.strftime('%A  %d/%m/%y')}"
-          @staff = Staff.where(id: staff_id).first
-        else
-          @page_header = "Orders from #{params[:start_date].to_date.strftime('%A  %d/%m/%y')} - #{params[:end_date].to_date.strftime('%A  %d/%m/%y')}"
-        end
-      end
+    @staffs = Staff.active_sales_staff
+    @statuses = Status.all
 
+    @staff, @status, orders, @search_text = order_param_filter(params, session[:user_id])
+    @orders = orders.order_by_id.page(params[:page])
 
-      if !customer_ids.nil?
-          @orders = Order.includes([{:customer => :staff}, :status]).status_staff_filter(status_id, staff_id, start_time, end_time).where('customers.id IN (?)', customer_ids).references(:customers).page(params[:page]).order('orders.id DESC')
-      else
-          @orders = Order.includes([{:customer => :staff}, :status]).status_staff_filter(status_id, staff_id, start_time, end_time).page(params[:page]).order('orders.id DESC')
-      end
+    # @staff = results_val[0]
+    # @status = results_val[1]
+    # @orders = results_val[2].order_by_id.page(params[:page])
+    # @search_text = results_val[3]
+    @start_date = params[:start_date]
+    @end_date = params[:end_date]
 
+    @staff_nickname = params[:staff_nickname]
   end
 
-
   def customers
-      @staffs = active_sales_staff
+    @staffs = Staff.active_sales_staff
 
-      if params.has_key?(:commit)
-          @search_text = params[:search]
-          if !params[:staff][:id].blank?
-              staff_id = params[:staff][:id]
-              @staff = Staff.where(id: staff_id).first
-          end
-      end
-
-      @customers = Customer.includes(:staff).staff_search_filter(@search_text, staff_id).page(params[:page]).order('actual_name ASC')
-              
+    @staff, customers, @search_text = customer_param_filter(params, session[:user_id])
+    @customers = customers.order_by_name.page(params[:page])
 
   end
 
   def products
 
-      @countries = ProducerCountry.all
-      @sub_types = ProductSubType.all
+    @countries = ProducerCountry.all
+    @sub_types = ProductSubType.all
 
-      staff_id = nil
-      producer_country_id = nil
-      product_sub_type_id = nil
+    results_val = product_param_filter(params)
 
-      if params.has_key?(:commit)
-        @search_text = params[:search]
-        if !params[:producer_country][:id].blank?
-            producer_country_id = params[:producer_country][:id]
-            @producer_country = ProducerCountry.where(id: producer_country_id).first
-        end
-        if !params[:product_sub_type][:id].blank?
-            product_sub_type_id = params[:product_sub_type][:id]
-            @product_sub_type = ProductSubType.where(id: product_sub_type_id).first
-        end
-      end
+    @producer_country = results_val[0]
+    @product_sub_type = results_val[1]
+    @products = results_val[2].order_by_name.page(params[:page])
+    @search_text = results_val[3]
 
-    @product_pending_count = Product.filter(@search_text, producer_country_id, product_sub_type_id).includes([{:order_products => :order}]).where('orders.status_id = 1').references(:orders).group('order_products.product_id').sum('order_products.qty')
-
-    @products = Product.filter(@search_text, producer_country_id, product_sub_type_id).page(params[:page]).order('name ASC')
+    @pending_stock_h = Product.pending_stock(@products.pluck("id"))
 
   end
-
-  def return_pending_stock(product_pending_count_map, product_id)
-    if product_pending_count_map.has_key?(product_id)
-      return product_pending_count_map[product_id]
-    else
-      return 0
-    end
-  end
-
-  helper_method :return_pending_stock
 
 end
