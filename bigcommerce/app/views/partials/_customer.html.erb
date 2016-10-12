@@ -3,6 +3,8 @@
 	<tr>
 		<th>Sales Rep</th>
 		<th>Name</th>
+		<th>Outstanding</th>
+		<th>Overdue</th>
 	</tr>
 
 	<% customers.each do |c| %>
@@ -10,6 +12,8 @@
 		<td><%= c.staff.nickname %></td>
 		<% cust_name = customer_name(c) %>
 		<td><%= link_to cust_name, controller: 'sales', action: 'orders_and_stats_for_customer', customer_id: c.id, customer_name: cust_name %></td>
+		<td class="num"><%= display_num(outstanding_customer(c.xero_contact_id))  %></td>
+		<td class="num"><%= display_num(overdue_customer(c.xero_contact_id)) %></td>
 	</tr>
 	<% end %>
 	
