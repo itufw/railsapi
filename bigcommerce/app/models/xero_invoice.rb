@@ -35,6 +35,9 @@ class XeroInvoice < ActiveRecord::Base
 
 	  	 		contact_name = remove_apostrophe(i.contact_name) unless i.contact_name.nil?
 
+	  	 		sent_to_contact = convert_bool(i.sent_to_contact)
+	  	 		has_attachments = convert_bool(i.has_attachments)
+
 	  			
 	  			time = Time.now.to_s(:db)
 
@@ -43,7 +46,7 @@ class XeroInvoice < ActiveRecord::Base
 		  			sql = "INSERT INTO xero_invoices (xero_invoice_id, invoice_number,\
 		  			xero_contact_id, contact_name, sub_total, total_tax, total, total_discount,\
 		  			amount_due, amount_paid, amount_credited, date, due_date, fully_paid_on_date,\
-		  			expected_payment_date, updated_date, status, line_amount_types, type, reference,\
+		  			expected_payment_date, updated_date, status, line_amount_types, invoice_type,\
 		  			currency_code, currency_rate, url, reference, branding_theme_id, sent_to_contact,\
 		  			has_attachments, created_at, updated_at)\
 		  			VALUES ('#{i.invoice_id}', '#{i.invoice_number}',\
@@ -51,9 +54,9 @@ class XeroInvoice < ActiveRecord::Base
 		  			'#{i.total(true)}', '#{i.total_discount}', '#{i.amount_due}', '#{i.amount_paid}',\
 		  			'#{i.amount_credited}', '#{date}', '#{due_date}', '#{fully_paid_on_date}',\
 		  			'#{expected_payment_date}', '#{updated_date}', '#{i.status}', '#{i.line_amount_types}',\
-		  			'#{i.type}', '#{i.reference}', '#{i.currency_code}', '#{i.currency_rate}',\
-		  			'#{i.url}', '#{i.reference}', '#{i.branding_theme_id}', '#{i.sent_to_contact}',\
-		  			'#{i.has_attachments}', '#{time}', '#{time}')"
+		  			'#{i.type}', '#{i.currency_code}', '#{i.currency_rate}',\
+		  			'#{i.url}', '#{i.reference}', '#{i.branding_theme_id}', '#{sent_to_contact}',\
+		  			'#{has_attachments}', '#{time}', '#{time}')"
 
 		  			ActiveRecord::Base.connection.execute(sql)
 
@@ -83,6 +86,25 @@ class XeroInvoice < ActiveRecord::Base
   		else
   			return false
   	    end
+  	end
+
+  	def self.get_invoice_id_and_number(invoice_number)
+  		if where(invoice_number: invoice_number).count > 0
+  			invoice = where(invoice_number: invoice_number).first
+  			return invoice
+  		else
+  			return false
+  		end
+  	end
+
+  	def self.find_by_order_id(order_id)
+  		if invoice = XeroInvoice.get_invoice_id_and_number(order_id.to_s)
+  			return invoice
+  		elsif invoice = XeroInvoice.get_invoice_id_and_number('BC' + order_id.to_s)
+  			return invoice
+  		else
+  			return nil
+  		end
   	end
 
 end

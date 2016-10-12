@@ -274,4 +274,15 @@ class Order < ActiveRecord::Base
 		includes([{:customer => :staff}, :status, {:order_products => :product}])
 	end
 
+	def self.xero_invoice_id_is_null
+		where(xero_invoice_id: nil)
+	end
+
+	def self.insert_invoice(order_id, invoice_id, invoice_number)
+		order = order_filter(order_id)
+		order.xero_invoice_id = invoice_id
+		order.xero_invoice_number = invoice_number
+		order.save
+	end
+
 end
