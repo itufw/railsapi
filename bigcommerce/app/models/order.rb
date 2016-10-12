@@ -193,8 +193,6 @@ class Order < ActiveRecord::Base
 		return all
 	end
 
-<<<<<<< HEAD
-=======
 	# Returns Orders who status has a valid order flag
 	def self.valid_order
 		includes(:status).where('statuses.valid_order = 1').references(:statuses)
@@ -276,5 +274,4 @@ class Order < ActiveRecord::Base
 		includes([{:customer => :staff}, :status, {:order_products => :product}])
 	end
 
->>>>>>> master
 end

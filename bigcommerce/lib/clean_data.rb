@@ -20,4 +20,17 @@ module CleanData
 		end
 	end
 
+	def convert_empty_list(list)
+		unless !list.empty?
+			return ''
+		end
+	end
+	# def convert_to_empty_decimal(string)
+	# 	if string.strip.length == 0
+	# 		return '0.00'
+	# 	else
+	# 		return string
+	# 	end
+	# end
+
 end

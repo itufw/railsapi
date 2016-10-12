@@ -188,4 +188,8 @@ class Customer < ActiveRecord::Base
 		customer.save
 	end
 
+	def self.xero_contact_id_is_null
+		where(xero_contact_id: nil)
+	end
+
 end

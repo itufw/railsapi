@@ -103,4 +103,12 @@ module ApplicationHelper
     return hash.values.sum
   end
 
+  def outstanding_customer(xero_contact_id)
+    XeroContact.get_accounts_receivable_outstanding(xero_contact_id)
+  end
+
+  def overdue_customer(xero_contact_id)
+    XeroContact.get_accounts_receivable_overdue(xero_contact_id)
+  end
+
 end
