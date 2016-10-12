@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161007061152) do
+ActiveRecord::Schema.define(version: 20161012050116) do
 
   create_table "addresses", force: :cascade do |t|
     t.integer  "customer_id", limit: 4
@@ -567,6 +567,67 @@ ActiveRecord::Schema.define(version: 20161007061152) do
   add_index "xero_credit_notes", ["type"], name: "index_xero_credit_notes_on_type", using: :btree
   add_index "xero_credit_notes", ["xero_contact_id"], name: "index_xero_credit_notes_on_xero_contact_id", using: :btree
   add_index "xero_credit_notes", ["xero_credit_note_id"], name: "index_xero_credit_notes_on_xero_credit_note_id", using: :btree
+
+  create_table "xero_invoice_line_items", primary_key: "xero_invoice_line_item_id", force: :cascade do |t|
+    t.string   "xero_invoice_id", limit: 36,                          null: false
+    t.string   "item_code",       limit: 255
+    t.string   "description",     limit: 255
+    t.decimal  "quantity",                    precision: 8, scale: 2
+    t.decimal  "unit_amount",                 precision: 8, scale: 2
+    t.decimal  "line_amount",                 precision: 8, scale: 2
+    t.decimal  "discount_rate",               precision: 8, scale: 2
+    t.decimal  "tax_amount",                  precision: 8, scale: 2
+    t.string   "tax_type",        limit: 255
+    t.string   "account_code",    limit: 255
+    t.datetime "created_at",                                          null: false
+    t.datetime "updated_at",                                          null: false
+  end
+
+  add_index "xero_invoice_line_items", ["xero_invoice_id"], name: "index_xero_invoice_line_items_on_xero_invoice_id", using: :btree
+  add_index "xero_invoice_line_items", ["xero_invoice_line_item_id"], name: "index_xero_invoice_line_items_on_xero_invoice_line_item_id", using: :btree
+
+  create_table "xero_invoices", primary_key: "xero_invoice_id", force: :cascade do |t|
+    t.string   "invoice_number",        limit: 255
+    t.string   "xero_contact_id",       limit: 36,                          null: false
+    t.string   "contact_name",          limit: 255
+    t.decimal  "sub_total",                         precision: 8, scale: 2
+    t.decimal  "total_tax",                         precision: 8, scale: 2
+    t.decimal  "total",                             precision: 8, scale: 2
+    t.decimal  "total_discount",                    precision: 8, scale: 2
+    t.decimal  "amount_due",                        precision: 8, scale: 2
+    t.decimal  "amount_paid",                       precision: 8, scale: 2
+    t.decimal  "amount_credited",                   precision: 8, scale: 2
+    t.datetime "date"
+    t.datetime "due_date"
+    t.datetime "fully_paid_on_date"
+    t.datetime "expected_payment_date"
+    t.datetime "updated_date"
+    t.string   "status",                limit: 255
+    t.string   "line_amount_types",     limit: 255
+    t.string   "invoice_type",          limit: 255
+    t.string   "reference",             limit: 255
+    t.string   "currency_code",         limit: 255
+    t.decimal  "currency_rate",                     precision: 8, scale: 2
+    t.string   "url",                   limit: 255
+    t.string   "branding_theme_id",     limit: 36
+    t.boolean  "sent_to_contact"
+    t.boolean  "has_attachments"
+    t.datetime "created_at",                                                null: false
+    t.datetime "updated_at",                                                null: false
+  end
+
+  add_index "xero_invoices", ["date"], name: "index_xero_invoices_on_date", using: :btree
+  add_index "xero_invoices", ["due_date"], name: "index_xero_invoices_on_due_date", using: :btree
+  add_index "xero_invoices", ["expected_payment_date"], name: "index_xero_invoices_on_expected_payment_date", using: :btree
+  add_index "xero_invoices", ["fully_paid_on_date"], name: "index_xero_invoices_on_fully_paid_on_date", using: :btree
+  add_index "xero_invoices", ["invoice_number"], name: "index_xero_invoices_on_invoice_number", using: :btree
+  add_index "xero_invoices", ["invoice_type"], name: "index_xero_invoices_on_invoice_type", using: :btree
+  add_index "xero_invoices", ["line_amount_types"], name: "index_xero_invoices_on_line_amount_types", using: :btree
+  add_index "xero_invoices", ["reference"], name: "index_xero_invoices_on_reference", using: :btree
+  add_index "xero_invoices", ["status"], name: "index_xero_invoices_on_status", using: :btree
+  add_index "xero_invoices", ["updated_date"], name: "index_xero_invoices_on_updated_date", using: :btree
+  add_index "xero_invoices", ["xero_contact_id"], name: "index_xero_invoices_on_xero_contact_id", using: :btree
+  add_index "xero_invoices", ["xero_invoice_id"], name: "index_xero_invoices_on_xero_invoice_id", using: :btree
 
   create_table "xero_op_allocations", primary_key: "xero_op_allocation_id", force: :cascade do |t|
     t.string   "xero_overpayment_id", limit: 36

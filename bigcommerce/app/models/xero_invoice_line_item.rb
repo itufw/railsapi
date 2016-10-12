@@ -9,7 +9,6 @@ class XeroInvoiceLineItem < ActiveRecord::Base
 	belongs_to :xero_invoice
 
 	def scrape(invoice_line_items, invoice_id)
-		clean = CleanData.new
 		invoice_line_items.each do |li|
 
 			time = Time.now.to_s(:db)
