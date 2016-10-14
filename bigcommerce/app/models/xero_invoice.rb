@@ -60,7 +60,7 @@ class XeroInvoice < ActiveRecord::Base
 
 		  			ActiveRecord::Base.connection.execute(sql)
 
-		  			XeroInvoiceLineItem.new.scrape(i.line_items, i.invoice_id)
+		  			XeroInvoiceLineItem.new.scrape(i.line_items, i.invoice_id, i.invoice_number)
 		  		end
 	  		end
 
