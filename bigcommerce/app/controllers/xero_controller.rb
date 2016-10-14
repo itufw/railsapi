@@ -8,6 +8,7 @@ class XeroController < ApplicationController
 	end
 
 	def link_bigc_xero_orders
-		Order.xero_invoice_id_is_null.each {|o| }
+		Order.xero_invoice_id_is_null.each {|o| link_invoice_id(o.id)}
+	end
 
 end

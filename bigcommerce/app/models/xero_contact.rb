@@ -34,13 +34,9 @@ class XeroContact < ActiveRecord::Base
             if c.balances.nil?
                 accounts_receivable_outstanding = 0.00
                 accounts_receivable_overdue = 0.00
-                accounts_payable_outstanding = 0.00
-                accounts_payable_overdue = 0.00
             else
                 accounts_receivable_outstanding = c.balances.accounts_receivable.outstanding
                 accounts_receivable_overdue = c.balances.accounts_receivable.overdue
-                accounts_payable_outstanding = c.balances.accounts_payable.outstanding
-                accounts_payable_overdue = c.balances.accounts_payable.overdue
             end
 
 			time = Time.now.to_s(:db)
