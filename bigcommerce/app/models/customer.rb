@@ -5,11 +5,12 @@ require 'csv'
 class Customer < ActiveRecord::Base
 	has_many :orders
 	has_many :addresses
-
 	belongs_to :cust_type
 	belongs_to :cust_group
 	belongs_to :cust_style
 	belongs_to :staff
+	has_one :xero_contact
+
 
 	scoped_search on: [:firstname, :lastname, :company, :actual_name]
 

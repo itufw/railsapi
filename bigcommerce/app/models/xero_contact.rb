@@ -6,6 +6,7 @@ class XeroContact < ActiveRecord::Base
 	include CleanData
     self.primary_key = 'xero_contact_id'
 
+    belongs_to :customer
     has_many :xero_invoices
     has_many :xero_payments
     has_many :xero_credit_notes

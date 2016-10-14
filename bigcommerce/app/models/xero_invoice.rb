@@ -7,7 +7,7 @@ class XeroInvoice < ActiveRecord::Base
 
 	self.primary_key = 'xero_invoice_id'
 
-	has_one :order
+	belongs_to :order
 	belongs_to :xero_contact
 	has_many :xero_invoice_line_items
 	has_many :xero_payments
@@ -73,10 +73,10 @@ class XeroInvoice < ActiveRecord::Base
 	end
 
 	def valid_invoice(invoice)
-		if invoice.status != 'DELETED' && invoice.type == 'ACCREC'
-			return true
+		if invoice.status == 'DELETED' || invoice.status == 'VOIDED' || invoice.type != 'ACCREC'
+			return false
 	    else
-	    	return false
+	    	return true
 	    end
 	end
 

@@ -2,25 +2,18 @@ require 'bigcommerce_connection.rb'
 require 'clean_data.rb'
 
 class Order < ActiveRecord::Base
+
 	belongs_to :customer
-
 	belongs_to :status
-
 	belongs_to :coupon
-
 	belongs_to :staff
-
 	has_many :order_shippings
 	has_many :addresses, through: :order_shippings
-
 	belongs_to :billing_address, class_name: :Address, foreign_key: :billing_address_id
-
 	has_many :order_products
-	#has_many :products, through: :order_products
-
+	has_many :products, through: :order_products
 	belongs_to :order_history
-
-	#has_one :xero_invoice
+	has_one :xero_invoice
 
 	self.per_page = 30
 
