@@ -2,6 +2,7 @@ require 'sales_controller_helper.rb'
 require 'models_filter.rb'
 require 'dates_helper.rb'
 require 'display_helper.rb'
+require 'stock_helper.rb'
 
 class SalesController < ApplicationController
 
@@ -11,6 +12,7 @@ class SalesController < ApplicationController
   include ModelsFilter
   include DatesHelper
   include DisplayHelper
+  include StockHelper
 
   helper_method :check_id_in_map
 
@@ -115,7 +117,7 @@ class SalesController < ApplicationController
   def stats_and_top_customers_for_product
     @product_id = params[:product_id]
     @product_name = params[:product_name]
-    @total_stock = params[:total_stock].to_i
+    @total_stock = total_stock_product(@product_id)
     @selected_period, @period_types = define_period_types(params)
 
     @time_periods_name, @all_stats, @sum_stats, @avg_stats, customer_ids, @monthly_supply = stats_for_timeperiods("Order.product_filter(%s).valid_order" % @product_id, :group_by_customerid, :sum_order_product_qty, @total_stock, @selected_period)

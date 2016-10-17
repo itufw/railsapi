@@ -83,7 +83,7 @@ class AdminController < ApplicationController
 
     #end
 
-    render 'update'
+    #render 'update'
 
   end
 
