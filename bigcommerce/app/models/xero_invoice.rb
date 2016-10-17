@@ -86,6 +86,8 @@ class XeroInvoice < ActiveRecord::Base
 		  		end
 	  		end
 
+	  		puts "Page Num : " + page_num.to_s
+
 	  		page_num += 1
 
 	  		invoices = xero.Invoice.all(page: page_num, modified_since: modified_since_time)

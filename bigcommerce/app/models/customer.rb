@@ -193,4 +193,17 @@ class Customer < ActiveRecord::Base
 		where(xero_contact_id: nil)
 	end
 
+	def self.new_customer_for_xero(customer_id)
+		customer = Customer.find(customer_id)
+		if customer.xero_contact_id.nil?
+			return true
+		else
+			return false
+		end
+	end
+
+	def self.get_xero_contact_id(customer_id)
+		return find(customer_id).xero_contact_id
+	end
+
 end

@@ -92,4 +92,9 @@ class XeroContact < ActiveRecord::Base
         return find(xero_contact_id).accounts_receivable_overdue if xero_contact_id
     end
 
+    def self.create_in_xero(customer)
+        xero = XeroConnection.new.connect
+        contact = xero.Contact.build(name: 'ABC Development')
+    end
+
 end

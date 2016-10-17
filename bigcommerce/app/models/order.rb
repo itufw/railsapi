@@ -267,6 +267,7 @@ class Order < ActiveRecord::Base
 		includes([{:customer => :staff}, :status, {:order_products => :product}])
 	end
 
+	# considered new invoices in the case of Xero Sync
 	def self.xero_invoice_id_is_null
 		where(xero_invoice_id: nil)
 	end
@@ -277,5 +278,6 @@ class Order < ActiveRecord::Base
 		order.xero_invoice_number = invoice_number
 		order.save
 	end
+
 
 end
