@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class DefaultAveragePeriodTest < ActiveSupport::TestCase
+class TaxPercentageTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end
