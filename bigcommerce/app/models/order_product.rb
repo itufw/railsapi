@@ -32,4 +32,10 @@ class OrderProduct < ActiveRecord::Base
 		delete_order_product = "DELETE FROM order_products WHERE order_id = '#{order_id}'"
 	    ActiveRecord::Base.connection.execute(delete_order_product)
 	end
+
+	def self.order_sum(order_products)
+		order_total = 0
+		order_products.each {|o| order_total += (o.qty * o.price_inc_tax)}
+		return order_total
+	end
 end

@@ -11,4 +11,6 @@ class XeroController < ApplicationController
 		Order.xero_invoice_id_is_null.each {|o| link_invoice_id(o.id)}
 	end
 
+	
+
 end
