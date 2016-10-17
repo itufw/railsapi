@@ -104,7 +104,7 @@ module SalesControllerHelper
     if params[:period_type]
       selected_period = params[:period_type]
     else
-      selected_period = "weekly"
+      selected_period = "monthly"
     end
     return selected_period, period_types
   end
