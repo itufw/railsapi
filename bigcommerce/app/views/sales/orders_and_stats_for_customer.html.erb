@@ -1,6 +1,16 @@
 <%= title @customer_name %>
 <h3><%= @customer_name %></h3>
-<%= render "partials/overall_stats", time_periods_name: @time_periods_name, sum_stats: @sum_stats, avg_stats: @avg_stats %>
+
+<div style="margin-top: 50px;">
+<%= form_tag({:action => "orders_and_stats_for_customer" }, {:method => "get"}) do %>
+	<%= render "partials/overall_stats", time_periods_name: @time_periods_name, sum_stats: @sum_stats, avg_stats: @avg_stats, monthly_supply_display_class: "none", monthly_supply: [] %>
+
+	<%= hidden_field_tag :customer_id, @customer_id %>
+   	<%= hidden_field_tag :customer_name, @customer_name %>
+
+<% end %>
+</div>
+
 <center>
 <button class="button center"><%= link_to "View Top Products for Customer", controller: 'sales', action: 'top_products_for_customer', customer_id: @customer_id, customer_name: @customer_name %></button>
 </center>

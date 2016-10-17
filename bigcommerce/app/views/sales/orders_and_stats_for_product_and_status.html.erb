@@ -18,7 +18,22 @@
 		<td class="num"><%= display_num(@total) %></td>
 </table>
 
-<%= render "partials/overall_stats", time_periods_name: @time_periods_name, sum_stats: @sum_stats, avg_stats: @avg_stats %>
+<div style="margin-top: 50px;">
+<%= form_tag({:action => "orders_and_stats_for_product_and_status" }, {:method => "get"}) do %>
+
+	<%= render "partials/overall_stats", time_periods_name: @time_periods_name, sum_stats: @sum_stats, avg_stats: @avg_stats, monthly_supply_display_class: "none", monthly_supply: [] %>
+
+	<%= hidden_field_tag :product_id, @product_id %>
+   <%= hidden_field_tag :product_name, @product_name %>
+   <%= hidden_field_tag :status_name, @status_name %>
+   <%= hidden_field_tag :status_id, @status_id %>
+   <%= hidden_field_tag :num_orders, @num_orders %>
+    <%= hidden_field_tag :qty, @qty %>
+   <%= hidden_field_tag :status_qty, @status_qty %>
+   <%= hidden_field_tag :total, @total %>
+
+<% end %>
+</div>
 
 <div class="form-group" style="margin-left:550px;">
 <%= form_tag({:controller => "sales", :action => "orders_and_stats_for_product_and_status"}, {:method => "get"}) do %>
