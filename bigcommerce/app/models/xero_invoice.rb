@@ -33,7 +33,8 @@ class XeroInvoice < ActiveRecord::Base
 	  			fully_paid_on_date = map_date(i.fully_paid_on_date)
 	  			expected_payment_date = map_date(i.expected_payment_date)
 
-	  	 		contact_name = remove_apostrophe(i.contact_name) unless i.contact_name.nil?
+	  	 		contact_name = remove_apostrophe(i.contact_name)
+	  	 		url = remove_apostrophe(i.url)
 
 	  	 		sent_to_contact = convert_bool(i.sent_to_contact)
 	  	 		has_attachments = convert_bool(i.has_attachments)
@@ -55,7 +56,7 @@ class XeroInvoice < ActiveRecord::Base
 		  			'#{i.amount_credited}', '#{date}', '#{due_date}', '#{fully_paid_on_date}',\
 		  			'#{expected_payment_date}', '#{updated_date}', '#{i.status}', '#{i.line_amount_types}',\
 		  			'#{i.type}', '#{i.currency_code}', '#{i.currency_rate}',\
-		  			'#{i.url}', '#{i.reference}', '#{i.branding_theme_id}', '#{sent_to_contact}',\
+		  			'#{url}', '#{i.reference}', '#{i.branding_theme_id}', '#{sent_to_contact}',\
 		  			'#{has_attachments}', '#{time}', '#{time}')"
 
 		  			ActiveRecord::Base.connection.execute(sql)

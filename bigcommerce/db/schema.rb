@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161014010804) do
+ActiveRecord::Schema.define(version: 20161014044541) do
 
   create_table "addresses", force: :cascade do |t|
     t.integer  "customer_id", limit: 4
@@ -31,6 +31,13 @@ ActiveRecord::Schema.define(version: 20161014010804) do
   end
 
   add_index "addresses", ["customer_id"], name: "index_addresses_on_customer_id", using: :btree
+
+  create_table "average_periods", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.integer  "days",       limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "categories", force: :cascade do |t|
     t.integer  "parent_id",        limit: 4
@@ -101,21 +108,6 @@ ActiveRecord::Schema.define(version: 20161014010804) do
   add_index "customers", ["cust_store_id"], name: "index_customers_on_cust_store_id", using: :btree
   add_index "customers", ["cust_type_id"], name: "index_customers_on_cust_type_id", using: :btree
   add_index "customers", ["staff_id"], name: "index_customers_on_staff_id", using: :btree
-
-  create_table "default_average_periods", force: :cascade do |t|
-    t.integer  "staff_id",   limit: 4
-    t.string   "name",       limit: 255
-    t.integer  "days",       limit: 4
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  create_table "default_start_dates", force: :cascade do |t|
-    t.integer  "staff_id",     limit: 4
-    t.date     "default_date"
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
 
   create_table "order_histories", force: :cascade do |t|
     t.integer  "order_id",                   limit: 4,                             null: false
@@ -485,6 +477,20 @@ ActiveRecord::Schema.define(version: 20161014010804) do
     t.datetime "created_at",              null: false
     t.datetime "updated_at",              null: false
     t.integer  "valid_order", limit: 1
+  end
+
+  create_table "tax_codes", force: :cascade do |t|
+    t.string   "customer_type", limit: 255
+    t.string   "tax_code",      limit: 255
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
+  create_table "tax_percentages", force: :cascade do |t|
+    t.string   "tax_name",       limit: 255
+    t.decimal  "tax_percentage",             precision: 8, scale: 2
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
   end
 
   create_table "warehouses", force: :cascade do |t|
