@@ -1,4 +1,12 @@
-<table class = "table table-striped table-bordered table-hover table-responsive">
+
+
+	<div class="col-xs-2" style="float: left;">
+	<%= render "partials/period_select" %>
+	</div>
+	
+   <%= submit_tag "Change", class: 'btn btn-primary' %>
+   
+<table class = "table table-striped table-bordered table-hover table-responsive" style="margin-top: -40px;">
 	<tr class="info">
 		<th></th>
 		<% time_periods_name.each do |t| %>
@@ -13,9 +21,15 @@
 		<% end %>
 	</tr>
 	<tr>
-		<td>Weekly Average</td>
+		<td><%= @selected_period.capitalize %> Average</td>
 		<% avg_stats.each do |a| %>
 			<td><%= display_num(a) %></td>
+		<% end %>
+	</tr>	
+	<tr class = <%= monthly_supply_display_class %>>
+		<td><%= @selected_period.capitalize %> Supply</td>
+		<% monthly_supply.each do |m| %>
+			<td><%= display_num(m) %></td>
 		<% end %>
 	</tr>	
 </table>

@@ -1,7 +1,17 @@
 <%= title @product_name %>
 <h3><%= @product_name %></h3>
+<h4>Total Stock : <%= @total_stock %></h4>
 
-<%= render "partials/overall_stats", time_periods_name: @time_periods_name, sum_stats: @sum_stats, avg_stats: @avg_stats %>
+<div style="margin-top: 50px;">
+<%= form_tag({:action => "stats_and_top_customers_for_product" }, {:method => "get"}) do %>
+	<%= render "partials/overall_stats", time_periods_name: @time_periods_name, sum_stats: @sum_stats, avg_stats: @avg_stats, monthly_supply_display_class: "", monthly_supply: @monthly_supply %>
+
+   <%= hidden_field_tag :product_id, @product_id %>
+   <%= hidden_field_tag :product_name, @product_name %>
+   <%= hidden_field_tag :total_stock, @total_stock %>
+   
+<% end %>
+</div>
 
 <center>
 <button class="button center"><%= link_to "View Orders for Product", controller: 'sales', action: 'orders_for_product', product_id: @product_id, product_name: @product_name %></button>
