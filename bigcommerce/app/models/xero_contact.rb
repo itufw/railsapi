@@ -42,7 +42,7 @@ class XeroContact < ActiveRecord::Base
 
 			time = Time.now.to_s(:db)
 
-            if scrape
+            if scrape || contact_doesnt_exist(c.contact_id)
 
     			sql = "INSERT INTO xero_contacts (xero_contact_id, name, firstname, lastname,\
     			email, skype_user_name, contact_number, contact_status, updated_date, account_number,\
@@ -95,6 +95,14 @@ class XeroContact < ActiveRecord::Base
     def self.create_in_xero(customer)
         xero = XeroConnection.new.connect
         contact = xero.Contact.build(name: 'ABC Development')
+    end
+
+    def contact_doesnt_exist(contact_id)
+        if XeroContact.where(xero_contact_id: contact_id).count == 0
+            return true
+        else
+            return false
+        end
     end
 
 end
