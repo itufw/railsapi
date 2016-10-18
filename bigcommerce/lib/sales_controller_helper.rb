@@ -115,7 +115,7 @@ module SalesControllerHelper
     elsif period_type == "monthly"
       return 30
     else
-      return nil
+      return 1
     end
   end
       
