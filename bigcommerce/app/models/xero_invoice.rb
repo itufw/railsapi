@@ -44,7 +44,7 @@ class XeroInvoice < ActiveRecord::Base
 
 	  			if valid_invoice(i)
 
-	  				if scrape || invoice_doesnt_exist(i.invoice_id)
+	  				if scrape && invoice_doesnt_exist(i.invoice_id)
 
 	  					sql = "INSERT INTO xero_invoices (xero_invoice_id, invoice_number,\
 						xero_contact_id, contact_name, sub_total, total_tax, total, total_discount,\
