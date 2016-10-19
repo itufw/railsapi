@@ -45,41 +45,41 @@ class XeroInvoice < ActiveRecord::Base
 
 	  			if valid_invoice(i)
 
-	  				if invoice_doesnt_exist(i.invoice_id)
+	  		# 		if invoice_doesnt_exist(i.invoice_id)
 
-	  					sql = "INSERT INTO xero_invoices (xero_invoice_id, invoice_number,\
-						xero_contact_id, contact_name, sub_total, total_tax, total, total_discount,\
-						amount_due, amount_paid, amount_credited, date, due_date, fully_paid_on_date,\
-						expected_payment_date, updated_date, status, line_amount_types, invoice_type,\
-						currency_code, currency_rate, url, reference, branding_theme_id, sent_to_contact,\
-						has_attachments, created_at, updated_at)\
-						VALUES ('#{i.invoice_id}', '#{i.invoice_number}',\
-						'#{i.contact_id}', '#{contact_name}', '#{i.sub_total(true)}', '#{i.total_tax(true)}',\
-						'#{i.total(true)}', '#{i.total_discount}', '#{i.amount_due}', '#{i.amount_paid}',\
-						'#{i.amount_credited}', '#{date}', '#{due_date}', '#{fully_paid_on_date}',\
-						'#{expected_payment_date}', '#{updated_date}', '#{i.status}', '#{i.line_amount_types}',\
-						'#{i.type}', '#{i.currency_code}', '#{i.currency_rate}',\
-						'#{url}', '#{reference}', '#{i.branding_theme_id}', '#{sent_to_contact}',\
-						'#{has_attachments}', '#{time}', '#{time}')"
-						ActiveRecord::Base.connection.execute(sql)
+	  		# 			sql = "INSERT INTO xero_invoices (xero_invoice_id, invoice_number,\
+					# 	xero_contact_id, contact_name, sub_total, total_tax, total, total_discount,\
+					# 	amount_due, amount_paid, amount_credited, date, due_date, fully_paid_on_date,\
+					# 	expected_payment_date, updated_date, status, line_amount_types, invoice_type,\
+					# 	currency_code, currency_rate, url, reference, branding_theme_id, sent_to_contact,\
+					# 	has_attachments, created_at, updated_at)\
+					# 	VALUES ('#{i.invoice_id}', '#{i.invoice_number}',\
+					# 	'#{i.contact_id}', '#{contact_name}', '#{i.sub_total(true)}', '#{i.total_tax(true)}',\
+					# 	'#{i.total(true)}', '#{i.total_discount}', '#{i.amount_due}', '#{i.amount_paid}',\
+					# 	'#{i.amount_credited}', '#{date}', '#{due_date}', '#{fully_paid_on_date}',\
+					# 	'#{expected_payment_date}', '#{updated_date}', '#{i.status}', '#{i.line_amount_types}',\
+					# 	'#{i.type}', '#{i.currency_code}', '#{i.currency_rate}',\
+					# 	'#{url}', '#{reference}', '#{i.branding_theme_id}', '#{sent_to_contact}',\
+					# 	'#{has_attachments}', '#{time}', '#{time}')"
+					# 	ActiveRecord::Base.connection.execute(sql)
 
-					else
+					# else
 
-						# sql = "UPDATE xero_invoices SET invoice_number = '#{i.invoice_number}',\
-						# xero_contact_id = '#{i.contact_id}', contact_name = '#{contact_name}',\
-						# sub_total = '#{i.sub_total(true)}', total_tax = '#{i.total_tax(true)}',\
-						# total = '#{i.total(true)}', total_discount = '#{i.total_discount}',\
-						# amount_due = '#{i.amount_due}', amount_paid = '#{i.amount_paid}',\
-						# amount_credited = '#{i.amount_credited}', date = '#{date}', due_date = '#{due_date}',\
-						# fully_paid_on_date = '#{fully_paid_on_date}', expected_payment_date = '#{expected_payment_date}',\
-						# updated_date = '#{updated_date}', status = '#{i.status}',\
-						# line_amount_types = '#{i.line_amount_types}', invoice_type = '#{i.type}',\
-						# currency_code = '#{i.currency_code}', currency_rate = '#{i.currency_rate}',\
-						# url = '#{url}', reference = '#{i.reference}', branding_theme_id = '#{i.branding_theme_id}',\
-						# sent_to_contact = '#{sent_to_contact}', has_attachments = '#{has_attachments}', updated_at = '#{time}'\
-						# WHERE xero_invoice_id = '#{i.invoice_id}'"
+					# 	# sql = "UPDATE xero_invoices SET invoice_number = '#{i.invoice_number}',\
+					# 	# xero_contact_id = '#{i.contact_id}', contact_name = '#{contact_name}',\
+					# 	# sub_total = '#{i.sub_total(true)}', total_tax = '#{i.total_tax(true)}',\
+					# 	# total = '#{i.total(true)}', total_discount = '#{i.total_discount}',\
+					# 	# amount_due = '#{i.amount_due}', amount_paid = '#{i.amount_paid}',\
+					# 	# amount_credited = '#{i.amount_credited}', date = '#{date}', due_date = '#{due_date}',\
+					# 	# fully_paid_on_date = '#{fully_paid_on_date}', expected_payment_date = '#{expected_payment_date}',\
+					# 	# updated_date = '#{updated_date}', status = '#{i.status}',\
+					# 	# line_amount_types = '#{i.line_amount_types}', invoice_type = '#{i.type}',\
+					# 	# currency_code = '#{i.currency_code}', currency_rate = '#{i.currency_rate}',\
+					# 	# url = '#{url}', reference = '#{i.reference}', branding_theme_id = '#{i.branding_theme_id}',\
+					# 	# sent_to_contact = '#{sent_to_contact}', has_attachments = '#{has_attachments}', updated_at = '#{time}'\
+					# 	# WHERE xero_invoice_id = '#{i.invoice_id}'"
 
-					end
+					# end
 					XeroInvoiceLineItem.new.download_data_from_api(i.line_items, i.invoice_id, i.invoice_number)
 
 
