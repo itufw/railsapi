@@ -19,7 +19,7 @@ class XeroInvoice < ActiveRecord::Base
 
 		xero = XeroConnection.new.connect
 
-  		page_num = 155
+  		page_num = 1
 		
 		invoices = xero.Invoice.all(page: page_num, modified_since: modified_since_time)
 
