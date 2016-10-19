@@ -36,15 +36,15 @@ class ModelsController < ApplicationController
 
     @countries = ProducerCountry.all
     @sub_types = ProductSubType.all
-
     results_val = product_param_filter(params)
 
     @producer_country = results_val[0]
     @product_sub_type = results_val[1]
-    @products = results_val[2].order_by_name.page(params[:page])
+    products = results_val[2]
     @search_text = results_val[3]
 
-    @pending_stock_h = Product.pending_stock(@products.pluck("id"))
+    @pending_stock_h = Product.pending_stock(products.pluck("id"))
+    @products = products.order_by_name.page(params[:page])
 
   end
 

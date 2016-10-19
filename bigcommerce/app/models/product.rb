@@ -186,8 +186,16 @@ class Product < ActiveRecord::Base
 		return find(product_id).product_no_vintage_id
 	end
 
+	def self.no_ws_id(product_id)
+		return find(product_id).product_no_ws_id
+	end
+
 	def self.products_with_same_no_vintage_id(no_vintage_id)
 		return where(product_no_vintage_id: no_vintage_id)
+	end
+
+	def self.products_with_same_no_ws_id(no_ws_id)
+		return where(product_no_ws_id: no_ws_id)
 	end
 
 end
