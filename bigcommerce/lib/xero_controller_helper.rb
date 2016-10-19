@@ -21,6 +21,7 @@ module XeroControllerHelper
 				# TEST CREATING NEW INVOICE
 				xero_contact_id = XeroContact.create_in_xero(Customer.filter_by_id(o.customer_id))
 				Customer.insert_xero_contact_id(o.customer_id, xero_contact_id)
+			# Otherwise just get the xero contact id
 			else
 				xero_contact_id = Customer.get_xero_contact_id(o.customer_id)
 			end
@@ -31,23 +32,35 @@ module XeroControllerHelper
 	end
 
 	def create_invoice(order)
+		# We want the order total in Bigc to be the order total in Xero
+		# All other values are different so we have to start from the ground up
+
+		# Calculate original order total by summing totals of order products
+		# see if a discount was applied, if yes get the rate, otherwise return 1
 		discount_rate = get_discount_rate(order)
 
+		# Unit amounts for xero line items include tax
+		# Get total for each order product by qty * price per bottle
+		# Then apply discount, then divide by qty to get the unit amount
 		line_items_unit_amount_h = Hash.new
 		order.order_products.each { |op| line_items_unit_amount_h[op.id] = discounted_unit_amount(op.price_inc_tax, op.qty, discount_rate) }
 
+		# multiply unit amount by quantity to get line amount total
 		line_items_totals_h = Hash.new
 		order.order_products.each { |op| line_items_totals_h[op.id] = discounted_line_item_total(discounted_unit_amount(op.price_inc_tax, op.qty, discount_rate), op.qty) }
 		
+		# line amount totals / 1 + GST/100 gives tax amount
 		line_items_tax_h = Hash.new
 		line_items_totals_h.each { |order_product_id, total| line_items_tax_h[order_product_id] = gst_price(total) }
 
+		# sum tax values first, then get sub total
 		invoice_total_tax = line_items_tax_h.values.sum
 		invoice_sub_total = calculate_subtotal(order.total_inc_tax, invoice_total_tax)
 		#invoice = XeroInvoice.create_in_xero(contact, o, invoice_sub_total, invoice_total_tax)
 
 		#invoice_with_line_items = XeroInvoiceLineItem.add_line_items(invoice, order.order_products, line_items_unit_amount_h, line_items_totals_h, line_items_tax_h)
 
+		# add shipping as a line item
 		# invoice_with_line_items.add_line_item(item_code: 'SHIPPING',\
 		#  description: 'Shipping Costs - Shipping - Fastway', quantity: 1, unit_amount: order.shipping_cost_inc_tax,\
 		#  account_code: TaxCode.shipping_tax_code, tax_type: 'OUTPUT', tax_amount: gst_price(order.shipping_cost_inc_tax),\
