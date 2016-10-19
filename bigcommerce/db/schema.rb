@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161017033920) do
+ActiveRecord::Schema.define(version: 20161019000146) do
 
   create_table "addresses", force: :cascade do |t|
     t.integer  "customer_id", limit: 4
@@ -527,7 +527,6 @@ ActiveRecord::Schema.define(version: 20161017033920) do
     t.string   "tax_number",                      limit: 255
     t.string   "bank_account_details",            limit: 255
     t.string   "accounts_receivable_tax_type",    limit: 255
-    t.string   "accounts_payable_tax_type",       limit: 255
     t.string   "contact_groups",                  limit: 255
     t.string   "default_currency",                limit: 255
     t.string   "purchases_default_account_code",  limit: 255

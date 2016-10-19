@@ -193,7 +193,7 @@ class Customer < ActiveRecord::Base
 		where(xero_contact_id: nil)
 	end
 
-	def self.new_customer_for_xero(customer_id)
+	def self.is_new_customer_for_xero(customer_id)
 		customer = Customer.find(customer_id)
 		if customer.xero_contact_id.nil?
 			return true
@@ -204,6 +204,10 @@ class Customer < ActiveRecord::Base
 
 	def self.get_xero_contact_id(customer_id)
 		return find(customer_id).xero_contact_id
+	end
+
+	def self.is_wholesale(customer_id)
+		return filter_by_id(customer_id).cust_type_id == 3
 	end
 
 end

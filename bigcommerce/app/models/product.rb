@@ -182,4 +182,8 @@ class Product < ActiveRecord::Base
 		order('name ASC')
 	end
 
+	def self.product_name(product_id)
+		return find(product_id).name
+	end
+
 end
