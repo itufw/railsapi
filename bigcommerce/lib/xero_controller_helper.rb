@@ -27,8 +27,7 @@ module XeroControllerHelper
 			# create a new invoice with line items
 			xero_invoice_id = create_invoice(o)
 			Order.insert_invoice(o.id, xero_invoice_id, o.id)
-		end
-			
+		end		
 	end
 
 	def create_invoice(order)
