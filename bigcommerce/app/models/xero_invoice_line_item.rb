@@ -38,9 +38,9 @@ class XeroInvoiceLineItem < ActiveRecord::Base
 
 	def invoice_line_item_doesnt_exist(line_item_id)
 		if XeroInvoiceLineItem.where(xero_invoice_line_item_id: line_item_id).count > 0
-			return true
-		else
 			return false
+		else
+			return true
 		end
 	end
 
