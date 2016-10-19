@@ -117,10 +117,11 @@ class SalesController < ApplicationController
   def stats_and_top_customers_for_product
     @product_id = params[:product_id]
     @product_name = params[:product_name]
-    @total_stock = total_stock_product(@product_id, params[:total_stock])
+    @total_stock = params[:total_stock]
+    @total_stock_no_ws = total_stock_product(@product_id, params[:total_stock])
     @selected_period, @period_types = define_period_types(params)
 
-    @time_periods_name, @all_stats, @sum_stats, @avg_stats, customer_ids, @monthly_supply = stats_for_timeperiods("Order.product_filter(%s).valid_order" % @product_id, :group_by_customerid, :sum_order_product_qty, @total_stock, @selected_period)
+    @time_periods_name, @all_stats, @sum_stats, @avg_stats, customer_ids, @monthly_supply = stats_for_timeperiods("Order.product_filter(%s).valid_order" % @product_id, :group_by_customerid, :sum_order_product_qty, @total_stock_no_ws, @selected_period)
 
     @staffs = staff_dropdown
 

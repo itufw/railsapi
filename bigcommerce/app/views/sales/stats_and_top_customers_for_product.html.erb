@@ -1,6 +1,7 @@
 <%= title @product_name %>
-<h3><%= @product_name %></h3>
+<h3><%= @product_name %></h3><br/>
 <h4>Total Stock : <%= @total_stock %></h4>
+<h4>Total Stock (WS &amp; Retail) : <%= @total_stock_no_ws %></h4>
 
 <div style="margin-top: 50px;">
 <%= form_tag({:action => "stats_and_top_customers_for_product" }, {:method => "get"}) do %>
