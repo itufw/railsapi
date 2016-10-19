@@ -33,9 +33,11 @@ class OrderProduct < ActiveRecord::Base
 	    ActiveRecord::Base.connection.execute(delete_order_product)
 	end
 
+	# Inc Tax
 	def self.order_sum(order_products)
 		order_total = 0
 		order_products.each {|o| order_total += (o.qty * o.price_inc_tax)}
 		return order_total
 	end
+
 end

@@ -13,4 +13,5 @@ class CustType < ActiveRecord::Base
 			CustType.create(id: row_hash['Id'], name: row_hash['CustTypeName'])
 		end
 	end
+
 end

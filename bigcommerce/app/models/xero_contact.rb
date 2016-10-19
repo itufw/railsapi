@@ -13,7 +13,7 @@ class XeroContact < ActiveRecord::Base
     has_many :xero_overpayments
     has_many :xero_receipts
 
-    def download_data_from_api(modified_since_time, scrape)
+    def download_data_from_api(modified_since_time)
     	xero = XeroConnection.new.connect
 
     	contacts = xero.Contact.all(modified_since: modified_since_time)
@@ -42,40 +42,41 @@ class XeroContact < ActiveRecord::Base
 
 			time = Time.now.to_s(:db)
 
-            if scrape || contact_doesnt_exist(c.contact_id)
+            if contact_doesnt_exist(c.contact_id)
 
     			sql = "INSERT INTO xero_contacts (xero_contact_id, name, firstname, lastname,\
     			email, skype_user_name, contact_number, contact_status, updated_date, account_number,\
-    			tax_number, bank_account_details, accounts_receivable_tax_type, accounts_payable_tax_type,\
+    			tax_number, bank_account_details, accounts_receivable_tax_type,\
     			contact_groups, default_currency, purchases_default_account_code, sales_default_account_code,\
     			is_supplier, is_customer, created_at, updated_at, accounts_receivable_outstanding,\
                 accounts_receivable_overdue)\
     	  		VALUES ('#{c.contact_id}', '#{contact_name}', '#{firstname}', '#{lastname}',\
     	  		'#{email}', '#{skype}', '#{c.contact_number}', '#{c.contact_status}',\
     	  		'#{updated_date}', '#{c.account_number}', '#{c.tax_number}', '#{c.bank_account_details}',\
-    	  		'#{c.accounts_receivable_tax_type}', '#{c.accounts_payable_tax_type}', '#{contact_groups}',\
+    	  		'#{c.accounts_receivable_tax_type}', '#{contact_groups}',\
     	  		'#{c.default_currency}', '#{c.purchases_default_account_code}', '#{c.sales_default_account_code}',\
     	  		'#{is_supplier}', '#{is_customer}', '#{time}', '#{time}', '#{accounts_receivable_outstanding}',\
                 '#{accounts_receivable_overdue}')"
+                ActiveRecord::Base.connection.execute(sql)
 
             else
 
-                sql = "UPDATE xero_contacts SET name = '#{contact_name}', firstname = '#{firstname}',\
-                lastname = '#{lastname}', email = '#{email}', skype_user_name = '#{skype}',\
-                contact_number = '#{c.contact_number}', contact_status = '#{c.contact_status}',\
-                updated_date = '#{updated_date}', account_number = '#{c.account_number}',\
-                tax_number = '#{c.tax_number}', bank_account_details = '#{c.bank_account_details}',\
-                accounts_receivable_tax_type = '#{c.accounts_receivable_tax_type}',\
-                accounts_payable_tax_type = '#{c.accounts_payable_tax_type}', contact_groups = '#{contact_groups}',\
-                default_currency = '#{c.default_currency}', purchases_default_account_code = '#{c.purchases_default_account_code}',\
-                sales_default_account_code = '#{c.sales_default_account_code}', is_supplier = '#{is_supplier}',\
-                is_customer = '#{is_customer}', accounts_receivable_outstanding = '#{accounts_receivable_outstanding}',\
-                accounts_receivable_overdue = '#{accounts_receivable_overdue}', updated_at = '#{time}'\
-                WHERE xero_contact_id = '#{c.contact_id}'"
+                # sql = "UPDATE xero_contacts SET name = '#{contact_name}', firstname = '#{firstname}',\
+                # lastname = '#{lastname}', email = '#{email}', skype_user_name = '#{skype}',\
+                # contact_number = '#{c.contact_number}', contact_status = '#{c.contact_status}',\
+                # updated_date = '#{updated_date}', account_number = '#{c.account_number}',\
+                # tax_number = '#{c.tax_number}', bank_account_details = '#{c.bank_account_details}',\
+                # accounts_receivable_tax_type = '#{c.accounts_receivable_tax_type}',\
+                # contact_groups = '#{contact_groups}',\
+                # default_currency = '#{c.default_currency}', purchases_default_account_code = '#{c.purchases_default_account_code}',\
+                # sales_default_account_code = '#{c.sales_default_account_code}', is_supplier = '#{is_supplier}',\
+                # is_customer = '#{is_customer}', accounts_receivable_outstanding = '#{accounts_receivable_outstanding}',\
+                # accounts_receivable_overdue = '#{accounts_receivable_overdue}', updated_at = '#{time}'\
+                # WHERE xero_contact_id = '#{c.contact_id}'"
 
             end
 
-	  		ActiveRecord::Base.connection.execute(sql)
+	  		# ActiveRecord::Base.connection.execute(sql)
 		end
     end
 
@@ -93,8 +94,21 @@ class XeroContact < ActiveRecord::Base
     end
 
     def self.create_in_xero(customer)
+        c = customer
         xero = XeroConnection.new.connect
-        contact = xero.Contact.build(name: 'ABC Development')
+        contact = xero.Contact.build(name: name(c.firstname + c.lastname, c.id), first_name: c.firstname,\
+            last_name: c.lastname, email_address: c.email, skype_user_name: c.id,\
+            contact_number: c.phone, contact_status: 'Active', is_customer: true)
+        contact.save
+        return contact.contact_id
+    end
+
+    def name(firstname, lastname, customer_id)
+        if Customer.is_wholesale(customer_id)
+            return ''
+        else
+            return firstname + ' ' + lastname
+        end
     end
 
     def contact_doesnt_exist(contact_id)
