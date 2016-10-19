@@ -35,7 +35,7 @@ class OrderProduct < ActiveRecord::Base
 
 	# Inc Tax
 	def self.order_sum(order_products)
-		order_total = 0
+		order_total = 0.0
 		order_products.each {|o| order_total += (o.qty * o.price_inc_tax)}
 		return order_total
 	end
