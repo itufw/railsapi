@@ -125,4 +125,9 @@ module DatesHelper
     return [date.month.to_i, date.year.to_i]
   end
 
+  def calculate_invoice_due_date(date_created, customer)
+    num_days_since_date_created = Customer.due_date_num_days(customer)
+    return num_days_since_date_created.since(date_created)
+  end
+
 end

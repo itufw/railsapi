@@ -14,90 +14,148 @@ module XeroControllerHelper
 
 	def xero_sync
 		# We have a new orders from BigC
-		new_orders = Order.xero_invoice_id_is_null
-		new_orders.each do |o|
-			# If its a new customer then create a new contact in Xero
-			if Customer.is_new_customer_for_xero(o.customer_id)
-				# TEST CREATING NEW INVOICE
-				xero_contact_id = XeroContact.create_in_xero(Customer.filter_by_id(o.customer_id))
-				Customer.insert_xero_contact_id(o.customer_id, xero_contact_id)
-			# Otherwise just get the xero contact id
-			else
-				xero_contact_id = Customer.get_xero_contact_id(o.customer_id)
-			end
-			# create a new invoice with line items
-			xero_invoice_id = create_invoice(o)
-			Order.insert_invoice(o.id, xero_invoice_id, o.id)
-		end		
+		# new_orders = Order.xero_invoice_id_is_null
+		# new_orders.each do |o|
+		# 	# If its a new customer then create a new contact in Xero
+		# 	if Customer.is_new_customer_for_xero(o.customer_id)
+		# 		# TEST CREATING NEW INVOICE
+		# 		xero_contact_id = XeroContact.create_in_xero(Customer.filter_by_id(o.customer_id))
+		# 		Customer.insert_xero_contact_id(o.customer_id, xero_contact_id)
+		# 	# Otherwise just get the xero contact id
+		# 	else
+		# 		xero_contact_id = Customer.get_xero_contact_id(o.customer_id)
+		# 	end
+		# 	# create a new invoice with line items
+		# 	invoice_not_saved = XeroInvoice.create_in_xero(o.customer, o)
+		# 	#Order.insert_invoice(o.id, xero_invoice_id, o.id)
+		# end		
 	end
 
-	def create_invoice(order)
-		# We want the order total in Bigc to be the order total in Xero
-		# All other values are different so we have to start from the ground up
+	def invoice_line_items(order)
+		order_id = order.id
+		is_customer_wholesale = Customer.is_wholesale(order.customer)
+		order_products = order.order_products
+		order_total = order.total_inc_tax
 
-		# Calculate original order total by summing totals of order products
-		# see if a discount was applied, if yes get the rate, otherwise return 1
 		discount_rate = get_discount_rate(order)
 
-		# Unit amounts for xero line items include tax
-		# Get total for each order product by qty * price per bottle
-		# Then apply discount, then divide by qty to get the unit amount
-		line_items_unit_amount_h = Hash.new
-		order.order_products.each { |op| line_items_unit_amount_h[op.id] = discounted_unit_amount(op.price_inc_tax, op.qty, discount_rate) }
+		discounted_unit_price = Hash.new
+		order_products.each { |op| discounted_unit_price[op.id] = (op.price_inc_tax * discount_rate) }
 
-		# multiply unit amount by quantity to get line amount total
-		line_items_totals_h = Hash.new
-		order.order_products.each { |op| line_items_totals_h[op.id] = discounted_line_item_total(discounted_unit_amount(op.price_inc_tax, op.qty, discount_rate), op.qty) }
+		discounted_ex_gst_unit_price = Hash.new
+		discounted_unit_price.each {|op_id, d| discounted_ex_gst_unit_price[op_id] =  get_ex_gst_price(d)}
+
+		inc_gst_shipping_price = order.shipping_cost_inc_tax
+		ex_gst_shipping_price = get_ex_gst_price(inc_gst_shipping_price)
+
+		if is_customer_wholesale
+			wholesale_line_items(discount_rate, discounted_unit_price, discounted_ex_gst_unit_price,\
+			inc_gst_shipping_price, ex_gst_shipping_price, order_id, order_products, order)
+		else
+			retail_line_items(discount_rate, discounted_unit_price, discounted_ex_gst_unit_price,\
+			inc_gst_shipping_price, ex_gst_shipping_price, order_id, order_products)
+		end
+
+	end
+
+	def retail_line_items(discount_rate, discounted_unit_price, discounted_ex_gst_unit_price,\
+		inc_gst_shipping_price, ex_gst_shipping_price, invoice_number, order_products)
 		
-		# line amount totals / 1 + GST/100 gives tax amount
-		line_items_tax_h = Hash.new
-		line_items_totals_h.each { |order_product_id, total| line_items_tax_h[order_product_id] = gst_price(total) }
+		order_products.each do |op|
+			op_id = op.id
+			product_id = op.product_id
+			product_name = Product.product_name(product_id)
+			XeroCalculation.insert_line_items_retail(invoice_number, product_id, product_name, op.qty,\
+			op.price_inc_tax, discount_rate, discounted_unit_price[op_id],\
+			discounted_ex_gst_unit_price[op_id])
+		end
 
-		# sum tax values first, then get sub total
-		invoice_total_tax = line_items_tax_h.values.sum
-		invoice_sub_total = calculate_subtotal(order.total_inc_tax, invoice_total_tax)
-		#invoice = XeroInvoice.create_in_xero(contact, o, invoice_sub_total, invoice_total_tax)
+		XeroCalculation.insert_shipping_calculation(invoice_number, inc_gst_shipping_price,\
+		ex_gst_shipping_price)
+	end
 
-		#invoice_with_line_items = XeroInvoiceLineItem.add_line_items(invoice, order.order_products, line_items_unit_amount_h, line_items_totals_h, line_items_tax_h)
+	def wholesale_line_items(discount_rate, discounted_unit_price, discounted_ex_gst_unit_price,\
+		inc_gst_shipping_price, ex_gst_shipping_price, invoice_number, order_products, order)
 
-		# add shipping as a line item
-		# invoice_with_line_items.add_line_item(item_code: 'SHIPPING',\
-		#  description: 'Shipping Costs - Shipping - Fastway', quantity: 1, unit_amount: order.shipping_cost_inc_tax,\
-		#  account_code: TaxCode.shipping_tax_code, tax_type: 'OUTPUT', tax_amount: gst_price(order.shipping_cost_inc_tax),\
-		#  line_amount: order.shipping_cost_inc_tax)
+		order_total = order.total_inc_tax
 
-		# invoice_with_line_items.save
-		# return invoice_with_line_items.invoice_id
+		discounted_ex_taxes_unit_price = Hash.new
+		discounted_ex_gst_unit_price.each {|op_id, d| discounted_ex_taxes_unit_price[op_id] = get_ex_taxes_price(d)}
+
+		wet_unadjusted_order_product_price = Hash.new
+		discounted_ex_taxes_unit_price.each {|op_id, d| wet_unadjusted_order_product_price[op_id] = wet_unadjusted_order_product(d, op_id)}
+	
+		wet_unadjusted_total = wet_unadjusted_order_product_price.values.sum
+
+		ship_deduction = calculate_ship_deduction(order.qty)
+
+		subtotal_ex_gst = (get_ex_gst_price(order_total) - ex_gst_shipping_price - ship_deduction)
+
+		wet_adjusted = (subtotal_ex_gst - get_ex_taxes_price(subtotal_ex_gst))
+
+		adjustment = (wet_unadjusted_total - wet_adjusted)
+
+		line_amounts_total_ex_taxes = 0
+		discounted_ex_taxes_unit_price.each {|op_id, d| line_amounts_total_ex_taxes += d.round(2) * OrderProduct.total_qty(op_id) }
+
+		total_ex_gst = line_amounts_total_ex_taxes.round(2) + wet_adjusted.round(2) + adjustment.round(2) + ex_gst_shipping_price.round(2)
+
+		gst = get_inc_gst_price(total_ex_gst)
+		
+		rounding_error = order.total_inc_tax - total_ex_gst - gst
+
+		order_products.each do |op|
+			op_id = op.id
+			product_id = op.product_id
+			product_name = Product.product_name(product_id)
+
+			XeroCalculation.insert_line_items_ws(invoice_number, product_id, product_name,\
+	 		op.qty, op.price_inc_tax, discount_rate, discounted_unit_price[op_id],\
+	 		discounted_ex_gst_unit_price[op_id], discounted_ex_taxes_unit_price[op_id],\
+	 		wet_unadjusted_order_product_price[op_id])
+		end
+
+		XeroCalculation.insert_wet_calculation(invoice_number, wet_unadjusted_total, ship_deduction,\
+		subtotal_ex_gst, wet_adjusted)
+
+		XeroCalculation.insert_adjustment(invoice_number, adjustment)
+
+		XeroCalculation.insert_shipping_calculation(invoice_number, inc_gst_shipping_price,\
+		ex_gst_shipping_price)
+
+		XeroCalculation.insert_rounding(invoice_number, line_amounts_total_ex_taxes,\
+	 	ex_gst_shipping_price, total_ex_gst, gst, order_total, rounding_error)
 	end
 
 	def get_discount_rate(order)
-		order_total = order.total_inc_tax
+		order_total_ex_shipping = order.total_inc_tax - order.shipping_cost_inc_tax
 		order_product_total = OrderProduct.order_sum(order.order_products)
-		if order_total === order_product_total
-			return 1
-		else
-		 	return order_total.to_f/order_product_total
-		end
-		return order_product_total
+		return order_total_ex_shipping/order_product_total
 	end
 
-		# Inc Tax 
-		# Also Invoice Line Item's Unit Amount
-	def discounted_unit_amount(op_price_inc_tax, op_qty, discount_rate)
-		total = op_price_inc_tax * op_qty * discount_rate
-		return (total.to_f/op_qty).round(2)
+	def get_ex_gst_price(inc_gst_price)
+		return inc_gst_price/(1 + (TaxPercentage.gst_percentage/100))
 	end
 
-	def discounted_line_item_total(op_discounted_total_per_qty, qty)
-		return (op_discounted_total_per_qty * qty).round(2)
+	def get_inc_gst_price(ex_gst_price)
+		return ex_gst_price * (TaxPercentage.gst_percentage/100)
 	end
 
-	def gst_price(inc_gst_price)
-		return (inc_gst_price/(1 + TaxPercentage.gst_percentage)).round(2)
+	# But only if customer type is Retail
+	def get_ex_taxes_price(ex_gst_price)
+		return ex_gst_price/(1 + (TaxPercentage.wet_percentage/100))
 	end
 
-	def calculate_subtotal(total, total_tax)
-		return total - total_tax
+	def wet_unadjusted_order_product(ex_taxes_unit_price, order_product_id)
+		qty = OrderProduct.total_qty(order_product_id)
+		return ((qty * ex_taxes_unit_price) * (TaxPercentage.wet_percentage/100))
 	end
+
+	def calculate_ship_deduction(qty)
+		ship_charge = TaxPercentage.ship_charge_percentage/100
+		ex_gst_ship_charge = get_ex_gst_price(ship_charge)
+		return qty * ex_gst_ship_charge
+	end
+
 
 end

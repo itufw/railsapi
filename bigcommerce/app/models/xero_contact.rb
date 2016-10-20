@@ -61,22 +61,22 @@ class XeroContact < ActiveRecord::Base
 
             else
 
-                # sql = "UPDATE xero_contacts SET name = '#{contact_name}', firstname = '#{firstname}',\
-                # lastname = '#{lastname}', email = '#{email}', skype_user_name = '#{skype}',\
-                # contact_number = '#{c.contact_number}', contact_status = '#{c.contact_status}',\
-                # updated_date = '#{updated_date}', account_number = '#{c.account_number}',\
-                # tax_number = '#{c.tax_number}', bank_account_details = '#{c.bank_account_details}',\
-                # accounts_receivable_tax_type = '#{c.accounts_receivable_tax_type}',\
-                # contact_groups = '#{contact_groups}',\
-                # default_currency = '#{c.default_currency}', purchases_default_account_code = '#{c.purchases_default_account_code}',\
-                # sales_default_account_code = '#{c.sales_default_account_code}', is_supplier = '#{is_supplier}',\
-                # is_customer = '#{is_customer}', accounts_receivable_outstanding = '#{accounts_receivable_outstanding}',\
-                # accounts_receivable_overdue = '#{accounts_receivable_overdue}', updated_at = '#{time}'\
-                # WHERE xero_contact_id = '#{c.contact_id}'"
+                sql = "UPDATE xero_contacts SET name = '#{contact_name}', firstname = '#{firstname}',\
+                lastname = '#{lastname}', email = '#{email}', skype_user_name = '#{skype}',\
+                contact_number = '#{c.contact_number}', contact_status = '#{c.contact_status}',\
+                updated_date = '#{updated_date}', account_number = '#{c.account_number}',\
+                tax_number = '#{c.tax_number}', bank_account_details = '#{c.bank_account_details}',\
+                accounts_receivable_tax_type = '#{c.accounts_receivable_tax_type}',\
+                contact_groups = '#{contact_groups}',\
+                default_currency = '#{c.default_currency}', purchases_default_account_code = '#{c.purchases_default_account_code}',\
+                sales_default_account_code = '#{c.sales_default_account_code}', is_supplier = '#{is_supplier}',\
+                is_customer = '#{is_customer}', accounts_receivable_outstanding = '#{accounts_receivable_outstanding}',\
+                accounts_receivable_overdue = '#{accounts_receivable_overdue}', updated_at = '#{time}'\
+                WHERE xero_contact_id = '#{c.contact_id}'"
 
             end
 
-	  		# ActiveRecord::Base.connection.execute(sql)
+	  		ActiveRecord::Base.connection.execute(sql)
 		end
     end
 
