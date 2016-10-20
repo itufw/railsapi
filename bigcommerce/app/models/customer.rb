@@ -206,8 +206,16 @@ class Customer < ActiveRecord::Base
 		return find(customer_id).xero_contact_id
 	end
 
-	def self.is_wholesale(customer_id)
-		return filter_by_id(customer_id).cust_type_id == 3
+	def self.is_wholesale(customer)
+		return customer.cust_type_id == 3
 	end
+
+	# def self.due_date_num_days(customer)
+	# 	if customer.end_of_month.nil?
+	# 		return customer.num_days
+	# 	else
+			
+	# 	end
+	# end
 
 end

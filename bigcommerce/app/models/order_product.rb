@@ -40,4 +40,8 @@ class OrderProduct < ActiveRecord::Base
 		return order_total
 	end
 
+	def self.total_qty(order_product_id)
+		return find(order_product_id).qty
+	end
+
 end

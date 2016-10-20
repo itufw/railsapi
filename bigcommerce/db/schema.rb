@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161019000146) do
+ActiveRecord::Schema.define(version: 20161020165807) do
 
   create_table "addresses", force: :cascade do |t|
     t.integer  "customer_id", limit: 4
@@ -102,6 +102,8 @@ ActiveRecord::Schema.define(version: 20161019000146) do
     t.integer  "cust_style_id",           limit: 4
     t.string   "region",                  limit: 255
     t.string   "xero_contact_id",         limit: 36
+    t.integer  "num_days",                limit: 4
+    t.integer  "end_of_month",            limit: 4
   end
 
   add_index "customers", ["cust_group_id"], name: "index_customers_on_cust_group_id", using: :btree
@@ -318,6 +320,15 @@ ActiveRecord::Schema.define(version: 20161019000146) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "product_no_ws", force: :cascade do |t|
+    t.string   "name",                  limit: 255
+    t.integer  "product_no_vintage_id", limit: 4
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+  end
+
+  add_index "product_no_ws", ["product_no_vintage_id"], name: "index_product_no_ws_on_product_no_vintage_id", using: :btree
+
   create_table "product_package_types", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -414,6 +425,7 @@ ActiveRecord::Schema.define(version: 20161019000146) do
     t.integer  "product_sub_type_id",       limit: 4
     t.integer  "product_package_type_id",   limit: 4
     t.integer  "product_no_vintage_id",     limit: 4
+    t.integer  "product_no_ws_id",          limit: 4
   end
 
   create_table "revisions", force: :cascade do |t|
@@ -479,13 +491,6 @@ ActiveRecord::Schema.define(version: 20161019000146) do
     t.integer  "valid_order", limit: 1
   end
 
-  create_table "tax_codes", force: :cascade do |t|
-    t.string   "customer_type", limit: 255
-    t.string   "tax_code",      limit: 255
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-  end
-
   create_table "tax_percentages", force: :cascade do |t|
     t.string   "tax_name",       limit: 255
     t.decimal  "tax_percentage",             precision: 8, scale: 2
@@ -497,6 +502,42 @@ ActiveRecord::Schema.define(version: 20161019000146) do
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+  end
+
+  create_table "xero_account_codes", force: :cascade do |t|
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+    t.string   "account_code", limit: 255
+    t.string   "account_name", limit: 255
+    t.string   "tax_type",     limit: 255
+  end
+
+  create_table "xero_calculations", force: :cascade do |t|
+    t.string   "invoice_number",                     limit: 255
+    t.string   "item_code",                          limit: 255
+    t.string   "description",                        limit: 255
+    t.integer  "qty",                                limit: 4
+    t.decimal  "unit_price_inc_tax",                             precision: 10, scale: 4
+    t.decimal  "discount_rate",                                  precision: 10, scale: 4
+    t.decimal  "discounted_unit_price",                          precision: 10, scale: 4
+    t.decimal  "discounted_ex_gst_unit_price",                   precision: 10, scale: 4
+    t.decimal  "discounted_ex_taxes_unit_price",                 precision: 10, scale: 4
+    t.decimal  "wet_unadjusted_order_product_price",             precision: 10, scale: 4
+    t.decimal  "wet_unadjusted_total",                           precision: 10, scale: 4
+    t.decimal  "ship_deduction",                                 precision: 10, scale: 4
+    t.decimal  "subtotal_ex_gst",                                precision: 10, scale: 4
+    t.decimal  "wet_adjusted",                                   precision: 10, scale: 4
+    t.decimal  "adjustment",                                     precision: 10, scale: 4
+    t.decimal  "line_amounts_total_ex_taxes",                    precision: 8,  scale: 2
+    t.decimal  "shipping_ex_gst",                                precision: 8,  scale: 2
+    t.decimal  "total_ex_gst",                                   precision: 8,  scale: 2
+    t.decimal  "gst",                                            precision: 8,  scale: 2
+    t.decimal  "order_total",                                    precision: 8,  scale: 2
+    t.decimal  "rounding_error",                                 precision: 8,  scale: 2
+    t.string   "account_code",                       limit: 255
+    t.string   "tax_type",                           limit: 255
+    t.datetime "created_at",                                                              null: false
+    t.datetime "updated_at",                                                              null: false
   end
 
   create_table "xero_cn_allocations", primary_key: "xero_cn_allocation_id", force: :cascade do |t|
