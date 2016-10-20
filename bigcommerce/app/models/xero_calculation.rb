@@ -57,8 +57,13 @@ class XeroCalculation < ActiveRecord::Base
 			description: product_name, qty: qty, unit_price_inc_tax: op_unit_price,\
 			discount_rate: discount_rate, discounted_unit_price: discounted_unit_price,\
 			discounted_ex_gst_unit_price: discounted_ex_gst_unit_price,\
+			discounted_ex_taxes_unit_price: discounted_ex_gst_unit_price,\
 			account_code: retail_account.account_code,\
 			tax_type: retail_account.tax_type)
+	end
+
+	def self.get_line_items(invoice_number)
+		where(invoice_number: invoice_number)
 	end
 
 
