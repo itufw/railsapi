@@ -13,7 +13,7 @@ module XeroControllerHelper
 	end
 
 	def xero_sync
-		We have a new orders from BigC
+		# We have a new orders from BigC
 		new_orders = Order.xero_invoice_id_is_null
 		new_orders.each do |o|
 
