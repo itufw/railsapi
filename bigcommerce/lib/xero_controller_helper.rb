@@ -13,22 +13,26 @@ module XeroControllerHelper
 	end
 
 	def xero_sync
-		# We have a new orders from BigC
-		# new_orders = Order.xero_invoice_id_is_null
-		# new_orders.each do |o|
-		# 	# If its a new customer then create a new contact in Xero
-		# 	if Customer.is_new_customer_for_xero(o.customer_id)
-		# 		# TEST CREATING NEW INVOICE
-		# 		xero_contact_id = XeroContact.create_in_xero(Customer.filter_by_id(o.customer_id))
-		# 		Customer.insert_xero_contact_id(o.customer_id, xero_contact_id)
-		# 	# Otherwise just get the xero contact id
-		# 	else
-		# 		xero_contact_id = Customer.get_xero_contact_id(o.customer_id)
-		# 	end
-		# 	# create a new invoice with line items
-		# 	invoice_not_saved = XeroInvoice.create_in_xero(o.customer, o)
-		# 	#Order.insert_invoice(o.id, xero_invoice_id, o.id)
-		# end		
+		We have a new orders from BigC
+		new_orders = Order.xero_invoice_id_is_null
+		new_orders.each do |o|
+
+			order_id = o.id
+			customer_id = o.customer_id
+			# If its a new customer then create a new contact in Xero
+			if Customer.is_new_customer_for_xero(customer_id)
+				# TEST CREATING NEW INVOICE
+				xero_contact_id = XeroContact.create_in_xero(Customer.filter_by_id(customer_id))
+				Customer.insert_xero_contact_id(customer_id, xero_contact_id)
+			# Otherwise just get the xero contact id
+			else
+				xero_contact_id = Customer.get_xero_contact_id(customer_id)
+			end
+			# create a new invoice with line items
+			invoice_not_saved = XeroInvoice.create_in_xero(o.customer, o)
+			xero_invoice_id = add_line_items(invoice_unsaved, order_id)
+			Order.insert_invoice(order_id, xero_invoice_id)
+		end		
 	end
 
 	def invoice_line_items(order)
@@ -157,5 +161,16 @@ module XeroControllerHelper
 		return qty * ex_gst_ship_charge
 	end
 
+	def add_line_items(invoice_unsaved, invoice_number)
+		line_items = XeroCalculation.get_line_items(invoice_number)
+		line_items.each do |l|
+			invoice_unsaved.add_line_item(item_code: l.item_code,\
+			description: l.description, quantity: l.qty, unit_amount: l.discounted_ex_taxes_unit_price,\
+			tax_type: l.tax_type, account_code: l.account_code
+		end
+
+		invoice = invoice_unsaved.save
+		return invoice.invoice_id
+	end
 
 end

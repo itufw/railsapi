@@ -44,10 +44,4 @@ class XeroInvoiceLineItem < ActiveRecord::Base
 		end
 	end
 
-	def self.add_line_items(invoice)
-		
-
-		return invoice
-	end
-
 end
