@@ -207,7 +207,7 @@ class Customer < ActiveRecord::Base
 	end
 
 	def self.is_wholesale(customer)
-		return customer.cust_type_id == 3
+		return customer.cust_type_id == 2
 	end
 
 	def self.xero_contact_id_of_duplicate_customer(customer_name)
