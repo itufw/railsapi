@@ -1,4 +1,8 @@
+require 'clean_data.rb'
+
 class XeroCalculation < ActiveRecord::Base
+
+	include CleanData
 
 	def self.insert_shipping_calculation(invoice_number, shipping_inc_tax, shipping_ex_tax)
 		shipping_account = XeroAccountCode.shipping_revenue
@@ -30,10 +34,13 @@ class XeroCalculation < ActiveRecord::Base
 	# ADD TAX CODE
 	def self.insert_rounding(invoice_number, line_amounts_total_ex_taxes, shipping_ex_gst,\
 		total_ex_gst, gst, order_total, rounding_error)
+		wholesale_account = XeroAccountCode.wholesale
 		create(invoice_number: invoice_number, item_code: "Rounding", description: "Rounding Error",\
 			qty: 1, line_amounts_total_ex_taxes: line_amounts_total_ex_taxes,\
 			shipping_ex_gst: shipping_ex_gst, total_ex_gst: total_ex_gst, gst: gst,\
-			order_total: order_total, rounding_error: rounding_error)
+			order_total: order_total, rounding_error: rounding_error,\
+			account_code: wholesale_account.account_code,\
+			tax_type: wholesale_account.tax_type)
 	end
 
 	def self.insert_line_items_ws(invoice_number, product_id, product_name, qty, op_unit_price,\
@@ -53,8 +60,10 @@ class XeroCalculation < ActiveRecord::Base
 	def self.insert_line_items_retail(invoice_number, product_id, product_name, qty,\
 		op_unit_price, discount_rate, discounted_unit_price, discounted_ex_gst_unit_price)
 		retail_account = XeroAccountCode.retail
+
+		clean_product_name = CleanData.remove_latin_chars(product_name)
 		create(invoice_number: invoice_number, item_code: product_id.to_s,\
-			description: product_name, qty: qty, unit_price_inc_tax: op_unit_price,\
+			description: clean_product_name, qty: qty, unit_price_inc_tax: op_unit_price,\
 			discount_rate: discount_rate, discounted_unit_price: discounted_unit_price,\
 			discounted_ex_gst_unit_price: discounted_ex_gst_unit_price,\
 			discounted_ex_taxes_unit_price: discounted_ex_gst_unit_price,\
@@ -65,7 +74,5 @@ class XeroCalculation < ActiveRecord::Base
 	def self.get_line_items(invoice_number)
 		where(invoice_number: invoice_number)
 	end
-
-
 
 end

@@ -1,9 +1,19 @@
+require 'xero_connection.rb'
+
 module XeroControllerHelper
 
 	def link_skype_id(customer_id)
 		xero_contact = XeroContact.find_by_skype_id(customer_id)
 		contact_id = xero_contact.xero_contact_id unless xero_contact.nil?
 		Customer.insert_xero_contact_id(customer_id, contact_id)
+	end
+
+	# Similar Contacts in Xero have been merged to one, but they are different in Xero
+	# Hence for customers that don't have a xero_contact_id, we find customers with
+	# same name and give them its xero_contact_id
+	def link_skype_id_by_customer_name(customer_id, actual_name)
+		xero_contact_id = Customer.xero_contact_id_of_duplicate_customer(actual_name)
+		Customer.insert_xero_contact_id(customer_id, xero_contact_id)
 	end
 
 	def link_invoice_id(order_id)
@@ -14,7 +24,9 @@ module XeroControllerHelper
 
 	def xero_sync
 		# We have a new orders from BigC
-		new_orders = Order.xero_invoice_id_is_null
+		orders = Order.export_to_xero
+		new_orders = [orders.last]
+
 		new_orders.each do |o|
 
 			order_id = o.id
@@ -22,16 +34,19 @@ module XeroControllerHelper
 			# If its a new customer then create a new contact in Xero
 			if Customer.is_new_customer_for_xero(customer_id)
 				# TEST CREATING NEW INVOICE
-				xero_contact_id = XeroContact.create_in_xero(Customer.filter_by_id(customer_id))
-				Customer.insert_xero_contact_id(customer_id, xero_contact_id)
+				xero_contact = XeroContact.create_in_xero(Customer.filter_by_id(customer_id))
+				Customer.insert_xero_contact_id(customer_id, xero_contact.contact_id)
 			# Otherwise just get the xero contact id
 			else
 				xero_contact_id = Customer.get_xero_contact_id(customer_id)
+				xero_contact = XeroContact.get_contact_from_xero(xero_contact_id)
 			end
+			return create_in_xero(o, xero_contact)
 			# create a new invoice with line items
-			invoice_not_saved = XeroInvoice.create_in_xero(o.customer, o)
-			xero_invoice_id = add_line_items(invoice_unsaved, order_id)
-			Order.insert_invoice(order_id, xero_invoice_id)
+			#invoice_line_items(o)
+			#invoice_saved = add_line_items(invoice_unsaved, order_id)
+			#invoice = create_in_xero(o)
+			#Order.insert_invoice(order_id, xero_invoice_id)
 		end		
 	end
 
@@ -161,16 +176,45 @@ module XeroControllerHelper
 		return qty * ex_gst_ship_charge
 	end
 
-	def add_line_items(invoice_unsaved, invoice_number)
-		line_items = XeroCalculation.get_line_items(invoice_number)
+
+	def create_in_xero(order, contact)
+  		xero = XeroConnection.new.connect
+
+  		invoice_number = order.id
+
+  		invoice = xero.Invoice.build(invoice_number: invoice_number.to_s, contact: contact,\
+  			type: "ACCREC", date: order.date_created.to_date,\
+  			due_date: 30.days.since(order.date_created.to_date), sent_to_contact: false)
+
+  		line_items = XeroCalculation.get_line_items(invoice_number)
+
 		line_items.each do |l|
-			invoice_unsaved.add_line_item(item_code: l.item_code,\
-			description: l.description, quantity: l.qty, unit_amount: l.discounted_ex_taxes_unit_price,\
-			tax_type: l.tax_type, account_code: l.account_code
+
+			unit_amount_clean = l.discounted_ex_taxes_unit_price.to_s.to_f.round(2)
+
+			invoice.add_line_item(item_code: l.item_code.to_s,\
+			description: l.description.to_s, quantity: l.qty,\
+			unit_amount: unit_amount_clean,\
+			tax_type: l.tax_type.to_s, account_code: l.account_code.to_s)
 		end
 
-		invoice = invoice_unsaved.save
-		return invoice.invoice_id
-	end
+		invoice.save
+  	end
+
+
+	# def add_line_items(invoice_unsaved, invoice_number)
+	# 	line_items = XeroCalculation.get_line_items(invoice_number)
+	# 	line_items.each do |l|
+
+	# 		unit_amount_clean = l.discounted_ex_taxes_unit_price.to_s.to_f.round(2)
+	# 		invoice_unsaved.add_line_item(item_code: l.item_code.to_s,\
+	# 		description: l.description.to_s, quantity: l.qty,\
+	# 		unit_amount: unit_amount_clean,\
+	# 		tax_type: l.tax_type.to_s, account_code: l.account_code.to_s)
+	# 	end
+
+	# 	#invoice = invoice_unsaved.save
+	# 	return invoice_unsaved
+	# end
 
 end

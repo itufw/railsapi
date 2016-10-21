@@ -139,13 +139,4 @@ class XeroInvoice < ActiveRecord::Base
   		end
   	end
 
-  	def self.create_in_xero(contact, order)
-  		xero = XeroConnection.new.connect
-  		invoice = xero.Invoice.build(invoice_number: order.id.to_s, contact: contact,\
-  			type: 'ACCREC', date: order.date_created.to_date,\
-  			due_date: 30.days.since(order.date_created.to_date),\
-			amount_due: order.total_inc_tax, sent_to_contact: false)
-  		return invoice
-  	end
-
 end

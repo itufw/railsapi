@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161020165807) do
+ActiveRecord::Schema.define(version: 20161021000301) do
 
   create_table "addresses", force: :cascade do |t|
     t.integer  "customer_id", limit: 4
@@ -489,6 +489,7 @@ ActiveRecord::Schema.define(version: 20161020165807) do
     t.datetime "created_at",              null: false
     t.datetime "updated_at",              null: false
     t.integer  "valid_order", limit: 1
+    t.integer  "xero_import", limit: 1
   end
 
   create_table "tax_percentages", force: :cascade do |t|
