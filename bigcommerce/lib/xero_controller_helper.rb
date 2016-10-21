@@ -72,13 +72,28 @@ module XeroControllerHelper
 			inc_gst_shipping_price, ex_gst_shipping_price, order_id, order_products, order)
 		else
 			retail_line_items(discount_rate, discounted_unit_price, discounted_ex_gst_unit_price,\
-			inc_gst_shipping_price, ex_gst_shipping_price, order_id, order_products)
+			inc_gst_shipping_price, ex_gst_shipping_price, order_id, order_products, order.total_inc_tax)
 		end
 
 	end
 
 	def retail_line_items(discount_rate, discounted_unit_price, discounted_ex_gst_unit_price,\
-		inc_gst_shipping_price, ex_gst_shipping_price, invoice_number, order_products)
+		inc_gst_shipping_price, ex_gst_shipping_price, invoice_number, order_products, order_total)
+
+		line_amount_ex_taxes = Hash.new
+		discounted_ex_gst_unit_price.each {|op_id, d| line_amount_ex_taxes_unrounded[op_id] = d * OrderProduct.total_qty(op_id) }
+
+		line_amounts_ex_taxes_rounded = Hash.new
+		line_amount_ex_taxes.each {|op_id, d| line_amounts_ex_taxes_rounded[op_id] = d.round(2) }
+
+		line_amount_total_ex_taxes = line_amount_ex_taxes.values.sum
+		line_amounts_total_ex_taxes_rounded = line_amounts_ex_taxes_rounded.values.sum
+
+		gst = get_gst_price(line_amounts_total_ex_taxes_rounded)
+
+		total_ex_gst = ex_gst_shipping_price + line_amounts_total_ex_taxes_rounded
+
+		rounding_error = total_inc_tax - get_gst_price(total_ex_gst)
 		
 		order_products.each do |op|
 			op_id = op.id
@@ -86,8 +101,13 @@ module XeroControllerHelper
 			product_name = Product.product_name(product_id)
 			XeroCalculation.insert_line_items_retail(invoice_number, product_id, product_name, op.qty,\
 			op.price_inc_tax, discount_rate, discounted_unit_price[op_id],\
-			discounted_ex_gst_unit_price[op_id])
+			discounted_ex_gst_unit_price[op_id], line_amount_ex_taxes[op_id],\
+			line_amounts_ex_taxes_rounded[op_id])
 		end
+
+		XeroCalculation.insert_rounding(invoice_number,\
+			line_amount_total_ex_taxes, line_amounts_total_ex_taxes_rounded,\
+			ex_gst_shipping_price, total_ex_gst, gst, order_total, rounding_error)
 
 		XeroCalculation.insert_shipping_calculation(invoice_number, inc_gst_shipping_price,\
 		ex_gst_shipping_price)
@@ -114,12 +134,18 @@ module XeroControllerHelper
 
 		adjustment = (wet_unadjusted_total - wet_adjusted)
 
-		line_amounts_total_ex_taxes = 0
-		discounted_ex_taxes_unit_price.each {|op_id, d| line_amounts_total_ex_taxes += d.round(2) * OrderProduct.total_qty(op_id) }
+		line_amount_ex_taxes = Hash.new
+		discounted_ex_taxes_unit_price.each {|op_id, d| line_amount_ex_taxes_unrounded[op_id] = d * OrderProduct.total_qty(op_id) }
 
-		total_ex_gst = line_amounts_total_ex_taxes.round(2) + wet_adjusted.round(2) + adjustment.round(2) + ex_gst_shipping_price.round(2)
+		line_amounts_ex_taxes_rounded = Hash.new
+		line_amount_ex_taxes.each {|op_id, d| line_amounts_ex_taxes_rounded[op_id] = d.round(2) }
 
-		gst = get_inc_gst_price(total_ex_gst)
+		line_amount_total_ex_taxes = line_amount_ex_taxes.values.sum
+		line_amounts_total_ex_taxes_rounded = line_amounts_ex_taxes_rounded.values.sum
+
+		total_ex_gst = line_amounts_total_ex_taxes_rounded + wet_adjusted.round(2) + adjustment.round(2) + ex_gst_shipping_price.round(2)
+
+		gst = get_gst_price(total_ex_gst)
 		
 		rounding_error = order.total_inc_tax - total_ex_gst - gst
 
@@ -131,6 +157,7 @@ module XeroControllerHelper
 			XeroCalculation.insert_line_items_ws(invoice_number, product_id, product_name,\
 	 		op.qty, op.price_inc_tax, discount_rate, discounted_unit_price[op_id],\
 	 		discounted_ex_gst_unit_price[op_id], discounted_ex_taxes_unit_price[op_id],\
+	 		line_amount_ex_taxes[op_id], line_amounts_ex_taxes_rounded[op_id],\
 	 		wet_unadjusted_order_product_price[op_id])
 		end
 
@@ -142,8 +169,9 @@ module XeroControllerHelper
 		XeroCalculation.insert_shipping_calculation(invoice_number, inc_gst_shipping_price,\
 		ex_gst_shipping_price)
 
-		XeroCalculation.insert_rounding(invoice_number, line_amounts_total_ex_taxes,\
-	 	ex_gst_shipping_price, total_ex_gst, gst, order_total, rounding_error)
+		XeroCalculation.insert_rounding(invoice_number, line_amount_total_ex_taxes,\
+		line_amounts_total_ex_taxes_rounded, ex_gst_shipping_price,\
+		total_ex_gst, gst, order_total, rounding_error)
 	end
 
 	def get_discount_rate(order)
@@ -156,7 +184,7 @@ module XeroControllerHelper
 		return inc_gst_price/(1 + (TaxPercentage.gst_percentage/100))
 	end
 
-	def get_inc_gst_price(ex_gst_price)
+	def get_gst_price(ex_gst_price)
 		return ex_gst_price * (TaxPercentage.gst_percentage/100)
 	end
 
@@ -200,21 +228,5 @@ module XeroControllerHelper
 
 		invoice.save
   	end
-
-
-	# def add_line_items(invoice_unsaved, invoice_number)
-	# 	line_items = XeroCalculation.get_line_items(invoice_number)
-	# 	line_items.each do |l|
-
-	# 		unit_amount_clean = l.discounted_ex_taxes_unit_price.to_s.to_f.round(2)
-	# 		invoice_unsaved.add_line_item(item_code: l.item_code.to_s,\
-	# 		description: l.description.to_s, quantity: l.qty,\
-	# 		unit_amount: unit_amount_clean,\
-	# 		tax_type: l.tax_type.to_s, account_code: l.account_code.to_s)
-	# 	end
-
-	# 	#invoice = invoice_unsaved.save
-	# 	return invoice_unsaved
-	# end
 
 end

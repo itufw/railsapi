@@ -32,7 +32,8 @@ class XeroCalculation < ActiveRecord::Base
 	end
 
 	# ADD TAX CODE
-	def self.insert_rounding(invoice_number, line_amounts_total_ex_taxes, shipping_ex_gst,\
+	def self.insert_rounding(invoice_number, line_amounts_total_ex_taxes,\
+		line_amounts_total_ex_taxes_rounded, shipping_ex_gst,\
 		total_ex_gst, gst, order_total, rounding_error)
 		wholesale_account = XeroAccountCode.wholesale
 		create(invoice_number: invoice_number, item_code: "Rounding", description: "Rounding Error",\
@@ -45,20 +46,24 @@ class XeroCalculation < ActiveRecord::Base
 
 	def self.insert_line_items_ws(invoice_number, product_id, product_name, qty, op_unit_price,\
 	    discount_rate, discounted_unit_price, discounted_ex_gst_unit_price,\
-	    discounted_ex_taxes_unit_price, wet_unadjusted_order_product_price)
+	    discounted_ex_taxes_unit_price, line_amount_ex_taxes, line_amount_ex_taxes_rounded,\
+	    wet_unadjusted_order_product_price)
 		wholesale_account = XeroAccountCode.wholesale
 		create(invoice_number: invoice_number, item_code: product_id.to_s,\
 			description: product_name, qty: qty, unit_price_inc_tax: op_unit_price,\
 			discount_rate: discount_rate, discounted_unit_price: discounted_unit_price,\
 			discounted_ex_gst_unit_price: discounted_ex_gst_unit_price,\
 			discounted_ex_taxes_unit_price: discounted_ex_taxes_unit_price,\
+			line_amount_ex_taxes: line_amount_ex_taxes,\
+			line_amount_ex_taxes_rounded: line_amount_ex_taxes_rounded,\
 			wet_unadjusted_order_product_price: wet_unadjusted_order_product_price,\
 			account_code: wholesale_account.account_code,\
 			tax_type: wholesale_account.tax_type)
 	end
 
 	def self.insert_line_items_retail(invoice_number, product_id, product_name, qty,\
-		op_unit_price, discount_rate, discounted_unit_price, discounted_ex_gst_unit_price)
+		op_unit_price, discount_rate, discounted_unit_price, discounted_ex_gst_unit_price,\
+		line_amount_ex_taxes, line_amount_ex_taxes_rounded)
 		retail_account = XeroAccountCode.retail
 
 		clean_product_name = CleanData.remove_latin_chars(product_name)
@@ -67,8 +72,10 @@ class XeroCalculation < ActiveRecord::Base
 			discount_rate: discount_rate, discounted_unit_price: discounted_unit_price,\
 			discounted_ex_gst_unit_price: discounted_ex_gst_unit_price,\
 			discounted_ex_taxes_unit_price: discounted_ex_gst_unit_price,\
+			line_amount_ex_taxes: line_amount_ex_taxes,\
+			line_amount_ex_taxes_rounded: line_amount_ex_taxes_rounded,\
 			account_code: retail_account.account_code,\
-			tax_type: retail_account.tax_type)
+			tax_type: retail_account.tax_type, order_total: order_total)
 	end
 
 	def self.get_line_items(invoice_number)
