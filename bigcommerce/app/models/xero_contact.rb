@@ -100,7 +100,7 @@ class XeroContact < ActiveRecord::Base
             last_name: c.lastname, email_address: c.email, skype_user_name: c.id,\
             contact_number: c.phone, contact_status: 'Active', is_customer: true)
         contact.save
-        return contact.contact_id
+        return contact
     end
 
     def name(firstname, lastname, customer_id)
@@ -117,6 +117,12 @@ class XeroContact < ActiveRecord::Base
         else
             return false
         end
+    end
+
+    def self.get_contact_from_xero(contact_id)
+        xero = XeroConnection.new.connect
+        contact = xero.Contact.find(contact_id)
+        return contact
     end
 
 end

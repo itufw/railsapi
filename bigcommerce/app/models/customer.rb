@@ -210,6 +210,11 @@ class Customer < ActiveRecord::Base
 		return customer.cust_type_id == 3
 	end
 
+	def self.xero_contact_id_of_duplicate_customer(customer_name)
+		customer = where('actual_name = ? and xero_contact_id IS NOT NULL', customer_name).first
+		return customer.xero_contact_id unless customer.nil?
+	end
+
 	# def self.due_date_num_days(customer)
 	# 	if customer.end_of_month.nil?
 	# 		return customer.num_days

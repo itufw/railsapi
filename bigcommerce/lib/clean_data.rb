@@ -1,3 +1,5 @@
+require "i18n"
+
 module CleanData
 
 	def remove_apostrophe(text)
@@ -24,6 +26,10 @@ module CleanData
 		unless !list.empty?
 			return ''
 		end
+	end
+
+	def self.remove_latin_chars(string)
+		I18n.transliterate(string) unless string.nil?
 	end
 	# def convert_to_empty_decimal(string)
 	# 	if string.strip.length == 0

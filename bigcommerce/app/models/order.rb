@@ -267,9 +267,12 @@ class Order < ActiveRecord::Base
 		includes([{:customer => :staff}, :status, {:order_products => :product}])
 	end
 
-	# considered new invoices in the case of Xero Sync
 	def self.xero_invoice_id_is_null
 		where(xero_invoice_id: nil)
+	end
+
+	def self.export_to_xero
+		xero_invoice_id_is_null.includes(:status, :customer).where('statuses.xero_import = 1 and orders.total_inc_tax > 0').references(:statuses)
 	end
 
 	def self.insert_invoice(order_id, invoice_id)
