@@ -1,8 +1,9 @@
 require 'bigcommerce_connection.rb'
 require 'clean_data.rb'
-require 'csv'
 
 class Customer < ActiveRecord::Base
+
+	include CleanData
 	has_many :orders
 	has_many :addresses
 	belongs_to :cust_type
@@ -48,15 +49,14 @@ class Customer < ActiveRecord::Base
 	def insert_sql(c, insert)
 
 		time = Time.now.to_s(:db)
-		clean = CleanData.new
 
-		firstname = clean.remove_apostrophe(c.first_name)
-		lastname = clean.remove_apostrophe(c.last_name)
-		company = clean.remove_apostrophe(c.company)
-		notes = clean.remove_apostrophe(c.notes)
-		email = clean.remove_apostrophe(c.email)
-		date_created = clean.map_date(c.date_created)
-		date_modified = clean.map_date(c.date_modified)
+		firstname = remove_apostrophe(c.first_name)
+		lastname = remove_apostrophe(c.last_name)
+		company = remove_apostrophe(c.company)
+		notes = remove_apostrophe(c.notes)
+		email = remove_apostrophe(c.email)
+		date_created = map_date(c.date_created)
+		date_modified = map_date(c.date_modified)
 		phone = c.phone.gsub(/\s+/, "")
 
 		sql = cust = ""
@@ -123,37 +123,6 @@ class Customer < ActiveRecord::Base
 
 	end
 
-
-	def csv_import
-
-		CSV.foreach("db/csv/cust_ref.csv", headers: true) do |row|
-
-			row_hash = row.to_hash
-
-			if !row_hash['Actual Name'].blank?
-				actual_name = row_hash['Actual Name'].force_encoding("UTF-8") 
-			else
-				actual_name = nil
-			end
-
-			Customer.update(row_hash['Customer ID'], actual_name: actual_name,\
-				staff_id: row_hash['Owner'], cust_type_id: row_hash['CustType'],\
-				cust_group_id: populate(row_hash['Group Name']),\
-				cust_style_id: populate(row_hash['CustStyle']),\
-				cust_store_id: populate(row_hash['CustIdentifier']),\
-				region:  populate(row_hash['Region']))
-		end
-
-	end
-
-	def populate(string)
-		if string != '0'
-			return string
-		else
-			return nil
-		end
-	end
-
 	def self.staff_search_filter(search_text = nil, staff_id = nil)
 		return includes(:staff).where(staff_id: staff_id).search_for(search_text) if staff_id
 		return search_for(search_text) if search_text
@@ -193,8 +162,7 @@ class Customer < ActiveRecord::Base
 		where(xero_contact_id: nil)
 	end
 
-	def self.is_new_customer_for_xero(customer_id)
-		customer = Customer.find(customer_id)
+	def self.is_new_customer_for_xero(customer)
 		if customer.xero_contact_id.nil?
 			return true
 		else
@@ -202,8 +170,8 @@ class Customer < ActiveRecord::Base
 		end
 	end
 
-	def self.get_xero_contact_id(customer_id)
-		return find(customer_id).xero_contact_id
+	def self.get_xero_contact_id(customer)
+		return customer.xero_contact_id
 	end
 
 	def self.is_wholesale(customer)

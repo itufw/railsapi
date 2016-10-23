@@ -1,5 +1,4 @@
 require 'bigcommerce_connection.rb'
-require 'csv'
 
 class Status < ActiveRecord::Base
 	has_many :orders
@@ -22,18 +21,6 @@ class Status < ActiveRecord::Base
 		ActiveRecord::Base.connection.execute(sql)		
 
 	end
-
-	def csv_import
-
-		CSV.foreach("db/csv/order_status.csv", headers: true) do |row|
-
-			row_hash = row.to_hash
-			Status.update(row_hash['Id'], alt_name: row_hash['Alternate Name'], order: row_hash['Order'],\
-			 	in_use: row_hash['In Use'], confirmed: row_hash['Confirmed'], in_transit: row_hash['InTransit'],\
-			 	delivered: row_hash['Delivered'], picking: row_hash['Picking'], valid_order: row_hash['ValidOrder'])
-		end
-	end
-
 
 	def self.filter_by_id(status_id)
 	  return find(status_id)

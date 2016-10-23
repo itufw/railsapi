@@ -3,6 +3,7 @@ require 'clean_data.rb'
 
 class Order < ActiveRecord::Base
 
+	include CleanData
 	belongs_to :customer
 	belongs_to :status
 	belongs_to :coupon
@@ -101,18 +102,17 @@ class Order < ActiveRecord::Base
 		order = sql = ""
 		time = Time.now.to_s(:db)
 
-		clean = CleanData.new
-		date_created = clean.map_date(o.date_created)
-		date_modified = clean.map_date(o.date_modified)
-		date_shipped = clean.map_date(o.date_shipped)
+		date_created = map_date(o.date_created)
+		date_modified = map_date(o.date_modified)
+		date_shipped = map_date(o.date_shipped)
 
-		staff_notes = clean.remove_apostrophe(o.staff_notes)
+		staff_notes = remove_apostrophe(o.staff_notes)
 
-		customer_notes = clean.remove_apostrophe(o.customer_message)
+		customer_notes = remove_apostrophe(o.customer_message)
 
-		active = clean.convert_bool(o.is_deleted)
+		active = convert_bool(o.is_deleted)
 
-		payment_method = clean.remove_apostrophe(o.payment_method)
+		payment_method = remove_apostrophe(o.payment_method)
 
 		if insert == 1
 
@@ -272,7 +272,7 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.export_to_xero
-		xero_invoice_id_is_null.includes(:status, :customer).where('statuses.xero_import = 1 and orders.total_inc_tax > 0').references(:statuses)
+		xero_invoice_id_is_null.include_all.where('statuses.xero_import = 1 and orders.total_inc_tax > 0').references(:statuses)
 	end
 
 	def self.insert_invoice(order_id, invoice_id)
