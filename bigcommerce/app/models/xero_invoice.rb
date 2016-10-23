@@ -17,6 +17,7 @@ class XeroInvoice < ActiveRecord::Base
 	has_many :xero_cn_allocations
 	has_many :xero_op_allocations
 
+
 	def download_data_from_api(modified_since_time)
 
 		xero = XeroConnection.new.connect
@@ -105,11 +106,15 @@ class XeroInvoice < ActiveRecord::Base
 	end
 
 	def valid_invoice(invoice)
-		if invoice.status == 'DELETED' || invoice.status == 'VOIDED' || invoice.type != 'ACCREC'
+		if (invoice.status == 'DELETED' || invoice.status == 'VOIDED' || invoice.type != 'ACCREC')
 			return false
-	    else
-	    	return true
-	    end
+		else
+			return true
+		end
+	end
+
+	def self.valid_invoice_for_linkage(invoice)
+		return (invoice.status == 'AUTHORISED' || invoice.status == 'PAID')
 	end
 
 	def invoice_doesnt_exist(invoice_id)
@@ -120,23 +125,27 @@ class XeroInvoice < ActiveRecord::Base
   	    end
   	end
 
-  	def self.get_invoice_id_and_number(invoice_number)
-  		if where(invoice_number: invoice_number).count > 0
-  			invoice = where(invoice_number: invoice_number).first
-  			return invoice
+  	def self.get_invoice_id(invoice_number)
+  		invoice = where(invoice_number: invoice_number).first
+  		if !invoice.nil? && valid_invoice_for_linkage(invoice)
+  			return invoice.xero_invoice_id
   		else
   			return false
   		end
   	end
 
   	def self.find_by_order_id(order_id)
-  		if invoice = XeroInvoice.get_invoice_id_and_number(order_id.to_s)
-  			return invoice
-  		elsif invoice = XeroInvoice.get_invoice_id_and_number('BC' + order_id.to_s)
-  			return invoice
+  		if invoice_id = XeroInvoice.get_invoice_id(order_id.to_s)
+  			return invoice_id
+  		# elsif invoice = XeroInvoice.get_invoice_id_and_number('BC' + order_id.to_s)
+  		# 	return invoice
   		else
   			return nil
   		end
+  	end
+
+  	def self.is_a_draft(order_id)
+  		return where(invoice_number: order_id.to_s, status: "DRAFT").count == 1
   	end
 
 end

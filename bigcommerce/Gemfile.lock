@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/hinammehra/xeroizer.git
-  revision: 4641c9d0e5db382e87263bc60a32504fe509f965
+  revision: 27c548ac5aa949e1551c3ac0b1f94995ebee3e23
   specs:
     xeroizer (2.16.4)
       activesupport

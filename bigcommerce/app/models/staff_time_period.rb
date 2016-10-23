@@ -1,5 +1,3 @@
-require 'csv'
-
 class StaffTimePeriod < ActiveRecord::Base
 
 	belongs_to :staff

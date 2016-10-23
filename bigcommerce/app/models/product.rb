@@ -2,6 +2,8 @@ require 'bigcommerce_connection.rb'
 require 'clean_data.rb'
 
 class Product < ActiveRecord::Base
+
+	include CleanData
 	has_many :order_products
 	has_many :orders, through: :order_products
 
@@ -52,20 +54,20 @@ class Product < ActiveRecord::Base
 
 	def insert_sql(p, insert)
 		time = Time.now.to_s(:db)
-		clean = CleanData.new
-		date_created = clean.map_date(p.date_created)
-		date_modified = clean.map_date(p.date_modified)
-		date_last_imported = clean.map_date(p.date_last_imported)
 
-		visible = clean.convert_bool(p.is_visible)
-		featured = clean.convert_bool(p.is_featured)
+		date_created = map_date(p.date_created)
+		date_modified = map_date(p.date_modified)
+		date_last_imported = map_date(p.date_last_imported)
 
-		name = clean.remove_apostrophe(p.name)
-		search_keywords = clean.remove_apostrophe(p.search_keywords)
-		meta_keywords = clean.remove_apostrophe(p.meta_keywords)
-		description = ActionView::Base.full_sanitizer.sanitize(clean.remove_apostrophe(p.description))
-		meta_description = clean.remove_apostrophe(p.meta_description)
-		page_title = clean.remove_apostrophe(p.page_title)
+		visible = convert_bool(p.is_visible)
+		featured = convert_bool(p.is_featured)
+
+		name = remove_apostrophe(p.name)
+		search_keywords = remove_apostrophe(p.search_keywords)
+		meta_keywords = remove_apostrophe(p.meta_keywords)
+		description = ActionView::Base.full_sanitizer.sanitize(remove_apostrophe(p.description))
+		meta_description = remove_apostrophe(p.meta_description)
+		page_title = remove_apostrophe(p.page_title)
 
 		if p.sku == ''
 			sku = 0

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161021030107) do
+ActiveRecord::Schema.define(version: 20161021033519) do
 
   create_table "addresses", force: :cascade do |t|
     t.integer  "customer_id", limit: 4
@@ -523,8 +523,8 @@ ActiveRecord::Schema.define(version: 20161021030107) do
     t.decimal  "discounted_unit_price",                          precision: 10, scale: 4
     t.decimal  "discounted_ex_gst_unit_price",                   precision: 10, scale: 4
     t.decimal  "discounted_ex_taxes_unit_price",                 precision: 10, scale: 4
-    t.decimal  "line_amounts_ex_taxes",                          precision: 10, scale: 4
-    t.decimal  "line_amounts_ex_taxes_rounded",                  precision: 8,  scale: 2
+    t.decimal  "line_amount_ex_taxes",                           precision: 10, scale: 4
+    t.decimal  "line_amount_ex_taxes_rounded",                   precision: 8,  scale: 2
     t.decimal  "wet_unadjusted_order_product_price",             precision: 10, scale: 4
     t.decimal  "wet_unadjusted_total",                           precision: 10, scale: 4
     t.decimal  "ship_deduction",                                 precision: 10, scale: 4

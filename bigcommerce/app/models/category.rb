@@ -4,6 +4,9 @@ require 'clean_data.rb'
 
 
 class Category < ActiveRecord::Base
+
+	include CleanData
+	
 	has_many :product_categories
 	has_many :products, through: :product_categories
 
@@ -45,13 +48,11 @@ class Category < ActiveRecord::Base
 
 		time = Time.now.to_s(:db)
 
-		clean = CleanData.new
-
-		visible = clean.convert_bool(c.is_visible)
-		description = clean.remove_apostrophe(c.description)
-		name = clean.remove_apostrophe(c.name)
+		visible = convert_bool(c.is_visible)
+		description = remove_apostrophe(c.description)
+		name = remove_apostrophe(c.name)
 		description = ActionView::Base.full_sanitizer.sanitize(description)
-		meta_description = clean.remove_apostrophe(c.meta_description)
+		meta_description = remove_apostrophe(c.meta_description)
 
 		sql = category = ""
 

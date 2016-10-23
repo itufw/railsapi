@@ -11,9 +11,9 @@ class XeroInvoiceLineItem < ActiveRecord::Base
 	def download_data_from_api(invoice_line_items, invoice_id, invoice_number)
 		invoice_line_items.each do |li|
 
-		time = Time.now.to_s(:db)
+			time = Time.now.to_s(:db)
 
-		description = remove_apostrophe(li.description)
+			description = remove_apostrophe(li.description)
 
 			if invoice_line_item_doesnt_exist(li.line_item_id)
 				sql = "INSERT INTO xero_invoice_line_items (xero_invoice_line_item_id,\
@@ -22,14 +22,13 @@ class XeroInvoiceLineItem < ActiveRecord::Base
 				'#{invoice_id}', '#{invoice_number}', '#{li.item_code}', '#{description}', '#{li.quantity}', '#{li.unit_amount}',\
 				'#{li.line_amount(true)}', '#{li.discount_rate}', '#{li.tax_amount}', '#{li.tax_type}',\
 				'#{li.account_code}', '#{time}', '#{time}')"
-				ActiveRecord::Base.connection.execute(sql)
 			else
 				sql = "UPDATE xero_invoice_line_items SET xero_invoice_id = '#{invoice_id}',\
 				invoice_number = '#{invoice_number}', item_code = '#{li.item_code}', description = '#{description}',\
 				quantity = '#{li.quantity}', unit_amount = '#{li.unit_amount}', line_amount = '#{li.line_amount(true)}',\
 				discount_rate = '#{li.discount_rate}', tax_amount = '#{li.tax_amount}',\
 				tax_type = '#{li.tax_type}', account_code = '#{li.account_code}',\
-				updated_at = '#{time}' WHERE xero_invoice_line_item_id = '#{i.line_item_id}'"
+				updated_at = '#{time}' WHERE xero_invoice_line_item_id = '#{li.line_item_id}'"
 			end
 			ActiveRecord::Base.connection.execute(sql)
 
