@@ -166,28 +166,6 @@ class Product < ActiveRecord::Base
 	def self.search(search_text)
 		return search_for(search_text)
 	end
-<<<<<<< HEAD
-
-	def self.filter_by_ids(product_ids_a)
-	    return where('products.id IN (?)', product_ids_a) if !product_ids_a.empty?
-	    return all
-	end
-
-	def self.include_orders
-		includes([{:order_products => :order}])
-	end
-
-	def self.pending_stock(product_ids_a)
-		include_orders.filter_by_ids(product_ids_a).where('orders.status_id = 1').references(:orders).group('order_products.product_id').sum('order_products.qty')
-	end
-
-	def self.order_by_name
-		order('name ASC')
-	end
-
-	def self.product_name(product_id)
-		return find(product_id).name
-=======
 
 	def self.filter_by_ids(product_ids_a)
 	    return where('products.id IN (?)', product_ids_a) if !product_ids_a.empty?
@@ -220,7 +198,6 @@ class Product < ActiveRecord::Base
 
 	def self.products_with_same_no_ws_id(no_ws_id)
 		return where(product_no_ws_id: no_ws_id)
->>>>>>> efafc87de3efa0844d5de64d6f57e3d3288f8a05
 	end
 
 end

@@ -170,7 +170,6 @@ class Customer < ActiveRecord::Base
 		end
 	end
 
-<<<<<<< HEAD
 	def self.get_xero_contact_id(customer)
 		return customer.xero_contact_id
 	end
@@ -191,35 +190,5 @@ class Customer < ActiveRecord::Base
 			
 	# 	end
 	# end
-=======
-	def self.staff_search_filter(search_text = nil, staff_id = nil)
-		return includes(:staff).where(staff_id: staff_id).search_for(search_text) if staff_id
-		return search_for(search_text) if search_text
-		return all
-	end
-
-	def self.customer_name(actual_name, firstname, lastname)
-		name = ""	
-		if actual_name.present?
-		  name = actual_name
-		elsif firstname.present? || lastname.present?
-		  name = firstname + ' ' + lastname
-		end
-		return name
-	end
-
-	def self.filter_by_id(id)
-		find(id)
-	end
-
-	def self.filter_by_ids(ids_array)
-		return Customer.all if ids_array.nil?
-		return where('customers.id IN (?)', ids_array)
-	end
-
-	def self.order_by_name
-		order('actual_name ASC')
-	end
->>>>>>> efafc87de3efa0844d5de64d6f57e3d3288f8a05
 
 end
