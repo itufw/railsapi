@@ -163,7 +163,9 @@ class Customer < ActiveRecord::Base
 	end
 
 	def self.is_new_customer_for_xero(customer)
-		if customer.xero_contact_id.nil?
+		if customer.nil?
+			return false
+		elsif customer.xero_contact_id.nil?
 			return true
 		else
 			return false
@@ -171,7 +173,11 @@ class Customer < ActiveRecord::Base
 	end
 
 	def self.get_xero_contact_id(customer)
-		return customer.xero_contact_id
+		if customer.nil?
+			return nil
+		else
+			return customer.xero_contact_id
+		end
 	end
 
 	def self.is_wholesale(customer)
