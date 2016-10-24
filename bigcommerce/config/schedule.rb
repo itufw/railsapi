@@ -29,3 +29,7 @@ end
 every 1.day, :at => '2:00 pm' do
 	rake "updates:timeperiods"
 end
+
+every 1.day, :at => '2:00 am', '6:30am', '8:00am' do
+  rake "updates:xero_sync"
+end
