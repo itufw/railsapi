@@ -106,7 +106,7 @@ class XeroInvoice < ActiveRecord::Base
 	end
 
 	def valid_invoice(invoice)
-		if (invoice.status == 'DELETED' || invoice.status == 'VOIDED' || invoice.type != 'ACCREC')
+		if (invoice.type != 'ACCREC')
 			return false
 		else
 			return true
@@ -126,14 +126,15 @@ class XeroInvoice < ActiveRecord::Base
   	end
 
   	def self.get_invoice_id(invoice_number)
-  		invoice = where(invoice_number: invoice_number).first
-  		if !invoice.nil? && valid_invoice_for_linkage(invoice)
-  			return invoice.xero_invoice_id
+  		invoice = where(invoice_number: invoice_number, status: "AUTHORISED")
+  		if invoice.count == 1
+  			return invoice.first.xero_invoice_id
   		else
   			return false
   		end
+  
   	end
-
+  		
   	def self.find_by_order_id(order_id)
   		if invoice_id = XeroInvoice.get_invoice_id(order_id.to_s)
   			return invoice_id

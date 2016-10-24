@@ -2,8 +2,7 @@ module XeroInvoiceCalculations
 
 	def xero_sync
 		# We have a new orders from BigC
-		#new_orders = Order.export_to_xero
-		new_orders = Order.find(19378)
+		new_orders = Order.export_to_xero
 		new_orders.each do |o|
 
 			order_id = o.id
@@ -20,6 +19,9 @@ module XeroInvoiceCalculations
 				# Otherwise just get the xero contact id
 				else
 					xero_contact_id = Customer.get_xero_contact_id(o.customer)
+					if xero_contact_id.nil?
+						next
+					end
 					#xero_contact = XeroContact.get_contact_from_xero(xero_contact_id)
 				end
 				invoice_line_items(o) unless XeroCalculation.get_line_items(order_id).count > 0
@@ -80,11 +82,21 @@ module XeroInvoiceCalculations
 
 		total_ex_gst = ex_gst_shipping_price + line_amounts_total_ex_taxes_rounded
 
-		order_total_ex_gst = get_ex_gst_price(order_total, gst_percentage)
-		
-		rounding_error = order_total_ex_gst - total_ex_gst
+		gst_line_amounts = Hash.new
+		line_amounts_ex_taxes_rounded.each {|op_id, d| gst_line_amounts[op_id] = get_gst_price(d, gst_percentage).round(2)}
 
-		gst = get_gst_price((order_total_ex_gst + rounding_error), gst_percentage)
+		gst_sum_line_amounts = 0.00
+		gst_sum_line_amounts += gst_line_amounts.values.sum.round(2)
+
+		gst_on_shipping = get_gst_price(ex_gst_shipping_price.round(2), gst_percentage)
+
+		gst_sum_line_amounts += gst_on_shipping
+		gst_sum_line_amounts = gst_sum_line_amounts.round(2)
+
+		total_inc_gst = total_ex_gst + gst_sum_line_amounts
+		rounding_error_inc_gst = order_total - total_inc_gst
+
+		rounding_error_ex_gst = get_ex_gst_price(rounding_error_inc_gst, gst_percentage).round(4)
 
 		order_products.each do |op|
 			op_id = op.id
@@ -93,15 +105,15 @@ module XeroInvoiceCalculations
 			XeroCalculation.insert_line_items_retail(invoice_number, product_id, product_name, op.qty,\
 			op.price_inc_tax, discount_rate, discounted_unit_price[op_id],\
 			discounted_ex_gst_unit_price[op_id], line_amount_ex_taxes[op_id],\
-			line_amounts_ex_taxes_rounded[op_id], order_total)
+			line_amounts_ex_taxes_rounded[op_id], gst_line_amounts[op_id], order_total)
 		end
 
 		XeroCalculation.insert_shipping_calculation(invoice_number, inc_gst_shipping_price,\
-		ex_gst_shipping_price)
+		ex_gst_shipping_price, gst_on_shipping)
 
 		XeroCalculation.insert_rounding(invoice_number,\
-			line_amount_total_ex_taxes, line_amounts_total_ex_taxes_rounded,\
-			ex_gst_shipping_price, total_ex_gst, gst, order_total, rounding_error)
+			total_ex_gst, gst_sum_line_amounts, order_total,\
+			rounding_error_inc_gst, rounding_error_ex_gst)
 
 	end
 
@@ -115,7 +127,6 @@ module XeroInvoiceCalculations
 
 		discounted_ex_taxes_unit_price = Hash.new
 		discounted_ex_gst_unit_price.each {|op_id, d| discounted_ex_taxes_unit_price[op_id] = get_ex_taxes_price(d, wet_percentage)}
-
 
 		line_amount_ex_taxes = Hash.new
 		discounted_ex_taxes_unit_price.each {|op_id, d| line_amount_ex_taxes[op_id] = d * product_qtys[op_id] }
@@ -140,12 +151,30 @@ module XeroInvoiceCalculations
 		adjustment = (wet_unadjusted_total - wet_adjusted)
 
 		total_ex_gst = line_amounts_total_ex_taxes_rounded + wet_adjusted.round(2) + adjustment.round(2) + ex_gst_shipping_price.round(2)
-
-		order_total_ex_gst = get_ex_gst_price(order.total_inc_tax, gst_percentage)
 		
-		rounding_error = order_total_ex_gst - total_ex_gst
+		gst_line_amounts = Hash.new
+		line_amounts_ex_taxes_rounded.each {|op_id, d| gst_line_amounts[op_id] = get_gst_price(d, gst_percentage).round(2)}
 
-		gst = get_gst_price((order_total_ex_gst + rounding_error), gst_percentage)
+		gst_sum_line_amounts = 0.00
+		gst_sum_line_amounts += gst_line_amounts.values.sum.round(2)
+
+		gst_on_wet =  get_gst_price(wet_adjusted.round(2), gst_percentage)
+		gst_on_adjustment = get_gst_price(adjustment.round(2), gst_percentage)
+		gst_on_shipping = get_gst_price(ex_gst_shipping_price.round(2), gst_percentage)
+
+		gst_sum_line_amounts += gst_on_wet
+		gst_sum_line_amounts = gst_sum_line_amounts.round(2)
+
+		gst_sum_line_amounts += gst_on_adjustment
+		gst_sum_line_amounts = gst_sum_line_amounts.round(2)
+
+		gst_sum_line_amounts += gst_on_shipping
+		gst_sum_line_amounts = gst_sum_line_amounts.round(2)
+
+		total_inc_gst = total_ex_gst + gst_sum_line_amounts
+		rounding_error_inc_gst = order_total - total_inc_gst
+
+		rounding_error_ex_gst = get_ex_gst_price(rounding_error_inc_gst, gst_percentage).round(4)
 
 		order_products.each do |op|
 			op_id = op.id
@@ -156,20 +185,19 @@ module XeroInvoiceCalculations
 	 		op.qty, op.price_inc_tax, discount_rate, discounted_unit_price[op_id],\
 	 		discounted_ex_gst_unit_price[op_id], discounted_ex_taxes_unit_price[op_id],\
 	 		line_amount_ex_taxes[op_id], line_amounts_ex_taxes_rounded[op_id],\
-	 		wet_unadjusted_order_product_price[op_id])
+	 		gst_line_amounts[op_id], wet_unadjusted_order_product_price[op_id])
 		end
 
 		XeroCalculation.insert_wet_calculation(invoice_number, wet_unadjusted_total, ship_deduction,\
-		subtotal_ex_gst, wet_adjusted)
+		subtotal_ex_gst, wet_adjusted, gst_on_wet)
 
-		XeroCalculation.insert_adjustment(invoice_number, adjustment)
+		XeroCalculation.insert_adjustment(invoice_number, adjustment, gst_on_adjustment)
 
 		XeroCalculation.insert_shipping_calculation(invoice_number, inc_gst_shipping_price,\
-		ex_gst_shipping_price)
+		ex_gst_shipping_price, gst_on_shipping)
 
-		XeroCalculation.insert_rounding(invoice_number, line_amount_total_ex_taxes,\
-		line_amounts_total_ex_taxes_rounded, ex_gst_shipping_price,\
-		total_ex_gst, gst, order_total, rounding_error)
+		XeroCalculation.insert_rounding(invoice_number,\
+		total_ex_gst, gst_sum_line_amounts, order_total, rounding_error_inc_gst, rounding_error_ex_gst)
 	end
 
 	def get_discount_rate(order)
@@ -184,6 +212,10 @@ module XeroInvoiceCalculations
 
 	def get_gst_price(ex_gst_price, gst_percentage)
 		return ex_gst_price * (gst_percentage/100)
+	end
+
+	def get_inc_gst_price(ex_gst_price, gst_percentage)
+		return ex_gst_price * (1 + gst_percentage/100)
 	end
 
 	# But only if customer type is Retail
@@ -220,7 +252,7 @@ module XeroInvoiceCalculations
 
 			create_item(item_code)
 
-			unit_amount_clean = l.discounted_ex_taxes_unit_price.to_s.to_f.round(2)
+			unit_amount_clean = l.discounted_ex_taxes_unit_price.to_s.to_f.round(4)
 
 			invoice.add_line_item(item_code: item_code, description: l.description,\
 			quantity: l.qty, unit_amount: unit_amount_clean,\

@@ -3,7 +3,7 @@ require "i18n"
 module CleanData
 
 	def remove_apostrophe(text)
-		return text.gsub("'","''") unless text.nil?
+		return text.to_s.gsub("'","''") unless text.nil?
 	end
 
 	def map_date(date)

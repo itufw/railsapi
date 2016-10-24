@@ -101,20 +101,12 @@ class XeroContact < ActiveRecord::Base
     def self.create_in_xero(customer)
         c = customer
         xero = XeroConnection.new.connect
-        contact = xero.Contact.build(name: self.get_fullname(c),\
+        contact = xero.Contact.build(name: c.firstname + c.lastname,\
             first_name: c.firstname,\
             last_name: c.lastname, email_address: c.email, skype_user_name: c.id,\
             contact_number: c.phone, is_customer: true)
         contact.save
         return contact
-    end
-
-    def self.get_fullname(customer)
-        if Customer.is_wholesale(customer)
-            return ''
-        else
-            return customer.firstname + ' ' + customer.lastname
-        end
     end
 
     def contact_doesnt_exist(contact_id)

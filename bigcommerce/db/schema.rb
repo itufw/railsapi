@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161021033519) do
+ActiveRecord::Schema.define(version: 20161024182129) do
 
   create_table "addresses", force: :cascade do |t|
     t.integer  "customer_id", limit: 4
@@ -499,20 +499,6 @@ ActiveRecord::Schema.define(version: 20161021033519) do
     t.datetime "updated_at",                                         null: false
   end
 
-  create_table "tax_codes", force: :cascade do |t|
-    t.string   "customer_type", limit: 255
-    t.string   "tax_code",      limit: 255
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-  end
-
-  create_table "tax_percentages", force: :cascade do |t|
-    t.string   "tax_name",       limit: 255
-    t.decimal  "tax_percentage",             precision: 8, scale: 2
-    t.datetime "created_at",                                         null: false
-    t.datetime "updated_at",                                         null: false
-  end
-
   create_table "warehouses", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -547,13 +533,14 @@ ActiveRecord::Schema.define(version: 20161021033519) do
     t.decimal  "adjustment",                                     precision: 10, scale: 4
     t.decimal  "shipping_ex_gst",                                precision: 8,  scale: 2
     t.decimal  "total_ex_gst",                                   precision: 8,  scale: 2
-    t.decimal  "gst",                                            precision: 8,  scale: 2
     t.decimal  "order_total",                                    precision: 8,  scale: 2
     t.decimal  "rounding_error",                                 precision: 8,  scale: 2
     t.string   "account_code",                       limit: 255
     t.string   "tax_type",                           limit: 255
     t.datetime "created_at",                                                              null: false
     t.datetime "updated_at",                                                              null: false
+    t.decimal  "rounding_error_inc_gst",                         precision: 8,  scale: 2
+    t.decimal  "gst",                                            precision: 8,  scale: 2
   end
 
   create_table "xero_cn_allocations", primary_key: "xero_cn_allocation_id", force: :cascade do |t|
