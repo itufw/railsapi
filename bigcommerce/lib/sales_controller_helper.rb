@@ -18,7 +18,7 @@ module SalesControllerHelper
     end
   end
 
-  def stats_for_timeperiods(where_query, group_by, sum_by)
+  def stats_for_timeperiods(where_query, group_by, sum_by, total_stock, period_type)
     time_periods = StaffTimePeriod.display
 
     # this is the stat per row and column, for eg. This is qty sold for each customer per time period
@@ -26,6 +26,7 @@ module SalesControllerHelper
     # this is the stat per column, for eg. this is the total qty sold in one time period
     overall_sum = []
     overall_avg = []
+    monthly_supply = []
 
     time_periods.each do |t| 
 
@@ -33,14 +34,23 @@ module SalesControllerHelper
         
       sum = (eval where_query).date_filter(t.start_date.to_s, t.end_date.to_s).send(sum_by)
       num_days = (t.end_date.to_date - t.start_date.to_date).to_i
-      avg = (sum.to_f/num_days)*(7)
+
+      avg = (sum.to_f/num_days)*(num_days_for_periods(period_type))
         
       overall_sum.push(sum)
       overall_avg.push(avg)
+      unless total_stock.nil?
+        if avg == 0
+          monthly_supply.push(0.0)
+        else
+          monthly_supply.push(total_stock/avg)
+        end
+      end
+
     end
 
     ids = overall_h.values.reduce(&:merge).keys unless overall_h.blank?
-    [time_periods.pluck("name"), overall_h, overall_sum, overall_avg, ids]
+    [time_periods.pluck("name"), overall_h, overall_sum, overall_avg, ids, monthly_supply]
   end
 
   def return_nil_string(val)
@@ -89,5 +99,24 @@ module SalesControllerHelper
     return products.to_a
   end
 
+  def define_period_types(params)
+    period_types = ["weekly", "monthly"]
+    if params[:period_type]
+      selected_period = params[:period_type]
+    else
+      selected_period = "monthly"
+    end
+    return selected_period, period_types
+  end
 
+  def num_days_for_periods(period_type)
+    if period_type == "weekly"
+      return 7
+    elsif period_type == "monthly"
+      return 30
+    else
+      return 1
+    end
+  end
+      
 end

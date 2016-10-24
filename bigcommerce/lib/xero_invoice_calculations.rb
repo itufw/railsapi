@@ -2,7 +2,8 @@ module XeroInvoiceCalculations
 
 	def xero_sync
 		# We have a new orders from BigC
-		new_orders = Order.export_to_xero
+		#new_orders = Order.export_to_xero
+		new_orders = Order.find(19378)
 		new_orders.each do |o|
 
 			order_id = o.id
@@ -77,12 +78,14 @@ module XeroInvoiceCalculations
 		line_amount_total_ex_taxes = line_amount_ex_taxes.values.sum
 		line_amounts_total_ex_taxes_rounded = line_amounts_ex_taxes_rounded.values.sum
 
-		gst = get_gst_price(line_amounts_total_ex_taxes_rounded, gst_percentage)
-
 		total_ex_gst = ex_gst_shipping_price + line_amounts_total_ex_taxes_rounded
 
-		rounding_error = total_ex_gst - get_gst_price(total_ex_gst, gst_percentage)
+		order_total_ex_gst = get_ex_gst_price(order_total, gst_percentage)
 		
+		rounding_error = order_total_ex_gst - total_ex_gst
+
+		gst = get_gst_price((order_total_ex_gst + rounding_error), gst_percentage)
+
 		order_products.each do |op|
 			op_id = op.id
 			product_id = op.product_id

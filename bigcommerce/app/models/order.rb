@@ -12,9 +12,16 @@ class Order < ActiveRecord::Base
 	has_many :addresses, through: :order_shippings
 	belongs_to :billing_address, class_name: :Address, foreign_key: :billing_address_id
 	has_many :order_products
+<<<<<<< HEAD
 	has_many :products, through: :order_products
+=======
+	#has_many :products, through: :order_products
+
+>>>>>>> efafc87de3efa0844d5de64d6f57e3d3288f8a05
 	belongs_to :order_history
 	has_one :xero_invoice
+
+	self.per_page = 30
 
 	self.per_page = 30
 
@@ -166,6 +173,7 @@ class Order < ActiveRecord::Base
 
 	def self.product_filter(product_ids)
 		return includes(:order_products).where('order_products.product_id IN (?)', product_ids).references(:order_products) if !product_ids.nil?
+<<<<<<< HEAD
 		return all
 	end
 
@@ -280,6 +288,107 @@ class Order < ActiveRecord::Base
 		order.xero_invoice_id = invoice_id
 		order.xero_invoice_number = order_id
 		order.save
+=======
+		return all
+	end
+
+	# Returns orders whose date created is between the start date and end date
+	# If you want today's orders
+	# Then start date should be Today's date and end date should be Tomorrow's date
+	# Since date_created is stored as datetime in the database, these start and end dates are
+	# converted into datetime values, with 00:00:00 as the time factor.
+	def self.date_filter(start_date, end_date)
+		if (!start_date.nil? && !end_date.nil?)
+			if !start_date.to_s.empty? && !end_date.to_s.empty?
+			  start_time = Time.parse(start_date.to_s)
+	          end_time = Time.parse(end_date.to_s)
+
+			  return where('orders.date_created >= ? and orders.date_created <= ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S"))
+			end
+		end
+		return all
+	end
+
+	# Returns Orders who status has a valid order flag
+	def self.valid_order
+		includes(:status).where('statuses.valid_order = 1').references(:statuses)
+	end
+
+	# Returns orders with a given status id
+	def self.status_filter(status_id)
+		return where(status_id: status_id) if !status_id.nil?
+		return all
+	end
+
+	def self.group_by_date_created
+		group("DATE(orders.date_created)")
+	end
+
+	def self.group_by_week_created
+		group("WEEK(orders.date_created)")
+	end
+
+	def self.group_by_month_created
+		group(["MONTH(orders.date_created)", "YEAR(orders.date_created)"])
+	end
+
+	def self.group_by_date_created_and_staff_id
+		includes(:customer).group(["customers.staff_id", "DATE(orders.date_created)"])
+	end
+
+	def self.group_by_week_created_and_staff_id
+		includes(:customer).group(["customers.staff_id", "WEEK(orders.date_created)"])
+	end
+
+	def self.group_by_month_created_and_staff_id
+		includes(:customer).group(["customers.staff_id", "MONTH(orders.date_created)", "YEAR(orders.date_created)"])
+	end
+
+	def self.group_by_customerid
+		group('orders.customer_id')
+	end
+
+	def self.group_by_product_id
+		includes(:order_products).group('order_products.product_id')
+	end
+
+	def self.count_order_id_from_order_products
+		count('order_products.order_id')
+	end
+
+	def self.sum_total
+		sum('orders.total_inc_tax')
+	end
+
+	def self.sum_qty
+		sum('orders.qty')
+	end
+
+	def self.sum_order_product_qty
+		includes(:order_products).sum('order_products.qty')
+	end
+
+	def self.customer_filter(customer_ids)
+		return where('orders.customer_id IN (?)', customer_ids) if !customer_ids.nil? || !customer_ids.empty?
+		return all
+	end
+
+	def self.staff_filter(staff_id)
+		return includes([{:customer => :staff}]).where('customers.staff_id = ?', staff_id).references(:customers) if !staff_id.nil?
+		return all
+	end
+
+	def self.order_by_id
+		order('orders.id DESC')
+	end
+
+	def self.include_customer_staff_status
+		includes([{:customer => :staff}, :status])
+	end
+
+	def self.include_all
+		includes([{:customer => :staff}, :status, {:order_products => :product}])
+>>>>>>> efafc87de3efa0844d5de64d6f57e3d3288f8a05
 	end
 
 end
