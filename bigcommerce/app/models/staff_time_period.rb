@@ -17,6 +17,7 @@ class StaffTimePeriod < ActiveRecord::Base
 	end
 
 	def update_quarter(time_period, date_today)
+		StaffTimePeriod.update(time_period.id, start_date: date_today.beginning_of_quarter, end_date: (date_today.end_of_quarter).next_day)
 
 	end
 

@@ -97,18 +97,18 @@ class Product < ActiveRecord::Base
 
 		else
 
-			# sql = "UPDATE products SET sku = '#{sku}', name = '#{name}', inventory = '#{p.inventory_level}',\
-			# date_created = '#{date_created}', weight = '#{p.weight}', height = '#{p.height}', width = '#{p.width}',\
-			# visible = '#{visible}', featured = '#{featured}', availability = '#{p.availability}', date_modified = '#{date_modified}',\
-			# date_last_imported = '#{date_last_imported}', num_sold = '#{p.total_sold}', num_viewed = '#{p.view_count}',\
-			# upc = '#{p.upc}', bin_picking_num = '#{p.bin_picking_number}', search_keywords = '#{search_keywords}', meta_keywords = '#{meta_keywords}',\
-			# description = '#{description}', meta_description = '#{meta_description}', page_title = '#{page_title}', retail_price = '#{p.retail_price}',\
-			# sale_price = '#{p.sale_price}', calculated_price = '#{p.calculated_price}', inventory_warning_level = '#{p.inventory_warning_level}',\
-			# inventory_tracking = '#{p.inventory_tracking}', keyword_filter = '#{p.keyword_filter}', sort_order = '#{p.sort_order}',\
-			# related_products = '#{p.related_products}', rating_total = '#{p.rating_total}', rating_count = '#{p.rating_count}', updated_at = '#{time}'\
-			# WHERE id = '#{p.id}'"
+			sql = "UPDATE products SET sku = '#{sku}', name = '#{name}', inventory = '#{p.inventory_level}',\
+			date_created = '#{date_created}', weight = '#{p.weight}', height = '#{p.height}', width = '#{p.width}',\
+			visible = '#{visible}', featured = '#{featured}', availability = '#{p.availability}', date_modified = '#{date_modified}',\
+			date_last_imported = '#{date_last_imported}', num_sold = '#{p.total_sold}', num_viewed = '#{p.view_count}',\
+			upc = '#{p.upc}', bin_picking_num = '#{p.bin_picking_number}', search_keywords = '#{search_keywords}', meta_keywords = '#{meta_keywords}',\
+			description = '#{description}', meta_description = '#{meta_description}', page_title = '#{page_title}', retail_price = '#{p.retail_price}',\
+			sale_price = '#{p.sale_price}', calculated_price = '#{p.calculated_price}', inventory_warning_level = '#{p.inventory_warning_level}',\
+			inventory_tracking = '#{p.inventory_tracking}', keyword_filter = '#{p.keyword_filter}', sort_order = '#{p.sort_order}',\
+			related_products = '#{p.related_products}', rating_total = '#{p.rating_total}', rating_count = '#{p.rating_count}', updated_at = '#{time}'\
+			WHERE id = '#{p.id}'"
 
-			sql = "UPDATE products SET inventory = '#{p.inventory_level}' WHERE id = '#{p.id}'"
+			#sql = "UPDATE products SET inventory = '#{p.inventory_level}' WHERE id = '#{p.id}'"
 
 		end
 
@@ -166,6 +166,7 @@ class Product < ActiveRecord::Base
 	def self.search(search_text)
 		return search_for(search_text)
 	end
+<<<<<<< HEAD
 
 	def self.filter_by_ids(product_ids_a)
 	    return where('products.id IN (?)', product_ids_a) if !product_ids_a.empty?
@@ -186,6 +187,40 @@ class Product < ActiveRecord::Base
 
 	def self.product_name(product_id)
 		return find(product_id).name
+=======
+
+	def self.filter_by_ids(product_ids_a)
+	    return where('products.id IN (?)', product_ids_a) if !product_ids_a.empty?
+	    return all
+	end
+
+	def self.include_orders
+		includes([{:order_products => :order}])
+	end
+
+	def self.pending_stock(product_ids_a)
+		include_orders.filter_by_ids(product_ids_a).where('orders.status_id = 1').references(:orders).group('order_products.product_id').sum('order_products.qty')
+	end
+
+	def self.order_by_name
+		order('name ASC')
+	end
+
+	def self.no_vintage_id(product_id)
+		return find(product_id).product_no_vintage_id
+	end
+
+	def self.no_ws_id(product_id)
+		return find(product_id).product_no_ws_id
+	end
+
+	def self.products_with_same_no_vintage_id(no_vintage_id)
+		return where(product_no_vintage_id: no_vintage_id)
+	end
+
+	def self.products_with_same_no_ws_id(no_ws_id)
+		return where(product_no_ws_id: no_ws_id)
+>>>>>>> efafc87de3efa0844d5de64d6f57e3d3288f8a05
 	end
 
 end

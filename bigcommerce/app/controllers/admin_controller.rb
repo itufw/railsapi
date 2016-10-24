@@ -78,12 +78,12 @@ class AdminController < ApplicationController
 
     #product_files.each do |p|
 
-          CSVImport.new.do(Product, "product_ref" , "current", "display")
-          CSVImport.new.do(ProductNoVintage, "product_no_vintage" , nil)
+          #CSVImport.new.do(Product, "products" , "current", "display")
+          CSVImport.new.do(ProductNoVintage, "product_no_vintages" , nil)
 
     #end
 
-    render 'update'
+    #render 'update'
 
   end
 

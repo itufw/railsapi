@@ -27,4 +27,9 @@ class Status < ActiveRecord::Base
 	end
 
 
+	def self.filter_by_id(status_id)
+	  return find(status_id)
+	end
+
+
 end

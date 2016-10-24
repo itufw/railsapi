@@ -499,6 +499,20 @@ ActiveRecord::Schema.define(version: 20161021033519) do
     t.datetime "updated_at",                                         null: false
   end
 
+  create_table "tax_codes", force: :cascade do |t|
+    t.string   "customer_type", limit: 255
+    t.string   "tax_code",      limit: 255
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
+  create_table "tax_percentages", force: :cascade do |t|
+    t.string   "tax_name",       limit: 255
+    t.decimal  "tax_percentage",             precision: 8, scale: 2
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+  end
+
   create_table "warehouses", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
