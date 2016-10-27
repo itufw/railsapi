@@ -19,12 +19,4 @@ namespace :updates do
 	  StaffTimePeriod.new.update_all
 	  puts "Staff Time Periods Update #{Time.now} ended"
 	end
-
-	task :xero_sync => :environment do
-	  puts "Xero Sync #{Time.now} started"
-	  XeroController.new.update_xero_invoices
-	  XeroController.new.link_bigc_xero_orders
-	  XeroController.new.export_invoices_to_xero
-	  puts "Xero Sync #{Time.now} ended"
-	end
 end

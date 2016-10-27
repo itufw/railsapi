@@ -31,13 +31,13 @@ every 1.day, :at => '2:00 pm' do
 end
  
 every 1.day, :at => '2:00 am' do
-  rake "updates:xero_sync"
+  rake "invoice_sync:xero_sync"
 end
 
 every 1.day, :at => '6:30am' do
-  rake "updates:xero_sync"
+  rake "invoice_sync:xero_sync"
 end
 
 every 1.day, :at => '8:00 am' do
-  rake "updates:xero_sync"
+  rake "invoice_sync:xero_sync"
 end

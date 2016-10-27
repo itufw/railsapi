@@ -95,8 +95,6 @@ class XeroInvoice < ActiveRecord::Base
 		  		end
 	  		end
 
-	  		puts "Page Num : " + page_num.to_s
-
 	  		page_num += 1
 
 	  		invoices = xero.Invoice.all(page: page_num, modified_since: modified_since_time)
@@ -113,10 +111,6 @@ class XeroInvoice < ActiveRecord::Base
 		end
 	end
 
-	def self.valid_invoice_for_linkage(invoice)
-		return (invoice.status == 'AUTHORISED' || invoice.status == 'PAID')
-	end
-
 	def invoice_doesnt_exist(invoice_id)
         if XeroInvoice.where(xero_invoice_id: invoice_id).count == 0
   			return true
@@ -126,7 +120,7 @@ class XeroInvoice < ActiveRecord::Base
   	end
 
   	def self.get_invoice_id(invoice_number)
-  		invoice = where(invoice_number: invoice_number, status: "AUTHORISED")
+  		invoice = where("invoice_number = '#{invoice_number}' and (status = 'PAID' or status = 'AUTHORISED')")
   		if invoice.count == 1
   			return invoice.first.xero_invoice_id
   		else
