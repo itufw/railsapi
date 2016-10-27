@@ -16,6 +16,7 @@ class XeroController < ApplicationController
 	end
 
 	def update_xero_invoices
+		#XeroInvoice.new.download_data_from_api(XeroRevision.order("created_at").last.last_update_time)
 		XeroInvoice.new.download_data_from_api(Revision.find(7090).next_update_time)
 	end
 
