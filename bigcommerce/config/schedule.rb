@@ -18,6 +18,8 @@
 # end
 
 # Learn more: http://github.com/javan/whenever
+Time.zone = "Melbourne"
+
 set :environment, "production"
 
 set :output, {:error => "log/cron_error_log.log", :standard => "log/cron_log.log"}
@@ -26,18 +28,18 @@ every '0,15,30,45 * * * *' do
 	rake "updates:models"
 end
 
-every 1.day, :at => '2:00 pm' do
+every 1.day, :at => Time.zone.parse('12:00 am').utc do
 	rake "updates:timeperiods"
 end
  
-every 1.day, :at => '2:00 am' do
+every 1.day, :at => Time.zone.parse('12:00 pm').utc do
   rake "invoice_sync:xero_sync"
 end
 
-every 1.day, :at => '6:30am' do
+every 1.day, :at => Time.zone.parse('4:30 pm').utc do
   rake "invoice_sync:xero_sync"
 end
 
-every 1.day, :at => '8:00 am' do
+every 1.day, :at => Time.zone.parse('6:00 pm').utc do
   rake "invoice_sync:xero_sync"
 end
