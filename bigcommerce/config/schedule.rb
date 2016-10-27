@@ -18,6 +18,8 @@
 # end
 
 # Learn more: http://github.com/javan/whenever
+require "active_support/all"
+
 Time.zone = "Melbourne"
 
 set :environment, "production"
