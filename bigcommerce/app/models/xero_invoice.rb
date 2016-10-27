@@ -119,7 +119,7 @@ class XeroInvoice < ActiveRecord::Base
   	    end
   	end
 
-  	def self.get_invoice_id(invoice_number)
+  	def self.get_invoice_id_for_valid_invoice(invoice_number)
   		invoice = where("invoice_number = '#{invoice_number}' and (status = 'PAID' or status = 'AUTHORISED')")
   		if invoice.count == 1
   			return invoice.first.xero_invoice_id
@@ -130,7 +130,7 @@ class XeroInvoice < ActiveRecord::Base
   	end
   		
   	def self.find_by_order_id(order_id)
-  		if invoice_id = XeroInvoice.get_invoice_id(order_id.to_s)
+  		if invoice_id = XeroInvoice.get_invoice_id_for_valid_invoice(order_id.to_s)
   			return invoice_id
   		# elsif invoice = XeroInvoice.get_invoice_id_and_number('BC' + order_id.to_s)
   		# 	return invoice
@@ -139,8 +139,38 @@ class XeroInvoice < ActiveRecord::Base
   		end
   	end
 
+  	def self.filter_by_invoice_number(invoice_number)
+  		invoice = where(invoice_number: invoice_number.to_s)
+  		if invoice.empty?
+  			return nil
+  		else
+  			return invoice.first
+  		end
+  	end
+
   	def self.is_a_draft(order_id)
   		return where(invoice_number: order_id.to_s, status: "DRAFT").count == 1
   	end
 
+  	def self.paid(xero_invoice)
+  		if xero_invoice.status == "PAID"
+  			return true
+  		end
+  	end
+
+  	def self.unpaid(xero_invoice)
+  		if xero_invoice.status == "AUTHORISED" and xero_invoice.amount_due > 0
+  			return true
+  		end
+  	end
+
+  	def self.partially_paid(xero_invoice)
+  		if xero_invoice.status == "AUTHORISED" and xero_invoice.amount_paid > 0 and xero_invoice.amount_paid < xero_invoice.amount_due
+  			return true
+  		end
+  	end
+
+  	def self.amount_due(xero_invoice)
+  		return xero_invoice.amount_due
+  	end
 end

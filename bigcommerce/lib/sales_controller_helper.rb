@@ -99,24 +99,4 @@ module SalesControllerHelper
     return products.to_a
   end
 
-  def define_period_types(params)
-    period_types = ["weekly", "monthly"]
-    if params[:period_type]
-      selected_period = params[:period_type]
-    else
-      selected_period = "monthly"
-    end
-    return selected_period, period_types
-  end
-
-  def num_days_for_periods(period_type)
-    if period_type == "weekly"
-      return 7
-    elsif period_type == "monthly"
-      return 30
-    else
-      return 1
-    end
-  end
-      
 end

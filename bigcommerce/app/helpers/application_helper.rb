@@ -111,4 +111,19 @@ module ApplicationHelper
     XeroContact.get_accounts_receivable_overdue(xero_contact_id)
   end
 
+  def invoice_status(order_id)
+    invoice = XeroInvoice.filter_by_invoice_number(order_id)
+    unless invoice.nil?
+      amount_due = XeroInvoice.amount_due(invoice)
+      if XeroInvoice.paid(invoice)
+        return ["Paid", 0.0]
+      elsif XeroInvoice.partially_paid(invoice)
+        return ["Partially-Paid", amount_due]
+      elsif XeroInvoice.unpaid(invoice)
+        return ["Unpaid", amount_due]
+      end
+    end
+    return [" ", " "]
+  end
+
 end
