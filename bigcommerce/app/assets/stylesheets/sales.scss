@@ -82,3 +82,15 @@ table {
 .none {
     display: none;
 }
+
+.paid {
+    color: green;
+}
+
+.unpaid {
+    color: red;
+}
+
+.partially-paid {
+    color: orange;
+}

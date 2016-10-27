@@ -9,6 +9,7 @@
         <th class = <%= display_class %> >Selected Prod Qty</th>
 		<th>Qty</th>
 		<th>Total</th>
+		<th>Invoice Status</th>
 	</tr>
 
 	<% orders.each do |order| %>
@@ -22,6 +23,9 @@
 		<td class = <%= display_class + " num " %>  ><%= sum_order_products_qty(order.order_products) %></th>
 		<td class = "num"><%= order.qty %></td>
 		<td class = "num"><%= display_num(order.total_inc_tax) %></td>
+		<% invoice_status = invoice_status(order.id) %>
+		<td class = <%= invoice_status[0].downcase %> ><%= invoice_status[0] %></td>
+
 	</tr>
 	<% end %>
 

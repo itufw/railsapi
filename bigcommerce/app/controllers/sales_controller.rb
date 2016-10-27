@@ -79,8 +79,6 @@ class SalesController < ApplicationController
     @staff_sum_by_periods = sum_orders(dates[0], dates[-1], (date_function + "_and_staff_id").to_sym, sum_function, staff_id)
     
     @periods = (3..15).to_a
-    @period_types = ["weekly", "monthly"]
-
   end
 
   # Displays all orders for selected customer
@@ -102,7 +100,11 @@ class SalesController < ApplicationController
     @time_periods_name, @all_stats, @sum_stats, @avg_stats, product_ids = stats_for_timeperiods("Order.customer_filter(%s).valid_order" % [[@customer_id]], :group_by_product_id, :sum_order_product_qty, nil, nil)
     
     # returns a hash {id => name}
-    @products_h = product_filter(product_ids)
+    if !product_ids.empty?
+      @products_h = product_filter(product_ids)
+    else
+      @products_h = {}
+    end
   end
 
   # Displays all details about an order

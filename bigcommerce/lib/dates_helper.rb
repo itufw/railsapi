@@ -102,6 +102,8 @@ module DatesHelper
       return ["beginning_of_week".to_sym, "last_week".to_sym, "group_by_week_created", :convert_to_week_num]
     elsif period_type == "monthly"
       return ["beginning_of_month".to_sym, "last_month".to_sym, "group_by_month_created", :convert_to_month_num]
+    elsif period_type == "quaterly"
+      return ["beginning_of_quarter".to_sym, "last_quarter".to_sym, "group_by_quarter_created", :convert_to_quarter_num]
     else
       return ["".to_sym, "".to_sym]
     end
@@ -125,9 +127,35 @@ module DatesHelper
     return [date.month.to_i, date.year.to_i]
   end
 
+  def convert_to_quarter_num(date)
+    return [((date.month.to_i - 1) / 3) + 1, date.year.to_i]
+  end
+
   # def calculate_invoice_due_date(date_created, customer)
   #   num_days_since_date_created = Customer.due_date_num_days(customer)
   #   return num_days_since_date_created.since(date_created)
   # end
 
+  def define_period_types(params)
+    period_types = ["weekly", "monthly", "quaterly"]
+    if params[:period_type]
+      selected_period = params[:period_type]
+    else
+      selected_period = "monthly"
+    end
+    return selected_period, period_types
+  end
+
+  def num_days_for_periods(period_type)
+    if period_type == "weekly"
+      return 7
+    elsif period_type == "monthly"
+      return 30
+    elsif period_type == "quaterly"
+      return 65
+    else
+      return 1
+    end
+  end
+      
 end
