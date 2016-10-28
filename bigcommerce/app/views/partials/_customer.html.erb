@@ -9,7 +9,7 @@
 
 	<% customers.each do |c| %>
 	<tr>
-		<td><%= c.staff.nickname %></td>
+		<%= render "partials/staff_update_form", customer: c %>
 		<% cust_name = customer_name(c) %>
 		<td><%= link_to cust_name, controller: 'sales', action: 'orders_and_stats_for_customer', customer_id: c.id, customer_name: cust_name %></td>
 		<td class="num"><%= display_num(outstanding_customer(c.xero_contact_id))  %></td>
