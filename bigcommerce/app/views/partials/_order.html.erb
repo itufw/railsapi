@@ -15,8 +15,9 @@
 	<% orders.each do |order| %>
 	<tr>
 
-		<td>
+		<td class="col-xs-2">
 		<% @staff_id = staff_id_for_order(order) %>
+		<% @staffs = all_staffs %>
 
 		<%= form_tag :controller => "models", :action => "update_staff" do %>
 
