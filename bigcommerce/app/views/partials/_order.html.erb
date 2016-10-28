@@ -14,7 +14,19 @@
 
 	<% orders.each do |order| %>
 	<tr>
-		<td><%= staff_nickname(order.customer) %></td>
+
+		<td>
+		<% @staff_id = staff_id_for_order(order) %>
+
+		<%= form_tag :controller => "models", :action => "update_staff" do %>
+
+		<%= select_tag(:staff_id, options_from_collection_for_select(@staffs, :id, :nickname, @staff_id), html_options = {:class => 'form-control', :onchange => "this.form.submit()"}) %>
+
+		<%= hidden_field_tag :customer_id, order.customer_id %>
+
+		<% end %>
+		</td>
+
 		<td><%= date_format_orders(order.date_created) %></td>
 		<td><%= link_to order.id, controller: 'sales', action: 'order_details', order_id: order.id %></td>
 		<% cust_name = customer_name(order.customer) %>

@@ -45,6 +45,11 @@ module ApplicationHelper
   	customer.staff.nickname unless customer.nil?
   end
 
+  def staff_id_for_order(order)
+    customer = order.customer unless order.nil?
+    return customer.staff_id unless customer.nil?
+  end
+
   # Paginates model unless the number of rows are less than 15
   # 15 is the paginate limit set in every model
   def paginate(model)
@@ -116,11 +121,11 @@ module ApplicationHelper
     unless invoice.nil?
       amount_due = XeroInvoice.amount_due(invoice)
       if XeroInvoice.paid(invoice)
-        return ["Paid", 0.0]
+        return ["PAID", 0.0]
       elsif XeroInvoice.partially_paid(invoice)
-        return ["Partially-Paid", amount_due]
+        return ["PARTIALLY-PAID", amount_due]
       elsif XeroInvoice.unpaid(invoice)
-        return ["Unpaid", amount_due]
+        return ["UNPAID", amount_due]
       end
     end
     return [" ", " "]
