@@ -34,6 +34,10 @@ module ApplicationHelper
   	status.name
   end
 
+  def all_staffs
+    return Staff.active_sales_staff
+  end
+
   # Returns Staff's nickname
   # Takes in a staff object as input
   def staff_nickname_direct(staff)
