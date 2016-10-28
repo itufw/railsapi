@@ -7,7 +7,7 @@ module XeroInvoiceCalculations
 
 			order_id = o.id
 
-			unless XeroInvoice.is_a_draft(order_id)
+			unless XeroInvoice.is_submitted(order_id)
 				customer_id = o.customer_id
 				# If its a new customer then create a new contact in Xero
 				if Customer.is_new_customer_for_xero(o.customer)
@@ -242,7 +242,8 @@ module XeroInvoiceCalculations
 
   		invoice = xero.Invoice.build(invoice_number: invoice_number.to_s, contact: contact,\
   			type: "ACCREC", date: order.date_created.to_date,\
-  			due_date: 30.days.since(order.date_created.to_date), sent_to_contact: false)
+  			due_date: 30.days.since(order.date_created.to_date), sent_to_contact: false,\
+  			status: "SUBMITTED")
 
   		line_items = XeroCalculation.get_line_items(invoice_number)
 

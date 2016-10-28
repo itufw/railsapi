@@ -148,8 +148,8 @@ class XeroInvoice < ActiveRecord::Base
   		end
   	end
 
-  	def self.is_a_draft(order_id)
-  		return where(invoice_number: order_id.to_s, status: "DRAFT").count == 1
+  	def self.is_submitted(order_id)
+  		return where(invoice_number: order_id.to_s, status: "SUBMITTED").count == 1
   	end
 
   	def self.paid(xero_invoice)
