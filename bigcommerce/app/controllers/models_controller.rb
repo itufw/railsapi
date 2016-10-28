@@ -47,4 +47,16 @@ class ModelsController < ApplicationController
 
   end
 
+  def update_staff
+    customer_id = params[:customer_id]
+    staff_id = params[:staff_id]
+
+    Customer.staff_change(staff_id, customer_id)
+
+    #render html: "#{customer_id}, #{staff_id}".html_safe
+    flash[:success] = "Staff Successfully Changed."
+    redirect_to request.referrer
+
+  end
+
 end

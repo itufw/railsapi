@@ -140,7 +140,7 @@ class Customer < ActiveRecord::Base
 	end
 
 	def self.filter_by_id(id)
-		find(id)
+		find(id.to_i)
 	end
 
 	def self.filter_by_ids(ids_array)
@@ -196,5 +196,11 @@ class Customer < ActiveRecord::Base
 			
 	# 	end
 	# end
+
+	def self.staff_change(staff_id, customer_id)
+		customer = filter_by_id(customer_id)
+		customer.staff_id = staff_id.to_i
+		customer.save
+	end
 
 end

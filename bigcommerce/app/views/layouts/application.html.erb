@@ -32,7 +32,9 @@
     </div>
   </div>
 </nav>
-
+<% flash.each do |key, value| %>
+  <center><%= content_tag :div, value, class: "flash #{key}" %></center>
+<% end %>
 <%= yield %>
 
 </body>
