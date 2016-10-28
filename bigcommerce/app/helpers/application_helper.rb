@@ -49,9 +49,16 @@ module ApplicationHelper
   	customer.staff.nickname unless customer.nil?
   end
 
-  def staff_id_for_order(order)
-    customer = order.customer unless order.nil?
-    return customer.staff_id unless customer.nil?
+  def staff_for_customer(customer)
+    return customer.staff unless customer.nil?
+  end
+
+  def can_update_staff
+    if Staff.display_report(session[:user_id]).to_i == 1
+      return true
+    else
+      return false
+    end
   end
 
   # Paginates model unless the number of rows are less than 15
