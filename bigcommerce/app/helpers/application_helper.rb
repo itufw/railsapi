@@ -54,7 +54,7 @@ module ApplicationHelper
   end
 
   def can_update_staff
-    if Staff.display_report(session[:user_id]).to_i == 1
+    if Staff.can_update(session[:user_id]).to_i == 1
       return true
     else
       return false
