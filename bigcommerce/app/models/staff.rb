@@ -35,5 +35,9 @@ class Staff < ActiveRecord::Base
 		find(staff_id).display_report
 	end
 
+	def self.can_update(staff_id)
+		find(staff_id).can_update
+	end
+
 
 end
