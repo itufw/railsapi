@@ -119,17 +119,23 @@ class SalesController < ApplicationController
     @product_id = params[:product_id]
     @product_name = params[:product_name]
 
-    @total_stock = params[:total_stock]
-    @total_stock_no_ws = total_stock_product(@product_id, params[:total_stock])
-    @selected_period, @period_types = define_period_types(params)
-
-    @time_periods_name, @all_stats, @sum_stats, @avg_stats, customer_ids, @monthly_supply = stats_for_timeperiods("Order.product_filter(%s).valid_order" % @product_id, :group_by_customerid, :sum_order_product_qty, @total_stock_no_ws, @selected_period)
-
     @staffs = staff_dropdown
 
     results_val = customer_param_filter(params, 25)
 
     @staff = results_val[0]
+    staff_id = results_val[3]
+
+    if staff_id.nil?
+      staff_id = "nil"
+    end
+
+    @total_stock = params[:total_stock]
+    @total_stock_no_ws = total_stock_product(@product_id, params[:total_stock])
+    @selected_period, @period_types = define_period_types(params)
+
+    @time_periods_name, @all_stats, @sum_stats, @avg_stats, customer_ids, @monthly_supply = stats_for_timeperiods("Order.product_filter(%s).valid_order.staff_filter(%s)" % [@product_id, staff_id], :group_by_customerid, :sum_order_product_qty, @total_stock_no_ws, @selected_period)
+
     customers_filtered_ids = results_val[1].pluck("id")
     customers = Customer.filter_by_ids(customers_filtered_ids & customer_ids)
     customers_h = Hash.new

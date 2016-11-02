@@ -52,7 +52,7 @@ module ModelsFilter
 
     customers = Customer.staff_search_filter(search_text, staff_id)
 
-    return staff, customers, search_text
+    return staff, customers, search_text, staff_id
 
   end
 
