@@ -157,7 +157,7 @@ class SalesController < ApplicationController
     @staffs = Staff.active_sales_staff
     @statuses = Status.all
 
-    @staff, @status, orders_filtered_by_param, @search_text = order_param_filter(params, session[:user_id])
+    @staff, @status, orders_filtered_by_param, @search_textt, @order_id = order_param_filter(params, session[:user_id])
     orders_filtered_by_product = Order.product_filter([@product_id]).pluck("id")
     order_ids = orders_filtered_by_param.pluck("id") & orders_filtered_by_product
     @orders = Order.include_customer_staff_status.order_filter_by_ids(order_ids).order_by_id.page(params[:page])
