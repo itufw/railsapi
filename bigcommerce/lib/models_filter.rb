@@ -101,13 +101,21 @@ module ModelsFilter
     return producer_country, product_sub_type, products, search_text
   end
 
-  def product_filter(product_ids_a)
-    product_h = Product.filter_by_ids(product_ids_a).pluck("id,name").to_h
+  def product_filter_with_price(product_ids_a)
+    products = Product.filter_by_ids(product_ids_a)
 
-    product_h_sorted = Hash[product_h.sort_by { |k,v| v }]
+    products_h = Hash.new
+
+    products.each do |p|
+      products_h[p.id] = [p.name, p.calculated_price, p.retail_ws]
+    end
+
+
+    product_h_sorted = Hash[products_h.sort_by { |k,v| v[0] }]
 
     return product_h_sorted
   end
+
 
   def reports_access_open(staff_id)
     display_val = (Staff.display_report(staff_id)).to_i
