@@ -87,9 +87,10 @@ class SalesController < ApplicationController
   def orders_and_stats_for_customer
     @customer_id = params[:customer_id]
     @customer_name = params[:customer_name]
+    @per_page = params[:per_page] || Order.per_page
 
     @selected_period, @period_types = define_period_types(params)
-    @orders = Order.include_customer_staff_status.customer_filter([@customer_id]).order_by_id.page(params[:page])
+    @orders = Order.include_customer_staff_status.customer_filter([@customer_id]).order_by_id.paginate( per_page: @per_page, page: params[:page])
     @time_periods_name, all_stats, @sum_stats, @avg_stats, product_ids = stats_for_timeperiods("Order.customer_filter(%s).valid_order" % [[@customer_id]], :"", :sum_total, nil, @selected_period)
   end
 
@@ -153,6 +154,8 @@ class SalesController < ApplicationController
   def orders_for_product
     @product_id = params[:product_id]
     @product_name = params[:product_name]
+    @per_page = params[:per_page] || Order.per_page
+
 
     @staffs = Staff.active_sales_staff
     @statuses = Status.all
@@ -160,7 +163,7 @@ class SalesController < ApplicationController
     @staff, @status, orders_filtered_by_param, @search_textt, @order_id = order_param_filter(params, session[:user_id])
     orders_filtered_by_product = Order.product_filter([@product_id]).pluck("id")
     order_ids = orders_filtered_by_param.pluck("id") & orders_filtered_by_product
-    @orders = Order.include_customer_staff_status.order_filter_by_ids(order_ids).order_by_id.page(params[:page])
+    @orders = Order.include_customer_staff_status.order_filter_by_ids(order_ids).order_by_id.paginate( per_page: @per_page, page: params[:page])
     @staff_nickname = params[:staff_nickname]
   end
 
@@ -172,12 +175,14 @@ class SalesController < ApplicationController
   def orders_and_stats_for_product_and_customer
     customer_id = params[:customer_id]
     @customer_name = params[:customer_name]
+    @per_page = params[:per_page] || Order.per_page
+
 
     product_id = params[:product_id]
     @product_name = params[:product_name]
 
     @selected_period, @period_types = define_period_types(params)
-    @orders = Order.include_customer_staff_status.product_filter(product_id).customer_filter([customer_id]).order_by_id.page(params[:page])
+    @orders = Order.include_customer_staff_status.product_filter(product_id).customer_filter([customer_id]).order_by_id.paginate( per_page: @per_page, page: params[:page])
     @time_periods_name, i, @sum_stats, @avg_stats = stats_for_timeperiods("Order.product_filter(%s).customer_filter(%s).valid_order" % [product_id, [customer_id]], "".to_sym, :sum_order_product_qty, nil, @selected_period)
   end
 
@@ -187,6 +192,8 @@ class SalesController < ApplicationController
   def orders_and_products_for_status
     @status_id = params[:status_id]
     @status_name = params[:status_name]
+    @per_page = params[:per_page] || Order.per_page
+
 
     if @status_id.nil?
       @status_id = 1
@@ -205,9 +212,9 @@ class SalesController < ApplicationController
     product_ids = products.pluck("id")
 
     # filter orders
-    orders = Order.include_all.status_filter(@status_id).staff_filter(staff_id).product_filter(product_ids).order_by_id.page(params[:page])
+    orders = Order.include_all.status_filter(@status_id).staff_filter(staff_id).product_filter(product_ids).order_by_id
 
-    @orders = orders.page(params[:page])
+    @orders = orders.paginate( per_page: @per_page, page: params[:page])
     @products = products_for_status(@status_id, staff_id, product_ids)
 
   end
@@ -218,6 +225,8 @@ class SalesController < ApplicationController
   def orders_and_stats_for_product_and_status
       product_id = params[:product_id]
       @product_name = params[:product_name]
+      @per_page = params[:per_page] || Order.per_page
+
 
       status_id = params[:status_id]
       @status_name = params[:status_name]
@@ -234,7 +243,7 @@ class SalesController < ApplicationController
 
       staff_id, @staff = staff_params_filter(params, session[:user_id])
     
-      @orders = Order.status_filter(status_id).staff_filter(staff_id).product_filter([product_id]).order_by_id.page(params[:page])
+      @orders = Order.status_filter(status_id).staff_filter(staff_id).product_filter([product_id]).order_by_id.paginate( per_page: @per_page, page: params[:page])
   end
 
 
