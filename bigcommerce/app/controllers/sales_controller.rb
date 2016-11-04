@@ -137,10 +137,13 @@ class SalesController < ApplicationController
     @time_periods_name, @all_stats, @sum_stats, @avg_stats, customer_ids, @monthly_supply = stats_for_timeperiods("Order.product_filter(%s).valid_order.staff_filter(%s)" % [@product_id, staff_id], :group_by_customerid, :sum_order_product_qty, @total_stock_no_ws, @selected_period)
 
     customers_filtered_ids = results_val[1].pluck("id")
+
+    # intersection between customers who have stats and customers who are filtered 
     customers = Customer.filter_by_ids(customers_filtered_ids & customer_ids)
     customers_h = Hash.new
     customers.map {|c| customers_h[c.id] = [Customer.customer_name(c.actual_name, c.firstname, c.lastname), Staff.filter_by_id(c.staff_id).nickname]}
     @customers_h_sorted = customers_h.sort_by {|id, key| key[0]}
+
   end
 
   # How do I get to this ? - Click on the page that displays all products -

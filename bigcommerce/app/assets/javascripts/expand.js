@@ -30,7 +30,7 @@
 // 	});
 // })
 
-$(document).on('page:change', function() {
+$(document).on('ready page:load', function () {
 
 	$("#products-view-button").click(function() {
 		$(".orders-view").removeClass("default")
@@ -50,3 +50,4 @@ $(document).on('page:change', function() {
 
 
 })
+
