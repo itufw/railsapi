@@ -11,8 +11,15 @@ module ModelsFilter
 
   	start_date = params[:start_date]
   	end_date = params[:end_date]
-  	orders = Order.include_customer_staff_status.date_filter(start_date, end_date).customer_filter(customer_ids).staff_filter(staff_id).status_filter(status_id)
-  	return staff, status, orders, search_text
+    order_id_text = params[:order_id_search]
+
+    if order_id_text.to_i > 0
+      orders = Order.include_customer_staff_status.order_filter_by_ids([order_id_text.to_i])
+    else
+      orders = Order.include_customer_staff_status.date_filter(start_date, end_date).customer_filter(customer_ids).staff_filter(staff_id).status_filter(status_id)
+  	end
+
+    return staff, status, orders, search_text, order_id_text
   end
 
   def staff_params_filter(params, session_staff_id)

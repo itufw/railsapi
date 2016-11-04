@@ -20,7 +20,6 @@ class Order < ActiveRecord::Base
 
 	self.per_page = 30
 
-	self.per_page = 30
 
 	def scrape
 
@@ -161,7 +160,8 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.order_filter(order_id)
-		find(order_id)
+		return find(order_id) if order_id > 0
+		return all
 	end
 
 	def self.order_filter_by_ids(order_ids)

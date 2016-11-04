@@ -10,7 +10,7 @@ class ModelsController < ApplicationController
     @staffs = Staff.active_sales_staff
     @statuses = Status.all
 
-    @staff, @status, orders, @search_text = order_param_filter(params, session[:user_id])
+    @staff, @status, orders, @search_text, @order_id = order_param_filter(params, session[:user_id])
     @orders = orders.order_by_id.page(params[:page])
 
     # @staff = results_val[0]
