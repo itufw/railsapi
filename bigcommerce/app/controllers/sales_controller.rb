@@ -100,9 +100,8 @@ class SalesController < ApplicationController
     @customer_name = params[:customer_name]
     @time_periods_name, @all_stats, @sum_stats, @avg_stats, product_ids = stats_for_timeperiods("Order.customer_filter(%s).valid_order" % [[@customer_id]], :group_by_product_id, :sum_order_product_qty, nil, nil)
     
-    # returns a hash {id => name}
     if !product_ids.empty?
-      @products_h = product_filter(product_ids)
+      @products_h = product_filter_with_price(product_ids)
     else
       @products_h = {}
     end
