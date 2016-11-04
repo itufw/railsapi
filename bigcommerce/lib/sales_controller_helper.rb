@@ -49,6 +49,7 @@ module SalesControllerHelper
 
     end
 
+    # overall_h structure : { time_period_name => [ key(customer_id or product_id) => stat ]}
     ids = overall_h.values.reduce(&:merge).keys unless overall_h.blank?
     [time_periods.pluck("name"), overall_h, overall_sum, overall_avg, ids, monthly_supply]
   end
