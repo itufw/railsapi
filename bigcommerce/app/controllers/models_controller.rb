@@ -10,13 +10,11 @@ class ModelsController < ApplicationController
     @staffs = Staff.active_sales_staff
     @statuses = Status.all
 
-    @staff, @status, orders, @search_text, @order_id = order_param_filter(params, session[:user_id])
-    @orders = orders.order_by_id.page(params[:page])
+    @per_page = params[:per_page] || Order.per_page
 
-    # @staff = results_val[0]
-    # @status = results_val[1]
-    # @orders = results_val[2].order_by_id.page(params[:page])
-    # @search_text = results_val[3]
+    @staff, @status, orders, @search_text, @order_id = order_param_filter(params, session[:user_id])
+    @orders = orders.order_by_id.paginate( per_page: @per_page, page: params[:page])
+
     @start_date = params[:start_date]
     @end_date = params[:end_date]
 
@@ -25,9 +23,10 @@ class ModelsController < ApplicationController
 
   def customers
     @staffs = Staff.active_sales_staff
+    @per_page = params[:per_page] || Customer.per_page
 
     @staff, customers, @search_text = customer_param_filter(params, session[:user_id])
-    @customers = customers.order_by_name.page(params[:page])
+    @customers = customers.order_by_name.paginate( per_page: @per_page, page: params[:page])
 
   end
 
@@ -37,13 +36,15 @@ class ModelsController < ApplicationController
     @sub_types = ProductSubType.all
     results_val = product_param_filter(params)
 
+    @per_page = params[:per_page] || Product.per_page
+
     @producer_country = results_val[0]
     @product_sub_type = results_val[1]
     products = results_val[2]
     @search_text = results_val[3]
 
     @pending_stock_h = Product.pending_stock(products.pluck("id"))
-    @products = products.order_by_name.page(params[:page])
+    @products = products.order_by_name.paginate( per_page: @per_page, page: params[:page])
 
   end
 
