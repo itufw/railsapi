@@ -119,11 +119,13 @@ class SalesController < ApplicationController
     @product_id = params[:product_id]
     @product_name = params[:product_name]
 
-    @staffs = staff_dropdown
+    @staffs = Staff.active_sales_staff
+    @cust_styles = CustStyle.all
 
     results_val = customer_param_filter(params, 25)
 
     @staff = results_val[0]
+    @cust_style = results_val[-1]
     staff_id = results_val[3]
 
     if staff_id.nil?
@@ -134,14 +136,14 @@ class SalesController < ApplicationController
     @total_stock_no_ws = total_stock_product(@product_id, params[:total_stock])
     @selected_period, @period_types = define_period_types(params)
 
-    @time_periods_name, @all_stats, @sum_stats, @avg_stats, customer_ids, @monthly_supply = stats_for_timeperiods("Order.product_filter(%s).valid_order.staff_filter(%s)" % [@product_id, staff_id], :group_by_customerid, :sum_order_product_qty, @total_stock_no_ws, @selected_period)
+    @time_periods_name, @all_stats, @sum_stats, @avg_stats, customer_ids, @monthly_supply = stats_for_timeperiods("Order.product_filter(%s).valid_order.includes(:customer).staff_filter(%s)" % [@product_id, staff_id], :group_by_customerid, :sum_order_product_qty, @total_stock_no_ws, @selected_period)
 
     customers_filtered_ids = results_val[1].pluck("id")
 
-    # intersection between customers who have stats and customers who are filtered 
-    customers = Customer.filter_by_ids(customers_filtered_ids & customer_ids)
+    # # intersection between customers who have stats and customers who are filtered 
+    customers = Customer.include_staff.include_cust_style.filter_by_ids(customers_filtered_ids & customer_ids)
     customers_h = Hash.new
-    customers.map {|c| customers_h[c.id] = [Customer.customer_name(c.actual_name, c.firstname, c.lastname), Staff.filter_by_id(c.staff_id).nickname]}
+    customers.map {|c| customers_h[c.id] = [Customer.customer_name(c.actual_name, c.firstname, c.lastname), c.staff.nickname, c.cust_style.name]}
     @customers_h_sorted = customers_h.sort_by {|id, key| key[0]}
 
   end
@@ -242,7 +244,7 @@ class SalesController < ApplicationController
 
       staff_id, @staff = staff_params_filter(params, session[:user_id])
     
-      @orders = Order.status_filter(status_id).staff_filter(staff_id).product_filter([product_id]).order_by_id.paginate( per_page: @per_page, page: params[:page])
+      @orders = Order.include_all.status_filter(status_id).staff_filter(staff_id).product_filter([product_id]).order_by_id.paginate( per_page: @per_page, page: params[:page])
   end
 
 

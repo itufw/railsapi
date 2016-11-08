@@ -44,7 +44,7 @@ module ModelsFilter
   end
 
   def status_params_filter(params)
-  	if !params[:status].nil? && !params[:status][:id].empty?
+    unless (params[:status].nil? or params[:status][:id].empty?)
   	  status_id = params[:status][:id]
   	  status = Status.filter_by_id(status_id)
   	  return status_id, status
@@ -57,11 +57,22 @@ module ModelsFilter
     search_text = params[:search]
 
     staff_id, staff = staff_params_filter(params, session_staff_id)
+    cust_style_id, cust_style = cust_style_param_filter(params)
 
-    customers = Customer.staff_search_filter(search_text, staff_id)
+    customers = Customer.staff_search_filter(search_text, staff_id).cust_style_filter(cust_style_id)
 
-    return staff, customers, search_text, staff_id
+    return staff, customers, search_text, staff_id, cust_style
 
+  end
+
+  def cust_style_param_filter(params)
+    unless (params[:cust_style].nil? or params[:cust_style][:id].empty?)
+      cust_style_id = params[:cust_style][:id]
+      cust_style = CustStyle.filter_by_id(cust_style_id)
+      return cust_style_id, cust_style
+    else
+      return nil, nil
+    end
   end
 
   def producer_country_params_filter(params)

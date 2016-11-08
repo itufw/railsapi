@@ -124,8 +124,13 @@ class Customer < ActiveRecord::Base
 	end
 
 	def self.staff_search_filter(search_text = nil, staff_id = nil)
-		return includes(:staff).where(staff_id: staff_id).search_for(search_text) if staff_id
+		return where(staff_id: staff_id).search_for(search_text) if staff_id
 		return search_for(search_text) if search_text
+		return all
+	end
+
+	def self.cust_style_filter(cust_style_id)
+		return where(cust_style_id: cust_style_id) unless cust_style_id.nil?
 		return all
 	end
 
@@ -201,6 +206,14 @@ class Customer < ActiveRecord::Base
 		customer = filter_by_id(customer_id)
 		customer.staff_id = staff_id.to_i
 		customer.save
+	end
+
+	def self.include_staff
+		includes(:staff)
+	end
+
+	def self.include_cust_style
+		includes(:cust_style)
 	end
 
 	def self.include_all

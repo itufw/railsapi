@@ -3,7 +3,8 @@
 		<th class = <%= display_class_otherwise %> >ID</th>
 		<th><%= column_name %></th>
 		<th class = <%= display_class_otherwise %> >Product Price</th>
-		<th class = <%= display_class %> ><%= column_name_optional %></th>
+		<th class = <%= display_class %> >Staff</th>
+		<th class = <%= display_class %> >Style</th>
 		<% time_periods_name.each do |t| %>
 			<th><%= t %></th>
 		<% end %>
@@ -23,6 +24,7 @@
 		<td class = <%= display_class %> ><%= link_to val[0], controller: 'sales', action: 
 		'orders_and_stats_for_product_and_customer', customer_id: id, customer_name: val[0], product_id: product_id, product_name: product_name %></td>
 		<td class = <%= display_class %> ><%= val[1] %></td>
+		<td class = <%= display_class %> ><%= val[2] %></td>
 		<% stats.each do |time_period_name, hash| %>
 		<td><%= exists_in_h(hash, id) %></td>
 		<% end %>
