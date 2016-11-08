@@ -3,7 +3,7 @@ module ModelsFilter
   def order_param_filter(params, session_staff_id)
 
   	search_text = params[:search]
-    customer_ids = Customer.search_for(search_text).pluck("id")
+    customer_ids = Customer.search_for(search_text).pluck("id") unless search_text.nil?
 
     staff_id, staff = staff_params_filter(params, session_staff_id)
 
@@ -14,10 +14,11 @@ module ModelsFilter
     order_id_text = params[:order_id_search]
 
     if order_id_text.to_i > 0
-      orders = Order.include_customer_staff_status.order_filter_by_ids([order_id_text.to_i])
+      orders = Order.order_filter_by_ids([order_id_text.to_i])
     else
-      orders = Order.include_customer_staff_status.date_filter(start_date, end_date).customer_filter(customer_ids).staff_filter(staff_id).status_filter(status_id)
-  	end
+      orders = Order.date_filter(start_date, end_date).customer_filter(customer_ids).staff_filter(staff_id).status_filter(status_id)
+    end
+    #orders = Order.all
 
     return staff, status, orders, search_text, order_id_text
   end

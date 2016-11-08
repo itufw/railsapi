@@ -21,4 +21,5 @@ module XeroControllerHelper
 		Order.insert_invoice(order_id, xero_invoice_id) unless xero_invoice_id.nil?
 	end
 
+
 end

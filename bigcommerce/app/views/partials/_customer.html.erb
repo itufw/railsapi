@@ -19,17 +19,21 @@
 	<tr>
 		<th>Sales Rep</th>
 		<th>Name</th>
+		<th>Type</th>
+		<th>Style</th>
 		<th>Outstanding</th>
 		<th>Overdue</th>
 	</tr>
 
 	<% customers.each do |c| %>
 	<tr>
-		<%= render "partials/staff_update_form", customer: c %>
+		<%= render "partials/staff_update_form", customer: c, staff: c.staff, can_update_staff: @can_update_bool %>
 		<% cust_name = customer_name(c) %>
 		<td><%= link_to cust_name, controller: 'sales', action: 'orders_and_stats_for_customer', customer_id: c.id, customer_name: cust_name %></td>
-		<td class="num"><%= display_num(outstanding_customer(c.xero_contact_id))  %></td>
-		<td class="num"><%= display_num(overdue_customer(c.xero_contact_id)) %></td>
+		<td><%= customer_type_name(c) %></td>
+		<td><%= customer_style_name(c) %></td>
+		<td class="num"><%= display_num(outstanding_customer(c.xero_contact))  %></td>
+		<td class="num"><%= display_num(overdue_customer(c.xero_contact)) %></td>
 	</tr>
 	<% end %>
 	

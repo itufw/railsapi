@@ -1,32 +1,38 @@
 require 'models_filter.rb'
+require 'display_helper.rb'
 
 class ModelsController < ApplicationController
 
   before_action :confirm_logged_in
 
   include ModelsFilter
+  include DisplayHelper
   
   def orders
     @staffs = Staff.active_sales_staff
+
+    @staff_nickname = params[:staff_nickname]
+    @start_date = params[:start_date]
+    @end_date = params[:end_date]
+
+    @can_update_bool = allow_to_update(session[:user_id])
     @statuses = Status.all
 
     @per_page = params[:per_page] || Order.per_page
 
+
     @staff, @status, orders, @search_text, @order_id = order_param_filter(params, session[:user_id])
-    @orders = orders.order_by_id.paginate( per_page: @per_page, page: params[:page])
+    @orders = orders.include_all.order_by_id.paginate( per_page: @per_page, page: params[:page])
 
-    @start_date = params[:start_date]
-    @end_date = params[:end_date]
-
-    @staff_nickname = params[:staff_nickname]
   end
 
   def customers
     @staffs = Staff.active_sales_staff
+    @can_update_bool = allow_to_update(session[:user_id])
     @per_page = params[:per_page] || Customer.per_page
 
     @staff, customers, @search_text = customer_param_filter(params, session[:user_id])
-    @customers = customers.order_by_name.paginate( per_page: @per_page, page: params[:page])
+    @customers = customers.include_all.order_by_name.paginate( per_page: @per_page, page: params[:page])
 
   end
 
