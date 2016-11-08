@@ -5,6 +5,7 @@ class Order < ActiveRecord::Base
 
 	include CleanData
 	belongs_to :customer
+	delegate :staff, to: :customer, allow_nil: true
 	belongs_to :status
 	belongs_to :coupon
 	belongs_to :staff
@@ -16,7 +17,7 @@ class Order < ActiveRecord::Base
 	#has_many :products, through: :order_products
 
 	belongs_to :order_history
-	has_one :xero_invoice
+	belongs_to :xero_invoice
 
 	self.per_page = 30
 
@@ -169,7 +170,7 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.product_filter(product_ids)
-		return includes(:order_products).where('order_products.product_id IN (?)', product_ids).references(:order_products) if !product_ids.nil?
+		return where('order_products.product_id IN (?)', product_ids).references(:order_products) if !product_ids.nil?
 		return all
 	end
 
@@ -192,7 +193,7 @@ class Order < ActiveRecord::Base
 
 	# Returns Orders who status has a valid order flag
 	def self.valid_order
-		includes(:status).where('statuses.valid_order = 1').references(:statuses)
+		where('statuses.valid_order = 1').references(:statuses)
 	end
 
 	# Returns orders with a given status id
@@ -218,19 +219,19 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.group_by_date_created_and_staff_id
-		includes(:customer).group(["customers.staff_id", "DATE(orders.date_created)"])
+		group(["customers.staff_id", "DATE(orders.date_created)"])
 	end
 
 	def self.group_by_week_created_and_staff_id
-		includes(:customer).group(["customers.staff_id", "WEEK(orders.date_created)"])
+		group(["customers.staff_id", "WEEK(orders.date_created)"])
 	end
 
 	def self.group_by_month_created_and_staff_id
-		includes(:customer).group(["customers.staff_id", "MONTH(orders.date_created)", "YEAR(orders.date_created)"])
+		group(["customers.staff_id", "MONTH(orders.date_created)", "YEAR(orders.date_created)"])
 	end
 
 	def self.group_by_quarter_created_and_staff_id
-		includes(:customer).group(["customers.staff_id", "QUARTER(orders.date_created)", "YEAR(orders.date_created)"])
+		group(["customers.staff_id", "QUARTER(orders.date_created)", "YEAR(orders.date_created)"])
 	end
 
 	def self.group_by_customerid
@@ -238,7 +239,7 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.group_by_product_id
-		includes(:order_products).group('order_products.product_id')
+		group('order_products.product_id')
 	end
 
 	def self.count_order_id_from_order_products
@@ -254,16 +255,16 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.sum_order_product_qty
-		includes(:order_products).sum('order_products.qty')
+		sum('order_products.qty')
 	end
 
 	def self.customer_filter(customer_ids)
-		return where('orders.customer_id IN (?)', customer_ids) if !customer_ids.nil? || !customer_ids.empty?
+		return where('orders.customer_id IN (?)', customer_ids) unless (customer_ids.nil? or  customer_ids.empty?)
 		return all
 	end
 
 	def self.staff_filter(staff_id)
-		return includes([{:customer => :staff}]).where('customers.staff_id = ?', staff_id).references(:customers) if !staff_id.nil?
+		where('customers.staff_id = ?', staff_id).references(:customers) if !staff_id.nil?
 		return all
 	end
 
@@ -271,12 +272,8 @@ class Order < ActiveRecord::Base
 		order('orders.id DESC')
 	end
 
-	def self.include_customer_staff_status
-		includes([{:customer => :staff}, :status])
-	end
-
 	def self.include_all
-		includes([{:customer => :staff}, :status, {:order_products => :product}])
+		includes([{:customer => :staff}, :status, {:order_products => :product}, :xero_invoice])
 	end
 
 	def self.xero_invoice_id_is_null

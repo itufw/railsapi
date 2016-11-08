@@ -53,14 +53,6 @@ module ApplicationHelper
     return customer.staff unless customer.nil?
   end
 
-  def can_update_staff
-    if Staff.can_update(session[:user_id]).to_i == 1
-      return true
-    else
-      return false
-    end
-  end
-
   # Paginates model unless the number of rows are less than 15
   # 15 is the paginate limit set in every model
   def paginate(model)
@@ -119,27 +111,25 @@ module ApplicationHelper
     return hash.values.sum
   end
 
-  def outstanding_customer(xero_contact_id)
-    XeroContact.get_accounts_receivable_outstanding(xero_contact_id)
+  def outstanding_customer(xero_contact)
+    XeroContact.get_accounts_receivable_outstanding(xero_contact)
   end
 
-  def overdue_customer(xero_contact_id)
-    XeroContact.get_accounts_receivable_overdue(xero_contact_id)
+  def overdue_customer(xero_contact)
+    XeroContact.get_accounts_receivable_overdue(xero_contact)
   end
 
-  def invoice_status(order_id)
-    invoice = XeroInvoice.filter_by_invoice_number(order_id)
-    unless invoice.nil?
-      amount_due = XeroInvoice.amount_due(invoice)
-      if XeroInvoice.paid(invoice)
-        return ["PAID", 0.0]
-      elsif XeroInvoice.partially_paid(invoice)
-        return ["PARTIALLY-PAID", amount_due]
-      elsif XeroInvoice.unpaid(invoice)
-        return ["UNPAID", amount_due]
-      end
-    end
-    return [" ", " "]
+  def invoice_status(xero_invoice)
+    return XeroInvoice.paid(xero_invoice) || XeroInvoice.unpaid(xero_invoice) \
+    || XeroInvoice.partially_paid(xero_invoice) || [" ", " "]
+  end
+
+  def customer_type_name(customer)
+    customer.cust_type.name unless customer.cust_type_id.nil?
+  end
+
+  def customer_style_name(customer)
+    customer.cust_style.name unless customer.cust_style_id.nil?
   end
 
 end

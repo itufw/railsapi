@@ -132,8 +132,8 @@ class XeroInvoice < ActiveRecord::Base
   	def self.find_by_order_id(order_id)
   		if invoice_id = XeroInvoice.get_invoice_id_for_valid_invoice(order_id.to_s)
   			return invoice_id
-  		# elsif invoice = XeroInvoice.get_invoice_id_and_number('BC' + order_id.to_s)
-  		# 	return invoice
+  		elsif invoice = XeroInvoice.get_invoice_id_for_valid_invoice('BC' + order_id.to_s)
+  		 	return invoice
   		else
   			return nil
   		end
@@ -153,24 +153,22 @@ class XeroInvoice < ActiveRecord::Base
   	end
 
   	def self.paid(xero_invoice)
-  		if xero_invoice.status == "PAID"
-  			return true
+  		if xero_invoice && xero_invoice.status = 'PAID'
+  			return ["PAID", xero_invoice.amount_due]
   		end
   	end
 
   	def self.unpaid(xero_invoice)
-  		if xero_invoice.status == "AUTHORISED" and xero_invoice.amount_due > 0
-  			return true
+  		if xero_invoice && xero_invoice.status = 'AUTHORISED' && xero_invoice.amount_due > 0 && xero_invoice.amount_paid == 0
+  			return ["UNPAID", invoice.first.amount_due]
   		end
   	end
 
   	def self.partially_paid(xero_invoice)
-  		if xero_invoice.status == "AUTHORISED" and xero_invoice.amount_paid > 0 and xero_invoice.amount_paid < xero_invoice.amount_due
-  			return true
+  		if xero_invoice && xero_invoice.status = 'AUTHORISED' && xero_invoice.amount_paid > 0\
+  		 	&& xero_invoice.amount_paid < xero_invoice.amount_due
+  			return ["PARTIALLY-PAID", invoice.first.amount_due]
   		end
   	end
 
-  	def self.amount_due(xero_invoice)
-  		return xero_invoice.amount_due
-  	end
 end

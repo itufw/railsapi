@@ -17,4 +17,8 @@ module DisplayHelper
     return display_val
   end
 
+  def allow_to_update(staff_id)
+    return Staff.can_update(staff_id).to_i == 1
+  end
+  
 end

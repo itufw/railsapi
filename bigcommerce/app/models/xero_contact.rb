@@ -89,13 +89,13 @@ class XeroContact < ActiveRecord::Base
     	return where(skype_user_name: skype_id).first
     end
 
-    def self.get_accounts_receivable_outstanding(xero_contact_id)
-        return find(xero_contact_id).accounts_receivable_outstanding if xero_contact_id
+    def self.get_accounts_receivable_outstanding(xero_contact)
+        return xero_contact.accounts_receivable_outstanding if xero_contact
 
     end
 
-    def self.get_accounts_receivable_overdue(xero_contact_id)
-        return find(xero_contact_id).accounts_receivable_overdue if xero_contact_id
+    def self.get_accounts_receivable_overdue(xero_contact)
+        return xero_contact.accounts_receivable_overdue if xero_contact
     end
 
     def self.create_in_xero(customer)

@@ -10,7 +10,7 @@ class Customer < ActiveRecord::Base
 	belongs_to :cust_group
 	belongs_to :cust_style
 	belongs_to :staff
-	has_one :xero_contact
+	belongs_to :xero_contact
 
 
 	scoped_search on: [:firstname, :lastname, :company, :actual_name]
@@ -201,6 +201,10 @@ class Customer < ActiveRecord::Base
 		customer = filter_by_id(customer_id)
 		customer.staff_id = staff_id.to_i
 		customer.save
+	end
+
+	def self.include_all
+		includes(:cust_style, :cust_type, :cust_group, :staff, :xero_contact)
 	end
 
 end

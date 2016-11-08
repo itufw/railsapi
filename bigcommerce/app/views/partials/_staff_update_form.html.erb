@@ -1,7 +1,6 @@
 <td class="col-xs-2">
 	<% if can_update_staff %>
-		<% @staff_id = staff_for_customer(customer).id %>
-		<% @staffs = all_staffs %>
+		<% @staff_id = staff.id %>
 
 		<%= form_tag :controller => "models", :action => "update_staff" do %>
 
@@ -11,6 +10,6 @@
 
 		<% end %>
 	<% else %>
-		<%= staff_nickname_direct(staff_for_customer(customer)) %>
+		<%= staff_nickname_direct(staff) %>
 	<% end %>
 </td>
