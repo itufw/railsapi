@@ -28,10 +28,11 @@ class ModelsController < ApplicationController
 
   def customers
     @staffs = Staff.active_sales_staff
+    @cust_styles = CustStyle.all
     @can_update_bool = allow_to_update(session[:user_id])
     @per_page = params[:per_page] || Customer.per_page
 
-    @staff, customers, @search_text = customer_param_filter(params, session[:user_id])
+    @staff, customers, @search_text, staff_id, @cust_style = customer_param_filter(params, session[:user_id])
     @customers = customers.include_all.order_by_name.paginate( per_page: @per_page, page: params[:page])
 
   end
@@ -50,7 +51,7 @@ class ModelsController < ApplicationController
     @search_text = results_val[3]
 
     @pending_stock_h = Product.pending_stock(products.pluck("id"))
-    @products = Product.all.order_by_name.paginate( per_page: @per_page, page: params[:page])
+    @products = products.all.order_by_name.paginate( per_page: @per_page, page: params[:page])
 
   end
 

@@ -264,7 +264,7 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.staff_filter(staff_id)
-		where('customers.staff_id = ?', staff_id).references(:customers) if !staff_id.nil?
+		return where('customers.staff_id = ?', staff_id).references(:customers) if !staff_id.nil?
 		return all
 	end
 
