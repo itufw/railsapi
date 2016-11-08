@@ -136,7 +136,7 @@ class SalesController < ApplicationController
     @total_stock_no_ws = total_stock_product(@product_id, params[:total_stock])
     @selected_period, @period_types = define_period_types(params)
 
-    @time_periods_name, @all_stats, @sum_stats, @avg_stats, customer_ids, @monthly_supply = stats_for_timeperiods("Order.product_filter(%s).valid_order.includes(:customer).staff_filter(%s)" % [@product_id, staff_id], :group_by_customerid, :sum_order_product_qty, @total_stock_no_ws, @selected_period)
+    @time_periods_name, @all_stats, @sum_stats, @avg_stats, customer_ids, @monthly_supply = stats_for_timeperiods("Order.product_filter(%s).valid_order.staff_filter(%s)" % [@product_id, staff_id], :group_by_customerid, :sum_order_product_qty, @total_stock_no_ws, @selected_period)
 
     customers_filtered_ids = results_val[1].pluck("id")
 

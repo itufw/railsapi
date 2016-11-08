@@ -1,4 +1,4 @@
-<% if orders.count > @per_page.to_i %>
+<% if orders.count > Order.per_page %>
 <div class="form-group orders-view default">
 
 	<div class="col-xs-3 col-xs-offset-7">
@@ -37,7 +37,7 @@
 		<% cust_name = customer_name(order.customer) %>
 		<td><%= link_to cust_name, controller: 'sales', action: 'orders_and_stats_for_customer', customer_id: order.customer_id, customer_name: cust_name %></td>
 		<td><%= order_status(order.status) %></td>
-		<td class = <%= display_class + " num " %>  ><%#= sum_order_products_qty(order.order_products) %></th>
+		<td class = <%= display_class + " num " %>  ><%= sum_order_products_qty(order.order_products) %></th>
 		<td class = "num"><%= order.qty %></td>
 		<td class = "num"><%= display_num(order.total_inc_tax) %></td>
 		<% invoice_status = invoice_status(order.xero_invoice) %>
