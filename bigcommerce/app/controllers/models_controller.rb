@@ -50,7 +50,7 @@ class ModelsController < ApplicationController
     @search_text = results_val[3]
 
     @pending_stock_h = Product.pending_stock(products.pluck("id"))
-    @products = products.order_by_name.paginate( per_page: @per_page, page: params[:page])
+    @products = Product.all.order_by_name.paginate( per_page: @per_page, page: params[:page])
 
   end
 

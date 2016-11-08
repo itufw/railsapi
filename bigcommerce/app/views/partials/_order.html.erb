@@ -41,7 +41,7 @@
 		<td class = "num"><%= order.qty %></td>
 		<td class = "num"><%= display_num(order.total_inc_tax) %></td>
 		<% invoice_status = invoice_status(order.xero_invoice) %>
-		<td class = <%= invoice_status[0].downcase %> ><%#= invoice_status[0] %></td>
+		<td class = <%= invoice_status[0].downcase %> ><%= invoice_status[0] %></td>
 
 	</tr>
 	<% end %>

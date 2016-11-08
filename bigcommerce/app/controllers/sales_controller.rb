@@ -90,7 +90,7 @@ class SalesController < ApplicationController
     @per_page = params[:per_page] || Order.per_page
 
     @selected_period, @period_types = define_period_types(params)
-    @orders = Order.include_customer_staff_status.customer_filter([@customer_id]).order_by_id.paginate( per_page: @per_page, page: params[:page])
+    @orders = Order.include_all.customer_filter([@customer_id]).order_by_id.paginate( per_page: @per_page, page: params[:page])
     @time_periods_name, all_stats, @sum_stats, @avg_stats, product_ids = stats_for_timeperiods("Order.customer_filter(%s).valid_order" % [[@customer_id]], :"", :sum_total, nil, @selected_period)
   end
 
@@ -162,7 +162,7 @@ class SalesController < ApplicationController
     @staff, @status, orders_filtered_by_param, @search_textt, @order_id = order_param_filter(params, session[:user_id])
     orders_filtered_by_product = Order.product_filter([@product_id]).pluck("id")
     order_ids = orders_filtered_by_param.pluck("id") & orders_filtered_by_product
-    @orders = Order.include_customer_staff_status.order_filter_by_ids(order_ids).order_by_id.paginate( per_page: @per_page, page: params[:page])
+    @orders = Order.include_all.order_filter_by_ids(order_ids).order_by_id.paginate( per_page: @per_page, page: params[:page])
     @staff_nickname = params[:staff_nickname]
   end
 
@@ -181,7 +181,7 @@ class SalesController < ApplicationController
     @product_name = params[:product_name]
 
     @selected_period, @period_types = define_period_types(params)
-    @orders = Order.include_customer_staff_status.product_filter(product_id).customer_filter([customer_id]).order_by_id.paginate( per_page: @per_page, page: params[:page])
+    @orders = Order.include_all.product_filter(product_id).customer_filter([customer_id]).order_by_id.paginate( per_page: @per_page, page: params[:page])
     @time_periods_name, i, @sum_stats, @avg_stats = stats_for_timeperiods("Order.product_filter(%s).customer_filter(%s).valid_order" % [product_id, [customer_id]], "".to_sym, :sum_order_product_qty, nil, @selected_period)
   end
 
