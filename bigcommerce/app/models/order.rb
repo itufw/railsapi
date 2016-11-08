@@ -193,7 +193,7 @@ class Order < ActiveRecord::Base
 
 	# Returns Orders who status has a valid order flag
 	def self.valid_order
-		where('statuses.valid_order = 1').references(:statuses)
+		includes(:status).where('statuses.valid_order = 1').references(:statuses)
 	end
 
 	# Returns orders with a given status id
@@ -219,19 +219,19 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.group_by_date_created_and_staff_id
-		group(["customers.staff_id", "DATE(orders.date_created)"])
+		includes(:customer).group(["customers.staff_id", "DATE(orders.date_created)"])
 	end
 
 	def self.group_by_week_created_and_staff_id
-		group(["customers.staff_id", "WEEK(orders.date_created)"])
+		includes(:customer).group(["customers.staff_id", "WEEK(orders.date_created)"])
 	end
 
 	def self.group_by_month_created_and_staff_id
-		group(["customers.staff_id", "MONTH(orders.date_created)", "YEAR(orders.date_created)"])
+		includes(:customer).group(["customers.staff_id", "MONTH(orders.date_created)", "YEAR(orders.date_created)"])
 	end
 
 	def self.group_by_quarter_created_and_staff_id
-		group(["customers.staff_id", "QUARTER(orders.date_created)", "YEAR(orders.date_created)"])
+		includes(:customer).group(["customers.staff_id", "QUARTER(orders.date_created)", "YEAR(orders.date_created)"])
 	end
 
 	def self.group_by_customerid
@@ -239,11 +239,11 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.group_by_product_id
-		group('order_products.product_id')
+		includes(:order_products).group('order_products.product_id')
 	end
 
 	def self.count_order_id_from_order_products
-		count('order_products.order_id')
+		includes(:order_products).count('order_products.order_id')
 	end
 
 	def self.sum_total
@@ -255,7 +255,7 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.sum_order_product_qty
-		sum('order_products.qty')
+		includes(:order_products).sum('order_products.qty')
 	end
 
 	def self.customer_filter(customer_ids)

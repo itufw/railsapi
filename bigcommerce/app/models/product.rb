@@ -177,7 +177,7 @@ class Product < ActiveRecord::Base
 	end
 
 	def self.pending_stock(product_ids_a)
-		include_orders.filter_by_ids(product_ids_a).where('orders.status_id = 1').references(:orders).group('order_products.product_id').sum('order_products.qty')
+		include_orders.where('orders.status_id = 1').filter_by_ids(product_ids_a).references(:orders).group('order_products.product_id').sum('order_products.qty')
 	end
 
 	def self.order_by_name
