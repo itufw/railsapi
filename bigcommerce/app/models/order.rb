@@ -161,7 +161,7 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.order_filter(order_id)
-		return find(order_id) if order_id > 0
+		return find(order_id.to_i) if order_id.to_i > 0
 		return all
 	end
 
@@ -170,7 +170,7 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.product_filter(product_ids)
-		return where('order_products.product_id IN (?)', product_ids).references(:order_products) if !product_ids.nil?
+		return includes(:order_products).where('order_products.product_id IN (?)', product_ids).references(:order_products) if !product_ids.nil?
 		return all
 	end
 
@@ -264,7 +264,7 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.staff_filter(staff_id)
-		return where('customers.staff_id = ?', staff_id).references(:customers) if !staff_id.nil?
+		return includes(:customer).where('customers.staff_id = ?', staff_id).references(:customers) if !staff_id.nil?
 		return all
 	end
 
