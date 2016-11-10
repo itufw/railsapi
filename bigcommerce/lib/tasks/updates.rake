@@ -24,7 +24,9 @@ namespace :updates do
 	  start_time = Time.now
 	  puts "Xero Sync #{start_time} started"
 	  XeroController.new.update_xero_invoices
+	  puts "Xero Invoices are updated"
 	  XeroController.new.link_bigc_xero_orders
+	  puts "Xero Invoices are linked to Orders"
 	  XeroController.new.export_invoices_to_xero
 	  puts "Xero Sync #{Time.now} ended"
 	  XeroRevision.updated(start_time)
