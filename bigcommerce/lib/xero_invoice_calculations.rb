@@ -242,8 +242,8 @@ module XeroInvoiceCalculations
 
   		invoice = xero.Invoice.build(invoice_number: invoice_number.to_s, contact: contact,\
   			type: "ACCREC", date: order.date_created.to_date,\
-  			due_date: 30.days.since(order.date_created.to_date), sent_to_contact: false,\
-  			status: "SUBMITTED")
+  			due_date: 30.days.since(order.date_created.to_date),\
+  			status: "SUBMITTED", line_amount_types: "Exclusive")
 
   		line_items = XeroCalculation.get_line_items(invoice_number)
 
