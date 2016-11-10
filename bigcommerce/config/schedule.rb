@@ -42,6 +42,6 @@ every 1.day, :at => Time.zone.parse('4:30 pm').utc do
   rake "updates:xero_sync"
 end
 
-every 1.day, :at => Time.zone.parse('6:15 pm').utc do
+every 1.day, :at => Time.zone.parse('6:00 pm').utc do
   rake "updates:xero_sync"
 end
