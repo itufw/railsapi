@@ -113,7 +113,7 @@ module XeroInvoiceCalculations
 
 		XeroCalculation.insert_rounding(invoice_number,\
 			total_ex_gst, gst_sum_line_amounts, order_total,\
-			rounding_error_inc_gst, rounding_error_ex_gst) unless rounding_error_ex_gst == 0.0
+			rounding_error_inc_gst, rounding_error_ex_gst) unless rounding_error_ex_gst.round(2) == 0.0
 
 	end
 
@@ -198,7 +198,7 @@ module XeroInvoiceCalculations
 
 		XeroCalculation.insert_rounding(invoice_number,\
 		total_ex_gst, gst_sum_line_amounts, order_total, rounding_error_inc_gst, rounding_error_ex_gst)\
-		unless rounding_error_ex_gst == 0.0
+		unless rounding_error_ex_gst.round(2) == 0.0
 	end
 
 	def get_discount_rate(order)
