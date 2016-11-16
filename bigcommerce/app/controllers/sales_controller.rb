@@ -145,7 +145,7 @@ class SalesController < ApplicationController
     # # intersection between customers who have stats and customers who are filtered 
     customers = Customer.include_staff.include_cust_style.filter_by_ids(customers_filtered_ids & customer_ids)
     customers_h = Hash.new
-    customers.map {|c| customers_h[c.id] = [Customer.customer_name(c.actual_name, c.firstname, c.lastname), c.staff.nickname, c.cust_style.name]}
+    customers.map {|c| customers_h[c.id] = [Customer.customer_name(c.actual_name, c.firstname, c.lastname), c.staff.nickname, c.cust_style_name]}
     @customers_h_sorted = customers_h.sort_by {|id, key| key[0]}
 
   end
