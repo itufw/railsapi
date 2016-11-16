@@ -10,7 +10,15 @@ namespace :updates do
 	  puts "Updated Customers"
 	  admin.update_orders
 	  puts "Updated Orders"
-	  Revision.new.insert("", start_time)
+
+	  xero = XeroController.new
+	  xero.update_xero_contacts
+	  puts "Updated Xero Contacts"
+	  xero.update_xero_invoices
+	  puts "Updated Xero Invoices"
+
+	  Revision.updated(start_time)
+
 	  puts "Models update #{Time.now} ended"
 	end
 
@@ -20,15 +28,4 @@ namespace :updates do
 	  puts "Staff Time Periods Update #{Time.now} ended"
 	end
 
-	task :xero_sync => :environment do
-	  start_time = Time.now
-	  puts "Xero Sync #{start_time} started"
-	  XeroController.new.update_xero_invoices
-	  puts "Xero Invoices are updated"
-	  XeroController.new.link_bigc_xero_orders
-	  puts "Xero Invoices are linked to Orders"
-	  XeroController.new.export_invoices_to_xero
-	  puts "Xero Sync #{Time.now} ended"
-	  XeroRevision.updated(start_time)
-	end
 end

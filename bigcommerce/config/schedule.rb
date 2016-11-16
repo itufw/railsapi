@@ -35,13 +35,13 @@ every 1.day, :at => Time.zone.parse('12:00 am').utc do
 end
  
 every 1.day, :at => Time.zone.parse('12:00 pm').utc do
-  rake "updates:xero_sync"
+  rake "xero_invoice_sync:sync"
 end
 
 every 1.day, :at => Time.zone.parse('4:30 pm').utc do
-  rake "updates:xero_sync"
+  rake "xero_invoice_sync:sync"
 end
 
 every 1.day, :at => Time.zone.parse('6:00 pm').utc do
-  rake "updates:xero_sync"
+  rake "xero_invoice_sync:sync"
 end

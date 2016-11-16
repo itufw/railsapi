@@ -10,11 +10,16 @@ module SalesControllerHelper
   	return Staff.active_sales_staff
   end
 
-  def order_sum_param(radio_button_value)
-    if radio_button_value == "Bottles"
-      return :sum_qty, true, false, "Bottles"
+  def order_sum_param(selected)
+    sum_params = ["Order Totals", "Bottles", "Avg. Order Total"]
+    if selected == "Bottles"
+      return :sum_qty, selected, sum_params
+    #elsif selected == "Avg. LUC"
+    #  return :avg_luc, selected, sum_params
+    elsif selected == "Avg. Order Total"
+      return :avg_order_total, selected, sum_params
     else
-      return :sum_total, false, true, "Order Totals"
+      return :sum_total, "Order Totals", sum_params
     end
   end
 

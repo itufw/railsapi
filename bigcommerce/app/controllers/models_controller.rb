@@ -37,6 +37,11 @@ class ModelsController < ApplicationController
 
   end
 
+  def edit_customer
+    @customer = Customer.find(params[:customer_id])
+    @customer_name = Customer.customer_name(@customer.actual_name, @customer.firstname, @customer.lastname)
+  end
+
   def products
 
     @countries = ProducerCountry.all

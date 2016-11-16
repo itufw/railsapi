@@ -1,9 +1,8 @@
 class Revision < ActiveRecord::Base
 
-	def insert(notes = "", time)
-		#Time.zone = "GMT"
-		#time = Time.current
-
-		Revision.create(next_update_time: time, notes: notes)
+	def self.updated(start_time)
+		only_row = first
+		only_row.last_update_time = start_time.utc
+		only_row.save
 	end
 end

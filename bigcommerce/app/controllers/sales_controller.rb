@@ -25,8 +25,9 @@ class SalesController < ApplicationController
     @dates_this_week = this_week(date_given)
     @dates_last_week = last_week(@dates_this_week[0])
 
-    sum_function, @checked_bottles, @checked_totals = order_sum_param(params[:sum_param])
-    # returns a hashmap like { date => order_totals }
+    sum_function, @param_val, @sum_params = order_sum_param(params[:sum_param])  
+
+      # returns a hashmap like { date => order_totals }
     @sum_this_week = sum_orders(@dates_this_week[0], @dates_this_week[-1], :group_by_date_created, sum_function, nil)
     @sum_last_week = sum_orders(@dates_last_week[0], @dates_last_week[-1], :group_by_date_created, sum_function, nil)
     
@@ -49,6 +50,7 @@ class SalesController < ApplicationController
     else 
       @num_periods = 13
     end
+    sum_function, @param_val, @sum_params = order_sum_param(params[:sum_param])
     @selected_period, @period_types = define_period_types(params)
 
     # periods_from_end_date is defined in Dates Helper
@@ -63,7 +65,7 @@ class SalesController < ApplicationController
     # order_sum_param is defined in Sales Controller Helper
     # Sum function returns :sum_qty or :sum_total
     # These functions are defined in the Order model
-    sum_function, @checked_bottles, @checked_totals, @param_val = order_sum_param(params[:sum_param])
+    sum_function, @param_val = order_sum_param(params[:sum_param])
 
     # sum_orders returns a hash like {date/week_num/month_num => sum} depending on the date_type
     # defined in Sales Controller Helper
