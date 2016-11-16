@@ -10,6 +10,6 @@
 =end
 %>
 
-<div class="col-xs-2" style="float: left;margin-top: 5px;margin-left: 50px;">
+<div class="col-xs-2">
 <%= select_tag "sum_param", options_for_select(@sum_params.collect{ |p| [p, p]}, selected: @param_val), class:"form-control"%>
 </div>
