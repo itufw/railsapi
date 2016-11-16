@@ -15,10 +15,10 @@
 
    <%= render "partials/dashboard_filter" %>
 
-   <div class="col-xs-3" style="float: left;margin-left: -50px;">
+   <div class="col-xs-3" style="float: left;margin-top: 2px;">
    End Date:   <%= date_field( "selected_date", "selected_date", value: @end_date) %>
    </div>
-   <div class="col-xs-2" style="float: right;">
+   <div class="col-xs-2">
    <%= submit_tag "Change", class: 'btn btn-primary' %>
    </div>
    
