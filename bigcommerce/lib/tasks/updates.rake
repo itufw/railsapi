@@ -4,10 +4,10 @@ namespace :updates do
 	  start_time = Time.now
 	  puts "Models update #{start_time} started"
 	  admin = AdminController.new
-	  admin.update_products
-	  puts "Updated Products"
 	  admin.update_customers
 	  puts "Updated Customers"
+	  admin.update_products
+	  puts "Updated Products"
 	  admin.update_orders
 	  puts "Updated Orders"
 
