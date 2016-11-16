@@ -246,12 +246,24 @@ class Order < ActiveRecord::Base
 		includes(:order_products).count('order_products.order_id')
 	end
 
+	def self.count_orders
+		count('orders.id')
+	end
+
 	def self.sum_total
 		sum('orders.total_inc_tax')
 	end
 
 	def self.sum_qty
 		sum('orders.qty')
+	end
+
+	def self.avg_order_total
+		average('orders.total_inc_tax')
+	end
+
+	def self.avg_luc
+		# TO DO 
 	end
 
 	def self.sum_order_product_qty

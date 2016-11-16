@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161102014126) do
+ActiveRecord::Schema.define(version: 20161116024117) do
 
   create_table "addresses", force: :cascade do |t|
     t.integer  "customer_id", limit: 4
@@ -429,10 +429,9 @@ ActiveRecord::Schema.define(version: 20161102014126) do
   end
 
   create_table "revisions", force: :cascade do |t|
-    t.datetime "next_update_time"
-    t.text     "notes",            limit: 65535
-    t.datetime "created_at",                     null: false
-    t.datetime "updated_at",                     null: false
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+    t.datetime "last_update_time"
   end
 
   create_table "staff_time_periods", force: :cascade do |t|

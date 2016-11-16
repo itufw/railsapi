@@ -1,0 +1,11 @@
+<%= title @customer_name %>
+<h3><%= @customer_name %></h3>
+
+<%= form_for @customer, url: {action: "edit_customer"}, html: {class: "form-group", style: "padding-left: 50px;"} do |f| %>
+  <%= f.label :firstname %>
+  <div class="col-xs-2">
+  <%= f.text_field :firstname, class: 'form-control' %>
+  </div>
+
+  <%= f.submit "Create" %>
+<% end %>
