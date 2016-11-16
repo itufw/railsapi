@@ -1,11 +1,29 @@
-<%= title @customer_name %>
-<h3><%= @customer_name %></h3>
+<%= title "Edit #{@customer_name}"%>
+<h3>Edit <%= @customer_name %></h3>
 
-<%= form_for @customer, url: {action: "edit_customer"}, html: {class: "form-group", style: "padding-left: 50px;"} do |f| %>
-  <%= f.label :firstname %>
-  <div class="col-xs-2">
-  <%= f.text_field :firstname, class: 'form-control' %>
-  </div>
+<%= form_for @customer, url: params.merge(action: "edit_customer"), html: {class: "form-group", style: "padding-left: 50px;"} do |f| %>
 
-  <%= f.submit "Create" %>
+  <%= f.label :firstname, class: 'margin-from-top label-new' %>
+  <%= f.text_field :firstname, class: 'form-control quarter-size' %>
+  <br/><br/>
+
+  <%= f.label :lastname, class: 'margin-from-top label-new' %>
+  <%= f.text_field :lastname, class: 'form-control quarter-size' %>
+  <br/><br/>
+
+  <%= f.label :actual_name, class: 'margin-from-top label-new' %>
+  <%= f.text_field :actual_name, class: 'form-control quarter-size' %>
+  <br/><br/>
+
+  <%= f.label :staff, class: 'margin-from-top label-new' %>
+  <% staff_id = @customer.staff_id %>
+  <%= f.collection_select :staff, Staff.active_sales_staff, :id, :nickname, {selected: staff_id}, {class: "form-control quarter-size"} %>
+  <br/><br/>
+
+  <%= f.label :customer_style, class: 'margin-from-top label-new' %>
+  <% cust_style_id = @customer.cust_style_id %>
+  <%= f.collection_select :cust_style, CustStyle.all, :id, :name, {selected: cust_style_id}, {class: "form-control quarter-size"} %><br/><br/>
+
+
+  <%= f.submit "Update", class: 'btn btn-primary' %>
 <% end %>

@@ -29,3 +29,17 @@
 	font-weight: bold;
 }
 
+.quarter-size {
+	width: 40%;
+	display: inline;
+	margin-left: 30px;
+}
+
+.margin-from-top {
+	margin-top: 20px;
+}
+
+.label-new {
+	font-size: 115%;
+}
+
