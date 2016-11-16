@@ -220,4 +220,8 @@ class Customer < ActiveRecord::Base
 		includes(:cust_style, :cust_type, :cust_group, :staff, :xero_contact)
 	end
 
+	def cust_style_name
+		cust_style.name unless cust_style.nil?
+	end
+
 end
