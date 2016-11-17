@@ -8,6 +8,7 @@
 
   <%= f.label :firstname, class: 'margin-from-top label-new' %>
   <%= f.text_field :firstname, class: 'form-control quarter-size' %>
+  <%= f.label @customer.cust_type.name, class: 'form-control quarter-size label-new' %>
   <br/><br/>
 
   <%= f.label :lastname, class: 'margin-from-top label-new' %>
@@ -22,8 +23,11 @@
   <%= f.collection_select :staff_id, Staff.active_sales_staff, :id, :nickname, {selected: @customer.staff_id}, {class: "form-control quarter-size"} %>
   <br/><br/>
 
-  <%= f.label :customer_style, class: 'margin-from-top label-new' %>
+  <%= f.label :channel, class: 'margin-from-top label-new' %>
   <%= f.collection_select :cust_style_id, CustStyle.all, :id, :name, {:selected => @customer.cust_style_id, :include_blank => 'Not Assigned'}, {class: "form-control quarter-size"} %><br/><br/>
+
+  <%= f.label :group, class: 'margin-from-top label-new' %>
+  <%= f.collection_select :cust_group_id, CustGroup.all, :id, :name, {:selected => @customer.cust_group_id, :include_blank => 'Not Assigned'}, {class: "form-control quarter-size"} %><br/><br/>
 
 
   <%= f.submit "Update", class: 'btn btn-primary' %>
