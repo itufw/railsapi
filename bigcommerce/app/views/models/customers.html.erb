@@ -1,6 +1,8 @@
 <%= title "Customers" %>
 <h3>Customers</h3>
 
+<center><%= link_to "View Incomplete Customers", action: 'incomplete_customers' %></center>
+
 <%= render "partials/customer_filter" %>
 
 <%= render "partials/customer", customers: @customers %>

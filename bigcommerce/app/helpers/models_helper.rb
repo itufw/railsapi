@@ -17,4 +17,12 @@ module ModelsHelper
   	  return "Orders"
   	end
   end
+
+  def customer_filter_path
+    if current_page?(action: 'incomplete_customers')
+      return "incomplete_customers"
+    else
+      return "customers"
+    end
+  end
 end

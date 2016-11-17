@@ -9,8 +9,6 @@ class ModelsController < ApplicationController
   include DisplayHelper
   
   def orders
-    @staffs = Staff.active_sales_staff
-
     @staff_nickname = params[:staff_nickname]
     @start_date = params[:start_date]
     @end_date = params[:end_date]
@@ -27,8 +25,6 @@ class ModelsController < ApplicationController
   end
 
   def customers
-    @staffs = Staff.active_sales_staff
-    @cust_styles = CustStyle.all
     @can_update_bool = allow_to_update(session[:user_id])
     @per_page = params[:per_page] || Customer.per_page
 
@@ -54,6 +50,14 @@ class ModelsController < ApplicationController
       render 'edit_customer'
     end
 
+  end
+
+  def incomplete_customers
+    @can_update_bool = allow_to_update(session[:user_id])
+    @per_page = params[:per_page] || Customer.per_page
+
+    @staff, customers, @search_text, staff_id, @cust_style = customer_param_filter(params, session[:user_id])
+    @customers = customers.incomplete.include_all.order_by_name.paginate( per_page: @per_page, page: params[:page])
   end
 
   def products

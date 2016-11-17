@@ -4,7 +4,7 @@
 
 		<%= form_tag :controller => "models", :action => "update_staff" do %>
 
-		<%= select_tag(:staff_id, options_from_collection_for_select(@staffs, :id, :nickname, @staff_id), html_options = {:class => 'form-control', :onchange => "this.form.submit()"}) %>
+		<%= select_tag(:staff_id, options_from_collection_for_select(Staff.active_sales_staff, :id, :nickname, @staff_id), html_options = {:class => 'form-control', :onchange => "this.form.submit()"}) %>
 
 		<%= hidden_field_tag :customer_id, customer.id %>
 
