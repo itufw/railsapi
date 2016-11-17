@@ -89,7 +89,8 @@ class ModelsController < ApplicationController
   private
 
   def customer_params
-    params.require(:customer).permit(:firstname, :lastname, :actual_name, :staff_id, :cust_style_id)
+    params.require(:customer).permit(:firstname, :lastname, :actual_name, :staff_id, :cust_style_id,\
+      :cust_group_id)
   end
 
 end
