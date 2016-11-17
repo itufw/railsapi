@@ -17,11 +17,11 @@ class XeroController < ApplicationController
 	end
 
 	def update_xero_invoices
-		XeroInvoice.new.download_data_from_api(Revision.order("created_at").last.last_update_time)
+		XeroInvoice.new.download_data_from_api(Revision.update_time)
 	end
 
 	def update_xero_contacts
-		XeroContact.new.download_data_from_api(Revision.order("created_at").last.last_update_time)
+		XeroContact.new.download_data_from_api(Revision.update_time)
 	end
 
 	def export_invoices_to_xero

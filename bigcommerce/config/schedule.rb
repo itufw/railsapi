@@ -26,14 +26,18 @@ set :environment, "production"
 
 set :output, {:error => "log/cron_error_log.log", :standard => "log/cron_log.log"}
 
-every '0,15,30,45 * * * *' do
+every 5.minutes do
 	rake "updates:models"
 end
 
 every 1.day, :at => Time.zone.parse('12:00 am').utc do
 	rake "updates:timeperiods"
 end
- 
+
+every 1.day, :at => Time.zone.parse('10:00 pm').utc do
+  rake "xero_invoice_sync:sync"
+end
+
 every 1.day, :at => Time.zone.parse('12:00 pm').utc do
   rake "xero_invoice_sync:sync"
 end

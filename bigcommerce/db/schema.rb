@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161116024117) do
+ActiveRecord::Schema.define(version: 20161117020802) do
 
   create_table "addresses", force: :cascade do |t|
     t.integer  "customer_id", limit: 4
@@ -429,9 +429,10 @@ ActiveRecord::Schema.define(version: 20161116024117) do
   end
 
   create_table "revisions", force: :cascade do |t|
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
-    t.datetime "last_update_time"
+    t.datetime "start_time"
+    t.datetime "end_time"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "staff_time_periods", force: :cascade do |t|
@@ -769,9 +770,10 @@ ActiveRecord::Schema.define(version: 20161116024117) do
   add_index "xero_receipts", ["xero_user_id"], name: "index_xero_receipts_on_xero_user_id", using: :btree
 
   create_table "xero_revisions", force: :cascade do |t|
-    t.datetime "last_update_time"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
+    t.datetime "start_time"
+    t.datetime "end_time"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
 end

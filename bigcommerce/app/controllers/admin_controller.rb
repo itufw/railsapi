@@ -22,47 +22,36 @@ class AdminController < ApplicationController
   end
 
 
-  def scrape
+  # def scrape
 
-    Revision.new.insert
+  #   Revision.new.insert
 
-    models_scrape = [Category.new, Product.new, Customer.new, Status.new, Order.new]
+  #   models_scrape = [Category.new, Product.new, Customer.new, Status.new, Order.new]
 
-    models_scrape.each do |m|
-      m.scrape
-    end
+  #   models_scrape.each do |m|
+  #     m.scrape
+  #   end
 
-    csv_import
+  #   csv_import
 
-    @success = "Yay!"
+  #   @success = "Yay!"
 
-  end
+  # end
 
   def update
 
   end
 
   def update_products    
-    update_time = Revision.order("created_at").last.last_update_time.iso8601
-    Product.new.update_from_api(update_time)
-    #@success = "Yay! Products Updated"
-    #render 'update'
+    Product.new.update_from_api(Revision.update_time_iso)
   end
 
   def update_customers
-    update_time = Revision.order("created_at").first.last_update_time.iso8601
-
-    Customer.new.update_from_api(update_time)
-    #@success = "Yay! Customers Updated"
-    #render 'update'
+    Customer.new.update_from_api(Revision.update_time_iso)
   end
 
   def update_orders
-    update_time = Revision.order("created_at").last.last_update_time.iso8601
-
-    Order.new.update_from_api(update_time)
-    #@success = "Yay! Orders Updated"
-    #render 'update'
+    Order.new.update_from_api(Revision.update_time_iso)
   end
 
   def import_from_csv
