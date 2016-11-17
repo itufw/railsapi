@@ -14,6 +14,8 @@ class SalesController < ApplicationController
   include DisplayHelper
   include StockHelper
 
+  
+
   helper_method :check_id_in_map
 
   # Displays this week's and last week's total order sales
