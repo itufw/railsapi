@@ -29,6 +29,7 @@ class ModelsController < ApplicationController
     @per_page = params[:per_page] || Customer.per_page
 
     @staff, customers, @search_text, staff_id, @cust_style = customer_param_filter(params, session[:user_id])
+
     @customers = customers.include_all.order_by_name.paginate( per_page: @per_page, page: params[:page])
 
   end

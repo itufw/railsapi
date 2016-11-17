@@ -225,7 +225,7 @@ class Customer < ActiveRecord::Base
 	end
 
 	def self.incomplete
-		where('actual_name IS NULL or cust_style_id is NULL or cust_group_id IS NULL or staff_id = 34')
+		where('actual_name IS NULL or cust_style_id is NULL or staff_id = 34')
 	end
 
 end
