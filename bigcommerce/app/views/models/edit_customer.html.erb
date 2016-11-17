@@ -1,7 +1,10 @@
 <%= title "Edit #{@customer_name}"%>
 <h3>Edit <%= @customer_name %></h3>
+<br/>
 
-<%= form_for @customer, url: params.merge(action: "edit_customer"), html: {class: "form-group", style: "padding-left: 50px;"} do |f| %>
+<%= form_for @customer, url: {action: "update_customer"}, method: "POST", html: {class: "form-group", style: "padding-left: 50px;"} do |f| %>
+
+  <%= f.hidden_field :id %>
 
   <%= f.label :firstname, class: 'margin-from-top label-new' %>
   <%= f.text_field :firstname, class: 'form-control quarter-size' %>
@@ -16,14 +19,14 @@
   <br/><br/>
 
   <%= f.label :staff, class: 'margin-from-top label-new' %>
-  <% staff_id = @customer.staff_id %>
-  <%= f.collection_select :staff, Staff.active_sales_staff, :id, :nickname, {selected: staff_id}, {class: "form-control quarter-size"} %>
+  <%= f.collection_select :staff_id, Staff.active_sales_staff, :id, :nickname, {selected: @customer.staff_id}, {class: "form-control quarter-size"} %>
   <br/><br/>
 
   <%= f.label :customer_style, class: 'margin-from-top label-new' %>
-  <% cust_style_id = @customer.cust_style_id %>
-  <%= f.collection_select :cust_style, CustStyle.all, :id, :name, {selected: cust_style_id}, {class: "form-control quarter-size"} %><br/><br/>
+  <%= f.collection_select :cust_style_id, CustStyle.all, :id, :name, {:selected => @customer.cust_style_id, :include_blank => 'Not Assigned'}, {class: "form-control quarter-size"} %><br/><br/>
 
 
   <%= f.submit "Update", class: 'btn btn-primary' %>
 <% end %>
+
+<p style="padding-left: 50px;"><%= link_to "Go Back to Customer Profile", controller: 'sales', action: 'orders_and_stats_for_customer', customer_id: @customer.id, customer_name: @customer_name %></p>

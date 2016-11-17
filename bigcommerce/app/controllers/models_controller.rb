@@ -38,8 +38,22 @@ class ModelsController < ApplicationController
   end
 
   def edit_customer
-    @customer = Customer.find(params[:customer_id])
+    @customer = Customer.include_all.filter_by_id(params[:customer_id] || params[:customer][:id])
     @customer_name = Customer.customer_name(@customer.actual_name, @customer.firstname, @customer.lastname)
+  end
+
+  def update_customer
+    @customer = Customer.filter_by_id(params[:customer][:id])
+    if @customer.update_attributes(customer_params)
+      flash[:success] = "Successfully Changed." 
+      redirect_to controller: 'sales', action: 'orders_and_stats_for_customer',\
+       customer_id: params[:customer][:id],\
+       customer_name: Customer.customer_name(@customer.actual_name, @customer.firstname, @customer.lastname)
+    else
+      flash[:error] = "Unsuccessful."
+      render 'edit_customer'
+    end
+
   end
 
   def products
@@ -70,6 +84,12 @@ class ModelsController < ApplicationController
     flash[:success] = "Staff Successfully Changed."
     redirect_to request.referrer
 
+  end
+
+  private
+
+  def customer_params
+    params.require(:customer).permit(:firstname, :lastname, :actual_name, :staff_id, :cust_style_id)
   end
 
 end
