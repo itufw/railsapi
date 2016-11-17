@@ -34,7 +34,7 @@ every 1.day, :at => Time.zone.parse('12:00 am').utc do
 	rake "updates:timeperiods"
 end
 
-every 1.day, :at => Time.zone.parse('10:00 pm').utc do
+every 1.day, :at => Time.zone.parse('10:00 am').utc do
   rake "xero_invoice_sync:sync"
 end
 
