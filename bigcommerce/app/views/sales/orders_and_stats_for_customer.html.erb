@@ -1,6 +1,6 @@
 <%= title @customer_name %>
 <h3><%= @customer_name %></h3>
-<%#= link_to "Edit", controller: 'models', action: 'edit_customer', customer_id: @customer_id %>
+<center><%= link_to "Edit", controller: 'models', action: 'edit_customer', customer_id: @customer_id %></center>
 
 <div style="margin-top: 50px;">
 <%= form_tag({:action => "orders_and_stats_for_customer" }, {:method => "get"}) do %>
