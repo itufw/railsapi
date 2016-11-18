@@ -262,6 +262,10 @@ class Order < ActiveRecord::Base
 		average('orders.total_inc_tax')
 	end
 
+	def self.avg_order_qty
+		average('orders.qty')
+	end
+
 	def self.avg_luc
 		# TO DO 
 	end
