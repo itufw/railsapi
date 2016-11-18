@@ -11,15 +11,14 @@ module SalesControllerHelper
   end
 
   def order_sum_param(selected)
-    sum_params = ["Order Totals", "Bottles", "Avg. Order Total"]
-    if selected == "Bottles"
-      return :sum_qty, selected, sum_params
-    #elsif selected == "Avg. LUC"
-    #  return :avg_luc, selected, sum_params
-    elsif selected == "Avg. Order Total"
-      return :avg_order_total, selected, sum_params
+    sum_params_h = {"Order Totals" => :sum_total, "Bottles" => :sum_qty,\
+     "Number of Orders" => :count_orders, "Avg. Order Total" => :avg_order_total,\
+      "Avg. Order Size" => :avg_order_qty}
+
+    if selected.nil?
+      return sum_params_h["Order Totals"], "Order Totals", sum_params_h.keys 
     else
-      return :sum_total, "Order Totals", sum_params
+      return sum_params_h[selected], selected, sum_params_h.keys
     end
   end
 
