@@ -53,9 +53,22 @@ module SalesControllerHelper
 
     end
 
-    # overall_h structure : { time_period_name => [ key(customer_id or product_id) => stat ]}
-    ids = overall_h.values.reduce(&:merge).keys unless overall_h.blank?
+    # overall_h structure : { time_period_name => {key(customer_id or product_id) => stat }}
+    #ids = overall_h.values.reduce(&:merge).keys unless overall_h.blank?
+    ids = sort_by_time_periods(overall_h)
     [time_periods.pluck("name"), overall_h, overall_sum, overall_avg, ids, monthly_supply]
+  end
+
+  def sort_by_time_periods(overall_h)
+
+    # overall_h structure : { time_period_name => {key(customer_id or product_id) => stat }}
+    prefered_time_period = "Last Month"
+    # get the hash for the time period, like "Last Month" =>{product_id => val}
+    # sort descending hence -v not v
+    # convert to a hash since sort_by gives array of arrays and get the keys 
+    ids_sorted = (overall_h[prefered_time_period].sort_by {|k,v| -v}).to_h.keys
+    return (ids_sorted.concat(overall_h.values.reduce(&:merge).keys)).uniq
+
   end
 
   def return_nil_string(val)

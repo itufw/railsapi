@@ -114,18 +114,19 @@ module ModelsFilter
   end
 
   def product_filter_with_price(product_ids_a)
-    products = Product.filter_by_ids(product_ids_a)
+    #products = Product.filter_by_ids(product_ids_a)
 
     products_h = Hash.new
 
-    products.each do |p|
-      products_h[p.id] = [p.name, p.calculated_price, p.retail_ws]
+    product_ids_a.each do |p_id|
+      product = Product.find(p_id)
+      products_h[p_id] = [product.name, product.calculated_price, product.retail_ws]
     end
 
 
-    product_h_sorted = Hash[products_h.sort_by { |k,v| v[0] }]
+    #product_h_sorted = Hash[products_h.sort_by { |k,v| v[0] }]
 
-    return product_h_sorted
+    return products_h
   end
 
 
