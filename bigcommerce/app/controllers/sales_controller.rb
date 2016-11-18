@@ -95,17 +95,22 @@ class SalesController < ApplicationController
 
     @selected_period, @period_types = define_period_types(params)
     @orders = Order.include_all.customer_filter([@customer_id]).order_by_id.paginate( per_page: @per_page, page: params[:page])
-    @time_periods_name, all_stats, @sum_stats, @avg_stats, product_ids = stats_for_timeperiods("Order.customer_filter(%s).valid_order" % [[@customer_id]], :"", :sum_total, nil, @selected_period)
+    @time_periods_name, all_stats, @sum_stats, @avg_stats, product_ids = \
+    stats_for_timeperiods("Order.customer_filter(%s).valid_order" % [[@customer_id]], :"",\
+     :sum_total, nil, @selected_period, nil, nil)
   end
 
   # Displays Stats for all the products the customer has ordered
   def top_products_for_customer
     @customer_id = params[:customer_id]
     @customer_name = params[:customer_name]
-    @time_periods_name, @all_stats, @sum_stats, @avg_stats, product_ids = stats_for_timeperiods("Order.customer_filter(%s).valid_order" % [[@customer_id]], :group_by_product_id, :sum_order_product_qty, nil, nil)
+
+    @time_periods_name, @all_stats, @sum_stats, @avg_stats, product_ids = \
+    stats_for_timeperiods("Order.customer_filter(%s).valid_order" % [[@customer_id]],\
+     :group_by_product_id, :sum_order_product_qty, nil, nil, params[:sort_column_stats])
     
     if !product_ids.empty?
-      @products_h = product_filter_with_price(product_ids)
+      @products_h = product_filter_with_price(product_ids, params[:sort_column], params[:sort_column_stats])
     else
       @products_h = {}
     end

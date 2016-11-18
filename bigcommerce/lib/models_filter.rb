@@ -113,7 +113,7 @@ module ModelsFilter
     return producer_country, product_sub_type, products, search_text
   end
 
-  def product_filter_with_price(product_ids_a)
+  def product_filter_with_price(product_ids_a, sort_column_index, sort_column_stats)
     #products = Product.filter_by_ids(product_ids_a)
 
     products_h = Hash.new
@@ -123,10 +123,15 @@ module ModelsFilter
       products_h[p_id] = [product.name, product.calculated_price, product.retail_ws]
     end
 
+    if sort_column_stats.nil?
+      return Hash[products_h.sort_by { |k,v| v[sort_column_index.to_i] }]
+    end
 
-    #product_h_sorted = Hash[products_h.sort_by { |k,v| v[0] }]
-
+    # unless sort_column_stats.nil?
+    #   return Hash[products_h.sort_by { |k,v| v[sort_column_index.to_i] }]
+    # end
     return products_h
+    
   end
 
 
