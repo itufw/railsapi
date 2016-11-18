@@ -239,12 +239,12 @@ class SalesController < ApplicationController
   # Displays Overall Product Stats irrespective of Order's Status and 
   # Orders when selected product was ordered, and they currently have selected status 
   def orders_and_stats_for_product_and_status
-      product_id = params[:product_id]
+      @product_id = params[:product_id]
       @product_name = params[:product_name]
       @per_page = params[:per_page] || Order.per_page
 
 
-      status_id = params[:status_id]
+      @status_id = params[:status_id]
       @status_name = params[:status_name]
 
       @num_orders = params[:num_orders]
@@ -254,14 +254,14 @@ class SalesController < ApplicationController
       @selected_period, @period_types = define_period_types(params)
 
       @time_periods_name, i, @sum_stats, @avg_stats = \
-      stats_for_timeperiods("Order.product_filter(%s).valid_order" % product_id,\
+      stats_for_timeperiods("Order.product_filter(%s).status_filter(%s)" % [@product_id, @status_id],\
        "".to_sym, :sum_order_product_qty, nil, @selected_period, nil)
 
       @staffs = staff_dropdown
 
       staff_id, @staff = staff_params_filter(params, session[:user_id])
     
-      @orders = Order.include_all.status_filter(status_id).staff_filter(staff_id).product_filter([product_id]).order_by_id.paginate( per_page: @per_page, page: params[:page])
+      @orders = Order.include_all.status_filter(@status_id).staff_filter(staff_id).product_filter([@product_id]).order_by_id.paginate( per_page: @per_page, page: params[:page])
   end
 
 
