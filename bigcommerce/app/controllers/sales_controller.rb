@@ -108,7 +108,7 @@ class SalesController < ApplicationController
      :group_by_product_id, :sum_order_product_qty, nil, nil, params[:sort_column_stats])
     
     if !product_ids.empty?
-      @products_h = product_filter_with_price(product_ids, params[:sort_column], params[:sort_column_stats])
+      @products_h = top_products_filter(product_ids, params[:sort_column], params[:sort_column_stats])
     else
       @products_h = {}
     end
