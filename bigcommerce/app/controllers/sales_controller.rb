@@ -97,7 +97,7 @@ class SalesController < ApplicationController
     @orders = Order.include_all.customer_filter([@customer_id]).order_by_id.paginate( per_page: @per_page, page: params[:page])
     @time_periods_name, all_stats, @sum_stats, @avg_stats, product_ids = \
     stats_for_timeperiods("Order.customer_filter(%s).valid_order" % [[@customer_id]], :"",\
-     :sum_total, nil, @selected_period, nil, nil)
+     :sum_total, nil, @selected_period, nil)
   end
 
   # Displays Stats for all the products the customer has ordered
@@ -145,15 +145,19 @@ class SalesController < ApplicationController
     @total_stock_no_ws = total_stock_product(@product_id, params[:total_stock])
     @selected_period, @period_types = define_period_types(params)
 
-    @time_periods_name, @all_stats, @sum_stats, @avg_stats, customer_ids, @monthly_supply = stats_for_timeperiods("Order.product_filter(%s).valid_order.staff_filter(%s)" % [@product_id, staff_id], :group_by_customerid, :sum_order_product_qty, @total_stock_no_ws, @selected_period)
+    @time_periods_name, @all_stats, @sum_stats, @avg_stats, customer_ids, @monthly_supply = \
+    stats_for_timeperiods("Order.product_filter(%s).valid_order.staff_filter(%s)" % [@product_id, staff_id],\
+     :group_by_customerid, :sum_order_product_qty, @total_stock_no_ws, @selected_period, params[:sort_column_stats])
 
-    customers_filtered_ids = results_val[1].pluck("id")
+    @customers_h = top_customer_filter(results_val[1].pluck("id") && customer_ids,\
+     params[:sort_column], params[:sort_column_stats])
+    # customers_filtered_ids = results_val[1].pluck("id")
 
-    # # intersection between customers who have stats and customers who are filtered 
-    customers = Customer.include_staff.include_cust_style.filter_by_ids(customers_filtered_ids & customer_ids)
-    customers_h = Hash.new
-    customers.map {|c| customers_h[c.id] = [Customer.customer_name(c.actual_name, c.firstname, c.lastname), c.staff.nickname, c.cust_style_name]}
-    @customers_h_sorted = customers_h.sort_by {|id, key| key[0]}
+    # # # intersection between customers who have stats and customers who are filtered 
+    # customers = Customer.include_staff.include_cust_style.filter_by_ids(customers_filtered_ids & customer_ids)
+    # customers_h = Hash.new
+    # customers.map {|c| customers_h[c.id] = [Customer.customer_name(c.actual_name, c.firstname, c.lastname), c.staff.nickname, c.cust_style_name]}
+    # @customers_h_sorted = customers_h.sort_by {|id, key| key[0]}
 
   end
 
@@ -193,7 +197,9 @@ class SalesController < ApplicationController
 
     @selected_period, @period_types = define_period_types(params)
     @orders = Order.include_all.product_filter(product_id).customer_filter([customer_id]).order_by_id.paginate( per_page: @per_page, page: params[:page])
-    @time_periods_name, i, @sum_stats, @avg_stats = stats_for_timeperiods("Order.product_filter(%s).customer_filter(%s).valid_order" % [product_id, [customer_id]], "".to_sym, :sum_order_product_qty, nil, @selected_period)
+    @time_periods_name, i, @sum_stats, @avg_stats = \
+    stats_for_timeperiods("Order.product_filter(%s).customer_filter(%s).valid_order" % [product_id,\
+     [customer_id]], "".to_sym, :sum_order_product_qty, nil, @selected_period, nil)
   end
 
   # Gets orders and products for a selected status on two different pages
@@ -247,7 +253,9 @@ class SalesController < ApplicationController
       @total = params[:total] 
       @selected_period, @period_types = define_period_types(params)
 
-      @time_periods_name, i, @sum_stats, @avg_stats = stats_for_timeperiods("Order.product_filter(%s).valid_order" % product_id, "".to_sym, :sum_order_product_qty, nil, @selected_period)
+      @time_periods_name, i, @sum_stats, @avg_stats = \
+      stats_for_timeperiods("Order.product_filter(%s).valid_order" % product_id,\
+       "".to_sym, :sum_order_product_qty, nil, @selected_period, nil)
 
       @staffs = staff_dropdown
 

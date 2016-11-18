@@ -1,16 +1,18 @@
 <table class = "table table-striped table-bordered table-hover table-responsive">
 	<tr class="info">
-		<th>Customer</th>
+		<th><%= link_to "Customer", controller: 'sales', action: 'stats_and_top_customers_for_product', product_id: product_id, product_name: product_name, sort_column: 0 %></th>
+		
 		<th>Staff</th>
 		<th>Channel</th>
+
 		<% time_periods_name.each do |t| %>
-			<th><%= link_to t %></th>
+			<th><%= link_to t, controller: 'sales', action: 'stats_and_top_customers_for_product', product_id: product_id, product_name: product_name, sort_column_stats: t %></th>
 		<% end %>
 	</tr>
 
 	<% customers.each do |id, val| %>
 	<tr>
-		<%#= For Top Customers for Product that have hash like {id => [name, staff]} %>
+		<%#= For Top Customers for Product that have hash like {id => [name, staff, channel]} %>
 		
 		<td><%= link_to val[0], controller: 'sales', action: 
 		'orders_and_stats_for_product_and_customer', customer_id: id, customer_name: val[0], product_id: product_id, product_name: product_name %></td>
