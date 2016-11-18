@@ -33,4 +33,4 @@
 <% end %>
 </div>
 
-<%= render "partials/detailed_stats", time_periods_name: @time_periods_name, column_name: "Customer", names: @customers_h_sorted, stats: @all_stats, display_class: "", display_class_otherwise: "none", column_name_optional: "Sales Rep", customer_id: nil, customer_name: nil, product_id: @product_id, product_name: @product_name %>
+<%= render "partials/top_customers", time_periods_name: @time_periods_name, customers: @customers_h_sorted, stats: @all_stats, product_id: @product_id, product_name: @product_name %>

@@ -1,0 +1,25 @@
+<table class = "table table-striped table-bordered table-hover table-responsive">
+	<tr class="info">
+		<th>Customer</th>
+		<th>Staff</th>
+		<th>Channel</th>
+		<% time_periods_name.each do |t| %>
+			<th><%= link_to t %></th>
+		<% end %>
+	</tr>
+
+	<% customers.each do |id, val| %>
+	<tr>
+		<%#= For Top Customers for Product that have hash like {id => [name, staff]} %>
+		
+		<td><%= link_to val[0], controller: 'sales', action: 
+		'orders_and_stats_for_product_and_customer', customer_id: id, customer_name: val[0], product_id: product_id, product_name: product_name %></td>
+		<td><%= val[1] %></td>
+		<td><%= val[2] %></td>
+		<% stats.each do |time_period_name, hash| %>
+		<td><%= exists_in_h(hash, id) %></td>
+		<% end %>
+	</tr>
+	<% end %>
+
+</table>

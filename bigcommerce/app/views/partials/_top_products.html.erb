@@ -1,0 +1,25 @@
+<table class = "table table-striped table-bordered table-hover table-responsive">
+	<tr class="info">
+		<th>ID</th>
+		<th><%= link_to "Product", controller: 'sales', action: 'top_products_for_customer', customer_id: customer_id, customer_name: customer_name, sort_column: 0 %></th>
+		<th><%= link_to "Price", controller: 'sales', action: 'top_products_for_customer', customer_id: customer_id, customer_name: customer_name, sort_column: 1 %></th>
+		<% time_periods_name.each do |t| %>
+			<th><%= link_to t, controller: 'sales', action: 'top_products_for_customer', customer_id: customer_id, customer_name: customer_name, sort_column_stats: t %></th>
+		<% end %>
+	</tr>
+
+	<% products.each do |id, val| %>
+	<tr>
+		<%#= For Top Products for customers that have hash like {id => [name, price, retail_ws]} %>
+		<td><%= id %></td>
+		<td><%= link_to val[0], controller: 'sales', action: 
+		'orders_and_stats_for_product_and_customer', customer_id: customer_id, customer_name: customer_name, product_id: id, product_name: val[0] %></td>
+		<td><%= display_num(calculate_product_price(val[1], val[2])) %></td>
+
+		<% stats.each do |time_period_name, hash| %>
+		<td><%= exists_in_h(hash, id) %></td>
+		<% end %>
+	</tr>
+	<% end %>
+
+</table>

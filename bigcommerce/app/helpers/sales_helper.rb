@@ -49,4 +49,5 @@ module SalesHelper
   	dates_map.values.flatten.last
   end
 
+
 end
