@@ -69,8 +69,11 @@ module ModelsFilter
 
     customers_h = Hash.new
 
-    customer_ids.each do |c_id|
-      c = Customer.include_staff.include_cust_style.find(c_id)
+    customers_out_of_order = Customer.include_staff.include_cust_style.find(customer_ids).group_by(&:id)
+
+    customers_in_order = customer_ids.map { |id| customers_out_of_order[id].first }
+
+    customers_in_order.each do |c|
       customers_h[c.id] = [Customer.customer_name(c.actual_name, c.firstname, c.lastname),\
        c.staff.nickname, c.cust_style_name]
     end
@@ -131,14 +134,16 @@ module ModelsFilter
     return producer_country, product_sub_type, products, search_text
   end
 
-  def product_filter_with_price(product_ids_a, sort_column_index, sort_column_stats)
-    #products = Product.filter_by_ids(product_ids_a)
+  def top_products_filter(product_ids_a, sort_column_index, sort_column_stats)
 
     products_h = Hash.new
 
-    product_ids_a.each do |p_id|
-      product = Product.find(p_id)
-      products_h[p_id] = [product.name, product.calculated_price, product.retail_ws]
+    products_out_of_order = Product.find(product_ids_a).group_by(&:id);
+
+    products_in_order = product_ids_a.map { |id| products_out_of_order[id].first }
+
+    products_in_order.each do |product|
+      products_h[product.id] = [product.name, product.calculated_price, product.retail_ws]
     end
 
     if sort_column_stats.nil?
