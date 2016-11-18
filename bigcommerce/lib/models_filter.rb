@@ -65,6 +65,24 @@ module ModelsFilter
 
   end
 
+  def top_customer_filter(customer_ids, sort_column_index, sort_column_stats)
+
+    customers_h = Hash.new
+
+    customer_ids.each do |c_id|
+      c = Customer.include_staff.include_cust_style.find(c_id)
+      customers_h[c.id] = [Customer.customer_name(c.actual_name, c.firstname, c.lastname),\
+       c.staff.nickname, c.cust_style_name]
+    end
+    
+    if sort_column_stats.nil?
+      return Hash[customers_h.sort_by { |k,v| v[sort_column_index.to_i] }]
+    end
+
+    return customers_h
+
+  end
+
   def cust_style_param_filter(params)
     unless (params[:cust_style].nil? or params[:cust_style][:id].empty?)
       cust_style_id = params[:cust_style][:id]
@@ -127,9 +145,6 @@ module ModelsFilter
       return Hash[products_h.sort_by { |k,v| v[sort_column_index.to_i] }]
     end
 
-    # unless sort_column_stats.nil?
-    #   return Hash[products_h.sort_by { |k,v| v[sort_column_index.to_i] }]
-    # end
     return products_h
     
   end
