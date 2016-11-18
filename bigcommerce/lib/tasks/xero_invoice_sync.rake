@@ -7,9 +7,11 @@ namespace :xero_invoice_sync do
 
 		if can_start_xero_sync
 
-			XeroRevision.start_update(Time.now)
+			start_time = Time.now
 
-			puts "Xero Sync #{Time.now} started"
+			XeroRevision.start_update
+
+			puts "Xero Sync #{start_time} started"
 
 			XeroController.new.link_bigc_xero_orders
 			puts "Xero Invoices are linked to Orders"
@@ -18,7 +20,7 @@ namespace :xero_invoice_sync do
 			puts "Invoices are exported"
 			puts "Xero Sync #{Time.now} ended"
 
-			XeroRevision.end_update(start_time)
+			XeroRevision.end_update(start_time, Time.now)
 		end
 	end
 end
