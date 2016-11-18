@@ -1,6 +1,8 @@
 <%= title @customer_name %>
 <h3><%= @customer_name %></h3>
+
 <center><%= link_to "Edit", controller: 'models', action: 'edit_customer', customer_id: @customer_id %></center>
+
 <button class="button" style="float: right;margin-top:-60px;margin-right:30px;"><%= link_to "Top Products", controller: 'sales', action: 'top_products_for_customer', customer_id: @customer_id, customer_name: @customer_name %></button>
 
 <div style="margin-top: 50px;">

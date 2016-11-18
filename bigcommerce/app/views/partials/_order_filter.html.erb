@@ -6,5 +6,5 @@
 </div>
 <%= render "partials/staff_filter" %>  
 <div class="col-xs-2">
-    <%= collection_select(:status, :id, @statuses, :id, :name, {:include_blank => 'All Statuses'}, {:class => 'form-control'}) %>
+    <%= collection_select(:status, :id, Status.all, :id, :name, {:include_blank => 'All Statuses'}, {:class => 'form-control'}) %>
 </div>

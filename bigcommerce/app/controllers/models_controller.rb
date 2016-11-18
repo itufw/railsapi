@@ -14,7 +14,6 @@ class ModelsController < ApplicationController
     @end_date = params[:end_date]
 
     @can_update_bool = allow_to_update(session[:user_id])
-    @statuses = Status.all
 
     @per_page = params[:per_page] || Order.per_page
 
@@ -63,8 +62,6 @@ class ModelsController < ApplicationController
 
   def products
 
-    @countries = ProducerCountry.all
-    @sub_types = ProductSubType.all
     results_val = product_param_filter(params)
 
     @per_page = params[:per_page] || Product.per_page

@@ -2,8 +2,8 @@
   <%= text_field_tag('search', @search_text, placeholder: 'Search for Product Name', class: 'form-control') %>
 </div>
 <div class="col-xs-2">
-    <%= collection_select(:producer_country, :id, @countries, :id, :name, {:include_blank => 'All Countries'}, {:class => 'form-control'}) %>
+    <%= collection_select(:producer_country, :id, ProducerCountry.all, :id, :name, {:include_blank => 'All Countries'}, {:class => 'form-control'}) %>
 </div>   
 <div class="col-xs-2">
-    <%= collection_select(:product_sub_type, :id, @sub_types, :id, :name, {:include_blank => 'All Varietals'}, {:class => 'form-control'}) %>
+    <%= collection_select(:product_sub_type, :id, ProductSubType.all, :id, :name, {:include_blank => 'All Varietals'}, {:class => 'form-control'}) %>
 </div>
