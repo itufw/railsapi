@@ -1,9 +1,12 @@
 require 'bigcommerce_connection.rb'
 require 'clean_data.rb'
+require 'application_helper.rb'
 
 class Product < ActiveRecord::Base
 
 	include CleanData
+	include ApplicationHelper
+
 	has_many :order_products
 	has_many :orders, through: :order_products
 
@@ -182,8 +185,21 @@ class Product < ActiveRecord::Base
 		include_orders.where('orders.status_id = 1').filter_by_ids(product_ids_a).references(:orders).group('order_products.product_id').sum('order_products.qty')
 	end
 
-	def self.order_by_name
-		order('name ASC')
+	def self.order_by_name(direction)
+		order('name ' + direction)
+	end
+
+	def self.order_by_id(direction)
+		order('id ' + direction)
+	end
+
+	def order_by_price(direction)
+		#order('calculated_price ' + direction)
+		sort_by {|p| order_int(direction) * calculate_product_price(p.calculated_price, p.retail_ws)}
+	end
+
+	def self.order_by_stock(direction)
+		order('inventory ' + direction)
 	end
 
 	def self.no_vintage_id(product_id)

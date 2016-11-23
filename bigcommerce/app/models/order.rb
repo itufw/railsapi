@@ -284,8 +284,28 @@ class Order < ActiveRecord::Base
 		return all
 	end
 
-	def self.order_by_id
-		order('orders.id DESC')
+	def self.order_by_id(direction)
+		order('orders.id ' + direction)
+	end
+
+	def self.order_by_customer(direction)
+		includes(:customer).order('customers.actual_name ' + direction)
+	end
+
+	def self.order_by_staff(direction)
+		includes(:staff).order('staffs.nickname ' + direction)
+	end
+
+	def self.order_by_status(direction)
+		includes(:status).order('statuses.name ' + direction)
+	end
+
+	def self.order_by_qty(direction)
+		order('qty ' + direction)
+	end
+
+	def self.order_by_total(direction)
+		order('total_inc_tax ' + direction)
 	end
 
 	def self.include_all

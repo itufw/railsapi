@@ -87,6 +87,14 @@ module ApplicationHelper
 
   end
 
+  def order_int(direction)
+    if direction == 'DESC'
+      return -1
+    else
+      return 1
+    end
+  end
+
   def convert_empty_string_to_int(val)
     if val.to_s.strip.empty?
       return 0

@@ -12,24 +12,28 @@ class ModelsController < ApplicationController
     @staff_nickname = params[:staff_nickname]
     @start_date = params[:start_date]
     @end_date = params[:end_date]
+    @staffs = Staff.active_sales_staff
 
     @can_update_bool = allow_to_update(session[:user_id])
 
     @per_page = params[:per_page] || Order.per_page
-
+    order_function, direction = sort_order(params, 'order_by_id', 'DESC')
 
     @staff, @status, orders, @search_text, @order_id = order_param_filter(params, session[:user_id])
-    @orders = orders.include_all.order_by_id.paginate( per_page: @per_page, page: params[:page])
+    @orders = orders.include_all.send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
 
   end
 
   def customers
     @can_update_bool = allow_to_update(session[:user_id])
     @per_page = params[:per_page] || Customer.per_page
+    @staffs = Staff.active_sales_staff
+
+    order_function, direction = sort_order(params, 'order_by_name', 'ASC')
 
     @staff, customers, @search_text, staff_id, @cust_style = customer_param_filter(params, session[:user_id])
 
-    @customers = customers.include_all.order_by_name.paginate( per_page: @per_page, page: params[:page])
+    @customers = customers.include_all.send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
 
   end
 
@@ -56,23 +60,22 @@ class ModelsController < ApplicationController
     @can_update_bool = allow_to_update(session[:user_id])
     @per_page = params[:per_page] || Customer.per_page
 
+    order_function, direction = sort_order(params, 'order_by_name', 'ASC')
+
     @staff, customers, @search_text, staff_id, @cust_style = customer_param_filter(params, session[:user_id])
-    @customers = customers.incomplete.include_all.order_by_name.paginate( per_page: @per_page, page: params[:page])
+    @customers = customers.incomplete.include_all.send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
   end
 
   def products
 
-    results_val = product_param_filter(params)
+    order_function, direction = sort_order(params, 'order_by_name', 'ASC')
 
     @per_page = params[:per_page] || Product.per_page
 
-    @producer_country = results_val[0]
-    @product_sub_type = results_val[1]
-    products = results_val[2]
-    @search_text = results_val[3]
+    @producer_country, @product_sub_type, products, @search_text = product_param_filter(params)
 
     @pending_stock_h = Product.pending_stock(products.pluck("id"))
-    @products = products.all.order_by_name.paginate( per_page: @per_page, page: params[:page])
+    @products = products.paginate( per_page: @per_page, page: params[:page]).send(order_function, direction)
 
   end
 

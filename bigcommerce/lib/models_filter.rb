@@ -165,4 +165,12 @@ module ModelsFilter
     return display_val
   end
 
+  def sort_order(params, default_function, default_direction)
+    if params[:order_function].nil?
+     return default_function, default_direction
+    else
+      return params[:order_function], params[:direction]
+    end
+  end
+
 end
