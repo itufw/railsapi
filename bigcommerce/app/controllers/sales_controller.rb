@@ -105,7 +105,7 @@ class SalesController < ApplicationController
 
     @producer_country, @product_sub_type, products, @search_text = product_param_filter(params)
 
-    where_query = "Order.customer_filter(%s).valid_order.product_filter(%s)" % [[807], products.pluck("id")]
+    where_query = "Order.customer_filter(%s).valid_order.product_filter(%s)" % [[@customer_id], products.pluck("id")]
 
     @time_periods_name, @all_stats, @sum_stats, @avg_stats, product_ids = \
     stats_for_timeperiods(where_query, :group_by_product_id, :sum_order_product_qty,\
