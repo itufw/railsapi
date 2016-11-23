@@ -12,8 +12,8 @@ class XeroController < ApplicationController
 	end
 
 	def link_bigc_xero_orders
-		#Order.export_to_xero.each {|o| link_invoice_id(o.id)}
-		Order.where('xero_invoice_id IS NULL').each {|o| link_invoice_id(o.id)}
+		Order.export_to_xero.each {|o| link_invoice_id(o.id)}
+		#Order.where('xero_invoice_id IS NULL').each {|o| link_invoice_id(o.id)}
 	end
 
 	def update_xero_invoices

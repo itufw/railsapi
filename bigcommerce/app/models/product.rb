@@ -168,8 +168,10 @@ class Product < ActiveRecord::Base
 	end
 
 	def self.filter_by_ids(product_ids_a)
-	    return where('products.id IN (?)', product_ids_a) if !product_ids_a.empty?
-	    return all
+		if (product_ids_a.empty? || product_ids_a.nil?)
+			return all
+		end
+	    return where('products.id IN (?)', product_ids_a)
 	end
 
 	def self.include_orders

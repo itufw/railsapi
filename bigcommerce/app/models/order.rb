@@ -307,4 +307,8 @@ class Order < ActiveRecord::Base
 		order.save
 	end
 
+	def self.filter_by_product(product_ids)
+		return includes(:products).where('products.id IN (?)', [product_ids]).references(:products) 
+	end
+
 end
