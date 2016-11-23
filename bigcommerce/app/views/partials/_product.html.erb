@@ -1,4 +1,4 @@
-<% if products.count > @per_page.to_i %>
+<% if products.count >= @per_page.to_i %>
 <div class="form-group">
 
 	<div class="col-xs-3 col-xs-offset-7">
@@ -18,7 +18,7 @@
 	<tr>
 		<th>ID <%= render "partials/sort_arrows", order: 'order_by_id' %></th>
 		<th>Product Name <%= render "partials/sort_arrows", order: 'order_by_name' %></th>
-		<th>Price ( Ex GST ) </th>
+		<th>Price ( Ex GST ) <%= render "partials/sort_arrows", order: 'order_by_price' %></th>
 		<th>Stock <%= render "partials/sort_arrows", order: 'order_by_stock' %></th>
 		<th>Pending Stock</th>
 		<th>Total Stock</th>
@@ -40,5 +40,5 @@
 </table>
 
 <span style="float:right;">
-<%= paginate(products) %>
+<%#= paginate(products) %>
 </span>
