@@ -119,26 +119,31 @@ module ModelsFilter
   end
 
   def product_param_filter(params)
-    search_text = params[:search]
 
-    producer_country_val = producer_country_params_filter(params)
-    producer_country_id = producer_country_val[0]
-    producer_country = producer_country_val[1]
+    if params.empty?
+      return nil, nil, Product.all, nil
+    else
+      search_text = params[:search]
 
-    product_sub_type_val = product_sub_type_params_filter(params)
-    product_sub_type_id = product_sub_type_val[0]
-    product_sub_type = product_sub_type_val[1]
+      producer_country_val = producer_country_params_filter(params)
+      producer_country_id = producer_country_val[0]
+      producer_country = producer_country_val[1]
 
-    products = Product.search(search_text).producer_country_filter(producer_country_id).sub_type_filter(product_sub_type_id) 
+      product_sub_type_val = product_sub_type_params_filter(params)
+      product_sub_type_id = product_sub_type_val[0]
+      product_sub_type = product_sub_type_val[1]
 
-    return producer_country, product_sub_type, products, search_text
+      products = Product.search(search_text).producer_country_filter(producer_country_id).sub_type_filter(product_sub_type_id) 
+
+      return producer_country, product_sub_type, products, search_text
+    end
   end
 
   def top_products_filter(product_ids_a, sort_column_index, sort_column_stats)
 
     products_h = Hash.new
 
-    products_out_of_order = Product.find(product_ids_a).group_by(&:id);
+    products_out_of_order = Product.find(product_ids_a).group_by(&:id)
 
     products_in_order = product_ids_a.map { |id| products_out_of_order[id].first }
 

@@ -103,9 +103,13 @@ class SalesController < ApplicationController
     @customer_id = params[:customer_id]
     @customer_name = params[:customer_name]
 
+    @producer_country, @product_sub_type, products, @search_text = product_param_filter(params)
+
+    where_query = "Order.customer_filter(%s).valid_order.product_filter(%s)" % [[807], products.pluck("id")]
+
     @time_periods_name, @all_stats, @sum_stats, @avg_stats, product_ids = \
-    stats_for_timeperiods("Order.customer_filter(%s).valid_order" % [[@customer_id]],\
-     :group_by_product_id, :sum_order_product_qty, nil, nil, params[:sort_column_stats])
+    stats_for_timeperiods(where_query, :group_by_product_id, :sum_order_product_qty,\
+     nil, nil, params[:sort_column_stats])
     
     if !product_ids.empty?
       @products_h = top_products_filter(product_ids, params[:sort_column], params[:sort_column_stats])
