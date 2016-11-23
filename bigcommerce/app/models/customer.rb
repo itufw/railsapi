@@ -153,8 +153,28 @@ class Customer < ActiveRecord::Base
 		return where('customers.id IN (?)', ids_array)
 	end
 
-	def self.order_by_name
-		order('actual_name ASC')
+	def self.order_by_name(direction)
+		order('actual_name ' + direction)
+	end
+
+	def self.order_by_staff(direction)
+		includes(:staff).order('staffs.nickname ' + direction)
+	end
+
+	def self.order_by_type(direction)
+		includes(:cust_type).order('cust_types.name ' + direction)
+	end
+
+	def self.order_by_style(direction)
+		includes(:cust_style).order('cust_styles.name ' + direction)
+	end
+
+	def self.order_by_outstanding(direction)
+		includes(:xero_contact).order('xero_contacts.accounts_receivable_outstanding ' + direction)
+	end
+
+	def self.order_by_overdue(direction)
+		includes(:xero_contact).order('xero_contacts.accounts_receivable_overdue ' + direction)
 	end
 
 	def self.insert_xero_contact_id(customer_id, xero_contact_id)

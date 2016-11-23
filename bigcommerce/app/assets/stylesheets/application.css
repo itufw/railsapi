@@ -43,3 +43,14 @@
 	font-size: 115%;
 }
 
+/*.caret {
+	border-top: 6px dashed;
+	border-left: 6px solid transparent;
+	border-right: 6px solid transparent;
+	margin-left: 6px;
+}
+
+.dropup .caret {
+	border-bottom: 6px dashed;
+}
+*/
