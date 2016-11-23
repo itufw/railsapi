@@ -193,9 +193,20 @@ class Product < ActiveRecord::Base
 		order('id ' + direction)
 	end
 
-	def order_by_price(direction)
-		#order('calculated_price ' + direction)
-		sort_by {|p| order_int(direction) * calculate_product_price(p.calculated_price, p.retail_ws)}
+	def ex_gst_price
+		if self.retail_ws == 'WS'
+	      return self.calculated_price * 1.29
+	    else
+	      return self.calculated_price
+	    end
+	end
+
+	def self.order_by_price(direction)
+		if direction == 'ASC'
+			return Product.all.sort_by(&:ex_gst_price)
+		else
+			return Product.all.sort_by(&:ex_gst_price).reverse
+		end
 	end
 
 	def self.order_by_stock(direction)

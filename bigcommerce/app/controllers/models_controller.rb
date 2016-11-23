@@ -75,7 +75,7 @@ class ModelsController < ApplicationController
     @producer_country, @product_sub_type, products, @search_text = product_param_filter(params)
 
     @pending_stock_h = Product.pending_stock(products.pluck("id"))
-    @products = products.paginate( per_page: @per_page, page: params[:page]).send(order_function, direction)
+    @products = products.send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
 
   end
 
