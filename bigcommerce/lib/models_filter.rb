@@ -29,12 +29,12 @@ module ModelsFilter
       staff = Staff.filter_by_id(session_staff_id)
       return staff_id, staff
     else
-    	if (!params[:staff].nil? && !params[:staff][:id].empty?)
-    	  staff_id = params[:staff][:id]
+    	if (!params["staff"].nil? && !params["staff"]["id"].empty?)
+    	  staff_id = params["staff"]["id"]
     	  staff = Staff.filter_by_id(staff_id)
     	  return staff_id, staff
-      elsif !params[:staff_id].nil?
-        staff_id = params[:staff_id]
+      elsif !params["staff_id"].nil?
+        staff_id = params["staff_id"]
         staff = Staff.filter_by_id(staff_id)
         return staff_id, staff   
     	else
@@ -87,8 +87,8 @@ module ModelsFilter
   end
 
   def cust_style_param_filter(params)
-    unless (params[:cust_style].nil? or params[:cust_style][:id].empty?)
-      cust_style_id = params[:cust_style][:id]
+    unless (params["cust_style"].nil? or params["cust_style"]["id"].empty?)
+      cust_style_id = params["cust_style"]["id"]
       cust_style = CustStyle.filter_by_id(cust_style_id)
       return cust_style_id, cust_style
     else

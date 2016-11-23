@@ -130,11 +130,7 @@ class SalesController < ApplicationController
     @product_id = params[:product_id]
     @product_name = params[:product_name]
 
-    results_val = customer_param_filter(params, 25)
-
-    @staff = results_val[0]
-    @cust_style = results_val[-1]
-    staff_id = results_val[3]
+    @staff, customers_filtered, @search_text, staff_id, @cust_style = customer_param_filter(params, 25)
 
     if staff_id.nil?
       staff_id = "nil"
@@ -148,7 +144,7 @@ class SalesController < ApplicationController
     stats_for_timeperiods("Order.product_filter(%s).valid_order.staff_filter(%s)" % [@product_id, staff_id],\
      :group_by_customerid, :sum_order_product_qty, @total_stock_no_ws, @selected_period, params[:sort_column_stats])
 
-    @customers_h = top_customer_filter(results_val[1].pluck("id") && customer_ids,\
+    @customers_h = top_customer_filter(customers_filtered.pluck("id") & customer_ids,\
      params[:sort_column], params[:sort_column_stats])
   end
 
