@@ -19,8 +19,8 @@
 		<th>ID <%= render "partials/sort_arrows", order: 'order_by_id' %></th>
 		<th>Product Name <%= render "partials/sort_arrows", order: 'order_by_name' %></th>
 		<th>Price ( Ex GST ) <%= render "partials/sort_arrows", order: 'order_by_price' %></th>
-		<th>Stock <%= render "partials/sort_arrows", order: 'order_by_stock' %></th>
-		<th>Pending Stock</th>
+		<th class = <%= display_class %> >Stock <%= render "partials/sort_arrows", order: 'order_by_stock' %></th>
+		<th class = <%= display_class %> >Pending Stock</th>
 		<th>Total Stock</th>
 	</tr>
 
@@ -30,8 +30,8 @@
 		<% pending_stock = exists_in_h_int(pending_stock_h, p.id) %>
 		<td><%= link_to p.name, controller: 'sales', action: 'stats_and_top_customers_for_product', product_id: p.id, product_name: p.name, total_stock: pending_stock + p.inventory %></td>
 		<td class="num"><%= display_num(calculate_product_price(p.calculated_price, p.retail_ws)) %></td>
-		<td class="num"><%= p.inventory %></td>
-		<td class="num"><%= link_to pending_stock, controller: 'sales', action: 'orders_and_stats_for_product_and_status', status_id: 1, status_name: "Pending", product_id: p.id, product_name: p.name, num_orders: nil, qty: p.inventory, status_qty: pending_stock, total: nil %></td>
+		<td class = <%= display_class %> + "num" ><%= p.inventory %></td>
+		<td class = <%= display_class %> + "num"><%= link_to pending_stock, controller: 'sales', action: 'orders_and_stats_for_product_and_status', status_id: 1, status_name: "Pending", product_id: p.id, product_name: p.name, num_orders: nil, qty: p.inventory, status_qty: pending_stock, total: nil %></td>
 		<td class="num"><%= pending_stock + p.inventory %></td>
 	</tr>
 

@@ -4,6 +4,6 @@
 <div class="col-xs-2">
     <%= collection_select(:producer_country, :id, ProducerCountry.all, :id, :name, {:include_blank => 'All Countries'}, {:class => 'form-control'}) %>
 </div>   
-<div class="col-xs-2">
+<div class="col-xs-3">
     <%= collection_select(:product_sub_type, :id, ProductSubType.all, :id, :name, {:include_blank => 'All Varietals'}, {:class => 'form-control'}) %>
 </div>

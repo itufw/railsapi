@@ -1,0 +1,28 @@
+<div class="row">
+	<div class="col-md-3">
+	  <%= text_field_tag('search', @search_text, placeholder: 'Search for Product Name', class: 'form-control') %>
+	</div>
+
+	<div class="col-md-2">
+		<%= collection_select(:product_type, :id, ProductType.all, :id, :name, {:include_blank => 'Types'}, {:class => 'form-control'}) %>
+	</div>
+
+	<div class="col-md-2">
+    	<%= collection_select(:producer_country, :id, ProducerCountry.all, :id, :name, {:include_blank => 'Countries'}, {:class => 'form-control'}) %>
+    </div>
+</div>
+</div>
+<div class="row">
+	<div class="col-md-2 col-md-offset-3">
+	    <%= collection_select(:product_sub_type, :id, @product_sub_types, :id, :name, {:include_blank => 'Varietals'}, {:class => 'form-control'}) %>
+	</div>
+
+	<div class="col-md-2">
+		<%= collection_select(:producer, :id, @producers, :id, :name, {:include_blank => 'Wineries'}, {:class => 'form-control'}) %>
+	</div>
+
+	<div class="col-md-2">
+		<%= collection_select(:producer_region, :id, @producer_regions, :id, :name, {:include_blank => 'Regions'}, {:class => 'form-control'}) %>
+	</div>
+</div>
+

@@ -166,6 +166,31 @@ class Product < ActiveRecord::Base
 		return all
 	end
 
+	def self.producer_filter(producer_id)
+		return where(producer_id: producer_id) if producer_id
+		return all
+	end
+
+	def self.producer_region_filter(producer_region_id)
+		return where(producer_region_id: producer_region_id) if producer_region_id
+		return all
+	end
+
+	def self.type_filter(type_id)
+		return where(product_type_id: type_id) if type_id
+		return all
+	end
+
+	def self.staff_filter(staff_id)
+		return includes_customers.where('customers.staff_id = ?', staff_id).references(:customers) if staff_id
+		return all
+	end
+
+	def self.cust_style_filter(cust_style_id)
+		return includes_customers.where('customers.cust_style_id = ?', cust_style_id).references(:customers) if cust_style_id
+		return all
+	end
+
 	def self.search(search_text)
 		return search_for(search_text)
 	end
@@ -179,6 +204,10 @@ class Product < ActiveRecord::Base
 
 	def self.include_orders
 		includes([{:order_products => :order}])
+	end
+
+	def self.includes_customers
+		includes([{:orders => :customer}])
 	end
 
 	def self.pending_stock(product_ids_a)
