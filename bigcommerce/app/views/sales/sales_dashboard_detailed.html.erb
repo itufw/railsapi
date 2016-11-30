@@ -5,22 +5,9 @@
 <div style="margin-top: 50px;">
 
 <%= form_tag({:action => "sales_dashboard_detailed"}, {:method => "get"}) do %>
-
-	<div class="col-xs-2" style="float: left;">
-	<%= render "partials/period_select" %>
-	</div>
-	<div class="col-xs-2" style="float: left;">
-   	<%= select_tag "num_period", options_for_select(@periods.collect{ |p| [p, p]}, selected: @num_periods), include_blank: "Number of Periods", class:'form-control' %>
-    </div>
-
-   <%= render "partials/dashboard_filter" %>
-
-   <div class="col-xs-3" style="float: left;margin-top: 2px;">
-   End Date:   <%= date_field( "selected_date", "selected_date", value: @end_date) %>
-   </div>
-   <div class="col-xs-2">
-   <%= submit_tag "Change", class: 'btn btn-primary' %>
-   </div>
+	
+	<%= render "partials/detailed_dashboard_date_filter" %>
+    <%= submit_tag "Submit", class: 'btn btn-primary' %>
    
 <% end %>
 </div>

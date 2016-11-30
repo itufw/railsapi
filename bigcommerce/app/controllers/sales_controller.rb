@@ -67,7 +67,7 @@ class SalesController < ApplicationController
     # order_sum_param is defined in Sales Controller Helper
     # Sum function returns :sum_qty or :sum_total
     # These functions are defined in the Order model
-    sum_function, @param_val = order_sum_param(params[:sum_param])
+    sum_function, @param_val, @sum_params = order_sum_param(params[:sum_param]) 
 
     # sum_orders returns a hash like {date/week_num/month_num => sum} depending on the date_type
     # defined in Sales Controller Helper

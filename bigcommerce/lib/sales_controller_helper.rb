@@ -10,18 +10,6 @@ module SalesControllerHelper
   	return Staff.active_sales_staff
   end
 
-  def order_sum_param(selected)
-    sum_params_h = {"Order Totals" => :sum_total, "Bottles" => :sum_qty,\
-     "Number of Orders" => :count_orders, "Avg. Order Total" => :avg_order_total,\
-      "Avg. Bottles" => :avg_order_qty}
-
-    if selected.nil?
-      return sum_params_h["Order Totals"], "Order Totals", sum_params_h.keys 
-    else
-      return sum_params_h[selected], selected, sum_params_h.keys
-    end
-  end
-
   def stats_for_timeperiods(where_query, group_by, sum_by, total_stock, period_type, sort_column)
     time_periods = StaffTimePeriod.display
 
