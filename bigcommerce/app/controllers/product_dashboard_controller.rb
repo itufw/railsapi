@@ -53,14 +53,12 @@ class ProductDashboardController < ApplicationController
     def products_filter(products_unfiltered_a, params)
     order_function, direction = sort_order(params, 'order_by_name', 'ASC')
 
-    @per_page = params[:per_page] || Product.per_page
-
     @producer, @producer_region, @product_type, @producer_country,\
     @product_sub_type, products_filtered, @search_text, @product_sub_types, @producers,\
     @producer_regions = \
     product_dashboard_param_filter(params)
 
-    @products = Product.filter_by_ids(products_unfiltered_a & products_filtered.pluck("id")).send(order_function, direction)
+    @products = Product.filter_by_ids_nil_allowed(products_unfiltered_a & products_filtered.pluck("id")).send(order_function, direction)
     #@pending_stock_h = Product.pending_stock(@products.pluck("id"))
     end
 
