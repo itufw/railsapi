@@ -7,8 +7,8 @@ class XeroController < ApplicationController
 	include XeroInvoiceCalculations
 	
 	def link_bigc_xero_contact
-		#Customer.xero_contact_id_is_null.each {|c| link_skype_id(c.id)}
-		Customer.xero_contact_id_is_null.each {|c| link_skype_id_by_customer_name(c.id, c.actual_name)}
+		Customer.xero_contact_id_is_null.each {|c| link_skype_id(c.id)}
+		#Customer.xero_contact_id_is_null.each {|c| link_skype_id_by_customer_name(c.id, c.actual_name)}
 	end
 
 	def link_bigc_xero_orders

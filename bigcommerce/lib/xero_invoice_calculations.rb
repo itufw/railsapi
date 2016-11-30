@@ -14,6 +14,7 @@ module XeroInvoiceCalculations
 					xero_contact = XeroContact.create_in_xero(o.customer)
 					xero_contact_id = xero_contact.contact_id
 
+					# insert the new contact created in Xero into our database.
 					XeroContact.new.insert_or_update_contact(xero_contact)
 					Customer.insert_xero_contact_id(customer_id, xero_contact_id)
 				# Otherwise just get the xero contact id
