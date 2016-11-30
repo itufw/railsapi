@@ -193,6 +193,10 @@ class Product < ActiveRecord::Base
 	    return where('products.id IN (?)', product_ids_a)
 	end
 
+	def self.filter_by_ids_nil_allowed(product_ids_a)
+	    return where('products.id IN (?)', product_ids_a)
+	end
+
 	def self.include_orders
 		includes([{:order_products => :order}])
 	end
