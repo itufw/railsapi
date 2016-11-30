@@ -6,7 +6,7 @@
 	<%= form_tag({:action => "sales"}, {:method => "get"}) do %>
 	<%= render "partials/extended_product_filter" %>
 	<br/>
-	<%= render "partials/period_select" %>
+	<%= render "partials/detailed_dashboard_date_filter" %>
    	<%= submit_tag "Submit", class: 'btn btn-primary' %>	
    	<button class = "btn btn-primary"><%= link_to "Reset", action: "sales" %></button>
 <% end %>
@@ -20,7 +20,7 @@
 		<th>Price (Ex. GST) <br/><%= render "partials/sort_arrows", order: 'order_by_price' %></th>
 		<% @dates_paired.each do |date_key, date_pair| %>
 			<% date =  date_format_orders(date_pair[0]) + " - " + date_format_orders(date_pair[1].prev_day) %>
-			<th> <%= link_to date %>
+			<th> <%= date %>
 				
 			</th>
 		<% end %>

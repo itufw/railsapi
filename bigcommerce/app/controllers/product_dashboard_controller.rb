@@ -1,5 +1,6 @@
 require 'dates_helper.rb'  
 require 'models_filter.rb'
+require 'product_dashboard_helper.rb'
 
 class ProductDashboardController < ApplicationController
 
@@ -7,6 +8,7 @@ class ProductDashboardController < ApplicationController
 
     include DatesHelper
     include ModelsFilter
+    include ProductDashboardHelper
 
 
 
@@ -20,6 +22,11 @@ class ProductDashboardController < ApplicationController
         @periods = (3..15).to_a
         # This returns 
         @selected_period, @period_types = define_period_types(params)
+
+        sum_function, @param_val, @sum_params = order_sum_param(params[:sum_param])
+        if params[:sum_param].nil?
+            sum_function, @param_val = :sum_qty,  "Bottles"
+        end
         # periods_from_end_date is defined in Dates Helper
         # returns an array of all dates - sorted
         # For example num_periods = 3, end_date = 5th oct and "monthly" as period_type returns
@@ -36,8 +43,8 @@ class ProductDashboardController < ApplicationController
         staff_id, @staff = staff_params_filter(params, session[:user_id])
         cust_style_id, @cust_style = collection_param_filter(params, :cust_style, CustStyle)
 
-        @qty_hash = Order.date_filter(dates[0], dates[-1]).staff_filter(staff_id).\
-        cust_style_filter(cust_style_id).send(date_function).sum_qty
+        @qty_hash = Order.valid_order.date_filter(dates[0], dates[-1]).staff_filter(staff_id).\
+        cust_style_filter(cust_style_id).send(date_function).send(sum_function)
 
         @product_ids_a = product_ids_for_hash(@qty_hash)
 
@@ -61,39 +68,5 @@ class ProductDashboardController < ApplicationController
         products_unfiltered = product_sales(params)
         products_filter(products_unfiltered, params)
     end
-
-
-    def sort_qty_hash(qty_hash, params)
-        product_ids_a = []
-
-        if (params.empty? || params[:order_function].nil?)
-            return product_ids_for_hash(qty_hash)
-        end
-
-        chosen_hash = qty_hash.select {|k,v| new_key(k) == 47}
-        return product_ids_for_hash(chosen_hash)
-
-    end
-
-    def product_ids_for_hash(qty_hash)
-        product_ids_a = []
-        qty_hash.keys.each { |date_id_pair| product_ids_a.push(date_id_pair[0])}
-        return product_ids_a
-    end
-
-
-    # If hash is like {[id, date] => sum} then return date
-    # Sometimes the hash is like {[id, date, year] => sum}
-    # then return [date, year]
-    def new_key(key)
-        if key[1..-1].count == 1
-            new_key = key[1]
-        else
-           new_key = key[1..-1]
-        end
-        return new_key
-    end
-
-
 
 end
