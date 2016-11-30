@@ -132,4 +132,29 @@ module ApplicationHelper
     customer.cust_style.name unless customer.cust_style_id.nil?
   end
 
+  # Takes input staff id and a Hash like {[staff_id, date] => sum}
+  # Returns a Hash like {date => sum} for that particular staff_id
+  # Here sum can be order_totals/qty..etc for that particular staff on that date
+  # Also works for product_id's hash.
+  def give_sum_date_h(object_id, date_sum_object_h)
+    filter_by_object = date_sum_object_h.select {|key, sum| key[0] == object_id}
+
+    sum_date_h = Hash.new
+    filter_by_object.each {|key, sum| sum_date_h[new_key(key)] = sum}
+    return sum_date_h
+  end
+
+  # If hash is like {[id, date] => sum} then return date
+  # Sometimes the hash is like {[id, date, year] => sum}
+  # then return [date, year]
+  def new_key(key)
+    if key[1..-1].count == 1
+      new_key = key[1]
+    else
+      new_key = key[1..-1]
+    end
+    return new_key
+  end
+
+
 end

@@ -1,0 +1,50 @@
+<%= title "Detailed Products Dashboard" %>
+
+<h3>Products Sales</h3>
+
+<div class="form-group container-fluid">
+	<%= form_tag({:action => "sales"}, {:method => "get"}) do %>
+	<%= render "partials/extended_product_filter" %>
+	<br/>
+	<%= render "partials/period_select" %>
+   	<%= submit_tag "Submit", class: 'btn btn-primary' %>	
+   	<button class = "btn btn-primary"><%= link_to "Reset", action: "sales" %></button>
+<% end %>
+</div>
+
+
+<br/><br/>
+<table class = "table table-striped table-bordered table-hover table-responsive">
+	<tr>
+		<th>Product Name <%= render "partials/sort_arrows", order: 'order_by_name' %></th>
+		<th>Price (Ex. GST) <br/><%= render "partials/sort_arrows", order: 'order_by_price' %></th>
+		<% @dates_paired.each do |date_key, date_pair| %>
+			<% date =  date_format_orders(date_pair[0]) + " - " + date_format_orders(date_pair[1].prev_day) %>
+			<th> <%= link_to date %>
+				
+			</th>
+		<% end %>
+		<th>Total</th>
+	</tr>
+
+	<% @products.each do |p| %>
+	<tr>
+		<td><%= p.name %></td>
+		<td class="num"><%= display_num(calculate_product_price(p.calculated_price, p.retail_ws)) %>
+		<%# @qty_hash is like {[product_id, week_num] => qty} %>
+		<% sums_dates_h = give_sum_date_h(p.id, @qty_hash) %>
+		<% @dates_paired.keys.each do |d| %>
+
+			
+			<td class="num"><%= exists_in_h(sums_dates_h, d) %></td>
+
+		<% end %>
+
+
+		<td class="num"><%= sums_dates_h.values.sum %></td>
+			
+	</tr>
+	<% end %>
+	</tr>
+
+</table>

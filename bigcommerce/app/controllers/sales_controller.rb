@@ -58,6 +58,10 @@ class SalesController < ApplicationController
     # 6th Oct is the last date in the array and not 5th oct because
     # we want to calculate orders including 5th Oct, for that we need to give the next day
     dates = periods_from_end_date(@num_periods, @end_date, @selected_period)
+     # returns a hash like {[start_date, end_date] => week_num/month_num}
+    @dates_paired = pair_dates(dates, @selected_period)
+    
+    @periods = (3..15).to_a
 
     # order_sum_param takes into account what the user wants to calculate - Bottles or Order Totals
     # order_sum_param is defined in Sales Controller Helper
@@ -71,15 +75,12 @@ class SalesController < ApplicationController
     # date_type returns group_by_week_created or group_by_month_created
     date_function = period_date_functions(@selected_period)[2]
     @sums_by_periods = sum_orders(dates[0], dates[-1], date_function.to_sym, sum_function, nil)
-
-    # returns a hash like {[start_date, end_date] => week_num/month_num}
-    @dates_paired = pair_dates(dates, @selected_period)
-
+    
     staff_id, @staff_nicknames = display_reports_for_sales_dashboard(session[:user_id])
     @staff_sum_by_periods = sum_orders(dates[0], dates[-1], (date_function + "_and_staff_id").to_sym, sum_function, staff_id)
-    
-    @periods = (3..15).to_a
+
   end
+
 
   # Displays all orders for selected customer
   # How do I get to this ? Click on Customer Name anywhere on the site

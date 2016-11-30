@@ -78,20 +78,6 @@ class ModelsController < ApplicationController
     @pending_stock_h = Product.pending_stock(@products.pluck("id"))
   end
 
-  def products_dashboard
-    order_function, direction = sort_order(params, 'order_by_name', 'ASC')
-
-    @per_page = params[:per_page] || Product.per_page
-
-    @staff, @producer, @producer_region, @product_type, @producer_country,\
-     @product_sub_type, products, @search_text, @product_sub_types, @producers, @producer_regions,\
-     @cust_style = \
-     product_dashboard_param_filter(params, session[:user_id])
-
-    @products = products.send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
-    @pending_stock_h = Product.pending_stock(@products.pluck("id"))
-  end
-
 
   def update_staff
     customer_id = params[:customer_id]

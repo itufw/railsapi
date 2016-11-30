@@ -202,6 +202,11 @@ class Order < ActiveRecord::Base
 		return all
 	end
 
+	def self.cust_style_filter(cust_style_id)
+		return includes(:customer).where('customers.cust_style_id = ?', cust_style_id).references(:customers) if !cust_style_id.nil?
+		return all
+	end
+
 	def self.group_by_date_created
 		group("DATE(orders.date_created)")
 	end
@@ -231,8 +236,25 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.group_by_quarter_created_and_staff_id
-		includes(:customer).group(["customers.staff_id", "QUARTER(orders.date_created)", "YEAR(orders.date_created)"])
+		includes(:customer).group(["order_products.product_id", "QUARTER(orders.date_created)", "YEAR(orders.date_created)"])
 	end
+
+	def self.group_by_week_created_and_product_id
+		includes(:order_products).group(["order_products.product_id",\
+		"WEEK(orders.date_created)"]).references(:order_products)
+	end
+
+	def self.group_by_month_created_and_product_id
+		includes(:order_products).group(["order_products.product_id",\
+		"MONTH(orders.date_created)", "YEAR(orders.date_created)"]).references(:order_products)
+	end
+
+	def self.group_by_quarter_created_and_product_id
+		includes(:order_products).group(["order_products.product_id",\
+		"QUARTER(orders.date_created)", "YEAR(orders.date_created)"]).references(:order_products)
+	end
+
+
 
 	def self.group_by_customerid
 		group('orders.customer_id')

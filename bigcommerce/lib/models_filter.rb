@@ -80,29 +80,28 @@ module ModelsFilter
     end
   end
 
-  def product_dashboard_param_filter(params, session_staff_id)
+  def product_dashboard_param_filter(params)
 
     if params.empty?
-      return nil, nil, nil, nil, nil, nil, Product.all, nil, ProductSubType.all,\
-       Producer.all, ProducerRegion.all, nil
+      return nil, nil, nil, nil, nil, Product.all, nil, ProductSubType.all,\
+       Producer.all, ProducerRegion.all
     end
 
-    staff_id, staff = staff_params_filter(params, session_staff_id)
     producer_id, producer = collection_param_filter(params, :producer, Producer)
     producer_region_id, producer_region = collection_param_filter(params, :producer_region, ProducerRegion)
     product_type_id, product_type = collection_param_filter(params, :product_type, ProductType)
-    cust_style_id, cust_style = collection_param_filter(params, :cust_style, CustStyle)
 
     producer_country, product_sub_type, products, search_text, producer_country_id = product_param_filter(params)
 
-    products_filtered = products.producer_filter(producer_id).staff_filter(staff_id).\
-    cust_style_filter(cust_style_id).producer_region_filter(producer_region_id).\
+    products_filtered = products.producer_filter(producer_id).\
+    producer_region_filter(producer_region_id).\
     type_filter(product_type_id)
 
     product_sub_types, producers, producer_regions = change_product_collections(product_type_id, producer_country_id)
 
-    return staff, producer, producer_region, product_type, producer_country,\
-     product_sub_type, products_filtered, search_text, product_sub_types, producers, producer_regions, cust_style
+    return producer, producer_region, product_type, producer_country,\
+     product_sub_type, products_filtered, search_text, product_sub_types, producers,\
+    producer_regions
   end
 
   def change_product_collections(product_type_id, country_id)
