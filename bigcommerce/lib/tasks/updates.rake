@@ -24,13 +24,13 @@ namespace :updates do
 			admin.update_orders
 			puts "Updated Orders"
 
-			xero = XeroController.new
+			#xero = XeroController.new
 			
-			xero.update_xero_contacts
-			puts "Updated Xero Contacts"
+			#xero.update_xero_contacts
+			#puts "Updated Xero Contacts"
 			
-			xero.update_xero_invoices
-			puts "Updated Xero Invoices"
+			#xero.update_xero_invoices
+			#puts "Updated Xero Invoices"
 
 			Revision.end_update(start_time, Time.now)
 
