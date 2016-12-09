@@ -236,7 +236,7 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.group_by_quarter_created_and_staff_id
-		includes(:customer).group(["order_products.product_id", "QUARTER(orders.date_created)", "YEAR(orders.date_created)"])
+		includes(:customer).group(["customers.staff_id", "QUARTER(orders.date_created)", "YEAR(orders.date_created)"])
 	end
 
 	def self.group_by_week_created_and_product_id
