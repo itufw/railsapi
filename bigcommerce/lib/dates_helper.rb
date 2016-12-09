@@ -102,7 +102,7 @@ module DatesHelper
       return ["beginning_of_week".to_sym, "last_week".to_sym, "group_by_week_created", :convert_to_week_num]
     elsif period_type == "monthly"
       return ["beginning_of_month".to_sym, "last_month".to_sym, "group_by_month_created", :convert_to_month_num]
-    elsif period_type == "quaterly"
+    elsif period_type == "quarterly"
       return ["beginning_of_quarter".to_sym, "last_quarter".to_sym, "group_by_quarter_created", :convert_to_quarter_num]
     else
       return ["".to_sym, "".to_sym]
@@ -137,7 +137,7 @@ module DatesHelper
   # end
 
   def define_period_types(params)
-    period_types = ["weekly", "monthly", "quaterly"]
+    period_types = ["weekly", "monthly", "quarterly"]
     if params[:period_type]
       selected_period = params[:period_type]
     else
@@ -151,7 +151,7 @@ module DatesHelper
       return 7
     elsif period_type == "monthly"
       return 30
-    elsif period_type == "quaterly"
+    elsif period_type == "quarterly"
       return 65
     else
       return 1
