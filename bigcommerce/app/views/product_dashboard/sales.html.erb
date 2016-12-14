@@ -34,7 +34,7 @@
 		<td><%= p.id %></td>
 		<td><%= p.name %></td>
 		<% pending_stock = exists_in_h_int(@pending_stock_h, p.id)
-		<td><%= p.inventory + pending_stock %>
+		<td><%= p.inventory + pending_stock %></td>
 		<td class="num"><%= display_num(calculate_product_price(p.calculated_price, p.retail_ws)) %>
 		<%# @qty_hash is like {[product_id, week_num] => qty} %>
 		<% sums_dates_h = give_sum_date_h(p.id, @qty_hash) %>
