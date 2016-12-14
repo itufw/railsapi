@@ -92,7 +92,7 @@ class SalesController < ApplicationController
     @customer_name = params[:customer_name]
     @per_page = params[:per_page] || Order.per_page
 
-    @selected_period, @period_types = define_period_types(params)
+    @selected_period, @period_types = current_period_type(params)
 
     @orders = Order.include_all.customer_filter([@customer_id]).order_by_id('DESC').paginate( per_page: @per_page, page: params[:page])
    
@@ -133,6 +133,9 @@ class SalesController < ApplicationController
     @product_id = params[:product_id]
     @product_name = params[:product_name]
 
+    # TODO
+    # change staff id from 25 to session_user_id
+    # Need to do product filter
     @staff, customers_filtered, @search_text, staff_id, @cust_style = customer_param_filter(params, 25)
 
     if staff_id.nil?
@@ -141,13 +144,13 @@ class SalesController < ApplicationController
 
     @total_stock = params[:total_stock]
     @total_stock_no_ws = total_stock_product(@product_id, params[:total_stock])
-    @selected_period, @period_types = define_period_types(params)
+    @selected_period, @period_types = current_period_type(params)
 
     @time_periods_name, @all_stats, @sum_stats, @avg_stats, customer_ids, @monthly_supply = \
     stats_for_timeperiods("Order.product_filter(%s).valid_order.staff_filter(%s)" % [@product_id, staff_id],\
      :group_by_customerid, :sum_order_product_qty, @total_stock_no_ws, @selected_period, params[:sort_column_stats])
 
-    @customers_h = top_customer_filter(customers_filtered.pluck("id") & customer_ids,\
+    @customers_h = top_customer_filter(customer_ids & customers_filtered.pluck("id"),\
      params[:sort_column], params[:sort_column_stats])
   end
 
@@ -186,7 +189,7 @@ class SalesController < ApplicationController
     product_id = params[:product_id]
     @product_name = params[:product_name]
 
-    @selected_period, @period_types = define_period_types(params)
+    @selected_period, @period_types = current_period_type(params)
     @orders = Order.include_all.product_filter(product_id).customer_filter([customer_id]).order_by_id('DESC').paginate( per_page: @per_page, page: params[:page])
     @time_periods_name, i, @sum_stats, @avg_stats = \
     stats_for_timeperiods("Order.product_filter(%s).customer_filter(%s).valid_order" % [product_id,\
@@ -237,7 +240,7 @@ class SalesController < ApplicationController
       @qty = params[:qty]
       @status_qty = params[:status_qty]
       @total = params[:total] 
-      @selected_period, @period_types = define_period_types(params)
+      @selected_period, @period_types = current_period_type(params)
 
       @time_periods_name, i, @sum_stats, @avg_stats = \
       stats_for_timeperiods("Order.product_filter(%s).status_filter(%s)" % [@product_id, @status_id],\
