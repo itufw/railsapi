@@ -110,4 +110,14 @@ module SalesControllerHelper
     return products.to_a
   end
 
+  # depending on the period type, returns the number of days that define that period
+  def num_days_for_periods(period_type)
+    days_period_h = { "weekly" => 7, "monthly" => 30, "quarterly" => 65 }
+    if days_period_h.has_key? period_type
+      return days_period_h[period_type]
+    else
+      return 1
+    end
+  end
+
 end
