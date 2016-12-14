@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/hinammehra/xeroizer.git
-  revision: 27c548ac5aa949e1551c3ac0b1f94995ebee3e23
+  revision: 3540bfa1f1cc329f0c528b642ff9390b7bb274d7
   specs:
-    xeroizer (2.16.4)
+    xeroizer (2.16.5)
       activesupport
       builder (>= 2.1.2)
       i18n
@@ -53,7 +53,7 @@ GEM
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
     arel (6.0.3)
-    autoprefixer-rails (6.5.3.1)
+    autoprefixer-rails (6.5.4)
       execjs
     bcrypt (3.1.11)
     bcrypt (3.1.11-x86-mingw32)
