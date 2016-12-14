@@ -1,8 +1,9 @@
 require 'sales_controller_helper.rb'
 require 'models_filter.rb'
-require 'dates_helper.rb'
+require 'dates.rb'
 require 'display_helper.rb'
 require 'stock_helper.rb'
+require 'dashboard_math.rb'
 
 class SalesController < ApplicationController
 
@@ -10,9 +11,11 @@ class SalesController < ApplicationController
 
   include SalesControllerHelper
   include ModelsFilter
-  include DatesHelper
+  include Dates
   include DisplayHelper
   include StockHelper
+  include DashboardMath
+
 
   # Displays this week's and last week's total order sales
   # Also displays total order sales for this week divided by staff
@@ -23,7 +26,7 @@ class SalesController < ApplicationController
     @dates_this_week = this_week(date_given)
     @dates_last_week = last_week(@dates_this_week[0])
 
-    sum_function, @param_val, @sum_params = order_sum_param(params[:sum_param])  
+    sum_function, @param_val, @sum_params = sum_function_orders(params[:sum_param], "Order Totals")  
 
       # returns a hashmap like { date => order_totals }
     @sum_this_week = sum_orders(@dates_this_week[0], @dates_this_week[-1], :group_by_date_created, sum_function, nil)
@@ -43,36 +46,35 @@ class SalesController < ApplicationController
 
   def sales_dashboard_detailed
     @end_date = return_end_date(return_date_given(params))
-    if params[:num_period]
-      @num_periods = params[:num_period].to_i
-    else 
-      @num_periods = 13
-    end
-    sum_function, @param_val, @sum_params = order_sum_param(params[:sum_param])
-    @selected_period, @period_types = define_period_types(params)
 
-    # periods_from_end_date is defined in Dates Helper
-    # returns an array of all dates - sorted
-    # For example num_periods = 3, end_date = 5th oct and "monthly" as period_type returns
+    # num_periods is the current number of periods value, default is 13
+    # periods is an array of all the possible number of periods, ranges from 3-15
+    @num_periods, @periods = num_of_periods(params)
+   
+    # selected_period is current selected period - can be weekly, monthly, quarterly,
+    # default is monthly
+    # period_types is an array of all the valid period types
+    @selected_period, @period_types = current_period_type(params)
+
+    # sum function is the sum function defined in Order model that the user
+    # wants orders to be summed by - can be order total, order qty, etc.
+    # it is in the form of a symbol - like :sum_total
+    # param_val is a string representing that function - like "Order Total"
+    # sum_params is a list of strings representing sum functions
+    sum_function, @param_val, @sum_params = sum_function_orders(params[:sum_param], "Order Totals")
+
+    # dates is an array of all dates - sorted
+    # For example num_periods = 3, end_date = 5th oct and "monthly" as selected_period returns
     # [1st Aug, 1st Sep, 1st Oct, 6th Oct]
     # 6th Oct is the last date in the array and not 5th oct because
     # we want to calculate orders including 5th Oct, for that we need to give the next day
-    dates = periods_from_end_date(@num_periods, @end_date, @selected_period)
-     # returns a hash like {[start_date, end_date] => week_num/month_num}
+    dates = dates_a_for_periods(@num_periods, @end_date, @selected_period)
+    # returns a hash like {week_num/month_num/quarter_num => [start_date, end_date]}
     @dates_paired = pair_dates(dates, @selected_period)
-    
-    @periods = (3..15).to_a
 
-    # order_sum_param takes into account what the user wants to calculate - Bottles or Order Totals
-    # order_sum_param is defined in Sales Controller Helper
-    # Sum function returns :sum_qty or :sum_total
-    # These functions are defined in the Order model
-    sum_function, @param_val, @sum_params = order_sum_param(params[:sum_param]) 
-
-    # sum_orders returns a hash like {date/week_num/month_num => sum} depending on the date_type
-    # defined in Sales Controller Helper
-
-    # date_type returns group_by_week_created or group_by_month_created
+    # date_function is a symbol representing group_by function depending on the period_type
+    # group_by functions for various period_types is defined in Order model -
+    # for eg. group_by_week_created
     date_function = period_date_functions(@selected_period)[2]
     @sums_by_periods = sum_orders(dates[0], dates[-1], date_function.to_sym, sum_function, nil)
     

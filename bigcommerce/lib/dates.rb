@@ -1,4 +1,8 @@
-module DatesHelper
+module Dates
+  # In a dashboard a period defines one column.
+  # Each column has a start date and an end date
+  # A user can choose these start and end dates to be divided into
+  # weekly segments, monthly or quarterly
 
   def return_date_given(params)
     date_param = params[:selected_date]
@@ -66,30 +70,28 @@ module DatesHelper
     return last_periods_dates
   end
 
-  # Gives a sorted array of dates
-  # where first element is the date, number of periods before the end_date
-  # a period is defined by a date function
-  # a period_type can be "weekly" or "monthly"
-  def periods_from_end_date(num_periods, end_date, period_type)
+  # Returns a sorted array of dates
+  # num_periods is the number of columns the user wants
+  # end_date is the last date in the last column
+  # period_type is how the dates needs to be divided - weekly, monthly or quarterly
+
+  # Start from the end date, according to the period type, go to the start date
+  # for that column
+  # repeat this till we reach the required numbers of columns
+  def dates_a_for_periods(num_periods, end_date, period_type)
     all_dates = []
+    # rails has pre-defined date functions
+    # depending on the period type tell me the beginning_function 
+    # i.e. given a date, how do I get the start date of that period
+    # eg. Given 3rd December 2016, I want the start date of the month i.e. 1st December 2016
+    # my beginning function is :beginning_of_month
+    # similarly last_function gives the last date in the period
     beginning_function, last_function = period_date_functions(period_type)
-    if end_date.send(beginning_function) == end_date
-      # It is the start of the week (Monday) or start of the month
-      # This end date won't be included in the calculations or in the final table
-      # We will push this date and not the date before this one because
-      # if I want today's orders I will give orders function start_date - Today at 00:00:00
-      # And tomorrow at 00:00:00
-      all_dates.push(end_date)
-      return (all_dates + get_last_periods_date(num_periods, end_date, last_function)).sort
-    else
-      # Not a Monday / 1st of month
-      # That periods start ( Monday - end_date or 1st - end_date) will be one period
-      # num_periods - 1 will be other complete periods
-      # like Monday - Sunday or 1st - 30th/31st
-      all_dates.push(end_date.next_day)
-      all_dates.push(end_date.send(beginning_function))
-      return (all_dates + get_last_periods_date(num_periods - 1, end_date.send(beginning_function), last_function)).sort      
-    end
+
+    # Orders table needs the date of the next day of the date you want the calculation to end at
+    all_dates.push(end_date.next_day)
+    all_dates.push(end_date.send(beginning_function))
+    return (all_dates + get_last_periods_date(num_periods - 1, end_date.send(beginning_function), last_function)).sort      
   end
 
   # Returns period_type specific values
@@ -136,26 +138,5 @@ module DatesHelper
   #   return num_days_since_date_created.since(date_created)
   # end
 
-  def define_period_types(params)
-    period_types = ["weekly", "monthly", "quarterly"]
-    if params[:period_type]
-      selected_period = params[:period_type]
-    else
-      selected_period = "monthly"
-    end
-    return selected_period, period_types
-  end
-
-  def num_days_for_periods(period_type)
-    if period_type == "weekly"
-      return 7
-    elsif period_type == "monthly"
-      return 30
-    elsif period_type == "quarterly"
-      return 65
-    else
-      return 1
-    end
-  end
       
 end
