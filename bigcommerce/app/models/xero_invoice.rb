@@ -160,14 +160,14 @@ class XeroInvoice < ActiveRecord::Base
 
   	def self.unpaid(xero_invoice)
   		if xero_invoice && xero_invoice.status == 'AUTHORISED' && xero_invoice.amount_due > 0 && xero_invoice.amount_paid == 0
-  			return ["UNPAID", invoice.first.amount_due]
+  			return ["UNPAID", xero_invoice.amount_due]
   		end
   	end
 
   	def self.partially_paid(xero_invoice)
   		if xero_invoice && xero_invoice.status == 'AUTHORISED' && xero_invoice.amount_paid > 0\
   		 	&& xero_invoice.amount_paid < xero_invoice.amount_due
-  			return ["PARTIALLY-PAID", invoice.first.amount_due]
+  			return ["PARTIALLY-PAID", xero_invoice.amount_due]
   		end
   	end
 
