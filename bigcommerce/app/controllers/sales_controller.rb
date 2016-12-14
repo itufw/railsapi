@@ -145,7 +145,7 @@ class SalesController < ApplicationController
     stats_for_timeperiods("Order.product_filter(%s).valid_order.staff_filter(%s)" % [@product_id, staff_id],\
      :group_by_customerid, :sum_order_product_qty, @total_stock_no_ws, @selected_period, params[:sort_column_stats])
 
-    @customers_h = top_customer_filter(customers_filtered.pluck("id") & customer_ids,\
+    @customers_h = top_customer_filter(customer_ids & customers_filtered.pluck("id"),\
      params[:sort_column], params[:sort_column_stats])
   end
 
