@@ -72,8 +72,8 @@ class ProductDashboardController < ApplicationController
         @producer_regions = \
         product_dashboard_param_filter(params)
 
-        @products = Product.filter_by_ids_nil_allowed(products_unfiltered_a & products_filtered.pluck("id")).send(order_function, direction)
-        #@pending_stock_h = Product.pending_stock(@products.pluck("id"))
+        @products = products_filtered.filter_by_ids_nil_allowed(products_unfiltered_a).send(order_function, direction)
+        @pending_stock_h = Product.pending_stock(@products.pluck("id"))
     end
 
     def sales
