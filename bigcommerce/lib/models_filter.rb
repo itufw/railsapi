@@ -23,18 +23,6 @@ module ModelsFilter
     return staff, status, orders, search_text, order_id_text
   end
 
-  def order_sum_param(selected)
-    sum_params_h = {"Order Totals" => :sum_total, "Bottles" => :sum_qty,\
-     "Number of Orders" => :count_orders, "Avg. Order Total" => :avg_order_total,\
-      "Avg. Bottles" => :avg_order_qty}
-
-    if selected.nil?
-      return sum_params_h["Order Totals"], "Order Totals", sum_params_h.keys 
-    else
-      return sum_params_h[selected], selected, sum_params_h.keys
-    end
-  end
-
   def staff_params_filter(params, session_staff_id)
     if reports_access_open(session_staff_id) == 0
       staff_id = session_staff_id
