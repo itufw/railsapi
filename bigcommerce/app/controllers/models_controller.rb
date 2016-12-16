@@ -78,6 +78,14 @@ class ModelsController < ApplicationController
     @pending_stock_h = Product.pending_stock(@products.pluck("id"))
   end
 
+  def products_no_vintage
+
+    # {product_no_vintage_id => accumulative_stock }
+    @stock_h = Product.group(:product_no_vintage_id).sum(:inventory)
+    # {product_no_vintage_id => avg price of WS }
+    @price_h = Product.where(retail_ws: 'WS').group(:product_no_vintage_id).average(:calculated_price)
+    @name_h = ProductNoVintage.all.pluck("id,name").to_h
+  end
 
   def update_staff
     customer_id = params[:customer_id]
