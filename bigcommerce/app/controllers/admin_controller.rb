@@ -82,4 +82,14 @@ class AdminController < ApplicationController
       #m.csv_import
     #end
 
+  def xero_sync
+
+    if system "rake xero_invoice_sync:sync"
+      @response = "Done"
+    else
+      @response = "Error!"
+    end
+
+  end
+
 end

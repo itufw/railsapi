@@ -112,6 +112,8 @@ module XeroInvoiceCalculations
 		XeroCalculation.insert_shipping_calculation(invoice_number, inc_gst_shipping_price,\
 		ex_gst_shipping_price, gst_on_shipping)
 
+		XeroCalculation.insert_gst(invoice_number, gst_sum_line_amounts)
+
 		XeroCalculation.insert_rounding(invoice_number,\
 			total_ex_gst, gst_sum_line_amounts, order_total,\
 			rounding_error_inc_gst, rounding_error_ex_gst) unless rounding_error_ex_gst.round(2) == 0.0
@@ -196,6 +198,8 @@ module XeroInvoiceCalculations
 
 		XeroCalculation.insert_shipping_calculation(invoice_number, inc_gst_shipping_price,\
 		ex_gst_shipping_price, gst_on_shipping)
+
+		XeroCalculation.insert_gst(invoice_number, gst_sum_line_amounts)
 
 		XeroCalculation.insert_rounding(invoice_number,\
 		total_ex_gst, gst_sum_line_amounts, order_total, rounding_error_inc_gst, rounding_error_ex_gst)\
