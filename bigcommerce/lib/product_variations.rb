@@ -23,7 +23,7 @@ module ProductVariations
     def transform_products(transform_column, product_transformed_ids)
         #products = Product.filter_by_ids(product_ids)
         #price_h = product_price(transform_column, products)
-        price_h = {}#product_price_after_transformation(transform_column, product_transformed_ids)
+        price_h = product_price_after_transformation(transform_column, product_transformed_ids)
         product_name_h = product_name(transform_column, product_transformed_ids)
         return price_h, product_name_h
     end
@@ -46,7 +46,8 @@ module ProductVariations
     # get product price from that
     def product_price_after_transformation(transform_column, product_transformed_ids)
         # we want something like where('products.product_no_vintage_id IN (?)', array)
-        where_query = "products." + transform_column + " IN (?)"
+        new_transform_column = transform_column == "product_id" ? "id" : transform_column
+        where_query = "products." + new_transform_column + " IN (?)"
         products = Product.where(where_query, product_transformed_ids)
         price_h = products.product_price('group_by_' + transform_column)
     end
