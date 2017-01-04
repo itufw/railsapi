@@ -87,7 +87,7 @@ module ModelsFilter
       producer_country_id, producer_country = collection_param_filter(params, :producer_country, ProducerCountry)
       product_sub_type_id, product_sub_type = collection_param_filter(params, :product_sub_type, ProductSubType)
       products = Product.search(search_text).producer_country_filter(producer_country_id).sub_type_filter(product_sub_type_id)
-
+      
       return producer_country, product_sub_type, products, search_text, producer_country_id
     end
   end
@@ -121,26 +121,6 @@ module ModelsFilter
     producers = Producer.country_filter(country_id)
     producer_regions = ProducerRegion.country_filter(country_id)
     return product_sub_types, producers, producer_regions
-  end
-
-  def top_products_filter(product_ids_a, sort_column_index, sort_column_stats)
-
-    products_h = Hash.new
-
-    products_out_of_order = Product.find(product_ids_a).group_by(&:id)
-
-    products_in_order = product_ids_a.map { |id| products_out_of_order[id].first }
-
-    products_in_order.each do |product|
-      products_h[product.id] = [product.name, product.calculated_price, product.retail_ws]
-    end
-
-    if sort_column_stats.nil?
-      return Hash[products_h.sort_by { |k,v| v[sort_column_index.to_i] }]
-    end
-
-    return products_h
-    
   end
 
   def top_customer_filter(customer_ids, sort_column_index, sort_column_stats)

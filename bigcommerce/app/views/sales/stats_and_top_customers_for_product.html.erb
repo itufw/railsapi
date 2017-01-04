@@ -16,7 +16,7 @@
 </div>
 
 <center>
-<button class="button center"><%= link_to "View Orders for Product", controller: 'sales', action: 'orders_for_product', product_id: @product_id, product_name: @product_name %></button>
+<button class="button center"><%= link_to "View Orders for Product", controller: 'sales', action: 'orders_for_product', product_id: @product_id, product_name: @product_name, transform_column: @transform_column %></button>
 </center>
 
 <div class="form-group col-xs-offset-5" style="margin-top:50px;">
