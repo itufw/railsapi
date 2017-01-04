@@ -261,7 +261,15 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.group_by_product_id
-		includes(:order_products).group('order_products.product_id')
+		includes(:products).group('products.id').references(:products)
+	end
+
+	def self.group_by_product_no_vintage_id
+		includes(:products).group('products.product_no_vintage_id').references(:products)
+	end
+
+	def self.group_by_product_no_ws_id
+		includes(:products).group('products.product_no_ws_id').references(:products)
 	end
 
 	def self.count_order_id_from_order_products

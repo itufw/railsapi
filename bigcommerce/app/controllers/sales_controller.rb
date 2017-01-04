@@ -2,7 +2,7 @@ require 'sales_controller_helper.rb'
 require 'models_filter.rb'
 require 'dates_helper.rb'
 require 'display_helper.rb'
-require 'stock_helper.rb'
+require 'product_variations.rb'
 
 class SalesController < ApplicationController
 
@@ -12,7 +12,7 @@ class SalesController < ApplicationController
   include ModelsFilter
   include DatesHelper
   include DisplayHelper
-  include StockHelper
+  include ProductVariations
 
   # Displays this week's and last week's total order sales
   # Also displays total order sales for this week divided by staff
@@ -104,6 +104,12 @@ class SalesController < ApplicationController
     @customer_id = params[:customer_id]
     @customer_name = params[:customer_name]
 
+    # check the radio button in the view based on how you want to group products
+    # group products by no_vintage_id or no_ws_id or don't group them at all
+    @transform_column = params[:transform_column] || "id"
+    @checked_id, @checked_no_vintage, @checked_no_ws = checked_radio_button(@transform_column)
+
+    # filter products
     @producer_country, @product_sub_type, products, @search_text = product_param_filter(params)
 
     where_query = "Order.customer_filter(%s).valid_order.product_filter(%s)" % [[@customer_id], products.pluck("id")]
@@ -113,6 +119,7 @@ class SalesController < ApplicationController
      nil, nil, params[:sort_column_stats])
     
     if !product_ids.empty?
+      # products_h is like {id => [name, price, retail_ws]}
       @products_h = top_products_filter(product_ids, params[:sort_column], params[:sort_column_stats])
     else
       @products_h = {}
@@ -130,21 +137,33 @@ class SalesController < ApplicationController
   def stats_and_top_customers_for_product
     @product_id = params[:product_id]
     @product_name = params[:product_name]
+    #@total_stock = params[:total_stock]
+    @transform_column = params[:transform_column]
 
+    # total stock to display on page - pending + inventory + retail + ws
+    @total_stock_no_ws = 0#total_stock_product(@product_id, params[:total_stock])
+
+    # form filter for top customers
     @staff, customers_filtered, @search_text, staff_id, @cust_style = customer_param_filter(params, 25)
 
     if staff_id.nil?
       staff_id = "nil"
     end
 
-    @total_stock = params[:total_stock]
-    @total_stock_no_ws = total_stock_product(@product_id, params[:total_stock])
+    # period type for overall stats - monthly or weekly
     @selected_period, @period_types = define_period_types(params)
 
+    # either we want stats for a product_id or for products based on a product_no_vintage_id
+    # or based on a product_no_ws_id
+    # this gives product_ids based on that transform_column
+    product_ids = transform_product_ids(@transform_column, @product_id) || @product_id
+
+    # Gives Overall Stats and Top Customers in arrays
     @time_periods_name, @all_stats, @sum_stats, @avg_stats, customer_ids, @monthly_supply = \
-    stats_for_timeperiods("Order.product_filter(%s).valid_order.staff_filter(%s)" % [@product_id, staff_id],\
+    stats_for_timeperiods("Order.product_filter(%s).valid_order.staff_filter(%s)" % [product_ids, staff_id],\
      :group_by_customerid, :sum_order_product_qty, @total_stock_no_ws, @selected_period, params[:sort_column_stats])
 
+    # filter customers based on params and sort by column heading
     @customers_h = top_customer_filter(customer_ids & customers_filtered.pluck("id"),\
      params[:sort_column], params[:sort_column_stats])
   end
@@ -157,13 +176,16 @@ class SalesController < ApplicationController
     @product_id = params[:product_id]
     @product_name = params[:product_name]
     @staff_nickname = params[:staff_nickname]
+    @transform_column = params[:transform_column]
 
     @per_page = params[:per_page] || Order.per_page
 
     @staff, @status, orders_filtered_by_param, @search_textt, @order_id = \
     order_param_filter(params, session[:user_id])
 
-    orders_filtered_by_product = Order.product_filter([@product_id]).pluck("id")
+    product_ids = transform_product_ids(@transform_column, @product_id) || [@product_id]
+
+    orders_filtered_by_product = Order.product_filter(product_ids).pluck("id")
 
     order_ids = orders_filtered_by_param.pluck("id") & orders_filtered_by_product
 
