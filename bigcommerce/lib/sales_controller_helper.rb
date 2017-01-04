@@ -10,60 +10,6 @@ module SalesControllerHelper
   	return Staff.active_sales_staff
   end
 
-  def stats_for_timeperiods(where_query, group_by, sum_by, total_stock, period_type, sort_column)
-    time_periods = StaffTimePeriod.display
-
-    # this is the stat per row and column, for eg. This is qty sold for each customer per time period
-    overall_h = Hash.new
-    # this is the stat per column, for eg. this is the total qty sold in one time period
-    overall_sum = []
-    overall_avg = []
-    monthly_supply = []
-
-    time_periods.each do |t| 
-
-      overall_h[t.name] = (eval where_query).date_filter(t.start_date.to_s, t.end_date.to_s).send(group_by).send(sum_by) unless group_by.empty?
-        
-      sum = (eval where_query).date_filter(t.start_date.to_s, t.end_date.to_s).send(sum_by)
-      num_days = (t.end_date.to_date - t.start_date.to_date).to_i
-
-      avg = (sum.to_f/num_days)*(num_days_for_periods(period_type))
-        
-      overall_sum.push(sum)
-      overall_avg.push(avg)
-      unless total_stock.nil?
-        if avg == 0
-          monthly_supply.push(0.0)
-        else
-          monthly_supply.push(total_stock/avg)
-        end
-      end
-
-    end
-
-    # overall_h structure : { time_period_name => {key(customer_id or product_id) => stat }}
-    #ids = overall_h.values.reduce(&:merge).keys unless overall_h.blank?
-    ids = sort_by_time_periods(overall_h, sort_column)
-    [time_periods.pluck("name"), overall_h, overall_sum, overall_avg, ids, monthly_supply]
-  end
-
-  def sort_by_time_periods(overall_h, sort_column)
-
-    # overall_h structure : { time_period_name => {key(customer_id or product_id) => stat }}
-    prefered_time_period = sort_column
-
-    if sort_column.nil?
-      return overall_h.values.reduce(&:merge).keys unless overall_h.blank?
-    else
-      # get the hash for the time period, like "Last Month" =>{product_id => val}
-      # sort descending hence -v not v
-      # convert to a hash since sort_by gives array of arrays and get the keys 
-      ids_sorted = (overall_h[prefered_time_period].sort_by {|k,v| -v}).to_h.keys
-      return (ids_sorted.concat(overall_h.values.reduce(&:merge).keys)).uniq
-    end
-
-  end
-
   def return_nil_string(val)
     if val.nil?
       return "nil"
