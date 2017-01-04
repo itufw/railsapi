@@ -260,7 +260,7 @@ class Product < ActiveRecord::Base
 
 	# transform column is no_vintage_id, no_ws_id
 	def self.product_price(transform_column)
-		if transform_column == 'group_by_id'
+		if transform_column == 'group_by_product_id'
 			pluck("id, calculated_price").to_h
 		else
 			send(transform_column).average(:calculated_price).merge\

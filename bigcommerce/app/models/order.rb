@@ -170,8 +170,10 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.product_filter(product_ids)
-		return includes(:order_products).where('order_products.product_id IN (?)', product_ids).references(:order_products) if !product_ids.nil?
-		return all
+		#return includes(:order_products).where('order_products.product_id IN (?)', product_ids).references(:order_products) if !product_ids.nil?
+		#return all
+		includes(:products).where('products.id IN (?)', product_ids).references(:products)
+
 	end
 
 	# Returns orders whose date created is between the start date and end date
@@ -301,7 +303,7 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.sum_order_product_qty
-		includes(:order_products).sum('order_products.qty')
+		sum('order_products.qty')
 	end
 
 	def self.customer_filter(customer_ids)
