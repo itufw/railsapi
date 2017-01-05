@@ -30,14 +30,14 @@ class Customer < ActiveRecord::Base
 		page_number = 1
 
 		# Loop through pages - each with 50 items
-		customer_pages.times do 
+		customer_pages.times do
 
 			customers = customer_api.all(page: page_number)
 
 			customers.each do |c|
 
 				insert_sql(c, 1)
-				
+
 			end
 
 			page_number += 1
@@ -82,7 +82,7 @@ class Customer < ActiveRecord::Base
 
 		end
 
-        ActiveRecord::Base.connection.execute(sql) 
+        ActiveRecord::Base.connection.execute(sql)
 
 	end
 
@@ -96,10 +96,10 @@ class Customer < ActiveRecord::Base
 		page_number = 1
 
 		# Loop through pages
-		customer_pages.times do 
+		customer_pages.times do
 
 			customers = customer_api.all(min_date_modified: update_time, page: page_number)
-			
+
 			if customers.blank?
 				return
 			end
@@ -135,7 +135,7 @@ class Customer < ActiveRecord::Base
 	end
 
 	def self.customer_name(actual_name, firstname, lastname)
-		name = ""	
+		name = ""
 		if actual_name.present?
 		  name = actual_name
 		elsif firstname.present? || lastname.present?
@@ -218,7 +218,7 @@ class Customer < ActiveRecord::Base
 	# 	if customer.end_of_month.nil?
 	# 		return customer.num_days
 	# 	else
-			
+
 	# 	end
 	# end
 
@@ -246,6 +246,14 @@ class Customer < ActiveRecord::Base
 
 	def self.incomplete
 		where('actual_name IS NULL or cust_style_id is NULL or staff_id = 34')
+	end
+
+	def self.xero_contact_is_not_null
+		where('customers.xero_contact_id IS NOT NULL')
+	end
+
+	def self.outstanding_is_greater_zero
+		where('xero_contacts.accounts_receivable_outstanding > 0').references(:xero_contacts)
 	end
 
 end
