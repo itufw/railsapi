@@ -4,8 +4,6 @@
 <div class="form-group container-fluid">
 	<%= form_tag({:action => "products"}, {:method => "get"}) do %>
 	<%= render "partials/product_filter" %>
-	<%= submit_tag "Filter", class: 'btn btn-primary' %>
-   <button class = "btn btn-primary"><%= link_to "Reset", action: "products" %></button>
 <% end %>
 </div>
 

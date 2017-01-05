@@ -201,8 +201,8 @@ class Product < ActiveRecord::Base
 		includes([{:order_products => :order}])
 	end
 
-	def self.pending_stock(product_ids_a)
-		include_orders.where('orders.status_id = 1').filter_by_ids(product_ids_a).references(:orders).group('order_products.product_id').sum('order_products.qty')
+	def self.pending_stock(group_by)
+		include_orders.where('orders.status_id = 1').references(:orders).group(group_by).sum('order_products.qty')
 	end
 
 	def self.order_by_name(direction)
@@ -247,6 +247,25 @@ class Product < ActiveRecord::Base
 
 	def self.products_with_same_no_ws_id(no_ws_id)
 		return where(product_no_ws_id: no_ws_id)
+	end
+
+	def self.group_by_product_no_vintage_id
+		group(:product_no_vintage_id)
+	end
+
+	def self.group_by_product_no_ws_id
+		group(:product_no_ws_id)
+	end
+
+
+	# transform column is no_vintage_id, no_ws_id
+	def self.product_price(transform_column)
+		if transform_column == 'group_by_id'
+			pluck("id, calculated_price").to_h
+		else
+			send(transform_column).average(:calculated_price).merge\
+			(self.where(retail_ws: 'WS').send(transform_column).average(:calculated_price))
+		end
 	end
 
 end

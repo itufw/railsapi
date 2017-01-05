@@ -1,6 +1,5 @@
-require 'dates_helper.rb'  
+require 'dates_helper.rb'
 require 'models_filter.rb'
-require 'product_dashboard_helper.rb'
 
 class ProductDashboardController < ApplicationController
 
@@ -8,19 +7,16 @@ class ProductDashboardController < ApplicationController
 
     include DatesHelper
     include ModelsFilter
-    include ProductDashboardHelper
-
-
 
     def product_sales(params)
         @end_date = return_end_date(return_date_given(params))
         if params[:num_period]
           @num_periods = params[:num_period].to_i
-        else 
+        else
           @num_periods = 13
         end
         @periods = (3..15).to_a
-        # This returns 
+        # This returns
         @selected_period, @period_types = define_period_types(params)
 
         sum_function, @param_val, @sum_params = order_sum_param(params[:sum_param])
@@ -52,19 +48,26 @@ class ProductDashboardController < ApplicationController
 
     def products_filter(products_unfiltered_a, params)
     order_function, direction = sort_order(params, 'order_by_name', 'ASC')
-
     @producer, @producer_region, @product_type, @producer_country,\
     @product_sub_type, products_filtered, @search_text, @product_sub_types, @producers,\
     @producer_regions = \
     product_dashboard_param_filter(params)
 
     @products = Product.filter_by_ids_nil_allowed(products_unfiltered_a & products_filtered.pluck("id")).send(order_function, direction)
-    @pending_stock_h = Product.pending_stock(@products.pluck("id"))
+    @pending_stock_h = Product.pending_stock('products.id')
+
     end
 
     def sales
         products_unfiltered = product_sales(params)
         products_filter(products_unfiltered, params)
+    end
+
+
+    def product_ids_for_hash(qty_hash)
+        product_ids_a = []
+        qty_hash.keys.each { |date_id_pair| product_ids_a.push(date_id_pair[0])}
+        return product_ids_a
     end
 
 end

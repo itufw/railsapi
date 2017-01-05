@@ -1,5 +1,6 @@
 require 'models_filter.rb'
 require 'display_helper.rb'
+require 'product_variations.rb'
 
 class ModelsController < ApplicationController
 
@@ -7,7 +8,8 @@ class ModelsController < ApplicationController
 
   include ModelsFilter
   include DisplayHelper
-  
+  include ProductVariations
+
   def orders
     @staff_nickname = params[:staff_nickname]
     @start_date = params[:start_date]
@@ -45,7 +47,7 @@ class ModelsController < ApplicationController
   def update_customer
     @customer = Customer.filter_by_id(params[:customer][:id])
     if @customer.update_attributes(customer_params)
-      flash[:success] = "Successfully Changed." 
+      flash[:success] = "Successfully Changed."
       redirect_to controller: 'sales', action: 'orders_and_stats_for_customer',\
        customer_id: params[:customer][:id],\
        customer_name: Customer.customer_name(@customer.actual_name, @customer.firstname, @customer.lastname)
@@ -67,25 +69,30 @@ class ModelsController < ApplicationController
   end
 
   def products
-
-    order_function, direction = sort_order(params, 'order_by_name', 'ASC')
-
-    @per_page = params[:per_page] || Product.per_page
-
     @producer_country, @product_sub_type, products, @search_text = product_param_filter(params)
 
-    @products = products.send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
-    @pending_stock_h = Product.pending_stock(@products.pluck("id"))
+    @transform_column = params[:transform_column] || "id"
+    @checked_id, @checked_no_vintage, @checked_no_ws = checked_radio_button(@transform_column)
+
+    # do another round of searching to calculate the total stock for no ws products
+    total_stock_no_ws, pri, pending_stock_no_ws, produ = transform_product_model('product_no_ws_id',products)
+    @total_stock_no_ws = Hash.new
+    products.each do |p|
+      @total_stock_no_ws[p.id] = total_stock_no_ws[p.product_no_ws_id].to_i + pending_stock_no_ws[p.product_no_ws_id].to_i
+    end
+
+    # check the number of queries - make it faster
+    @stock_h, @price_h, @pending_stock_h, products_transformed = \
+    transform_product_model(@transform_column, products)
+
+    # sorting doesn't work
+    order_function, direction = sort_order(params, 'order_by_name', 'ASC')
+    @per_page = params[:per_page] || Product.per_page
+
+    @products = products_transformed.send(order_function, direction).\
+    paginate( per_page: @per_page, page: params[:page])
   end
 
-  def products_no_vintage
-
-    # {product_no_vintage_id => accumulative_stock }
-    @stock_h = Product.group(:product_no_vintage_id).sum(:inventory)
-    # {product_no_vintage_id => avg price of WS }
-    @price_h = Product.where(retail_ws: 'WS').group(:product_no_vintage_id).average(:calculated_price)
-    @name_h = ProductNoVintage.all.pluck("id,name").to_h
-  end
 
   def update_staff
     customer_id = params[:customer_id]
