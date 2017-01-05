@@ -29,7 +29,7 @@ module ModelsFilter
       "Avg. Bottles" => :avg_order_qty}
 
     if selected.nil?
-      return sum_params_h["Order Totals"], "Order Totals", sum_params_h.keys 
+      return sum_params_h["Order Totals"], "Order Totals", sum_params_h.keys
     else
       return sum_params_h[selected], selected, sum_params_h.keys
     end
@@ -48,7 +48,7 @@ module ModelsFilter
       elsif !params["staff_id"].nil?
         staff_id = params["staff_id"]
         staff = Staff.filter_by_id(staff_id)
-        return staff_id, staff   
+        return staff_id, staff
       else
         return nil, nil
       end
@@ -69,7 +69,7 @@ module ModelsFilter
 
   def collection_param_filter(params, field, model)
     if !params[field].nil? && !params[field][:id].empty?
-      field_id = params[field][:id] 
+      field_id = params[field][:id]
       field_val = model.find(field_id)
       return field_id, field_val
     else
@@ -140,7 +140,7 @@ module ModelsFilter
     end
 
     return products_h
-    
+
   end
 
   def top_customer_filter(customer_ids, sort_column_index, sort_column_stats)
@@ -155,7 +155,7 @@ module ModelsFilter
       customers_h[c.id] = [Customer.customer_name(c.actual_name, c.firstname, c.lastname),\
        c.staff.nickname, c.cust_style_name]
     end
-    
+
     if sort_column_stats.nil?
       return Hash[customers_h.sort_by { |k,v| v[sort_column_index.to_i] }]
     end

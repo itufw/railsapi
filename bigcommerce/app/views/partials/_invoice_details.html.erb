@@ -1,0 +1,72 @@
+<div style="float: left;">
+	<h4>Invoices</h4>
+</div>
+
+<table class = "table table-striped table-bordered table-hover table-responsive" style="margin-top: -10px;">
+<tr class="info">
+	<th></th>
+	<th>Outstanding</th>
+	<th>Overdue</th>
+	<% @date = Date.today  %>
+	<th> Current </th>
+	<th> <%= (@date - 1.month).strftime("%B")%> </th>
+	<th> <%= (@date - 2.month).strftime("%B")%> </th>
+	<th> <%= (@date - 3.month).strftime("%B")%> </th>
+	<th> <%= (@date - 4.month).strftime("%B")%> </th>
+	<th> Older </th>
+</tr>
+
+<tr>
+	<td>Invoic Date</td>
+	<td class="num"><%= display_num(outstanding_customer(customer.xero_contact))  %></td>
+	<td class="num"><%= display_num(overdue_customer(customer.xero_contact)) %></td>
+	<% amount_due["invoice_date"].each do |amount| %>
+		<td><%= display_num(amount) %></td>
+	<% end %>
+</tr>
+
+<tr>
+	<td>Due Date</td>
+	<td class="num"><%= display_num(outstanding_customer(customer.xero_contact))  %></td>
+	<td class="num"><%= display_num(overdue_customer(customer.xero_contact)) %></td>
+	<% amount_due["due_date"].each do |amount| %>
+		<td><%= display_num(amount) %></td>
+	<% end %>
+</tr>
+</table>
+
+<div class="container">
+	<div class= "row">
+		<div class="col-md-3">
+			<%= check_box_tag(:temp) %>
+			<%= label_tag(:temp, "To be discussed") %>
+		</div>
+
+		<div class="col-md-6">
+			<table class = "table table-striped table-bordered table-hover table-responsive" style="margin-top: -10px;">
+				<tr class="info">
+					<th>Invoice#</th>
+					<th>Date</th>
+					<th>Due Date</th>
+					<th>Total</th>
+					<th>Amount Credited</th>
+					<th>Amount Due</th>
+				</tr>
+				<% customer.xero_contact.xero_invoices.has_amount_due.each do |i| %>
+				<tr>
+					<td><%= i.invoice_number %></td>
+					<td><%= i.date.to_date %></td>
+					<td><%= i.due_date.to_date %></td>
+					<td><%= i.total %></td>
+					<td><%= i.amount_credited %></td>
+					<td><%= i.amount_due %></td>
+				</tr>
+				<% end%>
+			</table>
+		</div>
+		<div class="col-md-3">
+			<h4>Invoice Reminder</h4>
+
+		</div>
+	</div>
+</div>

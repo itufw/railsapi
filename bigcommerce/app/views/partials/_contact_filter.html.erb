@@ -1,0 +1,8 @@
+<div class="row" style="margin-top: 20px;">
+	<div class="col-xs-6 col-xs-offset-5">
+		<%= radio_button_tag(:date_column, "invoice_date", @checked_invoice_date, :onclick => "this.form.submit();") %> Invoice Date
+		<span style="margin-left: 50px;">
+		<%= radio_button_tag(:date_column, "due_date", @checked_due_date, :onclick => "this.form.submit();") %>  Due Date
+		</span>
+	</div>
+</div>
