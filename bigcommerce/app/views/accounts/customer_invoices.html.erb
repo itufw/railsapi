@@ -1,0 +1,10 @@
+<%= title "Customer Invoice Reminder" %>
+<h3>Customer Invoice</h3>
+
+<div style="margin-top: 50px;">
+  <%= render "partials/invoice_header", customer: @customer %>
+</div>
+
+<div style="margin-top: 50px;">
+  <%= render "partials/invoice_details", customer: @customer, amount_due: @amount_due, date_column: @date_column %>
+</div

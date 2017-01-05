@@ -25,6 +25,7 @@
         <li><%= link_to "Customers", controller: "models", action: "customers" %></li>
         <li><%= link_to "Products", controller: "models", action: "products" %></li>
         <li><%= link_to "Pending Orders", controller: "sales", action: "orders_and_products_for_status", status_id: 1, status_name: "Pending" %></li>
+        <li><%= link_to "Accounting", controller: "accounts", action: "contacts" %></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><%= link_to "Hi," + "  " + session[:username] %></li>
