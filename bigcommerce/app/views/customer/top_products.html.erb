@@ -14,7 +14,7 @@
 		<th>ID</th>
 		<th><%= link_to "Product" %></th>
 		<th><%= link_to "Price" %></th>
-		<% @top_products_timeperiod_h.keys.each do |t| %>
+		<%  @time_periods.each do |t| %>
 			<th><%= link_to t, params.merge(sort_column_stats: t) %></th>
 		<% end %>
 	</tr>
@@ -25,8 +25,8 @@
 		<td><%= @product_name_h[id] %></td>
 		<td><%= display_num(@price_h[id]) %></td>
 
-		<% @top_products_timeperiod_h.each do |time_period_name, hash| %>
-		<td><%= exists_in_h(hash, id) %></td>
+		<% @time_periods.each do |t| %>
+			<td><%= exists_in_h(@top_products_timeperiod_h[t], id) %></td>
 		<% end %>
 	</tr>
 	<% end %>
