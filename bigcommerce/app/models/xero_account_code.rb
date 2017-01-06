@@ -16,4 +16,8 @@ class XeroAccountCode < ActiveRecord::Base
 		return where(account_name: 'Retail').first
 	end
 
+	def self.gst
+		return where(account_name: 'GST Payable').first
+	end
+
 end
