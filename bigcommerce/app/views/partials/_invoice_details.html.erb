@@ -17,7 +17,7 @@
 </tr>
 
 <tr>
-	<td>Invoic Date</td>
+	<td>Invoice Date</td>
 	<td class="num"><%= display_num(outstanding_customer(customer.xero_contact))  %></td>
 	<td class="num"><%= display_num(overdue_customer(customer.xero_contact)) %></td>
 	<% amount_due["invoice_date"].each do |amount| %>
@@ -54,7 +54,7 @@
 				</tr>
 				<% customer.xero_contact.xero_invoices.has_amount_due.each do |i| %>
 				<tr>
-					<td><%= i.invoice_number %></td>
+					<td><%= link_to i.invoice_number, controller: 'sales', action: 'order_details', order_id: i.invoice_number%></td>
 					<td><%= i.date.to_date %></td>
 					<td><%= i.due_date.to_date %></td>
 					<td><%= i.total %></td>

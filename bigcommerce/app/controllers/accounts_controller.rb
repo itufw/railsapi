@@ -39,7 +39,6 @@ class AccountsController < ApplicationController
 
   def customer_invoices
     @amount_due = params[:amount_due]
-    @date_column = params[:date_column] 
 
     @customer = Customer.include_all.filter_by_id(params[:customer_id])
   end

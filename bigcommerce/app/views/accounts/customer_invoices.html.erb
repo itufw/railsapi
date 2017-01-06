@@ -6,5 +6,9 @@
 </div>
 
 <div style="margin-top: 50px;">
-  <%= render "partials/invoice_details", customer: @customer, amount_due: @amount_due, date_column: @date_column %>
-</div
+  <%= render "partials/invoice_notes", customer: @customer %>
+</div>
+
+<div style="margin-top: 50px;">
+  <%= render "partials/invoice_details", customer: @customer, amount_due: @amount_due%>
+</div>
