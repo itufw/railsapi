@@ -8,7 +8,7 @@ module ProductVariations
     # have a 'group by transform column' function in the Product model
     # add a string -> model-name key-value pair in the model_map
     # add order_by name function in the Model 
-    def transform_product_model(transform_column, products)
+    def all_products_transform(transform_column, products)
 
     	stock_h = product_stock(transform_column, products)
 	    price_h = product_price(transform_column, products)
@@ -34,6 +34,7 @@ module ProductVariations
     # if it is product_no_vintage_id then the product_stock is the sum of the stock
     # of individual products that are related to the product_no_vintage_id
     def product_stock(transform_column, products)
+        transform_column = transform_column == "product_id" ? "id" : transform_column
     	stock_h = products.group(transform_column).sum(:inventory)
     end
 
@@ -53,6 +54,7 @@ module ProductVariations
     end
 
     def pending_stock(transform_column, products)
+        transform_column = transform_column == "product_id" ? "id" : transform_column
     	pending_stock_h = products.pending_stock('products.'+ transform_column)
     end
 
