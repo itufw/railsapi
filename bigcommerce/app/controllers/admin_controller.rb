@@ -83,7 +83,7 @@ class AdminController < ApplicationController
     #end
 
   def xero_sync
-
+    XeroRevision.end_time = Time.now.utc
     if system "rake xero_invoice_sync:sync"
       @response = "Done"
     else
