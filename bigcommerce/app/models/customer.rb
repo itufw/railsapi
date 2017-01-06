@@ -6,6 +6,7 @@ class Customer < ActiveRecord::Base
 	include CleanData
 	has_many :orders
 	has_many :addresses
+	has_many :notes
 	belongs_to :cust_type
 	belongs_to :cust_group
 	belongs_to :cust_style

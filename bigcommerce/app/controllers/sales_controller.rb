@@ -124,6 +124,7 @@ class SalesController < ApplicationController
   def order_details
     @order_id = params[:order_id]
     @order = Order.include_all.order_filter(@order_id)
+    @per_page = Order.per_page
   end
 
   # Displays overall stats for products(money gained) and all customers who bought that product

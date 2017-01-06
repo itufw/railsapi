@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161117020802) do
+ActiveRecord::Schema.define(version: 20170106020551) do
 
   create_table "addresses", force: :cascade do |t|
     t.integer  "customer_id", limit: 4
@@ -31,6 +31,12 @@ ActiveRecord::Schema.define(version: 20161117020802) do
   end
 
   add_index "addresses", ["customer_id"], name: "index_addresses_on_customer_id", using: :btree
+
+  create_table "ar_internal_metadata", primary_key: "key", force: :cascade do |t|
+    t.string   "value",      limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "average_periods", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -110,6 +116,20 @@ ActiveRecord::Schema.define(version: 20161117020802) do
   add_index "customers", ["cust_store_id"], name: "index_customers_on_cust_store_id", using: :btree
   add_index "customers", ["cust_type_id"], name: "index_customers_on_cust_type_id", using: :btree
   add_index "customers", ["staff_id"], name: "index_customers_on_staff_id", using: :btree
+
+  create_table "notes", force: :cascade do |t|
+    t.text     "text",        limit: 65535
+    t.integer  "priority",    limit: 4
+    t.string   "status",      limit: 255
+    t.datetime "due_date"
+    t.integer  "staff_id",    limit: 4,     null: false
+    t.integer  "customer_id", limit: 4,     null: false
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
+  add_index "notes", ["customer_id"], name: "index_notes_on_customer_id", using: :btree
+  add_index "notes", ["staff_id"], name: "index_notes_on_staff_id", using: :btree
 
   create_table "order_histories", force: :cascade do |t|
     t.integer  "order_id",                   limit: 4,                             null: false
@@ -469,6 +489,8 @@ ActiveRecord::Schema.define(version: 20161117020802) do
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
     t.integer  "can_update",      limit: 1
+    t.string   "contact_email",   limit: 255, null: false
+    t.string   "contact_phone",   limit: 255, null: false
   end
 
   add_index "staffs", ["active"], name: "index_staffs_on_active", using: :btree

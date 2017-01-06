@@ -43,7 +43,7 @@
 	<tr>
 		<!-- <td><%= link_to c.xero_contact.name, controller: 'sales', action: 'orders_and_stats_for_customer', customer_name: c.xero_contact.name, customer_id: c.id %></td> -->
 
-		<td><%= link_to c.xero_contact.name, controller: 'accounts', action: 'customer_invoices', customer_id: c.id, amount_due: sum_of_amount, date_column: @date_column %></td>
+		<td><%= link_to c.xero_contact.name, controller: 'accounts', action: 'customer_invoices', customer_id: c.id, amount_due: sum_of_amount %></td>
 
 		<td class="num"><%= display_num(outstanding_customer(c.xero_contact))  %></td>
 		<td class="num"><%= display_num(overdue_customer(c.xero_contact)) %></td>
