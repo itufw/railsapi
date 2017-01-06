@@ -8,28 +8,28 @@
 
 	<tr class="info">
 		<th></th>
-		<% time_periods_name.each do |t| %>
+		<% @overall_stats.keys.each do |t| %>
 			<th><%= t %></th>
 		<% end %>
 	</tr>
 
 	<tr>
 		<td>Total Qty</td>
-		<% sum_stats.each do |s| %>
-			<td><%= display_num(s) %></td>
+		<% @overall_stats.each do |t, a| %>
+			<td><%= display_num(a[0]) %></td>
 		<% end %>
 	</tr>
 	<tr>
 		<td><%= @selected_period.capitalize %> Average</td>
-		<% avg_stats.each do |a| %>
-			<td><%= display_num(a) %></td>
+		<% @overall_stats.each do |t, a| %>
+			<td><%= display_num(a[1]) %></td>
 		<% end %>
 	</tr>	
 
-	<tr class = <%= monthly_supply_display_class %>>
+	<tr class = <%= supply_display_class %>>
 		<td><%= @selected_period.capitalize %> Supply</td>
-		<% monthly_supply.each do |m| %>
-			<td><%= display_num(m) %></td>
+		<% @overall_stats.each do |t, a| %>
+			<td><%= display_num(a[2]) %></td>
 		<% end %>
 	</tr>	
 </table>
