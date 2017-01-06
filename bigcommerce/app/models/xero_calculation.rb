@@ -34,12 +34,20 @@ class XeroCalculation < ActiveRecord::Base
         order_total, rounding_error_inc_gst, rounding_error_ex_gst)
 		wholesale_account = XeroAccountCode.wholesale
 		create(invoice_number: invoice_number, item_code: "ROUNDING", description: "ROUNDING",\
-			qty: 1, discounted_ex_taxes_unit_price: rounding_error_ex_gst,\
+			qty: 1, discounted_ex_taxes_unit_price: rounding_error_inc_gst,\
 			total_ex_gst: total_ex_gst, gst: gst,\
 			order_total: order_total, rounding_error_inc_gst: rounding_error_inc_gst,\
 			rounding_error: rounding_error_ex_gst,\
 			account_code: wholesale_account.account_code,\
 			tax_type: wholesale_account.tax_type)
+	end
+
+	def self.insert_gst(invoice_number, gst)
+		gst_account = XeroAccountCode.gst
+		create(invoice_number: invoice_number, item_code: "GST", description: "GST",\
+			qty: 1, gst: gst, discounted_ex_taxes_unit_price: gst,\
+			account_code: gst_account.account_code,\
+			tax_type: gst_account.tax_type)
 	end
 
 	def self.insert_line_items_ws(invoice_number, product_id, product_name, qty, op_unit_price,\
