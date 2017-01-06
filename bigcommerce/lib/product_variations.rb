@@ -20,7 +20,7 @@ module ProductVariations
 	    #@products = ProductNoVintage.where('id IN (?)', ids).send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
     end
 
-    def transform_products(transform_column, product_transformed_ids)
+    def top_products_transform(transform_column, product_transformed_ids)
         #products = Product.filter_by_ids(product_ids)
         #price_h = product_price(transform_column, products)
         price_h = product_price_after_transformation(transform_column, product_transformed_ids)
