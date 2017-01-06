@@ -52,7 +52,7 @@ module TimePeriodStats
 
 	# returns top products for a customer
 	# or 
-	def top_objects(where_query, group_by, sum_by, time_period_sort_col)
+	def top_objects(where_query, group_by, sum_by, time_period_sort_col, direction)
 		time_periods = StaffTimePeriod.display
 
 		result_h = {}
@@ -67,23 +67,24 @@ module TimePeriodStats
 				send(group_by).send(sum_by)
 			end	
 		end
-		result_h = sort_by_time_period(result_h, time_period_sort_col)
+		result_h, sorted_bool = sort_by_time_period(result_h, time_period_sort_col, direction)
 		object_ids = result_h.values.reduce(&:merge).keys unless result_h.blank?
-		return result_h, object_ids, time_periods.pluck("name")
+		return result_h, object_ids, time_periods.pluck("name"), sorted_bool
 
 	end
 
-	def sort_by_time_period(result_h, time_period_sort_col)
-		if time_period_sort_col.nil?
-			return result_h
+	def sort_by_time_period(result_h, time_period_sort_col, direction)
+		if time_period_sort_col.nil? or !(result_h.has_key? time_period_sort_col) 
+			return result_h, false
 		else
 			# extract hash that represents time_period_sort_col
 			# sort that hash first
 			# result_h has structure { time_period_name => {} }
 			extracted_h = {}
-			extracted_h[time_period_sort_col] = result_h[time_period_sort_col].sort_by {|_key, value| -value}.to_h
+			extracted_h[time_period_sort_col] = result_h[time_period_sort_col].sort_by {|_key, value| direction.to_i * value}.to_h
 			# merge with the rest of the hash, with this at the front
 			sorted_h = extracted_h.merge(result_h.except(time_period_sort_col))
+			return sorted_h, true
 		end
 	end
 

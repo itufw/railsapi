@@ -1,2 +1,3 @@
-<%= link_to ("<span class='caret'></span>").html_safe, params.merge(order_function: order, direction: 'ASC') %>
-<%= link_to ("<span class='dropup'><span class='caret'></span></span>").html_safe, params.merge(order_function: order, direction: 'DESC') %>
+<br/>
+<%= link_to ("<span class='caret'></span>").html_safe, params.merge(order_col: order, direction: 1) %>
+<%= link_to ("<span class='dropup'><span class='caret'></span></span>").html_safe, params.merge(order_col: order, direction: -1) %>

@@ -31,11 +31,26 @@ class CustomerController < ApplicationController
   		# product_ids can be either product ids or even 
   		# product no vintage ids
   		# group_by can be group_by_product_id, group_by_product_no_vintage_id
-  		@top_products_timeperiod_h, @product_ids, @time_periods = \
-  		top_objects(where_query, ('group_by_' + @transform_column).to_sym, :sum_order_product_qty, params[:sort_column_stats])
+  		@top_products_timeperiod_h, @product_ids, @time_periods, sorted_bool = \
+  		top_objects(where_query, ('group_by_' + @transform_column).to_sym, :sum_order_product_qty, params[:order_col], params[:direction])
   		
+  		@price_h, @product_name_h = top_products_transform(@transform_column, @product_ids)
 
-  		@price_h, @product_name_h = transform_products(@transform_column, @product_ids)
+      # Sort by name/price
+      ####################################
+      # PUT THIS IN A LIB
+      unless sorted_bool
+        sort_column_map = {"0" => @product_name_h, "1" => @price_h}
+        # @name_h or @price_h are the structure {id => val}
+        # sort the hash using the val, then get the product_ids in order using map
+        hash_to_be_sorted = sort_column_map[params[:order_col]] || @product_name_h
+        if params[:direction].to_i == 1
+          @product_ids = hash_to_be_sorted.sort_by {|id, val| val}.map {|product| product[0]}
+        else
+          @product_ids = hash_to_be_sorted.sort_by {|id, val| -val}.map {|product| product[0]}
+        end
+      end
+      ####################################
   	end
 
 end
