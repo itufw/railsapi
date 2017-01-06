@@ -31,8 +31,8 @@ class CustomerController < ApplicationController
   		# product_ids can be either product ids or even 
   		# product no vintage ids
   		# group_by can be group_by_product_id, group_by_product_no_vintage_id
-  		@top_products_timeperiod_h, @product_ids = \
-  		top_objects(where_query, ('group_by_' + @transform_column).to_sym, :sum_order_product_qty)
+  		@top_products_timeperiod_h, @product_ids, @time_periods = \
+  		top_objects(where_query, ('group_by_' + @transform_column).to_sym, :sum_order_product_qty, params[:sort_column_stats])
   		
 
   		@price_h, @product_name_h = transform_products(@transform_column, @product_ids)
