@@ -8,6 +8,7 @@
 
 module TimePeriodStats
 
+	# result_h has structure {time_period_name => [sum, average, supply]}
 	def overall_stats(where_query, sum_by, calendar_period_type, total_stock)
 		time_periods = StaffTimePeriod.display
 		

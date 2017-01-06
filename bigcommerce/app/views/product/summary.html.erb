@@ -1,0 +1,33 @@
+<%= title @product_name %>
+
+<h3><%= @product_name %></h3><br/>
+<h4>(Product Stock + Pending Stock) : </h4>
+<h4>Total Stock (WS + Retail + Pending) : </h4>
+
+<%# Overall Stats Display %>
+<div style="margin-top: 50px;">
+<%= form_tag({:action => "summary" }, {:method => "get"}) do %>
+
+	<%= render "partials/overall_stats", supply_display_class: "" %>
+
+   <%= hidden_field_tag :product_id, @product_id %>
+   <%= hidden_field_tag :product_name, @product_name %>
+   <%= hidden_field_tag :total_stock, @total_stock %>
+   
+<% end %>
+</div>
+
+
+<%# Top Customers Display %>
+<div class="form-group col-xs-offset-5" style="margin-top:50px;">
+<%= form_tag({:action => "summary"}, {:method => "get"}) do %>
+  
+   <%= render "partials/cust_style_filter" %>
+   <%= render "partials/staff_filter" %>
+
+   <%= hidden_field_tag :product_id, @product_id %>
+   <%= hidden_field_tag :product_name, @product_name %>
+   
+   <%= submit_tag "Filter", class: 'btn btn-primary' %>
+<% end %>
+</div>
