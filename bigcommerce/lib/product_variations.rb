@@ -13,8 +13,9 @@ module ProductVariations
     	stock_h = product_stock(transform_column, products)
 	    price_h = product_price(transform_column, products)
 	   	pending_stock_h = pending_stock(transform_column, products)
-        products_transformed = all_products(transform_column, products)
-        return stock_h, price_h, pending_stock_h, products_transformed
+        name_h = name_(transform_column, products)
+        #products_transformed = all_products(transform_column, products)
+        return stock_h, price_h, pending_stock_h, name_h
 
 	    # sorting by something other than name doesnt work
 	    #@products = ProductNoVintage.where('id IN (?)', ids).send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
@@ -67,13 +68,13 @@ module ProductVariations
     # Given products and the transform column,
     # return all the rows from the database table that reprsents that transform column
     # for the given set of products
-    def all_products(transform_column, products)
+    def name_(transform_column, products)
         model_map = { "product_no_vintage_id" => ProductNoVintage, "product_no_ws_id" => ProductNoWs}
         if transform_column == "product_id"
             return products
         end
         ids_a = products.group(transform_column).pluck(transform_column)
-        products_transformed = model_map[transform_column].filter_by_ids(ids_a)
+        products_transformed = model_map[transform_column].filter_by_ids(ids_a).pluck("id, name").to_h
     end
 
     def checked_radio_button(transform_column)
@@ -87,17 +88,17 @@ module ProductVariations
     end
 
 
-
-    def transform_product_ids(transform_column, transform_column_val)
-        if transform_column == "product_no_vintage_id"
-            return (Product.where(product_no_vintage_id: transform_column_val)).pluck("id")
-        elsif transform_column == "product_no_ws_id"
-            return (Product.where(product_no_ws_id: transform_column_val)).pluck("id")
-        else
-            return nil
-        end
-
-    end
+    # Give an array of product_ids corresponding to
+    # a product_no_vintage_id/no_ws_id
+    # def transform_product_ids(transform_column, transform_column_val)
+    #     if transform_column == "product_no_vintage_id"
+    #         return (Product.where(product_no_vintage_id: transform_column_val)).pluck("id")
+    #     elsif transform_column == "product_no_ws_id"
+    #         return (Product.where(product_no_ws_id: transform_column_val)).pluck("id")
+    #     else
+    #         return nil
+    #     end
+    # end
 
     # # Given an array of product ids
     # # and a bool value for sort_column_index and sort_column_stats

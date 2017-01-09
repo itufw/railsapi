@@ -257,15 +257,16 @@ class Product < ActiveRecord::Base
 		group(:product_no_ws_id)
 	end
 
+	def self.group_by_product_id
+		group(:id)
+	end
 
 	# transform column is no_vintage_id, no_ws_id
-	def self.product_price(transform_column)
-		if transform_column == 'group_by_product_id'
-			pluck("id, calculated_price").to_h
-		else
-			send(transform_column).average(:calculated_price).merge\
-			(self.where(retail_ws: 'WS').send(transform_column).average(:calculated_price))
-		end
+	def self.product_price(group_by_transform_column)
+
+		send(group_by_transform_column).average(:calculated_price).merge\
+		(self.where(retail_ws: 'WS').send(group_by_transform_column).average('calculated_price * 1.29'))
+
 	end
 
 end
