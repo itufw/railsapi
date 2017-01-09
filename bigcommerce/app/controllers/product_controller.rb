@@ -19,15 +19,16 @@ class ProductController < ApplicationController
   	include TimePeriodStats
   	include DatesHelper
 
+    # Displays all products
   	def all
 	    filtered_products = filter(params)
 	    transform(params)
 
 	    # check the number of queries - make it faster
-	    @stock_h, @price_h, @pending_stock_h, products_transformed = \
+	    @stock_h, @price_h, @pending_stock_h, @name_h = \
 	    all_products_transform(@transform_column, filtered_products)
 	    
-	    display_(params, products_transformed)
+	    display_all(params)
   	end
 
   	# Displays Overall Stats and Top Customers for Product
@@ -69,7 +70,7 @@ class ProductController < ApplicationController
   			params[:order_col], params[:direction])  
 
       unless already_sorted
-        default_order(params)
+        default_customer_sort_order(params)
         @top_customers = get_id_activerecord_h(Customer.include_all.filter_by_ids(@customer_ids).send(@order_function, @direction))
         @customer_ids = @top_customers.keys
       else
@@ -92,15 +93,23 @@ class ProductController < ApplicationController
 	    @checked_id, @checked_no_vintage, @checked_no_ws = checked_radio_button(@transform_column)
 	  end
 
-  	def display_(params, products)
-  		# sorting by every table col doesn't work
-  	  order_function, direction = sort_order(params, 'order_by_name', 'ASC')
-  	    
-  	  @per_page = params[:per_page] || Product.per_page
-  	  @products = products.send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
+  	def display_all(params)
+  		@per_page = params[:per_page] || Product.per_page
+  	  # order_function, direction = sort_order(params, 'order_by_name', 'ASC')
+  	  sort_map = {'0' => @name_h, '1' => @price_h, '2' => @stock_h}
+      needs_to_be_sorted_h = sort_map[params[:order_col]] || @name_h
+
+      if params[:direction] == '-1'
+        # hash that needs to be sorted
+        sorted_hash = needs_to_be_sorted_h.sort_by {|id, val| -val}.to_h
+      else
+        sorted_hash = needs_to_be_sorted_h.sort_by {|id, val| val}.to_h
+      end
+
+      @product_ids = sorted_hash.keys.paginate( per_page: @per_page, page: params[:page])
   	end
 
-    def default_order(params)
+    def default_customer_sort_order(params)
        @order_function, @direction = sort_order(params, :order_by_name, 'ASC')
     end
 
