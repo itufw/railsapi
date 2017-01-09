@@ -43,6 +43,7 @@ class ProductController < ApplicationController
     	@overall_stats = overall(params, product_ids, 0)
 
     	# top customers
+      top_customers(params, product_ids)
   	end
 
   	def overall(params, product_ids, total_stock)
@@ -54,17 +55,26 @@ class ProductController < ApplicationController
 
   	def top_customers(params, product_ids)
   		# form filter for top customers
-  		# 25 is passed instead of staff_id
-  		# because we haven't implemented Product Display Rights yet. 
-  		@staff, customers_filtered, @search_text, staff_id, @cust_style = customer_param_filter(params, 25)
-  		staff_id = staff_id.nil? ? "nil" : staff_id
+  	  
+      # i only need to check product rights on this page
+      # So if product rights is 0, then restrict by staff
+      # otherwise just do a normal param filter
+  		@staff, customers_filtered, @search_text, staff_id, @cust_style = customer_filter(params, session[:user_id], "product_rights")
 
-  		# result_h has the form {time_period_name => {customer_id => stock_bought}}
-  		@result_h, @customer_ids, @time_periods, already_sorted = \
-  		top_objects("Order.product_filter(%s).valid_order.staff_filter(%s)" % \
-  			[product_ids, staff_id], :group_by_customerid, :sum_order_product_qty,\
-  			params[:order_col], params[:direction])
+  		#result_h has the form {time_period_name => {customer_id => stock_bought}}
+      #and it is sorted according to order_col and direction
+  		@top_customers_timeperiod_h, @customer_ids, @time_periods, already_sorted = top_objects(\
+        "Order.product_filter(%s).customer_filter(%s).valid_order" % \
+  			[product_ids, customers_filtered.pluck("id")], :group_by_customerid, :sum_order_product_qty,\
+  			params[:order_col], params[:direction])  
 
+      unless already_sorted
+        default_order(params)
+        @top_customers = get_id_activerecord_h(Customer.include_all.filter_by_ids(@customer_ids).send(@order_function, @direction))
+        @customer_ids = @top_customers.keys
+      else
+        @top_customers = get_id_activerecord_h(Customer.include_all.filter_by_ids(@customer_ids))
+      end
   	end
 
   	def params_for_one_product(params)
@@ -78,17 +88,26 @@ class ProductController < ApplicationController
   	end
 
   	def transform(params)
-  		@transform_column = params[:transform_column] || "product_id"
+  	  @transform_column = params[:transform_column] || "product_id"
 	    @checked_id, @checked_no_vintage, @checked_no_ws = checked_radio_button(@transform_column)
-	end
+	  end
 
-	def display_(params, products)
-		# sorting by every table col doesn't work
-	    order_function, direction = sort_order(params, 'order_by_name', 'ASC')
-	    
-	    @per_page = params[:per_page] || Product.per_page
-	    @products = products.send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
-	end
+  	def display_(params, products)
+  		# sorting by every table col doesn't work
+  	  order_function, direction = sort_order(params, 'order_by_name', 'ASC')
+  	    
+  	  @per_page = params[:per_page] || Product.per_page
+  	  @products = products.send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
+  	end
 
+    def default_order(params)
+       @order_function, @direction = sort_order(params, :order_by_name, 'ASC')
+    end
+
+    def get_id_activerecord_h(customers)
+      id_activerecord_h = {}
+      customers.map {|c| id_activerecord_h[c.id] = c}
+      return id_activerecord_h
+    end
 
 end

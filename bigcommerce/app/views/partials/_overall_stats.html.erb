@@ -8,6 +8,7 @@
 
 	<tr class="info">
 		<th></th>
+		<%# @overall_stats has structure {time_period => [sum, avg, supply]} %>
 		<% @overall_stats.keys.each do |t| %>
 			<th><%= t %></th>
 		<% end %>

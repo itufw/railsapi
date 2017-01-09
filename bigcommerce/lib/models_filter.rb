@@ -35,36 +35,54 @@ module ModelsFilter
     end
   end
 
-  def staff_params_filter(params, session_staff_id)
-    if reports_access_open(session_staff_id) == 0
-      staff_id = session_staff_id
-      staff = Staff.filter_by_id(session_staff_id)
-      return staff_id, staff
-    else
-      if (!params["staff"].nil? && !params["staff"]["id"].empty?)
-        staff_id = params["staff"]["id"]
-        staff = Staff.filter_by_id(staff_id)
-        return staff_id, staff
-      elsif !params["staff_id"].nil?
-        staff_id = params["staff_id"]
-        staff = Staff.filter_by_id(staff_id)
-        return staff_id, staff   
-      else
-        return nil, nil
+  def staff_params_filter(params)
+    # case when params is like {}
+    unless params["staff"].nil?
+      # case when params is like {"staff" => {}}
+      unless params["staff"]["id"].empty?
+        # return staff_id, staff row
+        return params["staff"]["id"], Staff.filter_by_id(params["staff"]["id"])
       end
     end
+
+    # case when the structure of params is different
+    # when does this happen? what pages?
+    unless params["staff_id"].nil?
+      return params["staff_id"], Staff.filter_by_id(params["staff_id"])
+    end
+    return nil, nil
   end
 
-  def customer_param_filter(params, session_staff_id)
+  def staff_session_filter(session_staff_id)
+    if reports_access_open(session_staff_id) == 0
+      return session_staff_id, Staff.filter_by_id(session_staff_id)
+    end
+    return nil, nil
+  end
+
+  def customer_param_filter(params)
     search_text = params[:search]
 
-    staff_id, staff = staff_params_filter(params, session_staff_id)
+    staff_id, staff = staff_params_filter(params)
     cust_style_id, cust_style = collection_param_filter(params, :cust_style, CustStyle)
 
     customers = Customer.staff_search_filter(search_text, staff_id).cust_style_filter(cust_style_id)
 
     return staff, customers, search_text, staff_id, cust_style
+  end
 
+  def customer_filter(params, session_staff_id, rights_col)
+    rights_val = Staff.where(id: session_staff_id).pluck(rights_col).first
+
+    # if rights_val is 0, then restrict by the staff_id in session
+    # otherwise don't
+    staff_id, staff = rights_val ? staff_params_filter(params) : staff_session_filter(session_staff_id)
+
+    search_text = params[:search]
+    cust_style_id, cust_style = collection_param_filter(params, :cust_style, CustStyle)
+    customers = Customer.staff_search_filter(search_text, staff_id).cust_style_filter(cust_style_id)
+
+    return staff, customers, search_text, staff_id, cust_style
   end
 
   def collection_param_filter(params, field, model)
@@ -151,11 +169,10 @@ module ModelsFilter
   end
 
   def sort_order(params, default_function, default_direction)
-    if params[:order_function].nil?
-     return default_function, default_direction
-    else
-      return params[:order_function], params[:direction]
-    end
+    direction_map = {"1" => 'ASC', "-1" => 'DESC'}
+    order_function = params[:order_col] ? params[:order_col] : default_function
+    direction = params[:direction] ? direction_map[params[:direction]] : default_direction
+    return order_function, direction
   end
 
 end
