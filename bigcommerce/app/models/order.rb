@@ -165,6 +165,10 @@ class Order < ActiveRecord::Base
 		return all
 	end
 
+	def self.order_filter_(order_id)
+		return where(id: order_id.to_i) if order_id.to_i > 0
+	end
+
 	def self.order_filter_by_ids(order_ids)
 		return where('orders.id IN (?)', order_ids).references(:orders)
 	end

@@ -1,25 +1,47 @@
 module ModelsFilter
 
-  def order_param_filter(params, session_staff_id)
+  # def order_param_filter(params, session_staff_id)
+
+  #   search_text = params[:search]
+  #   customer_ids = Customer.search_for(search_text).pluck("id") unless search_text.nil?
+
+  #   staff_id, staff = staff_params_filter(params, session_staff_id)
+
+  #   status_id, status = collection_param_filter(params, :status, Status)
+
+  #   start_date = params[:start_date]
+  #   end_date = params[:end_date]
+  #   order_id_text = params[:order_id_search]
+
+  #   if order_id_text.to_i > 0
+  #     orders = Order.order_filter_by_ids([order_id_text.to_i])
+  #   else
+  #     orders = Order.date_filter(start_date, end_date).customer_filter(customer_ids).staff_filter(staff_id).status_filter(status_id)
+  #   end
+  #   #orders = Order.all
+
+  #   return staff, status, orders, search_text, order_id_text
+  # end
+
+  def order_filter(params, session_staff_id, rights_col)
+
+    rights_val = Staff.where(id: session_staff_id).pluck(rights_col).first
+
+    # if rights_val is 0, then restrict by the staff_id in session
+    # otherwise don't
+    staff_id, staff = rights_val ? staff_params_filter(params) : staff_session_filter(session_staff_id)
 
     search_text = params[:search]
+    order_id_text = params[:order_id_search]
     customer_ids = Customer.search_for(search_text).pluck("id") unless search_text.nil?
 
-    staff_id, staff = staff_params_filter(params, session_staff_id)
-
     status_id, status = collection_param_filter(params, :status, Status)
-
-    start_date = params[:start_date]
-    end_date = params[:end_date]
-    order_id_text = params[:order_id_search]
 
     if order_id_text.to_i > 0
       orders = Order.order_filter_by_ids([order_id_text.to_i])
     else
-      orders = Order.date_filter(start_date, end_date).customer_filter(customer_ids).staff_filter(staff_id).status_filter(status_id)
+      orders = Order.date_filter(params[:start_date], params[:end_date]).customer_filter(customer_ids).staff_filter(staff_id).status_filter(status_id)
     end
-    #orders = Order.all
-
     return staff, status, orders, search_text, order_id_text
   end
 
@@ -60,16 +82,16 @@ module ModelsFilter
     return nil, nil
   end
 
-  def customer_param_filter(params)
-    search_text = params[:search]
+  # def customer_param_filter(params)
+  #   search_text = params[:search]
 
-    staff_id, staff = staff_params_filter(params)
-    cust_style_id, cust_style = collection_param_filter(params, :cust_style, CustStyle)
+  #   staff_id, staff = staff_params_filter(params)
+  #   cust_style_id, cust_style = collection_param_filter(params, :cust_style, CustStyle)
 
-    customers = Customer.staff_search_filter(search_text, staff_id).cust_style_filter(cust_style_id)
+  #   customers = Customer.staff_search_filter(search_text, staff_id).cust_style_filter(cust_style_id)
 
-    return staff, customers, search_text, staff_id, cust_style
-  end
+  #   return staff, customers, search_text, staff_id, cust_style
+  # end
 
   def customer_filter(params, session_staff_id, rights_col)
     rights_val = Staff.where(id: session_staff_id).pluck(rights_col).first

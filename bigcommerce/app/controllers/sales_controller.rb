@@ -85,6 +85,7 @@ class SalesController < ApplicationController
   # Displays all orders for selected customer
   # How do I get to this ? Click on Customer Name anywhere on the site
   # Displays all orders for that customer and a button to view stats
+  #*****************************************************
   def orders_and_stats_for_customer
     @customer_id = params[:customer_id]
     @customer_name = params[:customer_name]
@@ -100,6 +101,7 @@ class SalesController < ApplicationController
   end
 
   # Displays Stats for all the products the customer has ordered
+  #*****************************************************
   def top_products_for_customer
     @customer_id = params[:customer_id]
     @customer_name = params[:customer_name]
@@ -128,12 +130,14 @@ class SalesController < ApplicationController
 
   # Displays all details about an order
   # How do I get to this ? Click on a Order ID anywhere on the site
+  #*****************************************************
   def order_details
     @order_id = params[:order_id]
     @order = Order.include_all.order_filter(@order_id)
   end
 
   # Displays overall stats for products(money gained) and all customers who bought that product
+  #*****************************************************
   def stats_and_top_customers_for_product
     @product_id = params[:product_id]
     @product_name = params[:product_name]
@@ -172,6 +176,7 @@ class SalesController < ApplicationController
   # Look for your product - Then come to this page
   # Displays All the orders for the selected product, with the selected product qty
   # And displays a button to view stats
+  #*****************************************************
   def orders_for_product
     @product_id = params[:product_id]
     @product_name = params[:product_name]
@@ -180,7 +185,7 @@ class SalesController < ApplicationController
 
     @per_page = params[:per_page] || Order.per_page
 
-    @staff, @status, orders_filtered_by_param, @search_textt, @order_id = \
+    @staff, @status, orders_filtered_by_param, @search_text, @order_id = \
     order_param_filter(params, session[:user_id])
 
     product_ids = transform_product_ids(@transform_column, @product_id) || [@product_id]

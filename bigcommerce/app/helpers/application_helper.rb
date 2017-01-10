@@ -7,8 +7,13 @@ module ApplicationHelper
 
   # Displays a number with 2 precision and with commas
   def display_num(value)
-	number_with_delimiter(number_with_precision(value, precision: 2))
+	 number_with_delimiter(number_with_precision(value, precision: 2))
   end
+
+  def display_overall_stat(value, sum_param)
+    return sum_param == "Qty" ? number_with_delimiter(value) : display_num(value)
+  end
+
 
   # Displays a date in the form 'Day of the week, Day/Month/Year'
   def date_format(date)

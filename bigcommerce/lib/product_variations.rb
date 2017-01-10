@@ -71,7 +71,7 @@ module ProductVariations
     def name_(transform_column, products)
         model_map = { "product_no_vintage_id" => ProductNoVintage, "product_no_ws_id" => ProductNoWs}
         if transform_column == "product_id"
-            return products
+            return products.pluck("id, name").to_h
         end
         ids_a = products.group(transform_column).pluck(transform_column)
         products_transformed = model_map[transform_column].filter_by_ids(ids_a).pluck("id, name").to_h
@@ -90,15 +90,28 @@ module ProductVariations
 
     # Give an array of product_ids corresponding to
     # a product_no_vintage_id/no_ws_id
-    # def transform_product_ids(transform_column, transform_column_val)
-    #     if transform_column == "product_no_vintage_id"
-    #         return (Product.where(product_no_vintage_id: transform_column_val)).pluck("id")
-    #     elsif transform_column == "product_no_ws_id"
-    #         return (Product.where(product_no_ws_id: transform_column_val)).pluck("id")
-    #     else
-    #         return nil
-    #     end
-    # end
+    def transform_product_ids(transform_column, transform_column_val)
+        if transform_column == "product_no_vintage_id"
+            return (Product.where(product_no_vintage_id: transform_column_val)).pluck("id")
+        elsif transform_column == "product_no_ws_id"
+            return (Product.where(product_no_ws_id: transform_column_val)).pluck("id")
+        else
+            return nil
+        end
+    end
+
+    def total_stock_no_ws(transform_column, product_id, pending_stock, total_stock)
+        unless transform_column != "product_id"
+            product_no_ws_id = Product.no_ws_id(product_id)
+            unless product_no_ws_id.nil?
+                similar_products = Product.products_with_same_no_ws_id(product_no_ws_id)
+                inventory_sum = 0
+                similar_products.each {|p| inventory_sum += p.inventory}
+                return pending_stock + inventory_sum
+            end
+        end
+        return total_stock
+    end
 
     # # Given an array of product ids
     # # and a bool value for sort_column_index and sort_column_stats
