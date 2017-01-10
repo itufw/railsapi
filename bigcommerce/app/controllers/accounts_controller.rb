@@ -12,7 +12,6 @@ class AccountsController < ApplicationController
   end
 
   def contacts
-    @can_update_bool = allow_to_update(session[:user_id])
     @per_page = params[:per_page] || Customer.per_page
 
 
@@ -41,5 +40,12 @@ class AccountsController < ApplicationController
     @amount_due = params[:amount_due]
 
     @customer = Customer.include_all.filter_by_id(params[:customer_id])
+  end
+
+  def send_reminder
+    # ReminderMailer.reminder_email("test").deliver_now
+    p =c
+    redirect_to :back
+
   end
 end

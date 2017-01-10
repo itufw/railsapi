@@ -2,6 +2,12 @@
 	<h4>Notes</h4>
 </div>
 
+
+<button class = "btn btn-primary"><%= link_to "Create",
+								:onclick=>"window.open(this.href,'note_create', 'height=800, width=500'); return false;",
+								controller: "accounts", action: "note_create" %></button>
+
+<!-- 
 <div class="container" style="margin-right: 30px;">
 	<div class="row">
 		<div class="col-lg-3 col-md-3 col-sm-4 col-xs-12"></div>
@@ -31,4 +37,4 @@
 			<h4>To be discussed</h4>
 		</div>
 	</div>
-</div>
+</div> -->
