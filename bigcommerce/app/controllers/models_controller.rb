@@ -67,8 +67,10 @@ class ModelsController < ApplicationController
     @staff, customers, @search_text, staff_id, @cust_style = customer_param_filter(params, session[:user_id])
     @customers = customers.incomplete.include_all.send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
   end
-
+  
+#*****************************************************
   def products
+
     @producer_country, @product_sub_type, products, @search_text = product_param_filter(params)
 
     @transform_column = params[:transform_column] || "id"

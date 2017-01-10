@@ -35,38 +35,46 @@ class ProductController < ApplicationController
   	def summary
   		params_for_one_product(params)
   		transform(params)
+      # total_stock is inventory in bigcommerce + pending stock
+      get_total_stock(params)
+      # WS + Retail + Pending stock
+      @total_stock_no_ws = total_stock_no_ws(@transform_column, @product_id, @pending_stock, @total_stock)
+
   		# either we want stats for a product_id or for products based on a product_no_vintage_id
     	# or based on a product_no_ws_id
     	# this gives product_ids based on that transform_column
     	product_ids = transform_product_ids(@transform_column, @product_id) || @product_id
 
-    	# overall_stats has structure {time_period_name => [sum, average, supply]}
-    	@overall_stats = overall(params, product_ids, 0)
-
-    	# top customers
-      top_customers(params, product_ids)
-  	end
-
-  	def overall(params, product_ids, total_stock)
-  		# period type for overall stats - monthly or weekly
-   		@selected_period, @period_types = define_period_types(params)
-   		@result = overall_stats("Order.product_filter(%s).valid_order" % \
-   			[product_ids], :sum_order_product_qty, @selected_period, total_stock)
-  	end
-
-  	def top_customers(params, product_ids)
-  		# form filter for top customers
-  	  
+      # form filter for top customers
+      
       # i only need to check product rights on this page
       # So if product rights is 0, then restrict by staff
       # otherwise just do a normal param filter
-  		@staff, customers_filtered, @search_text, staff_id, @cust_style = customer_filter(params, session[:user_id], "product_rights")
+      @staff, customers_filtered, @search_text, staff_id, @cust_style = customer_filter(params, session[:user_id], "product_rights")
+      customers_filtered_ids = customers_filtered.pluck("id")
+      # both overall stats and top customers change based on the customer filter
+
+    	# overall_stats has structure {time_period_name => [sum, average, supply]}
+    	@overall_stats = overall(params, product_ids, customers_filtered_ids, @total_stock)
+
+    	# top customers
+      top_customers(params, product_ids, customers_filtered_ids)
+  	end
+
+  	def overall(params, product_ids, customers_filtered_ids, total_stock)
+  		# period type for overall stats - monthly or weekly
+   		@selected_period, @period_types = define_period_types(params)
+   		@result = overall_stats("Order.product_filter(%s).customer_filter(%s).valid_order" % \
+   			[product_ids, customers_filtered_ids], :sum_order_product_qty, @selected_period, total_stock)
+  	end
+
+  	def top_customers(params, product_ids, customers_filtered_ids)
 
   		#result_h has the form {time_period_name => {customer_id => stock_bought}}
       #and it is sorted according to order_col and direction
   		@top_customers_timeperiod_h, @customer_ids, @time_periods, already_sorted = top_objects(\
         "Order.product_filter(%s).customer_filter(%s).valid_order" % \
-  			[product_ids, customers_filtered.pluck("id")], :group_by_customerid, :sum_order_product_qty,\
+  			[product_ids, customers_filtered_ids], :group_by_customerid, :sum_order_product_qty,\
   			params[:order_col], params[:direction])  
 
       unless already_sorted
@@ -117,6 +125,11 @@ class ProductController < ApplicationController
       id_activerecord_h = {}
       customers.map {|c| id_activerecord_h[c.id] = c}
       return id_activerecord_h
+    end
+
+    def get_total_stock(params)
+      @total_stock = params[:total_stock].to_i
+      @pending_stock = params[:pending_stock].to_i
     end
 
 end

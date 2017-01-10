@@ -1,18 +1,22 @@
 <%= title @product_name %>
 
 <h3><%= @product_name %></h3><br/>
-<h4>(Product Stock + Pending Stock) : </h4>
-<h4>Total Stock (WS + Retail + Pending) : </h4>
+<h4>(Product Stock + Pending Stock) : <%= @total_stock %></h4>
+<h4>Total Stock (WS + Retail + Pending) : <%= @total_stock_no_ws %></h4>
+
+<button class="button" style="float: right;margin-top: -130px;"><%= link_to "Orders", controller: 'order', action: 'for_product', product_id: @product_id, product_name: @product_name, transform_column: @transform_column %></button>
+
 
 <%# Overall Stats Display %>
 <div style="margin-top: 50px;">
 <%= form_tag({:action => "summary" }, {:method => "get"}) do %>
 
-	<%= render "partials/overall_stats", supply_display_class: "" %>
+	<%= render "partials/overall_stats", sum_param: "Qty", supply_display_class: "" %>
 
    <%= hidden_field_tag :product_id, @product_id %>
    <%= hidden_field_tag :product_name, @product_name %>
    <%= hidden_field_tag :total_stock, @total_stock %>
+   <%= hidden_field_tag :transform_column, @transform_column %>
    
 <% end %>
 </div>
@@ -27,6 +31,7 @@
 
    <%= hidden_field_tag :product_id, @product_id %>
    <%= hidden_field_tag :product_name, @product_name %>
+   <%= hidden_field_tag :transform_column, @transform_column %>
    
    <%= submit_tag "Filter", class: 'btn btn-primary' %>
 <% end %>
@@ -45,8 +50,8 @@
 	<% @customer_ids.each do |id| %>
 	<tr>
 		<td><%= customer_name(@top_customers[id]) %></td>
-		<td><%= @top_customers[id].staff.nickname %></td>
-		<td><%= @top_customers[id].cust_style.name %></td>
+		<td><%= staff_nickname(@top_customers[id]) %></td>
+		<td><%= customer_style_name(@top_customers[id]) %></td>
 		<% @time_periods.each do |t| %>
 			<td><%= exists_in_h(@top_customers_timeperiod_h[t], id) %></td>
 		<% end %>

@@ -32,8 +32,11 @@
 	<% @product_ids.each do |id| %>
 		<tr>
 			<td><%= id %></td>
+
 			<td><%= link_to @name_h[id], controller: 'product', action: 'summary',\
-			product_id: id, product_name: @name_h[id], transform_column: @transform_column %></td>
+			product_id: id, product_name: @name_h[id], transform_column: @transform_column,\
+			total_stock: @pending_stock_h[id].to_i + @stock_h[id].to_i, pending_stock: @pending_stock_h[id].to_i %></td>
+
 			<td class="num"><%= display_num(@price_h[id]) %></td>
 			<td clas = "num" ><%= @stock_h[id] %></td>
 			<td clas = "num" ><%= @pending_stock_h[id].to_i %></td>
@@ -45,5 +48,5 @@
 </table>
 
 <span style="float:right;">
-<%#= paginate(products) %>
+<%= paginate(@product_ids) %>
 </span>
