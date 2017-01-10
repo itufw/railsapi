@@ -7,7 +7,7 @@ module ProductVariations
     # Should be as a column in the database
     # have a 'group by transform column' function in the Product model
     # add a string -> model-name key-value pair in the model_map
-    # add order_by name function in the Model 
+    # add order_by name function in the Model
     def transform_product_model(transform_column, products)
 
     	stock_h = product_stock(transform_column, products)
