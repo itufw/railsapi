@@ -12,6 +12,17 @@ class CustomerController < ApplicationController
 	include ModelsFilter
   include DatesHelper
 
+  def all
+    @staffs = Staff.active_sales_staff
+    customers = filter(params, "display_report")
+    display_(params, customers)
+  end
+
+  def incomplete_customers
+    customers_filtered = filter(params, "display_report")
+    display_(params, customers_filtered.incomplete)
+    render 'all'
+  end
 
   # Orders and Overall Stats for Customer
   def summary
@@ -36,6 +47,18 @@ class CustomerController < ApplicationController
   def get_id_and_name(params)
     @customer_id = params[:customer_id]
     @customer_name = params[:customer_name]
+  end
+
+  def filter(params, rights_col)
+    @staff, customers, @search_text, staff_id, @cust_style = customer_filter(params, session[:user_id], rights_col)
+    return customers
+  end
+
+  def display_(params, customers)
+    order_function, direction = sort_order(params, 'order_by_name', 'ASC')
+
+    @per_page = params[:per_page] || Customer.per_page
+    @customers = customers.include_all.send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
   end
 
   def edit

@@ -22,7 +22,7 @@ module ModelsHelper
     if current_page?(action: 'incomplete_customers')
       return "incomplete_customers"
     else
-      return "customers"
+      return "all"
     end
   end
 end

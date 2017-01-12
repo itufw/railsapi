@@ -9,7 +9,7 @@ class ModelsController < ApplicationController
   include ModelsFilter
   include DisplayHelper
   include ProductVariations
-  
+  #*********************************
   def orders
     @staff_nickname = params[:staff_nickname]
     @start_date = params[:start_date]
@@ -25,7 +25,7 @@ class ModelsController < ApplicationController
     @orders = orders.include_all.send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
 
   end
-
+#*********************************
   def customers
     @can_update_bool = allow_to_update(session[:user_id])
     @per_page = params[:per_page] || Customer.per_page
@@ -39,11 +39,12 @@ class ModelsController < ApplicationController
 
   end
 
+  #***********************
   def edit_customer
     @customer = Customer.include_all.filter_by_id(params[:customer_id] || params[:customer][:id])
     @customer_name = Customer.customer_name(@customer.actual_name, @customer.firstname, @customer.lastname)
   end
-
+  #***********************
   def update_customer
     @customer = Customer.filter_by_id(params[:customer][:id])
     if @customer.update_attributes(customer_params)
@@ -57,7 +58,7 @@ class ModelsController < ApplicationController
     end
 
   end
-
+#*********************************
   def incomplete_customers
     @can_update_bool = allow_to_update(session[:user_id])
     @per_page = params[:per_page] || Customer.per_page
@@ -101,6 +102,7 @@ class ModelsController < ApplicationController
 
   end
 
+  #***********************
   private
 
   def customer_params

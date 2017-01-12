@@ -1,0 +1,16 @@
+<%= title "Orders" %>
+<h3><%= orders_page_title(@staff_nickname, @start_date, @end_date) %></h3>
+
+<div class="form-group container-fluid" style="margin-top: 50px;">
+	<%= form_tag({:controller => "order", :action => "all"}, {:method => "get"}) do %>
+
+	<%= render "partials/order_filter" %>
+
+	<%= hidden_field_tag :start_date, @start_date %>
+   	<%= hidden_field_tag :end_date, @end_date %>
+   	<%= submit_tag "Filter", class: 'btn btn-primary' %>
+   	<%= link_to "Reset", {controller: "order", action: "all"}, class: "btn btn-primary" %></button>
+<% end %>
+</div>
+
+<%= render "partials/order", orders: @orders, display_class: "none", product_ids: nil %>
