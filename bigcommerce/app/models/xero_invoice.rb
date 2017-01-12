@@ -92,6 +92,8 @@ class XeroInvoice < ActiveRecord::Base
 	  				ActiveRecord::Base.connection.execute(sql)
 
 		  			XeroInvoiceLineItem.new.download_data_from_api(i.line_items, i.invoice_id, i.invoice_number)
+
+						XeroContact.update_balances_from_xero(i.contact_id)
 		  		end
 	  		end
 

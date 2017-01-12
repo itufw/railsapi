@@ -16,7 +16,7 @@ class Customer < ActiveRecord::Base
 
 	scoped_search on: [:firstname, :lastname, :company, :actual_name]
 
-	self.per_page = 30
+	self.per_page = 15
 
 	# mass insert from bigcommerce api
 	def scrape

@@ -123,4 +123,18 @@ class XeroContact < ActiveRecord::Base
         return contact
     end
 
+		def self.update_balances_from_xero(contact_id)
+			contact = XeroContact.get_contact_from_xero(contact_id)
+			time = Time.now.to_s(:db)
+
+			unless contact.balances.nil?
+				accounts_receivable_outstanding = contact.balances.accounts_receivable.outstanding
+				accounts_receivable_overdue = contact.balances.accounts_receivable.overdue
+
+				sql = "UPDATE xero_contacts SET accounts_receivable_outstanding = '#{accounts_receivable_outstanding}',\
+				accounts_receivable_overdue = '#{accounts_receivable_overdue}', updated_at = '#{time}'\
+				WHERE xero_contact_id = '#{contact_id}'"
+				ActiveRecord::Base.connection.execute(sql)
+			end
+		end
 end

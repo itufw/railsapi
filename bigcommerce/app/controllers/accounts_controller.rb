@@ -6,14 +6,21 @@ class AccountsController < ApplicationController
   # include AccountsFilter
   include DisplayHelper
   include ProductVariations
+  include DatesHelper
 
   def overdue_table
 
   end
 
   def contacts
-    @per_page = params[:per_page] || Customer.per_page
+    @start_date = Date.today
+    @end_date = (Date.today - 5.months)
 
+    @start_date = Date.new *flatten_date_array(params[:start_date_select]) unless params[:start_date_select].nil?
+    @end_date = Date.new *flatten_date_array(params[:end_date_select]) unless params[:end_date_select].nil?
+
+
+    @per_page = params[:per_page] || Customer.per_page
 
     @date_column = params[:date_column] || "due_date"
     if "due_date".eql? @date_column
@@ -43,9 +50,20 @@ class AccountsController < ApplicationController
   end
 
   def send_reminder
-    # ReminderMailer.reminder_email("test").deliver_now
-    p =c
+    # p =c
+    @selected_invoices = params[:selected_invoices]
+    @customer_id = params[:customer_id]
+    ReminderMailer.reminder_email(@customer_id,@selected_invoices).deliver_now
     redirect_to :back
 
+  end
+
+  def show
+    respond_to do |format|
+      format.html { render :layout => false }
+      format.pdf do
+        render pdf: "pdf_invoice"
+      end
+    end
   end
 end
