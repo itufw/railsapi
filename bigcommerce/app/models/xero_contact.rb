@@ -15,11 +15,14 @@ class XeroContact < ActiveRecord::Base
 
     def download_data_from_api(modified_since_time)
     	xero = XeroConnection.new.connect
+        page_num = 1
 
-    	contacts = xero.Contact.all(modified_since: modified_since_time)
+    	contacts = xero.Contact.all(page: page_num, modified_since: modified_since_time)
 
         contacts.each do |c|
 			insert_or_update_contact(c)
+            page_num += 1
+            contacts = xero.Contact.all(page: page_num, modified_since: modified_since_time)
 		end
     end
 
