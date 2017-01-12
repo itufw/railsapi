@@ -38,6 +38,26 @@ class CustomerController < ApplicationController
     @customer_name = params[:customer_name]
   end
 
+  def edit
+    get_id_and_name(params)
+    # params[:customer][:id] is used since update is a post request
+    # once you update using post request, then want to update again, we need to use params[:customer][:id]
+    @customer = Customer.include_all.filter_by_id(@customer_id || params[:customer][:id])
+  end
+
+  def update
+    @customer = Customer.filter_by_id(params[:customer][:id])
+    if @customer.update_attributes(customer_params)
+      flash[:success] = "Successfully Changed." 
+      redirect_to action: 'summary',\
+       customer_id: params[:customer][:id],\
+       customer_name: Customer.customer_name(@customer.actual_name, @customer.firstname, @customer.lastname)
+    else
+      flash[:error] = "Unsuccessful."
+      render 'edit'
+    end
+  end
+
 	# Displays Stats for all the products the customer has ordered
 	def top_products
   	get_id_and_name(params)
@@ -79,5 +99,12 @@ class CustomerController < ApplicationController
     end
     ####################################
 	end
+
+  private
+
+  def customer_params
+    params.require(:customer).permit(:firstname, :lastname, :actual_name, :staff_id, :cust_style_id,\
+      :cust_group_id)
+  end
 
 end
