@@ -22,7 +22,7 @@
 	<% @product_ids.each do |id| %>
 	<tr>
 		<td><%= id %></td>
-		<td><%= @product_name_h[id] %></td>
+		<td><%= link_to @product_name_h[id], action: 'summary_with_product', customer_id: @customer_id, customer_name: @customer_name, product_id: id, product_name: @product_name_h[id], transform_column: @transform_column %></td>
 		<td><%= display_num(@price_h[id]) %></td>
 
 		<% @time_periods.each do |t| %>

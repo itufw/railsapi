@@ -34,7 +34,7 @@ class OrderController < ApplicationController
 		# who have the same no_vintage_id
 		@product_ids = transform_product_ids(@transform_column, @product_id) || [@product_id]
 		# orders filtered by product
-		orders = orders_filtered.product_filter(@product_ids)
+		orders = orders_filtered.order_product_filter(@product_ids)
 		display_(params, orders)
 	end
 
