@@ -20,4 +20,9 @@ class XeroRevision < ActiveRecord::Base
 	def self.end_time
 		first.end_time
 	end
+
+	def self.update_end_time(updated_time)
+		first.end_time = updated_time
+		first.save
+	end
 end
