@@ -180,6 +180,13 @@ class Order < ActiveRecord::Base
 
 	end
 
+	def self.order_product_filter(product_ids)
+		#return includes(:order_products).where('order_products.product_id IN (?)', product_ids).references(:order_products) if !product_ids.nil?
+		#return all
+		includes(:order_products).where('order_products.product_id IN (?)', product_ids).references(:order_products)
+
+	end
+
 	# Returns orders whose date created is between the start date and end date
 	# If you want today's orders
 	# Then start date should be Today's date and end date should be Tomorrow's date
@@ -307,7 +314,7 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.sum_order_product_qty
-		sum('order_products.qty')
+		includes(:order_products).sum('order_products.qty')
 	end
 
 	def self.customer_filter(customer_ids)
@@ -363,6 +370,7 @@ class Order < ActiveRecord::Base
 		order.save
 	end
 
+	# WHERE DO I USE THIS?
 	def self.filter_by_product(product_ids)
 		return includes(:products).where('products.id IN (?)', [product_ids]).references(:products) 
 	end

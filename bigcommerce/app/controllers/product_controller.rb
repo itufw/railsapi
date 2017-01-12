@@ -14,7 +14,7 @@ class ProductController < ApplicationController
 
 	before_action :confirm_logged_in
 
-	include ModelsFilter
+	  include ModelsFilter
   	include ProductVariations
   	include TimePeriodStats
   	include DatesHelper
@@ -64,7 +64,7 @@ class ProductController < ApplicationController
   	def overall(params, product_ids, customers_filtered_ids, total_stock)
   		# period type for overall stats - monthly or weekly
    		@selected_period, @period_types = define_period_types(params)
-   		@result = overall_stats("Order.product_filter(%s).customer_filter(%s).valid_order" % \
+   		@result = overall_stats("Order.order_product_filter(%s).customer_filter(%s).valid_order" % \
    			[product_ids, customers_filtered_ids], :sum_order_product_qty, @selected_period, total_stock)
   	end
 
@@ -73,7 +73,7 @@ class ProductController < ApplicationController
   		#result_h has the form {time_period_name => {customer_id => stock_bought}}
       #and it is sorted according to order_col and direction
   		@top_customers_timeperiod_h, @customer_ids, @time_periods, already_sorted = top_objects(\
-        "Order.product_filter(%s).customer_filter(%s).valid_order" % \
+        "Order.order_product_filter(%s).customer_filter(%s).valid_order" % \
   			[product_ids, customers_filtered_ids], :group_by_customerid, :sum_order_product_qty,\
   			params[:order_col], params[:direction])  
 

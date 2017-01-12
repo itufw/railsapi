@@ -29,7 +29,23 @@ class CustomerController < ApplicationController
     get_id_and_name(params)
     # overall_stats has structure {time_period_name => [sum, average, supply]}
     @overall_stats = overall_stats_(params)
-    orders(params)
+    display_orders(params, Order.customer_filter([@customer_id]))
+  end
+
+  def summary_with_product
+    get_id_and_name(params)
+    @product_id = params[:product_id]
+    @product_name = params[:product_name]
+    @transform_column = params[:transform_column]
+
+    # either we want stats for a product_id or for products based on a product_no_vintage_id
+    # or based on a product_no_ws_id
+    # this gives product_ids based on that transform_column
+    @product_ids = transform_product_ids(@transform_column, @product_id) || [@product_id]
+
+    # overall_stats has structure {time_period_name => [sum, average, supply]}
+    @overall_stats = overall_stats_with_product(params, @product_ids)
+    display_orders(params, Order.customer_filter([@customer_id]).product_filter(@product_ids))
   end
 
   def overall_stats_(params)
@@ -38,10 +54,16 @@ class CustomerController < ApplicationController
         [[@customer_id]], :sum_total, @selected_period, nil)
   end
 
-  def orders(params)
+  def overall_stats_with_product(params, product_ids)
+    @selected_period, @period_types = define_period_types(params)
+    @result = overall_stats("Order.customer_filter(%s).order_product_filter(%s).valid_order" % \
+        [[@customer_id], product_ids], :sum_order_product_qty, @selected_period, nil)
+  end
+
+  def display_orders(params, orders)
     order_function, direction = sort_order(params, :order_by_id, 'DESC')
     @per_page = params[:per_page] || Order.per_page
-    @orders = Order.include_all.customer_filter([@customer_id]).send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
+    @orders = orders.include_all.send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
   end
 
   def get_id_and_name(params)
@@ -95,14 +117,14 @@ class CustomerController < ApplicationController
   	# Get top products
   	# To get top products, get all the orders for a customer, then get products of those orders
   	# based on the above param filters, filter products out
-  	where_query = "Order.customer_filter(%s).valid_order.product_filter(%s)" % [[@customer_id], Product.all.pluck("id")]
+  	where_query = "OrderProduct.valid_orders.order_customer_filter(%s).product_filter(%s)" % [[@customer_id], Product.all.pluck("id")]
 		
 		# hash has a structure {"time_period" => {product_id => stock}}
 		# product_ids can be either product ids or even 
 		# product no vintage ids
 		# group_by can be group_by_product_id, group_by_product_no_vintage_id
 		@top_products_timeperiod_h, @product_ids, @time_periods, sorted_bool = \
-		top_objects(where_query, ('group_by_' + @transform_column).to_sym, :sum_order_product_qty, params[:order_col], params[:direction])
+		top_objects(where_query, ('group_by_' + @transform_column).to_sym, :sum_qty, params[:order_col], params[:direction])
 		
 		@price_h, @product_name_h = top_products_transform(@transform_column, @product_ids)
 
