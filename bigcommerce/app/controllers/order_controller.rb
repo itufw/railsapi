@@ -7,25 +7,25 @@ class OrderController < ApplicationController
 	before_action :confirm_logged_in
 
 	include ModelsFilter
-  	include DisplayHelper
-  	include ProductVariations
+  include DisplayHelper
+  include ProductVariations
 
-  	def for_product
-  		@product_id = params[:product_id]
-  		@product_name = params[:product_name]
-  		@transform_column = params[:transform_column]
+	def for_product
+		@product_id = params[:product_id]
+		@product_name = params[:product_name]
+		@transform_column = params[:transform_column]
 
-  		# orders filtered by param
-  		@staff, @status, orders_filtered, @search_text, @order_id = order_filter(params, session[:user_id], "product_rights")
+		# orders filtered by param
+		@staff, @status, orders_filtered, @search_text, @order_id = order_filter(params, session[:user_id], "product_rights")
 
-  		# get product_ids depending on the transform_column
-  		# if transform_column is product_no_vintage_id then we have a set of products
-  		# who have the same no_vintage_id
-  		@product_ids = transform_product_ids(@transform_column, @product_id) || [@product_id]
-  		# orders filtered by product
-  		orders = orders_filtered.product_filter(@product_ids)
-  		display_(params, orders)
-  	end
+		# get product_ids depending on the transform_column
+		# if transform_column is product_no_vintage_id then we have a set of products
+		# who have the same no_vintage_id
+		@product_ids = transform_product_ids(@transform_column, @product_id) || [@product_id]
+		# orders filtered by product
+		orders = orders_filtered.product_filter(@product_ids)
+		display_(params, orders)
+	end
 
 	# def all
  #    	@staff_nickname = params[:staff_nickname]
