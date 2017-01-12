@@ -42,7 +42,7 @@ class AdminController < ApplicationController
 
   end
 
-  def update_products    
+  def update_products
     Product.new.update_from_api(Revision.update_time_iso)
   end
 
@@ -63,7 +63,7 @@ class AdminController < ApplicationController
     # [ProductPackageType, "product_package_types", nil],[Warehouse, "warehouses", nil]]
 
 
-     
+
 
     #product_files.each do |p|
 

@@ -190,7 +190,9 @@ GEM
       sprockets-rails (>= 2.0, < 4.0)
     whenever (0.9.7)
       chronic (>= 0.6.3)
+    wicked_pdf (1.1.0)
     will_paginate (3.1.5)
+    wkhtmltopdf-binary (0.12.3.1)
 
 PLATFORMS
   ruby
@@ -219,8 +221,10 @@ DEPENDENCIES
   uuidtools
   web-console (~> 2.0)
   whenever
+  wicked_pdf
   will_paginate (~> 3.1.0)
+  wkhtmltopdf-binary
   xeroizer!
 
 BUNDLED WITH
-   1.12.5
+   1.13.6
