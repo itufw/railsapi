@@ -160,9 +160,15 @@ class Order < ActiveRecord::Base
 
 	end
 
+	############## FILTER FUNCTIONS ############
+
 	def self.order_filter(order_id)
 		return find(order_id.to_i) if order_id.to_i > 0
 		return all
+	end
+
+	def self.order_filter_(order_id)
+		return where(id: order_id.to_i) if order_id.to_i > 0
 	end
 
 	def self.order_filter_by_ids(order_ids)
@@ -170,7 +176,26 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.product_filter(product_ids)
-		return includes(:order_products).where('order_products.product_id IN (?)', product_ids).references(:order_products) if !product_ids.nil?
+		#return includes(:order_products).where('order_products.product_id IN (?)', product_ids).references(:order_products) if !product_ids.nil?
+		#return all
+		includes(:products).where('products.id IN (?)', product_ids).references(:products)
+
+	end
+
+	def self.order_product_filter(product_ids)
+		#return includes(:order_products).where('order_products.product_id IN (?)', product_ids).references(:order_products) if !product_ids.nil?
+		#return all
+		includes(:order_products).where('order_products.product_id IN (?)', product_ids).references(:order_products)
+
+	end
+
+	def self.customer_filter(customer_ids)
+		return where('orders.customer_id IN (?)', customer_ids) unless (customer_ids.nil? or  customer_ids.empty?)
+		return all
+	end
+
+	def self.staff_filter(staff_id)
+		return includes(:customer).where('customers.staff_id = ?', staff_id).references(:customers) if !staff_id.nil?
 		return all
 	end
 
@@ -206,6 +231,8 @@ class Order < ActiveRecord::Base
 		return includes(:customer).where('customers.cust_style_id = ?', cust_style_id).references(:customers) if !cust_style_id.nil?
 		return all
 	end
+
+	########## GROUP BY FUNCTIONS ############
 
 	def self.group_by_date_created
 		group("DATE(orders.date_created)")
@@ -255,14 +282,23 @@ class Order < ActiveRecord::Base
 	end
 
 
-
 	def self.group_by_customerid
 		group('orders.customer_id')
 	end
 
 	def self.group_by_product_id
-		includes(:order_products).group('order_products.product_id')
+		includes(:order_products).group('order_products.product_id').references(:order_products)
 	end
+
+	# def self.group_by_product_no_vintage_id
+	# 	includes(:products).group('products.product_no_vintage_id').references(:products)
+	# end
+
+	# def self.group_by_product_no_ws_id
+	# 	includes(:products).group('products.product_no_ws_id').references(:products)
+	# end
+
+	########## SUMMATION FUNCTIONS ############
 
 	def self.count_order_id_from_order_products
 		includes(:order_products).count('order_products.order_id')
@@ -296,15 +332,7 @@ class Order < ActiveRecord::Base
 		includes(:order_products).sum('order_products.qty')
 	end
 
-	def self.customer_filter(customer_ids)
-		return where('orders.customer_id IN (?)', customer_ids) unless (customer_ids.nil? or  customer_ids.empty?)
-		return all
-	end
-
-	def self.staff_filter(staff_id)
-		return includes(:customer).where('customers.staff_id = ?', staff_id).references(:customers) if !staff_id.nil?
-		return all
-	end
+	######### ORDER BY FUNCTIONS ############
 
 	def self.order_by_id(direction)
 		order('orders.id ' + direction)
@@ -367,6 +395,7 @@ class Order < ActiveRecord::Base
 		order.save
 	end
 
+	# WHERE DO I USE THIS?
 	def self.filter_by_product(product_ids)
 		return includes(:products).where('products.id IN (?)', [product_ids]).references(:products)
 	end

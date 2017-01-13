@@ -14,18 +14,29 @@
     <div class="collapse navbar-collapse">
       <ul class="nav navbar-nav">
         <li class="dropdown">
-        <a class="" data-toggle="dropdown" href="#">Sales Summaries
-        <span class="caret"></span></a>
-        <ul class="dropdown-menu">
-          <li><%= link_to "Weekly", controller: "sales", action: "sales_dashboard" %></li>
-          <li><%= link_to "Detailed", controller: "sales", action: "sales_dashboard_detailed" %></li>
-          <li><%= link_to "Products", controller: "product_dashboard", action: "sales" %></li>
-        </ul>
-        <li><%= link_to "Orders", controller: "models", action: "orders" %></li>
-        <li><%= link_to "Customers", controller: "models", action: "customers" %></li>
-        <li><%= link_to "Products", controller: "models", action: "products" %></li>
-        <li><%= link_to "Pending Orders", controller: "sales", action: "orders_and_products_for_status", status_id: 1, status_name: "Pending" %></li>
-        <li><%= link_to "Accounting", controller: "accounts", action: "contacts" %></li>
+          <a class="" data-toggle="dropdown" href="#">Sales Summaries
+          <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><%= link_to "Weekly", controller: "sales", action: "sales_dashboard" %></li>
+            <li><%= link_to "Detailed", controller: "sales", action: "sales_dashboard_detailed" %></li>
+          </ul>
+        </li>
+
+        <li><%= link_to "Orders", controller: "order", action: "all" %></li>
+        <li><%= link_to "Customers", controller: "customer", action: "all" %></li>
+
+        <li class="dropdown">
+          <a class="" data-toggle="dropdown" href="#">Products
+          <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><%= link_to "All", controller: "product", action: "all" %></li>
+            <li><%= link_to "Detailed Dashboard", controller: "sales", action: "product_dashboard" %></li>
+          </ul>
+        </li>
+
+        <li><%= link_to "Pending Orders", controller: "status", action: "pending", status_id: 1, status_name: "Pending" %></li>
+        <li><%= link_to "Accounting", controller: "accounts", action: "contacts", status_id: 1, status_name: "contacts" %></li>
+
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><%= link_to "Hi," + "  " + session[:username] %></li>

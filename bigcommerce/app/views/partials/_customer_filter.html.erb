@@ -1,10 +1,5 @@
-<div class="form-group" style="margin-left:300px;margin-top:50px;">
-<%= form_tag({:controller => "models", :action => customer_filter_path}, {:method => "get"}) do %>
-	<div class="col-xs-4">
+<div class="col-xs-4">
    <%= text_field_tag('search', @search_text, placeholder: 'Enter Customer Name', class: 'form-control') %>
-   </div> 
-   <%= render "partials/cust_style_filter" %>
-   <%= render "partials/staff_filter" %>
-   <%= submit_tag "Filter", class: 'btn btn-primary' %>
-<% end %>
-</div>
+</div> 
+<%= render "partials/cust_style_filter" %>
+<%= render "partials/staff_filter" %>

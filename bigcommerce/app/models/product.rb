@@ -34,7 +34,7 @@ class Product < ActiveRecord::Base
 		limit = 50
 
 		product_pages = (product_count/limit) + 1
-		
+
 		page_number = 1
 
 		product_pages.times do
@@ -42,7 +42,7 @@ class Product < ActiveRecord::Base
 			products = product_api.all(page: page_number)
 
 			products.each do |p|
-				
+
 				insert_sql(p, 1)
 				ProductCategory.new.insert(p.id, p.categories)
 
@@ -128,8 +128,8 @@ class Product < ActiveRecord::Base
 
 		page_number = 1
 
-		product_pages.times do 
-			
+		product_pages.times do
+
 			products = product_api.all(min_date_modified: update_time, page: page_number)
 
 			if products.blank?
@@ -138,10 +138,10 @@ class Product < ActiveRecord::Base
 
 			products.each do |p|
 
-				
+
 
 				if Product.where(id: p.id).count == 1
-				
+
 					insert_sql(p, 0)
 				else
 					insert_sql(p, 1)
@@ -258,14 +258,16 @@ class Product < ActiveRecord::Base
 	end
 
 
+	def self.group_by_product_id
+		group(:id)
+	end
+
 	# transform column is no_vintage_id, no_ws_id
-	def self.product_price(transform_column)
-		if transform_column == 'group_by_id'
-			pluck("id, calculated_price").to_h
-		else
-			send(transform_column).average(:calculated_price).merge\
-			(self.where(retail_ws: 'WS').send(transform_column).average(:calculated_price))
-		end
+	def self.product_price(group_by_transform_column)
+
+		send(group_by_transform_column).average(:calculated_price).merge\
+		(self.where(retail_ws: 'WS').send(group_by_transform_column).average('calculated_price * 1.29'))
+
 	end
 
 end
