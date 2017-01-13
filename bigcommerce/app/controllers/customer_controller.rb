@@ -140,8 +140,6 @@ class CustomerController < ApplicationController
 		
 		@price_h, @product_name_h = top_products_transform(@transform_column, @product_ids)
 
-    #@product_ids = @product_name_h.sort_by {|id, val| val}.map {|product| product[0]}
-
     # Sort by name/price
     ####################################
     # PUT THIS IN A LIB
@@ -150,10 +148,12 @@ class CustomerController < ApplicationController
       # @name_h or @price_h are the structure {id => val}
       # sort the hash using the val, then get the product_ids in order using map
       hash_to_be_sorted = sort_column_map[params[:order_col]] || @product_name_h
+      sorted_hash = hash_to_be_sorted.sort_by {|id, val| val}
+      
       if params[:direction].to_i == 1
-        @product_ids = hash_to_be_sorted.sort_by {|id, val| val}.map {|product| product[0]}
+        @product_ids = sorted_hash.map {|product| product[0]}
       else
-        @product_ids = hash_to_be_sorted.sort_by {|id, val| val}.reverse.map {|product| product[0]}
+        @product_ids = sorted_hash.reverse.map {|product| product[0]}
       end
     end
     ####################################
