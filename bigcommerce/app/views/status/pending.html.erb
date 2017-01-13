@@ -1,0 +1,37 @@
+<%= title @status_name %>
+
+<%= render "partials/status_dropdown", path_name: 'pending' %>
+
+<center>
+  <div>
+  	<button class="button default inline orders-view" id="orders-view-button">Orders View</button>
+  	<button class="button not-default inline products-view" id="products-view-button">Products View</button>
+  </div>
+</center>
+
+<div class="form-group" style="margin-top:100px;">
+<%= form_tag({:controller => "status", :action => "pending"}, {:method => "get"}) do %>
+
+	<div class="col-xs-3">
+	  <%= text_field_tag('search', @search_text, placeholder: 'Search for Product Name', class: 'form-control') %>
+	</div>
+	<div class="col-xs-2">
+	    <%= collection_select(:producer_country, :id, ProducerCountry.all, :id, :name, {:include_blank => 'All Countries'}, {:class => 'form-control'}) %>
+	</div>   
+	<div class="col-xs-3">
+	    <%= collection_select(:product_sub_type, :id, ProductSubType.all, :id, :name, {:include_blank => 'All Varietals'}, {:class => 'form-control'}) %>
+	</div>
+	<%= render "partials/staff_filter" %>
+
+   	<%= hidden_field_tag :status_id, @status_id %>
+   	<%= hidden_field_tag :status_name, @status_name %>
+   
+    <%= submit_tag "Filter", class: 'btn btn-primary' %>
+<% end %>
+</div><br/>
+
+<h3 id="orders-view-heading" class="orders-view default"><%= @status_name %> Orders</h3>
+<%= render "partials/order", orders: @orders, display_class: "none", product_ids: nil %>
+
+<h3 id="products-view-heading" class="products-view not-default" style="text-align: center;"><%= @status_name %> Products</h3>
+<%= render "partials/product_status", products: @products %>

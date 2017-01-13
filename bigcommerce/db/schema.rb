@@ -11,6 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+
 ActiveRecord::Schema.define(version: 20170109025728) do
 
   create_table "addresses", force: :cascade do |t|
@@ -482,6 +483,10 @@ ActiveRecord::Schema.define(version: 20170109025728) do
     t.integer  "can_update",      limit: 1
     t.string   "contact_email",   limit: 255, null: false
     t.string   "contact_phone",   limit: 255, null: false
+<<<<<<< HEAD
+=======
+    t.integer  "pending_orders",  limit: 1
+>>>>>>> product_variations
   end
 
   add_index "staffs", ["active"], name: "index_staffs_on_active", using: :btree
@@ -634,7 +639,6 @@ ActiveRecord::Schema.define(version: 20170109025728) do
     t.string   "contact_name",       limit: 255
     t.string   "status",             limit: 255
     t.string   "line_amount_type",   limit: 255
-    t.string   "type",               limit: 255
     t.decimal  "sub_total",                      precision: 8, scale: 2
     t.decimal  "total",                          precision: 8, scale: 2
     t.decimal  "total_tax",                      precision: 8, scale: 2
@@ -648,13 +652,13 @@ ActiveRecord::Schema.define(version: 20170109025728) do
     t.boolean  "sent_to_contact"
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
+    t.string   "note",               limit: 255
   end
 
   add_index "xero_credit_notes", ["contact_name"], name: "index_xero_credit_notes_on_xero_contact_name", using: :btree
   add_index "xero_credit_notes", ["credit_note_number"], name: "index_xero_credit_notes_on_credit_note_number", using: :btree
   add_index "xero_credit_notes", ["line_amount_type"], name: "index_xero_credit_notes_on_line_amount_type", using: :btree
   add_index "xero_credit_notes", ["status"], name: "index_xero_credit_notes_on_status", using: :btree
-  add_index "xero_credit_notes", ["type"], name: "index_xero_credit_notes_on_type", using: :btree
   add_index "xero_credit_notes", ["xero_contact_id"], name: "index_xero_credit_notes_on_xero_contact_id", using: :btree
   add_index "xero_credit_notes", ["xero_credit_note_id"], name: "index_xero_credit_notes_on_xero_credit_note_id", using: :btree
 
@@ -736,8 +740,6 @@ ActiveRecord::Schema.define(version: 20170109025728) do
   add_index "xero_op_allocations", ["xero_overpayment_id"], name: "index_xero_op_allocations_on_xero_overpayment_id", using: :btree
 
   create_table "xero_overpayments", primary_key: "xero_overpayment_id", force: :cascade do |t|
-    t.string   "xero_invoice_id",   limit: 36,                 null: false
-    t.string   "invoice_number",    limit: 255
     t.string   "xero_contact_id",   limit: 36,                 null: false
     t.string   "contact_name",      limit: 255
     t.decimal  "sub_total",                     precision: 10
@@ -746,18 +748,16 @@ ActiveRecord::Schema.define(version: 20170109025728) do
     t.decimal  "remaining_credit",              precision: 10
     t.datetime "date"
     t.datetime "updated_date"
-    t.string   "type",              limit: 255
     t.string   "status",            limit: 255
     t.string   "line_amount_types", limit: 255
     t.string   "currency_code",     limit: 255
     t.boolean  "has_attachments"
     t.datetime "created_at",                                   null: false
     t.datetime "updated_at",                                   null: false
+    t.string   "note",              limit: 255
   end
 
-  add_index "xero_overpayments", ["invoice_number"], name: "index_xero_overpayments_on_invoice_number", using: :btree
   add_index "xero_overpayments", ["xero_contact_id"], name: "index_xero_overpayments_on_xero_contact_id", using: :btree
-  add_index "xero_overpayments", ["xero_invoice_id"], name: "index_xero_overpayments_on_xero_invoice_id", using: :btree
   add_index "xero_overpayments", ["xero_overpayment_id"], name: "index_xero_overpayments_on_xero_overpayment_id", using: :btree
 
   create_table "xero_payments", primary_key: "xero_payment_id", force: :cascade do |t|

@@ -1,44 +1,34 @@
-<% if products.count >= @per_page.to_i %>
-<div class="form-group">
-
-	<div class="col-xs-3 col-xs-offset-7">
-		<%= will_paginate products, :inner_window => 1, :outer_window => 1 %>  |
-	</div>
-
-	<div class="col-xs-2" style="margin-top: 20px;margin-left: -45px;">
-		<span style="float: left;">Per Page</span>
-		<span style="float: left;margin-left: 10px;margin-top: -5px;">
-		<%= select_tag :per_page, options_for_select([15,30,50,100], @per_page.to_i), :onchange => "if(this.value){window.location='?per_page='+this.value;}", :class => "form-control" %>
-		</span>
-	</div>
-</div>
-<% end %>
+<%= render "partials/paginate", objects: @product_ids %>
 
 <table class = "table table-striped table-bordered table-hover table-responsive">
 	<tr>
-		<th>ID <%= render "partials/sort_arrows", order: 'order_by_id' %></th>
-		<th>Product Name <%= render "partials/sort_arrows", order: 'order_by_name' %></th>
-		<th>Price ( Ex GST ) <%= render "partials/sort_arrows", order: 'order_by_price' %></th>
-		<th>Stock <%= render "partials/sort_arrows", order: 'order_by_stock' %></th>
+		<th>ID</th>
+		<th>Product Name <%= render "partials/sort_arrows", order: 0 %></th>
+		<th>Price ( Ex GST ) <%= render "partials/sort_arrows", order: 1 %></th>
+		<th>Stock <%= render "partials/sort_arrows", order: 2 %></th>
 		<th>Pending Stock</th>
 		<th>Total Stock</th>
 	</tr>
 
-	<% products.each do |p| %>
-	<tr>
-		<td><%= p.id %></td>
-		<% pending_stock = exists_in_h_int(pending_stock_h, p.id) %>
-		<td><%= link_to p.name, controller: 'sales', action: 'stats_and_top_customers_for_product', product_id: p.id, product_name: p.name, total_stock: pending_stock + p.inventory %></td>
-		<td class="num"><%= display_num(calculate_product_price(p.calculated_price, p.retail_ws)) %></td>
-		<td clas = "num" ><%= p.inventory %></td>
-		<td class = "num"><%= link_to pending_stock, controller: 'sales', action: 'orders_and_stats_for_product_and_status', status_id: 1, status_name: "Pending", product_id: p.id, product_name: p.name, num_orders: nil, qty: p.inventory, status_qty: pending_stock, total: nil %></td>
-		<td class="num"><%= pending_stock + p.inventory %></td>
-	</tr>
+
+	<% @product_ids.each do |id| %>
+		<tr>
+			<td><%= id %></td>
+
+			<td><%= link_to @name_h[id], controller: 'product', action: 'summary',\
+			product_id: id, product_name: @name_h[id], transform_column: @transform_column,\
+			total_stock: @pending_stock_h[id].to_i + @stock_h[id].to_i, pending_stock: @pending_stock_h[id].to_i %></td>
+
+			<td class="num"><%= display_num(@price_h[id]) %></td>
+			<td clas = "num" ><%= @stock_h[id] %></td>
+			<td clas = "num" ><%= @pending_stock_h[id].to_i %></td>
+			<td clas = "num" ><%= @pending_stock_h[id].to_i + @stock_h[id].to_i %></td>
+		</tr>
 
 	<% end %>
 
 </table>
 
 <span style="float:right;">
-<%#= paginate(products) %>
+<%= paginate(@product_ids) %>
 </span>
