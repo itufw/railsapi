@@ -111,7 +111,7 @@ class CustomerController < ApplicationController
   	@producer_country, @product_sub_type, products, @search_text = product_filter(params)
 
   	# which view of products needs to be displayed - normal products, or no vintage products, etc.
-		@transform_column = params[:transform_column] || "product_id"
+		@transform_column = params[:transform_column] || "product_no_vintage_id"
   	@checked_id, @checked_no_vintage, @checked_no_ws = checked_radio_button(@transform_column)
 
   	# Get top products
