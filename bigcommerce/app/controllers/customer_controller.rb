@@ -103,6 +103,18 @@ class CustomerController < ApplicationController
     end
   end
 
+  def update_staff
+    customer_id = params[:customer_id]
+    staff_id = params[:staff_id]
+
+    Customer.staff_change(staff_id, customer_id)
+
+    #render html: "#{customer_id}, #{staff_id}".html_safe
+    flash[:success] = "Staff Successfully Changed."
+    redirect_to request.referrer
+
+  end
+
 	# Displays Stats for all the products the customer has ordered
 	def top_products
   	get_id_and_name(params)
@@ -128,21 +140,21 @@ class CustomerController < ApplicationController
 		
 		@price_h, @product_name_h = top_products_transform(@transform_column, @product_ids)
 
-    # Sort by name/price
-    ####################################
-    # PUT THIS IN A LIB
-    unless sorted_bool
-      sort_column_map = {"0" => @product_name_h, "1" => @price_h}
-      # @name_h or @price_h are the structure {id => val}
-      # sort the hash using the val, then get the product_ids in order using map
-      hash_to_be_sorted = sort_column_map[params[:order_col]] || @product_name_h
-      if params[:direction].to_i == 1
-        @product_ids = hash_to_be_sorted.sort_by {|id, val| val}.map {|product| product[0]}
-      else
-        @product_ids = hash_to_be_sorted.sort_by {|id, val| -val}.map {|product| product[0]}
-      end
-    end
-    ####################################
+    # # Sort by name/price
+    # ####################################
+    # # PUT THIS IN A LIB
+    # unless sorted_bool
+    #   sort_column_map = {"0" => @product_name_h, "1" => @price_h}
+    #   # @name_h or @price_h are the structure {id => val}
+    #   # sort the hash using the val, then get the product_ids in order using map
+    #   hash_to_be_sorted = sort_column_map[params[:order_col]] || @product_name_h
+    #   if params[:direction].to_i == 1
+    #     @product_ids = hash_to_be_sorted.sort_by {|id, val| val}.map {|product| product[0]}
+    #   else
+    #     @product_ids = hash_to_be_sorted.sort_by {|id, val| -val}.map {|product| product[0]}
+    #   end
+    # end
+    # ####################################
 	end
 
   private
