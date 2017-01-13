@@ -13,7 +13,7 @@
 
 	<% customers.each do |c| %>
 	<tr>
-		<td><%= staff_nickname_direct(c.staff) %></td>
+		<%= render "partials/staff_update_form", customer: c, staff: c.staff, can_update_staff: allow_to_update(session[:user_id]) %>
 
 		<% cust_name = customer_name(c) %>
 		<td><%= link_to cust_name, controller: 'customer', action: 'summary', customer_id: c.id, customer_name: cust_name %></td>
