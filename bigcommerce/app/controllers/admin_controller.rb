@@ -94,4 +94,8 @@ class AdminController < ApplicationController
 
   end
 
+  def password_update
+    
+  end
+
 end
