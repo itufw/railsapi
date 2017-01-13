@@ -82,6 +82,7 @@ class SalesController < ApplicationController
   end
 
 
+  #***************************************
   # How do we come to this page ? - We click on Order ID - then click on any one of the products
   # Displays Orders when selected customer ordered selected product and shows overall product stats
   # (money spent on that product by customer)
