@@ -67,6 +67,17 @@ module ModelsFilter
 
   end
 
+  def contact_param_filter(params)
+    search_text = params[:search]
+
+    contacts = XeroContact.search_filter(search_text)
+
+    return contacts, search_text
+
+  end
+
+
+
   def collection_param_filter(params, field, model)
     if !params[field].nil? && !params[field][:id].empty?
       field_id = params[field][:id]

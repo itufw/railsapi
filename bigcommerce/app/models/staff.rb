@@ -3,7 +3,6 @@ require 'csv'
 class Staff < ActiveRecord::Base
 	has_many :customers
 	has_many :orders
-	has_many :notes
 
 	has_many :staff_time_periods
 	has_one :default_average_period
