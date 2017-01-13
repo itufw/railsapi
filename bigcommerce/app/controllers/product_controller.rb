@@ -97,7 +97,7 @@ class ProductController < ApplicationController
   	end
 
   	def transform(params)
-  	  @transform_column = params[:transform_column] || "product_id"
+  	  @transform_column = params[:transform_column] || "product_no_vintage_id"
 	    @checked_id, @checked_no_vintage, @checked_no_ws = checked_radio_button(@transform_column)
 	  end
 
