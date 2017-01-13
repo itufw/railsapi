@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161117020802) do
+ActiveRecord::Schema.define(version: 20170109025728) do
 
   create_table "addresses", force: :cascade do |t|
     t.integer  "customer_id", limit: 4
@@ -31,6 +31,12 @@ ActiveRecord::Schema.define(version: 20161117020802) do
   end
 
   add_index "addresses", ["customer_id"], name: "index_addresses_on_customer_id", using: :btree
+
+  create_table "ar_internal_metadata", primary_key: "key", force: :cascade do |t|
+    t.string   "value",      limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "average_periods", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -55,6 +61,11 @@ ActiveRecord::Schema.define(version: 20161117020802) do
   end
 
   add_index "categories", ["parent_id"], name: "index_categories_on_parent_id", using: :btree
+
+  create_table "contacts", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "coupons", force: :cascade do |t|
     t.text     "name",       limit: 255, null: false
@@ -469,6 +480,8 @@ ActiveRecord::Schema.define(version: 20161117020802) do
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
     t.integer  "can_update",      limit: 1
+    t.string   "contact_email",   limit: 255, null: false
+    t.string   "contact_phone",   limit: 255, null: false
   end
 
   add_index "staffs", ["active"], name: "index_staffs_on_active", using: :btree
@@ -491,6 +504,35 @@ ActiveRecord::Schema.define(version: 20161117020802) do
     t.datetime "updated_at",              null: false
     t.integer  "valid_order", limit: 1
     t.integer  "xero_import", limit: 1
+  end
+
+  create_table "task_activities", force: :cascade do |t|
+    t.integer  "task_id",    limit: 4
+    t.text     "log",        limit: 65535
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  create_table "task_relations", force: :cascade do |t|
+    t.integer  "task_id",       limit: 4
+    t.integer  "contact_id",    limit: 4
+    t.integer  "customer_id",   limit: 4
+    t.integer  "cust_group_id", limit: 4
+    t.integer  "staff_id",      limit: 4
+    t.integer  "type",          limit: 4
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
+  create_table "tasks", force: :cascade do |t|
+    t.string   "subject",    limit: 255
+    t.string   "priority",   limit: 255
+    t.text     "content",    limit: 65535
+    t.datetime "start_date",               null: false
+    t.datetime "end_date",                 null: false
+    t.string   "status",     limit: 255
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
   end
 
   create_table "tax_percentages", force: :cascade do |t|

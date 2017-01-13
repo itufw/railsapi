@@ -1,11 +1,12 @@
 require 'xero_controller_helper.rb'
 require 'xero_invoice_calculations.rb'
+require 'xero_connection.rb'
 
 class XeroController < ApplicationController
 
 	include XeroControllerHelper
 	include XeroInvoiceCalculations
-	
+
 	def link_bigc_xero_contact
 		Customer.xero_contact_id_is_null.each {|c| link_skype_id(c.id)}
 		#Customer.xero_contact_id_is_null.each {|c| link_skype_id_by_customer_name(c.id, c.actual_name)}
