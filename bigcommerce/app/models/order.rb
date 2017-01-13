@@ -314,7 +314,7 @@ class Order < ActiveRecord::Base
 		includes(:customer).order('customers.actual_name ' + direction)
 	end
 
-	def self.order_by_b(direction)
+	def self.order_by_staff(direction)
 		includes(:staff).order('staffs.nickname ' + direction)
 	end
 

@@ -6,7 +6,6 @@ class Customer < ActiveRecord::Base
 	include CleanData
 	has_many :orders
 	has_many :addresses
-	has_many :notes
 	belongs_to :cust_type
 	belongs_to :cust_group
 	belongs_to :cust_style
@@ -147,6 +146,10 @@ class Customer < ActiveRecord::Base
 
 	def self.filter_by_id(id)
 		find(id.to_i)
+	end
+
+	def self.filter_by_contact_id(id)
+		where("xero_contact_id = '#{id}'").first
 	end
 
 	def self.filter_by_ids(ids_array)

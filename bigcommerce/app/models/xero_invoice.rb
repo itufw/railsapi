@@ -93,7 +93,6 @@ class XeroInvoice < ActiveRecord::Base
 
 		  			XeroInvoiceLineItem.new.download_data_from_api(i.line_items, i.invoice_id, i.invoice_number)
 
-						XeroContact.update_balances_from_xero(i.contact_id)
 		  		end
 	  		end
 
@@ -191,5 +190,9 @@ class XeroInvoice < ActiveRecord::Base
 
 		def self.has_amount_due
 			where('xero_invoices.amount_due > 0')
+		end
+
+		def self.period_select(until_date)
+			where("(xero_invoices.date < '#{until_date}' or xero_invoices.due_date < '#{until_date}') and xero_invoices.amount_due > 0 ")
 		end
 end
