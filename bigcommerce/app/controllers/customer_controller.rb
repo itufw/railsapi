@@ -140,6 +140,8 @@ class CustomerController < ApplicationController
 		
 		@price_h, @product_name_h = top_products_transform(@transform_column, @product_ids)
 
+    @product_ids = @product_name_h.sort_by {|id, val| val}.map {|product| product[0]}
+
     # # Sort by name/price
     # ####################################
     # # PUT THIS IN A LIB
