@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161117020802) do
+ActiveRecord::Schema.define(version: 20170113012329) do
 
   create_table "addresses", force: :cascade do |t|
     t.integer  "customer_id", limit: 4
@@ -31,6 +31,12 @@ ActiveRecord::Schema.define(version: 20161117020802) do
   end
 
   add_index "addresses", ["customer_id"], name: "index_addresses_on_customer_id", using: :btree
+
+  create_table "ar_internal_metadata", primary_key: "key", force: :cascade do |t|
+    t.string   "value",      limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "average_periods", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -55,6 +61,11 @@ ActiveRecord::Schema.define(version: 20161117020802) do
   end
 
   add_index "categories", ["parent_id"], name: "index_categories_on_parent_id", using: :btree
+
+  create_table "contacts", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "coupons", force: :cascade do |t|
     t.text     "name",       limit: 255, null: false
@@ -469,6 +480,9 @@ ActiveRecord::Schema.define(version: 20161117020802) do
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
     t.integer  "can_update",      limit: 1
+    t.string   "contact_email",   limit: 255, null: false
+    t.string   "contact_phone",   limit: 255, null: false
+    t.integer  "pending_orders",  limit: 1
   end
 
   add_index "staffs", ["active"], name: "index_staffs_on_active", using: :btree
@@ -491,6 +505,35 @@ ActiveRecord::Schema.define(version: 20161117020802) do
     t.datetime "updated_at",              null: false
     t.integer  "valid_order", limit: 1
     t.integer  "xero_import", limit: 1
+  end
+
+  create_table "task_activities", force: :cascade do |t|
+    t.integer  "task_id",    limit: 4
+    t.text     "log",        limit: 65535
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  create_table "task_relations", force: :cascade do |t|
+    t.integer  "task_id",       limit: 4
+    t.integer  "contact_id",    limit: 4
+    t.integer  "customer_id",   limit: 4
+    t.integer  "cust_group_id", limit: 4
+    t.integer  "staff_id",      limit: 4
+    t.integer  "type",          limit: 4
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
+  create_table "tasks", force: :cascade do |t|
+    t.string   "subject",    limit: 255
+    t.string   "priority",   limit: 255
+    t.text     "content",    limit: 65535
+    t.datetime "start_date",               null: false
+    t.datetime "end_date",                 null: false
+    t.string   "status",     limit: 255
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
   end
 
   create_table "tax_percentages", force: :cascade do |t|
@@ -592,7 +635,6 @@ ActiveRecord::Schema.define(version: 20161117020802) do
     t.string   "contact_name",       limit: 255
     t.string   "status",             limit: 255
     t.string   "line_amount_type",   limit: 255
-    t.string   "type",               limit: 255
     t.decimal  "sub_total",                      precision: 8, scale: 2
     t.decimal  "total",                          precision: 8, scale: 2
     t.decimal  "total_tax",                      precision: 8, scale: 2
@@ -606,13 +648,13 @@ ActiveRecord::Schema.define(version: 20161117020802) do
     t.boolean  "sent_to_contact"
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
+    t.string   "note",               limit: 255
   end
 
   add_index "xero_credit_notes", ["contact_name"], name: "index_xero_credit_notes_on_xero_contact_name", using: :btree
   add_index "xero_credit_notes", ["credit_note_number"], name: "index_xero_credit_notes_on_credit_note_number", using: :btree
   add_index "xero_credit_notes", ["line_amount_type"], name: "index_xero_credit_notes_on_line_amount_type", using: :btree
   add_index "xero_credit_notes", ["status"], name: "index_xero_credit_notes_on_status", using: :btree
-  add_index "xero_credit_notes", ["type"], name: "index_xero_credit_notes_on_type", using: :btree
   add_index "xero_credit_notes", ["xero_contact_id"], name: "index_xero_credit_notes_on_xero_contact_id", using: :btree
   add_index "xero_credit_notes", ["xero_credit_note_id"], name: "index_xero_credit_notes_on_xero_credit_note_id", using: :btree
 
@@ -694,8 +736,6 @@ ActiveRecord::Schema.define(version: 20161117020802) do
   add_index "xero_op_allocations", ["xero_overpayment_id"], name: "index_xero_op_allocations_on_xero_overpayment_id", using: :btree
 
   create_table "xero_overpayments", primary_key: "xero_overpayment_id", force: :cascade do |t|
-    t.string   "xero_invoice_id",   limit: 36,                 null: false
-    t.string   "invoice_number",    limit: 255
     t.string   "xero_contact_id",   limit: 36,                 null: false
     t.string   "contact_name",      limit: 255
     t.decimal  "sub_total",                     precision: 10
@@ -704,18 +744,16 @@ ActiveRecord::Schema.define(version: 20161117020802) do
     t.decimal  "remaining_credit",              precision: 10
     t.datetime "date"
     t.datetime "updated_date"
-    t.string   "type",              limit: 255
     t.string   "status",            limit: 255
     t.string   "line_amount_types", limit: 255
     t.string   "currency_code",     limit: 255
     t.boolean  "has_attachments"
     t.datetime "created_at",                                   null: false
     t.datetime "updated_at",                                   null: false
+    t.string   "note",              limit: 255
   end
 
-  add_index "xero_overpayments", ["invoice_number"], name: "index_xero_overpayments_on_invoice_number", using: :btree
   add_index "xero_overpayments", ["xero_contact_id"], name: "index_xero_overpayments_on_xero_contact_id", using: :btree
-  add_index "xero_overpayments", ["xero_invoice_id"], name: "index_xero_overpayments_on_xero_invoice_id", using: :btree
   add_index "xero_overpayments", ["xero_overpayment_id"], name: "index_xero_overpayments_on_xero_overpayment_id", using: :btree
 
   create_table "xero_payments", primary_key: "xero_payment_id", force: :cascade do |t|

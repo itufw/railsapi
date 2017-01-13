@@ -92,7 +92,7 @@ class ProductController < ApplicationController
   	end
 
   	def filter(params)
-  		@producer_country, @product_sub_type, products, @search_text = product_param_filter(params)
+  		@producer_country, @product_sub_type, products, @search_text = product_filter(params)
   		return products
   	end
 

@@ -99,6 +99,15 @@ module ApplicationHelper
     return hash.values.sum
   end
 
+  def calculate_product_price(product_calculated_price, retail_ws)
+    if retail_ws == 'WS'
+      return product_calculated_price * 1.29
+    else
+      return product_calculated_price
+    end
+
+  end
+
   # Takes input staff id and a Hash like {[staff_id, date] => sum}
   # Returns a Hash like {date => sum} for that particular staff_id
   # Here sum can be order_totals/qty..etc for that particular staff on that date

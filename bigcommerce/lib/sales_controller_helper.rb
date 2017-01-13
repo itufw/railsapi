@@ -18,13 +18,25 @@ module SalesControllerHelper
     end
   end
 
+  def order_sum_param(selected)
+    sum_params_h = {"Order Totals" => :sum_total, "Bottles" => :sum_qty,\
+     "Number of Orders" => :count_orders, "Avg. Order Total" => :avg_order_total,\
+      "Avg. Bottles" => :avg_order_qty}
+
+    if selected.nil?
+      return sum_params_h["Order Totals"], "Order Totals", sum_params_h.keys 
+    else
+      return sum_params_h[selected], selected, sum_params_h.keys
+    end
+  end
+
   # Returns a array like
   # [[product_id, [number_of_orders, status_qty, orders_dollar_sum, product_name, product_stock]]
   def products_for_status(status_id, staff_id, product_ids)
     # Now I need to make a hash like from orders
     #{product_id => [number_of_orders, status_qty, orders_dollar_sum, product_name, product_stock]}
 
-    filter_string = "Order.status_filter(%s).staff_filter(%s).product_filter(%s)" % [status_id, return_nil_string(staff_id), product_ids]
+    filter_string = "Order.status_filter(%s).staff_filter(%s).order_product_filter(%s)" % [status_id, return_nil_string(staff_id), product_ids]
 
     # This returns a hash like {product_id => number_orders}
     num_orders = (eval filter_string).group_by_product_id.count_order_id_from_order_products
