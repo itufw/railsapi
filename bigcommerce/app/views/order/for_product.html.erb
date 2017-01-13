@@ -3,14 +3,15 @@
 
 
 <div class="form-group container-fluid" style="margin-top: 50px;">
-	<%= form_tag({:controller => "sales", :action => "orders_for_product"}, {:method => "get"}) do %>
+	<%= form_tag({:controller => "order", :action => "for_product"}, {:method => "get"}) do %>
 
 	<%= render "partials/order_filter" %>
 
 	<%= hidden_field_tag :product_id, @product_id %>
    	<%= hidden_field_tag :product_name, @product_name %>
+   	<%= hidden_field_tag :transform_column, @transform_column %>
    	<%= submit_tag "Filter", class: 'btn btn-primary' %>
 <% end %>
 </div>
 
-<%= render "partials/order", orders: @orders, display_class: "" %>
+<%= render "partials/order", orders: @orders, product_ids: @product_ids, display_class: "" %>

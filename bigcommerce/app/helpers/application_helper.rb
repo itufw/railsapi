@@ -7,8 +7,13 @@ module ApplicationHelper
 
   # Displays a number with 2 precision and with commas
   def display_num(value)
-	number_with_delimiter(number_with_precision(value, precision: 2))
+	 number_with_delimiter(number_with_precision(value, precision: 2))
   end
+
+  def display_overall_stat(value, sum_param)
+    return sum_param == "Qty" ? number_with_delimiter(value) : display_num(value)
+  end
+
 
   # Displays a date in the form 'Day of the week, Day/Month/Year'
   def date_format(date)
@@ -78,29 +83,12 @@ module ApplicationHelper
     end
   end
 
-  def calculate_product_price(product_calculated_price, retail_ws)
-    if retail_ws == 'WS'
-      return product_calculated_price * 1.29
-    else
-      return product_calculated_price
-    end
-
-  end
-
   def convert_empty_string_to_int(val)
     if val.to_s.strip.empty?
       return 0
     else
       return val
     end
-  end
-
-  def sum_order_products_qty(order_products)
-    sum = 0
-    order_products.each do |op|
-      sum += op.qty
-    end
-    return sum
   end
 
   def since_days(date_today, num_days)
@@ -111,25 +99,13 @@ module ApplicationHelper
     return hash.values.sum
   end
 
-  def outstanding_customer(xero_contact)
-    XeroContact.get_accounts_receivable_outstanding(xero_contact)
-  end
+  def calculate_product_price(product_calculated_price, retail_ws)
+    if retail_ws == 'WS'
+      return product_calculated_price * 1.29
+    else
+      return product_calculated_price
+    end
 
-  def overdue_customer(xero_contact)
-    XeroContact.get_accounts_receivable_overdue(xero_contact)
-  end
-
-  def invoice_status(xero_invoice)
-    return XeroInvoice.paid(xero_invoice) || XeroInvoice.unpaid(xero_invoice) \
-    || XeroInvoice.partially_paid(xero_invoice) || [" ", " "]
-  end
-
-  def customer_type_name(customer)
-    customer.cust_type.name unless customer.cust_type_id.nil?
-  end
-
-  def customer_style_name(customer)
-    customer.cust_style.name unless customer.cust_style_id.nil?
   end
 
   # Takes input staff id and a Hash like {[staff_id, date] => sum}

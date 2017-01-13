@@ -4,6 +4,8 @@ class OrderProduct < ActiveRecord::Base
 
 	belongs_to :order_shipping
 
+	delegate :status, to: :order, allow_nil: true
+
 	def insert(order_id)
 
 		order_product_api = Bigcommerce::OrderProduct
@@ -42,6 +44,48 @@ class OrderProduct < ActiveRecord::Base
 
 	def self.total_qty(order_product_id)
 		return find(order_product_id).qty
+	end
+
+	def self.order_customer_filter(customer_ids)
+		return includes(:order).where('orders.customer_id IN (?)', customer_ids).references(:orders) unless (customer_ids.nil? or  customer_ids.empty?)
+		return all
+	end
+
+	def self.valid_orders
+		includes([{:order => :status}]).where('statuses.valid_order = 1').references(:statuses)
+	end
+
+	def self.product_filter(product_ids)
+		where('product_id IN (?)', product_ids)
+	end
+
+	def self.date_filter(start_date, end_date)
+		if (!start_date.nil? && !end_date.nil?)
+			if !start_date.to_s.empty? && !end_date.to_s.empty?
+			  start_time = Time.parse(start_date.to_s)
+	          end_time = Time.parse(end_date.to_s)
+
+			  return includes(:order).where('orders.date_created >= ? and orders.date_created <= ?', start_time.strftime("%Y-%m-%d %H:%M:%S"), end_time.strftime("%Y-%m-%d %H:%M:%S")).references(:orders)
+			end
+		end
+		return all
+	end
+
+
+	def self.group_by_product_id
+		includes(:product).group('products.id').references(:products)
+	end
+
+	def self.group_by_product_no_vintage_id
+		includes(:product).group('products.product_no_vintage_id').references(:products)
+	end
+
+	def self.group_by_product_no_ws_id
+		includes(:product).group('products.product_no_ws_id').references(:products)
+	end
+
+	def self.sum_qty
+		sum('order_products.qty')
 	end
 
 end
