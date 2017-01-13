@@ -482,6 +482,7 @@ ActiveRecord::Schema.define(version: 20170113000835) do
     t.integer  "can_update",      limit: 1
     t.string   "contact_email",   limit: 255, null: false
     t.string   "contact_phone",   limit: 255, null: false
+    t.integer  "pending_orders",  limit: 1
   end
 
   add_index "staffs", ["active"], name: "index_staffs_on_active", using: :btree

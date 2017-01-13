@@ -1,5 +1,6 @@
 require 'xero_controller_helper.rb'
 require 'xero_invoice_calculations.rb'
+require 'xero_connection.rb'
 
 class XeroController < ApplicationController
 

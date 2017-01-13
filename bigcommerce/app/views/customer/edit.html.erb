@@ -2,7 +2,7 @@
 <h3>Edit <%= @customer_name %></h3>
 <br/>
 
-<%= form_for @customer, url: {action: "update_customer"}, method: "POST", html: {class: "form-group", style: "padding-left: 50px;"} do |f| %>
+<%= form_for @customer, url: {action: "update"}, method: "POST", html: {class: "form-group", style: "padding-left: 50px;"} do |f| %>
 
   <%= f.hidden_field :id %>
 
@@ -33,4 +33,4 @@
   <%= f.submit "Update", class: 'btn btn-primary' %>
 <% end %>
 
-<p style="padding-left: 50px;"><%= link_to "Go Back to Customer Profile", controller: 'sales', action: 'orders_and_stats_for_customer', customer_id: @customer.id, customer_name: @customer_name %></p>
+<p style="padding-left: 50px;"><%= link_to "Go Back to Customer Profile", action: 'summary', customer_id: @customer_id, customer_name: @customer_name %></p>
