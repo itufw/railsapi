@@ -108,7 +108,7 @@ class CustomerController < ApplicationController
   	get_id_and_name(params)
 
   	# filter products based on params
-  	@producer_country, @product_sub_type, products, @search_text = product_param_filter(params)
+  	@producer_country, @product_sub_type, products, @search_text = product_filter(params)
 
   	# which view of products needs to be displayed - normal products, or no vintage products, etc.
 		@transform_column = params[:transform_column] || "product_id"
