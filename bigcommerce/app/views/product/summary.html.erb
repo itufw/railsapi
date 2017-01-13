@@ -49,7 +49,7 @@
 
 	<% @customer_ids.each do |id| %>
 	<tr>
-		<td><%= customer_name(@top_customers[id]) %></td>
+		<td><%= link_to customer_name(@top_customers[id]), controller: 'customer', action: 'summary_with_product', product_id: @product_id, product_name: @product_name, customer_id: id, customer_name: customer_name(@top_customers[id]), transform_column: @transform_column %></td>
 		<td><%= staff_nickname(@top_customers[id]) %></td>
 		<td><%= customer_style_name(@top_customers[id]) %></td>
 		<% @time_periods.each do |t| %>
