@@ -1,19 +1,16 @@
+require 'models_filter.rb'
+require 'accounts_helper.rb'
+require 'dates_helper.rb'
+
 class AccountsController < ApplicationController
 
   before_action :confirm_logged_in
 
   include ModelsFilter
   include AccountsHelper
-  include DisplayHelper
-  include ProductVariations
   include DatesHelper
 
-  def overdue_table
-
-  end
-
   def contacts
-    # @start_date_select = { "date(1i)" => 2010, "date(2i)" => 01, "date(3i)" => 01}
     @end_date = return_end_date_invoices(params[:end_date])
 
     @per_page = params[:per_page] || XeroContact.per_page
@@ -26,9 +23,6 @@ class AccountsController < ApplicationController
 
     contacts, @search_text = contact_param_filter(params)
     @contacts = contacts.outstanding_is_greater_zero.period_select(@end_date).send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
-
-    # @staff, customers, @search_text, staff_id, @cust_style = customer_param_filter(params, session[:user_id])
-    # @customers = customers.include_all.xero_contact_is_not_null.outstanding_is_greater_zero.send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
 
     @invoices = Hash.new
     @contacts.each do |c|
@@ -53,12 +47,4 @@ class AccountsController < ApplicationController
 
   end
 
-  def show
-    respond_to do |format|
-      format.html { render :layout => false }
-      format.pdf do
-        render pdf: "pdf_invoice"
-      end
-    end
-  end
 end
