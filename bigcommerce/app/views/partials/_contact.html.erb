@@ -6,16 +6,15 @@
 		<th>Name <%= render "partials/sort_arrows", order: 'order_by_name' %></th>
 		<th>Outstanding <%= render "partials/sort_arrows", order: 'order_by_outstanding' %></th>
 		<th>Overdue <%= render "partials/sort_arrows", order: 'order_by_overdue' %></th>
-		<% @date = Date.today  %>
-		<% if "invoice_date".eql? date_column %>
+		<% @date = [Date.today,Date.strptime("#{@end_date}", '%Y-%m-%d')].min %>
+		<% if @date < Date.today %>
 			<th> <%= @date.strftime("%B")%> </th>
 		<% else %>
 			<th> Current </th>
 		<% end%>
-		<th> <%= (@date - 1.month).strftime("%B")%> </th>
-		<th> <%= (@date - 2.month).strftime("%B")%> </th>
-		<th> <%= (@date - 3.month).strftime("%B")%> </th>
-		<th> <%= (@date - 4.month).strftime("%B")%> </th>
+		<% for i in 1..4 %>
+			<th> <%= (@date - i.month).strftime("%B")%> </th>
+		<% end %>
 		<th> Older </th>
 	</tr>
 
@@ -25,13 +24,13 @@
 			<% sum_of_amount["invoice_date"] = Array.new(6){0}%>
 			<% sum_of_amount["due_date"] = Array.new(6){0}%>
 			<% invoices[c.id].each do |i| %>
-				<% interval = (Date.today.year * 12 + Date.today.month) -  (i.date.to_date.year * 12 + i.date.to_date.month)%>
+				<% interval = (@date.year * 12 + @date.month) -  (i.date.to_date.year * 12 + i.date.to_date.month)%>
 				<% if interval > 5 %>
 						<%  interval = 5 %>
 				<% elsif interval < 0 %>
 					<%  interval = 0 %>
 				<% end%>
-				<% interval_due_date = (Date.today.year * 12 + Date.today.month) -  (i.due_date.to_date.year * 12 + i.due_date.to_date.month)%>
+				<% interval_due_date = (@date.year * 12 + @date.month) -  (i.due_date.to_date.year * 12 + i.due_date.to_date.month)%>
 				<% if interval_due_date > 5 %>
 						<%  interval_due_date = 5 %>
 				<% elsif interval_due_date < 0 %>

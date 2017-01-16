@@ -19,6 +19,7 @@ class AccessController < ApplicationController
       # TODO : mark user as logged in
       session[:user_id] = authorized_user.id
       session[:username] = authorized_user.nickname
+      session[:arthority] = authorized_user.user_type
       flash[:success] = "You are now logged in."
       redirect_to controller: 'sales', action: 'sales_dashboard'
     else

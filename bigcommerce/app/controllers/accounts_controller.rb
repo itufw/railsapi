@@ -12,7 +12,6 @@ class AccountsController < ApplicationController
 
   def contacts
     @end_date = return_end_date_invoices(params[:end_date])
-
     @per_page = params[:per_page] || XeroContact.per_page
     @date_column = params[:date_column] || "due_date"
 
