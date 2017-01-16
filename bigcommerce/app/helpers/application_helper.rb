@@ -5,6 +5,10 @@ module ApplicationHelper
   	content_for(:title) { page_title }
   end
 
+  def allow_to_update(staff_id)
+      return Staff.can_update(staff_id).to_i == 1
+  end
+
   # Displays a number with 2 precision and with commas
   def display_num(value)
 	 number_with_delimiter(number_with_precision(value, precision: 2))

@@ -103,6 +103,18 @@ class CustomerController < ApplicationController
     end
   end
 
+  def update_staff
+    customer_id = params[:customer_id]
+    staff_id = params[:staff_id]
+
+    Customer.staff_change(staff_id, customer_id)
+
+    #render html: "#{customer_id}, #{staff_id}".html_safe
+    flash[:success] = "Staff Successfully Changed."
+    redirect_to request.referrer
+
+  end
+
 	# Displays Stats for all the products the customer has ordered
 	def top_products
   	get_id_and_name(params)
@@ -136,10 +148,12 @@ class CustomerController < ApplicationController
       # @name_h or @price_h are the structure {id => val}
       # sort the hash using the val, then get the product_ids in order using map
       hash_to_be_sorted = sort_column_map[params[:order_col]] || @product_name_h
+      sorted_hash = hash_to_be_sorted.sort_by {|id, val| val}
+      
       if params[:direction].to_i == 1
-        @product_ids = hash_to_be_sorted.sort_by {|id, val| val}.map {|product| product[0]}
+        @product_ids = sorted_hash.map {|product| product[0]}
       else
-        @product_ids = hash_to_be_sorted.sort_by {|id, val| -val}.map {|product| product[0]}
+        @product_ids = sorted_hash.reverse.map {|product| product[0]}
       end
     end
     ####################################

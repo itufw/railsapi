@@ -18,7 +18,8 @@
 
 	<% orders.each do |order| %>
 	<tr>
-		<td><%= staff_nickname(order.customer) %></td>
+		<%= render "partials/staff_update_form", customer: order.customer, staff: order.staff, can_update_staff: allow_to_update(session[:user_id]) %>
+
 		<td><%= date_format_orders(order.date_created) %></td>
 		<td><%= link_to order.id, controller: 'order', action: 'details', order_id: order.id %></td>
 
