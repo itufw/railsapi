@@ -9,4 +9,12 @@ module AccountsHelper
     return false, true
   end
 
+  def monthly_checked(monthly)
+    if "monthly".eql? monthly
+      # @checked_due_date = true
+      # @checked_invoice_date = false
+      return true, false
+    end
+    return false, true
+  end
 end

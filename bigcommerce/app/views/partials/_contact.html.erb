@@ -7,41 +7,38 @@
 		<th>Outstanding <%= render "partials/sort_arrows", order: 'order_by_outstanding' %></th>
 		<th>Overdue <%= render "partials/sort_arrows", order: 'order_by_overdue' %></th>
 		<% @date = [Date.today,Date.strptime("#{@end_date}", '%Y-%m-%d')].min %>
-		<% if @date < Date.today %>
-			<th> <%= @date.strftime("%B")%> </th>
+		<% if ('monthly'.eql? @monthly) && (@date != Date.today)%>
+			<th><%= @date.strftime("%B") %></th>
 		<% else %>
-			<th> Current </th>
-		<% end%>
+			<th>Current</th>
+		<% end %>
+
 		<% for i in 1..4 %>
-			<th> <%= (@date - i.month).strftime("%B")%> </th>
+			<% if 'monthly'.eql? @monthly %>
+				<th> <%= (@date - i.month).strftime("%B")%></th>
+			<% else %>
+				<th><%= @date - (i*15).days %> - <%= @date - ((i+1)*15).days + 1.day %></th>
+			<% end %>
 		<% end %>
 		<th> Older </th>
 	</tr>
-
 
 		<% contacts.each do |c| %>
 			<% sum_of_amount = Hash.new%>
 			<% sum_of_amount["invoice_date"] = Array.new(6){0}%>
 			<% sum_of_amount["due_date"] = Array.new(6){0}%>
+
 			<% invoices[c.id].each do |i| %>
-				<% interval = (@date.year * 12 + @date.month) -  (i.date.to_date.year * 12 + i.date.to_date.month)%>
-				<% if interval > 5 %>
-						<%  interval = 5 %>
-				<% elsif interval < 0 %>
-					<%  interval = 0 %>
-				<% end%>
-				<% interval_due_date = (@date.year * 12 + @date.month) -  (i.due_date.to_date.year * 12 + i.due_date.to_date.month)%>
-				<% if interval_due_date > 5 %>
-						<%  interval_due_date = 5 %>
-				<% elsif interval_due_date < 0 %>
-					<%  interval_due_date = 0 %>
-				<% end%>
+				<% interval = ("monthly".eql? @monthly)? ((@date.year * 12 + @date.month) -  (i.date.to_date.year * 12 + i.date.to_date.month)) : ((@date.mjd - i.date.to_date.mjd) / 15)%>
+				<% interval = interval > 5 ? 5 : interval %>
 				<% sum_of_amount["invoice_date"][interval]+=i.amount_due%>
-				<% sum_of_amount["due_date"][interval_due_date]+=i.amount_due%>
+				<% interval = ("monthly".eql? @monthly)? ((@date.year * 12 + @date.month) -  (i.due_date.to_date.year * 12 + i.due_date.to_date.month)) : ((@date.mjd - i.due_date.to_date.mjd) / 15)%>
+				<% interval = interval < 0 ? 0 : interval %>
+				<% interval = interval > 5 ? 5 : interval %>
+				<% sum_of_amount["due_date"][interval]+=i.amount_due%>
 			<% end%>
 	<tr>
-		<td><%= link_to c.name, controller: 'accounts', action: 'contact_invoices', contact_id: c.xero_contact_id, amount_due: sum_of_amount %></td>
-
+		<td><%= link_to c.name, controller: 'accounts', action: 'contact_invoices', contact_id: c.xero_contact_id, amount_due: sum_of_amount, end_date: @date, monthly: @monthly %></td>
 		<td class="num"><%= display_num(outstanding_customer(c))  %></td>
 		<td class="num"><%= display_num(overdue_customer(c)) %></td>
 		<% sum_of_amount[date_column].each do |sum|%>
