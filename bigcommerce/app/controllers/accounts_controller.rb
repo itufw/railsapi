@@ -14,9 +14,10 @@ class AccountsController < ApplicationController
     @end_date = return_end_date_invoices(params[:end_date])
     @per_page = params[:per_page] || XeroContact.per_page
     @date_column = params[:date_column] || "due_date"
+    @monthly = params[:monthly] || "monthly"
 
     @checked_due_date, @checked_invoice_date = date_column_checked(@date_column)
-
+    @checked_monthly, @checked_daily = monthly_checked(@monthly)
     # sorting via sort_order -> find the function called order_by_name
     order_function, direction = sort_order(params, 'order_by_name', 'ASC')
 
@@ -34,6 +35,9 @@ class AccountsController < ApplicationController
 
     @customer = Customer.include_all.filter_by_contact_id(params[:contact_id])
 
+    @end_date = params[:end_date] || Date.today
+
+    @monthly = params[:monthly] || "monthly"
   end
 
   def send_reminder

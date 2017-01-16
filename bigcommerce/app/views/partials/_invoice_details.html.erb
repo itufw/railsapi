@@ -6,12 +6,17 @@
 	<th></th>
 	<th>Outstanding</th>
 	<th>Overdue</th>
-	<% @date = Date.today  %>
+	<% @date = 	Date.strptime("#{@end_date}", '%Y-%m-%d')  %>
 	<th> Current </th>
-	<th> <%= (@date - 1.month).strftime("%B")%> </th>
-	<th> <%= (@date - 2.month).strftime("%B")%> </th>
-	<th> <%= (@date - 3.month).strftime("%B")%> </th>
-	<th> <%= (@date - 4.month).strftime("%B")%> </th>
+
+	<% for i in 1..4 %>
+		<% if 'monthly'.eql? @monthly %>
+			<th> <%= (@date - i.month).strftime("%B")%></th>
+		<% else %>
+			<th><%= @date - (i*15).days %> - <%= @date - ((i+1)*15).days + 1.day %></th>
+		<% end %>
+	<% end %>
+
 	<th> Older </th>
 </tr>
 
