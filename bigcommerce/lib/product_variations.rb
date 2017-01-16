@@ -7,19 +7,22 @@ module ProductVariations
     # Should be as a column in the database
     # have a 'group by transform column' function in the Product model
     # add a string -> model-name key-value pair in the model_map
-    # add order_by name function in the Model 
+
+    # add order_by name function in the Model
     def all_products_transform(transform_column, products)
 
     	stock_h = product_stock(transform_column, products)
 	    price_h = product_price(transform_column, products)
 	   	pending_stock_h = pending_stock(transform_column, products)
-        name_h = name_(transform_column, products)
-        #products_transformed = all_products(transform_column, products)
-        return stock_h, price_h, pending_stock_h, name_h
+
+      name_h = name_(transform_column, products)
+      #products_transformed = all_products(transform_column, products)
+      return stock_h, price_h, pending_stock_h, name_h
 
 	    # sorting by something other than name doesnt work
 	    #@products = ProductNoVintage.where('id IN (?)', ids).send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
     end
+
 
     def top_products_transform(transform_column, product_transformed_ids)
         #products = Product.filter_by_ids(product_ids)
@@ -29,13 +32,13 @@ module ProductVariations
         return price_h, product_name_h
     end
 
-    # returns a hash like {transform_column_id => product_stock} for the 
+    # returns a hash like {transform_column_id => product_stock} for the
     # given subset of products
     # transform_column_id can be product_id, product_no_vintage_id, etc.
     # if it is product_no_vintage_id then the product_stock is the sum of the stock
     # of individual products that are related to the product_no_vintage_id
     def product_stock(transform_column, products)
-        transform_column = transform_column == "product_id" ? "id" : transform_column
+      transform_column = transform_column == "product_id" ? "id" : transform_column
     	stock_h = products.group(transform_column).sum(:inventory)
     end
 

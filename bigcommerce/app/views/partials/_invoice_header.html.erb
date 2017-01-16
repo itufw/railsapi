@@ -1,0 +1,15 @@
+
+<div class="container-center">
+  <div class= "row">
+    <div class="col-xs-4">
+      <h5><%= customer.firstname+"  "+customer.lastname %></h5>
+      <p>Ph: <%= customer.xero_contact.contact_number unless customer.xero_contact.contact_number.nil? %></p>
+      <p>Email: <%= customer.email unless customer.email.nil? %></p>
+    </div>
+    <div class="col-xs-4 col-xs-offset-3">
+      <h5>Sales Rep.: <%= customer.staff.nickname %></h5>
+      <p>Ph: <%= customer.staff.contact_number unless customer.staff.contact_number.nil? %></p>
+      <p>Email: <%= customer.staff.email unless customer.staff.email.nil? %></p>
+    </div>
+  </div>
+</div>

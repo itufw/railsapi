@@ -61,9 +61,20 @@ module ModelsFilter
     return staff, customers, search_text, staff_id, cust_style
   end
 
+  def contact_param_filter(params)
+    search_text = params[:search]
+
+    contacts = XeroContact.search_filter(search_text)
+
+    return contacts, search_text
+
+  end
+
+
+
   def collection_param_filter(params, field, model)
     if !params[field].nil? && !params[field][:id].empty?
-      field_id = params[field][:id] 
+      field_id = params[field][:id]
       field_val = model.find(field_id)
       return field_id, field_val
     else
@@ -81,7 +92,7 @@ module ModelsFilter
       producer_country_id, producer_country = collection_param_filter(params, :producer_country, ProducerCountry)
       product_sub_type_id, product_sub_type = collection_param_filter(params, :product_sub_type, ProductSubType)
       products = Product.search(search_text).producer_country_filter(producer_country_id).sub_type_filter(product_sub_type_id)
-      
+
       return producer_country, product_sub_type, products, search_text, producer_country_id
     end
   end
@@ -116,7 +127,6 @@ module ModelsFilter
     producer_regions = ProducerRegion.country_filter(country_id)
     return product_sub_types, producers, producer_regions
   end
-
 
   def reports_access_open(staff_id)
     display_val = (Staff.display_report(staff_id)).to_i

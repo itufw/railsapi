@@ -1,0 +1,23 @@
+<div class="row" style="margin-top: 20px;">
+	<div class="col-md-4 col-md-offset-4">
+		<%= text_field_tag('search', @search_text, placeholder: 'Search for Customer Name', class: 'form-control') %>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-xs-6 col-xs-offset-4">
+		Find Invoices Until:  <%= date_field( "end_date", "end_date", value: @end_date) %>
+	</div>
+	<%= submit_tag "Search", class: 'btn btn-primary' %>
+	<button class = "btn btn-primary"><%= link_to "Reset", controller: "accounts", action: "contacts" %></button>
+</div>
+
+<!-- invoice or due date displayed -->
+<div class="row" style="margin-top: 5px;">
+	<div class="col-xs-6 col-xs-offset-5">
+		<%= radio_button_tag(:date_column, "invoice_date", @checked_invoice_date, :onclick => "this.form.submit();") %> Invoice Date
+		<span style="margin-left: 50px;">
+		<%= radio_button_tag(:date_column, "due_date", @checked_due_date, :onclick => "this.form.submit();") %>  Due Date
+		</span>
+	</div>
+</div>

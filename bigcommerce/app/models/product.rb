@@ -34,7 +34,7 @@ class Product < ActiveRecord::Base
 		limit = 50
 
 		product_pages = (product_count/limit) + 1
-		
+
 		page_number = 1
 
 		product_pages.times do
@@ -42,7 +42,7 @@ class Product < ActiveRecord::Base
 			products = product_api.all(page: page_number)
 
 			products.each do |p|
-				
+
 				insert_sql(p, 1)
 				ProductCategory.new.insert(p.id, p.categories)
 
@@ -128,8 +128,8 @@ class Product < ActiveRecord::Base
 
 		page_number = 1
 
-		product_pages.times do 
-			
+		product_pages.times do
+
 			products = product_api.all(min_date_modified: update_time, page: page_number)
 
 			if products.blank?
@@ -138,10 +138,10 @@ class Product < ActiveRecord::Base
 
 			products.each do |p|
 
-				
+
 
 				if Product.where(id: p.id).count == 1
-				
+
 					insert_sql(p, 0)
 				else
 					insert_sql(p, 1)
@@ -256,6 +256,7 @@ class Product < ActiveRecord::Base
 	def self.group_by_product_no_ws_id
 		group(:product_no_ws_id)
 	end
+
 
 	def self.group_by_product_id
 		group(:id)

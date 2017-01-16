@@ -1,3 +1,4 @@
+
 <span class="orders-view default" id = "orders-view-table">
 <%= render "partials/paginate", objects: orders %>
 </span>
@@ -29,7 +30,7 @@
 		<td class = <%= display_class + " num " %>  ><%= product_qty(product_ids, order.id) %></th>
 		<td class = "num"><%= order.qty %></td>
 		<td class = "num"><%= display_num(order.total_inc_tax) %></td>
-		
+
 		<% invoice_status = invoice_status(order.xero_invoice) %>
 		<td class = <%= invoice_status[0].downcase %> ><%= invoice_status[0] %></td>
 

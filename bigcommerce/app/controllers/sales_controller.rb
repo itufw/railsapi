@@ -21,19 +21,19 @@ class SalesController < ApplicationController
     @dates_this_week = this_week(date_given)
     @dates_last_week = last_week(@dates_this_week[0])
 
-    sum_function, @param_val, @sum_params = order_sum_param(params[:sum_param])  
+    sum_function, @param_val, @sum_params = order_sum_param(params[:sum_param])
 
       # returns a hashmap like { date => order_totals }
     @sum_this_week = sum_orders(@dates_this_week[0], @dates_this_week[-1], :group_by_date_created, sum_function, nil)
     @sum_last_week = sum_orders(@dates_last_week[0], @dates_last_week[-1], :group_by_date_created, sum_function, nil)
-    
+
     @dates_paired_this_week = make_daily_dates_map(@dates_this_week)
     @dates_paired_last_week = make_daily_dates_map(@dates_last_week)
 
     # returns a hashmap like { [staff_id, date] => order_totals }
 
     staff_id, @staff_nicknames = display_reports_for_sales_dashboard(session[:user_id])
-    
+
     @staff_sum_this_week = sum_orders(@dates_this_week[0], @dates_this_week[-1], :group_by_date_created_and_staff_id, sum_function, staff_id)
     #@staff_nicknames = Staff.active_sales_staff.nickname.to_h
     @staff_sum_this_week
@@ -43,7 +43,7 @@ class SalesController < ApplicationController
     @end_date = return_end_date(return_date_given(params))
     if params[:num_period]
       @num_periods = params[:num_period].to_i
-    else 
+    else
       @num_periods = 13
     end
     sum_function, @param_val, @sum_params = order_sum_param(params[:sum_param])
@@ -58,14 +58,14 @@ class SalesController < ApplicationController
     dates = periods_from_end_date(@num_periods, @end_date, @selected_period)
      # returns a hash like {[start_date, end_date] => week_num/month_num}
     @dates_paired = pair_dates(dates, @selected_period)
-    
+
     @periods = (3..15).to_a
 
     # order_sum_param takes into account what the user wants to calculate - Bottles or Order Totals
     # order_sum_param is defined in Sales Controller Helper
     # Sum function returns :sum_qty or :sum_total
     # These functions are defined in the Order model
-    sum_function, @param_val, @sum_params = order_sum_param(params[:sum_param]) 
+    sum_function, @param_val, @sum_params = order_sum_param(params[:sum_param])
 
     # sum_orders returns a hash like {date/week_num/month_num => sum} depending on the date_type
     # defined in Sales Controller Helper
@@ -73,7 +73,7 @@ class SalesController < ApplicationController
     # date_type returns group_by_week_created or group_by_month_created
     date_function = period_date_functions(@selected_period)[2]
     @sums_by_periods = sum_orders(dates[0], dates[-1], date_function.to_sym, sum_function, nil)
-    
+
     staff_id, @staff_nicknames = display_reports_for_sales_dashboard(session[:user_id])
     @staff_sum_by_periods = sum_orders(dates[0], dates[-1], (date_function + "_and_staff_id").to_sym, sum_function, staff_id)
 
@@ -83,11 +83,11 @@ class SalesController < ApplicationController
         @end_date = return_end_date(return_date_given(params))
         if params[:num_period]
           @num_periods = params[:num_period].to_i
-        else 
+        else
           @num_periods = 13
         end
         @periods = (3..15).to_a
-        # This returns 
+        # This returns
         @selected_period, @period_types = define_period_types(params)
 
         sum_function, @param_val, @sum_params = order_sum_param(params[:sum_param])
@@ -114,7 +114,6 @@ class SalesController < ApplicationController
         cust_style_filter(cust_style_id).send(date_function).send(sum_function)
 
         @product_ids_a = product_ids_for_hash(@qty_hash)
-
     end
 
     def products_filter(products_unfiltered_a, params)
@@ -134,12 +133,10 @@ class SalesController < ApplicationController
         products_filter(products_unfiltered, params)
     end
 
-
     def product_ids_for_hash(qty_hash)
         product_ids_a = []
         qty_hash.keys.each { |date_id_pair| product_ids_a.push(date_id_pair[0])}
         return product_ids_a
     end
-
 
 end

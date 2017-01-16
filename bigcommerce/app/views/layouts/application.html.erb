@@ -24,7 +24,7 @@
 
         <li><%= link_to "Orders", controller: "order", action: "all" %></li>
         <li><%= link_to "Customers", controller: "customer", action: "all" %></li>
-        
+
         <li class="dropdown">
           <a class="" data-toggle="dropdown" href="#">Products
           <span class="caret"></span></a>
@@ -35,6 +35,7 @@
         </li>
 
         <li><%= link_to "Pending Orders", controller: "status", action: "pending", status_id: 1, status_name: "Pending" %></li>
+
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><%= link_to "Hi," + "  " + session[:username] %></li>

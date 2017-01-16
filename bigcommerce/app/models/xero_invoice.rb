@@ -23,7 +23,7 @@ class XeroInvoice < ActiveRecord::Base
 		xero = XeroConnection.new.connect
 
   		page_num = 1
-		
+
 		invoices = xero.Invoice.all(page: page_num, modified_since: modified_since_time)
 
 		until invoices.blank?
@@ -49,7 +49,7 @@ class XeroInvoice < ActiveRecord::Base
 	  	 			calculate_line_amount = false
 	  	 		end
 
-	  			
+
 	  			time = Time.now.to_s(:db)
 
 	  			if valid_invoice(i)
@@ -92,6 +92,7 @@ class XeroInvoice < ActiveRecord::Base
 	  				ActiveRecord::Base.connection.execute(sql)
 
 		  			XeroInvoiceLineItem.new.download_data_from_api(i.line_items, i.invoice_id, i.invoice_number)
+
 		  		end
 	  		end
 
@@ -126,9 +127,9 @@ class XeroInvoice < ActiveRecord::Base
   		else
   			return false
   		end
-  
+
   	end
-  		
+
   	def self.find_by_order_id(order_id)
   		if invoice_id = XeroInvoice.get_invoice_id_for_valid_invoice(order_id.to_s)
   			return invoice_id
@@ -171,4 +172,27 @@ class XeroInvoice < ActiveRecord::Base
   		end
   	end
 
+		def self.sum_amount_due
+			sum('xero_invoices.amount_due')
+		end
+
+		def self.group_by_month
+			group(DATE_FORMAT('xero_invoices.date',  "%Y-%m-01" ))
+		end
+
+		def self.group_by_week
+			group("WEEK(xero_invoices.date)")
+		end
+
+		def self.group_by_contact_id
+			group('xero_invoices.contact_id')
+		end
+
+		def self.has_amount_due
+			where('xero_invoices.amount_due > 0')
+		end
+
+		def self.period_select(until_date)
+			where("(xero_invoices.date < '#{until_date}' or xero_invoices.due_date < '#{until_date}') and xero_invoices.amount_due > 0 ")
+		end
 end

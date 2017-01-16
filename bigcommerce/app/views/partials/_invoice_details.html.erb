@@ -1,0 +1,77 @@
+<div style="float: left;">
+	<h4>Invoices</h4>
+</div>
+<table class = "table table-striped table-bordered table-hover table-responsive" style="margin-top: -10px;">
+<tr class="info">
+	<th></th>
+	<th>Outstanding</th>
+	<th>Overdue</th>
+	<% @date = Date.today  %>
+	<th> Current </th>
+	<th> <%= (@date - 1.month).strftime("%B")%> </th>
+	<th> <%= (@date - 2.month).strftime("%B")%> </th>
+	<th> <%= (@date - 3.month).strftime("%B")%> </th>
+	<th> <%= (@date - 4.month).strftime("%B")%> </th>
+	<th> Older </th>
+</tr>
+
+<tr>
+	<td>Invoice Date</td>
+	<td class="num"><%= display_num(outstanding_customer(customer.xero_contact))  %></td>
+	<td class="num"><%= display_num(overdue_customer(customer.xero_contact)) %></td>
+	<% amount_due["invoice_date"].each do |amount| %>
+		<td><%= display_num(amount) %></td>
+	<% end %>
+</tr>
+
+<tr>
+	<td>Due Date</td>
+	<td class="num"><%= display_num(outstanding_customer(customer.xero_contact))  %></td>
+	<td class="num"><%= display_num(overdue_customer(customer.xero_contact)) %></td>
+	<% amount_due["due_date"].each do |amount| %>
+		<td><%= display_num(amount) %></td>
+	<% end %>
+</tr>
+</table>
+
+<div class="container">
+	<div class= "row">
+		<%= form_tag({:controller => "accounts", :action => "send_reminder"}, {:method => "post"}) do %>
+			<%= hidden_field_tag :customer_id, customer.id %>
+		<div class="col-md-8">
+			<table class = "table table-striped table-bordered table-hover table-responsive" style="margin-top: -10px;">
+				<tr class="info">
+					<th></th>
+					<th>Invoice#</th>
+					<th>Date</th>
+					<th>Due Date</th>
+					<th>Total</th>
+					<th>Amount Paid</th>
+					<th>Amount Credited</th>
+					<th>Amount Due</th>
+				</tr>
+				<% customer.xero_contact.xero_invoices.has_amount_due.each do |i| %>
+				<tr>
+					<td><%= check_box_tag 'selected_invoices[]', i.invoice_number %></td>
+					<td><%= link_to i.invoice_number, controller: 'sales', action: 'order_details', order_id: i.invoice_number%></td>
+					<td><%= i.date.to_date %></td>
+					<td><%= i.due_date.to_date %></td>
+					<td><%= i.total %></td>
+					<td><%= i.amount_paid %></td>
+					<td><%= i.amount_credited %></td>
+					<td><%= i.amount_due %></td>
+				</tr>
+				<% end%> <!--  customer.xero_contact.xero_invoices.has_amount_due.each do |i|-->
+			</table>
+		</div>
+
+		<div class="col-md-4">
+			<h4>Invoice Reminder</h4>
+			<%= submit_tag "Send Reminder", class: 'btn btn-primary', data: { confirm: "Send Reminder to #{@customer.xero_contact.name}" }%>
+		</div>
+
+		<!-- end of the form -->
+		<%end%>
+	</div>
+
+</div>

@@ -26,19 +26,19 @@ class Order < ActiveRecord::Base
 
 		order_api = Bigcommerce::Order
 		order_count = order_api.count.count
-		limit = 50 
+		limit = 50
 		order_pages = (order_count/limit) + 1
-		
+
 		page_number = 1
 
 		order_product = OrderProduct.new
-		
+
 		order_pages.times do
 
 			orders = order_api.all(page: page_number)
 
 			orders.each do |o|
-				
+
 				insert_or_update(o, 1)
 				order_product.insert(o.id)
 
@@ -64,7 +64,7 @@ class Order < ActiveRecord::Base
 		order_pages.times do
 
 			orders = order_api.all(min_date_modified: update_time, page: page_number)
-			
+
 			if orders.blank?
 				return
 			end
@@ -79,7 +79,7 @@ class Order < ActiveRecord::Base
 
 					# Update Order Table
 					insert_or_update(o, 0)
-					
+
 
 				    # doing a delete - insert instead of a select - update
 				    # because select - update doesnt work when product gets deleted
@@ -132,7 +132,7 @@ class Order < ActiveRecord::Base
 			'#{o.ip_address}', '#{staff_notes}', '#{customer_notes}',\
 			'#{o.discount_amount}', '#{o.coupon_discount}', '#{active}', '#{o.order_source}', '#{time}', '#{time}', '#{payment_method}')"
 
-			
+
 			sql = "INSERT INTO orders (id, customer_id, date_created, date_modified, date_shipped,\
 			status_id, subtotal_ex_tax, subtotal_inc_tax, subtotal_tax, base_shipping_cost,\
 			shipping_cost_ex_tax, shipping_cost_inc_tax, shipping_cost_tax, shipping_cost_tax_class_id,\
@@ -325,7 +325,7 @@ class Order < ActiveRecord::Base
 	end
 
 	def self.avg_luc
-		# TO DO 
+		# TO DO
 	end
 
 	def self.sum_order_product_qty
@@ -362,6 +362,24 @@ class Order < ActiveRecord::Base
 		includes([{:customer => :staff}, :status, {:order_products => :product}, :xero_invoice])
 	end
 
+	#-------------------------
+	#TODO to be finished
+	#-------------------------
+	def self.update_staff_id(order)
+		order.includes({:customer => :staff})
+		if order.staff
+			sql = "UPDATE orders SET staff_id = '#{order.staff.id}' WHERE id = '#{order.id}'"
+			ActiveRecord::Base.connection.execute(sql)
+		end
+	end
+
+	def self.update_all_staff_id
+		orders = Order.includes({:customer => :staff})
+		orders.each do |o|
+				Order.update_staff_id(o)
+		end
+	end
+
 	def self.xero_invoice_id_is_null
 		where(xero_invoice_id: nil)
 	end
@@ -379,7 +397,7 @@ class Order < ActiveRecord::Base
 
 	# WHERE DO I USE THIS?
 	def self.filter_by_product(product_ids)
-		return includes(:products).where('products.id IN (?)', [product_ids]).references(:products) 
+		return includes(:products).where('products.id IN (?)', [product_ids]).references(:products)
 	end
 
 end

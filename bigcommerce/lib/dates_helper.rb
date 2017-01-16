@@ -18,6 +18,14 @@ module DatesHelper
       return date_given
     end
   end
+
+  def return_end_date_invoices(date_given)
+    if date_given.blank?
+      return Date.today
+    else
+      return date_given['end_date']
+    end
+  end
 # If a set date isnt given then start of the week is current week's start
   # if date is given, then start of the week is given date
 
@@ -37,7 +45,7 @@ module DatesHelper
   	return (start_date..end_date).to_a
   end
 
-  # Returns an array of dates 
+  # Returns an array of dates
   # All of last week's dates based on the start date
   def last_week(start_date)
 
@@ -88,7 +96,7 @@ module DatesHelper
       # like Monday - Sunday or 1st - 30th/31st
       all_dates.push(end_date.next_day)
       all_dates.push(end_date.send(beginning_function))
-      return (all_dates + get_last_periods_date(num_periods - 1, end_date.send(beginning_function), last_function)).sort      
+      return (all_dates + get_last_periods_date(num_periods - 1, end_date.send(beginning_function), last_function)).sort
     end
   end
 
@@ -96,7 +104,7 @@ module DatesHelper
   # first value - how to calculate the date of the beginning of a period
   # second value - how to calculate the start date of last period
   # third value - string for group_by_date functions
-  # fourth value - function that converts date to period_number 
+  # fourth value - function that converts date to period_number
   def period_date_functions(period_type)
     if period_type == "weekly"
       return ["beginning_of_week".to_sym, "last_week".to_sym, "group_by_week_created", :convert_to_week_num]
@@ -157,5 +165,9 @@ module DatesHelper
       return 1
     end
   end
-      
+
+  def flatten_date_array(hash)
+    %w(1 2 3).map { |e| hash["date(#{e}i)"].to_i }
+  end
+
 end
