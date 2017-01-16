@@ -35,10 +35,17 @@
         </li>
 
         <li><%= link_to "Pending Orders", controller: "status", action: "pending", status_id: 1, status_name: "Pending" %></li>
+        <% if ["Admin", "Management","Accounts"].include? session[:arthority]%>
+          <li><%= link_to "Accounting", controller: "accounts", action: "contacts" %></li>
+          <% if ["Admin", "Management"].include? session[:arthority]%>
+            <li><%= link_to "Admin", controller: "admin", action: "index" %></li>
+          <% end%>
 
+        <% end%>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><%= link_to "Hi," + "  " + session[:username] %></li>
+        <li><%= link_to session[:arthority]%></li>
         <li><%= link_to "Logout", controller: "access", action: "logout" %></li>
       </ul>
     </div>

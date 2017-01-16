@@ -20,7 +20,7 @@ module DatesHelper
   end
 
   def return_end_date_invoices(date_given)
-    if date_given.blank?
+    if date_given.blank? || date_given['end_date'].blank?
       return Date.today
     else
       return date_given['end_date']
