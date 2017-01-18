@@ -2,8 +2,7 @@ require 'xero_connection.rb'
 require 'clean_data.rb'
 
 class XeroContact < ActiveRecord::Base
-
-	include CleanData
+    include CleanData
     self.primary_key = 'xero_contact_id'
 
     has_one :customer
@@ -13,26 +12,23 @@ class XeroContact < ActiveRecord::Base
     has_many :xero_overpayments
     has_many :xero_receipts
 
-		scoped_search on: [:name, :firstname, :lastname, :email, :skype_user_name]
-		self.per_page = 15
-
+    scoped_search on: [:name, :firstname, :lastname, :email, :skype_user_name]
+    self.per_page = 15
 
     def download_data_from_api(modified_since_time)
-    	xero = XeroConnection.new.connect
+        xero = XeroConnection.new.connect
         page_num = 1
 
-    	contacts = xero.Contact.all(page: page_num, modified_since: modified_since_time)
+        contacts = xero.Contact.all(page: page_num, modified_since: modified_since_time)
 
         contacts.each do |c|
-			insert_or_update_contact(c)
+            insert_or_update_contact(c)
             page_num += 1
             contacts = xero.Contact.all(page: page_num, modified_since: modified_since_time)
-		end
+        end
     end
 
-
     def insert_or_update_contact(c)
-
         contact_name = remove_apostrophe(c.name)
         firstname = remove_apostrophe(c.first_name)
         lastname = remove_apostrophe(c.last_name)
@@ -86,46 +82,42 @@ class XeroContact < ActiveRecord::Base
         end
 
         ActiveRecord::Base.connection.execute(sql)
-
     end
 
-		# run the balance updating for all contacts whose contact id is not null
-		def update_balance_for_all
-			contacts = XeroContact.all
-			contacts.each do |c|
-				c.update_balance_from_tables(c.xero_contact_id) if c.xero_contact_id != nil
-			end
-		end
+    # run the balance updating for all contacts whose contact id is not null
+    def update_balance_for_all
+        contacts = XeroContact.all
+        contacts.each do |c|
+            c.update_balance_from_tables(c.xero_contact_id) unless c.xero_contact_id.nil?
+        end
+      end
 
-		# update balance for single contact
-		def update_balance_from_tables(xero_contact_id)
+    # update balance for single contact
+    def update_balance_from_tables(xero_contact_id)
+        contacts = XeroContact.filter_by_id(xero_contact_id)
+        # Outstanding =  amount_due - remaining_credit(CreditNote+Overpayment)
+        # Overdue = c(due_date > ) - a -e
 
-			contacts = XeroContact.filter_by_id(xero_contact_id)
-			# Outstanding =  amount_due - remaining_credit(CreditNote+Overpayment)
-			# Overdue = c(due_date > ) - a -e
+        time = Time.now.to_s(:db)
+        amount_due = contacts.sum_invoice_amount_due || 0
+        credit_note_remaining_credit = XeroCreditNote.get_remaining_credit(xero_contact_id).sum_remaining_credit || 0
+        overpayment_remaining_credit = XeroOverpayment.get_remaining_credit(xero_contact_id).sum_remaining_credit || 0
 
-			time = Time.now.to_s(:db)
-			amount_due = contacts.sum_invoice_amount_due || 0
-			credit_note_remaining_credit = XeroCreditNote.get_remaining_credit(xero_contact_id).sum_remaining_credit || 0
-			overpayment_remaining_credit = XeroOverpayment.get_remaining_credit(xero_contact_id).sum_remaining_credit || 0
+        outstanding = amount_due - (credit_note_remaining_credit + overpayment_remaining_credit)
+        overdue = contacts.filter_overdue_invoices(Date.today).sum_invoice_amount_due || 0
 
-			outstanding = amount_due - (credit_note_remaining_credit + overpayment_remaining_credit)
-			overdue = contacts.filter_overdue_invoices(Date.today).sum_invoice_amount_due || 0
-
-			sql = "UPDATE xero_contacts SET accounts_receivable_outstanding = '#{outstanding}',\
-			accounts_receivable_overdue = '#{overdue}', updated_at = '#{time}'\
-			WHERE xero_contact_id = '#{xero_contact_id}'"
-			ActiveRecord::Base.connection.execute(sql)
-		end
-
+        sql = "UPDATE xero_contacts SET accounts_receivable_outstanding = '#{outstanding}',\
+  			accounts_receivable_overdue = '#{overdue}', updated_at = '#{time}'\
+  			WHERE xero_contact_id = '#{xero_contact_id}'"
+        ActiveRecord::Base.connection.execute(sql)
+      end
 
     def self.find_by_skype_id(skype_id)
-    	return where(skype_user_name: skype_id).first
+        where(skype_user_name: skype_id).first
     end
 
     def self.get_accounts_receivable_outstanding(xero_contact)
         return xero_contact.accounts_receivable_outstanding if xero_contact
-
     end
 
     def self.get_accounts_receivable_overdue(xero_contact)
@@ -136,81 +128,86 @@ class XeroContact < ActiveRecord::Base
         c = customer
         xero = XeroConnection.new.connect
         contact = xero.Contact.build(name: c.actual_name || (c.firstname + ' ' + c.lastname),\
-            first_name: c.firstname,\
-            last_name: c.lastname, email_address: c.email, skype_user_name: c.id,\
-            contact_number: c.phone, is_customer: true)
+                                     first_name: c.firstname,\
+                                     last_name: c.lastname, email_address: c.email, skype_user_name: c.id,\
+                                     contact_number: c.phone, is_customer: true)
         contact.save
-        return contact
+        contact
     end
 
     def contact_doesnt_exist(contact_id)
         if XeroContact.where(xero_contact_id: contact_id).count == 0
-            return true
+            true
         else
-            return false
+            false
         end
     end
 
     def self.get_contact_from_xero(contact_id)
         xero = XeroConnection.new.connect
         contact = xero.Contact.find(contact_id)
-        return contact
+        contact
     end
 
-		def self.update_balances_from_xero(contact_id)
-			contact = XeroContact.get_contact_from_xero(contact_id)
-			time = Time.now.to_s(:db)
+    def self.update_balances_from_xero(contact_id)
+        contact = XeroContact.get_contact_from_xero(contact_id)
+        time = Time.now.to_s(:db)
 
-			unless contact.balances.nil?
-				accounts_receivable_outstanding = contact.balances.accounts_receivable.outstanding
-				accounts_receivable_overdue = contact.balances.accounts_receivable.overdue
+        unless contact.balances.nil?
+            accounts_receivable_outstanding = contact.balances.accounts_receivable.outstanding
+            accounts_receivable_overdue = contact.balances.accounts_receivable.overdue
 
-				sql = "UPDATE xero_contacts SET accounts_receivable_outstanding = '#{accounts_receivable_outstanding}',\
-				accounts_receivable_overdue = '#{accounts_receivable_overdue}', updated_at = '#{time}'\
-				WHERE xero_contact_id = '#{contact_id}'"
-				ActiveRecord::Base.connection.execute(sql)
-			end
-		end
+            sql = "UPDATE xero_contacts SET accounts_receivable_outstanding = '#{accounts_receivable_outstanding}',\
+    				accounts_receivable_overdue = '#{accounts_receivable_overdue}', updated_at = '#{time}'\
+    				WHERE xero_contact_id = '#{contact_id}'"
+            ActiveRecord::Base.connection.execute(sql)
+        end
+      end
 
-		def self.period_select(until_date)
-			where("xero_contact_id IN (?)", XeroInvoice.select(:xero_contact_id).period_select(until_date).uniq)
-		end
+    def self.period_select(until_date)
+        where('xero_contacts.xero_contact_id IN (?)', XeroInvoice.select(:xero_contact_id).period_select(until_date).uniq)
+      end
 
-		def self.sum_invoice_amount_due
-			includes(:xero_invoices).sum('xero_invoices.amount_due')
-		end
+    def self.sum_invoice_amount_due
+        includes(:xero_invoices).sum('xero_invoices.amount_due')
+      end
 
-		def self.filter_overdue_invoices(time)
-			includes(:xero_invoices).where("xero_invoices.due_date < '#{time}'")
-		end
+    def self.filter_overdue_invoices(time)
+        includes(:xero_invoices).where("xero_invoices.due_date < '#{time}'")
+      end
 
-		def self.search_filter(search_text = nil)
-			return search_for(search_text) if search_text
-			return all
-		end
+    def self.search_filter(search_text = nil)
+        return search_for(search_text) if search_text
+        all
+      end
 
-		def self.include_all
-			includes(:customer, :xero_invoices, :xero_credit_notes, :xero_overpayments)
-		end
+    def self.include_all
+        includes(:customer, :xero_invoices, :xero_credit_notes, :xero_overpayments)
+      end
 
-		def self.outstanding_is_greater_zero
-			where('xero_contacts.accounts_receivable_outstanding > 0')
-		end
+    def self.outstanding_is_greater_zero
+        where('xero_contacts.accounts_receivable_outstanding > 0')
+      end
 
-		def self.order_by_name(direction)
-			order('name ' + direction)
-		end
+    def self.order_by_name(direction)
+        order('name ' + direction)
+      end
 
-		def self.order_by_outstanding(direction)
-			order('xero_contacts.accounts_receivable_outstanding ' + direction)
-		end
+    def self.order_by_outstanding(direction)
+        order('xero_contacts.accounts_receivable_outstanding ' + direction)
+      end
 
-		def self.order_by_overdue(direction)
-			order('xero_contacts.accounts_receivable_overdue ' + direction)
-		end
+    def self.order_by_overdue(direction)
+        order('xero_contacts.accounts_receivable_overdue ' + direction)
+      end
 
-		def self.filter_by_id(contact_id)
-			where("xero_contacts.xero_contact_id = '#{contact_id}' ")
-		end
+    def self.order_by_invoice(direction, start_date, end_date, date_column)
+      date_column = (date_column.eql? "invoice_date") ? 'date' : 'due_date'
+      includes(:xero_invoices).where("xero_invoices.#{date_column} >= '#{start_date}' and xero_invoices.#{date_column} <= '#{end_date}'").group('xero_invoices.xero_contact_id').order(" SUM(xero_invoices.amount_due) " + direction).references(:xero_invoices)
+    end
+
+    def self.filter_by_id(contact_id)
+        where("xero_contacts.xero_contact_id = '#{contact_id}' ")
+      end
 
 end

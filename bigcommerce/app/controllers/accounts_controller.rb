@@ -18,11 +18,21 @@ class AccountsController < ApplicationController
 
     @checked_due_date, @checked_invoice_date = date_column_checked(@date_column)
     @checked_monthly, @checked_daily = monthly_checked(@monthly)
+
     # sorting via sort_order -> find the function called order_by_name
-    order_function, direction = sort_order(params, 'order_by_name', 'ASC')
+    order_function, direction =  sort_order(params, 'order_by_name', 'ASC')
 
     contacts, @search_text = contact_param_filter(params)
-    @contacts = contacts.outstanding_is_greater_zero.period_select(@end_date).send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
+    # @contacts = contacts.outstanding_is_greater_zero.period_select(@end_date).send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
+    @contacts = contacts.outstanding_is_greater_zero.period_select(@end_date)
+
+    if order_function.start_with?("order_by_invoice")
+      # .split('|')
+      order_function, sort_date_start, sort_date_end = order_function.split('|')
+      @contacts = @contacts.paginate( per_page: @per_page, page: params[:page]).send(order_function, direction,sort_date_start,sort_date_end,@date_column)
+    else
+      @contacts = @contacts.send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
+    end
 
     @invoices = Hash.new
     @contacts.each do |c|

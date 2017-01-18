@@ -8,9 +8,9 @@
 		<th>Overdue <%= render "partials/sort_arrows", order: 'order_by_overdue' %></th>
 		<% @date = [Date.today,Date.strptime("#{@end_date}", '%Y-%m-%d')].min %>
 		<% if ('monthly'.eql? @monthly) && (@date != Date.today)%>
-			<th><%= @date.strftime("%B") %></th>
+			<th><%= @date.strftime("%B") %><%= render "partials/sort_arrows", order: 'order_by_invoice_from'%></th>
 		<% else %>
-			<th>Current</th>
+			<th>Current<%= render "partials/sort_arrows", order: "order_by_invoice|#{@date-1.month}|#{@date}"%></th>
 		<% end %>
 
 		<% for i in 1..4 %>
