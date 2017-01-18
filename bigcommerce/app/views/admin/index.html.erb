@@ -2,9 +2,9 @@
 <h3>Admin</h3>
 
 <div style="margin-left: 50px;">
-	<%= button_to "Xero Sync", "xero_sync", class: "btn btn-primary", method: "get" %>
+	<%= button_to "Xero Sync", controller: "admin", action:"xero_sync", class: "btn btn-primary", method: "get" %>
 </div>
 
 <div style="margin-left: 50px;">
-	<%= button_to "Password Update", "staff_update", class: "btn btn-primary", method: "get" %>
+	<%= button_to "Password Update", controller: "admin", action:"staff_update", class: "btn btn-primary", method: "get" %>
 </div>
