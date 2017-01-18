@@ -1,0 +1,58 @@
+id,name,product_type_id
+1,Albariño,2
+2,Bonarda,4
+3,Cabernet Franc,4
+4,Cabernet Sauvignon,4
+5,Cabernet Syrah Rosé,3
+6,Callet,4
+7,Carignan,4
+8,Carménère,4
+9,Cava,1
+10,Chardonnay,2
+11,Fiano,2
+12,Frisant,1
+13,Garnacha,4
+14,Garnacha Blanc,2
+15,Gewürztraminer,2
+16,Godello,2
+17,Graciano,4
+18,Malbec,4
+19,Maturana Tinta,4
+20,Mazuelo,4
+21,Mencia,4
+22,Mencía,4
+23,Merlot,4
+24,Monastrell,4
+25,Moscatel,5
+26,Moscatel de Alejandría,2
+27,Moscato,5
+28,Muscat De Frontignac,2
+29,na,6
+30,Nebbiolo,4
+31,Petit Manseng,2
+32,Petit Verdot,4
+33,Pinot Noir,4
+34,Premsal,2
+35,Red Blend,4
+36,Riesling,2
+37,Rosé,3
+38,Rosé ,3
+39,Rosé Blend,3
+40,Sangría,4
+41,Sauvignon Blanc,2
+42,Sauvignon Gris,2
+43,Semillon,2
+44,Sparkling,1
+45,Syrah,4
+46,Tannat,4
+47,Tannat ,4
+48,Tempranillo,4
+49,Tempranillo Blanco,2
+50,Tempranillo Garnacha,4
+51,Torrontés,2
+52,Verdejo,2
+53,Vermouth,4
+54,Viognier,2
+55,White Blend,2
+56,Xarel.lo,2
+57,Zinfandel,4

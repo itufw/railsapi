@@ -36,4 +36,6 @@ class AccessController < ApplicationController
     redirect_to action: 'login'
   end
 
+
+
 end
