@@ -93,7 +93,7 @@ class CustomerController < ApplicationController
   def update
     @customer = Customer.filter_by_id(params[:customer][:id])
     if @customer.update_attributes(customer_params)
-      flash[:success] = "Successfully Changed." 
+      flash[:success] = "Successfully Changed."
       redirect_to action: 'summary',\
        customer_id: params[:customer][:id],\
        customer_name: Customer.customer_name(@customer.actual_name, @customer.firstname, @customer.lastname)
@@ -130,14 +130,14 @@ class CustomerController < ApplicationController
   	# To get top products, get all the orders for a customer, then get products of those orders
   	# based on the above param filters, filter products out
   	where_query = "OrderProduct.valid_orders.order_customer_filter(%s).product_filter(%s)" % [[@customer_id], Product.all.pluck("id")]
-		
+
 		# hash has a structure {"time_period" => {product_id => stock}}
-		# product_ids can be either product ids or even 
+		# product_ids can be either product ids or even
 		# product no vintage ids
 		# group_by can be group_by_product_id, group_by_product_no_vintage_id
 		@top_products_timeperiod_h, @product_ids, @time_periods, sorted_bool = \
 		top_objects(where_query, ('group_by_' + @transform_column).to_sym, :sum_qty, params[:order_col], params[:direction])
-		
+
 		@price_h, @product_name_h = top_products_transform(@transform_column, @product_ids)
 
     # Sort by name/price
@@ -149,7 +149,7 @@ class CustomerController < ApplicationController
       # sort the hash using the val, then get the product_ids in order using map
       hash_to_be_sorted = sort_column_map[params[:order_col]] || @product_name_h
       sorted_hash = hash_to_be_sorted.sort_by {|id, val| val}
-      
+
       if params[:direction].to_i == 1
         @product_ids = sorted_hash.map {|product| product[0]}
       else

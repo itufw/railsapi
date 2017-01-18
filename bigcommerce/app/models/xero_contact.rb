@@ -203,7 +203,7 @@ class XeroContact < ActiveRecord::Base
 
     def self.order_by_invoice(direction, start_date, end_date, date_column)
       date_column = (date_column.eql? "invoice_date") ? 'date' : 'due_date'
-      includes(:xero_invoices).where("xero_invoices.#{date_column} >= '#{start_date}' and xero_invoices.#{date_column} <= '#{end_date}'").group('xero_invoices.xero_contact_id').order(" SUM(xero_invoices.amount_due) " + direction).references(:xero_invoices)
+      joins("RIGHT JOIN xero_invoices ON xero_contacts.xero_contact_id = xero_invoices.xero_contact_id").where("xero_invoices.#{date_column} >= '#{start_date}' and xero_invoices.#{date_column} <= '#{end_date}'").group('xero_invoices.xero_contact_id').order(" SUM(xero_invoices.amount_due) " + direction)
     end
 
     def self.filter_by_id(contact_id)
