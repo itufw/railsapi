@@ -160,7 +160,7 @@ class SalesController < ApplicationController
         @product_qty_h.each { |date_id_pair, v| @product_ids.push(date_id_pair[0])}
         @product_ids = @product_ids.uniq
 
-        @price_h, @product_name_h = top_products_transform(@transform_column, @product_ids)
+        @price_h, @product_name_h, @inventory_h, @pending_stock_h = get_data_after_transformation(@transform_column, @product_ids)
 
     end
 

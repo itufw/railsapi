@@ -41,7 +41,7 @@ class CustomerController < ApplicationController
     # either we want stats for a product_id or for products based on a product_no_vintage_id
     # or based on a product_no_ws_id
     # this gives product_ids based on that transform_column
-    @product_ids = transform_product_ids(@transform_column, @product_id) || [@product_id]
+    @product_ids = get_products_after_transformation(@transform_column, @product_id).pluck("id") || [@product_id]
 
     # overall_stats has structure {time_period_name => [sum, average, supply]}
     @overall_stats = overall_stats_with_product(params, @product_ids)
@@ -138,7 +138,7 @@ class CustomerController < ApplicationController
 		@top_products_timeperiod_h, @product_ids, @time_periods, sorted_bool = \
 		top_objects(where_query, ('group_by_' + @transform_column).to_sym, :sum_qty, params[:order_col], params[:direction])
 
-		@price_h, @product_name_h = top_products_transform(@transform_column, @product_ids)
+		@price_h, @product_name_h = get_data_after_transformation(@transform_column, @product_ids)
 
     # Sort by name/price
     ####################################
