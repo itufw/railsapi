@@ -1,11 +1,11 @@
 <meta charset="ISO-8859-1" />
-<%= wicked_pdf_stylesheet_link_tag "printinvoice" %>
+<link rel="stylesheet" href="https://www.untappedwines.com.au/template/Styles/printinvoice.css" type="text/css">
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 
 <div class="Invoice">
     <div id="heading">
         <div id="Logo">
-          <%= wicked_pdf_image_tag 'logo dark.jpg' %>
+          <img src="https://www.untappedwines.com.au/template/images/logo%20dark.jpg">
         </div>
         <h1 style="margin-bottom: 0px;">
             <b>TAX INVOICE</b>
@@ -73,7 +73,7 @@
                         <th></th>
                     </tr>
                     <% invoice.xero_invoice_line_items.each do |item| %>
-                      <% if item.item_code.to_i.to_s == item.item_code %>
+                      <% unless ((item.item_code.to_i.to_s != item.item_code) || ('1296'.eql? item.item_code)) %>
                         <% unit_price = ((order.order_products.where("order_id = #{item.invoice_number} and product_id = #{item.item_code}").first.price_inc_tax)/1.1)%>
                       <tr>
                           <td class="ProductQuantity"><%= item.quantity.to_i%></td>
