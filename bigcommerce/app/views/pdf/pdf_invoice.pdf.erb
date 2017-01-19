@@ -74,11 +74,12 @@
                     </tr>
                     <% invoice.xero_invoice_line_items.each do |item| %>
                       <% if item.item_code.to_i.to_s == item.item_code %>
+                        <% unit_price = ((order.order_products.where("order_id = #{item.invoice_number} and product_id = #{item.item_code}").first.price_inc_tax)/1.1)%>
                       <tr>
                           <td class="ProductQuantity"><%= item.quantity.to_i%></td>
                           <td class="ProductDetails"><%= item.description%></td>
-                          <td class="ProductCost" id="price" align="right">$<%= item.unit_amount %></td>
-                          <td class="ProductTotal" align="right" id="amt">$<%= item.quantity * item.unit_amount %></td>
+                          <td class="ProductCost" id="price" align="right">$<%= '%.2f' % unit_price %></td>
+                          <td class="ProductTotal" align="right" id="amt">$<%= '%.2f' % (item.quantity * unit_price) %></td>
                           <td></td>
                       </tr>
                       <%end%>
@@ -88,42 +89,44 @@
                       <td></td>
                       <td></td>
                       <td class="ProductCost" align="right">Subtotal(inc. WET ex. GST)</td>
-                      <td class="ProductTotal" align="right" >$<%= invoice.sub_total %></td>
+                      <td class="ProductTotal" align="right" >$<%= '%.2f' % (order.subtotal_inc_tax/1.1) %></td>
                       <td></td>
                     </tr>
-                    <tr>
-                      <td class="ProductQuantity"></td>
-                      <td class="ProductDetails"></td>
-                      <td class="ProductCost" align="right">Discount Coupon(ex. GST)</td>
-                      <td class="ProductTotal" align="right">$<%= invoice.total_discount %></td>
-                      <td></td>
-                    </tr>
+                    <% unless order.coupon_discount == 0%>
+                      <tr>
+                        <td class="ProductQuantity"></td>
+                        <td class="ProductDetails"></td>
+                        <td class="ProductCost" align="right">Discount Coupon(ex. GST)</td>
+                        <td class="ProductTotal" align="right">-$<%= '%.2f' % (order.coupon_discount/1.1) %></td>
+                        <td></td>
+                      </tr>
+                    <% end %>
                     <tr>
                       <td></td>
                       <td></td>
                       <td class="ProductCost" align="right">Shipping(ex. GST)</td>
-                      <td class="ProductTotal" align="right">$<%= invoice.xero_invoice_line_items.where("item_code = 'SHIPPING'").count == 0 ? 0 : invoice.xero_invoice_line_items.where("item_code = 'SHIPPING'").first.unit_amount %></td>
+                      <td class="ProductTotal" align="right">$<%= invoice.xero_invoice_line_items.where("item_code = 'SHIPPING'").count == 0 ? ('%.2f' % 0.00) : ('%.2f' % invoice.xero_invoice_line_items.where("item_code = 'SHIPPING'").first.unit_amount) %></td>
                       <td></td>
                     </tr>
                     <tr>
                       <td></td>
                       <td></td>
                       <td class="ProductCost" align="right">WET</td>
-                      <td class="ProductTotal" align="right">$<%= invoice.xero_invoice_line_items.where("item_code = 'WET'").count == 0 ? (invoice.total * 0.29 / 1.419).round(2) : invoice.xero_invoice_line_items.where("item_code = 'WET'").first.unit_amount %></td>
+                      <td class="ProductTotal" align="right">$<%= invoice.xero_invoice_line_items.where("item_code = 'WET'").count == 0 ? ('%.2f' % (invoice.total * 0.29 / 1.419)) : ('%.2f' % invoice.xero_invoice_line_items.where("item_code = 'WET'").first.unit_amount) %></td>
                       <td></td>
                     </tr>
                     <tr>
                       <td></td>
                       <td></td>
                       <td class="ProductCost" align="right">GST</td>
-                      <td class="ProductTotal" align="right">$<%= invoice.total_tax %></td>
+                      <td class="ProductTotal" align="right">$<%= '%.2f' % (invoice.total - (invoice.total/1.1)) %></td>
                       <td></td>
                     </tr>
                     <tr>
                       <td></td>
                       <td></td>
                       <td class="ProductCost" align="right"><h3>Grand Total:</h3></td>
-                      <td class="ProductTotal" align="right">$<%= invoice.total %></td>
+                      <td class="ProductTotal" align="right">$<%= '%.2f' % invoice.total %></td>
                       <td></td>
                     </tr>
             </table>
@@ -135,9 +138,9 @@
       </div>
     <% end %>
     <br/><br/><br/><br/>
-
-    <div id="bankDetails" style="font-size: .8em;" class="footer">
-        <b>Banking Details</b>
+<div style=" position: fixed; bottom: 0; width: 100%;">
+    <div id="bankDetails" style="font-size: .8em;">
+        <b style="font-size: 1em;">Banking Details</b>
         <table>
             <tr>
                 <td style="font-size: 1em;">
@@ -161,6 +164,7 @@
 
     <div class="additional-comments" style="font-size: 0.7em; font-style: italic;">A set shipping charge per bottle is included for all orders -- additional shipping charges may also apply</div>
     <div class="select-comments" style="font-size: 0.7em; font-style: italic;">All amount payable under contract to which this invoice relates, have been transferreed to Scottish Pacific Business Finance Pty Ltd("ScotPac"). Payment to any other person will not constitute a valid discharge of the debt</div>
+  </div>
 </div>
 <style>
     .InvoiceTotal.InvoiceTotalRow {
