@@ -42,26 +42,9 @@ class SalesController < ApplicationController
   end
 
   def sales_dashboard_detailed
-    @end_date = return_end_date(return_date_given(params))
-    if params[:num_period]
-      @num_periods = params[:num_period].to_i
-    else
-      @num_periods = 13
-    end
-    sum_function, @param_val, @sum_params = order_sum_param(params[:sum_param])
-    @selected_period, @period_types = define_period_types(params)
-
-    # periods_from_end_date is defined in Dates Helper
-    # returns an array of all dates - sorted
-    # For example num_periods = 3, end_date = 5th oct and "monthly" as period_type returns
-    # [1st Aug, 1st Sep, 1st Oct, 6th Oct]
-    # 6th Oct is the last date in the array and not 5th oct because
-    # we want to calculate orders including 5th Oct, for that we need to give the next day
-    dates = periods_from_end_date(@num_periods, @end_date, @selected_period)
-     # returns a hash like {[start_date, end_date] => week_num/month_num}
-    @dates_paired = pair_dates(dates, @selected_period)
-
-    @periods = (3..15).to_a
+    get_current_end_date(params)
+    set_num_columns(params)
+    date_pairs
 
     # order_sum_param takes into account what the user wants to calculate - Bottles or Order Totals
     # order_sum_param is defined in Sales Controller Helper
@@ -74,15 +57,15 @@ class SalesController < ApplicationController
 
     # date_type returns group_by_week_created or group_by_month_created
     date_function = period_date_functions(@selected_period)[2]
-    @sums_by_periods = sum_orders(dates[0], dates[-1], date_function.to_sym, sum_function, nil)
+    @sums_by_periods = sum_orders(@dates[0], @dates[-1], date_function.to_sym, sum_function, nil)
 
     staff_id, @staff_nicknames = display_reports_for_sales_dashboard(session[:user_id])
-    @staff_sum_by_periods = sum_orders(dates[0], dates[-1], (date_function + "_and_staff_id").to_sym, sum_function, staff_id)
+    @staff_sum_by_periods = sum_orders(@dates[0], @dates[-1], (date_function + "_and_staff_id").to_sym, sum_function, staff_id)
 
   end
 
 
-    def get_current_end_date
+    def get_current_end_date(params)
         @end_date = return_end_date(return_date_given(params))
     end
 
@@ -137,6 +120,7 @@ class SalesController < ApplicationController
     end
 
     def product_dashboard
+        get_current_end_date(params)
         set_num_columns(params)
         # this sum function is then queried on the OrderProduct model
         sum_function = set_sum_function(params, :sum_qty, "Bottles")
@@ -160,7 +144,7 @@ class SalesController < ApplicationController
         @product_qty_h.each { |date_id_pair, v| @product_ids.push(date_id_pair[0])}
         @product_ids = @product_ids.uniq
 
-        @price_h, @product_name_h = top_products_transform(@transform_column, @product_ids)
+        @price_h, @product_name_h, @inventory_h, @pending_stock_h = get_data_after_transformation(@transform_column, @product_ids)
 
     end
 
