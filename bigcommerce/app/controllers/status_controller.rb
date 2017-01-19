@@ -21,7 +21,7 @@ class StatusController < ApplicationController
 
 	def orders(params, product_ids, staff_id)
 		orders = Order.include_all.status_filter(@status_id).staff_filter(staff_id).product_filter(product_ids)
-		
+
 		order_function, direction = sort_order(params, :order_by_id, 'DESC')
 		@per_page = params[:per_page] || Order.per_page
 		@orders = orders.include_all.send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
@@ -55,7 +55,7 @@ class StatusController < ApplicationController
       	@num_orders = params[:num_orders]
       	@qty = params[:qty]
       	@status_qty = params[:status_qty]
-      	@total = params[:total] 
+      	@total = params[:total]
 
       	staff_id = staff_filter(params)
       	orders(params, @product_id, staff_id)

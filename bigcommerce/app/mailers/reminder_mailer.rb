@@ -19,9 +19,22 @@ class ReminderMailer < ActionMailer::Base
     #     )
     #   }
     # )
-    attachments["invoice.pdf"] = WickedPdf.new.pdf_from_string(
-      render_to_string(:pdf => "accounts",:template => 'accounts/pdf_invoice.pdf.erb')
-    )
+    @selected_invoices.each do |i|
+      invoice = XeroInvoice.includes(:xero_contact, :xero_invoice_line_items, :order).where("xero_invoices.invoice_number = #{i}").first
+      bill_address = Address.where(id: invoice.invoice_number).count == 0 ? "missing" : Address.find(invoice.invoice_number)
+      customer_notes = Order.where("orders.id = '#{invoice.invoice_number}'").count == 0 ? "missing" : Order.find("#{invoice.invoice_number}").customer_notes
+      # params = { :invoice => invoice }
+      # cust_type_id: 1.Retail, 2. Wholesale, 3. Staff
+      if 2 == Customer.where("customers.xero_contact_id = '#{invoice.xero_contact_id}'").first.cust_type_id
+        attachments["invoice\##{invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
+          render_to_string(:template => 'pdf/pdf_invoice', :locals => { :invoice => invoice, :bill_address => bill_address, :customer_notes => customer_notes})
+        )
+      else
+        attachments["invoice\##{invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
+          render_to_string(:template => 'pdf/pdf_invoice_retail', :locals => { :invoice => invoice, :bill_address => bill_address, :customer_notes => customer_notes})
+        )
+      end
+    end
 
     customer_address = %("#{@customer.xero_contact.name}" <it@untappedwines.com>)
     # the one that worked
