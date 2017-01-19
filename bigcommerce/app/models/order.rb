@@ -126,6 +126,9 @@ class Order < ActiveRecord::Base
       			coupon_discount, active, order_source, created_at, updated_at, payment_method)\
       			VALUES #{order}"
 
+            # insert the billing adress where the id is order_id
+            Address.new.insert_or_update(o.billing_address,o.customer_id,o.id)
+
         else
             sql = "UPDATE orders SET customer_id = '#{o.customer_id}', date_created = '#{date_created}',\
       					date_modified = '#{date_modified}', date_shipped = '#{date_shipped}', status_id = '#{o.status_id}',\

@@ -21,7 +21,15 @@
 
 			<td class="num"><%= display_num(@price_h[id]) %></td>
 			<td clas = "num" ><%= @stock_h[id] %></td>
-			<td clas = "num" ><%= @pending_stock_h[id].to_i %></td>
+			<% if @pending_stock_h[id].to_i != 0 && ('product_id'.eql? @transform_column) %>
+				<td><%= link_to @pending_stock_h[id].to_i, controller: 'status', action: 'summary_with_product',\
+				status_id: '1', status_name: 'Pending',\
+				product_id: id, product_name: @name_h[id],\
+				num_orders: Order.status_filter("1").order_product_filter(id).group_by_product_id.count_order_id_from_order_products,\
+				qty: @stock_h[id], status_qty: @pending_stock_h[id], total: @pending_stock_h[id].to_i + @stock_h[id].to_i %></td>
+			<% else %>
+				<td clas = "num" ><%= @pending_stock_h[id].to_i %></td>
+			<% end %>
 			<td clas = "num" ><%= @pending_stock_h[id].to_i + @stock_h[id].to_i %></td>
 		</tr>
 
