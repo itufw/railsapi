@@ -1,12 +1,14 @@
-<div class="col-xs-2" style="float: left;">
-	<%= select_tag "period_type", options_for_select(@period_types.collect{ |p| [p.capitalize, p]}, selected: @selected_period), class:"form-control"%>
-</div>
-<div class="col-xs-2" style="float: left;">
-   	<%= select_tag "num_period", options_for_select(@periods.collect{ |p| [p, p]}, selected: @num_periods), include_blank: "Number of Periods", class:'form-control' %>
-</div>
-<div class="col-xs-2">
-<%= select_tag "sum_param", options_for_select(@sum_params.collect{ |p| [p, p]}, selected: @param_val), class:"form-control"%>
-</div>
-<div class="col-xs-3" style="float: left;margin-top: 2px;">
-   	End Date:   <%= date_field( "selected_date", "selected_date", value: @end_date) %>
+<div class="row">
+	<div class="col-xs-2" style="float: left;">
+		<%= select_tag "period_type", options_for_select(@period_types.collect{ |p| [p.capitalize, p]}, selected: @selected_period), class:"form-control"%>
+	</div>
+	<div class="col-xs-2" style="float: left;">
+	   	<%= select_tag "num_period", options_for_select(@periods.collect{ |p| [p, p]}, selected: @num_periods), include_blank: "Number of Periods", class:'form-control' %>
+	</div>
+	<div class="col-xs-2">
+	<%= select_tag "sum_param", options_for_select(@sum_params.collect{ |p| [p, p]}, selected: @param_val), class:"form-control"%>
+	</div>
+	<div class="col-xs-3" style="float: left;margin-top: 2px;">
+	   	End Date:   <%= date_field( "selected_date", "selected_date", value: @end_date) %>
+	</div>
 </div>
