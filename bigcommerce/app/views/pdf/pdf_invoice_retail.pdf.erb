@@ -20,7 +20,7 @@
             </tr>
             <tr>
                 <td>Date</td>
-                <td id="dateRef" class="term_date"><%= invoice.date.to_date %></td>
+                <td id="dateRef" class="term_date"><%= invoice.date.strftime("%e/%m/%Y") %></td>
             </tr>
             <tr>
                 <td>ABN</td>
@@ -46,7 +46,7 @@
             </tr>
             <tr>
                 <td>Due Date</td>
-                <td id="dueDate" class="dueDates"><%= invoice.due_date.to_date %></td>
+                <td id="dueDate" class="dueDates"><%= invoice.due_date.strftime("%e/%m/%Y") %></td>
             </tr>
         </table>
     </div>
@@ -74,7 +74,7 @@
                     <% invoice.xero_invoice_line_items.each do |item| %>
                       <% if item.item_code.to_i.to_s == item.item_code %>
                       <tr>
-                          <td class="ProductQuantity"><%= item.quantity%></td>
+                        <td class="ProductQuantity"><%= item.quantity.to_i%></td>
                           <td class="ProductDetails"><%= item.description%></td>
                           <td class="ProductCost" id="price" align="right">$<%= item.unit_amount %></td>
                           <td class="ProductTotal" align="right" id="amt">$<%= item.quantity * item.unit_amount %></td>

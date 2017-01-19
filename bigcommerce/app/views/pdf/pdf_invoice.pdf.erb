@@ -1,3 +1,4 @@
+<meta charset="ISO-8859-1" />
 <link rel="stylesheet" href="https://www.untappedwines.com.au/template/Styles/printinvoice.css" type="text/css">
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 
@@ -20,7 +21,7 @@
             </tr>
             <tr>
                 <td>Date</td>
-                <td id="dateRef" class="term_date"><%= invoice.date.to_date %></td>
+                <td id="dateRef" class="term_date"><%= invoice.date.strftime("%e/%m/%Y") %></td>
             </tr>
             <tr>
                 <td>ABN</td>
@@ -46,7 +47,7 @@
             </tr>
             <tr>
                 <td>Due Date</td>
-                <td id="dueDate" class="dueDates"><%= invoice.due_date.to_date %></td>
+                <td id="dueDate" class="dueDates"><%= invoice.due_date.strftime("%e/%m/%Y") %></td>
             </tr>
         </table>
     </div>
@@ -74,7 +75,7 @@
                     <% invoice.xero_invoice_line_items.each do |item| %>
                       <% if item.item_code.to_i.to_s == item.item_code %>
                       <tr>
-                          <td class="ProductQuantity"><%= item.quantity%></td>
+                          <td class="ProductQuantity"><%= item.quantity.to_i%></td>
                           <td class="ProductDetails"><%= item.description%></td>
                           <td class="ProductCost" id="price" align="right">$<%= item.unit_amount %></td>
                           <td class="ProductTotal" align="right" id="amt">$<%= item.quantity * item.unit_amount %></td>
@@ -108,7 +109,7 @@
                       <td></td>
                       <td></td>
                       <td class="ProductCost" align="right">WET</td>
-                      <td class="ProductTotal" align="right">$<%= invoice.xero_invoice_line_items.where("item_code = 'WET'").count == 0 ? 0 : invoice.xero_invoice_line_items.where("item_code = 'WET'").first.unit_amount %></td>
+                      <td class="ProductTotal" align="right">$<%= invoice.xero_invoice_line_items.where("item_code = 'WET'").count == 0 ? (invoice.total * 0.29 / 1.419).round(2) : invoice.xero_invoice_line_items.where("item_code = 'WET'").first.unit_amount %></td>
                       <td></td>
                     </tr>
                     <tr>
