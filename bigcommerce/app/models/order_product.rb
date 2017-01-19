@@ -80,6 +80,10 @@ class OrderProduct < ActiveRecord::Base
 		return all
 	end
 
+	def self.product_pending_stock(group_by)
+		includes([{:order => :status}]).where('orders.status_id = 1').references(:orders).send(group_by).sum_qty
+	end
+
 
 	def self.group_by_product_id
 		includes(:product).group('products.id').references(:products)
