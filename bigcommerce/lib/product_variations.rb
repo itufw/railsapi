@@ -9,7 +9,7 @@ module ProductVariations
     # add a string -> model-name key-value pair in the model_map
 
     # add order_by name function in the Model
-    def all_products_transform(transform_column, products)
+    def transform_product_data(transform_column, products)
 
     	stock_h = product_stock(transform_column, products)
 	    price_h = product_price(transform_column, products)
@@ -24,12 +24,16 @@ module ProductVariations
     end
 
 
-    def top_products_transform(transform_column, product_transformed_ids)
+    def get_data_after_transformation(transform_column, product_transformed_ids)
         #products = Product.filter_by_ids(product_ids)
         #price_h = product_price(transform_column, products)
-        price_h = product_price_after_transformation(transform_column, product_transformed_ids)
+        products = get_products_after_transformation(transform_column, product_transformed_ids)
+        price_h = products.product_price('group_by_' + transform_column)
         product_name_h = product_name(transform_column, product_transformed_ids)
-        return price_h, product_name_h
+        inventory_h =  products.product_inventory('group_by_' + transform_column)
+        pending_stock_h = pending_stock(transform_column, products)
+        #products.pending_stock('group_by_' + transform_column)
+        return price_h, product_name_h, inventory_h, pending_stock_h
     end
 
     # returns a hash like {transform_column_id => product_stock} for the
@@ -47,19 +51,26 @@ module ProductVariations
     	price_h = products.product_price('group_by_' + transform_column)
     end
 
-    # we have an array of product_no_vintage_ids
-    # get product price from that
-    def product_price_after_transformation(transform_column, product_transformed_ids)
-        # we want something like where('products.product_no_vintage_id IN (?)', array)
-        new_transform_column = transform_column == "product_id" ? "id" : transform_column
-        where_query = "products." + new_transform_column + " IN (?)"
-        products = Product.where(where_query, product_transformed_ids)
-        price_h = products.product_price('group_by_' + transform_column)
-    end
+    # # we have an array of product_no_vintage_ids
+    # # get product price from that
+    # def product_price_after_transformation(transform_column, product_transformed_ids)
+    #     # we want something like where('products.product_no_vintage_id IN (?)', array)
+    #     products = get_products_after_transformation(transform_column, product_transformed_ids)
+    #     price_h = products.product_price('group_by_' + transform_column)
+    # end
+
+    # def product_stock_after_transformation(transform_column, product_transformed_ids)
+    #     # we want something like where('products.product_no_vintage_id IN (?)', array)
+    #     products = get_products_after_transformation(transform_column, product_transformed_ids)
+    #     price_h = products.product_price('group_by_' + transform_column)
+    # end
+
+
+
 
     def pending_stock(transform_column, products)
-        transform_column = transform_column == "product_id" ? "id" : transform_column
-    	pending_stock_h = products.pending_stock('products.'+ transform_column)
+        #transform_column = transform_column == "product_id" ? "id" : transform_column
+    	pending_stock_h = OrderProduct.product_filter(products.pluck("id")).product_pending_stock('group_by_' + transform_column)
     end
 
     def product_name(transform_column, product_ids)
@@ -93,14 +104,17 @@ module ProductVariations
 
     # Give an array of product_ids corresponding to
     # a product_no_vintage_id/no_ws_id
-    def transform_product_ids(transform_column, transform_column_val)
-        if transform_column == "product_no_vintage_id"
-            return (Product.where(product_no_vintage_id: transform_column_val)).pluck("id")
-        elsif transform_column == "product_no_ws_id"
-            return (Product.where(product_no_ws_id: transform_column_val)).pluck("id")
-        else
-            return nil
-        end
+    def get_products_after_transformation(transform_column, product_transformed_ids)
+        new_transform_column = transform_column == "product_id" ? "id" : transform_column
+        where_query = "products." + new_transform_column + " IN (?)"
+        products = Product.where(where_query, product_transformed_ids)
+        # if transform_column == "product_no_vintage_id"
+        #     return (Product.where(product_no_vintage_id: transform_column_val)).pluck("id")
+        # elsif transform_column == "product_no_ws_id"
+        #     return (Product.where(product_no_ws_id: transform_column_val)).pluck("id")
+        # else
+        #     return nil
+        # end
     end
 
     def total_stock_no_ws(transform_column, product_id, pending_stock, total_stock)
