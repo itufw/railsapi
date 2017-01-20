@@ -15,7 +15,7 @@
 
 		<% for i in 1..4 %>
 			<% if 'monthly'.eql? @monthly %>
-				<th> <%= (@date - i.month).strftime("%B")%><%= render "partials/sort_arrows", order: "order_by_invoice|#{(@date - (i+1).month).to_date}|#{(@date-i).to_date}" %></th></th>
+				<th> <%= (@date - i.month).strftime("%B")%><%= render "partials/sort_arrows", order: "order_by_invoice|#{(@date - (i+1).month).to_date}|#{(@date-i.month).to_date}" %></th></th>
 			<% else %>
 				<th><%= @date - (i*15).days %> - <%= @date - ((i+1)*15).days + 1.day %><%= render "partials/sort_arrows", order: "order_by_invoice|#{(@date - ((i+1)*15).days).to_date}|#{(@date - (i*15).days).to_date}" %></th>
 			<% end %>
