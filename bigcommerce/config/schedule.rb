@@ -30,6 +30,10 @@ every 5.minutes do
 	rake "updates:models"
 end
 
+every 1.day, :at => Time.zone.parse('5:00 am').utc do
+	rake "updates:balance_update"
+end
+
 every 1.day, :at => Time.zone.parse('12:00 am').utc do
 	rake "updates:timeperiods"
 end

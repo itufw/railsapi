@@ -26,8 +26,7 @@ class ProductController < ApplicationController
 
 	    # check the number of queries - make it faster
 	    @stock_h, @price_h, @pending_stock_h, @name_h = \
-	    all_products_transform(@transform_column, filtered_products)
-	    
+	    transform_product_data(@transform_column, filtered_products)
 	    display_all(params)
   	end
 
@@ -43,10 +42,10 @@ class ProductController < ApplicationController
   		# either we want stats for a product_id or for products based on a product_no_vintage_id
     	# or based on a product_no_ws_id
     	# this gives product_ids based on that transform_column
-    	product_ids = transform_product_ids(@transform_column, @product_id) || @product_id
+    	product_ids = get_products_after_transformation(@transform_column, @product_id).pluck("id") || @product_id
 
       # form filter for top customers
-      
+
       # i only need to check product rights on this page
       # So if product rights is 0, then restrict by staff
       # otherwise just do a normal param filter
@@ -75,7 +74,7 @@ class ProductController < ApplicationController
   		@top_customers_timeperiod_h, @customer_ids, @time_periods, already_sorted = top_objects(\
         "Order.order_product_filter(%s).customer_filter(%s).valid_order" % \
   			[product_ids, customers_filtered_ids], :group_by_customerid, :sum_order_product_qty,\
-  			params[:order_col], params[:direction])  
+  			params[:order_col], params[:direction])
 
       unless already_sorted
         default_customer_sort_order(params)

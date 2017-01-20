@@ -1,7 +1,8 @@
-require 'sales_controller_helper.rb'
-require 'dates_helper.rb'
-require 'display_helper.rb'
-require 'models_filter.rb'
+require 'sales_controller_helper'
+require 'dates_helper'
+require 'display_helper'
+require 'models_filter'
+require 'product_variations'
 
 class SalesController < ApplicationController
 
@@ -11,6 +12,7 @@ class SalesController < ApplicationController
   include DatesHelper
   include DisplayHelper
   include ModelsFilter
+  include ProductVariations
 
   # Displays this week's and last week's total order sales
   # Also displays total order sales for this week divided by staff
@@ -40,26 +42,9 @@ class SalesController < ApplicationController
   end
 
   def sales_dashboard_detailed
-    @end_date = return_end_date(return_date_given(params))
-    if params[:num_period]
-      @num_periods = params[:num_period].to_i
-    else
-      @num_periods = 13
-    end
-    sum_function, @param_val, @sum_params = order_sum_param(params[:sum_param])
-    @selected_period, @period_types = define_period_types(params)
-
-    # periods_from_end_date is defined in Dates Helper
-    # returns an array of all dates - sorted
-    # For example num_periods = 3, end_date = 5th oct and "monthly" as period_type returns
-    # [1st Aug, 1st Sep, 1st Oct, 6th Oct]
-    # 6th Oct is the last date in the array and not 5th oct because
-    # we want to calculate orders including 5th Oct, for that we need to give the next day
-    dates = periods_from_end_date(@num_periods, @end_date, @selected_period)
-     # returns a hash like {[start_date, end_date] => week_num/month_num}
-    @dates_paired = pair_dates(dates, @selected_period)
-
-    @periods = (3..15).to_a
+    get_current_end_date(params)
+    set_num_columns(params)
+    date_pairs
 
     # order_sum_param takes into account what the user wants to calculate - Bottles or Order Totals
     # order_sum_param is defined in Sales Controller Helper
@@ -72,71 +57,95 @@ class SalesController < ApplicationController
 
     # date_type returns group_by_week_created or group_by_month_created
     date_function = period_date_functions(@selected_period)[2]
-    @sums_by_periods = sum_orders(dates[0], dates[-1], date_function.to_sym, sum_function, nil)
+    @sums_by_periods = sum_orders(@dates[0], @dates[-1], date_function.to_sym, sum_function, nil)
 
     staff_id, @staff_nicknames = display_reports_for_sales_dashboard(session[:user_id])
-    @staff_sum_by_periods = sum_orders(dates[0], dates[-1], (date_function + "_and_staff_id").to_sym, sum_function, staff_id)
+    @staff_sum_by_periods = sum_orders(@dates[0], @dates[-1], (date_function + "_and_staff_id").to_sym, sum_function, staff_id)
 
   end
 
-      def product_sales(params)
+
+    def get_current_end_date(params)
+        @end_date = return_end_date(return_date_given(params))
+    end
+
+    def set_num_columns(params)
+        # periods = columns
+        # one period is a pair of start and end date.
         @end_date = return_end_date(return_date_given(params))
         if params[:num_period]
           @num_periods = params[:num_period].to_i
         else
           @num_periods = 13
         end
+        # maximum number of columns allowed = 15, min = 3
         @periods = (3..15).to_a
-        # This returns
+        # This returns if we want to divide columns as weekly date periods, monthly, etc.
         @selected_period, @period_types = define_period_types(params)
+    end
 
+    # sets the sum_function for the dashboard
+    # do we want the cell value to be product qty, average product qty, order total, etc.
+    def set_sum_function(params, default_sum_function, default_display_string)
         sum_function, @param_val, @sum_params = order_sum_param(params[:sum_param])
         if params[:sum_param].nil?
-            sum_function, @param_val = :sum_qty,  "Bottles"
+            sum_function, @param_val = default_sum_function,  default_display_string
         end
+        return sum_function
+    end
+
+    def date_pairs
         # periods_from_end_date is defined in Dates Helper
         # returns an array of all dates - sorted
         # For example num_periods = 3, end_date = 5th oct and "monthly" as period_type returns
         # [1st Aug, 1st Sep, 1st Oct, 6th Oct]
         # 6th Oct is the last date in the array and not 5th oct because
         # we want to calculate orders including 5th Oct, for that we need to give the next day
-        dates = periods_from_end_date(@num_periods, @end_date, @selected_period)
+        @dates = periods_from_end_date(@num_periods, @end_date, @selected_period)
         # returns a hash like {week_num/month_num => [start_date, end_date]}
-        @dates_paired = pair_dates(dates, @selected_period)
-
-        date_function = (period_date_functions(@selected_period)[2] + "_and_product_id").to_sym
-
-
-        staff_id, @staff = staff_params_filter(params)
-        cust_style_id, @cust_style = collection_param_filter(params, :cust_style, CustStyle)
-
-        @qty_hash = Order.valid_order.date_filter(dates[0], dates[-1]).staff_filter(staff_id).\
-        cust_style_filter(cust_style_id).send(date_function).send(sum_function)
-
-        @product_ids_a = product_ids_for_hash(@qty_hash)
+        @dates_paired = pair_dates(@dates, @selected_period)
     end
 
-    def products_filter(products_unfiltered_a, params)
-    order_function, direction = sort_order(params, 'order_by_name', 'ASC')
+    def transform_products(params)
+        @transform_column = params[:transform_column] || "product_no_vintage_id"
+        @checked_id, @checked_no_vintage, @checked_no_ws = checked_radio_button(@transform_column)
+      end
 
-    @producer, @producer_region, @product_type, @producer_country,\
-    @product_sub_type, products_filtered, @search_text, @product_sub_types, @producers,\
-    @producer_regions = \
-    product_dashboard_param_filter(params)
-
-    @products = Product.filter_by_ids_nil_allowed(products_unfiltered_a & products_filtered.pluck("id")).send(order_function, direction)
-    @pending_stock_h = Product.pending_stock('products.id')
+    def product_detailed_filter(params)
+        @producer, @producer_region, @product_type, @producer_country,\
+        @product_sub_type, products_filtered, @search_text, @product_sub_types, @producers,\
+        @producer_regions = \
+        product_dashboard_param_filter(params)
+        return products_filtered.pluck("id")
     end
 
     def product_dashboard
-        products_unfiltered = product_sales(params)
-        products_filter(products_unfiltered, params)
-    end
+        get_current_end_date(params)
+        set_num_columns(params)
+        # this sum function is then queried on the OrderProduct model
+        sum_function = set_sum_function(params, :sum_qty, "Bottles")
+        # we want to group by date and product_id
+        date_function = (period_date_functions(@selected_period)[2] + "_and_product_id").to_sym
+        
+        transform_products(params)
 
-    def product_ids_for_hash(qty_hash)
-        product_ids_a = []
-        qty_hash.keys.each { |date_id_pair| product_ids_a.push(date_id_pair[0])}
-        return product_ids_a
+        date_pairs
+        # filter data based on dropdowns
+        staff_id, @staff = staff_params_filter(params)
+        cust_style_id, @cust_style = collection_param_filter(params, :cust_style, CustStyle)
+        product_filtered_ids = product_detailed_filter(params)
+
+        # product_qty_h is a hash with structure {[product_id, date_id/date_ids] => qty}
+        @product_qty_h = OrderProduct.product_filter(product_filtered_ids).\
+        date_filter(@dates[0], @dates[-1]).staff_filter(staff_id).\
+        cust_style_filter(cust_style_id).send(date_function, @transform_column).send(sum_function)
+
+        @product_ids = []
+        @product_qty_h.each { |date_id_pair, v| @product_ids.push(date_id_pair[0])}
+        @product_ids = @product_ids.uniq
+
+        @price_h, @product_name_h, @inventory_h, @pending_stock_h = get_data_after_transformation(@transform_column, @product_ids)
+
     end
 
 end

@@ -17,14 +17,14 @@
 
 		<% cust_name = customer_name(c) %>
 		<td><%= link_to cust_name, controller: 'customer', action: 'summary', customer_id: c.id, customer_name: cust_name %></td>
-		
+
 		<td><%= customer_type_name(c) %></td>
 		<td><%= customer_style_name(c) %></td>
 		<td class="num"><%= display_num(outstanding_customer(c.xero_contact))  %></td>
 		<td class="num"><%= display_num(overdue_customer(c.xero_contact)) %></td>
 	</tr>
 	<% end %>
-	
+
 </table>
 
 <span style="float:right;">

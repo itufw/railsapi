@@ -15,5 +15,34 @@ class ApplicationController < ActionController::Base
       end
     end
 
+    def admin_logged_in
+      unless session[:user_id] && (session[:user_type].eql? "Admin")
+        flash[:notice] = "Please Log In or Do not have authorise"
+        redirect_to :back
+        return false
+      else
+        return true
+      end
+    end
+
+    def manager_logged_in
+      unless session[:user_id] && ((session[:user_type].eql? "Admin") || (session[:user_type].eql? "Manager"))
+        flash[:notice] = "Please Log In or Do not have authorise"
+        redirect_to :back
+        return false
+      else
+        return true
+      end
+    end
+
+    def accounts_logged_in
+      unless session[:user_id] && ((session[:user_type].eql? "Admin") || (session[:user_type].eql? "Manager") || (session[:user_type].eql? "Accounts"))
+        flash[:notice] = "Please Log In or Do not have authorise"
+        redirect_to :back
+        return false
+      else
+        return true
+      end
+    end
 
 end

@@ -1,3 +1,4 @@
+
 module ModelsFilter
 
   def order_filter(params, session_staff_id, rights_col)
@@ -69,8 +70,6 @@ module ModelsFilter
     return contacts, search_text
 
   end
-
-
 
   def collection_param_filter(params, field, model)
     if !params[field].nil? && !params[field][:id].empty?
