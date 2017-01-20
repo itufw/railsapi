@@ -201,9 +201,9 @@ class Product < ActiveRecord::Base
 		includes([{:order_products => :order}])
 	end
 
-	def self.pending_stock(group_by)
-		include_orders.where('orders.status_id = 1').references(:orders).group(group_by).sum('order_products.qty')
-	end
+	# def self.pending_stock(group_by)
+	# 	include_orders.where('orders.status_id = 1').references(:orders).group(group_by).sum('order_products.qty')
+	# end
 
 	def self.order_by_name(direction)
 		order('name ' + direction)
@@ -269,5 +269,10 @@ class Product < ActiveRecord::Base
 		(self.where(retail_ws: 'WS').send(group_by_transform_column).average('calculated_price * 1.29'))
 
 	end
+
+	def self.product_inventory(group_by_transform_column)
+		send(group_by_transform_column).sum(:inventory)
+	end
+
 
 end

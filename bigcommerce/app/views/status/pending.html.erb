@@ -17,7 +17,7 @@
 	</div>
 	<div class="col-xs-2">
 	    <%= collection_select(:producer_country, :id, ProducerCountry.all, :id, :name, {:include_blank => 'All Countries'}, {:class => 'form-control'}) %>
-	</div>   
+	</div>
 	<div class="col-xs-3">
 	    <%= collection_select(:product_sub_type, :id, ProductSubType.all, :id, :name, {:include_blank => 'All Varietals'}, {:class => 'form-control'}) %>
 	</div>
@@ -25,7 +25,7 @@
 
    	<%= hidden_field_tag :status_id, @status_id %>
    	<%= hidden_field_tag :status_name, @status_name %>
-   
+
     <%= submit_tag "Filter", class: 'btn btn-primary' %>
 <% end %>
 </div><br/>
