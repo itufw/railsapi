@@ -40,7 +40,6 @@ class ReminderMailer < ActionMailer::Base
     end
 
     customer_address = %("#{@customer.xero_contact.name}" <it@untappedwines.com>)
-    # the one that worked
-    mail(from: 'it@untappedwine.com',to: customer_address, subject: 'new testing', body: 'hello from other side')
+    mail(from: 'it@untappedwine.com',to: customer_address, subject: 'Invoice from Untapped Fine Wines')
   end
 end
