@@ -89,25 +89,25 @@ class AdminController < ApplicationController
         redirect_to controller: 'admin', action: 'index'
     end
 
-    def staff_update; end
-
     def password_update
-        if params[:username].present? && params[:password].present?
-            found_user = Staff.where(logon_details: params[:username]).first
-            if found_user
-                authorized_user = found_user.authenticate(params[:password])
+        current_user = Staff.find(session[:user_id])
+        if current_user.can_update
+            if params[:staff].present? && params[:staff][:id].present?
+                staff_to_update = Staff.find(params[:staff][:id])
+                if params[:new_password].eql? params[:new_password_confirmation]
+                    staff_to_update.password_digest = BCrypt::Password.create(params[:new_password])
+                    staff_to_update.save!
+                    flash[:success] = 'Updated'
+                else
+                    flash[:error] = 'Passwords don\'t match'
+                end
+            else
+                flash[:error] = 'Select a Staff to Update'
             end
-        end
-        if authorized_user && (params[:new_password].eql? params[:new_password_confirmation])
-            found_user.password_digest = BCrypt::Password.create(params[:new_password])
-            found_user.save!
-            flash[:success] = 'Updated.'
-        elsif authorized_user
-            flash[:error] = 'new password confirmation failed'
         else
-            flash[:error] = 'Invalid username/password combination'
+            flash[:error] = 'Not authorised to update'
         end
-        redirect_to action: 'staff_update'
+        redirect_to action: 'index'
     end
 
 end
