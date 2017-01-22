@@ -2,9 +2,9 @@
 <h3><%= @customer.xero_contact.name%></h3>
 
 <div style="margin-top: 50px;">
-  <%= render "partials/invoice_header", customer: @customer %>
+  <%= render "accounts_partials/invoice_header", customer: @customer %>
 </div>
 
 <div style="margin-top: 50px;">
-  <%= render "partials/invoice_details", customer: @customer, amount_due: @amount_due%>
+  <%= render "accounts_partials/invoice_details", customer: @customer, amount_due: @amount_due%>
 </div>

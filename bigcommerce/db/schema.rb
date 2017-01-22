@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170113000835) do
+ActiveRecord::Schema.define(version: 20170120034839) do
 
   create_table "addresses", force: :cascade do |t|
     t.integer  "customer_id", limit: 4
@@ -515,25 +515,35 @@ ActiveRecord::Schema.define(version: 20170113000835) do
   end
 
   create_table "task_relations", force: :cascade do |t|
-    t.integer  "task_id",       limit: 4
-    t.integer  "contact_id",    limit: 4
-    t.integer  "customer_id",   limit: 4
-    t.integer  "cust_group_id", limit: 4
-    t.integer  "staff_id",      limit: 4
-    t.integer  "type",          limit: 4
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.integer  "task_id",         limit: 4
+    t.integer  "contact_id",      limit: 4
+    t.integer  "customer_id",     limit: 4
+    t.integer  "cust_group_id",   limit: 4
+    t.integer  "staff_id",        limit: 4
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.datetime "completed_date"
+    t.integer  "completed_staff", limit: 4
   end
 
   create_table "tasks", force: :cascade do |t|
-    t.string   "subject",    limit: 255
-    t.string   "priority",   limit: 255
-    t.text     "content",    limit: 65535
-    t.datetime "start_date",               null: false
-    t.datetime "end_date",                 null: false
-    t.string   "status",     limit: 255
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.datetime "start_date",                      null: false
+    t.datetime "end_date",                        null: false
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.string   "title",               limit: 255
+    t.string   "description",         limit: 255
+    t.integer  "is_task",             limit: 4
+    t.integer  "response_staff",      limit: 4
+    t.integer  "last_modified_staff", limit: 4
+    t.string   "method",              limit: 255
+    t.string   "categorise",          limit: 255
+    t.integer  "parent_task",         limit: 4
+    t.datetime "completed_date"
+    t.integer  "completed_staff",     limit: 4
+    t.string   "subject_1",           limit: 255
+    t.string   "subject_2",           limit: 255
+    t.string   "subject_3",           limit: 255
   end
 
   create_table "tax_percentages", force: :cascade do |t|
