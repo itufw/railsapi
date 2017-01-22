@@ -1,19 +1,19 @@
-<% staffs.each do |id, nickname| %>
-	<tr>
-	<td><%= link_to nickname, controller: 'sales', action: 'customer_dashboard', staff_id: id, staff_nickname: nickname %></td>
-	<% sums_dates_h = give_sum_date_h(id, sums_dates_staffs_h) %>
-
-	<%#= dates_map is a hash like {date => date} when columns are single days, {week_num => [start_date, end_date]} when columns are weeks, {[month_num, year] => [start_date, end_date]} for months %>
-
-	<%#= sums_dates_h are a hash like {[start_date, end_date] => sum} %>
-
-	<%= render "partials/daily_sums", sums_dates_h: sums_dates_h, dates: dates, staff_nickname: nickname, staff_id: id, dates_map: dates_map %>
-
-	</tr>
+<% if ((current_user.user_type.in?(["Management","Admin","Accounts"])) || ("Yes".eql? display_all)) %>
+	<% staffs.each do |id, nickname| %>
+		<tr>
+		<td><%= link_to nickname, controller: 'sales', action: 'customer_dashboard', staff_id: id, staff_nickname: nickname %></td>
+		<% sums_dates_h = give_sum_date_h(id, sums_dates_staffs_h) %>
+		<%= render "partials/daily_sums", sums_dates_h: sums_dates_h, dates: dates, staff_nickname: nickname, staff_id: id, dates_map: dates_map %>
+		</tr>
+	<% end %>
+	<% else %>
+		<tr>
+		<td><%= link_to current_user.nickname, controller: 'sales', action: 'customer_dashboard', staff_id: current_user.id, staff_nickname: current_user.nickname %></td>
+		<% sums_dates_h = give_sum_date_h(current_user.id, sums_dates_staffs_h) %>
+		<%= render "partials/daily_sums", sums_dates_h: sums_dates_h, dates: dates, staff_nickname: current_user.nickname, staff_id: current_user.id, dates_map: dates_map %>
+		</tr>
 <% end %>
-
 <tr class="blank-row"></tr>
 <tr>
 <%= render "partials/staff_sums_total", sums_dates_h: sums_dates_staffs_h, dates: dates, staffs: staffs %>
 </tr>
-

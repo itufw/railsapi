@@ -39,6 +39,10 @@ class SalesController < ApplicationController
         @staff_sum_this_week = sum_orders(@dates_this_week[0], @dates_this_week[-1], :group_by_date_created_and_staff_id, sum_function, staff_id)
         #@staff_nicknames = Staff.active_sales_staff.nickname.to_h
         @staff_sum_this_week
+
+        @current_user = Staff.find(session[:user_id])
+        @display_all = params[:display_all] || "No"
+
     end
 
     def get_current_end_date(params)
@@ -138,7 +142,7 @@ class SalesController < ApplicationController
         sum_function = set_sum_function(params, :sum_qty, "Bottles")
         # we want to group by date and product_id
         date_function = (period_date_functions(@selected_period)[2] + "_and_product_id").to_sym
-        
+
         transform_products(params)
 
         date_pairs
