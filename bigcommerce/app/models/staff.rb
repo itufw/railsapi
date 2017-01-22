@@ -19,6 +19,10 @@ class Staff < ActiveRecord::Base
 	  where('active = 1 and user_type LIKE "Sales%"')
 	end
 
+	def self.active
+		where('active = 1')
+	end
+
 	def self.filter_by_id(staff_id)
 	  return find(staff_id)
 	end

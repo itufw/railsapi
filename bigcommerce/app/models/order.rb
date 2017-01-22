@@ -249,19 +249,34 @@ class Order < ActiveRecord::Base
         includes(:customer).group(['customers.staff_id', 'QUARTER(orders.date_created)', 'YEAR(orders.date_created)'])
     end
 
-    def self.group_by_week_created_and_product_id
-        includes(:order_products).group(['order_products.product_id',\
-                                         'WEEK(orders.date_created)']).references(:order_products)
+    # def self.group_by_week_created_and_product_id
+    #     includes(:order_products).group(['order_products.product_id',\
+    #                                      'WEEK(orders.date_created)']).references(:order_products)
+    # end
+
+    # def self.group_by_month_created_and_product_id
+    #     includes(:order_products).group(['order_products.product_id',\
+    #                                      'MONTH(orders.date_created)', 'YEAR(orders.date_created)']).references(:order_products)
+    # end
+
+    # def self.group_by_quarter_created_and_product_id
+    #     includes(:order_products).group(['order_products.product_id',\
+    #                                      'QUARTER(orders.date_created)', 'YEAR(orders.date_created)']).references(:order_products)
+    # end
+
+     def self.group_by_week_created_and_customer_id
+        includes(:customer).group(['customers.id',\
+                                         'WEEK(orders.date_created)']).references(:customers)
     end
 
-    def self.group_by_month_created_and_product_id
-        includes(:order_products).group(['order_products.product_id',\
-                                         'MONTH(orders.date_created)', 'YEAR(orders.date_created)']).references(:order_products)
+    def self.group_by_month_created_and_customer_id
+        includes(:customer).group(['customers.id',\
+                                         'MONTH(orders.date_created)', 'YEAR(orders.date_created)']).references(:customers)
     end
 
-    def self.group_by_quarter_created_and_product_id
-        includes(:order_products).group(['order_products.product_id',\
-                                         'QUARTER(orders.date_created)', 'YEAR(orders.date_created)']).references(:order_products)
+    def self.group_by_quarter_created_and_customer_id
+        includes(:customer).group(['customers.id',\
+                                         'QUARTER(orders.date_created)', 'YEAR(orders.date_created)']).references(:customers)
     end
 
     def self.group_by_customerid
