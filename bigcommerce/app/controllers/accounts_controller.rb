@@ -51,13 +51,12 @@ class AccountsController < ApplicationController
   end
 
   def send_reminder
-    # p =c
-    # TODO Have not finished yet!
     @selected_invoices = params[:selected_invoices]
     @customer_id = params[:customer_id]
     ReminderMailer.reminder_email(@customer_id,@selected_invoices).deliver_now
     redirect_to :back
-
   end
 
+  def task_detail
+  end
 end
