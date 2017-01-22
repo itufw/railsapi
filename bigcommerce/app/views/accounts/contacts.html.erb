@@ -3,8 +3,8 @@
 
 <div class="form-group container-center">
 	<%= form_tag({:action => "contacts"}, {:method => "get"}) do %>
-	<%= render "partials/contact_filter" %>
+	<%= render "accounts_partials/contact_filter" %>
   <% end %>
 </div>
 
-<%= render "partials/contact", contacts: @contacts, invoices: @invoices, date_column: @date_column %>
+<%= render "accounts_partials/contact", contacts: @contacts, invoices: @invoices, date_column: @date_column %>

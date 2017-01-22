@@ -58,7 +58,7 @@
 				<% customer.xero_contact.xero_invoices.has_amount_due.each do |i| %>
 				<tr>
 					<td><%= check_box_tag 'selected_invoices[]', i.invoice_number %></td>
-					<td><%= link_to i.invoice_number, controller: 'sales', action: 'order_details', order_id: i.invoice_number%></td>
+					<td><%= link_to i.invoice_number, controller: 'order', action: 'details', order_id: i.invoice_number%></td>
 					<td><%= i.date.to_date %></td>
 					<td><%= i.due_date.to_date %></td>
 					<td><%= i.total %></td>

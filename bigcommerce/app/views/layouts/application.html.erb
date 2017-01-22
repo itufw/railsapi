@@ -19,6 +19,9 @@
           <ul class="dropdown-menu">
             <li><%= link_to "Weekly", controller: "sales", action: "sales_dashboard" %></li>
             <li><%= link_to "Detailed", controller: "sales", action: "sales_dashboard_detailed" %></li>
+            <% unless Staff.find(session[:user_id]).user_type.in?(["Management","Admin","Accounts"]) %>
+            <li><%= link_to "Weekly All Staff", controller: "sales", action: "sales_dashboard", display_all: "Yes" %></li>
+            <% end %>
           </ul>
         </li>
 
