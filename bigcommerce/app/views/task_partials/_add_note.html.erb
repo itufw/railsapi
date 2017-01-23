@@ -1,15 +1,22 @@
-<div class="container">
+<div class="container orders-view default">
     <div class="row">
         <%= form_tag({:controller => "task", :action => "add_task"}, {:method => "post"}) do %>
         <%= hidden_field_tag :staff_id, "20" %>
-        <div class="col-md-4">
+        <%= hidden_field_tag :is_task, 0 %>
+        <div class="col-md-8">
             Title:
             <input type='text' name='title' id='title'/><br/>
             Description:<br/>
             <textarea name='description' id='description'></textarea><br/>
+            Start From:  <%= date_field( "start_date", "start_date", value: @start_date) %>
+            Until:  <%= date_field( "end_date", "end_date", value: @end_date) %>
         </div>
     </div>
     <%= submit_tag "Add Note!", class: 'btn btn-primary', data: { confirm: "Add Note?" }%>
     <!-- end of the form -->
     <%end%>
 </div>
+
+<!-- sql = "INSERT INTO `tasks`(`start_date`, `end_date`, `created_at`, `updated_at`,\
+      `title`, `description`, `is_task`, `response_staff`, `last_modified_staff`, `method`,\
+      `categorise`)\ -->

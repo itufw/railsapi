@@ -106,6 +106,9 @@ class SalesController < ApplicationController
 
         staff_id, @staff_nicknames = display_reports_for_sales_dashboard(session[:user_id])
         @staff_sum_by_periods = sum_orders(@dates[0], @dates[-1], (date_function + "_and_staff_id").to_sym, sum_function, staff_id)
+
+        @current_user = Staff.find(session[:user_id])
+        @display_all = params[:display_all] || "No"
     end
 
     def customer_dashboard
