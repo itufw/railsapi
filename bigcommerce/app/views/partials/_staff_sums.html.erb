@@ -1,4 +1,4 @@
-<% if ((current_user.user_type.in?(["Management","Admin","Accounts"])) || ("Yes".eql? display_all)) %>
+<% unless ((current_user.user_type.in?(["Sales Executive"])) && ("No".eql? display_all)) %>
 	<% staffs.each do |id, nickname| %>
 		<tr>
 		<td><%= link_to nickname, controller: 'sales', action: 'customer_dashboard', staff_id: id, staff_nickname: nickname %></td>

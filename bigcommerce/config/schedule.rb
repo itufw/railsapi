@@ -30,26 +30,26 @@ every 5.minutes do
 	rake "updates:models"
 end
 
-every 1.day, :at => Time.zone.parse('5:00 am').utc do
+every 1.day, :at => Time.zone.parse('6:00 pm').utc do
 	rake "updates:balance_update"
 end
 
-every 1.day, :at => Time.zone.parse('12:00 am').utc do
+every 1.day, :at => Time.zone.parse('6:00 pm').utc do
 	rake "updates:timeperiods"
 end
 
-every 1.day, :at => Time.zone.parse('10:00 am').utc do
+every 1.day, :at => Time.zone.parse('11:00 pm').utc do
   rake "xero_invoice_sync:sync"
 end
 
-every 1.day, :at => Time.zone.parse('12:00 pm').utc do
+every 1.day, :at => Time.zone.parse('1:00 am').utc do
   rake "xero_invoice_sync:sync"
 end
 
-every 1.day, :at => Time.zone.parse('4:30 pm').utc do
+every 1.day, :at => Time.zone.parse('6:30 am').utc do
   rake "xero_invoice_sync:sync"
 end
 
-every 1.day, :at => Time.zone.parse('6:00 pm').utc do
+every 1.day, :at => Time.zone.parse('8:00 am').utc do
   rake "xero_invoice_sync:sync"
 end

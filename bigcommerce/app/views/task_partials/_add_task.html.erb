@@ -1,15 +1,17 @@
-<div class="container">
+<div class="container products-view not-default">
     <div class="row">
         <%= form_tag({:controller => "task", :action => "add_task"}, {:method => "post"}) do %>
         <%= hidden_field_tag :staff_id, "20" %>
-        <div class="col-md-4">
+        <%= hidden_field_tag :is_task, 1 %>
+
+        <div class="col-md-6">
             Title:
             <input type='text' name='title' id='title'/><br/>
             Description:<br/>
             <textarea name='description' id='description'></textarea><br/>
         </div>
     </div>
-    <%= submit_tag "Add Note!", class: 'btn btn-primary', data: { confirm: "Add Note?" }%>
+    <%= submit_tag "Add Task!", class: 'btn btn-primary', data: { confirm: "Add Note?" }%>
     <!-- end of the form -->
     <%end%>
 </div>
