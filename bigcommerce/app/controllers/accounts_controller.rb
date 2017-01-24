@@ -53,7 +53,30 @@ class AccountsController < ApplicationController
   def send_reminder
     @selected_invoices = params[:selected_invoices]
     @customer_id = params[:customer_id]
-    ReminderMailer.reminder_email(@customer_id,@selected_invoices).deliver_now
+
+    case params[:commit]
+    when "Send Reminder", "Send Missed Payment"
+        if params[:selected_invoices]
+          ReminderMailer.reminder_email(@customer_id,@selected_invoices).deliver_now
+          flash[:success] = "Email Sent"
+        else
+          flash[:error] = "Please Select the invoice!"
+        end
+      # different template for overdue_reminder_body based on the button user clicked
+    when "Send Overdue Reminder"
+      ReminderMailer.send_overdue_reminder(@customer_id,"overdue").deliver_now
+      flash[:success] = "Email Sent"
+    when "Send 60 Days Overdue Reminder"
+      ReminderMailer.send_overdue_reminder(@customer_id,"overdue_60days").deliver_now
+      flash[:success] = "Email Sent"
+
+    when "Send 90 Days Overdue Reminder"
+      ReminderMailer.send_overdue_reminder(@customer_id,"overdue_90days").deliver_now
+      flash[:success] = "Email Sent"
+    when "Send New Order Hold"
+      ReminderMailer.send_overdue_reminder(@customer_id,"new_order_hold").deliver_now
+      flash[:success] = "Email Sent"
+    end
     redirect_to :back
   end
 

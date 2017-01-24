@@ -21,9 +21,17 @@ module DatesHelper
 
   def return_end_date_invoices(date_given)
     if date_given.blank? || date_given['end_date'].blank?
-      return Date.today
+      return Date.today.to_date
     else
       return date_given['end_date']
+    end
+  end
+
+  def return_start_date_invoices(date_given)
+    if date_given.blank? || date_given['start_date'].blank?
+      return Date.today.to_date
+    else
+      return date_given['start_date']
     end
   end
 # If a set date isnt given then start of the week is current week's start

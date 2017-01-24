@@ -4,26 +4,7 @@
     <meta content='text/html; charset=ISO-8859-1' http-equiv='Content-Type' />
   </head>
   <body>
-    <h1>Hello <%= @customer.xero_contact.name %></h1>
-    <div style=" position: fixed; bottom: 0; width: 100%;">
-        <div style="font-size: .8em;">
-          <img src="https://www.untappedwines.com.au/template/images/email_signature.png"><br/>
-          <b style="font-size: .8em;">Untapped Fine Wines</b>
-            <table>
-              <tr>
-                <td>P:</td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>E:</td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>W:</td>
-                <td>www.untappedwines.com</td>
-              </tr>
-            </table>
-        </div>
-      </div>
+    <%= render "reminder_mailer_partials/missed_payment_body", over_due_invoices: @over_due_invoices, xero_contact: @xero_contact%>
+    <%= render "reminder_mailer_partials/signature_anglica"%>
   </body>
 </html>

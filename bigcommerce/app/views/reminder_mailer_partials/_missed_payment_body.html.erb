@@ -1,0 +1,62 @@
+
+    <div>Hi,</div>
+    <br/>
+    <div>Thanks for the recent payment that was made to our account.</div>
+    <br/>
+    <div>Could I please refer you to an invoice that has been missed that we’re still awaiting payment for. The details are below.</div>
+    <br/>
+    <table style="border-collapse: collapse">
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td colspan="4" style="color: red; background-color: #bfbfbf; font-weight:bold" align="center">Total Overdue  <%= number_to_currency(over_due_invoices.sum(:amount_due)) %></td>
+      </tr>
+        <tr style="color: white; background-color: #043483; width: 90%; padding: 5px">
+            <th>Date</th>
+            <th>Invoice</th>
+            <th>Due Date</th>
+            <th>Days overdue</th>
+            <th>Total</th>
+            <th>Paid</th>
+            <th>Credited</th>
+            <th>Due</th>
+            <th>Running Balance</th>
+        </tr>
+        <% running_balance = 0 %>
+        <% over_due_invoices.each do |invoice| %>
+        <tr align="center">
+          <td><%= invoice.date.to_date.strftime("%d/%-m/%y")%></td>
+          <td><%= invoice.invoice_number%></td>
+          <td><%= invoice.due_date.to_date.strftime("%d/%-m/%y")%></td>
+          <td style="border-right: 1px solid"><%= Date.today.mjd - invoice.due_date.to_date.mjd %> days</td>
+          <td><%= number_to_currency(invoice.total) %></td>
+          <% unless invoice.amount_paid == 0%>
+            <td><%= number_to_currency(invoice.amount_paid) %></td>
+          <% else %>
+            <td>-</td>
+          <% end %>
+
+          <% unless invoice.amount_credited == 0%>
+            <td style="border-right: 1px solid"><%= number_to_currency(invoice.amount_credited) %></td>
+          <% else %>
+            <td style="border-right: 1px solid">-</td>
+          <% end %>
+
+          <td style="border-right: 1px solid"><%= number_to_currency(invoice.amount_due)%></td>
+          <% running_balance += invoice.amount_due %>
+          <td style="font-style: italic"><%= number_to_currency(running_balance) %></td>
+        </tr>
+        <% end %>
+    </table>
+    <br/>
+
+
+    <div>I’ve attached a copy of the invoice(s) in case you are missing them in your records. I will also follow-up with an additional email providing the Proof of delivery (POD).</div>
+    <br/>
+
+    <div>Thanks for the help and if you have any questions please be in contact.</div>
+    <br/>

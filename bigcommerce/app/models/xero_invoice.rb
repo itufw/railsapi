@@ -180,6 +180,13 @@ class XeroInvoice < ActiveRecord::Base
     def self.has_amount_due
         where('xero_invoices.amount_due > 0')
       end
+    def self.order_by_due_date
+      order(:due_date)
+    end
+
+    def self.over_due_invoices
+      where("due_date < '#{Date.today}'")
+    end
 
     def self.period_select(until_date)
         where("(xero_invoices.date < '#{until_date}' or xero_invoices.due_date < '#{until_date}') and xero_invoices.amount_due > 0 ")
