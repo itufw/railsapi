@@ -89,6 +89,16 @@ class AdminController < ApplicationController
         redirect_to controller: 'admin', action: 'index'
     end
 
+
+    def xero_sync_temp
+        XeroRevision.update_end_time(Time.now.utc)
+
+        system 'rake xero_invoice_sync:sync'
+        flash[:success] = 'Sync is Done! (Temporary!)'
+        redirect_to controller: 'admin', action: 'index'
+    end
+
+
     def password_update
         current_user = Staff.find(session[:user_id])
         if current_user.can_update

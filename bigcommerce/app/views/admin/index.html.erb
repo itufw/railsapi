@@ -7,6 +7,13 @@
 	<% end %>
 </div>
 
+
+<div align="center" style="margin-top: 50px;">
+	<%= form_tag({:action => "xero_sync_temp"}, {:method => "get"}) do %>
+		<%= submit_tag "Xero Sync! (For temporary Use!)", class: 'btn btn-primary' %>
+	<% end %>
+</div>
+
 <div style="margin-top: 50px;">
 	<%= form_tag({:action => "password_update"}, {:method => "get"}) do %>
 		<h4>Password Update : </h4>
