@@ -69,7 +69,6 @@ class AccountsController < ApplicationController
     when "Send 60 Days Overdue Reminder"
       ReminderMailer.send_overdue_reminder(@customer_id,"overdue_60days").deliver_now
       flash[:success] = "Email Sent"
-
     when "Send 90 Days Overdue Reminder"
       ReminderMailer.send_overdue_reminder(@customer_id,"overdue_90days").deliver_now
       flash[:success] = "Email Sent"
