@@ -1,0 +1,64 @@
+
+    <div>Hi,</div>
+    <br/>
+    <div>We have outstanding balance for wine that was delivered for <%= xero_contact.name %> total <%= number_to_currency(over_due_invoices.sum(:amount_due)) %>. Please see the details below.</div>
+    <br/>
+    <table style="border-collapse: collapse">
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td colspan="4" style="color: red; background-color: #bfbfbf; font-weight:bold" align="center">Total Overdue  <%= number_to_currency(over_due_invoices.sum(:amount_due)) %></td>
+      </tr>
+        <tr style="color: white; background-color: #043483; width: 90%; padding: 5px">
+            <th>Date</th>
+            <th>Invoice</th>
+            <th>Due Date</th>
+            <th>Days overdue</th>
+            <th>Total</th>
+            <th>Paid</th>
+            <th>Credited</th>
+            <th>Due</th>
+            <th>Running Balance</th>
+        </tr>
+        <% running_balance = 0 %>
+        <% over_due_invoices.each do |invoice| %>
+        <tr align="center">
+          <td><%= invoice.date.to_date.strftime("%d/%-m/%y")%></td>
+          <td><%= invoice.invoice_number%></td>
+          <td><%= invoice.due_date.to_date.strftime("%d/%-m/%y")%></td>
+          <td style="border-right: 1px solid"><%= Date.today.mjd - invoice.due_date.to_date.mjd %> days</td>
+          <td><%= number_to_currency(invoice.total) %></td>
+          <% unless invoice.amount_paid == 0%>
+            <td><%= number_to_currency(invoice.amount_paid) %></td>
+          <% else %>
+            <td>-</td>
+          <% end %>
+
+          <% unless invoice.amount_credited == 0%>
+            <td style="border-right: 1px solid"><%= number_to_currency(invoice.amount_credited) %></td>
+          <% else %>
+            <td style="border-right: 1px solid">-</td>
+          <% end %>
+
+          <td style="border-right: 1px solid"><%= number_to_currency(invoice.amount_due)%></td>
+          <% running_balance += invoice.amount_due %>
+          <td style="font-weight:italic"><%= number_to_currency(running_balance) %></td>
+        </tr>
+        <% end %>
+    </table>
+    <br/>
+
+    <div>This balance is now <a style="color: red">overdue</a> and we require payment of the amount provided above and repeated in the attached statement in order to continue to provide credit terms on a regular basis.</div>
+    <br/>
+
+    <div>Can you please examine this and either give me a call or reply to this email as to when the outstanding amount can be settled.</div>
+    <br/>
+
+    <div>If you have any questions regarding your account please be in contact.</div>
+    <br/>
+
+    <div>We appreciate your help in having this paid promptly.</div>

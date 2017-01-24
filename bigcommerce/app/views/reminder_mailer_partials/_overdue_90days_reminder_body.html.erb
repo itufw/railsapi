@@ -1,0 +1,69 @@
+
+    <div>Hi,</div>
+    <br/>
+    <div style="color: red; font-weight:bold">FINAL NOTICE – PAYMENT REQUIRED</div>
+    <br/>
+
+
+    <div>We have outstanding balance for wine that was delivered to <a style="font-weight:bold"> <%= xero_contact.name %> </a>for <%= number_to_currency(over_due_invoices.sum(:amount_due)) %>. Some of this wine is more than 90 days overdue. The details are listed below.</div>
+    <br/>
+    <div>We cannot continue to provide credit terms for your account on a normal basis. Until any overdue amount is cleared all new invoice must be paid for on creation before they can be shipped.</div>
+    <br/>
+    <div>We have made repeated attempts to address this outstanding amount with you and now we require immediate payment.</div>
+    <br/>
+    <table style="border-collapse: collapse">
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td colspan="4" style="color: red; background-color: #bfbfbf; font-weight:bold" align="center">Total Overdue  <%= number_to_currency(over_due_invoices.sum(:amount_due)) %></td>
+      </tr>
+        <tr style="color: white; background-color: #043483; width: 90%; padding: 5px">
+            <th>Date</th>
+            <th>Invoice</th>
+            <th>Due Date</th>
+            <th>Days overdue</th>
+            <th>Total</th>
+            <th>Paid</th>
+            <th>Credited</th>
+            <th>Due</th>
+            <th>Running Balance</th>
+        </tr>
+        <% running_balance = 0 %>
+        <% over_due_invoices.each do |invoice| %>
+        <tr align="center">
+          <td><%= invoice.date.to_date.strftime("%d/%-m/%y")%></td>
+          <td><%= invoice.invoice_number%></td>
+          <td><%= invoice.due_date.to_date.strftime("%d/%-m/%y")%></td>
+          <td style="border-right: 1px solid"><%= Date.today.mjd - invoice.due_date.to_date.mjd %> days</td>
+          <td><%= number_to_currency(invoice.total) %></td>
+          <% unless invoice.amount_paid == 0%>
+            <td><%= number_to_currency(invoice.amount_paid) %></td>
+          <% else %>
+            <td>-</td>
+          <% end %>
+
+          <% unless invoice.amount_credited == 0%>
+            <td style="border-right: 1px solid"><%= number_to_currency(invoice.amount_credited) %></td>
+          <% else %>
+            <td style="border-right: 1px solid">-</td>
+          <% end %>
+
+          <td style="border-right: 1px solid"><%= number_to_currency(invoice.amount_due)%></td>
+          <% running_balance += invoice.amount_due %>
+          <td style="font-style: italic"><%= number_to_currency(running_balance) %></td>
+        </tr>
+        <% end %>
+    </table>
+    <br/>
+
+    <div>Please be in contact with myself or our Operations and Finance manager Luke Voortman on 03 9676 9663 to discuss when we can expect to receive payment. If we fail to receive contact from you across the coming week we will begin <a style="font-weight:bold">recovery actions </a>. Any costs relating to recovery actions will be passed on to your business. Please be aware that these recovery costs can be costly.</div>
+    <br/>
+
+    <div>Attached are copies of the invoice(s) listed above in case they are missing from your records.</div>
+    <br/>
+
+    <div>We appreciate your help and in responding to this quickly.</div>

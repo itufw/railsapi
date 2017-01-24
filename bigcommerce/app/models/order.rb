@@ -58,6 +58,7 @@ class Order < ActiveRecord::Base
             return if orders.blank?
 
             orders.each do |o|
+
                 if !Order.where(id: o.id).blank?
                     # move row to history, update this one
 
@@ -80,6 +81,8 @@ class Order < ActiveRecord::Base
                     insert_or_update(o, 1)
                     order_product.insert(o.id)
                 end
+                Address.new.insert_or_update(o.billing_address,o.customer_id,o.id)
+
             end
 
             page_number += 1

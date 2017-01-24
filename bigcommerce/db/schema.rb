@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170120034839) do
+ActiveRecord::Schema.define(version: 20170124051307) do
 
   create_table "addresses", force: :cascade do |t|
     t.integer  "customer_id", limit: 4
@@ -462,27 +462,26 @@ ActiveRecord::Schema.define(version: 20170120034839) do
   end
 
   create_table "staffs", force: :cascade do |t|
-    t.string   "firstname",       limit: 255
-    t.string   "lastname",        limit: 255
-    t.string   "nickname",        limit: 255
-    t.string   "email",           limit: 255
-    t.string   "logon_details",   limit: 255
-    t.string   "contact_number",  limit: 255
-    t.string   "state",           limit: 255
-    t.string   "country",         limit: 255
-    t.string   "user_type",       limit: 255
-    t.integer  "display_report",  limit: 1
-    t.integer  "invoice_rights",  limit: 1
-    t.integer  "product_rights",  limit: 1
-    t.integer  "payment_rights",  limit: 1
-    t.integer  "active",          limit: 1
-    t.string   "password_digest", limit: 255
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
-    t.integer  "can_update",      limit: 1
-    t.string   "contact_email",   limit: 255, null: false
-    t.string   "contact_phone",   limit: 255, null: false
-    t.integer  "pending_orders",  limit: 1
+    t.string   "firstname",        limit: 255
+    t.string   "lastname",         limit: 255
+    t.string   "nickname",         limit: 255
+    t.string   "email",            limit: 255
+    t.string   "logon_details",    limit: 255
+    t.string   "contact_number",   limit: 255
+    t.string   "state",            limit: 255
+    t.string   "country",          limit: 255
+    t.string   "user_type",        limit: 255
+    t.integer  "display_report",   limit: 1
+    t.integer  "invoice_rights",   limit: 1
+    t.integer  "product_rights",   limit: 1
+    t.integer  "payment_rights",   limit: 1
+    t.integer  "active",           limit: 1
+    t.string   "password_digest",  limit: 255
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+    t.integer  "can_update",       limit: 1
+    t.integer  "pending_orders",   limit: 1
+    t.string   "salesforce_email", limit: 255
   end
 
   add_index "staffs", ["active"], name: "index_staffs_on_active", using: :btree
@@ -526,6 +525,14 @@ ActiveRecord::Schema.define(version: 20170120034839) do
     t.integer  "completed_staff", limit: 4
   end
 
+  create_table "task_subjects", force: :cascade do |t|
+    t.string   "subject",    limit: 255
+    t.string   "function",   limit: 255
+    t.string   "user_type",  limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "tasks", force: :cascade do |t|
     t.datetime "start_date",                      null: false
     t.datetime "end_date",                        null: false
@@ -537,13 +544,13 @@ ActiveRecord::Schema.define(version: 20170120034839) do
     t.integer  "response_staff",      limit: 4
     t.integer  "last_modified_staff", limit: 4
     t.string   "method",              limit: 255
-    t.string   "categorise",          limit: 255
     t.integer  "parent_task",         limit: 4
     t.datetime "completed_date"
     t.integer  "completed_staff",     limit: 4
     t.string   "subject_1",           limit: 255
     t.string   "subject_2",           limit: 255
     t.string   "subject_3",           limit: 255
+    t.string   "function",            limit: 255
   end
 
   create_table "tax_percentages", force: :cascade do |t|
