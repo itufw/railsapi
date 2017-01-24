@@ -71,7 +71,7 @@ class XeroCreditNote < ActiveRecord::Base
 			total = '#{c.total}', total_tax = '#{c.total_tax}',remaining_credit = '#{c.remaining_credit}',\
 			date = '#{date}', updated_date = '#{updated_date}',fully_paid_on_date = '#{fully_paid_on_date}',\
 			updated_at = '#{time}', currency_code = '#{c.currency_code}',currency_rate = '#{c.currency_rate}',\
-			reference = '#{c.reference}''\
+			reference = '#{c.reference}'\
 			WHERE xero_credit_note_id = '#{c.credit_note_id}'"
 		end
 		ActiveRecord::Base.connection.execute(sql)
