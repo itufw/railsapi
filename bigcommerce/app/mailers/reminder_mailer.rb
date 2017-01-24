@@ -2,7 +2,7 @@ class ReminderMailer < ActionMailer::Base
   require 'mail'
   require 'wicked_pdf'
 
-  default from: 'it@untappedwines.com'
+  default from: 'accounts@untappedwines.com'
   layout "mailer"
 
   def send_overdue_reminder(customer_id, template)
@@ -10,7 +10,7 @@ class ReminderMailer < ActionMailer::Base
     @over_due_invoices = XeroInvoice.has_amount_due.over_due_invoices.where(:xero_contact_id => @xero_contact.xero_contact_id).order(:due_date)
     @template = template
 
-    customer_address = %("#{@xero_contact.name}" <it@untappedwines.com>)
+    customer_address = %("#{@xero_contact.name}" <#{@xero_contact.email}>)
 
     case template
     when "overdue"
@@ -23,10 +23,11 @@ class ReminderMailer < ActionMailer::Base
       email_subject = "FINAL NOTICE PAYMENT REQUIRED, 90+ Days Overdue – Untapped Fine Wines – #{@xero_contact.name}"
       attach_invoices(@over_due_invoices)
     when "new_order_hold"
+      # redirect_to "reminder_mailer/send_overdue_reminder"
       email_subject = "ORDER ON HOLD – Untapped Fine Wines – #{@xero_contact.name}"
       attach_invoices(@over_due_invoices)
     end
-    mail(from: 'it@untappedwine.com',to: customer_address, subject: email_subject)
+    mail(from: 'accounts@untappedwine.com',to: customer_address, cc: Staff.find(Customer.find(customer_id).staff_id).email, bcc: "emailtosalesforce@y-5cvcy6yhzo3z4984r5f5htqn7.9yyfmeag.9.le.salesforce.com", subject: email_subject)
   end
 
 
