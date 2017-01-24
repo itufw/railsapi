@@ -2,7 +2,9 @@
 <h3 align="center">Admin</h3>
 
 <div align="center" style="margin-top: 50px;">
-	<%= button_tag "Xero Sync", controller: "admin", action:"xero_sync", class: "btn btn-primary", method: "post" %>
+	<%= form_tag({:action => "xero_sync"}, {:method => "get"}) do %>
+		<%= submit_tag "Xero Sync!", class: 'btn btn-primary' %>
+	<% end %>
 </div>
 
 <div style="margin-top: 50px;">
