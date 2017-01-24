@@ -1,6 +1,4 @@
-require 'dates_helper.rb'
 module TaskHelper
-    include DatesHelper
 
     def new_task_record(params, current_user)
 
@@ -8,8 +6,10 @@ module TaskHelper
             t = Task.new
             # format of id: staffID + Customer ID + is task + timestamp
             t.id = Time.now.to_i
-            start_date = return_start_date_invoices(params[:start_date])
-            end_date = return_end_date_invoices(params[:end_date])
+            # start_date = return_start_date_invoices(params[:start_date])
+            # end_date = return_end_date_invoices(params[:end_date])
+            start_date = Date.today
+            end_date = Date.today
             t.description = params[:description]
             t.is_task = params[:is_task]
             t.response_staff = current_user
