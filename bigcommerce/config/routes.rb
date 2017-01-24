@@ -3,6 +3,10 @@ Rails.application.routes.draw do
   root 'sales#sales_dashboard'
   #post 'admin/update'
 
+  get '/rails/mailers' => "rails/mailers#index"
+  get '/rails/mailers/*path' => "rails/mailers#preview"
+
+  # this needs to be replaced sometime
   match ':controller(/:action(/:id))', via: [:get, :post]
 
 
