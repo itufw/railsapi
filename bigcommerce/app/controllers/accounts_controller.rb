@@ -80,6 +80,4 @@ class AccountsController < ApplicationController
     redirect_to :back
   end
 
-  def task_detail
-  end
 end
