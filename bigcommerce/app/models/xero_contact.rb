@@ -41,14 +41,6 @@ class XeroContact < ActiveRecord::Base
 
         contact_groups = convert_empty_list(c.contact_groups)
 
-        # if c.balances.nil?
-        #     accounts_receivable_outstanding = 0.00
-        #     accounts_receivable_overdue = 0.00
-        # else
-        #     accounts_receivable_outstanding = c.balances.accounts_receivable.outstanding
-        #     accounts_receivable_overdue = c.balances.accounts_receivable.overdue
-        # end
-
         time = Time.now.to_s(:db)
 
         if contact_doesnt_exist(c.contact_id)

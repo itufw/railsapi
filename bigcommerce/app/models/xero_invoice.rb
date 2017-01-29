@@ -39,11 +39,7 @@ class XeroInvoice < ActiveRecord::Base
                 sent_to_contact = convert_bool(i.sent_to_contact)
                 has_attachments = convert_bool(i.has_attachments)
 
-                calculate_line_amount = if line_amount_types == 'Inclusive'
-                                            true
-                                        else
-                                            false
-                                             end
+                calculate_line_amount = line_amount_types == 'Inclusive' ? true : false
 
                 time = Time.now.to_s(:db)
 
