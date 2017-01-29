@@ -17,4 +17,11 @@ module AccountsHelper
     end
     return false, true
   end
+
+  def email_preview(email_ratio)
+    if "yes".eql? email_ratio
+      return true, false
+    end
+    return false, true
+  end
 end

@@ -79,6 +79,12 @@
 
 		<div class="col-md-4" align="center">
 			<h4>Invoice Reminder</h4>
+			Send Email to :
+				<%= radio_button_tag(:send_email_to_self, "yes", @checked_send_email_to_self %> <%= session[:username] %>
+				<span style="margin-left: 30px;">
+				<%= radio_button_tag(:send_email_to_self, "no", @checked_send_email_not_to_self %>  <%= @customer.xero_contact.name %>
+				</span>
+			<br/>
 			<%= submit_tag "Send Missed Payment", class: 'btn btn-primary', data: { confirm: "Send Missed Payment Reminder to #{@customer.xero_contact.name}" }%>
 			<br/>
 			<br/>

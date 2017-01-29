@@ -43,6 +43,10 @@ namespace :updates do
 	  	puts "Staff Time Periods Update #{Time.now} started"
 	  	StaffTimePeriod.new.update_all
 	  	puts "Staff Time Periods Update #{Time.now} ended"
+			
+			puts "Update contacts balance #{Time.now} started"
+			XeroContact.new.update_balance_for_all
+			puts "Update contacts balance #{Time.now} ended"
 	end
 
 	task :balance_update => :environment do

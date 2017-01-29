@@ -51,11 +51,9 @@ class XeroOverpayment < ActiveRecord::Base
 		updated_date = map_date(op.updated_date_utc)
 		time = Time.now.to_s(:db)
 		contact_name = remove_apostrophe(op.contact_name)
-		if 'false'.eql? op.has_attachments
-			has_attachments = 1
-		else
-			has_attachments = 0
-		end
+		
+		has_attachments = ('false'.eql? op.has_attachments) ? 1 : 0
+
 
 		if overpayment_doesnt_exist(op.overpayment_id)
 			sql = "INSERT INTO xero_overpayments (xero_overpayment_id, \
