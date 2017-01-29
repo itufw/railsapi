@@ -19,6 +19,10 @@ class AccountsController < ApplicationController
     @checked_due_date, @checked_invoice_date = date_column_checked(@date_column)
     @checked_monthly, @checked_daily = monthly_checked(@monthly)
 
+    # Check the ratio to check if this email a preview or sending directly to the customer
+    @checked_send_email_to_self, @checked_send_email_not_to_self = email_preview(params[:send_email_to_self])
+
+
     # sorting via sort_order -> find the function called order_by_name
     order_function, direction =  sort_order(params, 'order_by_name', 'ASC')
 
