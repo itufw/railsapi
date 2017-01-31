@@ -5,7 +5,7 @@ class ReminderMailer < ActionMailer::Base
   default from: 'accounts@untappedwines.com'
   layout "mailer"
 
-  def send_overdue_reminder(customer_id, template, send_email_to_staff)
+  def send_overdue_reminder(customer_id, template, send_email_to_staff,staff_id)
     @xero_contact = XeroContact.where(:skype_user_name => customer_id).first
     @over_due_invoices = XeroInvoice.has_amount_due.over_due_invoices.where(:xero_contact_id => @xero_contact.xero_contact_id).order(:due_date)
     @template = template
@@ -28,13 +28,10 @@ class ReminderMailer < ActionMailer::Base
     end
 
     unless send_email_to_staff
-      # customer_address = %("#{@xero_contact.name}" <#{@xero_contact.email}>)
-      # mail(from: 'accounts@untappedwine.com',to: customer_address, cc: Staff.find(Customer.find(customer_id).staff_id).email, bcc: "emailtosalesforce@y-5cvcy6yhzo3z4984r5f5htqn7.9yyfmeag.9.le.salesforce.com", subject: email_subject)
-      email_address = Staff.find(session[:user_id]).email || "it@untappedwines.com"
-      customer_address = %("#{@xero_contact.name} staff" <#{email_address}>)
-      mail(from: 'it@untappedwine.com',to: customer_address, subject: email_subject)
+      customer_address = %("#{@xero_contact.name}" <#{@xero_contact.email}>)
+      mail(from: 'accounts@untappedwine.com',to: customer_address, cc: Staff.find(Customer.find(customer_id).staff_id).email, bcc: "emailtosalesforce@y-5cvcy6yhzo3z4984r5f5htqn7.9yyfmeag.9.le.salesforce.com", subject: email_subject)
     else
-      email_address = Staff.find(session[:user_id]).email || "it@untappedwines.com"
+      email_address = Staff.find(staff_id).email || "it@untappedwines.com"
       customer_address = %("#{@xero_contact.name}" <#{email_address}>)
       mail(from: 'it@untappedwine.com',to: customer_address, subject: email_subject)
     end
@@ -126,7 +123,7 @@ class ReminderMailer < ActionMailer::Base
     end
   end
 
-  def reminder_email(customer_id,selected_invoices, send_email_to_staff)
+  def reminder_email(customer_id,selected_invoices, send_email_to_staff,staff_id)
 
     @customer = Customer.include_all.filter_by_id(customer_id)
     @xero_contact = @customer.xero_contact
@@ -137,13 +134,10 @@ class ReminderMailer < ActionMailer::Base
     email_subject = "MISSING INVOICE PAYMENT – Untapped Fine Wines – #{@customer.xero_contact.name}"
 
     unless send_email_to_staff
-      # customer_address = %("#{@xero_contact.name}" <#{@xero_contact.email}>)
-      # mail(from: 'accounts@untappedwine.com',to: customer_address, cc: Staff.find(Customer.find(customer_id).staff_id).email, bcc: "emailtosalesforce@y-5cvcy6yhzo3z4984r5f5htqn7.9yyfmeag.9.le.salesforce.com", subject: email_subject)
-      email_address = Staff.find(session[:user_id]).email || "it@untappedwines.com"
-      customer_address = %("#{@xero_contact.name} staff" <#{email_address}>)
-      mail(from: 'it@untappedwine.com',to: customer_address, subject: email_subject)
+      customer_address = %("#{@xero_contact.name}" <#{@xero_contact.email}>)
+      mail(from: 'accounts@untappedwine.com',to: customer_address, cc: Staff.find(Customer.find(customer_id).staff_id).email, bcc: "emailtosalesforce@y-5cvcy6yhzo3z4984r5f5htqn7.9yyfmeag.9.le.salesforce.com", subject: email_subject)
     else
-      email_address = Staff.find(session[:user_id]).email || "it@untappedwines.com"
+      email_address = Staff.find(staff_id).email || "it@untappedwines.com"
       customer_address = %("#{@xero_contact.name}" <#{email_address}>)
       mail(from: 'it@untappedwine.com',to: customer_address, subject: email_subject)
     end
