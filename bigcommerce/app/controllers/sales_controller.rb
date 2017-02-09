@@ -42,7 +42,6 @@ class SalesController < ApplicationController
 
         @current_user = Staff.find(session[:user_id])
         @display_all = params[:display_all] || "No"
-
     end
 
     def get_current_end_date(params)
