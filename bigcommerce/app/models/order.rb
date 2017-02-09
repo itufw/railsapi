@@ -236,6 +236,10 @@ class Order < ActiveRecord::Base
         group(['QUARTER(orders.date_created)', 'YEAR(orders.date_created)'])
     end
 
+    def self.group_by_year_created
+        group('YEAR(orders.date_created)')
+    end
+
     def self.group_by_date_created_and_staff_id
         includes(:customer).group(['customers.staff_id', 'DATE(orders.date_created)'])
     end
@@ -250,6 +254,10 @@ class Order < ActiveRecord::Base
 
     def self.group_by_quarter_created_and_staff_id
         includes(:customer).group(['customers.staff_id', 'QUARTER(orders.date_created)', 'YEAR(orders.date_created)'])
+    end
+
+    def self.group_by_year_created_and_staff_id
+        includes(:customer).group(['customers.staff_id', 'YEAR(orders.date_created)'])
     end
 
     # def self.group_by_week_created_and_product_id
