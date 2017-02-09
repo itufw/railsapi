@@ -154,9 +154,14 @@ class SalesController < ApplicationController
         cust_style_id, @cust_style = collection_param_filter(params, :cust_style, CustStyle)
         product_filtered_ids = product_detailed_filter(params)
 
+        #price range
+        @min_price = params['min_price'] || 0
+        @max_price = params['max_price'] || 10000
+
         # product_qty_h is a hash with structure {[product_id, date_id/date_ids] => qty}
         @product_qty_h = OrderProduct.product_filter(product_filtered_ids).\
         date_filter(@dates[0], @dates[-1]).staff_filter(staff_id).\
+        max_price_inc_tax(@max_price).min_price_inc_tax(@min_price).\
         cust_style_filter(cust_style_id).send(date_function, @transform_column).send(sum_function)
 
         @product_ids = []
