@@ -141,4 +141,12 @@ class OrderProduct < ActiveRecord::Base
         includes(:order).average('orders.total_inc_tax')
     end
 
+	# Price Range
+	def self.max_price_inc_tax(max_price)
+		where("price_inc_tax < #{max_price}")
+	end
+
+	def self.min_price_inc_tax(min_price)
+		where("price_inc_tax > #{min_price}")
+	end
 end

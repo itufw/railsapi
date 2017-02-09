@@ -7,6 +7,14 @@
 	<%= render "partials/extended_product_filter" %>
 	<br/>
 	<%= render "partials/detailed_dashboard_date_filter" %>
+	<div class="row">
+		<div class="col-xs-5 col-xs-offset-4">
+			Price Range:
+			<%= text_field_tag('min_price', @min_price, placeholder: 'Min', class: 'input-mir') %> To
+			<%= text_field_tag('max_price', @max_price, placeholder: 'Max', class: 'input-mir') %>
+		</div>
+	</div>
+
 	<div class="row" style="margin-top: 20px;">
 		<div class="col-xs-5 col-xs-offset-4">
 			<%= radio_button_tag(:transform_column, "product_id", @checked_id) %> Products
@@ -17,10 +25,10 @@
 			<%= radio_button_tag(:transform_column, "product_no_ws_id", @checked_no_ws) %>  No WS
 			</span>
 		</div>
-		<%= submit_tag "Submit", class: 'btn btn-primary' %>	
+		<%= submit_tag "Submit", class: 'btn btn-primary' %>
    		<button class = "btn btn-primary"><%= link_to "Reset", action: "product_dashboard" %></button>
 	</div>
-   	
+
 <% end %>
 </div>
 
@@ -35,7 +43,7 @@
 		<% @dates_paired.each do |date_key, date_pair| %>
 			<% date =  date_format_orders(date_pair[0]) + " - " + date_format_orders(date_pair[1].prev_day) %>
 			<th> <%= date %>
-				
+
 			</th>
 		<% end %>
 		<th>Total</th>
@@ -48,19 +56,19 @@
 		<td class="num"><%= display_num(@price_h[id]) %>
 
 		<td class="num"><%= @inventory_h[id].to_i + @pending_stock_h[id].to_i %>
-		
+
 		<%# @product_qty_h is like {[product_id, week_num] => qty} %>
 		<% sums_dates_h = give_sum_date_h(id, @product_qty_h) %>
 		<% @dates_paired.keys.each do |d| %>
 
-			
+
 			<td class="num"><%= exists_in_h(sums_dates_h, d) %></td>
 
 		<% end %>
 
 
 		<td class="num"><%= sums_dates_h.values.sum %></td>
-			
+
 	</tr>
 	<% end %>
 	</tr>
