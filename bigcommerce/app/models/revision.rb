@@ -24,4 +24,10 @@ class Revision < ActiveRecord::Base
 	def self.end_time
 		first.end_time
 	end
+
+	def self.update_end_time
+		only_row = first
+		only_row.end_time = only_row.start_time
+		only_row.save
+	end
 end

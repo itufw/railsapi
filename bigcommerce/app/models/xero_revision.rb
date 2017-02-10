@@ -22,7 +22,8 @@ class XeroRevision < ActiveRecord::Base
 	end
 
 	def self.update_end_time(updated_time)
-		first.end_time = updated_time
-		first.save
+		only_row = first
+		only_row.end_time = updated_time
+		only_row.save
 	end
 end
