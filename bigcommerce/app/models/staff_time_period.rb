@@ -6,9 +6,9 @@ class StaffTimePeriod < ActiveRecord::Base
 		StaffTimePeriod.update(time_period.id, {"start_date" => date_today.at_beginning_of_month, "end_date" => date_today.next_day})
 	end
 
-	def update_last_month(time_period, date_today)
-		StaffTimePeriod.update(time_period.id, start_date: date_today.at_beginning_of_month.last_month, end_date: (date_today.at_end_of_month.last_month).next_day)
-	end
+	# def update_last_month(time_period, date_today)
+	# 	StaffTimePeriod.update(time_period.id, start_date: date_today.at_beginning_of_month.last_month, end_date: (date_today.at_end_of_month.last_month).next_day)
+	# end
 
 	def update_using_default_start_date(time_period, date_today)
 		set_time_zone = 'Melbourne'

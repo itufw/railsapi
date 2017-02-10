@@ -115,6 +115,12 @@ class OrderProduct < ActiveRecord::Base
         								  references(:orders, :products)
     end
 
+		def self.group_by_year_created_and_product_id(product_transform_column)
+        includes(:order, :product).group([get_product_id(product_transform_column),\
+                                        'YEAR(orders.date_created)']).references(:orders, :products)
+    end
+
+
     def self.get_product_id(product_transform_column)
     	group_by_product_s = product_transform_column == 'product_id' ? 'products.id' : 'products.' + product_transform_column
     	return group_by_product_s

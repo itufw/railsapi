@@ -290,6 +290,12 @@ class Order < ActiveRecord::Base
                                          'QUARTER(orders.date_created)', 'YEAR(orders.date_created)']).references(:customers)
     end
 
+    def self.group_by_year_created_and_customer_id
+        includes(:customer).group(['customers.id',\
+                                         'YEAR(orders.date_created)']).references(:customers)
+    end
+
+
     def self.group_by_customerid
         group('orders.customer_id')
     end
