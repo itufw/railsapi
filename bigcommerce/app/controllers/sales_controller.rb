@@ -3,6 +3,7 @@ require 'dates_helper'
 require 'display_helper'
 require 'models_filter'
 require 'product_variations'
+require 'sales_helper.rb'
 
 class SalesController < ApplicationController
 
@@ -13,6 +14,7 @@ class SalesController < ApplicationController
   include DisplayHelper
   include ModelsFilter
   include ProductVariations
+  include SalesHelper
 
         # Displays this week's and last week's total order sales
         # Also displays total order sales for this week divided by staff
@@ -160,15 +162,27 @@ class SalesController < ApplicationController
         # product_qty_h is a hash with structure {[product_id, date_id/date_ids] => qty}
         @product_qty_h = OrderProduct.product_filter(product_filtered_ids).\
         date_filter(@dates[0], @dates[-1]).staff_filter(staff_id).\
-        max_price_inc_tax(@max_price).min_price_inc_tax(@min_price).\
         cust_style_filter(cust_style_id).send(date_function, @transform_column).send(sum_function)
 
-        @product_ids = []
-        @product_qty_h.each { |date_id_pair, v| @product_ids.push(date_id_pair[0])}
-        @product_ids = @product_ids.uniq
+        product_ids = []
+        @product_qty_h.each { |date_id_pair, v| product_ids.push(date_id_pair[0])}
+        # @product_ids = @product_ids.uniq
 
-        @price_h, @product_name_h, @inventory_h, @pending_stock_h = get_data_after_transformation(@transform_column, @product_ids)
+        # use the unique product id
+        # get the hash of {product_id => price}
+        # this function is located in lib->product_variations
+        @price_h = get_price_h(@transform_column, product_ids.uniq)
 
+        # price filter
+        @price_h.delete_if { |key, value| ((value < @min_price.to_f)||(value > @max_price.to_f)) }
+
+        # simplifier the product_qty_h
+        __, @product_name_h, @inventory_h, @pending_stock_h = get_data_after_transformation(@transform_column, @price_h.keys)
+        @product_qty_h.delete_if {|key, value| !(@price_h.keys.include?key[0])}
+
+        # sort based on the arrows
+        # this function is located in helpers -> sales_helper
+        @prodcut_ids = sort_by_arrows(params, @price_h, @product_name_h, @inventory_h, @pending_stock_h,@product_qty_h)
     end
 
 end
