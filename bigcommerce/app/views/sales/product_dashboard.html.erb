@@ -5,72 +5,35 @@
 <div class="form-group container-fluid">
 	<%= form_tag({:action => "product_dashboard"}, {:method => "get"}) do %>
 	<%= render "partials/extended_product_filter" %>
+
+	<% if @checked_detailis%>
 	<br/>
 	<%= render "partials/detailed_dashboard_date_filter" %>
+	<%= render "sales_partials/dashboard_range_filter"%>
+	<% end %>
+
 	<div class="row" style="margin-top: 20px;">
-		<div class="col-xs-5 col-xs-offset-4">
-			Price Range:
-			<%= text_field_tag('min_price', @min_price, placeholder: 'Min', class: 'input-mir') %> To
-			<%= text_field_tag('max_price', @max_price, placeholder: 'Max', class: 'input-mir') %>
-		</div>
+		<%= render "sales_partials/product_type_filter"%>
 	</div>
 
 	<div class="row" style="margin-top: 20px;">
-		<div class="col-xs-5 col-xs-offset-4">
-			<%= radio_button_tag(:transform_column, "product_id", @checked_id) %> Products
-			<span style="margin-left: 50px;">
-			<%= radio_button_tag(:transform_column, "product_no_vintage_id", @checked_no_vintage) %>  No Vintage
-			</span>
-			<span style="margin-left: 50px;">
-			<%= radio_button_tag(:transform_column, "product_no_ws_id", @checked_no_ws) %>  No WS
-			</span>
+		<%= render "sales_partials/stats_or_details_filter"%>
+	</div>
+
+	<div class="row" style="margin-top: 20px;">
+		<div class="col-xs-5 col-xs-offset-5">
+			<%= submit_tag "Submit", class: 'btn btn-primary' %>
+			<button class = "btn btn-primary"><%= link_to "Reset", action: "product_dashboard" %></button>
 		</div>
-		<%= submit_tag "Submit", class: 'btn btn-primary' %>
-   		<button class = "btn btn-primary"><%= link_to "Reset", action: "product_dashboard" %></button>
 	</div>
 
 <% end %>
 </div>
 
-
-<br/><br/>
-<table class = "table table-striped table-bordered table-hover table-responsive">
-	<tr>
-		<th>ID <%= render "partials/sort_arrows", order: 'order_by_id' %></th>
-		<th>Product Name <%= render "partials/sort_arrows", order: 'order_by_name' %></th>
-		<th>Price (Ex. GST) <%= render "partials/sort_arrows", order: 'order_by_price' %><br/></th>
-		<th>Total Stock (Inventory + Pending) <%= render "partials/sort_arrows", order: 'order_by_stock' %><br/></th>
-		<% @dates_paired.each do |date_key, date_pair| %>
-			<% date =  date_format_orders(date_pair[0]) + " - " + date_format_orders(date_pair[1].prev_day) %>
-			<th> <%= date %>
-
-			</th>
-		<% end %>
-		<th>Total <%= render "partials/sort_arrows", order: 'order_by_total' %></th>
-	</tr>
-
-	<% @prodcut_ids.keys.each do |id| %>
-	<tr>
-		<td><%= id %></td>
-		<td><%= link_to @product_name_h[id], controller: 'product', action: 'summary', product_id: id, product_name: @product_name_h[id], transform_column: @transform_column, total_stock: @inventory_h[id].to_i, pending_stock: @pending_stock_h[id].to_i %></td>
-		<td class="num"><%= display_num(@price_h[id]) %>
-
-		<td class="num"><%= @inventory_h[id].to_i + @pending_stock_h[id].to_i %>
-
-		<%# @product_qty_h is like {[product_id, week_num] => qty} %>
-		<% sums_dates_h = give_sum_date_h(id, @product_qty_h) %>
-		<% @dates_paired.keys.each do |d| %>
-
-
-			<td class="num"><%= exists_in_h(sums_dates_h, d) %></td>
-
-		<% end %>
-
-
-		<td class="num"><%= sums_dates_h.values.sum %></td>
-
-	</tr>
-	<% end %>
-	</tr>
-
-</table>
+<% if @checked_stats %>
+	<div>
+		<%= render "sales_partials/stats_view", sum_param: "Qty", supply_display_class: "" %>
+	</div>
+<% else %>
+	<%= render "sales_partials/details_view" %>
+<% end %>

@@ -2,7 +2,7 @@
 	<%= render "partials/period_select" %>
 	</div>
 	<%= submit_tag "Change", class: 'btn btn-primary' %>
-   
+
 <table class = "table table-striped table-bordered table-hover table-responsive" style="margin-top: -40px;">
 
 	<tr class="info">
@@ -24,12 +24,12 @@
 		<% @overall_stats.each do |t, a| %>
 			<td class="num"><%= display_num(a[1]) %></td>
 		<% end %>
-	</tr>	
+	</tr>
 
 	<tr class = <%= supply_display_class %>>
 		<td><%= @selected_period.capitalize %> Supply</td>
 		<% @overall_stats.each do |t, a| %>
 			<td class="num"><%= display_num(a[2]) %></td>
 		<% end %>
-	</tr>	
+	</tr>
 </table>

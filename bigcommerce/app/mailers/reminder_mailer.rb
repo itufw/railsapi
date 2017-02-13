@@ -5,10 +5,11 @@ class ReminderMailer < ActionMailer::Base
   default from: 'accounts@untappedwines.com'
   layout "mailer"
 
-  def send_overdue_reminder(customer_id, template, send_email_to_staff,staff_id)
+  def send_overdue_reminder(customer_id, template, send_email_to_staff,staff_id,email_content)
     @xero_contact = XeroContact.where(:skype_user_name => customer_id).first
     @over_due_invoices = XeroInvoice.has_amount_due.over_due_invoices.where(:xero_contact_id => @xero_contact.xero_contact_id).order(:due_date)
     @template = template
+    @email_content = email_content
 
 
     case template
@@ -123,7 +124,7 @@ class ReminderMailer < ActionMailer::Base
     end
   end
 
-  def reminder_email(customer_id,selected_invoices, send_email_to_staff,staff_id)
+  def reminder_email(customer_id,selected_invoices, send_email_to_staff,staff_id,email_content)
 
     @customer = Customer.include_all.filter_by_id(customer_id)
     @xero_contact = @customer.xero_contact

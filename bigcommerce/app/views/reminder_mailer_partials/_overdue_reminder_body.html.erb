@@ -1,4 +1,6 @@
-
+<div>
+  <%= email_content %>
+</div>
     <div>Hi,</div>
     <br/>
     <div>We have outstanding balance for wine that was delivered for <a style="font-weight:bold"><%= xero_contact.name %></a> total <%= number_to_currency(over_due_invoices.sum(:amount_due)) %>. Please see the details below.</div>
@@ -60,7 +62,7 @@
 
     <div>I’ve attached a copy of the invoice(s) in case you are missing them in your records.</div>
     <br/>
-    
+
     <div>If you have any questions regarding your account please be in contact.</div>
     <br/>
 

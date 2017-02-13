@@ -57,7 +57,7 @@ class SalesController < ApplicationController
         if params[:num_period]
           @num_periods = params[:num_period].to_i
         else
-          @num_periods = 13
+          @num_periods = 6
         end
         # maximum number of columns allowed = 15, min = 3
         @periods = (3..15).to_a
@@ -156,33 +156,45 @@ class SalesController < ApplicationController
         product_filtered_ids = product_detailed_filter(params)
 
         #price range
-        @min_price = params['min_price'] || 0
-        @max_price = params['max_price'] || 10000
+        @min_price = params['min_price']
+        @max_price = params['max_price']
+
+        #stock range
+        @min_stock = params['min_stock']
+        @max_stock = params['max_stock']
+
+        #sales range
+        @min_sales = params['min_sales']
+        @max_sales = params['max_sales']
 
         # product_qty_h is a hash with structure {[product_id, date_id/date_ids] => qty}
-        @product_qty_h = OrderProduct.product_filter(product_filtered_ids).\
+        product_qty_h = OrderProduct.product_filter(product_filtered_ids).\
         date_filter(@dates[0], @dates[-1]).staff_filter(staff_id).\
         cust_style_filter(cust_style_id).send(date_function, @transform_column).send(sum_function)
 
         product_ids = []
-        @product_qty_h.each { |date_id_pair, v| product_ids.push(date_id_pair[0])}
+        product_qty_h.each { |date_id_pair, v| product_ids.push(date_id_pair[0])}
         # @product_ids = @product_ids.uniq
 
-        # use the unique product id
-        # get the hash of {product_id => price}
-        # this function is located in lib->product_variations
-        @price_h = get_price_h(@transform_column, product_ids.uniq)
-
-        # price filter
-        @price_h.delete_if { |key, value| ((value < @min_price.to_f)||(value > @max_price.to_f)) }
-
-        # simplifier the product_qty_h
-        __, @product_name_h, @inventory_h, @pending_stock_h = get_data_after_transformation(@transform_column, @price_h.keys)
-        @product_qty_h.delete_if {|key, value| !(@price_h.keys.include?key[0])}
+        # get the array of valid product_id
+        # this function is located in helpers -> sales_helper
+        @product_ids, @price_h, @product_name_h, @inventory_h, @pending_stock_h, @product_qty_h = \
+                                        filter_by_range(@transform_column, product_ids.uniq,[@min_price, @max_price],\
+                                        [@min_stock,@max_stock],[@min_sales,@max_sales], product_qty_h)
 
         # sort based on the arrows
         # this function is located in helpers -> sales_helper
-        @prodcut_ids = sort_by_arrows(params, @price_h, @product_name_h, @inventory_h, @pending_stock_h,@product_qty_h)
+        @product_ids = sort_by_arrows(params, @price_h, @product_name_h, @inventory_h, @pending_stock_h,@product_qty_h,@product_ids)
+
+
+        @checked_stats = ("stats".eql? params[:display_column]) ? true : false
+        @checked_detailis = !@checked_stats
+
+        # stats View!
+        @stats_info = stats_info(@product_ids, @product_name_h, @transform_column, @inventory_h, @pending_stock_h) if @checked_stats
+
+
     end
+
 
 end

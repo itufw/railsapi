@@ -6,7 +6,7 @@
   <body>
     <%case @template%>
     <%when "overdue"%>
-      <%= render "reminder_mailer_partials/overdue_reminder_body", over_due_invoices: @over_due_invoices, xero_contact: @xero_contact%>
+      <%= render "reminder_mailer_partials/overdue_reminder_body", over_due_invoices: @over_due_invoices, xero_contact: @xero_contact, email_content: @email_content%>
     <%when "overdue_60days"%>
       <%= render "reminder_mailer_partials/overdue_60days_reminder_body", over_due_invoices: @over_due_invoices, xero_contact: @xero_contact%>
     <%when "overdue_90days"%>
@@ -16,7 +16,7 @@
     <%when "missed_payment"%>
       <%= render "reminder_mailer_partials/missed_payment_body", over_due_invoices: @over_due_invoices, xero_contact: @xero_contact%>
     <%end%>
-    
+
     <%= render "reminder_mailer_partials/signature_anglica"%>
   </body>
 </html>
