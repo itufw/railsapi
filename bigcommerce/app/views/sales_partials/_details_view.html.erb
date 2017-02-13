@@ -1,0 +1,40 @@
+<br/>
+<table class = "table table-striped table-bordered table-hover table-responsive">
+	<tr>
+		<th>ID <%= render "partials/sort_arrows", order: 'order_by_id' %></th>
+		<th>Product Name <%= render "partials/sort_arrows", order: 'order_by_name' %></th>
+		<th>Price (Ex. GST) <%= render "partials/sort_arrows", order: 'order_by_price' %><br/></th>
+		<th>Total Stock (Inventory + Pending) <%= render "partials/sort_arrows", order: 'order_by_stock' %><br/></th>
+		<th>Pending Stock <%= render "partials/sort_arrows", order: 'order_by_pending' %><br/></th>
+
+		<% @dates_paired.each do |date_key, date_pair| %>
+			<% date =  date_format_orders(date_pair[0]) + " - " + date_format_orders(date_pair[1].prev_day) %>
+			<th> <%= date %><%= render "partials/sort_arrows", order: "order_by_date_#{date_key}" %></th>
+		<% end %>
+		<th>Total <%= render "partials/sort_arrows", order: 'order_by_total' %></th>
+	</tr>
+
+	<% @product_ids.each do |id| %>
+	<tr>
+		<td><%= id %></td>
+		<td><%= link_to @product_name_h[id], controller: 'product', action: 'summary', product_id: id, product_name: @product_name_h[id], transform_column: @transform_column, total_stock: @inventory_h[id].to_i, pending_stock: @pending_stock_h[id].to_i %></td>
+		<td class="num"><%= display_num(@price_h[id]) %>
+
+		<td class="num"><%= @inventory_h[id].to_i + @pending_stock_h[id].to_i %>
+		<td class="num"><%= @pending_stock_h[id].to_i %>
+
+		<%# @product_qty_h is like {[product_id, week_num] => qty} %>
+		<% sums_dates_h = give_sum_date_h(id, @product_qty_h) %>
+		<% @dates_paired.keys.each do |d| %>
+
+			<td class="num"><%= exists_in_h(sums_dates_h, d) %></td>
+
+		<% end %>
+
+		<td class="num"><%= sums_dates_h.values.sum %></td>
+
+	</tr>
+	<% end %>
+	</tr>
+
+</table>
