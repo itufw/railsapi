@@ -8,6 +8,7 @@ class ReminderMailer < ActionMailer::Base
   def send_overdue_reminder(customer_id, email_subject,staff_id,email_content,email_address, cc, bcc, email_type, selected_invoices)
     staff = Staff.find(staff_id)
     staff_name = staff.firstname + " " + staff.lastname
+    @xero_contact = XeroContact.where(:skype_user_name => customer_id).first
 
     if ["Send Reminder", "Send Missed Payment"].include? email_type
       @over_due_invoices = XeroInvoice.has_amount_due.over_due_invoices.where("invoice_number IN (?)",selected_invoices).order(:due_date)
@@ -18,8 +19,7 @@ class ReminderMailer < ActionMailer::Base
     attach_invoices(@over_due_invoices)
 
     @email_content = email_content
-    
-    @xero_contact = XeroContact.where(:skype_user_name => customer_id).first
+
     customer_address = %("#{@xero_contact.name}" <#{email_address}>)
     mail(from: "\"#{staff_name}\" <accounts@untappedwine.com>",to: customer_address, cc: cc, bcc: bcc, subject: email_subject)
   end
