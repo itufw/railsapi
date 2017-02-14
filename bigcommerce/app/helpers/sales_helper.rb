@@ -6,6 +6,7 @@ module SalesHelper
   include ProductVariations
   include TimePeriodStats
 
+
   # Takes input a date, a Hash like {[staff_id, date] => sum} and a hash of staffs like {staff_id => nickname}
   # Returns a Hash like {date => sum} where sum is the sum of order_totals/bottles
   # for all the active staffs for that date
@@ -115,7 +116,7 @@ module SalesHelper
     # sales filter
     sales_h = {}
     product_ids.each do |id|
-      sales_h[id] = give_sum_date_h(id,product_qty_h).values.sum
+      sales_h[id] = give_sum_date_h(id,product_qty_h).values.sum if (give_sum_date_h(id,product_qty_h).values.sum > sales_range[0] && give_sum_date_h(id,product_qty_h).values.sum < sales_range[1])
     end
 
     product_ids = product_ids & sales_h.keys
@@ -131,8 +132,8 @@ module SalesHelper
   end
 
   def range_validation(range)
-    range[0] = ((range[0].to_f.to_s == range[0].to_s)||((range[0].to_i.to_s == range[0].to_s))) ? range[0] : 0
-    range[1] = ((range[1].to_f.to_s == range[1].to_s)||((range[1].to_i.to_s == range[1].to_s))) ? range[1] : 100000
+    range[0] = ((range[0].to_f.to_s == range[0].to_s)||((range[0].to_i.to_s == range[0].to_s))) ? range[0].to_f : 0
+    range[1] = ((range[1].to_f.to_s == range[1].to_s)||((range[1].to_i.to_s == range[1].to_s))) ? range[1].to_f : 100000
     return range
   end
 
@@ -151,5 +152,7 @@ module SalesHelper
     # stats_info has structure {"product_name" => "name", "time_period" => {time_period_name => [sum, average, supply]}}
     return stats_info
   end
+
+
 
 end

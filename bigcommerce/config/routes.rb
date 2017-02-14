@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  mount Bootsy::Engine => '/bootsy', as: 'bootsy'
 
   root 'sales#sales_dashboard'
   #post 'admin/update'
@@ -8,8 +9,7 @@ Rails.application.routes.draw do
 
   # this needs to be replaced sometime
   match ':controller(/:action(/:id))', via: [:get, :post]
-
-
+  resources :posts
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
