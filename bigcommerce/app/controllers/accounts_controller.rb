@@ -89,7 +89,7 @@ class AccountsController < ApplicationController
     # form builder
     @email_content = AccountEmail.new
 
-    @email_content.receive_address = @checked_send_email_to_self ? Staff.find(session[:user_id]).email : xero_contact.email
+    @email_content.receive_address = @checked_send_email_to_self ? Staff.find(session[:user_id]).email : @xero_contact.email
 
     @email_content.email_type = params[:commit]
 
