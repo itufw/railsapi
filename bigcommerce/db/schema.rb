@@ -11,7 +11,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170124051307) do
+ActiveRecord::Schema.define(version: 20170214040722) do
+
+  create_table "account_emails", force: :cascade do |t|
+    t.string   "receive_address",   limit: 255
+    t.string   "send_address",      limit: 255
+    t.text     "content",           limit: 65535
+    t.string   "email_type",        limit: 255
+    t.string   "selected_invoices", limit: 255
+    t.integer  "customer_id",       limit: 4
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.string   "cc",                limit: 255
+    t.string   "bcc",               limit: 255
+    t.text     "content_second",    limit: 65535
+  end
 
   create_table "addresses", force: :cascade do |t|
     t.integer  "customer_id", limit: 4
@@ -43,6 +57,20 @@ ActiveRecord::Schema.define(version: 20170124051307) do
     t.integer  "days",       limit: 4
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+  end
+
+  create_table "bootsy_image_galleries", force: :cascade do |t|
+    t.integer  "bootsy_resource_id",   limit: 4
+    t.string   "bootsy_resource_type", limit: 255
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "bootsy_images", force: :cascade do |t|
+    t.string   "image_file",       limit: 255
+    t.integer  "image_gallery_id", limit: 4
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "categories", force: :cascade do |t|
@@ -241,39 +269,39 @@ ActiveRecord::Schema.define(version: 20170124051307) do
 
   create_table "orders", force: :cascade do |t|
     t.datetime "date_created"
-    t.integer  "customer_id",                limit: 4,                             null: false
+    t.integer  "customer_id",                limit: 4,                              null: false
     t.integer  "status_id",                  limit: 4
     t.integer  "staff_id",                   limit: 4
-    t.decimal  "total_inc_tax",                            precision: 6, scale: 2
-    t.decimal  "refunded_amount",                          precision: 6, scale: 2
-    t.integer  "qty",                        limit: 3,                             null: false
+    t.decimal  "total_inc_tax",                            precision: 12, scale: 2
+    t.decimal  "refunded_amount",                          precision: 6,  scale: 2
+    t.integer  "qty",                        limit: 3,                              null: false
     t.integer  "items_shipped",              limit: 3
     t.text     "staff_notes",                limit: 65535
     t.text     "customer_notes",             limit: 65535
     t.integer  "billing_address_id",         limit: 4
     t.integer  "coupon_id",                  limit: 4
     t.text     "payment_method",             limit: 255
-    t.decimal  "discount_amount",                          precision: 6, scale: 2
-    t.decimal  "coupon_discount",                          precision: 6, scale: 2
-    t.decimal  "subtotal_ex_tax",                          precision: 6, scale: 2
-    t.decimal  "subtotal_inc_tax",                         precision: 6, scale: 2
-    t.decimal  "subtotal_tax",                             precision: 6, scale: 2
-    t.decimal  "total_ex_tax",                             precision: 6, scale: 2
-    t.decimal  "total_tax",                                precision: 6, scale: 2
-    t.decimal  "base_shipping_cost",                       precision: 6, scale: 2
-    t.decimal  "shipping_cost_ex_tax",                     precision: 6, scale: 2
-    t.decimal  "shipping_cost_inc_tax",                    precision: 6, scale: 2
-    t.decimal  "shipping_cost_tax",                        precision: 6, scale: 2
-    t.decimal  "base_handling_cost",                       precision: 6, scale: 2
-    t.decimal  "handling_cost_ex_tax",                     precision: 6, scale: 2
-    t.decimal  "handling_cost_inc_tax",                    precision: 6, scale: 2
-    t.decimal  "handling_cost_tax",                        precision: 6, scale: 2
-    t.decimal  "base_wrapping_cost",                       precision: 6, scale: 2
-    t.decimal  "wrapping_cost_ex_tax",                     precision: 6, scale: 2
-    t.decimal  "wrapping_cost_inc_tax",                    precision: 6, scale: 2
-    t.decimal  "wrapping_cost_tax",                        precision: 6, scale: 2
-    t.decimal  "store_credit",                             precision: 6, scale: 2
-    t.decimal  "gift_certificate_amount",                  precision: 6, scale: 2
+    t.decimal  "discount_amount",                          precision: 6,  scale: 2
+    t.decimal  "coupon_discount",                          precision: 6,  scale: 2
+    t.decimal  "subtotal_ex_tax",                          precision: 6,  scale: 2
+    t.decimal  "subtotal_inc_tax",                         precision: 10, scale: 2
+    t.decimal  "subtotal_tax",                             precision: 6,  scale: 2
+    t.decimal  "total_ex_tax",                             precision: 6,  scale: 2
+    t.decimal  "total_tax",                                precision: 6,  scale: 2
+    t.decimal  "base_shipping_cost",                       precision: 6,  scale: 2
+    t.decimal  "shipping_cost_ex_tax",                     precision: 6,  scale: 2
+    t.decimal  "shipping_cost_inc_tax",                    precision: 6,  scale: 2
+    t.decimal  "shipping_cost_tax",                        precision: 6,  scale: 2
+    t.decimal  "base_handling_cost",                       precision: 6,  scale: 2
+    t.decimal  "handling_cost_ex_tax",                     precision: 6,  scale: 2
+    t.decimal  "handling_cost_inc_tax",                    precision: 6,  scale: 2
+    t.decimal  "handling_cost_tax",                        precision: 6,  scale: 2
+    t.decimal  "base_wrapping_cost",                       precision: 6,  scale: 2
+    t.decimal  "wrapping_cost_ex_tax",                     precision: 6,  scale: 2
+    t.decimal  "wrapping_cost_inc_tax",                    precision: 6,  scale: 2
+    t.decimal  "wrapping_cost_tax",                        precision: 6,  scale: 2
+    t.decimal  "store_credit",                             precision: 6,  scale: 2
+    t.decimal  "gift_certificate_amount",                  precision: 6,  scale: 2
     t.integer  "shipping_cost_tax_class_id", limit: 4
     t.integer  "handling_cost_tax_class_id", limit: 4
     t.integer  "wrapping_cost_tax_class_id", limit: 4
@@ -282,8 +310,8 @@ ActiveRecord::Schema.define(version: 20170124051307) do
     t.text     "order_source",               limit: 255
     t.datetime "date_modified"
     t.datetime "date_shipped"
-    t.datetime "created_at",                                                       null: false
-    t.datetime "updated_at",                                                       null: false
+    t.datetime "created_at",                                                        null: false
+    t.datetime "updated_at",                                                        null: false
     t.string   "xero_invoice_id",            limit: 36
     t.string   "xero_invoice_number",        limit: 255
   end

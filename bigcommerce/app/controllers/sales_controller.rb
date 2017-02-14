@@ -193,7 +193,6 @@ class SalesController < ApplicationController
         # stats View!
         @stats_info = stats_info(@product_ids, @product_name_h, @transform_column, @inventory_h, @pending_stock_h) if @checked_stats
 
-
     end
 
 

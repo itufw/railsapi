@@ -1,52 +1,39 @@
 <div class="container">
-    <%= form_tag({:controller => "accounts", :action => "send_reminder"}, {:method => "post"}) do %>
-    <%= hidden_field_tag :commit, @commit %>
-    <%= hidden_field_tag :customer_id, @customer_id %>
-    <%= hidden_field_tag :selected_invoices, @selected_invoices %>
-    <%= hidden_field_tag :checked_send_email_to_self, @checked_send_email_to_self %>
-
-    <%
-    case @commit
-      when "Send Reminder", "Send Missed Payment"
-        email_content = "Hi,\r\n\r\n
-                        Thanks for the recent payment that was made to our account.\r\n\r\n
-                        Could I please refer you to an invoice that has been missed that we’re still awaiting payment for. The details are below.\r\n\r\n"
-      when "Send Overdue Reminder"
-        email_content = "Hi,
-                        We have outstanding balance for wine that was delivered for #{@customer_name} total #{number_to_currency(@over_due_invoices.sum(:amount_due))}. Please see the details below."
-      when "Send 60 Days Overdue Reminder"
-        email_content = "Hi,\r\n\r\n
-                        We have outstanding balance of #{number_to_currency(@over_due_invoices.sum(:amount_due))} for #{@customer_name}. Please see the details below.\r\n\r\n
-                        Until this overdue amount is settled any new order must be paid for prior to being dispatched\r\n\r\n"
-      when "Send 90 Days Overdue Reminder"
-        email_content = "Hi,
-                        We have outstanding balance of #{number_to_currency(@over_due_invoices.sum(:amount_due))} for #{@customer_name}. Some of this wine is more than 90 days overdue. The details are listed below.
-                        We cannot continue to provide credit terms for your account on a normal basis. Until any overdue amount is cleared all new invoice must be paid for on creation before they can be shipped.
-                        We have made repeated attempts to address this outstanding amount with you and now we require immediate payment.\r\n\r\n"
-      when "Send New Order Hold"
-        email_content = "Hi,
-                        We have an order for #{@customer_name} that was entered today that I’d like to have despatched for you today. In reviewing your account there are some amounts that are quite overdue. This is listed below for your reference. Could you please let me know when this amount can be paid?
-                        Until I hear back from you we won’t be able to ship the wine.\r\n\r\n"
-      end
-    %>
-
     <div class="row">
       <div class="col-md-8 col-md-offset-4">
-        Send <%= @commit %> Email to <%= @customer_name %>
+        <%= @email_title %>
       </div>
 
         <div class="col-md-8 col-md-offset-4">
-            Content:<br/>
-            <textarea name='content' id='content' rows="15" cols="50">
-              <%=email_content%>
-            </textarea><br/>
-        </div>
+            <%= form_for @email_content, :url => {:controller => "accounts", :action => "send_reminder"}  do |email_content| %>
+            <%= hidden_field_tag :checked_send_email_to_self, @checked_send_email_to_self %>
+            <%= hidden_field_tag :email_subject, @email_title %>
 
-        <div class="col-xs-6 col-xs-offset-5">
-          <%= submit_tag "Send Email!", class: 'btn btn-primary', data: { confirm: "Send email to #{@customer_name}?" }%>
-        </div>
+              <%= email_content.hidden_field(:email_type)%>
+              <%= email_content.hidden_field(:customer_id)%>
+              <%= email_content.hidden_field(:selected_invoices)%>
+              <%= email_content.hidden_field(:customer_id)%>
 
+              <%= label(:title, "Send to:")%>
+              <%= email_content.text_field :receive_address, :maxlength=>"50"	%>
+              <br/>
+              <%= label(:title, "CC:")%>
+              <%= email_content.text_field :cc, :maxlength=>"50"	%>
+              <br/>
+              <%= label(:title, "BCC:")%>
+              <%= email_content.text_field :bcc, :maxlength=>"50"	%>
+
+              <%= email_content.bootsy_area :content, editor_options: { link: false, html: false, image: false, lists: false, html: true, color: false}, :rows=>5, :cols=>60 %>
+
+            <%=render "reminder_mailer_partials/reminder_table", over_due_invoices: @over_due_invoices, xero_contact: @xero_contact%>
+
+            <%= email_content.bootsy_area :content_second, editor_options: { link: false, html: false, image: false, lists: false, html: true, color: false}, :rows=>10, :cols=>60 %>
+            </br>
+              <%= button_tag(type: 'submit', class: "btn btn-primary") do %>
+                Send Email
+              <% end %>
+            <% end %>
+
+        </div>
     </div>
-    <!-- end of the form -->
-    <%end%>
 </div>

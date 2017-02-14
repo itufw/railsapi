@@ -6,23 +6,20 @@
 	<%= form_tag({:action => "product_dashboard"}, {:method => "get"}) do %>
 	<%= render "partials/extended_product_filter" %>
 
-	<% if @checked_detailis%>
 	<br/>
 	<%= render "partials/detailed_dashboard_date_filter" %>
 	<%= render "sales_partials/dashboard_range_filter"%>
-	<% end %>
 
 	<div class="row" style="margin-top: 20px;">
 		<%= render "sales_partials/product_type_filter"%>
-	</div>
 
-	<div class="row" style="margin-top: 20px;">
 		<%= render "sales_partials/stats_or_details_filter"%>
-	</div>
 
-	<div class="row" style="margin-top: 20px;">
-		<div class="col-xs-5 col-xs-offset-5">
+		<div class="col-md-4">
+			<span style="margin-left: 50px;">
+
 			<%= submit_tag "Submit", class: 'btn btn-primary' %>
+			</span>
 			<button class = "btn btn-primary"><%= link_to "Reset", action: "product_dashboard" %></button>
 		</div>
 	</div>

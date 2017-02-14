@@ -5,40 +5,23 @@ class ReminderMailer < ActionMailer::Base
   default from: 'accounts@untappedwines.com'
   layout "mailer"
 
-  def send_overdue_reminder(customer_id, template, send_email_to_staff,staff_id,email_content)
-    @xero_contact = XeroContact.where(:skype_user_name => customer_id).first
-    @over_due_invoices = XeroInvoice.has_amount_due.over_due_invoices.where(:xero_contact_id => @xero_contact.xero_contact_id).order(:due_date)
-    @template = template
-    @email_content = email_content
+  def send_overdue_reminder(customer_id, email_subject,staff_id,email_content,email_address, cc, bcc, email_type, selected_invoices)
+    staff = Staff.find(staff_id)
+    staff_name = staff.firstname + " " + staff.lastname
 
-
-    case template
-    when "overdue"
-      email_subject = "OVERDUE REMINDER – Untapped Fine Wines – #{@xero_contact.name}"
-      attach_invoices(@over_due_invoices)
-    when "overdue_60days"
-      email_subject = "OVERDUE PAYMENT REQUIRED – Untapped Fine Wines – #{@xero_contact.name}"
-      attach_invoices(@over_due_invoices)
-    when "overdue_90days"
-      email_subject = "FINAL NOTICE PAYMENT REQUIRED, 90+ Days Overdue – Untapped Fine Wines – #{@xero_contact.name}"
-      attach_invoices(@over_due_invoices)
-    when "new_order_hold"
-      # redirect_to "reminder_mailer/send_overdue_reminder"
-      email_subject = "ORDER ON HOLD – Untapped Fine Wines – #{@xero_contact.name}"
-      attach_invoices(@over_due_invoices)
-    end
-
-    unless send_email_to_staff
-      customer_address = %("#{@xero_contact.name}" <#{@xero_contact.email}>)
-      mail(from: 'accounts@untappedwine.com',to: customer_address, cc: Staff.find(Customer.find(customer_id).staff_id).email, bcc: "emailtosalesforce@y-5cvcy6yhzo3z4984r5f5htqn7.9yyfmeag.9.le.salesforce.com", subject: email_subject)
+    if ["Send Reminder", "Send Missed Payment"].include? email_type
+      @over_due_invoices = XeroInvoice.has_amount_due.over_due_invoices.where("invoice_number IN (?)",selected_invoices).order(:due_date)
     else
-      email_address = Staff.find(staff_id).email || "it@untappedwines.com"
-      customer_address = %("#{@xero_contact.name}" <#{email_address}>)
-      mail(from: 'it@untappedwine.com',to: customer_address, subject: email_subject)
+      @over_due_invoices = XeroInvoice.has_amount_due.over_due_invoices.where(:xero_contact_id => @xero_contact.xero_contact_id).order(:due_date)
     end
 
+    attach_invoices(@over_due_invoices)
 
-
+    @email_content = email_content
+    
+    @xero_contact = XeroContact.where(:skype_user_name => customer_id).first
+    customer_address = %("#{@xero_contact.name}" <#{email_address}>)
+    mail(from: "\"#{staff_name}\" <accounts@untappedwine.com>",to: customer_address, cc: cc, bcc: bcc, subject: email_subject)
   end
 
 
@@ -124,24 +107,4 @@ class ReminderMailer < ActionMailer::Base
     end
   end
 
-  def reminder_email(customer_id,selected_invoices, send_email_to_staff,staff_id,email_content)
-
-    @customer = Customer.include_all.filter_by_id(customer_id)
-    @xero_contact = @customer.xero_contact
-    @over_due_invoices = XeroInvoice.has_amount_due.over_due_invoices.where("invoice_number IN (?)",selected_invoices).order(:due_date)
-
-    attach_invoices_number(selected_invoices)
-
-    email_subject = "MISSING INVOICE PAYMENT – Untapped Fine Wines – #{@customer.xero_contact.name}"
-
-    unless send_email_to_staff
-      customer_address = %("#{@xero_contact.name}" <#{@xero_contact.email}>)
-      mail(from: 'accounts@untappedwine.com',to: customer_address, cc: Staff.find(Customer.find(customer_id).staff_id).email, bcc: "emailtosalesforce@y-5cvcy6yhzo3z4984r5f5htqn7.9yyfmeag.9.le.salesforce.com", subject: email_subject)
-    else
-      email_address = Staff.find(staff_id).email || "it@untappedwines.com"
-      customer_address = %("#{@xero_contact.name}" <#{email_address}>)
-      mail(from: 'it@untappedwine.com',to: customer_address, subject: email_subject)
-    end
-
-  end
 end

@@ -38,7 +38,7 @@
 				<% sum_of_amount["due_date"][interval]+=i.amount_due%>
 			<% end%>
 	<tr>
-		<td><%= link_to c.name, controller: 'accounts', action: 'contact_invoices', contact_id: c.xero_contact_id, amount_due: sum_of_amount, end_date: @date, monthly: @monthly %></td>
+		<td><%= link_to c.name, controller: 'accounts', action: 'contact_invoices', contact_id: c.xero_contact_id, end_date: @date, monthly: @monthly %></td>
 		<td class="num"><%= display_num(outstanding_customer(c))  %></td>
 		<td class="num"><%= display_num(overdue_customer(c)) %></td>
 		<% sum_of_amount[date_column].each do |sum|%>
