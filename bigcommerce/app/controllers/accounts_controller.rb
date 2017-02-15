@@ -103,6 +103,8 @@ class AccountsController < ApplicationController
 
     @email_content.customer_id = customer_id
     @email_content.selected_invoices = selected_invoices
+
+    record_email(@email_content)
   end
 
   def send_reminder

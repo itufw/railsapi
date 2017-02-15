@@ -122,4 +122,21 @@ module AccountsHelper
 
         sum_of_amount
     end
+
+    def record_email(account_email)
+
+
+      email_content = AccountEmail.new
+
+      email_content.receive_address = account_email.receive_address
+      email_content.email_type = account_email.email_type
+      email_content.cc = account_email.cc
+      email_content.bcc = account_email.bcc
+      email_content.content = account_email.content
+      email_content.content_second = account_email.content_second
+      email_content.customer_id = account_email.customer_id
+      email_content.selected_invoices = account_email.selected_invoices
+      
+      email_content.save!
+    end
 end
