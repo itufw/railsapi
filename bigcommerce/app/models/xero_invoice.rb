@@ -39,11 +39,7 @@ class XeroInvoice < ActiveRecord::Base
                 sent_to_contact = convert_bool(i.sent_to_contact)
                 has_attachments = convert_bool(i.has_attachments)
 
-                calculate_line_amount = if line_amount_types == 'Inclusive'
-                                            true
-                                        else
-                                            false
-                                             end
+                calculate_line_amount = line_amount_types == 'Inclusive' ? true : false
 
                 time = Time.now.to_s(:db)
 
@@ -180,6 +176,13 @@ class XeroInvoice < ActiveRecord::Base
     def self.has_amount_due
         where('xero_invoices.amount_due > 0')
       end
+    def self.order_by_due_date
+      order(:due_date)
+    end
+
+    def self.over_due_invoices
+      where("due_date < '#{Date.today}'")
+    end
 
     def self.period_select(until_date)
         where("(xero_invoices.date < '#{until_date}' or xero_invoices.due_date < '#{until_date}') and xero_invoices.amount_due > 0 ")

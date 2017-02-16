@@ -21,9 +21,17 @@ module DatesHelper
 
   def return_end_date_invoices(date_given)
     if date_given.blank? || date_given['end_date'].blank?
-      return Date.today
+      return Date.today.to_date
     else
       return date_given['end_date']
+    end
+  end
+
+  def return_start_date_invoices(date_given)
+    if date_given.blank? || date_given['start_date'].blank?
+      return Date.today.to_date
+    else
+      return date_given['start_date']
     end
   end
 # If a set date isnt given then start of the week is current week's start
@@ -112,6 +120,8 @@ module DatesHelper
       return ["beginning_of_month".to_sym, "last_month".to_sym, "group_by_month_created", :convert_to_month_num]
     elsif period_type == "quarterly"
       return ["beginning_of_quarter".to_sym, "last_quarter".to_sym, "group_by_quarter_created", :convert_to_quarter_num]
+    elsif period_type == "annually"
+      return ["beginning_of_year".to_sym, "last_year".to_sym, "group_by_year_created", :convert_to_year_num]
     else
       return ["".to_sym, "".to_sym]
     end
@@ -139,13 +149,17 @@ module DatesHelper
     return [((date.month.to_i - 1) / 3) + 1, date.year.to_i]
   end
 
+  def convert_to_year_num(date)
+    return date.year.to_i
+  end
+
   # def calculate_invoice_due_date(date_created, customer)
   #   num_days_since_date_created = Customer.due_date_num_days(customer)
   #   return num_days_since_date_created.since(date_created)
   # end
 
   def define_period_types(params)
-    period_types = ["weekly", "monthly", "quarterly"]
+    period_types = ["weekly", "monthly", "quarterly","annually"]
     if params[:period_type]
       selected_period = params[:period_type]
     else

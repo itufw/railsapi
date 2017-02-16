@@ -1,0 +1,39 @@
+<div class="container">
+    <div class="row">
+      <div class="col-md-8 col-md-offset-4">
+        <%= @email_title %>
+      </div>
+
+        <div class="col-md-8 col-md-offset-4">
+            <%= form_for @email_content, :url => {:controller => "accounts", :action => "send_reminder"}  do |email_content| %>
+            <%= hidden_field_tag :checked_send_email_to_self, @checked_send_email_to_self %>
+            <%= hidden_field_tag :email_subject, @email_title %>
+
+              <%= email_content.hidden_field(:email_type)%>
+              <%= email_content.hidden_field(:customer_id)%>
+              <%= email_content.hidden_field(:selected_invoices)%>
+              <%= email_content.hidden_field(:customer_id)%>
+
+              <%= label(:title, "Send to:")%>
+              <%= email_content.text_field :receive_address, :maxlength=>"50"	%>
+              <br/>
+              <%= label(:title, "CC:")%>
+              <%= email_content.text_field :cc, :maxlength=>"50"	%>
+              <br/>
+              <%= label(:title, "BCC:")%>
+              <%= email_content.text_field :bcc, :maxlength=>"50"	%>
+
+              <%= email_content.bootsy_area :content, editor_options: { link: false, html: false, image: false, lists: false, html: true, color: false}, :rows=>5, :cols=>60 %>
+
+            <%=render "reminder_mailer_partials/reminder_table", over_due_invoices: @over_due_invoices, xero_contact: @xero_contact%>
+
+            <%= email_content.bootsy_area :content_second, editor_options: { link: false, html: false, image: false, lists: false, html: true, color: false}, :rows=>10, :cols=>60 %>
+            </br>
+              <%= button_tag(type: 'submit', class: "btn btn-primary") do %>
+                Send Email
+              <% end %>
+            <% end %>
+
+        </div>
+    </div>
+</div>

@@ -17,7 +17,7 @@
    <%= hidden_field_tag :product_name, @product_name %>
    <%= hidden_field_tag :total_stock, @total_stock %>
    <%= hidden_field_tag :transform_column, @transform_column %>
-   
+
 <% end %>
 </div>
 
@@ -25,14 +25,14 @@
 <%# Top Customers Display %>
 <div class="form-group col-xs-offset-5" style="margin-top:50px;">
 <%= form_tag({:action => "summary"}, {:method => "get"}) do %>
-  
+
    <%= render "partials/cust_style_filter" %>
    <%= render "partials/staff_filter" %>
 
    <%= hidden_field_tag :product_id, @product_id %>
    <%= hidden_field_tag :product_name, @product_name %>
    <%= hidden_field_tag :transform_column, @transform_column %>
-   
+
    <%= submit_tag "Filter", class: 'btn btn-primary' %>
 <% end %>
 </div>

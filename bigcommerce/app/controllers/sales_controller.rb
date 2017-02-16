@@ -3,6 +3,7 @@ require 'dates_helper'
 require 'display_helper'
 require 'models_filter'
 require 'product_variations'
+require 'sales_helper.rb'
 
 class SalesController < ApplicationController
 
@@ -13,6 +14,7 @@ class SalesController < ApplicationController
   include DisplayHelper
   include ModelsFilter
   include ProductVariations
+  include SalesHelper
 
         # Displays this week's and last week's total order sales
         # Also displays total order sales for this week divided by staff
@@ -42,7 +44,6 @@ class SalesController < ApplicationController
 
         @current_user = Staff.find(session[:user_id])
         @display_all = params[:display_all] || "No"
-
     end
 
     def get_current_end_date(params)
@@ -56,7 +57,7 @@ class SalesController < ApplicationController
         if params[:num_period]
           @num_periods = params[:num_period].to_i
         else
-          @num_periods = 13
+          @num_periods = 6
         end
         # maximum number of columns allowed = 15, min = 3
         @periods = (3..15).to_a
@@ -106,6 +107,9 @@ class SalesController < ApplicationController
 
         staff_id, @staff_nicknames = display_reports_for_sales_dashboard(session[:user_id])
         @staff_sum_by_periods = sum_orders(@dates[0], @dates[-1], (date_function + "_and_staff_id").to_sym, sum_function, staff_id)
+
+        @current_user = Staff.find(session[:user_id])
+        @display_all = params[:display_all] || "No"
     end
 
     def customer_dashboard
@@ -151,17 +155,45 @@ class SalesController < ApplicationController
         cust_style_id, @cust_style = collection_param_filter(params, :cust_style, CustStyle)
         product_filtered_ids = product_detailed_filter(params)
 
+        #price range
+        @min_price = params['min_price']
+        @max_price = params['max_price']
+
+        #stock range
+        @min_stock = params['min_stock']
+        @max_stock = params['max_stock']
+
+        #sales range
+        @min_sales = params['min_sales']
+        @max_sales = params['max_sales']
+
         # product_qty_h is a hash with structure {[product_id, date_id/date_ids] => qty}
-        @product_qty_h = OrderProduct.product_filter(product_filtered_ids).\
+        product_qty_h = OrderProduct.product_filter(product_filtered_ids).\
         date_filter(@dates[0], @dates[-1]).staff_filter(staff_id).\
         cust_style_filter(cust_style_id).send(date_function, @transform_column).send(sum_function)
 
-        @product_ids = []
-        @product_qty_h.each { |date_id_pair, v| @product_ids.push(date_id_pair[0])}
-        @product_ids = @product_ids.uniq
+        product_ids = []
+        product_qty_h.each { |date_id_pair, v| product_ids.push(date_id_pair[0])}
+        # @product_ids = @product_ids.uniq
 
-        @price_h, @product_name_h, @inventory_h, @pending_stock_h = get_data_after_transformation(@transform_column, @product_ids)
+        # get the array of valid product_id
+        # this function is located in helpers -> sales_helper
+        @product_ids, @price_h, @product_name_h, @inventory_h, @pending_stock_h, @product_qty_h = \
+                                        filter_by_range(@transform_column, product_ids.uniq,[@min_price, @max_price],\
+                                        [@min_stock,@max_stock],[@min_sales,@max_sales], product_qty_h)
+
+        # sort based on the arrows
+        # this function is located in helpers -> sales_helper
+        @product_ids = sort_by_arrows(params, @price_h, @product_name_h, @inventory_h, @pending_stock_h,@product_qty_h,@product_ids)
+
+
+        @checked_stats = ("stats".eql? params[:display_column]) ? true : false
+        @checked_detailis = !@checked_stats
+
+        # stats View!
+        @stats_info = stats_info(@product_ids, @product_name_h, @transform_column, @inventory_h, @pending_stock_h) if @checked_stats
 
     end
+
 
 end

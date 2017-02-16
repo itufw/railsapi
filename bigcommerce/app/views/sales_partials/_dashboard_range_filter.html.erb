@@ -1,0 +1,17 @@
+<div class="row" style="margin-top: 20px;">
+  <div class="col-md-4">
+    Stock Range:
+    <%= text_field_tag('min_stock', @min_stock, placeholder: 'Min', class: 'input-mini') %> To
+    <%= text_field_tag('max_stock', @max_stock, placeholder: 'Max', class: 'input-mini') %>
+  </div>
+  <div class="col-md-4">
+    Price Range :
+    <%= text_field_tag('min_price', @min_price, placeholder: 'Min', class: 'input-mini') %> To
+    <%= text_field_tag('max_price', @max_price, placeholder: 'Max', class: 'input-mini') %>
+  </div>
+  <div class="col-md-4">
+    Sales Range :
+    <%= text_field_tag('min_sales', @min_sales, placeholder: 'Min', class: 'input-mini') %> To
+    <%= text_field_tag('max_sales', @max_sales, placeholder: 'Max', class: 'input-mini') %>
+  </div>
+</div>

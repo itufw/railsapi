@@ -23,6 +23,11 @@ module ProductVariations
 	    #@products = ProductNoVintage.where('id IN (?)', ids).send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
     end
 
+    def get_price_h(transform_column, product_transformed_ids)
+      products = get_products_after_transformation(transform_column, product_transformed_ids)
+      price_h = products.product_price('group_by_' + transform_column)
+      return price_h
+    end
 
     def get_data_after_transformation(transform_column, product_transformed_ids)
         #products = Product.filter_by_ids(product_ids)

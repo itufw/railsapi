@@ -260,4 +260,24 @@ class Customer < ActiveRecord::Base
 		where('xero_contacts.accounts_receivable_outstanding > 0').references(:xero_contacts)
 	end
 
+	def self.create_date_filter(start_date, end_date)
+		where("date_created > '#{start_date}' and date_created <= '#{end_date}'")
+	end
+
+	def self.filter_by_staff(staff_id)
+		return where(:staff_id => staff_id) unless staff_id.nil?
+		all
+	end
+
+	def self.count_id
+		count("id")
+	end
+
+	def self.group_by_date_created
+		group('DATE(customers.date_created)')
+	end
+
+	def self.group_by_date_created_and_staff_id
+		group(['customers.staff_id', 'DATE(customers.date_created)'])
+	end
 end

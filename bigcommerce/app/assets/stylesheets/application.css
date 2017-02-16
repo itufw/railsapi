@@ -12,13 +12,14 @@
  *
  *= require_tree .
  *= require_self
+ *= require bootsy
  */
 
 @media print {
   a[href]:after {
-    content: none !important; 
+    content: none !important;
   }
-} 
+}
 
 .btn-primary{
 	color: white !important;
