@@ -372,6 +372,10 @@ class Order < ActiveRecord::Base
         order('total_inc_tax ' + direction)
     end
 
+    def self.order_by_date_created(direction)
+        order('date_created ' + direction)
+    end
+
     def self.include_all
         includes([{ customer: :staff }, :status, { order_products: :product }, :xero_invoice])
     end

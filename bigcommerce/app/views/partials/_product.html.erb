@@ -21,12 +21,23 @@
 
 			<td class="num"><%= display_num(@price_h[id]) %></td>
 			<td clas = "num" ><%= @stock_h[id] %></td>
-			<% if @pending_stock_h[id].to_i != 0 && ('product_id'.eql? @transform_column) %>
+			<% if @pending_stock_h[id].to_i != 0 %>
+				<% case @transform_column
+						when 'product_no_vintage_id'
+							product_ids = Product.products_with_same_no_vintage_id(id).map{|x| x[:id]}
+						when 'product_no_ws_id'
+							product_ids = Product.products_with_same_no_ws_id(id).map{|x| x[:id]}
+						else
+							product_ids = id
+						end
+					product_orders =  Order.status_filter("1").order_product_filter(product_ids).group_by_product_id
+				%>
 				<td><%= link_to @pending_stock_h[id].to_i, controller: 'status', action: 'summary_with_product',\
 				status_id: '1', status_name: 'Pending',\
 				product_id: id, product_name: @name_h[id],\
-				num_orders: Order.status_filter("1").order_product_filter(id).group_by_product_id.count_order_id_from_order_products,\
-				qty: @stock_h[id], status_qty: @pending_stock_h[id], total: @pending_stock_h[id].to_i + @stock_h[id].to_i %></td>
+				num_orders: product_orders.count_order_id_from_order_products.values.sum,\
+				qty: @stock_h[id], status_qty: @pending_stock_h[id], total: product_orders.sum_total.values.sum,\
+				transform_column:  @transform_column %></td>
 			<% else %>
 				<td clas = "num" ><%= @pending_stock_h[id].to_i %></td>
 			<% end %>

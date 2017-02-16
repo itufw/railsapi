@@ -20,6 +20,13 @@ class StatusController < ApplicationController
 	end
 
 	def orders(params, product_ids, staff_id)
+		case params[:transform_column]
+		when 'product_no_vintage_id'
+			product_ids = Product.products_with_same_no_vintage_id(product_ids).map{|x| x[:id]}
+		when 'product_no_ws_id'
+			product_ids = Product.products_with_same_no_ws_id(product_ids).map{|x| x[:id]}
+		end
+
 		orders = Order.include_all.status_filter(@status_id).staff_filter(staff_id).product_filter(product_ids)
 
 		order_function, direction = sort_order(params, :order_by_id, 'DESC')
