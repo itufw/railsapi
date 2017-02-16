@@ -4,12 +4,12 @@
     <div class="col-xs-4">
       <h5><%= customer.firstname+"  "+customer.lastname %></h5>
       <p>Ph: <%= number_to_phone(customer.xero_contact.contact_number, pattern: /(\d{4})(\d{3})(\d{3})$/) unless customer.xero_contact.contact_number.nil? %></p>
-      <p>Email: <%= customer.xero_contact.email unless customer.xero_contact.email.nil? %></p>
+      <p>Email: <%= mail_to(customer.xero_contact.email) unless customer.xero_contact.email.nil? %></p>
     </div>
     <div class="col-xs-4 col-xs-offset-3">
       <h5>Sales Rep.: <%= customer.staff.nickname %></h5>
       <p>Ph: <%= number_to_phone(customer.staff.contact_number, pattern: /(\d{4})(\d{3})(\d{3})$/) unless customer.staff.contact_number.nil? %></p>
-      <p>Email: <%= customer.staff.email unless customer.staff.email.nil? %></p>
+      <p>Email: <%= mail_to(customer.staff.email) unless customer.staff.email.nil? %></p>
     </div>
   </div>
 </div>

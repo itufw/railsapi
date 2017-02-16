@@ -123,8 +123,27 @@ module AccountsHelper
         sum_of_amount
     end
 
-    def record_email(account_email)
+    def get_email_content(params, staff_id, customer_id, selected_invoices)
+      # form builder
+      email_content = AccountEmail.new
+      email_content.send_address = Staff.find(staff_id).email
+      email_content.receive_address = @checked_send_email_to_self ? email_content.send_address : @xero_contact.email
+      email_content.email_type = params[:commit]
+      unless @checked_send_email_to_self
+        email_content.cc = Staff.find(Customer.find(customer_id).staff_id).email
+        email_content.bcc = "emailtosalesforce@y-5cvcy6yhzo3z4984r5f5htqn7.9yyfmeag.9.le.salesforce.com"
+      end
+      # set default_email_content, this function is located in helpers-> accounts_helper
+      email_content.content, email_content.content_second, @email_title = default_email_content(params[:commit])
+      email_content.customer_id = customer_id
+      email_content.selected_invoices = selected_invoices
 
+      record_email(email_content)
+
+      return email_content
+    end
+
+    def record_email(account_email)
 
       email_content = AccountEmail.new
 
