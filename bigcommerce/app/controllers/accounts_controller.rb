@@ -41,28 +41,24 @@ class AccountsController < ApplicationController
   end
 
   def contact_invoices
-
     # Check the ratio to check if this email a preview or sending directly to the customer
     @checked_send_email_to_self, @checked_send_email_not_to_self = email_preview(params[:send_email_to_self])
 
     @customer = params[:contact_id] ? Customer.include_all.filter_by_contact_id(params[:contact_id]) : Customer.include_all.find(params[:customer_id])
 
-    @end_date = params[:end_date] || Date.today
-
+    @end_date = return_end_date_invoices(params[:end_date]) || Date.today
     @monthly = params[:monthly] || "monthly"
+    @checked_monthly, @checked_daily = monthly_checked(@monthly)
 
     # calculate the invoice table based
     # function located in helper -> accounts_helper
     @amount_due = get_invoice_table(@customer.id,@monthly,@end_date)
-
-
   end
 
   def email_edit
     selected_invoices = params[:selected_invoices]
-
-
     customer_id = params[:customer_id]
+
     @xero_contact = XeroContact.where(:skype_user_name => customer_id).first
 
     # filter the unexpected invoices missing
@@ -76,36 +72,15 @@ class AccountsController < ApplicationController
       @over_due_invoices = XeroInvoice.has_amount_due.over_due_invoices.where(:xero_contact_id => @xero_contact.xero_contact_id).order(:due_date)
     end
 
-
     @customer_name = @xero_contact.name
-
     @over_due_invoices = XeroInvoice.has_amount_due.over_due_invoices.where(:xero_contact_id => @xero_contact.xero_contact_id).order(:due_date)
 
     # Check the ratio to check if this email a preview or sending directly to the customer
     @checked_send_email_to_self, checked_send_email_not_to_self = email_preview(params[:send_email_to_self])
 
-
-
-    # form builder
-    @email_content = AccountEmail.new
-
-    @email_content.receive_address = @checked_send_email_to_self ? Staff.find(session[:user_id]).email : @xero_contact.email
-
-    @email_content.email_type = params[:commit]
-
-    unless @checked_send_email_to_self
-      @email_content.cc = Staff.find(Customer.find(customer_id).staff_id).email
-      @email_content.bcc = "emailtosalesforce@y-5cvcy6yhzo3z4984r5f5htqn7.9yyfmeag.9.le.salesforce.com"
-    end
-
-    # set default_email_content, this function is located in helpers-> accounts_helper
-    @email_content.content, @email_content.content_second, @email_title = default_email_content(params[:commit])
-
-    @email_content.customer_id = customer_id
-    @email_content.selected_invoices = selected_invoices
-    @email_content.send_address = Staff.find(session[:user_id]).email
-
-    record_email(@email_content)
+    # helpers -> accounts_helper
+    # assigned value to @email_title via this function
+    @email_content = get_email_content(params, session[:user_id], customer_id, selected_invoices)
   end
 
   def send_reminder

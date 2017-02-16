@@ -12,15 +12,7 @@
 	<button class = "btn btn-primary"><%= link_to "Reset", controller: "accounts", action: "contacts" %></button>
 </div>
 
-<!-- monthly or 15 days displayed -->
-<div class="row" style="margin-top: 5px;">
-	<div class="col-xs-6 col-xs-offset-5">
-		<%= radio_button_tag(:monthly, "monthly", @checked_monthly, :onclick => "this.form.submit();") %> Monthly
-		<span style="margin-left: 50px;">
-		<%= radio_button_tag(:monthly, "daily", @checked_daily, :onclick => "this.form.submit();") %>  15 Days
-		</span>
-	</div>
-</div>
+<%= render "accounts_partials/contact_monthly_filter"%>
 
 <!-- invoice or due date displayed -->
 <div class="row" style="margin-top: 5px;">
