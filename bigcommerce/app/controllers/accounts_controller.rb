@@ -41,22 +41,63 @@ class AccountsController < ApplicationController
   end
 
   def contact_invoices
-    @amount_due = params[:amount_due]
+    # Check the ratio to check if this email a preview or sending directly to the customer
+    @checked_send_email_to_self, @checked_send_email_not_to_self = email_preview(params[:send_email_to_self])
 
-    @customer = Customer.include_all.filter_by_contact_id(params[:contact_id])
+    @customer = params[:contact_id] ? Customer.include_all.filter_by_contact_id(params[:contact_id]) : Customer.include_all.find(params[:customer_id])
 
-    @end_date = params[:end_date] || Date.today
-
+    @end_date = return_end_date_invoices(params[:end_date]) || Date.today
     @monthly = params[:monthly] || "monthly"
+    @checked_monthly, @checked_daily = monthly_checked(@monthly)
+
+    # calculate the invoice table based
+    # function located in helper -> accounts_helper
+    @amount_due = get_invoice_table(@customer.id,@monthly,@end_date)
+  end
+
+  def email_edit
+    selected_invoices = params[:selected_invoices]
+    customer_id = params[:customer_id]
+
+    @xero_contact = XeroContact.where(:skype_user_name => customer_id).first
+
+    # filter the unexpected invoices missing
+    if ["Send Reminder","Send Missed Payment"].include? params[:commit]
+      unless selected_invoices
+        flash[:error] = "Please Select the invoice!"
+        redirect_to :back
+      end
+      @over_due_invoices = XeroInvoice.has_amount_due.over_due_invoices.where("invoice_number IN (?)",selected_invoices).order(:due_date)
+    else
+      @over_due_invoices = XeroInvoice.has_amount_due.over_due_invoices.where(:xero_contact_id => @xero_contact.xero_contact_id).order(:due_date)
+    end
+
+    @customer_name = @xero_contact.name
+    @over_due_invoices = XeroInvoice.has_amount_due.over_due_invoices.where(:xero_contact_id => @xero_contact.xero_contact_id).order(:due_date)
+
+    # Check the ratio to check if this email a preview or sending directly to the customer
+    @checked_send_email_to_self, checked_send_email_not_to_self = email_preview(params[:send_email_to_self])
+
+    # helpers -> accounts_helper
+    # assigned value to @email_title via this function
+    @email_content = get_email_content(params, session[:user_id], customer_id, selected_invoices)
   end
 
   def send_reminder
-    @selected_invoices = params[:selected_invoices]
-    @customer_id = params[:customer_id]
-    ReminderMailer.reminder_email(@customer_id,@selected_invoices).deliver_now
-    redirect_to :back
+    # this function is located in helpers -> accounts_helper
+    email_type, customer_id, receive_address, email_content, selected_invoices, email_cc, email_bcc = get_data_from_email_form(params)
+
+    # Check the ratio to check if this email a preview or sending directly to the customer
+    checked_send_email_to_self = email_preview(params[:checked_send_email_to_self])
+    email_subject = params[:email_subject]
+
+    staff_id = session[:user_id]
+
+    ReminderMailer.send_overdue_reminder(customer_id, email_subject, staff_id, email_content, receive_address, email_cc, email_bcc, email_type, selected_invoices).deliver_now
+    flash[:success] = "Email Sent"
+
+    redirect_to action: "contact_invoices", customer_id: customer_id
+
   end
 
-  def task_detail
-  end
 end

@@ -5,10 +5,10 @@
 <div style="margin-top: 50px;">
 
 <%= form_tag({:action => "sales_dashboard_detailed"}, {:method => "get"}) do %>
-	
 	<%= render "partials/detailed_dashboard_date_filter" %>
-    <%= submit_tag "Submit", class: 'btn btn-primary' %>
-   
+	<div class="col-xs-6 col-xs-offset-7" style="margin-top: 20px;">
+		<%= submit_tag "Submit", class: 'btn btn-primary' %>
+	</div>
 <% end %>
 </div>
 <br/><br/>
@@ -24,7 +24,7 @@
 	<%#= dates_map is a hash like {date => date} when columns are single days, {week_num => [start_date, end_date]} when columns are weeks, {[month_num, year] => [start_date, end_date]} for months %>
 
 	<%#= sums_dates_h are a hash like {[start_date, end_date] => sum} %>
-	
+
 	<tr>
 		<td><%= @param_val %></td>
 		<%= render "partials/daily_sums", sums_dates_h: @sums_by_periods, dates: @dates_paired.keys, dates_map: @dates_paired, staff_nickname: nil, staff_id: nil %>
@@ -33,6 +33,6 @@
 	<tr class = "blank-row"><td colspan="20"></td><tr>
 
 	<tr>
-		<%= render "partials/staff_sums", sums_dates_staffs_h: @staff_sum_by_periods, staffs: @staff_nicknames, dates: @dates_paired.keys, dates_map: @dates_paired %>
+		<%= render "partials/staff_sums", sums_dates_staffs_h: @staff_sum_by_periods, staffs: @staff_nicknames, dates: @dates_paired.keys, dates_map: @dates_paired, current_user: @current_user, display_all: @display_all  %>
 	</tr>
 </table>

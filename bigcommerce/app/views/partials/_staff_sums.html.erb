@@ -1,18 +1,24 @@
-<% if ((current_user.user_type.in?(["Management","Admin","Accounts"])) || ("Yes".eql? display_all)) %>
+<% unless ((current_user.user_type.in?(["Sales Executive"])) && ("No".eql? display_all)) %>
 	<% staffs.each do |id, nickname| %>
 		<tr>
+			<% unless ((current_user.id != id) && (current_user.user_type.in?(["Sales Executive"])))%>
 		<td><%= link_to nickname, controller: 'sales', action: 'customer_dashboard', staff_id: id, staff_nickname: nickname %></td>
+			<% else %>
+				<td><%= nickname %></td>
+			<% end %>
 		<% sums_dates_h = give_sum_date_h(id, sums_dates_staffs_h) %>
 		<%= render "partials/daily_sums", sums_dates_h: sums_dates_h, dates: dates, staff_nickname: nickname, staff_id: id, dates_map: dates_map %>
 		</tr>
 	<% end %>
-	<% else %>
+
+<% else %>
 		<tr>
 		<td><%= link_to current_user.nickname, controller: 'sales', action: 'customer_dashboard', staff_id: current_user.id, staff_nickname: current_user.nickname %></td>
 		<% sums_dates_h = give_sum_date_h(current_user.id, sums_dates_staffs_h) %>
 		<%= render "partials/daily_sums", sums_dates_h: sums_dates_h, dates: dates, staff_nickname: current_user.nickname, staff_id: current_user.id, dates_map: dates_map %>
 		</tr>
 <% end %>
+
 <tr class="blank-row"></tr>
 <tr>
 <%= render "partials/staff_sums_total", sums_dates_h: sums_dates_staffs_h, dates: dates, staffs: staffs %>

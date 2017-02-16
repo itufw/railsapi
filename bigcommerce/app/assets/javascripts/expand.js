@@ -20,5 +20,3 @@ $(document.body).ready(
         change();  //call it when the page is loaded
     }
 );
-
-

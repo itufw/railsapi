@@ -58,6 +58,7 @@ class Order < ActiveRecord::Base
             return if orders.blank?
 
             orders.each do |o|
+
                 if !Order.where(id: o.id).blank?
                     # move row to history, update this one
 
@@ -80,6 +81,8 @@ class Order < ActiveRecord::Base
                     insert_or_update(o, 1)
                     order_product.insert(o.id)
                 end
+                Address.new.insert_or_update(o.billing_address,o.customer_id,o.id)
+
             end
 
             page_number += 1
@@ -233,6 +236,10 @@ class Order < ActiveRecord::Base
         group(['QUARTER(orders.date_created)', 'YEAR(orders.date_created)'])
     end
 
+    def self.group_by_year_created
+        group('YEAR(orders.date_created)')
+    end
+
     def self.group_by_date_created_and_staff_id
         includes(:customer).group(['customers.staff_id', 'DATE(orders.date_created)'])
     end
@@ -247,6 +254,10 @@ class Order < ActiveRecord::Base
 
     def self.group_by_quarter_created_and_staff_id
         includes(:customer).group(['customers.staff_id', 'QUARTER(orders.date_created)', 'YEAR(orders.date_created)'])
+    end
+
+    def self.group_by_year_created_and_staff_id
+        includes(:customer).group(['customers.staff_id', 'YEAR(orders.date_created)'])
     end
 
     # def self.group_by_week_created_and_product_id
@@ -278,6 +289,12 @@ class Order < ActiveRecord::Base
         includes(:customer).group(['customers.id',\
                                          'QUARTER(orders.date_created)', 'YEAR(orders.date_created)']).references(:customers)
     end
+
+    def self.group_by_year_created_and_customer_id
+        includes(:customer).group(['customers.id',\
+                                         'YEAR(orders.date_created)']).references(:customers)
+    end
+
 
     def self.group_by_customerid
         group('orders.customer_id')
@@ -353,6 +370,10 @@ class Order < ActiveRecord::Base
 
     def self.order_by_total(direction)
         order('total_inc_tax ' + direction)
+    end
+
+    def self.order_by_date_created(direction)
+        order('date_created ' + direction)
     end
 
     def self.include_all
