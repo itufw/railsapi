@@ -103,6 +103,7 @@ class AccountsController < ApplicationController
 
     @email_content.customer_id = customer_id
     @email_content.selected_invoices = selected_invoices
+    @email_content.send_address = Staff.find(session[:user_id]).email
 
     record_email(@email_content)
   end

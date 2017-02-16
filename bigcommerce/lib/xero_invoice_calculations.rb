@@ -28,7 +28,7 @@ module XeroInvoiceCalculations
 				invoice_line_items(o) unless XeroCalculation.get_line_items(order_id).count > 0
 				create_in_xero(o, xero_contact_id)
 			end
-		end		
+		end
 	end
 
 	def invoice_line_items(order)
@@ -142,7 +142,7 @@ module XeroInvoiceCalculations
 
 		wet_unadjusted_order_product_price = Hash.new
 		line_amounts_ex_taxes_rounded.each {|op_id, d| wet_unadjusted_order_product_price[op_id] = wet_unadjusted_order_product(d, wet_percentage)}
-	
+
 		wet_unadjusted_total = wet_unadjusted_order_product_price.values.sum
 
 		ship_deduction = calculate_ship_deduction(order.qty, ship_charge_percentage, gst_percentage)
@@ -154,7 +154,7 @@ module XeroInvoiceCalculations
 		adjustment = (wet_unadjusted_total - wet_adjusted)
 
 		total_ex_gst = line_amounts_total_ex_taxes_rounded + wet_adjusted.round(2) + adjustment.round(2) + ex_gst_shipping_price.round(2)
-		
+
 		gst_line_amounts = Hash.new
 		line_amounts_ex_taxes_rounded.each {|op_id, d| gst_line_amounts[op_id] = get_gst_price(d, gst_percentage).round(2)}
 
