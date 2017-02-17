@@ -132,6 +132,10 @@ class Order < ActiveRecord::Base
             # insert the billing adress where the id is order_id
             Address.new.insert_or_update(o.billing_address,o.customer_id,o.id)
 
+            # update the staff id
+            Order.update_staff_id(o.id,o.customer_id)
+
+
         else
             sql = "UPDATE orders SET customer_id = '#{o.customer_id}', date_created = '#{date_created}',\
       					date_modified = '#{date_modified}', date_shipped = '#{date_shipped}', status_id = '#{o.status_id}',\
@@ -383,18 +387,26 @@ class Order < ActiveRecord::Base
     #-------------------------
     # TODO to be finished
     #-------------------------
-    def self.update_staff_id(order)
-        order.includes(customer: :staff)
-        if order.staff
-            sql = "UPDATE orders SET staff_id = '#{order.staff.id}' WHERE id = '#{order.id}'"
-            ActiveRecord::Base.connection.execute(sql)
+    def self.update_staff_id(order_id,customer_id)
+      customer = Customer.where(id: customer_id).first
+      unless customer.nil?
+        staff_id = customer.staff_id
+        sql = "UPDATE orders SET staff_id = '#{staff_id}' WHERE id = '#{order_id}'"
+        ActiveRecord::Base.connection.execute(sql)
+      end
+    end
+
+    def update_missing_staff_id
+        orders = Order.where(staff_id: nil)
+        orders.each do |o|
+            Order.update_staff_id(o.id,o.customer_id)
         end
     end
 
-    def self.update_all_staff_id
-        orders = Order.includes(customer: :staff)
+    def update_all_staff_id
+        orders = Order.all
         orders.each do |o|
-            Order.update_staff_id(o)
+            Order.update_staff_id(o.id,o.customer_id)
         end
     end
 

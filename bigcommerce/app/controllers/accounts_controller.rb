@@ -29,7 +29,7 @@ class AccountsController < ApplicationController
     if order_function.start_with?("order_by_invoice")
       # .split('|')
       order_function, sort_date_start, sort_date_end = order_function.split('|')
-      @contacts = XeroContact.select('*').from(@contacts.send(order_function, direction,sort_date_start,sort_date_end,@date_column))
+      @contacts = XeroContact.select('*').from(@contacts.send(order_function, direction, sort_date_start, sort_date_end, @date_column))
     else
       @contacts = @contacts.send(order_function, direction)
     end

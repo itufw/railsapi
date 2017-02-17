@@ -112,21 +112,21 @@
                       <td></td>
                       <td></td>
                       <td class="ProductCost" align="right">WET</td>
-                      <td class="ProductTotal" align="right">$<%= invoice.xero_invoice_line_items.where("item_code = 'WET'").count == 0 ? ('%.2f' % (invoice.amount_due * 0.29 / 1.419)) : ('%.2f' % invoice.xero_invoice_line_items.where("item_code = 'WET'").first.unit_amount) %></td>
+                      <td class="ProductTotal" align="right">$<%= invoice.xero_invoice_line_items.where("item_code = 'WET'").count == 0 ? ('%.2f' % (invoice.total * 0.29 / 1.419)) : ('%.2f' % invoice.xero_invoice_line_items.where("item_code = 'WET'").first.unit_amount) %></td>
                       <td></td>
                     </tr>
                     <tr>
                       <td></td>
                       <td></td>
                       <td class="ProductCost" align="right">GST</td>
-                      <td class="ProductTotal" align="right">$<%= '%.2f' % (invoice.amount_due - (invoice.amount_due/1.1)) %></td>
+                      <td class="ProductTotal" align="right">$<%= '%.2f' % (invoice.total - (invoice.total/1.1)) %></td>
                       <td></td>
                     </tr>
                     <tr>
                       <td></td>
                       <td></td>
                       <td class="ProductCost" align="right"><h3>Grand Total:</h3></td>
-                      <td class="ProductTotal" align="right">$<%= '%.2f' % invoice.amount_due %></td>
+                      <td class="ProductTotal" align="right">$<%= '%.2f' % invoice.total %></td>
                       <td></td>
                     </tr>
             </table>

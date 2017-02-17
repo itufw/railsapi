@@ -2,6 +2,7 @@ require 'time_period_stats.rb'
 require 'product_variations.rb'
 require 'models_filter.rb'
 require 'dates_helper.rb'
+require 'customer_helper.rb'
 
 class CustomerController < ApplicationController
 
@@ -11,11 +12,19 @@ class CustomerController < ApplicationController
 	include ProductVariations
 	include ModelsFilter
   include DatesHelper
+	include CustomerHelper
 
   def all
     @staffs = Staff.active_sales_staff
     customers = filter(params, "display_report")
     display_(params, customers)
+  end
+
+	def new_customers
+    @staffs = Staff.active_sales_staff
+    customers = filter(params, "display_report")
+		# hepler -> customer_helper
+		@per_page, @customers = get_new_customers(params, customers)
   end
 
   def incomplete_customers
