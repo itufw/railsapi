@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170214040722) do
+ActiveRecord::Schema.define(version: 20170217002606) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -470,8 +470,9 @@ ActiveRecord::Schema.define(version: 20170214040722) do
   create_table "revisions", force: :cascade do |t|
     t.datetime "start_time"
     t.datetime "end_time"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+    t.integer  "attempt_count", limit: 4
   end
 
   create_table "staff_time_periods", force: :cascade do |t|

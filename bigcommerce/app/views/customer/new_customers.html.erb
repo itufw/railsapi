@@ -1,0 +1,13 @@
+<%= title "New Customers" %>
+<h3>New Customers</h3>
+
+<center><%= link_to "View Incomplete Customers", action: 'incomplete_customers' %></center>
+
+<div class="form-group" style="margin-left:300px;margin-top:50px;">
+<%= form_tag({:controller => "customer", :action => customer_filter_path}, {:method => "get"}) do %>
+	<%= render "partials/customer_filter" %>
+	<%= submit_tag "Filter", class: 'btn btn-primary' %>
+	<% end %>
+</div>
+
+<%= render "partials/customer", customers: @customers %>

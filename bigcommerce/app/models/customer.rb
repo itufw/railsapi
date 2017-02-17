@@ -152,6 +152,11 @@ class Customer < ActiveRecord::Base
 		where("xero_contact_id = '#{id}'").first
 	end
 
+	def self.filter_new_customer(days)
+		time_period = Time.now - days
+		where("created_at >= '#{time_period}'")
+	end
+
 	def self.filter_by_ids(ids_array)
 		return Customer.all if ids_array.nil?
 		return where('customers.id IN (?)', ids_array)
