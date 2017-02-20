@@ -13,7 +13,7 @@ class XeroContact < ActiveRecord::Base
     has_many :xero_receipts
 
     scoped_search on: [:name, :firstname, :lastname, :email, :skype_user_name]
-    self.per_page = 15
+    self.per_page = 100
 
     def download_data_from_api(modified_since_time)
         xero = XeroConnection.new.connect

@@ -13,6 +13,7 @@ class AccountsController < ApplicationController
   def contacts
     @end_date = return_end_date_invoices(params[:end_date])
     @per_page = params[:per_page] || XeroContact.per_page
+
     @date_column = params[:date_column] || "due_date"
     @monthly = params[:monthly] || "monthly"
 
@@ -73,6 +74,7 @@ class AccountsController < ApplicationController
     end
 
     @customer_name = @xero_contact.name
+    @customer_firstname = @xero_contact.firstname
     @over_due_invoices = XeroInvoice.has_amount_due.over_due_invoices.where(:xero_contact_id => @xero_contact.xero_contact_id).order(:due_date)
 
     # Check the ratio to check if this email a preview or sending directly to the customer

@@ -63,6 +63,10 @@ class OrderProduct < ActiveRecord::Base
 		return where('product_id IN (?)', product_ids)
 	end
 
+	def self.order_filter(order_ids)
+		return where('order_id IN (?)', order_ids) unless ((order_ids.nil?) || (order_ids.empty?))
+	end
+
 	def self.cust_style_filter(cust_style_id)
 		return all if cust_style_id.nil?
 		return includes([{:order => :customer}]).where('customers.cust_style_id = ?', cust_style_id).references(:customers)

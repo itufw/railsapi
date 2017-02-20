@@ -30,7 +30,7 @@ module AccountsHelper
         email_title = ''
         case commit
         when 'Send Reminder', 'Send Missed Payment'
-            email_content = "Hi,<br><br>
+            email_content = "Hi #{@customer_firstname},<br><br>
                             Thanks for the recent payment that was made to our account.<br><br>
                             Could I please refer you to an invoice that has been missed that we’re still awaiting payment for. The details are below.<br><br>"
             content_second_half = "I’ve attached a copy of the invoice(s) in case you are missing them in your records. I will also follow-up with an additional email providing the Proof of delivery (POD).<br><br>
@@ -38,7 +38,7 @@ module AccountsHelper
             email_title = "MISSING INVOICE PAYMENT – Untapped Fine Wines – #{@customer_name}"
 
         when 'Send Overdue Reminder'
-            email_content = "Hi,<br><br>
+            email_content = "Hi #{@customer_firstname},<br><br>
                             We have outstanding balance for wine that was delivered for <b>#{@customer_name}</b> total <span class=\"wysiwyg-color-red\">#{number_to_currency(@over_due_invoices.sum(:amount_due))}</span>. Please see the details below."
             content_second_half = "This balance is now <a style=\"color: red\">overdue</a> and we require payment of the amount provided above and repeated in the attached statement in order to continue to provide credit terms on a regular basis.<br><br>
                                   Can you please examine this and either give me a call or reply to this email as to when the outstanding amount can be settled.<br><br>
@@ -48,7 +48,7 @@ module AccountsHelper
             email_title = "OVERDUE REMINDER – Untapped Fine Wines – #{@customer_name}"
 
         when 'Send 60 Days Overdue Reminder'
-            email_content = "Hi,<br><br>
+            email_content = "Hi #{@customer_firstname},<br><br>
                             We have outstanding balance of <span class=\"wysiwyg-color-red\">#{number_to_currency(@over_due_invoices.sum(:amount_due))} </span> for <b>#{@customer_name}</b>. Please see the details below.<br><br>
                             Until this overdue amount is settled any new order must be paid for prior to being dispatched<br><br>"
             content_second_half = "If you have any questions regarding your account please be in contact.<br><br>
@@ -57,7 +57,7 @@ module AccountsHelper
             email_title = "OVERDUE PAYMENT REQUIRED – Untapped Fine Wines – #{@customer_name}"
 
         when 'Send 90 Days Overdue Reminder'
-            email_content = "Hi,<br><br>
+            email_content = "Hi #{@customer_firstname},<br><br>
                             We have outstanding balance of <span class=\"wysiwyg-color-red\">#{number_to_currency(@over_due_invoices.sum(:amount_due))}</span> for <b>#{@customer_name}</b>. Some of this wine is more than 90 days overdue. The details are listed below.
                             We cannot continue to provide credit terms for your account on a normal basis. Until any overdue amount is cleared all new invoice must be paid for on creation before they can be shipped.
                             We have made repeated attempts to address this outstanding amount with you and now we require immediate payment.<br><br>"
@@ -67,7 +67,7 @@ module AccountsHelper
             email_title = "FINAL NOTICE PAYMENT REQUIRED, 90+ Days Overdue – Untapped Fine Wines – #{@customer_name}"
 
         when 'Send New Order Hold'
-            email_content = "Hi,<br><br>
+            email_content = "Hi #{@customer_firstname},<br><br>
                             We have an order for <b>#{@customer_name}</b> that was entered today that I’d like to have despatched for you today. In reviewing your account there are some amounts that are quite overdue. This is listed below for your reference. Could you please let me know when this amount can be paid?
                             Until I hear back from you we won’t be able to ship the wine.<br><br>"
             content_second_half = "I’ve attached a copy of the invoice(s) in case you are missing them in your records.<br><br>

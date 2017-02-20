@@ -2,6 +2,7 @@ require 'models_filter.rb'
 require 'sales_controller_helper.rb'
 require 'dates_helper.rb'
 require 'time_period_stats.rb'
+require 'status_helper.rb'
 
 class StatusController < ApplicationController
 
@@ -11,49 +12,15 @@ class StatusController < ApplicationController
 	include SalesControllerHelper
 	include DatesHelper
 	include TimePeriodStats
+	include StatusHelper
 
 	def pending
-		get_id_and_name(params)
-		staff_id = staff_filter(params)
-		product_filtered_ids = products(params, staff_id)
-		orders(params, product_filtered_ids, staff_id)
+		@status_id, @status_name = get_id_and_name(params)
+		staff_id, @staff = staff_filter(params)
+		product_filtered_ids, @producer_country, @product_sub_type, @search_text = products(params, staff_id, @status_id)
+		@per_page, @orders, @products, @last_order_date = orders(params, product_filtered_ids, staff_id, @status_id)
 	end
 
-	def orders(params, product_ids, staff_id)
-		case params[:transform_column]
-		when 'product_no_vintage_id'
-			product_ids = Product.products_with_same_no_vintage_id(product_ids).map{|x| x[:id]}
-		when 'product_no_ws_id'
-			product_ids = Product.products_with_same_no_ws_id(product_ids).map{|x| x[:id]}
-		end
-
-		orders = Order.include_all.status_filter(@status_id).staff_filter(staff_id).product_filter(product_ids)
-
-		order_function, direction = sort_order(params, :order_by_id, 'DESC')
-		@per_page = params[:per_page] || Order.per_page
-		@orders = orders.include_all.send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
-	end
-
-	def products(params, staff_id)
-		@producer_country, @product_sub_type, products, @search_text = product_filter(params)
-		product_ids = products.pluck("id")
-		@products = products_for_status(@status_id, staff_id, product_ids)
-		return product_ids
-	end
-
-	def staff_filter(params)
-		staff_id, @staff = staff_params_filter(params)
-		return staff_id
-	end
-
-	def get_id_and_name(params)
-		@status_id = params[:status_id]
-    	@status_name = params[:status_name]
-    	if @status_id.nil?
-      		@status_id = 1
-      		@status_name = "Pending"
-    	end
-	end
 
 	def summary_with_product
 		get_id_and_name(params)

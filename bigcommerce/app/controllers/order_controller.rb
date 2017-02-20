@@ -1,6 +1,7 @@
 require 'models_filter.rb'
 require 'display_helper.rb'
 require 'product_variations.rb'
+require 'order_helper.rb'
 
 class OrderController < ApplicationController
 
@@ -9,6 +10,7 @@ class OrderController < ApplicationController
     include ModelsFilter
     include DisplayHelper
     include ProductVariations
+    include OrderHelper
 
     def all
      	@staff_nickname = params[:staff_nickname]
@@ -17,8 +19,8 @@ class OrderController < ApplicationController
      	@staffs = Staff.active_sales_staff
 
      	#@can_update_bool = allow_to_update(session[:user_id])
-     	orders = filter(params, "display_report")
-     	display_(params, orders)
+     	@staff, @status, orders, @search_text, @order_id = order_controller_filter(params, "display_report")
+     	@per_page, @orders = order_display_(params, orders)
     end
 
 	def for_product
@@ -27,7 +29,7 @@ class OrderController < ApplicationController
 		@transform_column = params[:transform_column]
 
 		# orders filtered by param
-		orders_filtered = filter(params, "product_rights")
+		@staff, @status, orders_filtered, @search_text, @order_id  = order_controller_filter(params, "product_rights")
 
 		# get product_ids depending on the transform_column
 		# if transform_column is product_no_vintage_id then we have a set of products
@@ -35,7 +37,7 @@ class OrderController < ApplicationController
 		@product_ids = get_products_after_transformation(@transform_column, @product_id).pluck("id") || [@product_id]
 		# orders filtered by product
 		orders = orders_filtered.order_product_filter(@product_ids)
-		display_(params, orders)
+		@per_page, @orders = order_display_(params, orders)
 	end
 
 	# Displays all details about an order
@@ -46,14 +48,4 @@ class OrderController < ApplicationController
     	@order = Order.include_all.order_filter_(@order_id).paginate( per_page: @per_page, page: params[:page])
 	end
 
-	def filter(params, rights_col)
-		@staff, @status, orders, @search_text, @order_id = order_filter(params, session[:user_id], "product_rights")
-		return orders
-	end
-
-	def display_(params, orders)
-    	order_function, direction = sort_order(params, :order_by_id, 'DESC')
-		@per_page = params[:per_page] || Order.per_page
-		@orders = orders.include_all.send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
-	end
 end

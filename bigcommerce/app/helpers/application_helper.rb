@@ -38,14 +38,6 @@ module ApplicationHelper
     end
   end
 
-  def last_order_date(customer,total_inc_tax)
-    if customer.nil? || total_inc_tax == 0
-      return nil
-    else
-      Order.customer_filter([customer.id]).order_by_date_created('DESC').map{|x| x[:date_created]}[1]
-    end
-  end
-
   # Returns name of Status
   def order_status(status)
   	status.name
@@ -144,5 +136,9 @@ module ApplicationHelper
     return new_key
   end
 
+  # format the phone number for accounting header
+  def num_to_phone(num)
+    "#{ num[0..3] }-#{ num[4..6] }-#{ num[7..9] }"
+  end
 
 end

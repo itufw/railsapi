@@ -45,6 +45,8 @@ module SalesControllerHelper
     # This returns a hash like {product_id => number_orders}
     num_orders = (eval filter_string).group_by_product_id.count_order_id_from_order_products
 
+    return [] if num_orders.empty?
+
     # This returns a hash like {product_id => product_qty sum over all the valid orders}
     product_qty = (eval filter_string).group_by_product_id.sum_order_product_qty
 

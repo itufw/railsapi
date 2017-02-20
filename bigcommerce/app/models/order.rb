@@ -170,7 +170,8 @@ class Order < ActiveRecord::Base
     def self.product_filter(product_ids)
         # return includes(:order_products).where('order_products.product_id IN (?)', product_ids).references(:order_products) if !product_ids.nil?
         # return all
-        includes(:products).where('products.id IN (?)', product_ids).references(:products)
+        return includes(:products).where('products.id IN (?)', product_ids).references(:products) unless product_ids.nil? || product_ids.empty?
+        all
     end
 
     def self.order_product_filter(product_ids)
@@ -187,6 +188,11 @@ class Order < ActiveRecord::Base
     def self.staff_filter(staff_id)
         return includes(:customer).where('customers.staff_id = ?', staff_id).references(:customers) unless staff_id.nil?
         all
+    end
+
+    def self.product_customer_filter(product_ids, customer_ids)
+      return includes(:order_products).where('order_products.product_id IN (?)', product_ids).references(:order_products) if customer_ids.nil? || customer_ids.empty?
+      return includes(:order_products).where('order_products.product_id IN (?) OR orders.customer_id IN (?)', product_ids, customer_ids).references(:order_products)
     end
 
     # Returns orders whose date created is between the start date and end date
@@ -377,7 +383,7 @@ class Order < ActiveRecord::Base
     end
 
     def self.order_by_date_created(direction)
-        order('date_created ' + direction)
+        order('orders.date_created ' + direction)
     end
 
     def self.include_all
