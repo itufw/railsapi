@@ -90,19 +90,19 @@
 				<%= radio_button_tag(:send_email_to_self, "no", @checked_send_email_not_to_self) %>  <%= @customer.xero_contact.name %>
 				</span>
 			<br/>
-			<%= submit_tag "Send Missed Payment", class: 'btn btn-primary', data: { confirm: "Send Missed Payment Reminder to #{@customer.xero_contact.name}" }%>
+			<%= submit_tag "Send Missed Payment", class: 'btn btn-primary'%>
 			<br/>
 			<br/>
-			<%= submit_tag "Send New Order Hold", class: 'btn btn-primary', data: { confirm: "Send New Order Hold Reminder to #{@customer.xero_contact.name}" }%>
+			<%= submit_tag "Send New Order Hold", class: 'btn btn-primary'%>
 			<br/>
 			<br/>
-			<%= submit_tag "Send Overdue Reminder",class: 'btn btn-primary', data: { confirm: "Send Overdue Reminder to #{@customer.xero_contact.name}" } if over_days %></button>
+			<%= submit_tag "Send Overdue Reminder",class: 'btn btn-primary' if over_days %></button>
 			<br/>
 			<br/>
-			<%= submit_tag "Send 60 days Overdue Reminder",class: 'btn btn-primary', data: { confirm: "Send 60 Days Overdue Reminder to #{@customer.xero_contact.name}" } if over_60_days %></button>
+			<%= submit_tag "Send 60 Days Overdue Reminder",class: 'btn btn-primary' if over_60_days %></button>
 			<br/>
 			<br/>
-			<%= submit_tag "Send 90 days Overdue Reminder",class: 'btn btn-primary', data: { confirm: "Send 90 Days Overdue Reminder to #{@customer.xero_contact.name}" } if over_90_days  %></button>
+			<%= submit_tag "Send 90 Days Overdue Reminder",class: 'btn btn-primary' if over_90_days  %></button>
 		</div>
 
 		<!-- end of the form -->

@@ -42,7 +42,7 @@
 		<td class="num"><%= display_num(outstanding_customer(c))  %></td>
 		<td class="num"><%= display_num(overdue_customer(c)) %></td>
 		<% sum_of_amount[date_column].each do |sum|%>
-			<td><%=sum %></td>
+			<td><%=display_num(sum) %></td>
 		<% end %>
 	</tr>
 	<% end %>

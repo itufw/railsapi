@@ -14,6 +14,7 @@
 		<th>Qty <%= render "partials/sort_arrows", order: 'order_by_qty' %></th>
 		<th>Total <%= render "partials/sort_arrows", order: 'order_by_total' %></th>
 		<th>Invoice Status</th>
+		<th>Last Order Date</th>
 	</tr>
 
 	<% orders.each do |order| %>
@@ -33,6 +34,7 @@
 
 		<% invoice_status = invoice_status(order.xero_invoice) %>
 		<td class = <%= invoice_status[0].downcase %> ><%= invoice_status[0] %></td>
+		<td><%= date_format_orders(last_order_date[order.id]) %></td>
 	</tr>
 	<% end %>
 
