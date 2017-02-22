@@ -21,9 +21,16 @@ class ReminderMailer < ActionMailer::Base
     attach_invoices(@over_due_invoices)
 
     @email_content = email_content
-
-    customer_address = %("#{@xero_contact.name}" <#{email_address}>)
-    mail(from: "\"#{staff_name}\" <accounts@untappedwine.com>",to: customer_address, cc: cc, bcc: bcc, subject: email_subject)
+    recipients_addresses = []
+    email_address.split(";").each do |contact_address|
+      customer_address = %("#{@xero_contact.name}" <#{contact_address}>)
+      recipients_addresses.push(customer_address)
+    end
+    bcc_group = []
+    bcc_group.push(bcc)
+    bcc_group.push(%("#{staff_name}" <#{staff.email}>))
+    # customer_address = %("#{@xero_contact.name}" <#{email_address}>)
+    mail(from: "\"#{staff_name}\" <accounts@untappedwine.com>",to: recipients_addresses, cc: cc, bcc: bcc_group, subject: email_subject)
   end
 
 

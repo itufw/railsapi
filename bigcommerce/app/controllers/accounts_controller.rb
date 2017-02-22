@@ -96,7 +96,6 @@ class AccountsController < ApplicationController
     email_subject = params[:email_subject]
 
     staff_id = session[:user_id]
-
     ReminderMailer.send_overdue_reminder(customer_id, email_subject, staff_id, email_content, receive_address, email_cc, email_bcc, email_type, selected_invoices).deliver_now
     flash[:success] = "Email Sent"
 
