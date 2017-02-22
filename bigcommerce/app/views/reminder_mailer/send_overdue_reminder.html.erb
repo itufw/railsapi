@@ -4,7 +4,7 @@
     <meta content='text/html; charset=ISO-8859-1' http-equiv='Content-Type' />
   </head>
   <body>
-    <%= render "reminder_mailer_partials/overdue_reminder_body", over_due_invoices: @over_due_invoices, xero_contact: @xero_contact, email_content: @email_content%>
+    <%= render "reminder_mailer_partials/overdue_reminder_body", over_due_invoices: @over_due_invoices, xero_contact: @xero_contact, email_content: @email_content, missing_invoice: @missing_invoice%>
 
     <%= render "reminder_mailer_partials/signature_anglica"%>
   </body>

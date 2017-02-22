@@ -70,14 +70,14 @@ class AccountsController < ApplicationController
         flash[:error] = "Please Select the invoice!"
         redirect_to :back
       end
-      @over_due_invoices = XeroInvoice.has_amount_due.over_due_invoices.where("invoice_number IN (?)",selected_invoices).order(:due_date)
+      @over_due_invoices = XeroInvoice.has_amount_due.where("invoice_number IN (?)",selected_invoices).order(:due_date)
+      @missing_invoice = true
     else
       @over_due_invoices = XeroInvoice.has_amount_due.over_due_invoices.where(:xero_contact_id => @xero_contact.xero_contact_id).order(:due_date)
+      @missing_invoice = false
     end
-
     @customer_name = @xero_contact.name
     @customer_firstname = @xero_contact.firstname
-    @over_due_invoices = XeroInvoice.has_amount_due.over_due_invoices.where(:xero_contact_id => @xero_contact.xero_contact_id).order(:due_date)
 
     # Check the ratio to check if this email a preview or sending directly to the customer
     @checked_send_email_to_self, checked_send_email_not_to_self = email_preview(params[:send_email_to_self])
