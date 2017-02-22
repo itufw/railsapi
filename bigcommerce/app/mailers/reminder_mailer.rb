@@ -11,9 +11,11 @@ class ReminderMailer < ActionMailer::Base
     @xero_contact = XeroContact.where(:skype_user_name => customer_id).first
 
     if ["Send Reminder", "Send Missed Payment"].include? email_type
-      @over_due_invoices = XeroInvoice.has_amount_due.over_due_invoices.where("invoice_number IN (?)",selected_invoices).order(:due_date)
+      @over_due_invoices = XeroInvoice.has_amount_due.where("invoice_number IN (?)",selected_invoices).order(:due_date)
+      @missing_invoice = true
     else
       @over_due_invoices = XeroInvoice.has_amount_due.over_due_invoices.where(:xero_contact_id => @xero_contact.xero_contact_id).order(:due_date)
+      @missing_invoice = false
     end
 
     attach_invoices(@over_due_invoices)
