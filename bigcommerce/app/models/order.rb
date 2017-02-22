@@ -219,7 +219,7 @@ class Order < ActiveRecord::Base
 
     # Returns orders with a given status id
     def self.status_filter(status_id)
-        return where(status_id: status_id) unless status_id.nil?
+        return where("status_id = ?", status_id) unless status_id.nil?
         all
     end
 

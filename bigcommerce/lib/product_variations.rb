@@ -110,7 +110,7 @@ module ProductVariations
     # Give an array of product_ids corresponding to
     # a product_no_vintage_id/no_ws_id
     def get_products_after_transformation(transform_column, product_transformed_ids)
-        new_transform_column = transform_column == "product_id" ? "id" : transform_column
+        new_transform_column = ((transform_column == "product_id")||(transform_column.nil?)) ? "id" : transform_column
         where_query = "products." + new_transform_column + " IN (?)"
         products = Product.where(where_query, product_transformed_ids)
         # if transform_column == "product_no_vintage_id"

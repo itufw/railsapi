@@ -1,6 +1,30 @@
 module AccountsHelper
     include ActionView::Helpers::NumberHelper
 
+    def credit_note_and_overpayment(xero_contact_id)
+      op = XeroOverpayment.get_remaining_credit(xero_contact_id).where("remaining_credit > 0")
+      cn = XeroCreditNote.get_remaining_credit(xero_contact_id).where("remaining_credit > 0")
+      cn_op = {}
+
+      op.each do |o|
+        reference = ""
+        op_allocation = XeroOpAllocation.where("xero_overpayment_id = '#{o.xero_overpayment_id}' ")
+
+        op_allocation.each do |opa|
+          reference += "Order##{opa.invoice_number} applied #{opa.applied_amount}  \n"
+        end
+        cn_op["Overpayment_#{o.date.year}_#{o.date.month}_#{o.date.day}"] = {:sub_total => o.sub_total, :total => o.total,\
+                                         :remaining_credit => o.remaining_credit, :date => o.date, :reference => reference}
+      end
+
+      cn.each do |c|
+        cn_op[c.credit_note_number] = {:sub_total => c.sub_total, :total => c.total,\
+                                         :remaining_credit => c.remaining_credit, :date => c.date, :reference => c.reference}
+
+      end
+      cn_op
+    end
+
     def date_column_checked(date_column)
         if 'due_date'.eql? date_column
             # @checked_due_date = true

@@ -51,6 +51,8 @@ class AccountsController < ApplicationController
     @monthly = params[:monthly] || "monthly"
     @checked_monthly, @checked_daily = monthly_checked(@monthly)
 
+    @cn_op = credit_note_and_overpayment(@customer.xero_contact_id)
+
     # calculate the invoice table based
     # function located in helper -> accounts_helper
     @amount_due = get_invoice_table(@customer.id,@monthly,@end_date)

@@ -39,10 +39,10 @@
 			<% end%>
 	<tr>
 		<td><%= link_to c.name, controller: 'accounts', action: 'contact_invoices', contact_id: c.xero_contact_id, end_date: @date, monthly: @monthly %></td>
-		<td class="num"><%= display_num(outstanding_customer(c))  %></td>
-		<td class="num"><%= display_num(overdue_customer(c)) %></td>
+		<td class="num"><%= (outstanding_customer(c) == 0)? "-" : display_num(outstanding_customer(c))  %></td>
+		<td class="num"><%= (overdue_customer(c) == 0)? "-" : display_num(overdue_customer(c)) %></td>
 		<% sum_of_amount[date_column].each do |sum|%>
-			<td><%=display_num(sum) %></td>
+			<td class="num"><%= (sum == 0)? "-" : display_num(sum) %></td>
 		<% end %>
 	</tr>
 	<% end %>

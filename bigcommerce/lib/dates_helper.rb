@@ -20,10 +20,19 @@ module DatesHelper
   end
 
   def return_end_date_invoices(date_given)
-    if date_given.blank? || date_given['end_date'].blank?
+    if date_given.blank?
       return Date.today.to_date
+    elsif date_given.first.first.blank?
+        return (Date.today - 14.days).to_date if "start_date".eql? date_given.first.first
     else
-      return date_given['end_date']
+      require 'date'
+      begin
+         Date.parse(date_given.first.last)
+         return Date.parse(date_given.first.last).to_date
+      rescue (ArgumentError || TypeError)
+         # handle invalid date
+         return Date.today.to_date
+      end
     end
   end
 
