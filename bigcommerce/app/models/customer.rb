@@ -152,9 +152,8 @@ class Customer < ActiveRecord::Base
 		where("xero_contact_id = '#{id}'").first
 	end
 
-	def self.filter_new_customer(days)
-		time_period = Time.now - days
-		where("created_at >= '#{time_period}'")
+	def self.filter_new_customer(start_date, end_date)
+		where("created_at >= '#{start_date}' and created_at<='#{end_date}'")
 	end
 
 	def self.filter_by_ids(ids_array)

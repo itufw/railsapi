@@ -34,7 +34,6 @@ module StatusHelper
 
 
         orders = Order.include_all.status_filter(status_id).staff_filter(staff_id).product_customer_filter(product_ids, customer_ids)
-
         # {order_id => date }
         last_order_date = last_order_date_customer(orders, product_ids)
 

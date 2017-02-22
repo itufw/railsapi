@@ -20,12 +20,10 @@ module CustomerHelper
     	XeroContact.get_accounts_receivable_overdue(xero_contact)
   	end
 
-		def get_new_customers(params, customers)
-			time_period = 14.days
-
+		def get_new_customers(params, customers, start_date, end_date)
 			order_function, direction = sort_order(params, 'order_by_name', 'ASC')
 			per_page = params[:per_page] || Customer.per_page
-			customers = customers.filter_new_customer(time_period).include_all.send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
+			customers = customers.filter_new_customer(start_date, end_date).include_all.send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
 
 			[per_page, customers]
 		end
