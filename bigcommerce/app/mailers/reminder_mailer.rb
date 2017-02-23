@@ -5,7 +5,9 @@ class ReminderMailer < ActionMailer::Base
   default from: 'accounts@untappedwines.com'
   layout "mailer"
 
-  def send_overdue_reminder(customer_id, email_subject,staff_id,email_content,email_address, cc, bcc, email_type, selected_invoices)
+  def send_overdue_reminder(customer_id, email_subject,staff_id,email_content,email_address, cc, bcc, email_type, selected_invoices, cn_op)
+    @cn_op = ("{}".eql? cn_op) ? {} : unzip_cn_op_hash(cn_op)
+    @total_remaining_credit = (@cn_op.map {|x| x[:remaining_credit]}).sum
     staff = Staff.find(staff_id)
     staff_name = staff.firstname + " " + staff.lastname
     @xero_contact = XeroContact.where(:skype_user_name => customer_id).first
@@ -27,12 +29,42 @@ class ReminderMailer < ActionMailer::Base
       recipients_addresses.push(customer_address)
     end
     bcc_group = []
-    bcc_group.push(bcc)
+    bcc_group.push(bcc) unless "".eql? bcc
     bcc_group.push(%("#{staff_name}" <#{staff.email}>))
+
+    record_email(recipients_addresses, staff.email, email_type, cc, bcc_group, email_content.first, email_content.last, customer_id, selected_invoices)
+
+
     # customer_address = %("#{@xero_contact.name}" <#{email_address}>)
     mail(from: "\"#{staff_name}\" <accounts@untappedwine.com>",to: recipients_addresses, cc: cc, bcc: bcc_group, subject: email_subject)
   end
 
+  def unzip_cn_op_hash(cn_op_list)
+    cn_op = []
+    cn_op_list.split("} {").each do |co|
+      co = "{" + co unless "{".eql? co.first
+      co = co + "}" unless "}".eql? co.last
+      cn_op.push(eval(co))
+    end
+    cn_op
+  end
+
+  def record_email(receive_address, send_address, email_type, cc, bcc, content, content_second, customer_id, selected_invoices)
+
+    email_content = AccountEmail.new
+
+    email_content.receive_address = receive_address
+    email_content.send_address = send_address
+    email_content.email_type = email_type
+    email_content.cc = cc
+    email_content.bcc = bcc
+    email_content.content = content
+    email_content.content_second = content_second
+    email_content.customer_id = customer_id
+    email_content.selected_invoices = selected_invoices
+
+    email_content.save!
+  end
 
   def statement_generator(customer_id)
     xero_contact = XeroContact.where(:skype_user_name => customer_id).first

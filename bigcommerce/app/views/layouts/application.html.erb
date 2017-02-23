@@ -39,9 +39,9 @@
         </li>
 
         <li><%= link_to "Pending Orders", controller: "status", action: "pending", status_id: 1, status_name: "Pending" %></li>
-        <% if ["Admin", "Management","Accounts"].include? session[:arthority]%>
+        <% if ["Admin", "Management", "Accounts"].include? session[:arthority]%>
           <li><%= link_to "Accounting", controller: "accounts", action: "contacts" %></li>
-          <% if ["Admin", "Management"].include? session[:arthority]%>
+          <% if ["Admin", "Management", "Accounts"].include? session[:arthority]%>
             <li><%= link_to "Admin", controller: "admin", action: "index" %></li>
           <% end%>
 
