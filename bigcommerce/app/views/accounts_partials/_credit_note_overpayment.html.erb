@@ -10,8 +10,7 @@
             </tr>
             <% cn_op.keys.each do |co| %>
             <tr>
-                <!-- <td><%= check_box_tag 'cn_op[]', co %></td> -->
-                <td></td>
+                <td><%= check_box_tag 'cn_op[]', [cn_op[co][:status], cn_op[co][:date].to_date, cn_op[co][:remaining_credit]] %></td>
                 <td><%= co %></td>
                 <td><%= cn_op[co][:date].to_date.strftime("%d/%-m/%y") %></td>
                 <td><%= cn_op[co][:total] %></td>

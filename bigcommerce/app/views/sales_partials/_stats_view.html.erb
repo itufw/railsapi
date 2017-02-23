@@ -9,6 +9,13 @@
     <th><%= t %></th>
   <% end %>
 </tr>
+<tr>
+  <td></td>
+  <td> Total </td>
+  <% @stats_sum.each do |sum|%>
+    <td class="num"><%= display_overall_stat(sum, sum_param) %></td>
+  <% end %>
+</tr>
 <% @stats_info.keys.each do |id|%>
 <tr>
   <td><%= id %></td>

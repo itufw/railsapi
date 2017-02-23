@@ -14,13 +14,25 @@ module AccountsHelper
           reference += "Order##{opa.invoice_number} applied #{opa.applied_amount}  \n"
         end
         cn_op["Overpayment_#{o.date.year}_#{o.date.month}_#{o.date.day}"] = {:sub_total => o.sub_total, :total => o.total,\
-                                         :remaining_credit => o.remaining_credit, :date => o.date, :reference => reference}
+                                         :remaining_credit => o.remaining_credit, :date => o.date, :reference => reference,\
+                                       :status => "Overpayment"}
       end
 
       cn.each do |c|
         cn_op[c.credit_note_number] = {:sub_total => c.sub_total, :total => c.total,\
-                                         :remaining_credit => c.remaining_credit, :date => c.date, :reference => c.reference}
+                                         :remaining_credit => c.remaining_credit, :date => c.date, :reference => c.reference,\
+                                       :status => c.credit_note_number}
 
+      end
+      cn_op
+    end
+
+    def unzip_cn_op(cn_op_array)
+      cn_op = []
+      cn_op_array.each do |co|
+        status, date, remaining_credit = co.split(" ")
+        co_op_item = {:status => status, :date => date, :remaining_credit => remaining_credit.to_f}
+        cn_op.push(co_op_item)
       end
       cn_op
     end
@@ -162,25 +174,7 @@ module AccountsHelper
       email_content.customer_id = customer_id
       email_content.selected_invoices = selected_invoices
 
-      record_email(email_content)
-
       return email_content
     end
 
-    def record_email(account_email)
-
-      email_content = AccountEmail.new
-
-      email_content.receive_address = account_email.receive_address
-      email_content.send_address = account_email.send_address
-      email_content.email_type = account_email.email_type
-      email_content.cc = account_email.cc
-      email_content.bcc = account_email.bcc
-      email_content.content = account_email.content
-      email_content.content_second = account_email.content_second
-      email_content.customer_id = account_email.customer_id
-      email_content.selected_invoices = account_email.selected_invoices
-
-      email_content.save!
-    end
 end
