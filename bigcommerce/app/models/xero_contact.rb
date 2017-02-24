@@ -11,6 +11,7 @@ class XeroContact < ActiveRecord::Base
     has_many :xero_credit_notes
     has_many :xero_overpayments
     has_many :xero_receipts
+    has_many :xero_contact_people
 
     scoped_search on: [:name, :firstname, :lastname, :email, :skype_user_name]
     self.per_page = 100
@@ -74,6 +75,7 @@ class XeroContact < ActiveRecord::Base
         end
 
         ActiveRecord::Base.connection.execute(sql)
+        XeroContactPerson.new.insert_or_update_contact_people(c.contact_people, c.contact_id, skype) unless c.contact_people.nil?
     end
 
     # run the balance updating for all contacts whose contact id is not null
