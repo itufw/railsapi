@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170217002606) do
+ActiveRecord::Schema.define(version: 20170224031124) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -641,12 +641,47 @@ ActiveRecord::Schema.define(version: 20170217002606) do
     t.string   "invoice_number",      limit: 255
     t.datetime "created_at",                                              null: false
     t.datetime "updated_at",                                              null: false
+    t.string   "status",              limit: 255
+    t.string   "credit_note_number",  limit: 255
+    t.string   "reference",           limit: 255
   end
 
   add_index "xero_cn_allocations", ["invoice_number"], name: "index_xero_cn_allocations_on_invoice_number", using: :btree
   add_index "xero_cn_allocations", ["xero_cn_allocation_id"], name: "index_xero_cn_allocations_on_xero_cn_allocation_id", using: :btree
   add_index "xero_cn_allocations", ["xero_credit_note_id"], name: "index_xero_cn_allocations_on_xero_credit_note_id", using: :btree
   add_index "xero_cn_allocations", ["xero_invoice_id"], name: "index_xero_cn_allocations_on_xero_invoice_id", using: :btree
+
+  create_table "xero_cn_line_items", primary_key: "xero_cn_line_item_id", force: :cascade do |t|
+    t.string   "xero_credit_note_id", limit: 36,                          null: false
+    t.string   "item_code",           limit: 255
+    t.string   "description",         limit: 255
+    t.decimal  "quantity",                        precision: 8, scale: 2
+    t.decimal  "unit_amount",                     precision: 8, scale: 2
+    t.decimal  "line_amount",                     precision: 8, scale: 2
+    t.decimal  "discount_rate",                   precision: 8, scale: 2
+    t.decimal  "tax_amount",                      precision: 8, scale: 2
+    t.string   "tax_type",            limit: 255
+    t.string   "account_code",        limit: 255
+    t.datetime "created_at",                                              null: false
+    t.datetime "updated_at",                                              null: false
+  end
+
+  add_index "xero_cn_line_items", ["xero_cn_line_item_id"], name: "index_xero_cn_line_items_on_xero_cn_line_item_id", using: :btree
+  add_index "xero_cn_line_items", ["xero_credit_note_id"], name: "index_xero_cn_line_items_on_xero_credit_note_id", using: :btree
+
+  create_table "xero_contact_people", force: :cascade do |t|
+    t.string   "xero_contact_id",   limit: 36,  null: false
+    t.string   "customer_id",       limit: 8,   null: false
+    t.string   "first_name",        limit: 255
+    t.string   "last_name",         limit: 255
+    t.string   "email_address",     limit: 255
+    t.boolean  "include_in_emails"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+  end
+
+  add_index "xero_contact_people", ["customer_id"], name: "index_xero_contact_people_on_customer_id", using: :btree
+  add_index "xero_contact_people", ["xero_contact_id"], name: "index_xero_contact_people_on_xero_contact_id", using: :btree
 
   create_table "xero_contacts", primary_key: "xero_contact_id", force: :cascade do |t|
     t.string   "name",                            limit: 255

@@ -7,6 +7,7 @@ class XeroCreditNote < ActiveRecord::Base
 	self.primary_key = 'xero_credit_note_id'
 
 	has_many :xero_cn_allocations
+	has_many :xero_cn_line_items
 	belongs_to :xero_contact
 
 	def scrape
@@ -74,6 +75,10 @@ class XeroCreditNote < ActiveRecord::Base
 			reference = '#{c.reference}'\
 			WHERE xero_credit_note_id = '#{c.credit_note_id}'"
 		end
+		XeroCnAllocation.new.insert_cn_allocation(c.allocations,c.credit_note_id, c.credit_note_number, "allocations") unless c.allocations.nil?
+
+
+
 		ActiveRecord::Base.connection.execute(sql)
 	end
 

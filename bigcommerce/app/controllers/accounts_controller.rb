@@ -52,6 +52,10 @@ class AccountsController < ApplicationController
 
         @cn_op = credit_note_and_overpayment(@customer.xero_contact_id)
 
+        # multiple contact people
+        # xeroizer only provides email_address, the details of phone number should be discussed
+        @contact_people = XeroContactPerson.all_contact_people(@customer.xero_contact_id)
+
         # calculate the invoice table based
         # function located in helper -> accounts_helper
         @amount_due = get_invoice_table(@customer.id, @monthly, @end_date)
