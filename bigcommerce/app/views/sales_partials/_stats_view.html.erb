@@ -4,6 +4,9 @@
 <tr class="info">
   <th>id</th>
   <th></th>
+  <th>Price (EX. GST)</th>
+  <th>Total Stock</th>
+  <th>Pending Stock</th>
   <%# @overall_stats has structure {time_period => [sum, avg, supply]} %>
   <% @stats_info.first[1]["time_period"].keys.each do |t| %>
     <th><%= t %></th>
@@ -12,6 +15,9 @@
 <tr>
   <td></td>
   <th> Total </th>
+  <th></th>
+  <th></th>
+  <th></th>
   <% @stats_sum.each do |sum|%>
     <th class="num"><%= display_overall_stat(sum, sum_param) %></th>
   <% end %>
@@ -20,6 +26,9 @@
 <tr>
   <td><%= id %></td>
   <td><%= @stats_info[id]["product_name"] %></td>
+  <td class="num"><%= display_num(@price_h[id]) %>
+  <td class="num"><%= @inventory_h[id].to_i + @pending_stock_h[id].to_i %>
+  <td class="num"><%= @pending_stock_h[id].to_i %>
   <% @stats_info[id]["time_period"].each do |key, value| %>
     <td class="num"><%= display_overall_stat(value[0], sum_param) %></td>
   <% end %>
