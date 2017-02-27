@@ -15,7 +15,7 @@ class XeroCNLineItem < ActiveRecord::Base
         invoice_line_items.each do |li|
             time = Time.now.to_s(:db)
 
-            next unless cn_line_item_doesnt_exist(li.line_item_id)
+            next unless cn_line_item_doesnt_exist(li.line_item_id, description)
             sql = "INSERT INTO xero_cn_line_items (xero_cn_line_item_id,\
     				xero_credit_note_id, item_code, description, quantity, unit_amount, line_amount,\
     				tax_amount, tax_type, account_code, created_at, updated_at) VALUES ('#{SecureRandom.uuid}',\
