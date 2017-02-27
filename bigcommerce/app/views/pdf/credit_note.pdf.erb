@@ -8,24 +8,28 @@
           <img src="https://www.untappedwines.com.au/template/images/logo%20dark.jpg">
         </div>
         <h1 style="margin-bottom: 0px;">
-            <b>TAX INVOICE</b>
+            <b>Credit Note</b>
         </h1>
         <table id="invoiceDets">
             <tr>
                 <td>
-                    <b>Invoice No</b>
+                    <b>Credit Note Number</b>
                 </td>
                 <td>
-                    <b>000<%= invoice.invoice_number %></b>
+                    <b><%= credit_note.credit_note_number %></b>
                 </td>
             </tr>
             <tr>
                 <td>Date</td>
-                <td id="dateRef" class="term_date"><%= invoice.date.strftime("%e/%m/%Y") %></td>
+                <td id="dateRef" class="term_date"><%= credit_note.date.strftime("%e/%m/%Y") %></td>
             </tr>
             <tr>
                 <td>ABN</td>
                 <td>78 095 444 036</td>
+            </tr>
+            <tr>
+                <td><h3>Reference</h3></td>
+                <td><%= credit_note.reference %></td>
             </tr>
         </table>
         <div id="UFW">
@@ -39,22 +43,11 @@
                 <i>Liquor License: 33762538</i>
             </span><br/>
         </div>
-
-        <table id="terms">
-            <tr>
-                <td>Terms</td>
-                <td><%= ((invoice.due_date - invoice.date)/86400).to_i %> days</td>
-            </tr>
-            <tr>
-                <td>Due Date</td>
-                <td id="dueDate" class="dueDates"><%= invoice.due_date.strftime("%e/%m/%Y") %></td>
-            </tr>
-        </table>
     </div>
 
     <div id="customerDetails">
-        <i>Bill To:</i><br/>
-        <h3 style="margin-bottom: 0px;padding-right: 5px;"><%= invoice.contact_name%></h3>
+        <i>Credit Note Issue to:</i><br/>
+        <h3 style="margin-bottom: 0px;padding-right: 5px;"><%= xero_contact_name %></h3>
         <% unless 'missing'.eql? bill_address %>
           <%= bill_address.street_1%><br/>
           <%= bill_address.street_2%><br/>
@@ -66,106 +59,56 @@
     <div id="products">
             <table class="InvoiceTable">
                     <tr>
-                        <th class="ProductQuantity">Qty</th>
-                        <th class="ProductDetails">Product Name</th>
-                        <th class="ProductCost" id="price" align="right">Price (LUC)</th>
+                        <th class="ProductDetails">Description</th>
+                        <th class="ProductQuantity">Quantity</th>
+                        <th class="ProductCost" id="price" align="right">Unit Price</th>
                         <th class="ProductTotal" align="right" id="amt">Amount</th>
                         <th></th>
                     </tr>
-                    <% invoice.xero_invoice_line_items.each do |item| %>
-                      <% unless ((item.item_code.to_i.to_s != item.item_code) || ('1296'.eql? item.item_code)) %>
-                      <%p = c%>
-                        <% unit_price = ((order.order_products.where("order_id = #{item.invoice_number} and product_id = #{item.item_code}").first.price_inc_tax)/1.1)%>
-                      <tr>
-                          <td class="ProductQuantity"><%= item.quantity.to_i%></td>
+                    <% cn_line_items.each do |item| %>
                           <td class="ProductDetails"><%= item.description%></td>
-                          <td class="ProductCost" id="price" align="right">$<%= '%.2f' % unit_price %></td>
-                          <td class="ProductTotal" align="right" id="amt">$<%= '%.2f' % (item.quantity * unit_price) %></td>
+                          <td class="ProductQuantity"><%= item.quantity.to_i%></td>
+                          <td class="ProductCost" id="price" align="right">$<%= '%.2f' % item.unit_amount %></td>
+                          <td class="ProductTotal" align="right" id="amt">$<%= '%.2f' % (item.quantity * item.unit_amount) %></td>
                           <td></td>
                       </tr>
                       <%end%>
-                    <% end %>
                     <tr style="border-bottom:1px solid black"><td colspan="100%"></td></tr>
+
                     <tr>
                       <td></td>
                       <td></td>
-                      <td class="ProductCost" align="right">Subtotal(inc. WET ex. GST)</td>
-                      <td class="ProductTotal" align="right" >$<%= '%.2f' % (order.subtotal_inc_tax/1.1) %></td>
+                      <td class="ProductCost" align="right">Total</td>
+                      <td class="ProductTotal" align="right" >$<%= '%.2f' % (credit_note.total) %></td>
                       <td></td>
                     </tr>
-                    <% unless order.coupon_discount == 0%>
+                    <% cn_allocations.each do |allocation| %>
                       <tr>
                         <td class="ProductQuantity"></td>
                         <td class="ProductDetails"></td>
-                        <td class="ProductCost" align="right">Discount Coupon(ex. GST)</td>
-                        <td class="ProductTotal" align="right">-$<%= '%.2f' % (order.coupon_discount/1.1) %></td>
+                        <td class="ProductCost" align="right">Credit to Invoice#<%= allocation.invoice_number %></td>
+                        <td class="ProductTotal" align="right">-$<%= '%.2f' % (allocation.applied_amount) %></td>
                         <td></td>
                       </tr>
                     <% end %>
+                    <tr style="border-bottom:1px solid black"><td colspan="100%"></td></tr>
+
                     <tr>
                       <td></td>
                       <td></td>
-                      <td class="ProductCost" align="right">Shipping(ex. GST)</td>
-                      <td class="ProductTotal" align="right">$<%= invoice.xero_invoice_line_items.where("item_code = 'SHIPPING'").count == 0 ? ('%.2f' % 0.00) : ('%.2f' % invoice.xero_invoice_line_items.where("item_code = 'SHIPPING'").first.unit_amount) %></td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td></td>
-                      <td></td>
-                      <td class="ProductCost" align="right">WET</td>
-                      <td class="ProductTotal" align="right">$<%= invoice.xero_invoice_line_items.where("item_code = 'WET'").count == 0 ? ('%.2f' % (invoice.total * 0.29 / 1.419)) : ('%.2f' % invoice.xero_invoice_line_items.where("item_code = 'WET'").first.unit_amount) %></td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td></td>
-                      <td></td>
-                      <td class="ProductCost" align="right">GST</td>
-                      <td class="ProductTotal" align="right">$<%= '%.2f' % (invoice.total - (invoice.total/1.1)) %></td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td></td>
-                      <td></td>
-                      <td class="ProductCost" align="right"><h3>Grand Total:</h3></td>
-                      <td class="ProductTotal" align="right">$<%= '%.2f' % invoice.total %></td>
+                      <td class="ProductCost" align="right"><h3>Remaining Credit:</h3></td>
+                      <td class="ProductTotal" align="right">$<%= '%.2f' % credit_note.remaining_credit %></td>
                       <td></td>
                     </tr>
             </table>
     </div>
-    <% unless "missing".eql? customer_notes%>
-      <div class="InvoiceComments" style="%%GLOBAL_HideComments%%; margin-top: -75px; font-size: 0.8em;width: 350px; text-align: justify;">
-              <div class="InvoiceHeading" style="font-size: .9em;">Comments</div>
-              <%= customer_notes %>
-      </div>
-    <% end %>
-    <br/><br/><br/><br/>
-<div style=" position: fixed; bottom: 0; width: 100%;">
-    <div id="bankDetails" style="font-size: .8em;">
-        <b style="font-size: 1em;">Banking Details</b>
-        <table>
-            <tr>
-                <td style="font-size: .8em;">
-                    BSB:
-                </td>
-                <td style="font-size: .8em; border-right:1px solid black; padding-right:4px;">
-                    013 606
-                </td>
-                <td style="font-size: .8em;">
-                    Account Number:
-                </td>
-                <td style="font-size: .8em;border-right:1px solid black; padding-right:4px;">
-                    2762 95364
-                </td>
-                <td style="font-size: .8em;">
-                    Please include invoice number in description
-                </td>
-            </tr>
-        </table>
-    </div>
 
-    <div class="additional-comments" style="font-size: 0.7em; font-style: italic;">A set shipping charge per bottle is included for all orders -- additional shipping charges may also apply</div>
-    <div class="select-comments" style="font-size: 0.7em; font-style: italic;">All amount payable under contract to which this invoice relates, have been transferreed to Scottish Pacific Business Finance Pty Ltd("ScotPac"). Payment to any other person will not constitute a valid discharge of the debt</div>
-  </div>
+    <div class="InvoiceComments" style="%%GLOBAL_HideComments%%; margin-top: -75px; font-size: 0.8em;width: 350px; text-align: justify;">
+      Please do not pay on this advice. Deduct the amount of this Credit Note from your next payment to us.
+    </div>
+    <br/><br/><br/><br/>
+
+
 </div>
 <style>
     .InvoiceTotal.InvoiceTotalRow {

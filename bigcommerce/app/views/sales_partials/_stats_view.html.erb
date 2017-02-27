@@ -11,9 +11,9 @@
 </tr>
 <tr>
   <td></td>
-  <td> Total </td>
+  <th> Total </th>
   <% @stats_sum.each do |sum|%>
-    <td class="num"><%= display_overall_stat(sum, sum_param) %></td>
+    <th class="num"><%= display_overall_stat(sum, sum_param) %></th>
   <% end %>
 </tr>
 <% @stats_info.keys.each do |id|%>

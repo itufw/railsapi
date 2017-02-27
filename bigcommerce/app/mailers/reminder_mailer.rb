@@ -21,6 +21,7 @@ class ReminderMailer < ActionMailer::Base
     end
 
     attach_invoices(@over_due_invoices)
+    attach_credit_note(@cn_op, @over_due_invoices.map {|x| x.xero_invoice_id}, @xero_contact.name)
 
     @email_content = email_content
     recipients_addresses = []
@@ -112,6 +113,45 @@ class ReminderMailer < ActionMailer::Base
         )
       end
     end
+  end
+
+  def attach_credit_note(cn_op, invoice_ids, xero_contact_name)
+    credit_note_numbers = []
+    # include the selected credit note
+    cn_op.each do |co|
+      credit_note_numbers.push(co[:status]) if co[:status].start_with?("CN")
+    end
+
+    # credit note that applied on the invoices
+    credit_note_numbers.push(*(XeroCnAllocation.apply_to_invoices(invoice_ids).map {|x| x.credit_note_number}))
+    credit_note_numbers = credit_note_numbers.uniq
+
+    if credit_note_numbers.blank?
+      return
+    end
+
+    credit_note_numbers.each do |cn_number|
+      credit_note = XeroCreditNote.where("xero_credit_notes.credit_note_number = '#{cn_number}'").first
+      cn_line_items = XeroCNLineItem.where("xero_cn_line_items.xero_credit_note_id = '#{credit_note.xero_credit_note_id}'")
+      cn_allocations = XeroCnAllocation.apply_from_credit_note_number(cn_number)
+
+      latest_invoice_number = XeroInvoice.find(invoice_ids.first).invoice_number
+      bill_address = (Address.where(id: latest_invoice_number).count == 0) ? "missing" : Address.find(latest_invoice_number)
+
+
+      attachments["Credit Note \##{cn_number}.pdf"] = WickedPdf.new.pdf_from_string(
+        render_to_string(
+            :template => 'pdf/credit_note',
+            :locals => {:credit_note => credit_note,
+                        :cn_line_items => cn_line_items,
+                        :cn_allocations => cn_allocations,
+                        :bill_address => bill_address,
+                        :xero_contact_name => xero_contact_name
+                        }
+            )
+      )
+    end
+
   end
 
   # input is an array with selected invoices number

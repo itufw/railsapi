@@ -47,4 +47,15 @@ class XeroCnAllocation < ActiveRecord::Base
 		return (XeroCnAllocation.where("xero_cn_allocations.credit_note_number = '#{credit_note_number}' AND xero_cn_allocations.xero_invoice_id = '#{invoice.invoice_id}'").count == 0 )
 	end
 
+	def self.apply_to_invoices_or_cn_number(invoice_ids, credit_note_number)
+		where("xero_cn_allocations.xero_invoice_id IN (?) OR xero_cn_allocations.credit_note_number IN (?)", invoice_ids, credit_note_number)
+	end
+
+	def self.apply_to_invoices(invoice_ids)
+		where("xero_cn_allocations.xero_invoice_id IN (?)", invoice_ids)
+	end
+
+	def self.apply_from_credit_note_number(credit_note_number)
+		where("xero_cn_allocations.credit_note_number IN (?)", credit_note_number)
+	end
 end
