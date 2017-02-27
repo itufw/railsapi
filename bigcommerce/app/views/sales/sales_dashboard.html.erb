@@ -8,7 +8,7 @@
    <%= render "partials/dashboard_filter" %>
    <div style="float:right;">
 	Start Date:   <%= date_field( "selected_date", "selected_date", value: @dates_this_week.first ) %>
-  <% unless @current_user.user_type.in?(["Sales Executive"]) %>
+  <% unless ( (@current_user.user_type.in?(["Sales Executive"])) && ("Yes".eql? @display_all)) %>
    <%= submit_tag "Change", class: 'btn btn-primary' %>
   <% end %>
    </div>

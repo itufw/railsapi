@@ -6,7 +6,12 @@ class XeroCNLineItem < ActiveRecord::Base
 
     belongs_to :xero_credit_note
 
-    def download_data_from_api(invoice_line_items, credit_note_id)
+    def download_line_items_from_api(xero, credit_note_number)
+      credit_note = xero.CreditNote.find(credit_note_number)
+      update_data_from_api(credit_note.line_items, credit_note.credit_note_id) unless credit_note.nil?
+    end
+
+    def update_data_from_api(invoice_line_items, credit_note_id)
         invoice_line_items.each do |li|
             time = Time.now.to_s(:db)
 

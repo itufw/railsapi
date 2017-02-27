@@ -24,7 +24,7 @@ class AccountsController < ApplicationController
 
         contacts, @search_text = contact_param_filter(params)
         # @contacts = contacts.outstanding_is_greater_zero.period_select(@end_date).send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
-        @contacts = contacts.outstanding_is_greater_zero.period_select(@end_date)
+        @contacts = contacts.outstanding_is_greater_zero.is_customer.period_select(@end_date)
 
         if order_function.start_with?('order_by_invoice')
             # .split('|')

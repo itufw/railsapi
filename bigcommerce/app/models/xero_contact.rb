@@ -183,6 +183,10 @@ class XeroContact < ActiveRecord::Base
         where('xero_contacts.accounts_receivable_outstanding > 0')
       end
 
+    def self.is_customer
+      where("xero_contacts.skype_user_name REGEXP '^-?[0-9]+$'")
+    end
+
     def self.order_by_name(direction)
         order('name ' + direction)
       end
