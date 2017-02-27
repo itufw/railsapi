@@ -74,7 +74,6 @@
                     </tr>
                     <% invoice.xero_invoice_line_items.each do |item| %>
                       <% unless ((item.item_code.to_i.to_s != item.item_code) || ('1296'.eql? item.item_code)) %>
-                      <%p = c%>
                         <% unit_price = ((order.order_products.where("order_id = #{item.invoice_number} and product_id = #{item.item_code}").first.price_inc_tax)/1.1)%>
                       <tr>
                           <td class="ProductQuantity"><%= item.quantity.to_i%></td>
