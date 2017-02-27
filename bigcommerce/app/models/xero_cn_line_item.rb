@@ -26,11 +26,7 @@ class XeroCNLineItem < ActiveRecord::Base
         end
      end
 
-    def cn_line_item_doesnt_exist(line_item_id)
-        if XeroCNLineItem.where(xero_cn_line_item_id: line_item_id).count > 0
-            false
-        else
-            true
-        end
+    def cn_line_item_doesnt_exist(credit_note_id, description)
+        return (XeroCNLineItem.where("xero_cn_line_items.xero_credit_note_id = '#{credit_note_id}' AND xero_cn_line_items.description = \"#{description}\"").count == 0)
     end
 end
