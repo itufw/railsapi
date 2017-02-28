@@ -44,8 +44,8 @@
           <% if ["Admin", "Management", "Accounts"].include? session[:arthority]%>
             <li><%= link_to "Admin", controller: "admin", action: "index" %></li>
           <% end%>
-
         <% end%>
+        
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><%= link_to "Hi," + "  " + session[:username] %></li>

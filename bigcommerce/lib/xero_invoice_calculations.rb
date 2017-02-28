@@ -242,7 +242,7 @@ module XeroInvoiceCalculations
         contact = XeroContact.get_contact_from_xero(contact_id)
 
         invoice = xero.Invoice.build(invoice_number: invoice_number.to_s, contact: contact,\
-                                     type: 'ACCREC', date: order.date_cxreated.to_date,\
+                                     type: 'ACCREC', date: order.date_created.to_date,\
                                      due_date: 30.days.since(order.date_created.to_date),\
                                      status: 'SUBMITTED', line_amount_types: 'Exclusive')
 
