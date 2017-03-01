@@ -55,6 +55,18 @@ class XeroCnAllocation < ActiveRecord::Base
 		where("xero_cn_allocations.xero_invoice_id IN (?)", invoice_ids)
 	end
 
+	def self.apply_to_orders(invoice_numbers)
+		where("xero_cn_allocations.invoice_number IN (?)", invoice_numbers)
+	end
+
+	def self.group_by_orders
+		group(:invoice_number)
+	end
+
+	def self.sum_applied_amount
+		sum(:applied_amount)
+	end
+
 	def self.apply_from_credit_note_number(credit_note_number)
 		where("xero_cn_allocations.credit_note_number IN (?)", credit_note_number)
 	end

@@ -431,6 +431,10 @@ class Order < ActiveRecord::Base
         order.save
     end
 
+    def self.total_dismatch
+        includes(:xero_invoice).where("ROUND(orders.total_inc_tax, 1) <> Round(xero_invoices.total, 1)").references(:xero_invoice)
+    end
+
     # WHERE DO I USE THIS?
     def self.filter_by_product(product_ids)
         includes(:products).where('products.id IN (?)', [product_ids]).references(:products)

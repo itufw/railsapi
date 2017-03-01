@@ -55,6 +55,13 @@ module AccountsHelper
         [false, true]
     end
 
+    def different_orders_checked(all)
+        if 'all'.eql? all
+            return true, false
+        end
+        [false, true]
+    end
+
     def email_preview(email_ratio)
         return false, true if 'no'.eql? email_ratio
         [true, false]
