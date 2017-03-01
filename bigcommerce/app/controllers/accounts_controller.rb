@@ -108,4 +108,12 @@ class AccountsController < ApplicationController
 
         redirect_to action: 'contact_invoices', customer_id: customer_id
     end
+
+    def different_orders
+      @all,@unpaid = different_orders_checked(params[:unpaid])
+
+      @orders = Order.total_dismatch.order_by_id("DESC")
+      @credit_note_allocation = XeroCnAllocation.apply_to_orders(@orders.map {|x| x.id}).group_by_orders.sum_applied_amount
+      @xero_line_items_sum = XeroInvoiceLineItem.is_product.belongs_to_invoice(@orders.map {|x| x.xero_invoice.xero_invoice_id}).group_by_invoice.sum_order_product_qty
+    end
 end

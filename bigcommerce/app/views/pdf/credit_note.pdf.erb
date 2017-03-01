@@ -10,7 +10,7 @@
         <h1 style="margin-bottom: 0px;">
             <b>Credit Note</b>
         </h1>
-        <table id="invoiceDets">
+        <table id="invoiceDets" style="width:300px;table-layout:fixed">
             <tr>
                 <td>
                     <b>Credit Note Number</b>
@@ -32,7 +32,7 @@
                 <td><%= credit_note.reference %></td>
             </tr>
         </table>
-        <div id="UFW">
+        <div id="UFW" style="width:180px;table-layout:fixed">
             <h1 style="margin-bottom: 0px;padding-right: 5px;">Untapped Fine Wines</h1><br/>
             www.untappedwines.com<br/>
             Unit 3, 225 Ingles St<br/>
@@ -46,7 +46,7 @@
     </div>
 
     <div id="customerDetails">
-        <i>Credit Note Issue to:</i><br/>
+        <i>Credit Note Issues to:</i><br/>
         <h3 style="margin-bottom: 0px;padding-right: 5px;"><%= xero_contact_name %></h3>
         <% unless 'missing'.eql? bill_address %>
           <%= bill_address.street_1%><br/>
@@ -55,7 +55,7 @@
           <%= bill_address.country%><br/>
         <% end %>
     </div>
-
+    <br/><br/><br/>
     <div id="products">
             <table class="InvoiceTable">
                     <tr>
@@ -102,10 +102,11 @@
                     </tr>
             </table>
     </div>
-
-    <div class="InvoiceComments" style="%%GLOBAL_HideComments%%; margin-top: -75px; font-size: 0.8em;width: 350px; text-align: justify;">
-      Please do not pay on this advice. Deduct the amount of this Credit Note from your next payment to us.
-    </div>
+    <% unless (credit_note.remaining_credit == 0)%>
+      <div class="InvoiceComments" style="%%GLOBAL_HideComments%%; font-size: 0.8em;width: 350px; text-align: justify;">
+        Please do not pay on this advice. Deduct the amount of this Credit Note from your next payment to us.
+      </div>
+    <% end %>
     <br/><br/><br/><br/>
 
 
