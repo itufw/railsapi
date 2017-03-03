@@ -39,8 +39,7 @@
         </li>
 
         <li><%= link_to "Pending Orders", controller: "status", action: "pending", status_id: 1, status_name: "Pending" %></li>
-        <% if ["Admin", "Management", "Accounts"].include? session[:arthority]%>
-
+        <% if ["Admin", "Management", "Accounts"].include? session[:authority]%>
           <li class="dropdown">
             <a class="" data-toggle="dropdown" href="#">Accounting
             <span class="caret"></span></a>
@@ -49,16 +48,24 @@
               <li><%= link_to "Different Orders", controller: "accounts", action: "different_orders" %></li>
             </ul>
           </li>
-
-          <% if ["Admin", "Management", "Accounts"].include? session[:arthority]%>
+          <% if ["Admin", "Management", "Accounts"].include? session[:authority]%>
             <li><%= link_to "Admin", controller: "admin", action: "index" %></li>
           <% end%>
         <% end%>
-
+        <% if ["Admin", "Management", "Accounts"].include? session[:authority]%>
+          <li class="dropdown">
+            <a class="" data-toggle="dropdown" href="#">Note
+            <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><%= link_to "My Note", controller: "task", action: "staff_task" %></li>
+              <li><%= link_to "Add Note", controller: "task", action: "add_task" %></li>
+            </ul>
+          </li>
+        <% end %>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><%= link_to "Hi," + "  " + session[:username] %></li>
-        <li><%= link_to session[:arthority]%></li>
+        <li><%= link_to session[:authority]%></li>
         <li><%= link_to "Logout", controller: "access", action: "logout" %></li>
       </ul>
     </div>

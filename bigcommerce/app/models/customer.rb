@@ -269,7 +269,7 @@ class Customer < ActiveRecord::Base
 	end
 
 	def self.filter_by_staff(staff_id)
-		return where(:staff_id => staff_id) unless staff_id.nil?
+		return where(:staff_id => staff_id) unless (staff_id.nil? && staff_id.blank?)
 		all
 	end
 

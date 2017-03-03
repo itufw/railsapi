@@ -4,8 +4,11 @@ Rails.application.routes.draw do
   root 'sales#sales_dashboard'
   #post 'admin/update'
 
+  get 'add_task', to: "task#add_task"
   get '/rails/mailers' => "rails/mailers#index"
   get '/rails/mailers/*path' => "rails/mailers#preview"
+
+  post 'add_task', to: "task#task_record"
 
   # this needs to be replaced sometime
   match ':controller(/:action(/:id))', via: [:get, :post]

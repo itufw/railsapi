@@ -1,0 +1,22 @@
+<div class="col-md-12">
+  <div style="float: left;">
+    <h4>Note</h4>
+  </div>
+  <table class="table table-hover table-responsive" style="margin-top: 10px;">
+    <tr>
+      <th>Function</th>
+      <th>Subject</th>
+      <th>Description</th>
+      <th>Created At</th>
+    </tr>
+    <% @tasks.each do |note|%>
+    <% next if (note.is_task==1)%>
+    <tr>
+      <td><%=note.function%></td>
+      <td><%=TaskSubject.where("id = '#{note.subject_1}'").first.subject%></td>
+      <td><%=note.description%></td>
+      <td><%=date_format_orders(note.created_at)%></td>
+    </tr>
+    <% end %>
+  </table>
+</div>

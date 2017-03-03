@@ -141,4 +141,23 @@ module ApplicationHelper
     "#{ num[0..3] }-#{ num[4..6] }-#{ num[7..9] }"
   end
 
+  # task_display_hepler
+  def task_customer_staff(task_relation)
+    customer = ""
+    staff = ""
+    if ((task_relation.nil?) || (task_relation.blank?))
+      customer = "-"
+      staff = "-"
+    else
+      task_relation = task_relation.first
+      customer = "-" if ( (task_relation.customer_id.nil?) || (task_relation.customer_id == 0))
+      staff    = "-" if ( (task_relation.staff_id.nil?) || (task_relation.staff_id == 0))
+    end
+
+
+    customer = ("-".eql? customer) ? "-" : Customer.find(task_relation.customer_id)
+    staff = ("-".eql? staff) ? "-" : Staff.find(task_relation.staff_id)
+
+    [customer,staff]
+  end
 end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170224031124) do
+ActiveRecord::Schema.define(version: 20170303010231) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -542,6 +542,14 @@ ActiveRecord::Schema.define(version: 20170224031124) do
     t.datetime "updated_at",               null: false
   end
 
+  create_table "task_methods", force: :cascade do |t|
+    t.string   "method",     limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "task_methods", ["method"], name: "index_task_methods_on_method", using: :btree
+
   create_table "task_relations", force: :cascade do |t|
     t.integer  "task_id",         limit: 4
     t.integer  "contact_id",      limit: 4
@@ -580,6 +588,7 @@ ActiveRecord::Schema.define(version: 20170224031124) do
     t.string   "subject_2",           limit: 255
     t.string   "subject_3",           limit: 255
     t.string   "function",            limit: 255
+    t.integer  "expired",             limit: 1
   end
 
   create_table "tax_percentages", force: :cascade do |t|
