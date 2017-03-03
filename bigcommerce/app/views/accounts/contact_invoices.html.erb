@@ -2,9 +2,20 @@
 <h3><%= @customer.xero_contact.name%></h3>
 
 <div style="margin-top: 50px;">
-  <%= render "accounts_partials/invoice_header", customer: @customer %>
+    <%= render "accounts_partials/invoice_header", customer: @customer %>
 </div>
 
 <div style="margin-top: 50px;">
-  <%= render "accounts_partials/invoice_details", customer: @customer, amount_due: @amount_due%>
+    <%= render "accounts_partials/invoice_details", customer: @customer, amount_due: @amount_due%>
+</div>
+
+<div class="row">
+    <div class="col-md-12 col-md-offset-10">
+        <button class="btn btn-primary"><%= link_to "Add Note/Task", controller: "task", action: "add_task", account_customer: @customer.id%></button>
+    </div>
+</div>
+<div class="row">
+    <div style="margin-top: -10px;">
+        <%= render "task_partials/task_table"%>
+    </div>
 </div>

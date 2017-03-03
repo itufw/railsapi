@@ -5,21 +5,13 @@ class TaskRelation < ActiveRecord::Base
   belongs_to :contact
   belongs_to :cust_group
 
-  def insert_or_update(relation,target)
+  def insert_or_update(task_id,customer_id,staff_id)
     time = Time.now.to_s(:db)
 
-    if "customer".eql? target
-      r = "(#{relation.task_id},#{relation.customer_id},'#{time}','#{time}')"
-
-    sql = "INSERT INTO `task_relations`(`task_id`, `customer_id`,`created_at`, `updated_at`)\
+    r = "('#{task_id}','#{customer_id}','#{staff_id}','#{time}','#{time}')"
+    sql = "INSERT INTO `task_relations`(`task_id`, `customer_id`,`staff_id`,`created_at`, `updated_at`)\
           VALUES #{r}"
-    else
-      r = "(#{relation.task_id},#{relation.staff_id},#{time},#{time})"
-      sql = "INSERT INTO `task_relations`(`task_id`,`staff_id`, `created_at`, `updated_at`)\
-                VALUES #{r}"
-    end
     ActiveRecord::Base.connection.execute(sql)
-
   end
 
   def self.filter_by_staff_id(staff_id)

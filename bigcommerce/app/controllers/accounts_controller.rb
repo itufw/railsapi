@@ -59,6 +59,9 @@ class AccountsController < ApplicationController
         # calculate the invoice table based
         # function located in helper -> accounts_helper
         @amount_due = get_invoice_table(@customer.id, @monthly, @end_date)
+
+        @tasks = Task.active_tasks.customer_tasks(@customer.id).order_by_id("DESC")
+
     end
 
     def email_edit

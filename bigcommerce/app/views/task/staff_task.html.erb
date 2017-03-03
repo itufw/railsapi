@@ -1,0 +1,15 @@
+<%= title "#{session[:username]}'s Tasks" %>
+
+<div class="container">
+	<div class="row">
+    <div class="col-md-12 col-md-offset-10">
+
+		<button class="btn btn-primary"><%= link_to "Add Note/Task", controller: "task", action: "add_task"%></button>
+  </div>
+	</div>
+	<div class="row">
+  <%= render "task_partials/note_table"%>
+  <%= render "task_partials/task_table"%>
+
+	</div>
+</div>

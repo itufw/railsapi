@@ -1,31 +1,29 @@
 <div class="container orders-view default">
-    <%= form_tag({:controller => "task", :action => "add_task"}, {:method => "post"}) do %>
+    <%= form_for @task, :url => {:controller => "task", :action => "add_task"}  do |f| %>
     <%= hidden_field_tag :is_task, 0 %>
+
     <div class="row">
-      <div class="col-md-8 col-md-offset-4" id = "task_function">
-        Function:
-        <% if @user_type.in?(["Management","Admin"]) %>
-        <%= collection_select(:function, :function_name, TaskSubject.distinct_function, :function, :function, {:include_blank => 'Select Function'}, {:class => 'task_function_selection'}) %>
-        <% else%>
-        <%= collection_select(:function, :function_name, TaskSubject.distinct_function_user(Staff.find(session[:user_id]).user_type), :function, :function, {:class => 'task_function_selection'}) %>
-        <% end %>
-        <%= collection_select(:subject_id, :id, TaskSubject.get_subjects_on_user_type(@user_type), :id, :subject,{:include_blank => 'Select Subject'}, {:class=>"subject_selection"}) %>
-      </div>
-
-        <div class="col-md-8 col-md-offset-4">
-            Description:<br/>
-            <textarea name='description' id='description' rows="15" cols="50"></textarea><br/>
+        <div class="col-md-8 col-md-offset-4" id="task_function">
+            <%= label(:function, "Function:")%>
+            <%= f.collection_select :function, @function, :function, :function, {:include_blank => "Select a Function"}, {:class=>"function_selection"} %>
+            <%= label(:subject_1, "Subject:")%>
+            <%= f.collection_select :subject_1, @subjects, :id, :subject, {:prompt => "Select a Subject"}, {:class=>"subject_selection"} %>
         </div>
-
+        <div class="col-md-8 col-md-offset-4">
+            Description
+            <br/>
+            <%= f.text_area :description, :rows=>15, :cols=>50	%>
+        </div>
         <div class="col-xs-6 col-xs-offset-4">
-            Start From:
+            <%= label(:start_date, "Start From")%>
             <%= date_field( "start_date", "start_date", value: @start_date) %><br>
         </div>
-        <div class="col-xs-6 col-xs-offset-5">
-          <%= submit_tag "Add Note!", class: 'btn btn-primary', data: { confirm: "Add Note?" }%>
-        </div>
-
-    </div>
-        <!-- end of the form -->
-        <%end%>
+      </br>
+      <div class="col-xs-6 col-xs-offset-4">
+          <%= button_tag(type: 'submit', class: "btn btn-primary", data: { confirm: "Add Note?" }) do %>
+          Create Note!
+          <% end %>
+      </div>
+  </div>
+<% end %>
 </div>

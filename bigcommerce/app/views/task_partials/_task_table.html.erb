@@ -1,0 +1,37 @@
+<div class="col-md-12">
+    <div style="float: left;">
+        <h4>Task</h4>
+    </div>
+    <table class="table table-hover table-responsive" style="margin-top: -30px;">
+        <thead>
+            <tr>
+                <th>Function</th>
+                <th>Subject</th>
+                <th>Description</th>
+                <th>Customer</th>
+                <th>Staff</th>
+                <th>Method</th>
+                <th>Created By</th>
+                <th>Start</th>
+                <th>End</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% @tasks.each do |task|%>
+            <% next if (task.is_task==0)%>
+            <tr>
+                <td><%=task.function%></td>
+                <td><%=TaskSubject.where("id = '#{task.subject_1}'").first.subject%></td>
+                <td><%=task.description%></td>
+                <% customer, staff = task_customer_staff(task.task_relations) %>
+                <td><%= ("-".eql? customer) ? "-" : customer.actual_name %></td>
+                <td><%= ("-".eql? staff) ? "-" : staff.nickname %></td>
+                <td><%=task.method%></td>
+                <td><%=Staff.find(task.response_staff).nickname%></td>
+                <td><%=date_format_orders(task.start_date)%></td>
+                <td><%=date_format_orders(task.end_date)%></td>
+            </tr>
+            <% end %>
+        </tbody>
+    </table>
+</div>

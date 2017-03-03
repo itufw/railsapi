@@ -27,6 +27,11 @@ class Staff < ActiveRecord::Base
 	  return find(staff_id)
 	end
 
+	def self.filter_by_ids(staff_ids)
+		return Staff.active if staff_ids.nil? || staff_ids.blank?
+		return where('staff.id IN (?)', staff_ids)
+	end
+
 	def self.nickname
 		pluck("id, nickname")
 	end
