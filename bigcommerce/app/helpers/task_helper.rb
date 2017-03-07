@@ -17,6 +17,7 @@ module TaskHelper
             t.function = params[:task][:function]
             t.subject_1 = params[:task][:subject_1]
             t.description = params[:task][:description]
+            t.parent_task = params[:parent_task] if params[:parent_task]!=0
 
             if 1 == t.is_task
                 Task.new.insert_or_update(t, start_date, end_date)
@@ -29,5 +30,35 @@ module TaskHelper
             return true
         end
         return false
+    end
+
+    def note_find_parent(note)
+      unless note.parent.nil?
+        @notes.unshift(note.parent)
+        note_find_parent(note.parent)
+      end
+    end
+
+    def expire_task(task_id)
+      task = Task.find(task_id)
+      return if task.nil?
+      task.expired = 1
+      task.save!
+    end
+
+    def reactive_task(task_id)
+      task = Task.find(task_id)
+      return if task.nil?
+      task.expired = 0
+      task.save!
+    end
+
+    def complete_task(task_id, staff_id)
+      task = Task.find(task_id)
+      return if task.nil?
+      task.expired = 1
+      task.completed_date = Time.now.to_s(:db)
+      task.completed_staff = staff_id
+      task.save!
     end
 end

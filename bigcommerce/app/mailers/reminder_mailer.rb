@@ -33,7 +33,7 @@ class ReminderMailer < ActionMailer::Base
     bcc_group.push(bcc) unless "".eql? bcc
     bcc_group.push(%("#{staff_name}" <#{staff.email}>))
 
-    record_email(recipients_addresses, staff.email, email_type, cc, bcc_group, email_content.first, email_content.last, customer_id, selected_invoices, staff_id)
+    record_email(recipients_addresses, staff.email, email_type, cc, bcc_group, email_content.first, email_content.last, customer_id, @over_due_invoices.map {|x| x.invoice_number}, staff_id)
 
 
     # customer_address = %("#{@xero_contact.name}" <#{email_address}>)
@@ -64,8 +64,9 @@ class ReminderMailer < ActionMailer::Base
     email_content.customer_id = customer_id
     email_content.selected_invoices = selected_invoices
 
-    Task.new.auto_insert_from_mailer(email_type, customer_id, staff_id)
     email_content.save!
+    Task.new.auto_insert_from_mailer(email_type, customer_id, staff_id, email_content.id)
+
   end
 
   def statement_generator(customer_id)

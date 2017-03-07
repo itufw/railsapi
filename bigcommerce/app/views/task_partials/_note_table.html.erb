@@ -1,22 +1,44 @@
-<div class="col-md-12">
-  <div style="float: left;">
-    <h4>Note</h4>
-  </div>
-  <table class="table table-hover table-responsive" style="margin-top: 10px;">
-    <tr>
-      <th>Function</th>
-      <th>Subject</th>
-      <th>Description</th>
-      <th>Created At</th>
-    </tr>
-    <% @tasks.each do |note|%>
-    <% next if (note.is_task==1)%>
-    <tr>
-      <td><%=note.function%></td>
-      <td><%=TaskSubject.where("id = '#{note.subject_1}'").first.subject%></td>
-      <td><%=note.description%></td>
-      <td><%=date_format_orders(note.created_at)%></td>
-    </tr>
-    <% end %>
-  </table>
+<div class="col-md-12 products-view not-default">
+    <div style="float: left;">
+        <h4>Note</h4>
+    </div>
+    <table class="table table-hover table-responsive task_table" style="margin-top: -30px;">
+        <thead>
+            <tr>
+                <th>Func/Sub</th>
+                <th>Method</th>
+                <th>Description</th>
+                <th>Customer</th>
+                <th>Staff</th>
+                <th>Created By</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <% @tasks.each do |note|%>
+            <% next if note.is_task==1%>
+            <tr>
+                <td><%=note.function.byteslice(0,3) + "/" + TaskSubject.where("id ='#{note.subject_1}'").first.subject%></td>
+                <td><%=note.method%></td>
+                <td><%= link_to note.description,controller: "task", action: "task_details", task_id: note.id%></td>
+                <% customer, staff = task_customer_staff(note.task_relations) %>
+                <td><%= ("-".eql? customer) ? "-" : customer.actual_name %></td>
+                <td><%= ("-".eql? staff) ? "-" : staff.nickname %></td>
+
+                <td><%=Staff.find(note.response_staff).nickname%></td>
+                <td><%=date_format_orders(note.start_date)%></td>
+                <td><%=date_format_orders(note.end_date)%></td>
+                <% is_task = (1==note.is_task)? "task" : "note"%>
+                <td class=<%=is_task%> ><%=is_task.upcase%></td>
+                <td>
+                  <%=render "task_partials/control_icon", task: note%>
+                </td>
+            </tr>
+            <% end %>
+        </tbody>
+
+    </table>
 </div>

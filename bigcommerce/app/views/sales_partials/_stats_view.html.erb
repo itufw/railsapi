@@ -16,8 +16,9 @@
   <td></td>
   <th> Total </th>
   <th></th>
-  <th></th>
-  <th></th>
+  <% pending_stock_h_sum = @pending_stock_h.values.sum%>
+  <th class="num"><%= @inventory_h.values.sum + pending_stock_h_sum%></th>
+  <th class="num"><%= pending_stock_h_sum%></th>
   <% @stats_sum.each do |sum|%>
     <th class="num"><%= display_overall_stat(sum, sum_param) %></th>
   <% end %>

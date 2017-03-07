@@ -1,16 +1,27 @@
 class Task < ActiveRecord::Base
   has_many :task_activities
   has_many :task_relations
+  belongs_to :parent, :class_name => 'Task', :foreign_key => "parent_task"
+  has_many :children, :class_name => 'Task', :foreign_key => "parent_task"
 
   def insert_or_update(t,start_date,end_date)
     time = Time.now.to_s(:db)
 
-    task = "(#{t.id},'#{start_date}', '#{end_date}', '#{time}', '#{time}', '#{t.title}', '#{t.description}', #{t.is_task},\
-            #{t.response_staff}, #{t.last_modified_staff}, '#{t.method}', '#{t.function}','#{t.subject_1}', 0)"
-    sql = "INSERT INTO `tasks`(`id`,`start_date`, `end_date`, `created_at`, `updated_at`,\
-          `title`, `description`, `is_task`, `response_staff`, `last_modified_staff`, `method`,\
-          `function`, `subject_1`, `expired`)\
-          VALUES #{task}"
+    if t.parent_task != 0
+      task = "(#{t.id},'#{start_date}', '#{end_date}', '#{time}', '#{time}', '#{t.title}', '#{t.description}', #{t.is_task},\
+              #{t.response_staff}, #{t.last_modified_staff}, '#{t.method}', '#{t.function}','#{t.subject_1}', 0,'#{t.parent_task}')"
+      sql = "INSERT INTO `tasks`(`id`,`start_date`, `end_date`, `created_at`, `updated_at`,\
+            `title`, `description`, `is_task`, `response_staff`, `last_modified_staff`, `method`,\
+            `function`, `subject_1`, `expired`, `parent_task`)\
+            VALUES #{task}"
+    else
+      task = "(#{t.id},'#{start_date}', '#{end_date}', '#{time}', '#{time}', '#{t.title}', '#{t.description}', #{t.is_task},\
+              #{t.response_staff}, #{t.last_modified_staff}, '#{t.method}', '#{t.function}','#{t.subject_1}', 0)"
+      sql = "INSERT INTO `tasks`(`id`,`start_date`, `end_date`, `created_at`, `updated_at`,\
+            `title`, `description`, `is_task`, `response_staff`, `last_modified_staff`, `method`,\
+            `function`, `subject_1`, `expired`)\
+            VALUES #{task}"
+    end
 
     ActiveRecord::Base.connection.execute(sql)
   end
@@ -18,23 +29,30 @@ class Task < ActiveRecord::Base
 
   def insert_or_update_note(t,start_date)
     time = Time.now.to_s(:db)
-
-    task = "(#{t.id},'#{start_date}', '#{start_date}', '#{time}', '#{time}', '#{t.description}', #{t.is_task},\
-            #{t.response_staff}, #{t.last_modified_staff}, '#{t.function}', '#{t.subject_1}', 0)"
-
-    sql = "INSERT INTO `tasks`(`id`,`start_date`,`end_date`, `created_at`, `updated_at`,\
-          `description`, `is_task`, `response_staff`, `last_modified_staff`,\
-          `function`, `subject_1`, `expired`)\
-          VALUES #{task}"
+    unless ((t.parent_task.nil?) || ("".eql? t.parent_task) || (t.parent_task == 0))
+      task = "(#{t.id},'#{start_date}', '#{start_date}', '#{time}', '#{time}', '#{t.description}', #{t.is_task},\
+              #{t.response_staff}, #{t.last_modified_staff}, '#{t.method}', '#{t.function}', '#{t.subject_1}', 0, '#{t.parent_task}')"
+      sql = "INSERT INTO `tasks`(`id`,`start_date`,`end_date`, `created_at`, `updated_at`,\
+            `description`, `is_task`, `response_staff`, `last_modified_staff`, `method`,\
+            `function`, `subject_1`, `expired`,`parent_task`)\
+            VALUES #{task}"
+    else
+      task = "(#{t.id},'#{start_date}', '#{start_date}', '#{time}', '#{time}', '#{t.description}', #{t.is_task},\
+              #{t.response_staff}, #{t.last_modified_staff}, '#{t.method}', '#{t.function}', '#{t.subject_1}', 0)"
+      sql = "INSERT INTO `tasks`(`id`,`start_date`,`end_date`, `created_at`, `updated_at`,\
+            `description`, `is_task`, `response_staff`, `last_modified_staff`, `method`,\
+            `function`, `subject_1`, `expired`)\
+            VALUES #{task}"
+    end
 
     ActiveRecord::Base.connection.execute(sql)
   end
 
-  def auto_insert_from_mailer(email_type, customer_id, staff_id)
+  def auto_insert_from_mailer(email_type, customer_id, staff_id, mailer_id)
     time = Time.now.to_s(:db)
     end_time = (Time.now+1.month).to_s(:db)
 
-    description = "Send #{email_type}"
+    description = "Sent #{email_type}"
     case email_type
     when 'Send Reminder', 'Send Missed Payment'
       subject = 18
@@ -50,10 +68,10 @@ class Task < ActiveRecord::Base
 
     task_id = Time.now.to_i
 
-    task = "(#{task_id},'#{time}', '#{end_time}', '#{time}', '#{time}', '#{description}', 1,\
+    task = "(#{task_id},'#{time}', '#{end_time}', '#{time}', '#{time}', '#{mailer_id}', '#{description}', 0,\
             #{staff_id}, #{staff_id}, 'Email', 'Accounting', '#{subject}', 0)"
     sql = "INSERT INTO `tasks`(`id`,`start_date`,`end_date`, `created_at`, `updated_at`,\
-          `description`, `is_task`, `response_staff`, `last_modified_staff`,\
+          `title`, `description`, `is_task`, `response_staff`, `last_modified_staff`,\
           `method`, `function`, `subject_1`, `expired`)\
           VALUES #{task}"
 
@@ -78,4 +96,5 @@ class Task < ActiveRecord::Base
   def self.order_by_id(direction)
       order('tasks.id ' + direction)
   end
+
 end

@@ -2,6 +2,8 @@
 
   <%= form_for @task, :url => {:controller => "task", :action => "add_task"}  do |f| %>
   <%= hidden_field_tag :is_task, 1 %>
+  <%= hidden_field_tag :parent_task, @parent_task %>
+
   <div class="row">
       <div class="col-md-8 col-md-offset-4" id="task_function">
           <%= label(:function, "Function:")%>
@@ -49,4 +51,4 @@
       </div>
   </div>
   <% end %>
-    </div>
+</div>
