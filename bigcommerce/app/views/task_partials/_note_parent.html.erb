@@ -1,0 +1,30 @@
+<% @notes.each do |note|%>
+<div class="row">
+    <div class="task_details panel panel-info" style="margin-top:5px;margin-left:auto; margin-right:auto; width:30%">
+        <div class="task_details panel-heading clickable">
+            <h4 class="task_details panel-title">
+              <%= link_to "##{note.id} " + TaskSubject.where("id ='#{note.subject_1}'").first.subject,\
+                                      controller: "task", action: "task_details", task_id: note.id%>
+            </h4>
+            <span class="pull-right "><i class="task_details glyphicon glyphicon-minus"></i></span>
+        </div>
+        <div class="task_details panel-body">
+          <%=note.description%>
+          <br/>
+          <br/>
+          <%= "Following: #" + note.parent_task.to_s unless note.parent_task.nil?%>
+        </div>
+        <div class="task_details panel-footer">
+          <% if note.is_task==1%>
+            <% if note.completed_date.nil? %>
+              <a style="color: red;">Incomplete</a>
+            <% else %>
+              <a style="color: green;">Completed</a>
+            <% end %>
+            <br/>
+          <% end %>
+            <%=(1==note.is_task)? date_format_orders(note.start_date)+" - "+date_format_orders(note.end_date) : date_format_orders(note.start_date)%>
+        </div>
+    </div>
+</div>
+<% end %>

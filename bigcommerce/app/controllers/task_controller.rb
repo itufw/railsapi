@@ -15,6 +15,8 @@ class TaskController < ApplicationController
     @subjects = TaskSubject.get_subjects_on_function(params[:selected_function])
     @subjects_task = TaskSubject.get_subjects_on_function(params[:selected_function_task])
 
+    @parent_task = params[:parent_task] || 0
+
     @methods = TaskMethod.all
     if (params[:account_customer].nil? || params[:account_customer].blank?)
       @staffs = Staff.active
@@ -35,6 +37,14 @@ class TaskController < ApplicationController
     @subjects = TaskSubject.all
   end
 
+  def task_details
+    @note = Task.find(params[:task_id])
+    @notes = []
+    # find all parent tasks
+    # used @notes
+    note_find_parent(@note)
+  end
+
   def task_record
     if ("1".eql? params[:is_task])
       if (params[:staff][:id].blank? && params[:customer][:id].blank?)
@@ -48,6 +58,7 @@ class TaskController < ApplicationController
         # create new row for the task
         if new_task_record(params,session[:user_id])
           flash[:success] = "Created new Task!"
+          redirect_to action: 'staff_task' and return
         else
           flash[:error] = "Fill the form!"
         end
@@ -57,11 +68,27 @@ class TaskController < ApplicationController
     if "0".eql? params[:is_task]
       if (params[:task][:subject_1].nil? || params[:task][:subject_1].blank?)
         flash[:error] = "Select the Subject!"
+      elsif (params[:task][:method].nil? || params[:task][:method].blank?)
+        flash[:error] = "Select the Method!"
       elsif new_task_record(params,session[:user_id])
         flash[:success] = "Created new Note!"
+        redirect_to action: 'staff_task' and return
       else
         flash[:error] = "Fill the form!"
       end
+    end
+    redirect_to :back
+  end
+
+  def task_update
+    task_id = params[:task_id]
+    case params[:task_type]
+    when "expired"
+      expire_task(params[:task_id])
+    when "reactive"
+      reactive_task(params[:task_id])
+    when "completed"
+      complete_task(params[:task_id], session[:user_id])
     end
     redirect_to :back
   end

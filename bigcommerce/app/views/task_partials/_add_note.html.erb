@@ -1,6 +1,7 @@
 <div class="container orders-view default">
     <%= form_for @task, :url => {:controller => "task", :action => "add_task"}  do |f| %>
     <%= hidden_field_tag :is_task, 0 %>
+    <%= hidden_field_tag :parent_task, @parent_task %>
 
     <div class="row">
         <div class="col-md-8 col-md-offset-4" id="task_function">
@@ -8,6 +9,10 @@
             <%= f.collection_select :function, @function, :function, :function, {:include_blank => "Select a Function"}, {:class=>"function_selection"} %>
             <%= label(:subject_1, "Subject:")%>
             <%= f.collection_select :subject_1, @subjects, :id, :subject, {:prompt => "Select a Subject"}, {:class=>"subject_selection"} %>
+        </div>
+        <div class="col-md-8 col-md-offset-4" id="task_function">
+            <%= label(:method, "Method:")%>
+            <%= f.collection_select :method, @methods, :method, :method, {:prompt => "Select a Method"} %>
         </div>
         <div class="col-md-8 col-md-offset-4">
             Description

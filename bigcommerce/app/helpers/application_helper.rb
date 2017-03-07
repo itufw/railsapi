@@ -160,4 +160,13 @@ module ApplicationHelper
 
     [customer,staff]
   end
+
+
+  def fetch_note_children(notes)
+    children = []
+    notes.each do |n|
+      children += n.children unless n.children.nil? || n.children.blank?
+    end
+    children
+  end
 end
