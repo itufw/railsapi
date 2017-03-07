@@ -12,8 +12,10 @@
                 <% if ((["18","19","20","21"].include? @note.subject_1)&&(!@note.title.nil?)) %>
                   <% email = AccountEmail.find(@note.title)%>
                   <%=raw(email.content + "<br/>" + email.content_second) unless email.nil?%>
-                  <%= "Including Invoice: "+email.selected_invoices unless email.selected_invoices.nil?%>
                 <% end %>
+                <br/>
+                <%  selected_orders = OrderAction.where("task_id = ?", @note.id).map {|x| x.order_id} %>
+                <%= "Including Invoice: "+selected_orders.to_s unless selected_orders.blank?%>
             </div>
             <div class="panel-footer">
                 <%=render "task_partials/control_icon", task: @note%>

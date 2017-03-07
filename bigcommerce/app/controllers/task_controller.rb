@@ -9,7 +9,6 @@ class TaskController < ApplicationController
   include TaskHelper
 
   def add_task
-
     @task = Task.new
     @function = TaskSubject.distinct_function
     @subjects = TaskSubject.get_subjects_on_function(params[:selected_function])
@@ -30,6 +29,9 @@ class TaskController < ApplicationController
 
     @start_date = return_start_date_invoices(params[:start_date])
     @end_date = return_end_date_invoices(params[:end_date])
+
+    # for some sepcial input
+    @selected_orders = params[:selected_invoices] || Array.new
   end
 
   def staff_task
@@ -46,6 +48,8 @@ class TaskController < ApplicationController
   end
 
   def task_record
+    selected_orders = params[:selected_orders] || ""
+
     if ("1".eql? params[:is_task])
       if (params[:staff][:id].blank? && params[:customer][:id].blank?)
         flash[:error] = "Select the Receiver!"
@@ -56,7 +60,7 @@ class TaskController < ApplicationController
       else
         # in the Task Helper
         # create new row for the task
-        if new_task_record(params,session[:user_id])
+        if new_task_record(params, session[:user_id], selected_orders)
           flash[:success] = "Created new Task!"
           redirect_to action: 'staff_task' and return
         else
@@ -70,7 +74,7 @@ class TaskController < ApplicationController
         flash[:error] = "Select the Subject!"
       elsif (params[:task][:method].nil? || params[:task][:method].blank?)
         flash[:error] = "Select the Method!"
-      elsif new_task_record(params,session[:user_id])
+      elsif new_task_record(params,session[:user_id], selected_orders)
         flash[:success] = "Created new Note!"
         redirect_to action: 'staff_task' and return
       else
