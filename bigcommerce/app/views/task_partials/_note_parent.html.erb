@@ -1,6 +1,6 @@
 <% @notes.each do |note|%>
 <div class="row">
-    <div class="task_details panel panel-info" style="margin-top:5px;margin-left:auto; margin-right:auto; width:30%">
+    <div class="task_details panel panel-info text-center" style="margin-top:5px;margin-left:auto; margin-right:auto; width:30%">
         <div class="task_details panel-heading clickable">
             <h4 class="task_details panel-title">
               <%= link_to "##{note.id} " + TaskSubject.where("id ='#{note.subject_1}'").first.subject,\
@@ -11,6 +11,8 @@
         <div class="task_details panel-body">
           <%=note.description%>
           <br/>
+          <%  selected_orders = OrderAction.where("task_id = ?", note.id).map {|x| x.order_id} %>
+          <%= "Including Invoice: "+selected_orders.to_s unless selected_orders.blank?%>
           <br/>
           <%= "Following: #" + note.parent_task.to_s unless note.parent_task.nil?%>
         </div>

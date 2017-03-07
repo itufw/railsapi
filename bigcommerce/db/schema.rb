@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170303010231) do
+ActiveRecord::Schema.define(version: 20170307032107) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -149,6 +149,14 @@ ActiveRecord::Schema.define(version: 20170303010231) do
   add_index "customers", ["cust_store_id"], name: "index_customers_on_cust_store_id", using: :btree
   add_index "customers", ["cust_type_id"], name: "index_customers_on_cust_type_id", using: :btree
   add_index "customers", ["staff_id"], name: "index_customers_on_staff_id", using: :btree
+
+  create_table "order_actions", force: :cascade do |t|
+    t.integer  "order_id",   limit: 4,  null: false
+    t.string   "action",     limit: 20, null: false
+    t.integer  "task_id",    limit: 4
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
+  end
 
   create_table "order_histories", force: :cascade do |t|
     t.integer  "order_id",                   limit: 4,                             null: false
@@ -571,12 +579,12 @@ ActiveRecord::Schema.define(version: 20170303010231) do
   end
 
   create_table "tasks", force: :cascade do |t|
-    t.datetime "start_date",                      null: false
-    t.datetime "end_date",                        null: false
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "start_date",                        null: false
+    t.datetime "end_date",                          null: false
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
     t.string   "title",               limit: 255
-    t.string   "description",         limit: 255
+    t.text     "description",         limit: 65535
     t.integer  "is_task",             limit: 4
     t.integer  "response_staff",      limit: 4
     t.integer  "last_modified_staff", limit: 4

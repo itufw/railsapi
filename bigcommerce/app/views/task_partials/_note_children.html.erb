@@ -14,6 +14,8 @@
           <div class="task_details panel-body">
             <%=note.description%>
             <br/>
+            <%  selected_orders = OrderAction.where("task_id = ?", note.id).map {|x| x.order_id} %>
+            <%= "Including Invoice: "+selected_orders.to_s unless selected_orders.blank?%>
             <br/>
             <%= "Following: #" + note.parent_task.to_s unless note.parent_task.nil?%>
           </div>

@@ -10,6 +10,7 @@ class Order < ActiveRecord::Base
     belongs_to :staff
     has_many :order_shippings
     has_many :addresses, through: :order_shippings
+    has_many :order_actions
     belongs_to :billing_address, class_name: :Address, foreign_key: :billing_address_id
     has_many :order_products
     has_many :products, through: :order_products

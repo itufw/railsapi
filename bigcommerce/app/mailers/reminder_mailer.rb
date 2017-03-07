@@ -65,7 +65,7 @@ class ReminderMailer < ActionMailer::Base
     email_content.selected_invoices = selected_invoices
 
     email_content.save!
-    Task.new.auto_insert_from_mailer(email_type, customer_id, staff_id, email_content.id)
+    Task.new.auto_insert_from_mailer(email_type, customer_id, staff_id, email_content.id, selected_invoices)
 
   end
 

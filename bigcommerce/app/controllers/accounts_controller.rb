@@ -60,16 +60,18 @@ class AccountsController < ApplicationController
         # function located in helper -> accounts_helper
         @amount_due = get_invoice_table(@customer.id, @monthly, @end_date)
 
-        @tasks = Task.active_tasks.customer_tasks(@customer.id).order_by_id("DESC")
-
+        @tasks = Task.active_tasks.customer_tasks(@customer.id).order_by_id('DESC')
     end
 
     def email_edit
-        @cn_op = (params[:cn_op].nil?) ? {} : unzip_cn_op(params[:cn_op])
-        @total_remaining_credit = (@cn_op.map { |x| x[:remaining_credit] }).sum
-
         selected_invoices = params[:selected_invoices]
         customer_id = params[:customer_id]
+
+        if 'Add Note/Task'.eql? params[:commit]
+            redirect_to(controller: 'task', action: 'add_task', account_customer: customer_id, selected_invoices: selected_invoices) && return
+        end
+        @cn_op = params[:cn_op].nil? ? {} : unzip_cn_op(params[:cn_op])
+        @total_remaining_credit = (@cn_op.map { |x| x[:remaining_credit] }).sum
 
         @xero_contact = XeroContact.where(skype_user_name: customer_id).first
 
@@ -113,10 +115,10 @@ class AccountsController < ApplicationController
     end
 
     def different_orders
-      @all,@unpaid = different_orders_checked(params[:unpaid])
+        @all, @unpaid = different_orders_checked(params[:unpaid])
 
-      @orders = Order.total_dismatch.order_by_id("DESC")
-      @credit_note_allocation = XeroCnAllocation.apply_to_orders(@orders.map {|x| x.id}).group_by_orders.sum_applied_amount
-      @xero_line_items_sum = XeroInvoiceLineItem.is_product.belongs_to_invoice(@orders.map {|x| x.xero_invoice.xero_invoice_id}).group_by_invoice.sum_order_product_qty
+        @orders = Order.total_dismatch.order_by_id('DESC')
+        @credit_note_allocation = XeroCnAllocation.apply_to_orders(@orders.map(&:id)).group_by_orders.sum_applied_amount
+        @xero_line_items_sum = XeroInvoiceLineItem.is_product.belongs_to_invoice(@orders.map { |x| x.xero_invoice.xero_invoice_id }).group_by_invoice.sum_order_product_qty
     end
 end

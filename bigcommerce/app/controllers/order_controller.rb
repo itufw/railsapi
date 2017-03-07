@@ -44,8 +44,10 @@ class OrderController < ApplicationController
 	# How do I get to this ? Click on a Order ID anywhere on the site
 	def details
     	@order_id = params[:order_id]
-        @per_page = params[:per_page] || Order.per_page
+      @per_page = params[:per_page] || Order.per_page
     	@order = Order.include_all.order_filter_(@order_id).paginate( per_page: @per_page, page: params[:page])
+
+      @tasks = Task.active_tasks.order_tasks(@order_id).staff_tasks(session[:user_id]).order_by_id('DESC')
 	end
 
 end

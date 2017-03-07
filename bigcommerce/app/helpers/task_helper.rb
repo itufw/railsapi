@@ -1,6 +1,6 @@
 module TaskHelper
 
-    def new_task_record(params, current_user)
+    def new_task_record(params, current_user, selected_orders)
 
         if ((params[:task][:description] != '') && params[:task][:subject_1])
             t = Task.new
@@ -19,6 +19,17 @@ module TaskHelper
             t.description = params[:task][:description]
             t.parent_task = params[:parent_task] if params[:parent_task]!=0
 
+            # automatically add the parent task to new task
+            unless "".eql? selected_orders
+              parent_tasks = OrderAction.where("order_actions.order_id IN (?) AND task_id IS NOT NULL", selected_orders.split).order("created_at DESC")
+              unless (parent_tasks.nil? || (params[:parent_task] == 0))
+                t.parent_task = parent_tasks.first.task_id
+              end
+              selected_orders.split.each do |order|
+                add_order_action(order.to_i, t.id, t.is_task)
+              end
+            end
+
             if 1 == t.is_task
                 Task.new.insert_or_update(t, start_date, end_date)
                 customer_id = (params['customer']['id'] != '') ? params['customer']['id'] : 0
@@ -27,9 +38,18 @@ module TaskHelper
             else
                 Task.new.insert_or_update_note(t, start_date)
             end
+
             return true
         end
         return false
+    end
+
+    def add_order_action(order_id, task_id, is_task)
+      order_action = OrderAction.new
+      order_action.order_id = order_id
+      order_action.task_id = task_id
+      order_action.action = (1==is_task)? "task" : "note"
+      order_action.save!
     end
 
     def note_find_parent(note)
