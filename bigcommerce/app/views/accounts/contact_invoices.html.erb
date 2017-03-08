@@ -8,6 +8,7 @@
 <div style="margin-top: 50px;">
     <%= render "accounts_partials/invoice_details", customer: @customer, amount_due: @amount_due%>
 </div>
+<% unless @tasks.blank?%>
 <div class="container">
     <div class="row">
         <div style="margin-top: -10px;">
@@ -15,3 +16,4 @@
         </div>
     </div>
 </div>
+<% end %>
