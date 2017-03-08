@@ -5,6 +5,7 @@
     <table class="table table-hover table-responsive task_table" style="margin-top: -30px;">
         <thead>
             <tr>
+                <th></th>
                 <th>Func/Sub</th>
                 <th>Method</th>
                 <th>Description</th>
@@ -12,7 +13,7 @@
                 <th>Staff</th>
                 <th>Created By</th>
                 <th>Start Date</th>
-                <th>End Date</th>
+                <th>Due Date</th>
                 <th></th>
                 <th></th>
             </tr>
@@ -21,6 +22,7 @@
             <% @tasks.each do |task|%>
             <% next if ((task.is_task==0)&&("No".eql? display_all))%>
             <tr>
+                <td class="<%=task_priority_display(task.priority)%>"><%= task_priority_display(task.priority)%></td>
                 <td><%=task.function.byteslice(0,3) + "/" + TaskSubject.where("id ='#{task.subject_1}'").first.subject%></td>
                 <td><%=task.method%></td>
                 <td><%= link_to task.description,controller: "task", action: "task_details", task_id: task.id%></td>

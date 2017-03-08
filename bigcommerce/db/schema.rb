@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170307032107) do
+ActiveRecord::Schema.define(version: 20170308013545) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -597,6 +597,8 @@ ActiveRecord::Schema.define(version: 20170307032107) do
     t.string   "subject_3",           limit: 255
     t.string   "function",            limit: 255
     t.integer  "expired",             limit: 1
+    t.integer  "priority",            limit: 1
+    t.string   "accepted",            limit: 10
   end
 
   create_table "tax_percentages", force: :cascade do |t|

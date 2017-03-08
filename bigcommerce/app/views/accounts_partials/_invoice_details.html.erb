@@ -91,7 +91,7 @@
 			    <!--  customer.xero_contact.xero_invoices.has_amount_due.each do |i|-->
 			  </table>
 			</div>
-			<%= render "accounts_partials/credit_note_overpayment", cn_op: @cn_op %>
+			<%= render "accounts_partials/credit_note_overpayment", cn_op: @cn_op unless @cn_op.blank? %>
 		</div>
 		<div class="col-md-4" align="center">
 			<h4>Invoice Reminder</h4>
@@ -118,7 +118,7 @@
 	<%= submit_tag "Send 90 Days Overdue Reminder",class: 'btn btn-primary' if over_90_days  %></button>
 	<br/>
 	<br/>
-	<%= submit_tag "Add Note/Task",class: 'btn btn-primary'%></button>
+	<%= submit_tag "Add Note/Task",class: 'btn btn-default'%></button>
 </div>
 </div>
 <!-- end of the form -->

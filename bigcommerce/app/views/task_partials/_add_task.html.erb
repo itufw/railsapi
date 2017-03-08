@@ -4,6 +4,7 @@
   <%= hidden_field_tag :is_task, 1 %>
   <%= hidden_field_tag :parent_task, @parent_task %>
   <%= hidden_field_tag :selected_orders, @selected_orders unless @selected_orders.blank?%>
+  <%= hidden_field_tag :accounts_page, @customer_locked %>
 
   <div class="row">
       <div class="col-md-8 col-md-offset-4" id="task_function">
@@ -27,10 +28,10 @@
         Assign To: </br>
         <% if !@customer_locked%>
           <%= label(:staff, "Staff:")%>
-            <%= collection_select(:staff, :id, @staffs, :id, :nickname, {:prompt => 'Active Staff'}, {:class => 'staff_selection'}) %>
+            <%= collection_select(:staff, :id, @staffs, :id, :nickname, {:prompt => 'Active Staff'}, {:class => 'staff_selection_task'}) %>
           </br>
           <%= label(:customer, "Customer:")%>
-            <%= collection_select(:customer, :id, @customers, :id, :actual_name, {:include_blank => 'Active Customer'}, {:class => 'customer_selection'}) %>
+            <%= collection_select(:customer, :id, @customers, :id, :actual_name, {:include_blank => 'Active Customer'}, {:class => 'customer_selection_task'}) %>
         <% else %>
         <%= label(:staff, "Staff:")%>
           <%= collection_select(:staff, :id, @staffs, :id, :nickname) %>
@@ -41,14 +42,14 @@
       </div>
 
       <div class="col-xs-6 col-xs-offset-4">
-          <%= label(:start_date, "Start From")%>
-          <%= date_field( "start_date", "start_date", value: @start_date) %>
-          <%= label(:end_date, "Until")%>
+          <%= label(:end_date, "Due Date")%>
           <%= date_field( "end_date", "end_date", value: @end_date) %><br/><br/>
+          <%= label(:start_date, "Start From")%>
+          <%= date_field( "start_date", "start_date", value: @start_date) %><br/>
       </div>
       </br>
       <div class="col-xs-6 col-xs-offset-4">
-          <%= button_tag(type: 'submit', class: "btn btn-primary", data: { confirm: "Add Task?" }) do %>
+          <%= button_tag(type: 'submit', class: "btn btn-primary") do %>
           Create Task!
           <% end %>
       </div>

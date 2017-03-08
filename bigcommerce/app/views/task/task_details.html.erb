@@ -9,13 +9,21 @@
                                     controller: "task", action: "task_details", task_id: @note.id%></h4>
             <div class="panel-body">
                 <%=@note.description%>
-                <% if ((["18","19","20","21"].include? @note.subject_1)&&(!@note.title.nil?)) %>
+                <br/>
+                <% if ((["18","19","20","21"].include? @note.subject_1)&&(!@note.title.nil?)&&(@note.title.to_s.eql? @note.title.to_i.to_s)) %>
                   <% email = AccountEmail.find(@note.title)%>
-                  <%=raw(email.content + "<br/>" + email.content_second) unless email.nil?%>
+                  <% unless email.nil? %>
+                    Send Email to :<%=email.receive_address%>
+                    <br/>
+                    <%=raw(email.content)%>
+                      <%= render "task_partials/note_invoice_table", over_due_invoices: XeroInvoice.find_by_order_ids(@selected_orders)%>
+                    <br/>
+                    <%=raw(email.content_second)%>
+                    <br/>
+                  <% end %>
                 <% end %>
                 <br/>
-                <%  selected_orders = OrderAction.where("task_id = ?", @note.id).map {|x| x.order_id} %>
-                <%= "Including Invoice: "+selected_orders.to_s unless selected_orders.blank?%>
+                <%= "Including Invoice: "+@selected_orders.to_s unless @selected_orders.blank?%>
             </div>
             <div class="panel-footer">
                 <%=render "task_partials/control_icon", task: @note%>
