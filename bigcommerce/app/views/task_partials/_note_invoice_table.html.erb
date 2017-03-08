@@ -1,0 +1,33 @@
+<table style="border-collapse: collapse" align="center">
+    <tr style="color: white; background-color: #043483; width: 90%; padding: 5px">
+        <th>Date</th>
+        <th>Invoice</th>
+        <th>Due Date</th>
+        <th>Days overdue</th>
+        <th>Total</th>
+        <th>Paid</th>
+        <th>Credited</th>
+        <th>Due</th>
+    </tr>
+    <% over_due_invoices.each do |invoice| %>
+    <tr align="center">
+        <td><%= invoice.date.to_date.strftime("%d/%-m/%y")%></td>
+        <td><%= invoice.invoice_number%></td>
+        <td><%= invoice.due_date.to_date.strftime("%d/%-m/%y")%></td>
+        <td style="border-right: 1px solid"><%= Date.today.mjd - invoice.due_date.to_date.mjd %>
+            days</td>
+        <td><%= number_to_currency(invoice.total) %></td>
+        <% unless invoice.amount_paid == 0%>
+          <td><%= number_to_currency(invoice.amount_paid) %></td>
+        <% else %>
+          <td>-</td>
+        <% end %>
+        <% unless invoice.amount_credited == 0%>
+          <td style="border-right: 1px solid"><%= number_to_currency(invoice.amount_credited) %></td>
+        <% else %>
+          <td style="border-right: 1px solid">-</td>
+        <% end %>
+        <td style="border-right: 1px solid"><%= number_to_currency(invoice.amount_due)%></td>
+    </tr>
+    <% end %>
+  </table>

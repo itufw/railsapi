@@ -16,3 +16,10 @@ $('.customer_selection').append( $('<option value="">Do not assign to customers<
 <% @customers.each do |customer| %>
   $('.customer_selection').append($('<option value="<%= customer.id %>"><%=customer.actual_name%></option>'));
 <% end %>
+
+$('.customer_selection_task').empty();
+$('.customer_selection_task').append( $('<option value="">Assign to Customer</option>'));
+$('.customer_selection_task').append( $('<option value="">Do not assign to customers</option>'));
+<% @customers_task.each do |customer| %>
+  $('.customer_selection_task').append($('<option value="<%= customer.id %>"><%=customer.actual_name%></option>'));
+<% end %>

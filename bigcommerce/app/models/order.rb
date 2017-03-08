@@ -149,6 +149,10 @@ class Order < ActiveRecord::Base
       					ip_address = '#{o.ip_address}', staff_notes = '#{staff_notes}', customer_notes = '#{customer_notes}', discount_amount = '#{o.discount_amount}',\
       					coupon_discount = '#{o.coupon_discount}', active = '#{active}', order_source = '#{o.order_source}', updated_at = '#{time}', payment_method = '#{payment_method}' WHERE id = '#{o.id}'"
 
+            # update order action table
+            # if o.status_id == 10
+            #   OrderAction.new.order_paid(o.id)
+            # end
         end
         ActiveRecord::Base.connection.execute(sql)
     end

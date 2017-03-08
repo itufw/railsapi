@@ -125,6 +125,10 @@ class XeroInvoice < ActiveRecord::Base
         end
      end
 
+     def self.find_by_order_ids(order_ids)
+       where("xero_invoices.invoice_number IN (?)", order_ids)
+     end
+
     def self.filter_by_invoice_number(invoice_number)
         invoice = where(invoice_number: invoice_number.to_s)
         if invoice.empty?

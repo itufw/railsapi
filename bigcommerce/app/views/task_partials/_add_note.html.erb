@@ -3,6 +3,7 @@
     <%= hidden_field_tag :is_task, 0 %>
     <%= hidden_field_tag :parent_task, @parent_task %>
     <%= hidden_field_tag :selected_orders, @selected_orders unless @selected_orders.blank?%>
+    <%= hidden_field_tag :accounts_page, @customer_locked %>
 
     <div class="row">
         <div class="col-md-8 col-md-offset-4" id="task_function">
@@ -22,13 +23,29 @@
             <br/>
             <%= f.text_area :description, :rows=>15, :cols=>50	%>
         </div>
+        <div class="col-xs-4 col-xs-offset-4">
+          Assign To: </br>
+          <% if !@customer_locked%>
+            <%= label(:staff, "Staff:")%>
+              <%= collection_select(:staff, :id, @staffs, :id, :nickname, {:prompt => 'Active Staff'}, {:class => 'staff_selection'}) %>
+            </br>
+            <%= label(:customer, "Customer:")%>
+              <%= collection_select(:customer, :id, @customers, :id, :actual_name, {:include_blank => 'Active Customer'}, {:class => 'customer_selection'}) %>
+          <% else %>
+          <%= label(:staff, "Staff:")%>
+            <%= collection_select(:staff, :id, @staffs, :id, :nickname) %>
+          </br>
+          <%= label(:customer, "Customer:")%>
+            <%= collection_select(:customer, :id, @customers, :id, :actual_name) %>
+          <% end %>
+        </div>
         <div class="col-xs-6 col-xs-offset-4">
             <%= label(:start_date, "Start From")%>
             <%= date_field( "start_date", "start_date", value: @start_date) %><br>
         </div>
       </br>
       <div class="col-xs-6 col-xs-offset-4">
-          <%= button_tag(type: 'submit', class: "btn btn-primary", data: { confirm: "Add Note?" }) do %>
+          <%= button_tag(type: 'submit', class: "btn btn-primary") do %>
           Create Note!
           <% end %>
       </div>
