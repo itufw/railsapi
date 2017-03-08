@@ -11,8 +11,10 @@ class TaskController < ApplicationController
     def add_task
         @task = Task.new
         @function = TaskSubject.distinct_function
-        @subjects = TaskSubject.get_subjects_on_function(params[:selected_function])
-        @subjects_task = TaskSubject.get_subjects_on_function(params[:selected_function_task])
+
+        subjects = TaskSubject.all
+        @subjects = subjects.select{ |x| x.function == params[:selected_function]}
+        @subjects_task = subjects.select{ |x| x.function == params[:selected_function_task]}
 
         @parent_task = params[:parent_task] || 0
 
@@ -38,7 +40,6 @@ class TaskController < ApplicationController
 
     def staff_task
         @tasks = Task.active_tasks.staff_tasks(session[:user_id]).order_by_id('DESC')
-        @subjects = TaskSubject.all
     end
 
     def task_details
