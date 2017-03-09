@@ -28,7 +28,7 @@ class XeroContactPerson < ActiveRecord::Base
   end
 
   def contact_person_exists(person, contact_id)
-    return (XeroContactPerson.where("xero_contact_id = '#{contact_id}' and first_name = '#{person.first_name}' and last_name = '#{person.last_name}'").count > 0)
+    return (XeroContactPerson.where("xero_contact_id = '#{contact_id}' and first_name = \"#{person.first_name}\" and last_name = \"#{person.last_name}\"").count > 0)
   end
 
   def self.all_contact_people(xero_contact_id)
