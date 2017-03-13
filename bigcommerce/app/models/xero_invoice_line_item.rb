@@ -43,4 +43,20 @@ class XeroInvoiceLineItem < ActiveRecord::Base
 		end
 	end
 
+	def self.is_product
+		where("xero_invoice_line_items.item_code REGEXP '^[0-9]+$'")
+	end
+
+	def self.belongs_to_invoice(invoice_ids)
+		where("xero_invoice_line_items.xero_invoice_id IN (?)", invoice_ids)
+	end
+
+	def self.sum_order_product_qty
+		sum("xero_invoice_line_items.quantity")
+	end
+
+	def self.group_by_invoice
+		group("xero_invoice_line_items.xero_invoice_id")
+	end
+
 end

@@ -11,9 +11,10 @@ class XeroContact < ActiveRecord::Base
     has_many :xero_credit_notes
     has_many :xero_overpayments
     has_many :xero_receipts
+    has_many :xero_contact_people
 
     scoped_search on: [:name, :firstname, :lastname, :email, :skype_user_name]
-    self.per_page = 15
+    self.per_page = 100
 
     def download_data_from_api(modified_since_time)
         xero = XeroConnection.new.connect
@@ -74,6 +75,7 @@ class XeroContact < ActiveRecord::Base
         end
 
         ActiveRecord::Base.connection.execute(sql)
+        XeroContactPerson.new.insert_or_update_contact_people(c.contact_people, c.contact_id, skype) unless c.contact_people.nil?
     end
 
     # run the balance updating for all contacts whose contact id is not null
@@ -180,6 +182,10 @@ class XeroContact < ActiveRecord::Base
     def self.outstanding_is_greater_zero
         where('xero_contacts.accounts_receivable_outstanding > 0')
       end
+
+    def self.is_customer
+      where("xero_contacts.skype_user_name REGEXP '^-?[0-9]+$'")
+    end
 
     def self.order_by_name(direction)
         order('name ' + direction)

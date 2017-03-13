@@ -79,13 +79,15 @@ class AdminController < ApplicationController
     # end
 
     def xero_sync
-        XeroRevision.update_end_time(Time.now.utc)
+        start_time = Time.now.utc
+        XeroRevision.update_end_time(start_time)
         xero = XeroController.new
         xero.update_xero_contacts
         xero.update_xero_invoices
 
         system 'rake xero_invoice_sync:sync'
         flash[:success] = 'Sync is Done!'
+        XeroRevision.end_update(start_time, Time.now)
         redirect_to controller: 'admin', action: 'index'
     end
 

@@ -7,7 +7,7 @@ class XeroOverpayment < ActiveRecord::Base
 	belongs_to :xero_invoice
 	belongs_to :xero_contact
 
-# NEVER USE THIS ONE!
+  # NEVER USE THIS ONE!
 	def scrape
 		xero = XeroConnection.new.connect
 
@@ -51,7 +51,7 @@ class XeroOverpayment < ActiveRecord::Base
 		updated_date = map_date(op.updated_date_utc)
 		time = Time.now.to_s(:db)
 		contact_name = remove_apostrophe(op.contact_name)
-		
+
 		has_attachments = ('false'.eql? op.has_attachments) ? 1 : 0
 
 

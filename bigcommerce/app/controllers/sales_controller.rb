@@ -104,7 +104,6 @@ class SalesController < ApplicationController
         # date_type returns group_by_week_created or group_by_month_created
         date_function = period_date_functions(@selected_period)[2]
         @sums_by_periods = sum_orders(@dates[0], @dates[-1], date_function.to_sym, sum_function, nil)
-
         staff_id, @staff_nicknames = display_reports_for_sales_dashboard(session[:user_id])
         @staff_sum_by_periods = sum_orders(@dates[0], @dates[-1], (date_function + "_and_staff_id").to_sym, sum_function, staff_id)
 
@@ -168,7 +167,7 @@ class SalesController < ApplicationController
         @max_sales = params['max_sales']
 
         # product_qty_h is a hash with structure {[product_id, date_id/date_ids] => qty}
-        product_qty_h = OrderProduct.product_filter(product_filtered_ids).\
+        product_qty_h = OrderProduct.product_filter(product_filtered_ids).valid_orders.\
         date_filter(@dates[0], @dates[-1]).staff_filter(staff_id).\
         cust_style_filter(cust_style_id).send(date_function, @transform_column).send(sum_function)
 
@@ -191,7 +190,9 @@ class SalesController < ApplicationController
         @checked_detailis = !@checked_stats
 
         # stats View!
-        @stats_info = stats_info(@product_ids, @product_name_h, @transform_column, @inventory_h, @pending_stock_h) if @checked_stats
+        # helpers - > sales_helper
+        @stats_info, @stats_sum = stats_info(@product_ids, @product_name_h, @transform_column, @inventory_h, @pending_stock_h) if @checked_stats
+
 
     end
 

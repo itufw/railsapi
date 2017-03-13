@@ -9,7 +9,9 @@ Bundler.require(*Rails.groups)
 module ApiBigcommerce
   class Application < Rails::Application
     config.assets.paths << "#{Rails}/vendor/assets/fonts"
-    config.assets.precompile += %w( *.svg *.eot *.woff *.ttf )
+    config.assets.precompile += %w( *.svg *.eot *.woff *.ttf)
+    config.assets.precompile += %w(*.js)
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.

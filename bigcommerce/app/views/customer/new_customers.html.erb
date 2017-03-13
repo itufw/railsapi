@@ -1,0 +1,22 @@
+<%= title "New Customers" %>
+<h3>New Customers</h3>
+
+<center><%= link_to "View Incomplete Customers", action: 'incomplete_customers' %></center>
+<%= form_tag({:controller => "customer", :action => "new_customers"}, {:method => "get"}) do %>
+<center>
+<div>
+	Customer Created From:
+	<%= date_field( "start_date", "start_date", value: @start_date) %>
+	To:
+	<%= date_field( "end_date", "end_date", value: @end_date) %>
+</div>
+</center>
+
+<div class="form-group" style="margin-left:300px;margin-top:50px;">
+
+	<%= render "partials/customer_filter" %>
+	<%= submit_tag "Filter", class: 'btn btn-primary' %>
+	<% end %>
+</div>
+
+<%= render "partials/customer", customers: @customers %>

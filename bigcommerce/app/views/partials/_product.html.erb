@@ -20,7 +20,7 @@
 			total_stock: @pending_stock_h[id].to_i + @stock_h[id].to_i, pending_stock: @pending_stock_h[id].to_i %></td>
 
 			<td class="num"><%= display_num(@price_h[id]) %></td>
-			<td clas = "num" ><%= @stock_h[id] %></td>
+			<td class="num"><%= @stock_h[id] %></td>
 			<% if @pending_stock_h[id].to_i != 0 %>
 				<% case @transform_column
 						when 'product_no_vintage_id'

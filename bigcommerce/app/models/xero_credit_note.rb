@@ -7,6 +7,7 @@ class XeroCreditNote < ActiveRecord::Base
 	self.primary_key = 'xero_credit_note_id'
 
 	has_many :xero_cn_allocations
+	has_many :xero_cn_line_items
 	belongs_to :xero_contact
 
 	def scrape
@@ -42,6 +43,7 @@ class XeroCreditNote < ActiveRecord::Base
 		credit_note = xero.CreditNote.all(modified_since: modified_since_time)
 		credit_note.each do |c|
 			insert_or_update_credit_note(c)
+			XeroCNLineItem.new.download_line_items_from_api(xero, c.credit_note_number)
 		end
 	end
 
@@ -63,7 +65,7 @@ class XeroCreditNote < ActiveRecord::Base
 			'#{c.contact_id}', '#{contact_name}', '#{c.status}', '#{c.line_amount_types}',\
 			'#{c.type}', '#{c.sub_total}', '#{c.total}', '#{c.total_tax}', '#{c.remaining_credit}',\
 			'#{date}', '#{updated_date}', '#{fully_paid_on_date}', '#{time}', '#{time}',\
-			'#{c.currency_code}', '#{c.currency_rate}', '#{c.reference}')"
+			'#{c.currency_code}', '#{c.currency_rate}', \"#{c.reference}\")"
 		else
 			sql = "UPDATE xero_credit_notes SET credit_note_number = '#{c.credit_note_number}',\
 			xero_contact_id = '#{c.contact_id}',contact_name = '#{contact_name}', status = '#{c.status}',\
@@ -71,9 +73,13 @@ class XeroCreditNote < ActiveRecord::Base
 			total = '#{c.total}', total_tax = '#{c.total_tax}',remaining_credit = '#{c.remaining_credit}',\
 			date = '#{date}', updated_date = '#{updated_date}',fully_paid_on_date = '#{fully_paid_on_date}',\
 			updated_at = '#{time}', currency_code = '#{c.currency_code}',currency_rate = '#{c.currency_rate}',\
-			reference = '#{c.reference}'\
+			reference = \"#{c.reference}\"\
 			WHERE xero_credit_note_id = '#{c.credit_note_id}'"
 		end
+		XeroCnAllocation.new.insert_cn_allocation(c.allocations,c.credit_note_id, c.credit_note_number, "allocations") unless c.allocations.nil?
+
+
+
 		ActiveRecord::Base.connection.execute(sql)
 	end
 

@@ -1,0 +1,84 @@
+<%= title "Note/Task ##{@note.id}" %>
+
+<div class="container">
+  <%= render "task_partials/note_parent"%>
+
+    <div class="row">
+        <div class="well panel-primary panel text-center" style="margin-top:5px;">
+            <h4 class="panel-heading"><%= link_to "##{@note.id} " + TaskSubject.where("id ='#{@note.subject_1}'").first.subject,\
+                                    controller: "task", action: "task_details", task_id: @note.id%></h4>
+            <div class="panel-body">
+                <%=@note.description%>
+                <br/>
+                <% if ((["18","19","20","21"].include? @note.subject_1)&&(!@note.title.nil?)&&(@note.title.to_s.eql? @note.title.to_i.to_s)) %>
+                  <% email = AccountEmail.find(@note.title)%>
+                  <% unless email.nil? %>
+                    Send Email to :<%=email.receive_address%>
+                    <br/>
+                    <%=raw(email.content)%>
+                      <%= render "task_partials/note_invoice_table", over_due_invoices: XeroInvoice.find_by_order_ids(@selected_orders)%>
+                    <br/>
+                    <%=raw(email.content_second)%>
+                    <br/>
+                  <% end %>
+                <% end %>
+                <br/>
+                <%= "Including Invoice: "+@selected_orders.to_s unless @selected_orders.blank?%>
+            </div>
+            <div class="panel-footer">
+                <%=render "task_partials/control_icon", task: @note%>
+                <br/>
+                Assigned By:
+                <%=Staff.find("#{@note.response_staff}").nickname%>
+                <br/>
+                <%= "Completed By:" + Staff.find("#{@note.completed_staff}").nickname unless @note.completed_staff.nil?%>
+                <br/>
+                <% if @note.is_task==1%>
+                  <% if @note.completed_date.nil? %>
+                    <a style="color: red;">Incomplete</a>
+                  <% else %>
+                    <a style="color: green;">Completed</a>
+                  <% end %>
+                  <br/>
+                <% end %>
+                <%=(1==@note.is_task)? date_format_orders(@note.start_date)+" - "+date_format_orders(@note.end_date) : date_format_orders(@note.start_date)%>
+            </div>
+        </div>
+    </div>
+
+    <% unless fetch_note_children([@note]).blank? %>
+    <%= render "task_partials/note_children", notes: [@note]%>
+    <% end %>
+</div>
+
+<script>
+$(document).on('click', '.panel-heading span.clickable', function (e) {
+    var $this = $(this);
+    if (!$this.hasClass('panel-collapsed')) {
+        $this.parents('.panel').find('.panel-body').slideUp();
+        $this.addClass('panel-collapsed');
+        $this.find('i').removeClass('glyphicon-minus').addClass('glyphicon-plus');
+    } else {
+        $this.parents('.panel').find('.panel-body').slideDown();
+        $this.removeClass('panel-collapsed');
+        $this.find('i').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+    }
+});
+
+$(document).on('click', '.panel div.clickable', function (e) {
+    var $this = $(this);
+    if (!$this.hasClass('panel-collapsed')) {
+        $this.parents('.panel').find('.panel-body').slideUp();
+        $this.addClass('panel-collapsed');
+        $this.find('i').removeClass('glyphicon-minus').addClass('glyphicon-plus');
+    } else {
+        $this.parents('.panel').find('.panel-body').slideDown();
+        $this.removeClass('panel-collapsed');
+        $this.find('i').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+    }
+});
+$(document).ready(function () {
+    $('.panel-heading span.clickable').click();
+    $('.panel div.clickable').click();
+});
+</script>

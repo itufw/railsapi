@@ -152,6 +152,10 @@ class Customer < ActiveRecord::Base
 		where("xero_contact_id = '#{id}'").first
 	end
 
+	def self.filter_new_customer(start_date, end_date)
+		where("created_at >= '#{start_date}' and created_at<='#{end_date}'")
+	end
+
 	def self.filter_by_ids(ids_array)
 		return Customer.all if ids_array.nil?
 		return where('customers.id IN (?)', ids_array)
@@ -265,7 +269,7 @@ class Customer < ActiveRecord::Base
 	end
 
 	def self.filter_by_staff(staff_id)
-		return where(:staff_id => staff_id) unless staff_id.nil?
+		return where(:staff_id => staff_id) unless (staff_id.nil? && staff_id.blank?)
 		all
 	end
 
@@ -273,11 +277,45 @@ class Customer < ActiveRecord::Base
 		count("id")
 	end
 
+	########## GROUP BY FUNCTIONS ############
+
 	def self.group_by_date_created
 		group('DATE(customers.date_created)')
 	end
 
+	def self.group_by_week_created
+			group('WEEK(customers.date_created)')
+	end
+
+	def self.group_by_month_created
+		group(['MONTH(customers.date_created)', 'YEAR(customers.date_created)'])
+	end
+
+	def self.group_by_quarter_created
+			group(['QUARTER(customers.date_created)', 'YEAR(customers.date_created)'])
+	end
+
+	def self.group_by_year_created
+			group('YEAR(customers.date_created)')
+	end
+
 	def self.group_by_date_created_and_staff_id
 		group(['customers.staff_id', 'DATE(customers.date_created)'])
+	end
+
+	def self.group_by_week_created_and_staff_id
+	  group(['customers.staff_id', 'WEEK(orders.date_created)'])
+	end
+
+	def self.group_by_month_created_and_staff_id
+		group(['customers.staff_id', 'MONTH(customers.date_created)', 'YEAR(customers.date_created)'])
+	end
+
+	def self.group_by_quarter_created_and_staff_id
+	   group(['customers.staff_id', 'QUARTER(customers.date_created)', 'YEAR(customers.date_created)'])
+	end
+
+	def self.group_by_year_created_and_staff_id
+	   group(['customers.staff_id', 'YEAR(customers.date_created)'])
 	end
 end

@@ -1,0 +1,15 @@
+class CreateCnLineItems < ActiveRecord::Migration
+  def change
+    create_table :xero_cn_line_items, :id => false do |t|
+      t.string :xero_cn_line_item_id, limit: 36, primary: true, null: false, index: true
+      t.string :xero_credit_note_id, limit: 36, null: false, index: true
+      t.string :item_code, :description
+      t.decimal :quantity, :unit_amount, :line_amount, :discount_rate, scale: 2, precision: 8
+      t.decimal :tax_amount, scale: 2, precision: 8
+      t.string :tax_type, :account_code
+
+      t.timestamps null: false
+    end
+    execute "ALTER TABLE xero_cn_line_items ADD PRIMARY KEY (xero_cn_line_item_id);"
+  end
+end

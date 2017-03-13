@@ -5,25 +5,69 @@ class ReminderMailer < ActionMailer::Base
   default from: 'accounts@untappedwines.com'
   layout "mailer"
 
-  def send_overdue_reminder(customer_id, email_subject,staff_id,email_content,email_address, cc, bcc, email_type, selected_invoices)
+  def send_overdue_reminder(customer_id, email_subject,staff_id,email_content,email_address, cc, bcc, email_type, selected_invoices, cn_op)
+    @cn_op = ("{}".eql? cn_op) ? {} : unzip_cn_op_hash(cn_op)
+    @total_remaining_credit = (@cn_op.map {|x| x[:remaining_credit]}).sum
     staff = Staff.find(staff_id)
     staff_name = staff.firstname + " " + staff.lastname
     @xero_contact = XeroContact.where(:skype_user_name => customer_id).first
 
     if ["Send Reminder", "Send Missed Payment"].include? email_type
-      @over_due_invoices = XeroInvoice.has_amount_due.over_due_invoices.where("invoice_number IN (?)",selected_invoices).order(:due_date)
+      @over_due_invoices = XeroInvoice.has_amount_due.where("invoice_number IN (?)",selected_invoices).order(:due_date)
+      @missing_invoice = true
     else
       @over_due_invoices = XeroInvoice.has_amount_due.over_due_invoices.where(:xero_contact_id => @xero_contact.xero_contact_id).order(:due_date)
+      @missing_invoice = false
     end
 
     attach_invoices(@over_due_invoices)
+    attach_credit_note(@cn_op, @over_due_invoices.map {|x| x.xero_invoice_id}, @xero_contact.name)
 
     @email_content = email_content
+    recipients_addresses = []
+    email_address.split(";").each do |contact_address|
+      customer_address = %("#{@xero_contact.name}" <#{contact_address}>)
+      recipients_addresses.push(customer_address)
+    end
+    bcc_group = []
+    bcc_group.push(bcc) unless "".eql? bcc
+    bcc_group.push(%("#{staff_name}" <#{staff.email}>))
 
-    customer_address = %("#{@xero_contact.name}" <#{email_address}>)
-    mail(from: "\"#{staff_name}\" <accounts@untappedwine.com>",to: customer_address, cc: cc, bcc: bcc, subject: email_subject)
+    record_email(recipients_addresses, staff.email, email_type, cc, bcc_group, email_content.first, email_content.last, customer_id, @over_due_invoices.map {|x| x.invoice_number}, staff_id)
+
+
+    # customer_address = %("#{@xero_contact.name}" <#{email_address}>)
+    mail(from: "\"#{staff_name}\" <accounts@untappedwine.com>",to: recipients_addresses, cc: cc, bcc: bcc_group, subject: email_subject)
   end
 
+  def unzip_cn_op_hash(cn_op_list)
+    cn_op = []
+    cn_op_list.split("} {").each do |co|
+      co = "{" + co unless "{".eql? co.first
+      co = co + "}" unless "}".eql? co.last
+      cn_op.push(eval(co))
+    end
+    cn_op
+  end
+
+  def record_email(receive_address, send_address, email_type, cc, bcc, content, content_second, customer_id, selected_invoices, staff_id)
+
+    email_content = AccountEmail.new
+
+    email_content.receive_address = receive_address
+    email_content.send_address = send_address
+    email_content.email_type = email_type
+    email_content.cc = cc
+    email_content.bcc = bcc
+    email_content.content = content
+    email_content.content_second = content_second
+    email_content.customer_id = customer_id
+    email_content.selected_invoices = selected_invoices
+
+    email_content.save!
+    Task.new.auto_insert_from_mailer(email_type, customer_id, staff_id, email_content.id, selected_invoices)
+
+  end
 
   def statement_generator(customer_id)
     xero_contact = XeroContact.where(:skype_user_name => customer_id).first
@@ -71,6 +115,45 @@ class ReminderMailer < ActionMailer::Base
         )
       end
     end
+  end
+
+  def attach_credit_note(cn_op, invoice_ids, xero_contact_name)
+    credit_note_numbers = []
+    # include the selected credit note
+    cn_op.each do |co|
+      credit_note_numbers.push(co[:status]) if co[:status].start_with?("CN")
+    end
+
+    # credit note that applied on the invoices
+    credit_note_numbers.push(*(XeroCnAllocation.apply_to_invoices(invoice_ids).map {|x| x.credit_note_number}))
+    credit_note_numbers = credit_note_numbers.uniq
+
+    if credit_note_numbers.blank?
+      return
+    end
+
+    credit_note_numbers.each do |cn_number|
+      credit_note = XeroCreditNote.where("xero_credit_notes.credit_note_number = '#{cn_number}'").first
+      cn_line_items = XeroCNLineItem.where("xero_cn_line_items.xero_credit_note_id = '#{credit_note.xero_credit_note_id}'")
+      cn_allocations = XeroCnAllocation.apply_from_credit_note_number(cn_number)
+
+      latest_invoice_number = XeroInvoice.find(invoice_ids.first).invoice_number
+      bill_address = (Address.where(id: latest_invoice_number).count == 0) ? "missing" : Address.find(latest_invoice_number)
+
+
+      attachments["Credit Note \##{cn_number}.pdf"] = WickedPdf.new.pdf_from_string(
+        render_to_string(
+            :template => 'pdf/credit_note',
+            :locals => {:credit_note => credit_note,
+                        :cn_line_items => cn_line_items,
+                        :cn_allocations => cn_allocations,
+                        :bill_address => bill_address,
+                        :xero_contact_name => xero_contact_name
+                        }
+            )
+      )
+    end
+
   end
 
   # input is an array with selected invoices number

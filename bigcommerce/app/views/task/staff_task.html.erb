@@ -1,0 +1,22 @@
+<%= title "#{session[:username]}'s Tasks" %>
+
+<div class="container">
+	<div class="row">
+		<div class="col-md-12 col-md-offset-10">
+
+			<button class="btn btn-primary"><%= link_to "Add Note/Task", controller: "task", action: "add_task"%></button>
+		</div>
+	</div>
+	<div class="row">
+		<center>
+		    <div>
+		        <button class="button default inline orders-view" id="orders-view-button">Task</button>
+		        <button class="button not-default inline products-view" id="products-view-button">Note</button>
+		    </div>
+		</center>
+		<h3 id="orders-view-heading" class="orders-view default">Task</h3>
+			<%= render "task_partials/task_table", display_all: "task"%>
+		<h3 id="products-view-heading" class="products-view not-default" style="text-align: center;">Note</h3>
+			<%= render "task_partials/note_table"%>
+	</div>
+</div>

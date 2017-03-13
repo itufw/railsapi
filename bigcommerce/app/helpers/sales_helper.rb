@@ -141,6 +141,7 @@ module SalesHelper
   # stats VIEW:
   def stats_info(product_ids, product_name_h, transform_column, inventory_h, pending_stock_h)
     stats_info = {}
+    stats_sum = Array.new(StaffTimePeriod.display.count, 0)
     product_ids.each do |product_id|
       product_transform_ids = get_products_after_transformation(transform_column, product_id).pluck("id") || product_id
       # overall_stats has structure {time_period_name => [sum, average, supply]}
@@ -148,9 +149,10 @@ module SalesHelper
         [product_transform_ids], :sum_order_product_qty, "monthly", inventory_h[product_id].to_i+pending_stock_h[product_id].to_i)
 
       stats_info[product_id] = {"product_name" => product_name_h[product_id], "time_period" => overall_stats }
+      stats_sum = [stats_sum, overall_stats.map{|x| x.last[0]}].transpose.map {|x| x.reduce(:+)}
     end
     # stats_info has structure {"product_name" => "name", "time_period" => {time_period_name => [sum, average, supply]}}
-    return stats_info
+    return stats_info, stats_sum
   end
 
 

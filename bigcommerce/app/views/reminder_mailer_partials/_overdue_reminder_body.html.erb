@@ -2,7 +2,7 @@
   <%= raw(email_content.first)%>
 </div>
 
-<%=render "reminder_mailer_partials/reminder_table", over_due_invoices: over_due_invoices, xero_contact: xero_contact%>
+<%=render "reminder_mailer_partials/reminder_table", over_due_invoices: over_due_invoices, xero_contact: xero_contact, missing_invoice: missing_invoice%>
 
 <div>
   <%= raw(email_content.last)%>

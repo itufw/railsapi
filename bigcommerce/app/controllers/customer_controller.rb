@@ -2,6 +2,7 @@ require 'time_period_stats.rb'
 require 'product_variations.rb'
 require 'models_filter.rb'
 require 'dates_helper.rb'
+require 'customer_helper.rb'
 
 class CustomerController < ApplicationController
 
@@ -11,11 +12,23 @@ class CustomerController < ApplicationController
 	include ProductVariations
 	include ModelsFilter
   include DatesHelper
+	include CustomerHelper
 
   def all
     @staffs = Staff.active_sales_staff
     customers = filter(params, "display_report")
     display_(params, customers)
+  end
+
+	def new_customers
+    @staffs = Staff.active_sales_staff
+    customers = filter(params, "display_report")
+
+		start_date = params[:start_date] || {:start_date => (Date.today - 14.days).to_date.to_s}
+		@start_date = return_end_date_invoices(start_date)
+		@end_date = return_end_date_invoices(params[:end_date])
+		# hepler -> customer_helper
+		@per_page, @customers = get_new_customers(params, customers, @start_date, @end_date)
   end
 
   def incomplete_customers
@@ -131,15 +144,17 @@ class CustomerController < ApplicationController
   	# based on the above param filters, filter products out
   	where_query = "OrderProduct.valid_orders.order_customer_filter(%s).product_filter(%s)" % [[@customer_id], Product.all.pluck("id")]
 
+		# default sorting with name
+		order_col = params[:order_col] || "0"
+		order_direction = params[:direction] || "1"
+
 		# hash has a structure {"time_period" => {product_id => stock}}
 		# product_ids can be either product ids or even
 		# product no vintage ids
 		# group_by can be group_by_product_id, group_by_product_no_vintage_id
 		@top_products_timeperiod_h, @product_ids, @time_periods, sorted_bool = \
-		top_objects(where_query, ('group_by_' + @transform_column).to_sym, :sum_qty, params[:order_col], params[:direction])
-
+		top_objects(where_query, ('group_by_' + @transform_column).to_sym, :sum_qty, order_col, order_direction)
 		@price_h, @product_name_h = get_data_after_transformation(@transform_column, @product_ids)
-
     # Sort by name/price
     ####################################
     # PUT THIS IN A LIB
@@ -147,10 +162,10 @@ class CustomerController < ApplicationController
       sort_column_map = {"0" => @product_name_h, "1" => @price_h}
       # @name_h or @price_h are the structure {id => val}
       # sort the hash using the val, then get the product_ids in order using map
-      hash_to_be_sorted = sort_column_map[params[:order_col]] || @product_name_h
+      hash_to_be_sorted = sort_column_map[order_col] || @product_name_h
       sorted_hash = hash_to_be_sorted.sort_by {|id, val| val}
 
-      if params[:direction].to_i == 1
+      if order_direction.to_i == 1
         @product_ids = sorted_hash.map {|product| product[0]}
       else
         @product_ids = sorted_hash.reverse.map {|product| product[0]}

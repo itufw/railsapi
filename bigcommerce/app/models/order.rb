@@ -10,6 +10,7 @@ class Order < ActiveRecord::Base
     belongs_to :staff
     has_many :order_shippings
     has_many :addresses, through: :order_shippings
+    has_many :order_actions
     belongs_to :billing_address, class_name: :Address, foreign_key: :billing_address_id
     has_many :order_products
     has_many :products, through: :order_products
@@ -132,6 +133,10 @@ class Order < ActiveRecord::Base
             # insert the billing adress where the id is order_id
             Address.new.insert_or_update(o.billing_address,o.customer_id,o.id)
 
+            # update the staff id
+            Order.update_staff_id(o.id,o.customer_id)
+
+
         else
             sql = "UPDATE orders SET customer_id = '#{o.customer_id}', date_created = '#{date_created}',\
       					date_modified = '#{date_modified}', date_shipped = '#{date_shipped}', status_id = '#{o.status_id}',\
@@ -144,6 +149,10 @@ class Order < ActiveRecord::Base
       					ip_address = '#{o.ip_address}', staff_notes = '#{staff_notes}', customer_notes = '#{customer_notes}', discount_amount = '#{o.discount_amount}',\
       					coupon_discount = '#{o.coupon_discount}', active = '#{active}', order_source = '#{o.order_source}', updated_at = '#{time}', payment_method = '#{payment_method}' WHERE id = '#{o.id}'"
 
+            # update order action table
+            # if o.status_id == 10
+            #   OrderAction.new.order_paid(o.id)
+            # end
         end
         ActiveRecord::Base.connection.execute(sql)
     end
@@ -166,7 +175,8 @@ class Order < ActiveRecord::Base
     def self.product_filter(product_ids)
         # return includes(:order_products).where('order_products.product_id IN (?)', product_ids).references(:order_products) if !product_ids.nil?
         # return all
-        includes(:products).where('products.id IN (?)', product_ids).references(:products)
+        return includes(:products).where('products.id IN (?)', product_ids).references(:products) unless product_ids.nil? || product_ids.empty?
+        all
     end
 
     def self.order_product_filter(product_ids)
@@ -183,6 +193,11 @@ class Order < ActiveRecord::Base
     def self.staff_filter(staff_id)
         return includes(:customer).where('customers.staff_id = ?', staff_id).references(:customers) unless staff_id.nil?
         all
+    end
+
+    def self.product_customer_filter(product_ids, customer_ids)
+      return includes(:order_products).where('order_products.product_id IN (?)', product_ids).references(:order_products) if customer_ids.nil? || customer_ids.empty?
+      return includes(:order_products).where('order_products.product_id IN (?) OR orders.customer_id IN (?)', product_ids, customer_ids).references(:order_products)
     end
 
     # Returns orders whose date created is between the start date and end date
@@ -209,7 +224,7 @@ class Order < ActiveRecord::Base
 
     # Returns orders with a given status id
     def self.status_filter(status_id)
-        return where(status_id: status_id) unless status_id.nil?
+        return where("status_id = ?", status_id) unless status_id.nil?
         all
     end
 
@@ -373,7 +388,7 @@ class Order < ActiveRecord::Base
     end
 
     def self.order_by_date_created(direction)
-        order('date_created ' + direction)
+        order('orders.date_created ' + direction)
     end
 
     def self.include_all
@@ -383,18 +398,26 @@ class Order < ActiveRecord::Base
     #-------------------------
     # TODO to be finished
     #-------------------------
-    def self.update_staff_id(order)
-        order.includes(customer: :staff)
-        if order.staff
-            sql = "UPDATE orders SET staff_id = '#{order.staff.id}' WHERE id = '#{order.id}'"
-            ActiveRecord::Base.connection.execute(sql)
+    def self.update_staff_id(order_id,customer_id)
+      customer = Customer.where(id: customer_id).first
+      unless customer.nil?
+        staff_id = customer.staff_id
+        sql = "UPDATE orders SET staff_id = '#{staff_id}' WHERE id = '#{order_id}'"
+        ActiveRecord::Base.connection.execute(sql)
+      end
+    end
+
+    def update_missing_staff_id
+        orders = Order.where(staff_id: nil)
+        orders.each do |o|
+            Order.update_staff_id(o.id,o.customer_id)
         end
     end
 
-    def self.update_all_staff_id
-        orders = Order.includes(customer: :staff)
+    def update_all_staff_id
+        orders = Order.all
         orders.each do |o|
-            Order.update_staff_id(o)
+            Order.update_staff_id(o.id,o.customer_id)
         end
     end
 
@@ -411,6 +434,10 @@ class Order < ActiveRecord::Base
         order.xero_invoice_id = invoice_id
         order.xero_invoice_number = order_id
         order.save
+    end
+
+    def self.total_dismatch
+        includes(:xero_invoice).where("ROUND(orders.total_inc_tax, 1) <> Round(xero_invoices.total, 1)").references(:xero_invoice)
     end
 
     # WHERE DO I USE THIS?

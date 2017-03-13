@@ -8,6 +8,8 @@
             <%= form_for @email_content, :url => {:controller => "accounts", :action => "send_reminder"}  do |email_content| %>
             <%= hidden_field_tag :checked_send_email_to_self, @checked_send_email_to_self %>
             <%= hidden_field_tag :email_subject, @email_title %>
+            <%= hidden_field_tag :cn_op, @cn_op %>
+
 
               <%= email_content.hidden_field(:email_type)%>
               <%= email_content.hidden_field(:customer_id)%>
@@ -15,7 +17,7 @@
               <%= email_content.hidden_field(:customer_id)%>
 
               <%= label(:title, "Send to:")%>
-              <%= email_content.text_field :receive_address, :maxlength=>"50"	%>
+              <%= email_content.text_field :receive_address, :maxlength=>"100"	%>
               <br/>
               <%= label(:title, "CC:")%>
               <%= email_content.text_field :cc, :maxlength=>"50"	%>

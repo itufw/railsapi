@@ -3,12 +3,18 @@
   <div class= "row">
     <div class="col-xs-4">
       <h5><%= customer.firstname+"  "+customer.lastname %></h5>
-      <p>Ph: <%= number_to_phone(customer.xero_contact.contact_number, pattern: /(\d{4})(\d{3})(\d{3})$/) unless customer.xero_contact.contact_number.nil? %></p>
+      <p>Ph: <%= num_to_phone(customer.xero_contact.contact_number) unless customer.xero_contact.contact_number.nil? %></p>
       <p>Email: <%= mail_to(customer.xero_contact.email) unless customer.xero_contact.email.nil? %></p>
     </div>
-    <div class="col-xs-4 col-xs-offset-3">
+    <% @contact_people.each do |person| %>
+      <div class="col-xs-4">
+        <h5><%= person.first_name+"  "+person.last_name %></h5>
+        <p>Email: <%= mail_to(person.email_address) unless person.email_address.nil? %></p>
+      </div>
+    <% end %>
+    <div class="col-xs-4">
       <h5>Sales Rep.: <%= customer.staff.nickname %></h5>
-      <p>Ph: <%= number_to_phone(customer.staff.contact_number, pattern: /(\d{4})(\d{3})(\d{3})$/) unless customer.staff.contact_number.nil? %></p>
+      <p>Ph: <%= num_to_phone(customer.staff.contact_number) unless customer.staff.contact_number.nil? %></p>
       <p>Email: <%= mail_to(customer.staff.email) unless customer.staff.email.nil? %></p>
     </div>
   </div>
