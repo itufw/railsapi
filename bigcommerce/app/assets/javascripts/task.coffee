@@ -2,10 +2,39 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://coffeescript.org/
 $(document).ready ->
-  $(".task_function_selection").on "change", ->
+  $(".function_selection").on "change", ->
     $.ajax
       url: "/task/add_task"
       type: "GET"
       dataType: "script"
-      data:
-        function_name: $('.task_function_selection option:selected').val()
+      data:{
+        selected_function: $('.function_selection option:selected').val(),
+        selected_staff: $('.staff_selection option:selected').val()
+      };
+  $(".staff_selection").on "change", ->
+    $.ajax
+      url: "/task/add_task"
+      type: "GET"
+      dataType: "script"
+      data:{
+        selected_function: $('.function_selection option:selected').val(),
+        selected_staff: $('.staff_selection option:selected').val()
+      };
+  $(".function_selection_task").on "change", ->
+    $.ajax
+      url: "/task/add_task"
+      type: "GET"
+      dataType: "script"
+      data:{
+        selected_function_task: $('.function_selection_task option:selected').val(),
+        selected_staff_task: $('.staff_selection_task option:selected').val()
+      }
+  $(".staff_selection_task").on "change", ->
+    $.ajax
+      url: "/task/add_task"
+      type: "GET"
+      dataType: "script"
+      data:{
+        selected_function_task: $('.function_selection_task option:selected').val(),
+        selected_staff_task: $('.staff_selection_task option:selected').val()
+      };

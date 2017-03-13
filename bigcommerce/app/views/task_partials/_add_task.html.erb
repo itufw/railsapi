@@ -1,66 +1,58 @@
 <div class="container products-view not-default">
-    <%= form_tag({:controller => "task", :action => "add_task"}, {:method => "post"}) do %>
-    <%= hidden_field_tag :is_task, 1 %>
-    <div class="row">
-      <div class="col-md-8 col-md-offset-4" id = "task_function">
-        Function:
-        <% if @user_type.in?(["Management","Admin"]) %>
-        <%= collection_select(:function, :function_name, TaskSubject.distinct_function, :function, :function, {:include_blank => 'Select Function'}, {:class => 'task_function_selection'}) %>
-        <% else%>
-        <%= collection_select(:function, :function_name, TaskSubject.distinct_function_user(Staff.find(session[:user_id]).user_type), :function, :function, {:class => 'task_function_selection'}) %>
+
+  <%= form_for @task, :url => {:controller => "task", :action => "add_task"}  do |f| %>
+  <%= hidden_field_tag :is_task, 1 %>
+  <%= hidden_field_tag :parent_task, @parent_task %>
+  <%= hidden_field_tag :selected_orders, @selected_orders unless @selected_orders.blank?%>
+  <%= hidden_field_tag :accounts_page, @customer_locked %>
+
+  <div class="row">
+      <div class="col-md-8 col-md-offset-4" id="task_function">
+          <%= "Include Order: "+ @selected_orders.to_s unless @selected_orders.blank?%>
+          <br/>
+          <%= label(:function, "Function:")%>
+          <%= f.collection_select :function, @function, :function, :function, {:include_blank => "Select a Function"}, {:class=>"function_selection_task"} %>
+          <%= label(:subject_1, "Subject:")%>
+          <%= f.collection_select :subject_1, @subjects_task, :id, :subject, {:prompt => "Select a Subject"}, {:class=>"subject_selection_task"} %>
+      </div>
+      <div class="col-md-8 col-md-offset-4" id="task_function">
+          <%= label(:method, "Method:")%>
+          <%= f.collection_select :method, @methods, :method, :method, {:prompt => "Select a Method"} %>
+      </div>
+      <div class="col-md-8 col-md-offset-4">
+          Description
+          <br/>
+          <%= f.text_area :description, :rows=>15, :cols=>50	%>
+      </div>
+      <div class="col-xs-4 col-xs-offset-4">
+        Assign To: </br>
+        <% if !@customer_locked%>
+          <%= label(:staff, "Staff:")%>
+            <%= collection_select(:staff, :id, @staffs, :id, :nickname, {:prompt => 'Active Staff'}, {:class => 'staff_selection_task'}) %>
+          </br>
+          <%= label(:customer, "Customer:")%>
+            <%= collection_select(:customer, :id, @customers, :id, :actual_name, {:include_blank => 'Active Customer'}, {:class => 'customer_selection_task'}) %>
+        <% else %>
+        <%= label(:staff, "Staff:")%>
+          <%= collection_select(:staff, :id, @staffs, :id, :nickname) %>
+        </br>
+        <%= label(:customer, "Customer:")%>
+          <%= collection_select(:customer, :id, @customers, :id, :actual_name) %>
         <% end %>
-        <%= collection_select(:subject_id, :id, TaskSubject.get_subjects_on_user_type(@user_type), :id, :subject,{:include_blank => 'Select Subject'}, {:class=>"subject_selection"}) %>
       </div>
 
-        <div class="col-md-8 col-md-offset-4">
-            Description:<br/>
-            <textarea name='description' id='description' rows="15" cols="50"></textarea><br/>
-        </div>
-
-
-        <div class="col-md-8 col-md-offset-4">
-            Assign to:
-        </div>
-
-        <div class="col-xs-8 col-xs-offset-5">
-            <%= radio_button_tag(:relation, "staff", @checked_meeting) %>
-            staff
-            <span style="margin-left: 50px;">
-                <%= radio_button_tag(:relation, "customer", @checked_email) %>
-                customer
-            </span>
-        </div>
-
-        <div class="col-xs-4 col-xs-offset-3">
-            Staff:
-            <%= collection_select(:staff, :id, Staff.active, :id, :nickname, {:include_blank => 'Active Staff'}, {:class => 'form-control'}) %>
-            Customer:
-            <%= collection_select(:customer, :id, @customers_xero_contact, :skype_user_name, :name, {:include_blank => 'Active Customer'}, {:class => 'form-control'}) %>
-        </div>
-
-        <div class="col-xs-6 col-xs-offset-4">
-            <%= radio_button_tag(:method, "meeting", @checked_meeting) %>
-            meeting
-            <span style="margin-left: 50px;">
-                <%= radio_button_tag(:method, "call", @checked_phone) %>
-                call
-                <span style="margin-left: 50px;">
-                    <%= radio_button_tag(:method, "email", @checked_email) %>
-                    email
-                </span>
-        </div>
-        <div class="col-xs-6 col-xs-offset-3">
-
-                Start From:
-                <%= date_field( "start_date", "start_date", value: @start_date) %>
-                Until:
-                <%= date_field( "end_date", "end_date", value: @end_date) %><br/><br/>
-        </div>
-        <div class="col-xs-6 col-xs-offset-5">
-          <%= submit_tag "Add Task!", class: 'btn btn-primary', data: { confirm: "Add Task?" }%>
-        </div>
-
-    </div>
-        <!-- end of the form -->
-        <%end%>
+      <div class="col-xs-6 col-xs-offset-4">
+          <%= label(:end_date, "Due Date")%>
+          <%= date_field( "end_date", "end_date", value: @end_date) %><br/><br/>
+          <%= label(:start_date, "Start From")%>
+          <%= date_field( "start_date", "start_date", value: @start_date) %><br/>
+      </div>
+      </br>
+      <div class="col-xs-6 col-xs-offset-4">
+          <%= button_tag(type: 'submit', class: "btn btn-primary") do %>
+          Create Task!
+          <% end %>
+      </div>
+  </div>
+  <% end %>
 </div>

@@ -4,109 +4,130 @@
 	<h4>Invoices</h4>
 </div>
 <%= form_tag({:action => "contact_invoices"}, {:method => "get"}) do %>
-	<%= hidden_field_tag :customer_id , customer.id %>
-	<%= render "accounts_partials/contact_monthly_filter"%>
+<%= hidden_field_tag :customer_id , customer.id %>
+<%= render "accounts_partials/contact_monthly_filter"%>
 <% end %>
 
-<table class = "table table-striped table-bordered table-hover table-responsive" style="margin-top: 10px;">
-<tr class="info">
-	<th></th>
-	<th>Outstanding</th>
-	<th>Overdue</th>
-	<% @date = 	Date.strptime("#{@end_date}", '%Y-%m-%d')  %>
-	<th> Current </th>
+<table class="table table-striped table-bordered table-hover table-responsive" style="margin-top: 10px;">
+	<tr class="info">
+		<th></th>
+		<th>Outstanding</th>
+		<th>Overdue</th>
+		<% @date = 	Date.strptime("#{@end_date}", '%Y-%m-%d')  %>
+		<th>
+			Current
+		</th>
 
-	<% for i in 1..4 %>
+		<% for i in 1..4 %>
 		<% if 'monthly'.eql? @monthly %>
-			<th> <%= (@date - i.month).strftime("%B")%></th>
-		<% else %>
-			<th><%= @date - (i*15).days %> - <%= @date - ((i+1)*15).days + 1.day %></th>
+		<th>
+			<%= (@date - i.month).strftime("%B")%></th>
+	<% else %>
+		<th><%= @date - (i*15).days %>
+			-
+			<%= @date - ((i+1)*15).days + 1.day %></th>
 		<% end %>
-	<% end %>
+		<% end %>
 
-	<th> Older </th>
-</tr>
+		<th>
+			Older
+		</th>
+	</tr>
 
-<tr>
-	<td>Invoice Date</td>
-	<td class="num"><%= display_num(outstanding_customer(customer.xero_contact))  %></td>
-	<td class="num"><%= display_num(overdue_customer(customer.xero_contact)) %></td>
-	<% amount_due["invoice_date"].each do |amount| %>
+	<tr>
+		<td>Invoice Date</td>
+		<td class="num"><%= display_num(outstanding_customer(customer.xero_contact))  %></td>
+		<td class="num"><%= display_num(overdue_customer(customer.xero_contact)) %></td>
+		<% amount_due["invoice_date"].each do |amount| %>
 		<td><%= display_num(amount) %></td>
-	<% end %>
-</tr>
+		<% end %>
+	</tr>
 
-<tr>
-	<td>Due Date</td>
-	<td class="num"><%= display_num(outstanding_customer(customer.xero_contact))  %></td>
-	<td class="num"><%= display_num(overdue_customer(customer.xero_contact)) %></td>
-	<% amount_due["due_date"].each do |amount| %>
+	<tr>
+		<td>Due Date</td>
+		<td class="num"><%= display_num(outstanding_customer(customer.xero_contact))  %></td>
+		<td class="num"><%= display_num(overdue_customer(customer.xero_contact)) %></td>
+		<% amount_due["due_date"].each do |amount| %>
 		<td><%= display_num(amount) %></td>
-	<% end %>
-</tr>
+		<% end %>
+	</tr>
 </table>
 
 <div class="container">
-	<div class= "row">
+	<div class="row">
 		<%= form_tag({:controller => "accounts", :action => "email_edit"}, {:method => "post"}) do %>
-			<%= hidden_field_tag :customer_id, customer.id %>
+		<%= hidden_field_tag :customer_id, customer.id %>
 		<div class="col-md-8">
-			<table class = "table table-striped table-bordered table-hover table-responsive" style="margin-top: -10px;">
-				<tr class="info">
-					<th></th>
-					<th>Invoice#</th>
-					<th>Date</th>
-					<th>Due Date</th>
-					<th>Overdue Days</th>
-					<th>Total</th>
-					<th>Amount Paid</th>
-					<th>Amount Credited</th>
-					<th>Amount Due</th>
-				</tr>
-				<% customer.xero_contact.xero_invoices.has_amount_due.order_by_due_date.each do |i| %>
-				<tr>
-					<td><%= check_box_tag 'selected_invoices[]', i.invoice_number %></td>
-					<td><%= link_to i.invoice_number, controller: 'order', action: 'details', order_id: i.invoice_number%></td>
-					<td><%= i.date.to_date.strftime("%d/%-m/%y") %></td>
-					<td><%= i.due_date.to_date.strftime("%d/%-m/%y") %></td>
-					<td><%= Date.today.mjd - i.due_date.to_date.mjd %> Days</td>
+			<div>
+				<table class="table table-striped table-bordered table-hover table-responsive" style="margin-top: -10px;">
+					<tr class="info">
+						<th></th>
+						<th>Invoice#</th>
+						<th>Date</th>
+						<th>Due Date</th>
+						<th>Overdue Days</th>
+						<th>Total</th>
+						<th>Amount Paid</th>
+						<th>Amount Credited</th>
+						<th>Amount Due</th>
+					</tr>
+					<% customer.xero_contact.xero_invoices.has_amount_due.order_by_due_date.each do |i| %>
+					<tr>
+						<td><%= check_box_tag 'selected_invoices[]', i.invoice_number %></td>
+						<td><%= link_to i.invoice_number, controller: 'order', action: 'details', order_id: i.invoice_number%></td>
+						<td><%= i.date.to_date.strftime("%d/%-m/%y") %></td>
+						<td><%= i.due_date.to_date.strftime("%d/%-m/%y") %></td>
+						<td><%= Date.today.mjd - i.due_date.to_date.mjd %>
+							Days</td>
 						<% over_days = true if Date.today.mjd - i.due_date.to_date.mjd > 0%>
 						<% over_60_days = true if Date.today.mjd - i.due_date.to_date.mjd > 60 %>
 						<% over_90_days = true if Date.today.mjd - i.due_date.to_date.mjd > 90 %>
-					<td><%= i.total %></td>
-					<td><%= i.amount_paid %></td>
-					<td><%= i.amount_credited %></td>
-					<td><%= i.amount_due %></td>
-				</tr>
-				<% end%> <!--  customer.xero_contact.xero_invoices.has_amount_due.each do |i|-->
-			</table>
+						<td><%= i.total %></td>
+						<td><%= i.amount_paid %></td>
+						<td><%= i.amount_credited %></td>
+						<td><%= i.amount_due %></td>
+					</tr>
+					<% end%>
+					<!--  customer.xero_contact.xero_invoices.has_amount_due.each do |i|-->
+				</table>
+			</div>
+			<%= render "accounts_partials/credit_note_overpayment", cn_op: @cn_op unless @cn_op.blank? %>
 		</div>
-
 		<div class="col-md-4" align="center">
 			<h4>Invoice Reminder</h4>
 			Send Email to :
-				<%= radio_button_tag(:send_email_to_self, "yes", @checked_send_email_to_self) %> <%= session[:username] %>
-				<span style="margin-left: 30px;">
-				<%= radio_button_tag(:send_email_to_self, "no", @checked_send_email_not_to_self) %>  <%= @customer.xero_contact.name %>
-				</span>
+			<%= radio_button_tag(:send_email_to_self, "yes", @checked_send_email_to_self) %>
+			<%= session[:username] %>
+			<span style="margin-left: 30px;">
+				<%= radio_button_tag(:send_email_to_self, "no", @checked_send_email_not_to_self) %>
+				<%= @customer.xero_contact.name %>
+			</span>
 			<br/>
-			<%= submit_tag "Send Missed Payment", class: 'btn btn-primary', data: { confirm: "Send Missed Payment Reminder to #{@customer.xero_contact.name}" }%>
-			<br/>
-			<br/>
-			<%= submit_tag "Send New Order Hold", class: 'btn btn-primary', data: { confirm: "Send New Order Hold Reminder to #{@customer.xero_contact.name}" }%>
-			<br/>
-			<br/>
-			<%= submit_tag "Send Overdue Reminder",class: 'btn btn-primary', data: { confirm: "Send Overdue Reminder to #{@customer.xero_contact.name}" } if over_days %></button>
+			<%= submit_tag "Send Missed Payment", class: 'btn btn-primary'%>
 			<br/>
 			<br/>
-			<%= submit_tag "Send 60 days Overdue Reminder",class: 'btn btn-primary', data: { confirm: "Send 60 Days Overdue Reminder to #{@customer.xero_contact.name}" } if over_60_days %></button>
+			<%= submit_tag "Send New Order Hold", class: 'btn btn-primary'%>
 			<br/>
 			<br/>
-			<%= submit_tag "Send 90 days Overdue Reminder",class: 'btn btn-primary', data: { confirm: "Send 90 Days Overdue Reminder to #{@customer.xero_contact.name}" } if over_90_days  %></button>
+			<% if over_days %>
+			<%= submit_tag "Send Overdue Reminder",class: 'btn btn-primary'  %>
+			<br/>
+			<br/>
+			<% end%>
+			<% if over_60_days %>
+			<%= submit_tag "Send 60 Days Overdue Reminder",class: 'btn btn-primary' %>
+			<br/>
+			<br/>
+			<% end%>
+			<% if over_90_days %>
+			<%= submit_tag "Send 90 Days Overdue Reminder",class: 'btn btn-primary' %>
+			<br/>
+			<br/>
+			<% end%>
+			<%= submit_tag "Add Note/Task",class: 'btn btn-default'%>
 		</div>
-
-		<!-- end of the form -->
-		<%end%>
 	</div>
+	<!-- end of the form -->
+	<%end%>
 
 </div>

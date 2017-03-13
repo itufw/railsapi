@@ -1,0 +1,33 @@
+<div>
+  <table class="table table-striped table-bordered table-hover table-responsive" style="margin-top: -10px;">
+    <tr class="info">
+      <th></th>
+      <th>Invoice#</th>
+      <th>Date</th>
+      <th>Due Date</th>
+      <th>Overdue Days</th>
+      <th>Total</th>
+      <th>Amount Paid</th>
+      <th>Amount Credited</th>
+      <th>Amount Due</th>
+    </tr>
+    <% customer.xero_contact.xero_invoices.has_amount_due.order_by_due_date.each do |i| %>
+    <tr>
+      <td><%= check_box_tag 'selected_invoices[]', i.invoice_number %></td>
+      <td><%= link_to i.invoice_number, controller: 'order', action: 'details', order_id: i.invoice_number%></td>
+      <td><%= i.date.to_date.strftime("%d/%-m/%y") %></td>
+      <td><%= i.due_date.to_date.strftime("%d/%-m/%y") %></td>
+      <td><%= Date.today.mjd - i.due_date.to_date.mjd %>
+        Days</td>
+      <% over_days = true if Date.today.mjd - i.due_date.to_date.mjd > 0%>
+      <% over_60_days = true if Date.today.mjd - i.due_date.to_date.mjd > 60 %>
+      <% over_90_days = true if Date.today.mjd - i.due_date.to_date.mjd > 90 %>
+      <td><%= i.total %></td>
+      <td><%= i.amount_paid %></td>
+      <td><%= i.amount_credited %></td>
+      <td><%= i.amount_due %></td>
+    </tr>
+    <% end%>
+    <!--  customer.xero_contact.xero_invoices.has_amount_due.each do |i|-->
+  </table>
+</div>

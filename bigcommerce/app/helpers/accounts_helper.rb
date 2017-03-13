@@ -1,6 +1,42 @@
 module AccountsHelper
     include ActionView::Helpers::NumberHelper
 
+    def credit_note_and_overpayment(xero_contact_id)
+      op = XeroOverpayment.get_remaining_credit(xero_contact_id).where("remaining_credit > 0")
+      cn = XeroCreditNote.get_remaining_credit(xero_contact_id).where("remaining_credit > 0")
+      cn_op = {}
+
+      op.each do |o|
+        reference = ""
+        op_allocation = XeroOpAllocation.where("xero_overpayment_id = '#{o.xero_overpayment_id}' ")
+
+        op_allocation.each do |opa|
+          reference += "Order##{opa.invoice_number} applied #{opa.applied_amount}  \n"
+        end
+        cn_op["Overpayment_#{o.date.year}_#{o.date.month}_#{o.date.day}"] = {:sub_total => o.sub_total, :total => o.total,\
+                                         :remaining_credit => o.remaining_credit, :date => o.date, :reference => reference,\
+                                       :status => "Overpayment"}
+      end
+
+      cn.each do |c|
+        cn_op[c.credit_note_number] = {:sub_total => c.sub_total, :total => c.total,\
+                                         :remaining_credit => c.remaining_credit, :date => c.date, :reference => c.reference,\
+                                       :status => c.credit_note_number}
+
+      end
+      cn_op
+    end
+
+    def unzip_cn_op(cn_op_array)
+      cn_op = []
+      cn_op_array.each do |co|
+        status, date, remaining_credit = co.split(" ")
+        co_op_item = {:status => status, :date => date, :remaining_credit => remaining_credit.to_f}
+        cn_op.push(co_op_item)
+      end
+      cn_op
+    end
+
     def date_column_checked(date_column)
         if 'due_date'.eql? date_column
             # @checked_due_date = true
@@ -19,6 +55,13 @@ module AccountsHelper
         [false, true]
     end
 
+    def different_orders_checked(all)
+        if 'all'.eql? all
+            return true, false
+        end
+        [false, true]
+    end
+
     def email_preview(email_ratio)
         return false, true if 'no'.eql? email_ratio
         [true, false]
@@ -30,7 +73,7 @@ module AccountsHelper
         email_title = ''
         case commit
         when 'Send Reminder', 'Send Missed Payment'
-            email_content = "Hi,<br><br>
+            email_content = "Hi #{@customer_firstname},<br><br>
                             Thanks for the recent payment that was made to our account.<br><br>
                             Could I please refer you to an invoice that has been missed that we’re still awaiting payment for. The details are below.<br><br>"
             content_second_half = "I’ve attached a copy of the invoice(s) in case you are missing them in your records. I will also follow-up with an additional email providing the Proof of delivery (POD).<br><br>
@@ -38,7 +81,7 @@ module AccountsHelper
             email_title = "MISSING INVOICE PAYMENT – Untapped Fine Wines – #{@customer_name}"
 
         when 'Send Overdue Reminder'
-            email_content = "Hi,<br><br>
+            email_content = "Hi #{@customer_firstname},<br><br>
                             We have outstanding balance for wine that was delivered for <b>#{@customer_name}</b> total <span class=\"wysiwyg-color-red\">#{number_to_currency(@over_due_invoices.sum(:amount_due))}</span>. Please see the details below."
             content_second_half = "This balance is now <a style=\"color: red\">overdue</a> and we require payment of the amount provided above and repeated in the attached statement in order to continue to provide credit terms on a regular basis.<br><br>
                                   Can you please examine this and either give me a call or reply to this email as to when the outstanding amount can be settled.<br><br>
@@ -48,7 +91,7 @@ module AccountsHelper
             email_title = "OVERDUE REMINDER – Untapped Fine Wines – #{@customer_name}"
 
         when 'Send 60 Days Overdue Reminder'
-            email_content = "Hi,<br><br>
+            email_content = "Hi #{@customer_firstname},<br><br>
                             We have outstanding balance of <span class=\"wysiwyg-color-red\">#{number_to_currency(@over_due_invoices.sum(:amount_due))} </span> for <b>#{@customer_name}</b>. Please see the details below.<br><br>
                             Until this overdue amount is settled any new order must be paid for prior to being dispatched<br><br>"
             content_second_half = "If you have any questions regarding your account please be in contact.<br><br>
@@ -57,7 +100,7 @@ module AccountsHelper
             email_title = "OVERDUE PAYMENT REQUIRED – Untapped Fine Wines – #{@customer_name}"
 
         when 'Send 90 Days Overdue Reminder'
-            email_content = "Hi,<br><br>
+            email_content = "Hi #{@customer_firstname},<br><br>
                             We have outstanding balance of <span class=\"wysiwyg-color-red\">#{number_to_currency(@over_due_invoices.sum(:amount_due))}</span> for <b>#{@customer_name}</b>. Some of this wine is more than 90 days overdue. The details are listed below.
                             We cannot continue to provide credit terms for your account on a normal basis. Until any overdue amount is cleared all new invoice must be paid for on creation before they can be shipped.
                             We have made repeated attempts to address this outstanding amount with you and now we require immediate payment.<br><br>"
@@ -67,7 +110,7 @@ module AccountsHelper
             email_title = "FINAL NOTICE PAYMENT REQUIRED, 90+ Days Overdue – Untapped Fine Wines – #{@customer_name}"
 
         when 'Send New Order Hold'
-            email_content = "Hi,<br><br>
+            email_content = "Hi #{@customer_firstname},<br><br>
                             We have an order for <b>#{@customer_name}</b> that was entered today that I’d like to have despatched for you today. In reviewing your account there are some amounts that are quite overdue. This is listed below for your reference. Could you please let me know when this amount can be paid?
                             Until I hear back from you we won’t be able to ship the wine.<br><br>"
             content_second_half = "I’ve attached a copy of the invoice(s) in case you are missing them in your records.<br><br>
@@ -138,25 +181,7 @@ module AccountsHelper
       email_content.customer_id = customer_id
       email_content.selected_invoices = selected_invoices
 
-      record_email(email_content)
-
       return email_content
     end
 
-    def record_email(account_email)
-
-      email_content = AccountEmail.new
-
-      email_content.receive_address = account_email.receive_address
-      email_content.send_address = account_email.send_address
-      email_content.email_type = account_email.email_type
-      email_content.cc = account_email.cc
-      email_content.bcc = account_email.bcc
-      email_content.content = account_email.content
-      email_content.content_second = account_email.content_second
-      email_content.customer_id = account_email.customer_id
-      email_content.selected_invoices = account_email.selected_invoices
-
-      email_content.save!
-    end
 end

@@ -14,3 +14,13 @@
   <h4 class="panel-heading">Staff Notes</h4>
   <div class="panel-body"><%= @order.first.staff_notes %></div>
 </div>
+
+<% unless @tasks.nil? || @tasks.blank?%>
+<div class="container">
+    <div class="row">
+        <div style="margin-top: -10px;">
+            <%= render "task_partials/task_table", display_all: "Yes"%>
+        </div>
+    </div>
+</div>
+<% end %>

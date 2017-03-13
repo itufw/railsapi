@@ -1,3 +1,73 @@
 // Place all the styles related to the Task controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+.task_table tr {
+width: 100%;
+height:60px;
+table-layout: fixed;
+}
+
+.task_table td {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task_table table{
+ height:1000px;
+ display: -moz-groupbox;
+}
+.task_table tbody{
+  overflow-y: scroll;
+  height: 200px;
+  position: relative;
+}
+
+.task_details .clickable
+{
+    cursor: pointer;
+}
+
+.task_details .clickable .glyphicon
+{
+    background: rgba(0, 0, 0, 0.15);
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 4px
+}
+
+.task_details .panel-heading span
+{
+    margin-top: -23px;
+    font-size: 15px;
+    margin-right: -9px;
+}
+
+.task {
+    color: blue;
+}
+
+.note {
+    color: green;
+}
+
+.lowest{
+  color: #00D4FF;
+}
+
+.low{
+  color: #00FF83;
+}
+
+.medium{
+  color: #83FF00;
+}
+
+.high{
+  color: #FF6100;
+}
+
+.important{
+  color: #FF2700;
+}

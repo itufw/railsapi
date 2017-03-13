@@ -8,14 +8,14 @@
 		<th>Overdue <%= render "partials/sort_arrows", order: 'order_by_overdue' %></th>
 		<% @date = [Date.today,Date.strptime("#{@end_date}", '%Y-%m-%d')].min %>
 		<% if ('monthly'.eql? @monthly) && (@date != Date.today)%>
-			<th><%= @date.strftime("%B") %><%= render "partials/sort_arrows", order: "order_by_invoice|#{(@date - 1.month).to_date}|#{@date.to_date}" %></th></th>
+			<th><%= @date.strftime("%B") %><%= render "partials/sort_arrows", order: "order_by_invoice|#{(@date - 1.month).to_date.beginning_of_month}|#{@date.to_date.end_of_month}" %></th></th>
 		<% else %>
 			<th>Current<%= render "partials/sort_arrows", order: "order_by_invoice|#{(@date - 15.days).to_date}|#{@date.to_date}" %></th>
 		<% end %>
 
 		<% for i in 1..4 %>
 			<% if 'monthly'.eql? @monthly %>
-				<th> <%= (@date - i.month).strftime("%B")%><%= render "partials/sort_arrows", order: "order_by_invoice|#{(@date - (i+1).month).to_date}|#{(@date-i.month).to_date}" %></th></th>
+				<th> <%= (@date - i.month).strftime("%B")%><%= render "partials/sort_arrows", order: "order_by_invoice|#{(@date - (i+1).month).to_date.beginning_of_month}|#{(@date-i.month).to_date.end_of_month}" %></th></th>
 			<% else %>
 				<th><%= @date - (i*15).days %> - <%= @date - ((i+1)*15).days + 1.day %><%= render "partials/sort_arrows", order: "order_by_invoice|#{(@date - ((i+1)*15).days).to_date}|#{(@date - (i*15).days).to_date}" %></th>
 			<% end %>
@@ -39,10 +39,10 @@
 			<% end%>
 	<tr>
 		<td><%= link_to c.name, controller: 'accounts', action: 'contact_invoices', contact_id: c.xero_contact_id, end_date: @date, monthly: @monthly %></td>
-		<td class="num"><%= display_num(outstanding_customer(c))  %></td>
-		<td class="num"><%= display_num(overdue_customer(c)) %></td>
+		<td class="num"><%= (outstanding_customer(c) == 0)? "-" : display_num(outstanding_customer(c))  %></td>
+		<td class="num"><%= (overdue_customer(c) == 0)? "-" : display_num(overdue_customer(c)) %></td>
 		<% sum_of_amount[date_column].each do |sum|%>
-			<td><%=sum %></td>
+			<td class="num"><%= (sum == 0)? "-" : display_num(sum) %></td>
 		<% end %>
 	</tr>
 	<% end %>

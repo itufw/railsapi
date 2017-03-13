@@ -1,45 +1,79 @@
-
-<span class="orders-view default" id = "orders-view-table">
-<%= render "partials/paginate", objects: orders %>
+<span class="orders-view default">
+	<%= render "partials/paginate", objects: orders %>
 </span>
 
-<table class = "table table-striped table-bordered table-hover table-responsive orders-view default" id = "orders-view-table">
-	<tr>
-		<th>Sales Rep <%= render "partials/sort_arrows", order: 'order_by_staff' %></th>
-		<th>Date</th>
-		<th>Order Id <%= render "partials/sort_arrows", order: 'order_by_id' %></th>
-		<th>Customer <%= render "partials/sort_arrows", order: 'order_by_customer' %></th>
-		<th>Status <%= render "partials/sort_arrows", order: 'order_by_status' %></th>
-        <th class = <%= display_class %> >Selected Prod Qty</th>
-		<th>Qty <%= render "partials/sort_arrows", order: 'order_by_qty' %></th>
-		<th>Total <%= render "partials/sort_arrows", order: 'order_by_total' %></th>
-		<th>Invoice Status</th>
-		<th>Last Order Date</th>
-	</tr>
+<table class="table table-striped table-bordered table-hover table-responsive orders-view default" id="orders-view-table">
+	<thead>
+		<tr>
+			<th>Order Id
+				<%= render "partials/sort_arrows", order: 'order_by_id' %></th>
+			<th>Date</th>
+			<th>Customer
+				<%= render "partials/sort_arrows", order: 'order_by_customer' %></th>
+			<th>Status
+				<%= render "partials/sort_arrows", order: 'order_by_status' %></th>
+			<th class=<%= display_class %>>Selected Prod Qty</th>
+			<th>Qty
+				<%= render "partials/sort_arrows", order: 'order_by_qty' %></th>
+			<th>Total
+				<%= render "partials/sort_arrows", order: 'order_by_total' %></th>
+			<th>Sales Rep
+				<%= render "partials/sort_arrows", order: 'order_by_staff' %></th>
+			<th>Invoice Status</th>
+		</tr>
+	</thead>
 
 	<% orders.each do |order| %>
 	<tr>
-		<%= render "partials/staff_update_form", customer: order.customer, staff: order.staff, can_update_staff: allow_to_update(session[:user_id]) %>
-
-		<td><%= date_format_orders(order.date_created) %></td>
 		<td><%= link_to order.id, controller: 'order', action: 'details', order_id: order.id %></td>
+		<td><%= date_format_orders(order.date_created) %></td>
 
 		<% cust_name = customer_name(order.customer) %>
 		<td><%= link_to cust_name, controller: 'customer', action: 'summary', customer_id: order.customer_id, customer_name: cust_name %></td>
 
 		<td><%= order_status(order.status) %></td>
-		<td class = <%= display_class + " num " %>  ><%= product_qty(product_ids, order.id) %></th>
-		<td class = "num"><%= order.qty %></td>
-		<td class = "num"><%= display_num(order.total_inc_tax) %></td>
+		<td class=<%= display_class + " num " %>><%= product_qty(product_ids, order.id) %></th>
+		<td class="num"><%= order.qty %></td>
+		<td class="num"><%= display_num(order.total_inc_tax) %></td>
 
+		<%= render "partials/staff_update_form", customer: order.customer, staff: order.staff, can_update_staff: allow_to_update(session[:user_id]) %>
 		<% invoice_status = invoice_status(order.xero_invoice) %>
-		<td class = <%= invoice_status[0].downcase %> ><%= invoice_status[0] %></td>
-		<td><%= date_format_orders(last_order_date(order.customer,order.total_inc_tax)) %></td>
+		<td class=<%= invoice_status[0].downcase %>><%= invoice_status[0] %></td>
+	</tr>
+	<tr>
+		<td colspan="8">
+		<%
+			order_products = order.order_products
+			cust_id = order.customer_id
+			cust_name = customer_name(order.customer)
+		%>
+		<% order_products.each do |op| %>
+			<%= link_to op.product.name, controller: 'customer', action: 'summary_with_product', product_id: op.product.id, product_name: op.product.name, customer_id: cust_id, customer_name: cust_name %>
+			<br/>
+			&nbsp;&nbsp;&nbsp;
+			Qty:<%= op.qty %>
+			&nbsp;&nbsp;&nbsp;
+			<%= display_num(op.price_inc_tax) %>
+			<br/><br/>
+		<% end %>
+		</td>
 	</tr>
 	<% end %>
-
 </table>
 
-<span class="orders-view default" id = "orders-view-table" style="float:right;">
-<%= paginate(orders) %>
+<span class="orders-view default" style="float:right;">
+	<%= paginate(orders) %>
 </span>
+
+<script>
+$("#orders-view-table tr:odd").addClass("odd");
+$("#orders-view-table tr:not(.odd)").hide();
+$("#orders-view-table tr:first-child").show();
+
+$("#orders-view-table tr.odd").click(function () {
+    var trToToggle = $(this).next("tr");
+    $("#orders-view-table tbody tr:not(.odd)").not(trToToggle).hide();
+    $(trToToggle).toggle();
+    $(this).find(".arrow").toggleClass("up");
+});
+</script>
