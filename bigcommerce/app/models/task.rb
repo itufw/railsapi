@@ -78,7 +78,7 @@ class Task < ActiveRecord::Base
     # add the notes to order level
     selected_orders.each do |order|
       parent_tasks = OrderAction.where("order_actions.order_id = ? AND task_id IS NOT NULL", order.to_i).order("created_at DESC")
-      unless parent_tasks.nil?
+      unless ((parent_tasks.nil?)||(parent_tasks.blank?))
         sql = "INSERT INTO `tasks`(`id`,`start_date`,`end_date`, `created_at`, `updated_at`,\
               `title`, `description`, `is_task`, `response_staff`, `last_modified_staff`,\
               `method`, `function`, `subject_1`, `expired`, `parent_task`)\
