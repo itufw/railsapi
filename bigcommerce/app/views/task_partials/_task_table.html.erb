@@ -1,4 +1,4 @@
-<div class="col-md-12 orders-view default">
+<div class="col-md-12">
     <table class="table table-hover table-responsive task_table" style="margin-top: 5px;" id = "task_table">
         <thead>
             <tr>
@@ -12,12 +12,10 @@
                 <th>Start Date</th>
                 <th>Due Date</th>
                 <th></th>
-                <th></th>
+                <th><%=@selected_display %></th>
             </tr>
         </thead>
             <% @tasks.each do |task|%>
-            <% next if ((task.is_task==0)&&("task".eql? display_all))%>
-            <% next if ((task.is_task==1)&&("note".eql? display_all))%>
             <tr>
                 <td class="<%=task_priority_display(task.priority).downcase%>"><%= task_priority_display(task.priority)%></td>
                 <td><%=task.function.byteslice(0,3) + "/" + TaskSubject.where("id ='#{task.subject_1}'").first.subject%></td>
@@ -55,4 +53,5 @@ $("#task_table tr.odd").click(function () {
     $(trToToggle).toggle();
     $(this).find(".arrow").toggleClass("up");
 });
+
 </script>

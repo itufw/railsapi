@@ -4,11 +4,11 @@ module TaskHelper
             t = Task.new
             # format of id: staffID + Customer ID + is task + timestamp
             t.id = Time.now.to_i
-            # start_date = return_start_date_invoices(params[:start_date])
-            # end_date = return_end_date_invoices(params[:end_date])
-            start_date = Date.today
-            end_date = Date.today
-            t.is_task = params[:is_task]
+
+            t.start_date = DateTime.strptime(params[:start_time],'%m/%d/%Y %l:%M %P')
+            t.end_date = DateTime.strptime(params[:due_time],'%m/%d/%Y %l:%M %P')
+
+            t.is_task = (params[:is_task] == "Yes") ? 1 : 0
             t.response_staff = current_user
             t.last_modified_staff = current_user
             t.method = params[:task][:method]
@@ -27,7 +27,7 @@ module TaskHelper
                     add_order_action(order.to_i, t.id, t.is_task)
                 end
             end
-            Task.new.insert_or_update(t, start_date, end_date)
+            Task.new.insert_or_update(t)
             customer_id = params['customer']['id'] != '' ? params['customer']['id'] : 0
             staff_id = params['staff']['id'] != '' ? params['staff']['id'] : 0
             TaskRelation.new.insert_or_update(t.id, customer_id, staff_id)
@@ -89,5 +89,38 @@ module TaskHelper
         task.completed_date = Time.now.to_s(:db)
         task.completed_staff = staff_id
         task.save!
+    end
+
+    def staff_function(staff_id)
+      staff = Staff.find(staff_id)
+      case staff.user_type
+      when "Sales Executive"
+        function = TaskSubject.distinct_function_user("Sales Executive")
+      when "Accounts"
+        function = TaskSubject.distinct_function_user("Accounts")
+      when "Management"
+        function = TaskSubject.distinct_function
+      when "Admin"
+        function = TaskSubject.distinct_function
+      else
+        function = TaskSubject.distinct_function
+      end
+      function
+    end
+
+    def staff_task_display(task_selected_display,user_id)
+      case task_selected_display
+      when nil
+        tasks = Task.active_tasks.staff_tasks(user_id).order_by_id('DESC')
+      when "All"
+        tasks = Task.active_tasks.staff_tasks(user_id).order_by_id('DESC')
+      when "Task"
+        tasks = Task.active_tasks.is_task.staff_tasks(user_id).order_by_id('DESC')
+      when "Note"
+        tasks = Task.active_tasks.is_note.staff_tasks(user_id).order_by_id('DESC')
+      when "Expired All"
+        tasks = Task.staff_tasks(user_id).order_by_id('DESC')
+      end
+      tasks
     end
 end

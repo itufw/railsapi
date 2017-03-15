@@ -70,7 +70,7 @@ class AccountsController < ApplicationController
         if 'Add Note/Task'.eql? params[:commit]
             redirect_to(controller: 'task', action: 'add_task', account_customer: customer_id, selected_invoices: selected_invoices) && return
         end
-        @cn_op = params[:cn_op].nil? ? {} : unzip_cn_op(params[:cn_op])
+        @cn_op = (params[:cn_op].nil?) ? {} : unzip_cn_op(params[:cn_op])
         @total_remaining_credit = (@cn_op.map { |x| x[:remaining_credit] }).sum
 
         @xero_contact = XeroContact.where(skype_user_name: customer_id).first
@@ -95,7 +95,7 @@ class AccountsController < ApplicationController
 
         # helpers -> accounts_helper
         # assigned value to @email_title via this function
-        @email_content = get_email_content(params, session[:user_id], customer_id, selected_invoices)
+        @email_content = get_email_content(params, session[:user_id], customer_id, selected_invoices, @cn_op)
     end
 
     def send_reminder

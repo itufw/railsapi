@@ -10,26 +10,24 @@ class TaskController < ApplicationController
 
     def add_task
         @task = Task.new
-        @function = TaskSubject.distinct_function
+        @function = staff_function(session[:user_id])
 
         subjects = TaskSubject.all
         @subjects = subjects.select{ |x| x.function == params[:selected_function]}
-        @subjects_task = subjects.select{ |x| x.function == params[:selected_function_task]}
 
         @parent_task = params[:parent_task] || 0
 
         @methods = TaskMethod.all
         if params[:account_customer].nil? || params[:account_customer].blank?
-            @staffs = Staff.active
             @customers = Customer.filter_by_staff(params[:selected_staff])
-            @customers_task = Customer.filter_by_staff(params[:selected_staff_task])
             @customer_locked = false
         else
             @customers = Customer.filter_by_ids(params[:account_customer])
-            @customers_task = @customers
-            @staffs = Staff.active
             @customer_locked = true
         end
+
+        @staffs = Staff.active
+        @current_user = Staff.find(session[:user_id])
 
         @start_date = return_start_date_invoices(params[:start_date])
         @end_date = return_end_date_invoices(params[:end_date])
@@ -39,7 +37,8 @@ class TaskController < ApplicationController
     end
 
     def staff_task
-        @tasks = Task.active_tasks.staff_tasks(session[:user_id]).order_by_id('DESC')
+        @selected_display = params[:display_options] || "All"
+        @tasks = staff_task_display(params[:display_options],session[:user_id])
     end
 
     def task_details
