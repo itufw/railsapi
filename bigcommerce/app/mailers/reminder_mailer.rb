@@ -30,14 +30,23 @@ class ReminderMailer < ActionMailer::Base
       recipients_addresses.push(customer_address)
     end
     bcc_group = []
-    bcc_group.push(bcc) unless "".eql? bcc
+    bcc.split(";").each do |contact_address|
+      customer_address = %(#{contact_address})
+      bcc_group.push(customer_address)
+    end
     bcc_group.push(%("#{staff_name}" <#{staff.email}>))
 
-    record_email(recipients_addresses, staff.email, email_type, cc, bcc_group, email_content.first, email_content.last, customer_id, @over_due_invoices.map {|x| x.invoice_number}, staff_id)
+    cc_group = []
+    cc.split(";").each do |contact_address|
+      customer_address = %(#{contact_address})
+      cc_group.push(customer_address)
+    end
+
+    record_email(recipients_addresses, staff.email, email_type, cc_group, bcc_group, email_content.first, email_content.last, customer_id, @over_due_invoices.map {|x| x.invoice_number}, staff_id)
 
 
     # customer_address = %("#{@xero_contact.name}" <#{email_address}>)
-    mail(from: "\"#{staff_name}\" <accounts@untappedwine.com>",to: recipients_addresses, cc: cc, bcc: bcc_group, subject: email_subject)
+    mail(from: "\"#{staff_name}\" <accounts@untappedwine.com>",to: recipients_addresses, cc: cc_group, bcc: bcc_group, subject: email_subject)
   end
 
   def unzip_cn_op_hash(cn_op_list)
