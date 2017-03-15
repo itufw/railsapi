@@ -20,7 +20,7 @@ module TaskHelper
             # automatically add the parent task to new task
             unless ''.eql? selected_orders
                 parent_tasks = OrderAction.where('order_actions.order_id IN (?) AND task_id IS NOT NULL', selected_orders.split).order('created_at DESC')
-                unless parent_tasks.nil? || (params[:parent_task] == 0)
+                unless parent_tasks.nil? || (params[:parent_task] == 0) || parent_tasks.blank?
                     t.parent_task = parent_tasks.first.task_id
                 end
                 selected_orders.split.each do |order|
@@ -97,7 +97,7 @@ module TaskHelper
       when "Sales Executive"
         function = TaskSubject.distinct_function_user("Sales Executive")
       when "Accounts"
-        function = TaskSubject.distinct_function_user("Accounts")
+        function = TaskSubject.distinct_function
       when "Management"
         function = TaskSubject.distinct_function
       when "Admin"
