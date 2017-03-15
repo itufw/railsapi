@@ -1,0 +1,6 @@
+  <% priority_id = priority %>
+
+		<%= form_tag :controller => "task", :action => "update_priority" do %>
+		<%= select_tag(:priority, options_from_collection_for_select(TaskPriority.all, :id, :priority_level, priority_id), html_options = {:class => 'form-control', :onchange => "this.form.submit()"}) %>
+		<%= hidden_field_tag :task_id, task_id %>
+		<% end %>
