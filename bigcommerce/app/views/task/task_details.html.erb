@@ -15,6 +15,10 @@
                   <% unless email.nil? %>
                     Send Email to :<%=email.receive_address%>
                     <br/>
+                    CC  to :<%=email.cc%>
+                    <br/>
+                    Bcc to :<%=email.bcc%>
+                    <br/>
                     <%=raw(email.content)%>
                       <%= render "task_partials/note_invoice_table", over_due_invoices: XeroInvoice.find_by_order_ids(@selected_orders)%>
                     <br/>

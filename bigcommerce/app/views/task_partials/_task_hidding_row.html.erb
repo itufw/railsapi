@@ -17,7 +17,7 @@ unless task_parent.nil?%>
 
 
 <% task_children.each do |task_child| %>
-<%= link_to "Following: #" + task_child.id.to_s + "  " + task_child.function + " / " + TaskSubject.where("id ='#{task_child.subject_1}'").first.subject, {controller: "task", action: "task_details", task_id: task_child.id},{ style: "color: green;"} %>
+<%= link_to "Followed By: #" + task_child.id.to_s + "  " + task_child.function + " / " + TaskSubject.where("id ='#{task_child.subject_1}'").first.subject, {controller: "task", action: "task_details", task_id: task_child.id},{ style: "color: green;"} %>
   <br/>
   <%= task_child.description%>
   <br/>

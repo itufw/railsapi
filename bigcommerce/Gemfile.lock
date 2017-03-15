@@ -63,6 +63,8 @@ GEM
       hashie (~> 3.4)
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
+    bootstrap3-datetimepicker-rails (4.17.47)
+      momentjs-rails (>= 2.8.1)
     bootsy (2.3.1)
       carrierwave (~> 0.11)
       mini_magick (~> 4.5)
@@ -113,6 +115,8 @@ GEM
     mini_magick (4.6.1)
     mini_portile2 (2.1.0)
     minitest (5.10.1)
+    momentjs-rails (2.17.1)
+      railties (>= 3.1)
     multi_json (1.12.1)
     multipart-post (2.0.0)
     mysql2 (0.3.21)
@@ -214,11 +218,13 @@ DEPENDENCIES
   autoprefixer-rails
   bcrypt (~> 3.1.7)
   bigcommerce (~> 1.0.0)
+  bootstrap3-datetimepicker-rails (~> 4.17.47)
   bootsy
   byebug
   coffee-rails (~> 4.1.0)
   jbuilder (~> 2.0)
   jquery-rails
+  momentjs-rails (>= 2.9.0)
   mysql2 (~> 0.3.18)
   puma
   rails (= 4.2.4)

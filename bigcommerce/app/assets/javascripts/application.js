@@ -13,3 +13,5 @@
 //= require_tree
 //= require bootstrap
 //= require bootsy
+//= require moment
+//= require bootstrap-datetimepicker
