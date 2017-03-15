@@ -17,7 +17,10 @@
         </thead>
             <% @tasks.each do |task|%>
             <tr>
-                <td class="<%=task_priority_display(task.priority).downcase%>"><%= task_priority_display(task.priority)%></td>
+
+                <!-- <td class="<%=task_priority_display(task.priority).downcase%>"><%= task_priority_display(task.priority)%></td> -->
+                <td class="<%=task_priority_display(task.priority).downcase%>"><%= render "task_partials/priority_update_cell", task_id: task.id, priority: task.priority %></td>
+
                 <td><%=task.function.byteslice(0,3) + "/" + TaskSubject.where("id ='#{task.subject_1}'").first.subject%></td>
                 <td><%=task.method%></td>
                 <td><%= link_to task.description,controller: "task", action: "task_details", task_id: task.id%></td>

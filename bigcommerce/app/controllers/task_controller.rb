@@ -64,7 +64,7 @@ class TaskController < ApplicationController
             # create new row for the task
             if new_task_record(params, session[:user_id], selected_orders)
                 flash[:success] = 'Created new Task!'
-                params[:accounts_page] && params[:customer][:id] ? redirect_to(controller: 'accounts', action: 'contact_invoices', customer_id: params[:customer][:id]) && return : redirect_to(action: 'staff_task') && return
+                (params[:accounts_page] && !("".eql? params[:customer][:id])) ? (redirect_to(controller: 'accounts', action: 'contact_invoices', customer_id: params[:customer][:id]) && return) : redirect_to(action: 'staff_task') && return
             else
                 flash[:error] = 'Fill the form!'
             end
@@ -88,5 +88,15 @@ class TaskController < ApplicationController
             complete_task(params[:task_id], session[:user_id])
         end
         redirect_to :back
+    end
+
+    def update_priority
+      task_id = params[:task_id]
+      priority = params[:priority]
+
+      Task.priority_change(task_id, priority)
+
+      flash[:success] = "Priority Successfully Changed."
+      redirect_to request.referrer
     end
 end

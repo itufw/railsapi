@@ -15,8 +15,8 @@ module TaskHelper
             t.function = params[:task][:function]
             t.subject_1 = params[:task][:subject_1]
             t.description = params[:task][:description]
+            t.priority = params[:task][:priority].to_i
             t.parent_task = params[:parent_task] if params[:parent_task] != 0
-
             # automatically add the parent task to new task
             unless ''.eql? selected_orders
                 parent_tasks = OrderAction.where('order_actions.order_id IN (?) AND task_id IS NOT NULL', selected_orders.split).order('created_at DESC')
