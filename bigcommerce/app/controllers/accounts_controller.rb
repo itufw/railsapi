@@ -38,7 +38,7 @@ class AccountsController < ApplicationController
 
         @end_date = return_end_date_invoices(params[:end_date]) || Date.today
         @monthly = params[:monthly] || 'monthly'
-        @checked_monthly, @checked_daily = monthly_checked(@monthly)
+        @checked_monthly = ("monthly".eql? @monthly) ? true : false
 
         @cn_op = credit_note_and_overpayment(@customer.xero_contact_id)
 

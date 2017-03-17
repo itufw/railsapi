@@ -166,10 +166,10 @@ module AccountsHelper
         sum_of_amount['due_date'] = Array.new(6) { 0 }
 
         invoice.each do |i|
-            interval = 'monthly'.eql? monthly ? ((date.year * 12 + date.month) - (i.date.to_date.year * 12 + i.date.to_date.month)) : ((date.mjd - i.date.to_date.mjd) / 15)
+            interval = ('monthly'.eql? monthly) ? ((date.year * 12 + date.month) - (i.date.to_date.year * 12 + i.date.to_date.month)) : ((date.mjd - i.date.to_date.mjd) / 15)
             interval = interval > 5 ? 5 : interval
             sum_of_amount['invoice_date'][interval] += i.amount_due
-            interval = 'monthly'.eql? monthly ? ((date.year * 12 + date.month) - (i.due_date.to_date.year * 12 + i.due_date.to_date.month)) : ((date.mjd - i.due_date.to_date.mjd) / 15)
+            interval = ('monthly'.eql? monthly) ? ((date.year * 12 + date.month) - (i.due_date.to_date.year * 12 + i.due_date.to_date.month)) : ((date.mjd - i.due_date.to_date.mjd) / 15)
             interval = interval < 0 ? 0 : interval
             interval = interval > 5 ? 5 : interval
             sum_of_amount['due_date'][interval] += i.amount_due
