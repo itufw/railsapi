@@ -51,7 +51,7 @@ class Task < ActiveRecord::Base
 
     sql = "INSERT INTO `tasks`(`id`,`start_date`,`end_date`, `created_at`, `updated_at`,\
           `title`, `description`, `is_task`, `response_staff`, `last_modified_staff`,\
-          `method`, `function`, `subject_1`, `expired`)\
+          `method`, `function`, `subject_1`, `expired`, `priority`)\
           VALUES (#{task_id},'#{time}', '#{end_time}', '#{time}', '#{time}', '#{mailer_id}', '#{description}', 0,\
                   #{staff_id}, #{staff_id}, 'Email', 'Accounting', '#{subject}', 0)"
 
@@ -62,9 +62,9 @@ class Task < ActiveRecord::Base
       unless ((parent_tasks.nil?)||(parent_tasks.blank?))
         sql = "INSERT INTO `tasks`(`id`,`start_date`,`end_date`, `created_at`, `updated_at`,\
               `title`, `description`, `is_task`, `response_staff`, `last_modified_staff`,\
-              `method`, `function`, `subject_1`, `expired`, `parent_task`)\
+              `method`, `function`, `subject_1`, `expired`, `parent_task`, `priority`)\
               VALUES (#{task_id},'#{time}', '#{end_time}', '#{time}', '#{time}', '#{mailer_id}', '#{description}', 0,\
-                      #{staff_id}, #{staff_id}, 'Email', 'Accounting', '#{subject}', 0, #{parent_tasks.first.task_id})"
+                      #{staff_id}, #{staff_id}, 'Email', 'Accounting', '#{subject}', 0, #{parent_tasks.first.task_id}, 3)"
       end
 
       order_action = OrderAction.new

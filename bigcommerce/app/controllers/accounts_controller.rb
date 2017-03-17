@@ -14,29 +14,19 @@ class AccountsController < ApplicationController
         @per_page = params[:per_page] || XeroContact.per_page
 
         @date_column = params[:date_column] || 'due_date'
+        @checked_due_date =  ('due_date'.eql? @date_column) ? true : false
+
         @monthly = params[:monthly] || 'monthly'
+        @checked_monthly = ("monthly".eql? @monthly) ? true : false
 
-        @checked_due_date, @checked_invoice_date = date_column_checked(@date_column)
-        @checked_monthly, @checked_daily = monthly_checked(@monthly)
+        @contacts, @search_text, @selected_staff =  contacts_selection(params, @end_date, @per_page, @date_column)
 
-        # sorting via sort_order -> find the function called order_by_name
-        order_function, direction = sort_order(params, 'order_by_name', 'ASC')
-
-        contacts, @search_text = contact_param_filter(params)
-        # @contacts = contacts.outstanding_is_greater_zero.period_select(@end_date).send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
-        @contacts = contacts.outstanding_is_greater_zero.is_customer.period_select(@end_date)
-
-        if order_function.start_with?('order_by_invoice')
-            # .split('|')
-            order_function, sort_date_start, sort_date_end = order_function.split('|')
-            @contacts = XeroContact.select('*').from(@contacts.send(order_function, direction, sort_date_start, sort_date_end, @date_column))
-        else
-            @contacts = @contacts.send(order_function, direction)
-        end
-        @contacts = @contacts.paginate(per_page: @per_page, page: params[:page])
         @invoices = {}
+        @staff_pair = {}
         @contacts.each do |c|
             @invoices[c.id] = c.xero_invoices.has_amount_due.period_select(@end_date)
+            staff = c.customer.staff
+            @staff_pair[c.id] = [staff.id, staff.nickname]
         end
     end
 
@@ -108,7 +98,11 @@ class AccountsController < ApplicationController
         email_subject = params[:email_subject]
 
         staff_id = session[:user_id]
-        ReminderMailer.send_overdue_reminder(customer_id, email_subject, staff_id, email_content, receive_address, email_cc, email_bcc, email_type, selected_invoices, cn_op).deliver_now
+
+        # attach the attachment
+        attachment_tmp = params[:account_email][:attachment]
+
+        ReminderMailer.send_overdue_reminder(customer_id, email_subject, staff_id, email_content, receive_address, email_cc, email_bcc, email_type, selected_invoices, cn_op, attachment_tmp).deliver_now
         flash[:success] = 'Email Sent'
 
         redirect_to action: 'contact_invoices', customer_id: customer_id

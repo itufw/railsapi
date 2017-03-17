@@ -8,7 +8,7 @@ module TaskHelper
             t.start_date = DateTime.strptime(params[:start_time],'%m/%d/%Y %l:%M %P')
             t.end_date = DateTime.strptime(params[:due_time],'%m/%d/%Y %l:%M %P')
 
-            t.is_task = (params[:is_task] == "Yes") ? 1 : 0
+            t.is_task = (params[:is_task] == "Task") ? 1 : 0
             t.response_staff = current_user
             t.last_modified_staff = current_user
             t.method = params[:task][:method]
@@ -16,7 +16,7 @@ module TaskHelper
             t.subject_1 = params[:task][:subject_1]
             t.description = params[:task][:description]
             t.priority = params[:task][:priority].to_i
-            t.parent_task = params[:parent_task] if params[:parent_task] != 0
+            t.parent_task = ((params[:parent_task] != 0) && (params[:parent_task].to_i.to_s == params[:parent_task]))? params[:parent_task] : 0
             # automatically add the parent task to new task
             unless ''.eql? selected_orders
                 parent_tasks = OrderAction.where('order_actions.order_id IN (?) AND task_id IS NOT NULL', selected_orders.split).order('created_at DESC')
@@ -32,9 +32,9 @@ module TaskHelper
             staff_id = params['staff']['id'] != '' ? params['staff']['id'] : 0
             TaskRelation.new.insert_or_update(t.id, customer_id, staff_id)
 
-            return true
+            return t.id
         end
-        false
+        return 0
     end
 
     def add_order_action(order_id, task_id, is_task)

@@ -5,7 +5,7 @@ class ReminderMailer < ActionMailer::Base
   default from: 'accounts@untappedwines.com'
   layout "mailer"
 
-  def send_overdue_reminder(customer_id, email_subject,staff_id,email_content,email_address, cc, bcc, email_type, selected_invoices, cn_op)
+  def send_overdue_reminder(customer_id, email_subject,staff_id,email_content,email_address, cc, bcc, email_type, selected_invoices, cn_op, attachment_tmp)
     @cn_op = ("{}".eql? cn_op) ? {} : unzip_cn_op_hash(cn_op)
     @total_remaining_credit = (@cn_op.map {|x| x[:remaining_credit]}).sum
     staff = Staff.find(staff_id)
@@ -22,6 +22,13 @@ class ReminderMailer < ActionMailer::Base
 
     attach_invoices(@over_due_invoices)
     attach_credit_note(@cn_op, @over_due_invoices.map {|x| x.xero_invoice_id}, @xero_contact.name)
+
+
+    # attachment file
+    # basically Pod
+    attachment_tmp_path = File.absolute_path(attachment_tmp.tempfile)
+    attachment_tmp_name = attachment_tmp.original_filename
+    attachments[attachment_tmp_name] = File.read(attachment_tmp_path)
 
     @email_content = email_content
     recipients_addresses = []

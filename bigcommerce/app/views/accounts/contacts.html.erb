@@ -1,10 +1,12 @@
 <%= title "Contacts" %>
 <h3>Contacts</h3>
 
+<%= form_tag({:action => "contacts"}, {:method => "get"}) do %>
+
 <div class="form-group container-center">
-	<%= form_tag({:action => "contacts"}, {:method => "get"}) do %>
 	<%= render "accounts_partials/contact_filter" %>
-  <% end %>
 </div>
 
 <%= render "accounts_partials/contact", contacts: @contacts, invoices: @invoices, date_column: @date_column %>
+
+<% end %>
