@@ -1,64 +1,73 @@
 module AccountsHelper
     include ActionView::Helpers::NumberHelper
 
-    def credit_note_and_overpayment(xero_contact_id)
-      op = XeroOverpayment.get_remaining_credit(xero_contact_id).where("remaining_credit > 0")
-      cn = XeroCreditNote.get_remaining_credit(xero_contact_id).where("remaining_credit > 0")
-      cn_op = {}
+    def contacts_selection(params, end_date, per_page, date_column)
+        contacts_unfiltered, search_text = contact_param_filter(params)
 
-      op.each do |o|
-        reference = ""
-        op_allocation = XeroOpAllocation.where("xero_overpayment_id = '#{o.xero_overpayment_id}' ")
+        # select customers with the balance above zero
+        contacts = contacts_unfiltered.outstanding_is_greater_zero.is_customer
 
-        op_allocation.each do |opa|
-          reference += "Order##{opa.invoice_number} applied #{opa.applied_amount}  \n"
+        # filter based on the staff
+        selected_staff = params[:selected_staff]
+        contacts = contacts.filter_by_staff(selected_staff) unless selected_staff.nil? || selected_staff.blank?
+
+        # sorting via sort_order -> find the function called order_by_name
+        order_function, direction = sort_order(params, 'order_by_name', 'ASC')
+
+        if params[:selected_months].blank?
+            contacts = contacts.period_select(end_date)
+        else
+            contacts = contacts.limited_period_select(params[:selected_months], date_column)
         end
-        cn_op["Overpayment_#{o.date.year}_#{o.date.month}_#{o.date.day}"] = {:sub_total => o.sub_total, :total => o.total,\
-                                         :remaining_credit => o.remaining_credit, :date => o.date, :reference => reference,\
-                                       :status => "Overpayment"}
-      end
 
-      cn.each do |c|
-        cn_op[c.credit_note_number] = {:sub_total => c.sub_total, :total => c.total,\
-                                         :remaining_credit => c.remaining_credit, :date => c.date, :reference => c.reference,\
-                                       :status => c.credit_note_number}
+        if order_function.start_with?('order_by_invoice')
+            # .split('|')
+            order_function, sort_date_start, sort_date_end = order_function.split('|')
+            contacts = XeroContact.select('*').from(contacts.send(order_function, direction, sort_date_start, sort_date_end, date_column))
+        else
+            contacts = contacts.send(order_function, direction)
+        end
+        contacts = contacts.paginate(per_page: per_page, page: params[:page])
+        [contacts, search_text, selected_staff]
+    end
 
-      end
-      cn_op
+    def credit_note_and_overpayment(xero_contact_id)
+        op = XeroOverpayment.get_remaining_credit(xero_contact_id).where('remaining_credit > 0')
+        cn = XeroCreditNote.get_remaining_credit(xero_contact_id).where('remaining_credit > 0')
+        cn_op = {}
+
+        op.each do |o|
+            reference = ''
+            op_allocation = XeroOpAllocation.where("xero_overpayment_id = '#{o.xero_overpayment_id}' ")
+
+            op_allocation.each do |opa|
+                reference += "Order##{opa.invoice_number} applied #{opa.applied_amount}  \n"
+            end
+            cn_op["Overpayment_#{o.date.year}_#{o.date.month}_#{o.date.day}"] = { sub_total: o.sub_total, total: o.total,\
+                                                                                  remaining_credit: o.remaining_credit, date: o.date, reference: reference,\
+                                                                                  status: 'Overpayment' }
+        end
+
+        cn.each do |c|
+            cn_op[c.credit_note_number] = { sub_total: c.sub_total, total: c.total,\
+                                            remaining_credit: c.remaining_credit, date: c.date, reference: c.reference,\
+                                            status: c.credit_note_number }
+        end
+        cn_op
     end
 
     def unzip_cn_op(cn_op_array)
-      cn_op = []
-      cn_op_array.each do |co|
-        status, date, remaining_credit = co.split(" ")
-        co_op_item = {:status => status, :date => date, :remaining_credit => remaining_credit.to_f}
-        cn_op.push(co_op_item)
-      end
-      cn_op
-    end
-
-    def date_column_checked(date_column)
-        if 'due_date'.eql? date_column
-            # @checked_due_date = true
-            # @checked_invoice_date = false
-            return true, false
+        cn_op = []
+        cn_op_array.each do |co|
+            status, date, remaining_credit = co.split(' ')
+            co_op_item = { status: status, date: date, remaining_credit: remaining_credit.to_f }
+            cn_op.push(co_op_item)
         end
-        [false, true]
-    end
-
-    def monthly_checked(monthly)
-        if 'monthly'.eql? monthly
-            # @checked_due_date = true
-            # @checked_invoice_date = false
-            return true, false
-        end
-        [false, true]
+        cn_op
     end
 
     def different_orders_checked(all)
-        if 'all'.eql? all
-            return true, false
-        end
+        return true, false if 'all'.eql? all
         [false, true]
     end
 
@@ -68,9 +77,8 @@ module AccountsHelper
     end
 
     def default_email_content(commit, cn_op)
-
         cn_op_amount = 0
-        cn_op_amount = cn_op.map{|x| x[:remaining_credit]}.sum unless cn_op.nil? || cn_op.blank?
+        cn_op_amount = cn_op.map { |x| x[:remaining_credit] }.sum unless cn_op.nil? || cn_op.blank?
 
         email_content = ''
         content_second_half = ''
@@ -158,10 +166,10 @@ module AccountsHelper
         sum_of_amount['due_date'] = Array.new(6) { 0 }
 
         invoice.each do |i|
-            interval = ('monthly'.eql? monthly) ? ((date.year * 12 + date.month) - (i.date.to_date.year * 12 + i.date.to_date.month)) : ((date.mjd - i.date.to_date.mjd) / 15)
+            interval = 'monthly'.eql? monthly ? ((date.year * 12 + date.month) - (i.date.to_date.year * 12 + i.date.to_date.month)) : ((date.mjd - i.date.to_date.mjd) / 15)
             interval = interval > 5 ? 5 : interval
             sum_of_amount['invoice_date'][interval] += i.amount_due
-            interval = ('monthly'.eql? monthly) ? ((date.year * 12 + date.month) - (i.due_date.to_date.year * 12 + i.due_date.to_date.month)) : ((date.mjd - i.due_date.to_date.mjd) / 15)
+            interval = 'monthly'.eql? monthly ? ((date.year * 12 + date.month) - (i.due_date.to_date.year * 12 + i.due_date.to_date.month)) : ((date.mjd - i.due_date.to_date.mjd) / 15)
             interval = interval < 0 ? 0 : interval
             interval = interval > 5 ? 5 : interval
             sum_of_amount['due_date'][interval] += i.amount_due
@@ -171,21 +179,20 @@ module AccountsHelper
     end
 
     def get_email_content(params, staff_id, customer_id, selected_invoices, cn_op)
-      # form builder
-      email_content = AccountEmail.new
-      email_content.send_address = Staff.find(staff_id).email
-      email_content.receive_address = @checked_send_email_to_self ? email_content.send_address : @xero_contact.email
-      email_content.email_type = params[:commit]
-      unless @checked_send_email_to_self
-        email_content.cc = Staff.find(Customer.find(customer_id).staff_id).email
-        email_content.bcc = "emailtosalesforce@y-5cvcy6yhzo3z4984r5f5htqn7.9yyfmeag.9.le.salesforce.com"
-      end
-      # set default_email_content, this function is located in helpers-> accounts_helper
-      email_content.content, email_content.content_second, @email_title = default_email_content(params[:commit], cn_op)
-      email_content.customer_id = customer_id
-      email_content.selected_invoices = selected_invoices
+        # form builder
+        email_content = AccountEmail.new
+        email_content.send_address = Staff.find(staff_id).email
+        email_content.receive_address = @checked_send_email_to_self ? email_content.send_address : @xero_contact.email
+        email_content.email_type = params[:commit]
+        unless @checked_send_email_to_self
+            email_content.cc = Staff.find(Customer.find(customer_id).staff_id).email
+            email_content.bcc = 'emailtosalesforce@y-5cvcy6yhzo3z4984r5f5htqn7.9yyfmeag.9.le.salesforce.com'
+        end
+        # set default_email_content, this function is located in helpers-> accounts_helper
+        email_content.content, email_content.content_second, @email_title = default_email_content(params[:commit], cn_op)
+        email_content.customer_id = customer_id
+        email_content.selected_invoices = selected_invoices
 
-      return email_content
+        email_content
     end
-
 end

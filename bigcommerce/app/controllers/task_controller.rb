@@ -29,9 +29,6 @@ class TaskController < ApplicationController
         @staffs = Staff.active
         @current_user = Staff.find(session[:user_id])
 
-        @start_date = return_start_date_invoices(params[:start_date])
-        @end_date = return_end_date_invoices(params[:end_date])
-
         # for some sepcial input
         @selected_orders = params[:selected_invoices] || []
     end
@@ -53,7 +50,7 @@ class TaskController < ApplicationController
     def task_record
         selected_orders = params[:selected_orders] || ''
 
-        if params[:staff][:id].blank? && params[:customer][:id].blank?
+        if (params[:task][:is_task] == 1) && params[:staff][:id].blank? && params[:customer][:id].blank?
             flash[:error] = 'Select the Receiver!'
         elsif params[:task][:method].nil? || params[:task][:method].blank?
             flash[:error] = 'Select the Method!'
@@ -62,14 +59,21 @@ class TaskController < ApplicationController
         else
             # in the Task Helper
             # create new row for the task
-            if new_task_record(params, session[:user_id], selected_orders)
+            # return task id or 0
+            parent_task_id = new_task_record(params, session[:user_id], selected_orders)
+            if parent_task_id > 0
                 flash[:success] = 'Created new Task!'
-                (params[:accounts_page] && !("".eql? params[:customer][:id])) ? (redirect_to(controller: 'accounts', action: 'contact_invoices', customer_id: params[:customer][:id]) && return) : redirect_to(action: 'staff_task') && return
+                if "".eql? params[:button]
+                  (params[:accounts_page] && !("".eql? params[:customer][:id])) ? (redirect_to(controller: 'accounts', action: 'contact_invoices', customer_id: params[:customer][:id]) && return) : (redirect_to(action: 'staff_task') && return)
+                else
+                  redirect_to(controller: 'task', action: 'add_task',\
+                    parent_task: parent_task_id, account_customer: params[:customer][:id],\
+                    selected_invoices: params[:selected_orders].split(), selected_function: params[:task][:function]) && return
+                end
             else
                 flash[:error] = 'Fill the form!'
             end
         end
-
         redirect_to :back
     end
 

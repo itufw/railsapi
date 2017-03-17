@@ -1,24 +1,9 @@
 <div class="col-md-12">
     <table class="table table-hover table-responsive task_table" style="margin-top: 5px;" id = "task_table">
-        <thead>
-            <tr>
-                <th></th>
-                <th>Func/Sub</th>
-                <th>Method</th>
-                <th>Description</th>
-                <th>Customer</th>
-                <th>Staff</th>
-                <th>Created By</th>
-                <th>Start Date</th>
-                <th>Due Date</th>
-                <th></th>
-                <th><%=@selected_display %></th>
-            </tr>
-        </thead>
+      <%= render "task_partials/task_table_head_filter" %>
             <% @tasks.each do |task|%>
             <tr>
 
-                <!-- <td class="<%=task_priority_display(task.priority).downcase%>"><%= task_priority_display(task.priority)%></td> -->
                 <td class="<%=task_priority_display(task.priority).downcase%>"><%= render "task_partials/priority_update_cell", task_id: task.id, priority: task.priority %></td>
 
                 <td><%=task.function.byteslice(0,3) + "/" + TaskSubject.where("id ='#{task.subject_1}'").first.subject%></td>
@@ -50,11 +35,10 @@ $("#task_table tr:odd").addClass("odd");
 $("#task_table tr:not(.odd)").hide();
 $("#task_table tr:first-child").show();
 
-$("#task_table tr.odd").click(function () {
+$("#task_table tbody tr.odd").click(function () {
     var trToToggle = $(this).next("tr");
     $("#task_table tbody tr:not(.odd)").not(trToToggle).hide();
     $(trToToggle).toggle();
     $(this).find(".arrow").toggleClass("up");
 });
-
 </script>

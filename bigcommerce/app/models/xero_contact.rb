@@ -161,6 +161,9 @@ class XeroContact < ActiveRecord::Base
     def self.period_select(until_date)
         where('xero_contacts.xero_contact_id IN (?)', XeroInvoice.select(:xero_contact_id).period_select(until_date).uniq)
       end
+    def self.limited_period_select(select_days, date_column)
+      (date_column.eql? "invoice_date") ? where('xero_contacts.xero_contact_id IN (?)', XeroInvoice.select(:xero_contact_id).limited_period_select_date(select_days).uniq) : where('xero_contacts.xero_contact_id IN (?)', XeroInvoice.select(:xero_contact_id).limited_period_select_due_date(select_days).uniq)
+    end
 
     def self.sum_invoice_amount_due
         includes(:xero_invoices).sum('xero_invoices.amount_due')
@@ -185,6 +188,10 @@ class XeroContact < ActiveRecord::Base
 
     def self.is_customer
       where("xero_contacts.skype_user_name REGEXP '^-?[0-9]+$'")
+    end
+
+    def self.filter_by_staff(staff)
+      where("xero_contacts.xero_contact_id IN (?)", Customer.select(:xero_contact_id).where("staff_id IN (?)",staff))
     end
 
     def self.order_by_name(direction)

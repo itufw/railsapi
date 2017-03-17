@@ -1,0 +1,89 @@
+<thead>
+    <tr>
+        <th id="priority_th"></th>
+        <th id="function_th">Func/Sub</th>
+        <th id="method_th">Method</th>
+        <th>Description</th>
+        <th id="customer_th">Customer</th>
+        <th id="staff_th">Staff</th>
+        <th id="created_by_th">Created By</th>
+        <th>Start Date</th>
+        <th>Due Date</th>
+        <th></th>
+        <th></th>
+    </tr>
+</thead>
+
+<!-- <div id="filter_by_priority">
+  Priority:
+  <% @tasks.map{|x| x.priority}.uniq do |priority|%>
+      <%= check_box_tag 'selected_priority[]', priority %>
+      <%= TaskPriority.find(priority).priority_level %>
+      &nbsp;&nbsp;
+  <% end %>
+</div>
+<div id="filter_by_function">
+  <h4>Function: </h4>
+  <% @tasks.map{|x| x.function}.uniq do |function|%>
+      <%= check_box_tag 'selected_function[]', function %>
+      <%= function %>
+      &nbsp;&nbsp;
+  <% end %>
+</div>
+<div id="filter_by_method">
+  <h4>Method: </h4>
+  <% @tasks.map{|x| x.method}.uniq do |method|%>
+      <%= check_box_tag 'selected_method[]', method %>
+      <%= method %>
+      &nbsp;&nbsp;
+  <% end %>
+</div>
+<div id="filter_by_customer">
+  <h4>Customer: </h4>
+</div>
+<div id="filter_by_staff">
+  <h4>Assigned to: </h4>
+</div>
+<div id="filter_by_created_by">
+  <h4>Created By: </h4>
+  <% @tasks.map{|x| x.response_staff}.uniq do |staff|%>
+      <%= check_box_tag 'selected_response_staff[]', staff %>
+      <%= Staff.find(staff).nickname %>
+      &nbsp;&nbsp;
+  <% end %>
+</div> -->
+
+<script>
+$("#filter_by_priority").hide();
+$("#filter_by_function").hide();
+$("#filter_by_method").hide();
+$("#filter_by_customer").hide();
+$("#filter_by_staff").hide();
+$("#filter_by_created_by").hide();
+
+$("#priority_th").click(function () {
+  $("#filter_by_priority").toggle();
+});
+
+$("#function_th").click(function () {
+  $("#filter_by_function").toggle();
+});
+
+$("#method_th").click(function () {
+  $("#filter_by_method").toggle();
+});
+
+$("#customer_th").click(function () {
+  $("#filter_by_customer").toggle();
+});
+
+$("#staff_th").click(function () {
+  $("#filter_by_staff").toggle();
+});
+
+$("#created_by_th").click(function () {
+  $("#filter_by_created_by").toggle();
+});
+
+
+</script>
