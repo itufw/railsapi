@@ -4,7 +4,25 @@
 <table class = "table table-striped table-bordered table-hover table-responsive">
 	<tr>
 		<th>Name <%= render "partials/sort_arrows", order: 'order_by_name' %></th>
-		<th id="sales_rep">Sales Rep</th>
+		<th>
+			<li class="dropdown">
+				<a class="" data-toggle="dropdown" href="#">Sales Rep
+					<span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<% @staff_pair.values.uniq.each do |staff_id, staff_name| %>
+						<li>
+							<% if ((!@selected_staff.nil?)&&(@selected_staff.include? staff_id.to_s)) %>
+								<%= check_box_tag 'selected_staff[]', staff_id, true %>
+							<% else %>
+								<%= check_box_tag 'selected_staff[]', staff_id %>
+							<% end %>
+							<%= staff_name %>
+							&nbsp;&nbsp;
+						</li>
+						<% end %>
+					</ul>
+			</li>
+		</th>
 		<th>Outstanding <%= render "partials/sort_arrows", order: 'order_by_outstanding' %></th>
 		<th>Overdue <%= render "partials/sort_arrows", order: 'order_by_overdue' %></th>
 		<% @date = [Date.today,Date.strptime("#{@end_date}", '%Y-%m-%d')].min %>
@@ -44,21 +62,6 @@
 		</th>
 	</tr>
 
-
-	<tr id="sales_rep_selection">
-		<td colspan="11">
-			<% @staff_pair.values.uniq.each do |staff_id, staff_name| %>
-				<% if ((!@selected_staff.nil?)&&(@selected_staff.include? staff_id.to_s)) %>
-					<%= check_box_tag 'selected_staff[]', staff_id, true %>
-				<% else %>
-					<%= check_box_tag 'selected_staff[]', staff_id %>
-				<% end %>
-				<%= staff_name %>
-				&nbsp;&nbsp;
-			<% end %>
-		</td>
-	</tr>
-
 		<% contacts.each do |c| %>
 			<% sum_of_amount = Hash.new%>
 			<% sum_of_amount["invoice_date"] = Array.new(6){0}%>
@@ -89,10 +92,3 @@
 <span style="float:right;">
 <%= paginate(contacts) %>
 </span>
-
-<script>
- $("#sales_rep_selection").hide();
- $("#sales_rep").click(function () {
-	 $("#sales_rep_selection").toggle();
- });
-</script>
