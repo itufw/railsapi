@@ -88,7 +88,7 @@ module AccountsHelper
             email_content = "Hi #{@customer_firstname},<br><br>
                             Thanks for the recent payment that was made to our account.<br><br>
                             Could I please refer you to an invoice that has been missed that we’re still awaiting payment for. The details are below.<br><br>"
-            content_second_half = "I’ve attached a copy of the invoice(s) in case you are missing them in your records. I will also follow-up with an additional email providing the Proof of delivery (POD).<br><br>
+            content_second_half = "I’ve attached a copy of the invoice(s) and the Proof of Delivery (POD) in case you are missing them in your records.<br><br>
                                   Thanks for the help and if you have any questions please be in contact.<br><br>"
             email_title = "MISSING INVOICE PAYMENT – Untapped Fine Wines – #{@customer_name}"
 
