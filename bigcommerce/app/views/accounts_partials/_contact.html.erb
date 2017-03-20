@@ -3,7 +3,8 @@
 
 <table class = "table table-striped table-bordered table-hover table-responsive">
 	<tr>
-		<th>Name <%= render "partials/sort_arrows", order: 'order_by_name' %></th>
+		<th id="contact_name_head">Name <%= render "partials/sort_arrows", order: 'order_by_name' %></th>
+		<th>Top Task</th>
 		<th>
 			<li class="dropdown">
 				<a class="" data-toggle="dropdown" href="#">Sales Rep
@@ -77,7 +78,26 @@
 				<% sum_of_amount["due_date"][interval]+=i.amount_due%>
 			<% end%>
 	<tr>
-		<td><%= link_to c.name, controller: 'accounts', action: 'contact_invoices', contact_id: c.xero_contact_id, end_date: @date, monthly: @monthly %></td>
+		<td>
+			<%= check_box_tag 'selected_contacts[]', c.skype_user_name, false, class: "contact_name_checkbox" if overdue_customer(c) > 0 %>
+			<%= link_to c.name, controller: 'accounts', action: 'contact_invoices', contact_id: c.xero_contact_id, end_date: @date, monthly: @monthly %>
+		</td>
+		<% top_task = Task.select("tasks.id, tasks.subject_1, tasks.end_date").customer_tasks(c.skype_user_name).is_task.active_tasks.order(:end_date).first %>
+			<% unless top_task.blank?%>
+				<% task_week = top_task.end_date.strftime("%U")
+						now_week = Time.now.strftime("%U")
+						if task_week == now_week %>
+							<td class="this_week">
+				<%  elsif task_week > now_week %>
+							<td class="next_week">
+				<%  else %>
+							<td class="last_week">
+				<%  end %>
+					<%= TaskSubject.find(top_task.subject_1).subject%>
+			<% else %>
+				<td>
+			<% end %>
+		</td>
 		<td><%= @staff_pair[c.id].last %></td>
 		<td class="num"><%= (outstanding_customer(c) == 0)? "-" : display_num(outstanding_customer(c))  %></td>
 		<td class="num"><%= (overdue_customer(c) == 0)? "-" : display_num(overdue_customer(c)) %></td>

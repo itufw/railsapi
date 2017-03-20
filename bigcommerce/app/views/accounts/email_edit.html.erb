@@ -9,6 +9,7 @@
             <%= hidden_field_tag :checked_send_email_to_self, @checked_send_email_to_self %>
             <%= hidden_field_tag :email_subject, @email_title %>
             <%= hidden_field_tag :cn_op, @cn_op %>
+            <%= hidden_field_tag :multiple_customer_id, @multiple_customer_id%>
 
               <%= email_content.hidden_field(:email_type)%>
               <%= email_content.hidden_field(:customer_id)%>
@@ -36,8 +37,8 @@
               <%= button_tag(type: 'submit', class: "btn btn-primary") do %>
                 Send Email
               <% end %>
+              <%= submit_tag "Do Not Send",class: 'btn btn-primary'%>
             <% end %>
-
         </div>
     </div>
 </div>

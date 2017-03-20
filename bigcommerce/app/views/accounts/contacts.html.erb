@@ -10,3 +10,21 @@
 <%= render "accounts_partials/contact", contacts: @contacts, invoices: @invoices, date_column: @date_column %>
 
 <% end %>
+
+<script>
+	$("#send_reminders").hide();
+	$(".contact_name_checkbox").hide();
+
+	$("#contact_name_head").click(function() {
+		$(".contact_name_checkbox").toggle();
+		if ($(".contact_name_checkbox").is(":hidden")){
+			$("#send_reminders").hide();
+		}
+	});
+
+	$(".contact_name_checkbox").change(function(){
+		if ($(this).is(':checked')) {
+			$("#send_reminders").show();
+		}
+	});
+</script>

@@ -2,8 +2,8 @@
 <% if task.expired == 1%>
   <%= link_to '<i class="glyphicon glyphicon-repeat" title="Re-Active"></i>'.html_safe, controller: "task", action: "task_update", task_id: task.id, task_type: "reactive"%>
 <% else %>
-  <%= link_to '<i class="glyphicon glyphicon-star" title="Higher priority"></i>'.html_safe, controller: "task", action: "task_update", task_id: task.id, task_type: "higher_priority"%>
-  <%= link_to '<i class="glyphicon glyphicon-star-empty" title="Lower priority"></i>'.html_safe, controller: "task", action: "task_update", task_id: task.id, task_type: "lower_priority"%>
+  <!-- <%= link_to '<i class="glyphicon glyphicon-star" title="Higher priority"></i>'.html_safe, controller: "task", action: "task_update", task_id: task.id, task_type: "higher_priority"%> -->
+  <!-- <%= link_to '<i class="glyphicon glyphicon-star-empty" title="Lower priority"></i>'.html_safe, controller: "task", action: "task_update", task_id: task.id, task_type: "lower_priority"%> -->
   <%= link_to '<i class="glyphicon glyphicon-ok" title="Completed"></i>'.html_safe, controller: "task", action: "task_update",task_id: task.id, task_type: "completed" if (task.completed_date.nil? && (task.is_task == 1))%>
   <%= link_to '<i class="glyphicon glyphicon-remove" title="Expired"></i>'.html_safe, controller: "task", action: "task_update",task_id: task.id, task_type: "expired"%>
 <% end %>

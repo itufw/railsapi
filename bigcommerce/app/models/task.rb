@@ -112,6 +112,18 @@ class Task < ActiveRecord::Base
       order('tasks.id ' + direction)
   end
 
+  def self.filter_by_params(priority, subject, method, staff_created, customers, staff)
+    sql = ""
+    sql += "tasks.priority in (#{priority.join(",")}) OR " unless priority.nil? || priority.blank?
+    sql += "tasks.subject_1 in (#{subject.join(",")}) OR " unless subject.nil? || subject.blank?
+    sql += "tasks.method in (\"#{method.join(",")}\") OR " unless method.nil? || method.blank?
+    sql += "tasks.response_staff in (#{staff_created.join(",")}) OR " unless staff_created.nil? || staff_created.blank?
+    sql += "tasks.id in (#{TaskRelation.select("task_id").where("customer_id IN (?)",customers).map{|x| x.task_id}.join(",")}) OR " unless customers.nil? || customers.blank?
+    sql += "tasks.id in (#{TaskRelation.select("task_id").where("staff_id IN (?)",staff).map{|x| x.task_id}.join(",")}) OR " unless staff.nil? || staff.blank?
+    sql = sql[0..-4] unless sql.length < 5
+    where(sql)
+  end
+
   def self.priority_change(task_id, priority)
     task = Task.find(task_id)
     task.priority = priority
