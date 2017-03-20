@@ -118,7 +118,7 @@ module TaskHelper
       staff = params[:selected_staff]
 
       case task_selected_display
-      when nil || "All"
+      when "All"
         tasks = Task.active_tasks.staff_tasks(user_id)
       when "Task"
         tasks = Task.active_tasks.is_task.staff_tasks(user_id)
@@ -126,6 +126,8 @@ module TaskHelper
         tasks = Task.active_tasks.is_note.staff_tasks(user_id)
       when "Expired All"
         tasks = Task.staff_tasks(user_id)
+      else
+        tasks = Task.active_tasks.staff_tasks(user_id)
       end
 
       tasks = tasks.filter_by_params(priority, subject, method, staff_created, customers, staff)
