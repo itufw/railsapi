@@ -35,7 +35,7 @@ class TaskController < ApplicationController
 
     def staff_task
         @selected_display = params[:display_options] || "All"
-        @tasks = staff_task_display(params[:display_options],session[:user_id])
+        @tasks = staff_task_display(params, session[:user_id])
     end
 
     def task_details

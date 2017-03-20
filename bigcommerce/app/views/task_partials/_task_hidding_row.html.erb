@@ -3,7 +3,7 @@
   task_children = Task.task_children(task.id)
 
 unless task_parent.nil?%>
-  <%= link_to "Following: #" + task_parent.id.to_s + "  " + task_parent.function + " / " + TaskSubject.where("id ='#{task_parent.subject_1}'").first.subject, {controller: "task", action: "task_details", task_id: task_parent.id},{ style: "color: red;"} %>
+  <%= link_to "Following: " + task_parent.function + " / " + TaskSubject.where("id ='#{task_parent.subject_1}'").first.subject, {controller: "task", action: "task_details", task_id: task_parent.id},{ style: "color: red;"} %>
   <br/>
   <%=task_parent.description%>
   <br/>
@@ -17,7 +17,7 @@ unless task_parent.nil?%>
 
 
 <% task_children.each do |task_child| %>
-<%= link_to "Followed By: #" + task_child.id.to_s + "  " + task_child.function + " / " + TaskSubject.where("id ='#{task_child.subject_1}'").first.subject, {controller: "task", action: "task_details", task_id: task_child.id},{ style: "color: green;"} %>
+<%= link_to "Followed By: " + task_child.function + " / " + TaskSubject.where("id ='#{task_child.subject_1}'").first.subject, {controller: "task", action: "task_details", task_id: task_child.id},{ style: "color: green;"} %>
   <br/>
   <%= task_child.description%>
   <br/>

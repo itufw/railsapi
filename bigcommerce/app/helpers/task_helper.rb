@@ -108,19 +108,29 @@ module TaskHelper
       function
     end
 
-    def staff_task_display(task_selected_display,user_id)
+    def staff_task_display(params, user_id)
+      task_selected_display = params[:display_options]
+      priority = params[:selected_priority]
+      subject = params[:selected_subject]
+      method = params[:selected_method]
+      staff_created = params[:selected_staff_created]
+      customers = params[:selected_customer]
+      staff = params[:selected_staff]
+
       case task_selected_display
-      when nil
-        tasks = Task.active_tasks.staff_tasks(user_id).order_by_id('DESC')
-      when "All"
-        tasks = Task.active_tasks.staff_tasks(user_id).order_by_id('DESC')
+      when nil || "All"
+        tasks = Task.active_tasks.staff_tasks(user_id)
       when "Task"
-        tasks = Task.active_tasks.is_task.staff_tasks(user_id).order_by_id('DESC')
+        tasks = Task.active_tasks.is_task.staff_tasks(user_id)
       when "Note"
-        tasks = Task.active_tasks.is_note.staff_tasks(user_id).order_by_id('DESC')
+        tasks = Task.active_tasks.is_note.staff_tasks(user_id)
       when "Expired All"
-        tasks = Task.staff_tasks(user_id).order_by_id('DESC')
+        tasks = Task.staff_tasks(user_id)
       end
+
+      tasks = tasks.filter_by_params(priority, subject, method, staff_created, customers, staff)
+
+      tasks = tasks.order_by_id('DESC')
       tasks
     end
 end

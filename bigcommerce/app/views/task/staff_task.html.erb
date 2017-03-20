@@ -7,13 +7,11 @@
 			<button class="btn btn-primary"><%= link_to "Add Note/Task", controller: "task", action: "add_task"%></button>
 		</div>
 	</div>
-	<div class="row" id="task_row">
-	  <%= form_tag({:controller => "task", :action => "staff_task"}, {:method => "get"}) do %>
-	    <div class="col-xs-2 col-xs-offset-5">
-	      <%= select_tag "display_options", options_for_select(["Task", "Note","All","Expired All"], selected: @selected_display), class:"form-control", :onchange => "this.form.submit();"%>
-	    </div>
-	  <% end %>
+	<%= form_tag({:controller => "task", :action => "staff_task"}, {:method => "get"}) do %>
 
+	<div class="row" id="task_row">
 		<%= render "task_partials/task_table"%>
 	</div>
+
+	<% end %>
 </div>
