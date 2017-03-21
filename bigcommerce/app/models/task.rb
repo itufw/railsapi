@@ -53,7 +53,7 @@ class Task < ActiveRecord::Base
           `title`, `description`, `is_task`, `response_staff`, `last_modified_staff`,\
           `method`, `function`, `subject_1`, `expired`, `priority`)\
           VALUES (#{task_id},'#{time}', '#{end_time}', '#{time}', '#{time}', '#{mailer_id}', '#{description}', 0,\
-                  #{staff_id}, #{staff_id}, 'Email', 'Accounting', '#{subject}', 0)"
+                  #{staff_id}, #{staff_id}, 'Email', 'Accounting', '#{subject}', 0, 3)"
 
 
     # add the notes to order level
