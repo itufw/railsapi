@@ -7,6 +7,7 @@ class XeroContact < ActiveRecord::Base
 
     has_one :customer
     has_many :xero_invoices
+    has_many :contacts
     has_many :xero_payments
     has_many :xero_credit_notes
     has_many :xero_overpayments
@@ -76,6 +77,7 @@ class XeroContact < ActiveRecord::Base
 
         ActiveRecord::Base.connection.execute(sql)
         XeroContactPerson.new.insert_or_update_contact_people(c.contact_people, c.contact_id, skype) unless c.contact_people.nil?
+        Contact.new.insert_or_update_contacts(c.phones, c.skype_user_name, c.id) unless c.phones.nil?
     end
 
     # run the balance updating for all contacts whose contact id is not null
@@ -183,7 +185,7 @@ class XeroContact < ActiveRecord::Base
       end
 
     def self.outstanding_is_greater_zero
-        where('xero_contacts.accounts_receivable_outstanding > 0')
+        where('xero_contacts.accounts_receivable_outstanding > 0 OR xero_contacts.accounts_receivable_outstanding < 0')
       end
 
     def self.is_customer
