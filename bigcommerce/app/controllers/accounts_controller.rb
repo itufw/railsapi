@@ -49,6 +49,7 @@ class AccountsController < ApplicationController
         # multiple contact people
         # xeroizer only provides email_address, the details of phone number should be discussed
         @contact_people = XeroContactPerson.all_contact_people(@customer.xero_contact_id)
+        @contacts_phone = Contact.filter_by_xero_contact_id(@customer.xero_contact_id)
 
         # calculate the invoice table based
         # function located in helper -> accounts_helper

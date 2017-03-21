@@ -18,4 +18,16 @@
       <p>Email: <%= mail_to(customer.staff.email) unless customer.staff.email.nil? %></p>
     </div>
   </div>
+  <% unless @contacts_phone.blank?%>
+  <h5>  Contacts:</h5>
+
+  <div class= "row">
+    <% @contacts_phone.each do |contact| %>
+      <div class="col-xs-4">
+        <h5 style="font-size:20px"><%= contact.name+": "%></h5>
+        <p style="font-size:20px">Ph: <%= contact.area_code unless contact.area_code.nil? %> <%= num_to_phone(contact.number) unless contact.number.nil? %></p>
+      </div>
+    <% end %>
+  </div>
+  <% end %>
 </div>

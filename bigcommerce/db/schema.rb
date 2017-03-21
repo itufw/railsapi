@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170315044015) do
+ActiveRecord::Schema.define(version: 20170321015504) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -91,8 +91,14 @@ ActiveRecord::Schema.define(version: 20170315044015) do
   add_index "categories", ["parent_id"], name: "index_categories_on_parent_id", using: :btree
 
   create_table "contacts", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+    t.string   "name",            limit: 255
+    t.string   "number",          limit: 255
+    t.string   "area_code",       limit: 255
+    t.string   "phone_type",      limit: 255
+    t.string   "xero_contact_id", limit: 36
+    t.integer  "customer_id",     limit: 4
   end
 
   create_table "coupons", force: :cascade do |t|
