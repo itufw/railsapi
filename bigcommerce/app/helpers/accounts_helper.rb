@@ -185,7 +185,8 @@ module AccountsHelper
         email_content.receive_address = @checked_send_email_to_self ? email_content.send_address : @xero_contact.email
         email_content.email_type = params[:commit]
         unless @checked_send_email_to_self
-            email_content.cc = Staff.find(Customer.find(customer_id).staff_id).email
+            luke_email = Staff.find(9).email
+            email_content.cc = luke_email +";"+Staff.find(Customer.find(customer_id).staff_id).email.to_s
             email_content.bcc = 'emailtosalesforce@y-5cvcy6yhzo3z4984r5f5htqn7.9yyfmeag.9.le.salesforce.com'
         end
         # set default_email_content, this function is located in helpers-> accounts_helper
