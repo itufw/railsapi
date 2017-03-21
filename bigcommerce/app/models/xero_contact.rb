@@ -7,6 +7,7 @@ class XeroContact < ActiveRecord::Base
 
     has_one :customer
     has_many :xero_invoices
+    has_many :contacts
     has_many :xero_payments
     has_many :xero_credit_notes
     has_many :xero_overpayments
@@ -76,6 +77,7 @@ class XeroContact < ActiveRecord::Base
 
         ActiveRecord::Base.connection.execute(sql)
         XeroContactPerson.new.insert_or_update_contact_people(c.contact_people, c.contact_id, skype) unless c.contact_people.nil?
+        Contact.new.insert_or_update_contacts(c.phones, c.skype_user_name, c.id) unless c.phones.nil?
     end
 
     # run the balance updating for all contacts whose contact id is not null
@@ -161,6 +163,9 @@ class XeroContact < ActiveRecord::Base
     def self.period_select(until_date)
         where('xero_contacts.xero_contact_id IN (?)', XeroInvoice.select(:xero_contact_id).period_select(until_date).uniq)
       end
+    def self.limited_period_select(select_days, date_column)
+      (date_column.eql? "invoice_date") ? where('xero_contacts.xero_contact_id IN (?)', XeroInvoice.select(:xero_contact_id).limited_period_select_date(select_days).uniq) : where('xero_contacts.xero_contact_id IN (?)', XeroInvoice.select(:xero_contact_id).limited_period_select_due_date(select_days).uniq)
+    end
 
     def self.sum_invoice_amount_due
         includes(:xero_invoices).sum('xero_invoices.amount_due')
@@ -180,11 +185,15 @@ class XeroContact < ActiveRecord::Base
       end
 
     def self.outstanding_is_greater_zero
-        where('xero_contacts.accounts_receivable_outstanding > 0')
+        where('xero_contacts.accounts_receivable_outstanding > 0 OR xero_contacts.accounts_receivable_outstanding < 0')
       end
 
     def self.is_customer
       where("xero_contacts.skype_user_name REGEXP '^-?[0-9]+$'")
+    end
+
+    def self.filter_by_staff(staff)
+      where("xero_contacts.xero_contact_id IN (?)", Customer.select(:xero_contact_id).where("staff_id IN (?)",staff))
     end
 
     def self.order_by_name(direction)

@@ -1,0 +1,99 @@
+<thead>
+    <tr>
+        <th id="priority_th">
+          <li class="dropdown">
+            <a class="" data-toggle="dropdown" href="#">Priority</a>
+              <ul class="dropdown-menu">
+                <% @tasks.map {|x| x.priority}.uniq.each do |priority| %>
+                <li>
+                  <%= check_box_tag 'selected_priority[]', priority %>
+                  <%= TaskPriority.find(priority).priority_level %>
+                  &nbsp;&nbsp;
+                </li>
+                <% end %>
+              </ul>
+          </li>
+        </th>
+        <th id="function_th">
+          <li class="dropdown">
+            <a class="" data-toggle="dropdown" href="#">Func/Sub</a>
+              <ul class="dropdown-menu">
+                <% @tasks.map {|x| x.subject_1}.uniq.each do |subject| %>
+                <li>
+                  <%= check_box_tag 'selected_subject[]', subject %>
+                  <%= TaskSubject.find(subject).subject %>
+                  &nbsp;&nbsp;
+                </li>
+                <% end %>
+              </ul>
+          </li>
+        </th>
+        <th id="method_th">
+          <li class="dropdown">
+            <a class="" data-toggle="dropdown" href="#">Method</a>
+              <ul class="dropdown-menu">
+                <% @tasks.map {|x| x.method}.uniq.each do |method| %>
+                <li>
+                  <%= check_box_tag 'selected_method[]', method %>
+                  <%= method %>
+                  &nbsp;&nbsp;
+                </li>
+                <% end %>
+              </ul>
+          </li>
+        </th>
+        <th>Description</th>
+        <th id="customer_th">
+          <li class="dropdown">
+            <a class="" data-toggle="dropdown" href="#">Customer</a>
+              <ul class="dropdown-menu">
+                <% @tasks.map{|x| x.task_relations}.map {|x| x.first}.compact.map {|x| x.customer_id}.uniq.each do |customer| %>
+                <% next if customer==0%>
+                <li>
+                  <%= check_box_tag 'selected_customer[]', customer %>
+                  <%= Customer.find(customer).actual_name %>
+                  &nbsp;&nbsp;
+                </li>
+                <% end %>
+              </ul>
+          </li>
+        </th>
+        <th id="staff_th">
+          <li class="dropdown">
+            <a class="" data-toggle="dropdown" href="#">Customer</a>
+              <ul class="dropdown-menu">
+                <% @tasks.map{|x| x.task_relations}.map {|x| x.first}.compact.map {|x| x.staff_id}.uniq.each do |staff| %>
+                <% next if staff==0 || staff.nil?%>
+                <li>
+                  <%= check_box_tag 'selected_staff[]', staff %>
+                  <%= Staff.find(staff).nickname %>
+                  &nbsp;&nbsp;
+                </li>
+                <% end %>
+              </ul>
+          </li>
+        </th>
+        <th id="created_by_th">
+          <li class="dropdown">
+            <a class="" data-toggle="dropdown" href="#">Created By</a>
+              <ul class="dropdown-menu">
+                <% @tasks.map{|x| x.response_staff}.uniq.each do |staff| %>
+                <% next if staff==0 || staff.nil?%>
+                <li>
+                  <%= check_box_tag 'selected_staff_created[]', staff %>
+                  <%= Staff.find(staff).nickname %>
+                  &nbsp;&nbsp;
+                </li>
+                <% end %>
+              </ul>
+          </li>
+        </th>
+        <th>Due Date</th>
+        <th>
+          <%= select_tag "display_options", options_for_select(["Task", "Note","All","Expired All"], selected: @selected_display), class:"form-control", :onchange => "this.form.submit();" unless @selected_display.nil?%>
+        </th>
+        <th>
+          <%= submit_tag "Search", class: 'btn btn-primary' unless @selected_display.nil? %>
+        </th>
+    </tr>
+</thead>

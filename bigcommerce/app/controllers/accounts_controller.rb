@@ -10,34 +10,28 @@ class AccountsController < ApplicationController
     include DatesHelper
 
     def contacts
+      if (("Send Reminder".eql? params[:commit]) && (!params[:selected_contacts].blank?))
+        redirect_to(action: 'email_edit', send_email_to_self: "no", multiple_customer_id: params[:selected_contacts], commit: "Send Overdue Reminder") && return
+      end
         @end_date = return_end_date_invoices(params[:end_date])
         @per_page = params[:per_page] || XeroContact.per_page
 
         @date_column = params[:date_column] || 'due_date'
+        @checked_due_date =  ('due_date'.eql? @date_column) ? true : false
+
         @monthly = params[:monthly] || 'monthly'
+        @checked_monthly = ("monthly".eql? @monthly) ? true : false
 
-        @checked_due_date, @checked_invoice_date = date_column_checked(@date_column)
-        @checked_monthly, @checked_daily = monthly_checked(@monthly)
+        @contacts, @search_text, @selected_staff =  contacts_selection(params, @end_date, @per_page, @date_column)
 
-        # sorting via sort_order -> find the function called order_by_name
-        order_function, direction = sort_order(params, 'order_by_name', 'ASC')
-
-        contacts, @search_text = contact_param_filter(params)
-        # @contacts = contacts.outstanding_is_greater_zero.period_select(@end_date).send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
-        @contacts = contacts.outstanding_is_greater_zero.is_customer.period_select(@end_date)
-
-        if order_function.start_with?('order_by_invoice')
-            # .split('|')
-            order_function, sort_date_start, sort_date_end = order_function.split('|')
-            @contacts = XeroContact.select('*').from(@contacts.send(order_function, direction, sort_date_start, sort_date_end, @date_column))
-        else
-            @contacts = @contacts.send(order_function, direction)
-        end
-        @contacts = @contacts.paginate(per_page: @per_page, page: params[:page])
         @invoices = {}
+        @staff_pair = {}
         @contacts.each do |c|
             @invoices[c.id] = c.xero_invoices.has_amount_due.period_select(@end_date)
+            staff = c.customer.staff
+            @staff_pair[c.id] = [staff.id, staff.nickname]
         end
+
     end
 
     def contact_invoices
@@ -48,13 +42,14 @@ class AccountsController < ApplicationController
 
         @end_date = return_end_date_invoices(params[:end_date]) || Date.today
         @monthly = params[:monthly] || 'monthly'
-        @checked_monthly, @checked_daily = monthly_checked(@monthly)
+        @checked_monthly = ("monthly".eql? @monthly) ? true : false
 
         @cn_op = credit_note_and_overpayment(@customer.xero_contact_id)
 
         # multiple contact people
         # xeroizer only provides email_address, the details of phone number should be discussed
         @contact_people = XeroContactPerson.all_contact_people(@customer.xero_contact_id)
+        @contacts_phone = Contact.filter_by_xero_contact_id(@customer.xero_contact_id)
 
         # calculate the invoice table based
         # function located in helper -> accounts_helper
@@ -65,12 +60,19 @@ class AccountsController < ApplicationController
 
     def email_edit
         selected_invoices = params[:selected_invoices]
-        customer_id = params[:customer_id]
+        if (params[:multiple_customer_id].nil? || params[:multiple_customer_id].blank?)
+          customer_id = params[:customer_id]
+          @multiple_customer_id = nil
+        else
+          customer_id = params[:multiple_customer_id].first
+          params[:multiple_customer_id].delete(customer_id)
+          @multiple_customer_id = params[:multiple_customer_id]
+        end
 
         if 'Add Note/Task'.eql? params[:commit]
             redirect_to(controller: 'task', action: 'add_task', account_customer: customer_id, selected_invoices: selected_invoices) && return
         end
-        @cn_op = params[:cn_op].nil? ? {} : unzip_cn_op(params[:cn_op])
+        @cn_op = (params[:cn_op].nil?) ? {} : unzip_cn_op(params[:cn_op])
         @total_remaining_credit = (@cn_op.map { |x| x[:remaining_credit] }).sum
 
         @xero_contact = XeroContact.where(skype_user_name: customer_id).first
@@ -95,10 +97,17 @@ class AccountsController < ApplicationController
 
         # helpers -> accounts_helper
         # assigned value to @email_title via this function
-        @email_content = get_email_content(params, session[:user_id], customer_id, selected_invoices)
+        @email_content = get_email_content(params, session[:user_id], customer_id, selected_invoices, @cn_op)
     end
 
     def send_reminder
+      if ("Do Not Send".eql? params[:commit])
+        if (!(params[:multiple_customer_id].nil?) && !(params[:multiple_customer_id].split().blank?))
+          redirect_to(action: 'email_edit', send_email_to_self: "no", multiple_customer_id: params[:multiple_customer_id].split(), commit: "Send Overdue Reminder") && return
+        else
+          redirect_to(action: 'contact_invoices', customer_id: params[:account_email][:customer_id]) && return
+        end
+      end
         cn_op = params[:cn_op]
         # this function is located in helpers -> accounts_helper
         email_type, customer_id, receive_address, email_content, selected_invoices, email_cc, email_bcc = get_data_from_email_form(params)
@@ -108,10 +117,18 @@ class AccountsController < ApplicationController
         email_subject = params[:email_subject]
 
         staff_id = session[:user_id]
-        ReminderMailer.send_overdue_reminder(customer_id, email_subject, staff_id, email_content, receive_address, email_cc, email_bcc, email_type, selected_invoices, cn_op).deliver_now
+
+        # attach the attachment
+        attachment_tmp = params[:account_email][:attachment]
+
+        ReminderMailer.send_overdue_reminder(customer_id, email_subject, staff_id, email_content, receive_address, email_cc, email_bcc, email_type, selected_invoices, cn_op, attachment_tmp).deliver_now
         flash[:success] = 'Email Sent'
 
-        redirect_to action: 'contact_invoices', customer_id: customer_id
+        if (!(params[:multiple_customer_id].nil?) && !(params[:multiple_customer_id].split().blank?))
+          redirect_to(action: 'email_edit', send_email_to_self: "no", multiple_customer_id: params[:multiple_customer_id].split(), commit: "Send Overdue Reminder") && return
+        else
+          redirect_to action: 'contact_invoices', customer_id: customer_id
+        end
     end
 
     def different_orders

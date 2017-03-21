@@ -5,7 +5,7 @@ class ReminderMailer < ActionMailer::Base
   default from: 'accounts@untappedwines.com'
   layout "mailer"
 
-  def send_overdue_reminder(customer_id, email_subject,staff_id,email_content,email_address, cc, bcc, email_type, selected_invoices, cn_op)
+  def send_overdue_reminder(customer_id, email_subject,staff_id,email_content,email_address, cc, bcc, email_type, selected_invoices, cn_op, attachment_tmp)
     @cn_op = ("{}".eql? cn_op) ? {} : unzip_cn_op_hash(cn_op)
     @total_remaining_credit = (@cn_op.map {|x| x[:remaining_credit]}).sum
     staff = Staff.find(staff_id)
@@ -23,6 +23,15 @@ class ReminderMailer < ActionMailer::Base
     attach_invoices(@over_due_invoices)
     attach_credit_note(@cn_op, @over_due_invoices.map {|x| x.xero_invoice_id}, @xero_contact.name)
 
+
+    # attachment file
+    # basically Pod
+    unless attachment_tmp.nil?
+      attachment_tmp_path = File.absolute_path(attachment_tmp.tempfile)
+      attachment_tmp_name = attachment_tmp.original_filename
+      attachments[attachment_tmp_name] = File.read(attachment_tmp_path)
+    end
+
     @email_content = email_content
     recipients_addresses = []
     email_address.split(";").each do |contact_address|
@@ -30,14 +39,23 @@ class ReminderMailer < ActionMailer::Base
       recipients_addresses.push(customer_address)
     end
     bcc_group = []
-    bcc_group.push(bcc) unless "".eql? bcc
+    bcc.split(";").each do |contact_address|
+      customer_address = %(#{contact_address})
+      bcc_group.push(customer_address)
+    end
     bcc_group.push(%("#{staff_name}" <#{staff.email}>))
 
-    record_email(recipients_addresses, staff.email, email_type, cc, bcc_group, email_content.first, email_content.last, customer_id, @over_due_invoices.map {|x| x.invoice_number}, staff_id)
+    cc_group = []
+    cc.split(";").each do |contact_address|
+      customer_address = %(#{contact_address})
+      cc_group.push(customer_address)
+    end
+
+    record_email(recipients_addresses, staff.email, email_type, cc_group, bcc_group, email_content.first, email_content.last, customer_id, @over_due_invoices.map {|x| x.invoice_number}, staff_id)
 
 
     # customer_address = %("#{@xero_contact.name}" <#{email_address}>)
-    mail(from: "\"#{staff_name}\" <accounts@untappedwine.com>",to: recipients_addresses, cc: cc, bcc: bcc_group, subject: email_subject)
+    mail(from: "\"#{staff_name}\" <accounts@untappedwine.com>",to: recipients_addresses, cc: cc_group, bcc: bcc_group, subject: email_subject)
   end
 
   def unzip_cn_op_hash(cn_op_list)

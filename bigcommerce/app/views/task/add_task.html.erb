@@ -5,16 +5,5 @@
             <button class="btn btn-primary"><%= link_to "My Task/Note", controller: "task", action: "staff_task"%></button>
         </div>
     </div>
+    <%= render "task_partials/add_task"%>
 </div>
-<center>
-    <div>
-        <button class="button default inline orders-view" id="orders-view-button">Note</button>
-        <button class="button not-default inline products-view" id="products-view-button">Task</button>
-    </div>
-</center>
-
-<h3 id="orders-view-heading" class="orders-view default">Note</h3>
-<%= render "task_partials/add_note"%>
-
-<h3 id="products-view-heading" class="products-view not-default" style="text-align: center;">Task</h3>
-<%= render "task_partials/add_task"%>
