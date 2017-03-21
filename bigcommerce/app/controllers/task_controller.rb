@@ -10,36 +10,32 @@ class TaskController < ApplicationController
 
     def add_task
         @task = Task.new
-        @function = TaskSubject.distinct_function
+        @function = staff_function(session[:user_id])
 
         subjects = TaskSubject.all
         @subjects = subjects.select{ |x| x.function == params[:selected_function]}
-        @subjects_task = subjects.select{ |x| x.function == params[:selected_function_task]}
 
         @parent_task = params[:parent_task] || 0
 
         @methods = TaskMethod.all
         if params[:account_customer].nil? || params[:account_customer].blank?
-            @staffs = Staff.active
             @customers = Customer.filter_by_staff(params[:selected_staff])
-            @customers_task = Customer.filter_by_staff(params[:selected_staff_task])
             @customer_locked = false
         else
             @customers = Customer.filter_by_ids(params[:account_customer])
-            @customers_task = @customers
-            @staffs = Staff.active
             @customer_locked = true
         end
 
-        @start_date = return_start_date_invoices(params[:start_date])
-        @end_date = return_end_date_invoices(params[:end_date])
+        @staffs = Staff.active
+        @current_user = Staff.find(session[:user_id])
 
         # for some sepcial input
         @selected_orders = params[:selected_invoices] || []
     end
 
     def staff_task
-        @tasks = Task.active_tasks.staff_tasks(session[:user_id]).order_by_id('DESC')
+        @selected_display = params[:display_options] || "All"
+        @tasks = staff_task_display(params, session[:user_id])
     end
 
     def task_details
@@ -54,7 +50,7 @@ class TaskController < ApplicationController
     def task_record
         selected_orders = params[:selected_orders] || ''
 
-        if params[:staff][:id].blank? && params[:customer][:id].blank?
+        if (params[:task][:is_task] == 1) && params[:staff][:id].blank? && params[:customer][:id].blank?
             flash[:error] = 'Select the Receiver!'
         elsif params[:task][:method].nil? || params[:task][:method].blank?
             flash[:error] = 'Select the Method!'
@@ -63,14 +59,21 @@ class TaskController < ApplicationController
         else
             # in the Task Helper
             # create new row for the task
-            if new_task_record(params, session[:user_id], selected_orders)
+            # return task id or 0
+            parent_task_id = new_task_record(params, session[:user_id], selected_orders)
+            if parent_task_id > 0
                 flash[:success] = 'Created new Task!'
-                params[:accounts_page] && params[:customer][:id] ? redirect_to(controller: 'accounts', action: 'contact_invoices', customer_id: params[:customer][:id]) && return : redirect_to(action: 'staff_task') && return
+                if "".eql? params[:button]
+                  (params[:accounts_page] && !("".eql? params[:customer][:id])) ? (redirect_to(controller: 'accounts', action: 'contact_invoices', customer_id: params[:customer][:id]) && return) : (redirect_to(action: 'staff_task') && return)
+                else
+                  redirect_to(controller: 'task', action: 'add_task',\
+                    parent_task: parent_task_id, account_customer: params[:customer][:id],\
+                    selected_invoices: params[:selected_orders].split(), selected_function: params[:task][:function]) && return
+                end
             else
                 flash[:error] = 'Fill the form!'
             end
         end
-
         redirect_to :back
     end
 
@@ -89,5 +92,15 @@ class TaskController < ApplicationController
             complete_task(params[:task_id], session[:user_id])
         end
         redirect_to :back
+    end
+
+    def update_priority
+      task_id = params[:task_id]
+      priority = params[:priority]
+
+      Task.priority_change(task_id, priority)
+
+      flash[:success] = "Priority Successfully Changed."
+      redirect_to request.referrer
     end
 end

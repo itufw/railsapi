@@ -125,7 +125,6 @@ class CustomerController < ApplicationController
     #render html: "#{customer_id}, #{staff_id}".html_safe
     flash[:success] = "Staff Successfully Changed."
     redirect_to request.referrer
-
   end
 
 	# Displays Stats for all the products the customer has ordered

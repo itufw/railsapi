@@ -9,7 +9,7 @@
             <%= hidden_field_tag :checked_send_email_to_self, @checked_send_email_to_self %>
             <%= hidden_field_tag :email_subject, @email_title %>
             <%= hidden_field_tag :cn_op, @cn_op %>
-
+            <%= hidden_field_tag :multiple_customer_id, @multiple_customer_id%>
 
               <%= email_content.hidden_field(:email_type)%>
               <%= email_content.hidden_field(:customer_id)%>
@@ -20,10 +20,13 @@
               <%= email_content.text_field :receive_address, :maxlength=>"100"	%>
               <br/>
               <%= label(:title, "CC:")%>
-              <%= email_content.text_field :cc, :maxlength=>"50"	%>
+              <%= email_content.text_field :cc, :maxlength=>"100"	%>
               <br/>
               <%= label(:title, "BCC:")%>
-              <%= email_content.text_field :bcc, :maxlength=>"50"	%>
+              <%= email_content.text_field :bcc, :maxlength=>"100"	%>
+              <br/>
+              <%= label(:file_attachment, "Attach PoD:")%>
+              <%= email_content.file_field :attachment %>
 
               <%= email_content.bootsy_area :content, editor_options: { link: false, html: false, image: false, lists: false, html: true, color: false}, :rows=>5, :cols=>60 %>
 
@@ -34,8 +37,8 @@
               <%= button_tag(type: 'submit', class: "btn btn-primary") do %>
                 Send Email
               <% end %>
+              <%= submit_tag "Do Not Send",class: 'btn btn-primary'%>
             <% end %>
-
         </div>
     </div>
 </div>

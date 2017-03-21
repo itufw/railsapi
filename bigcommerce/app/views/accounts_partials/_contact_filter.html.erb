@@ -5,11 +5,12 @@
 </div>
 
 <div class="row">
-	<div class="col-xs-6 col-xs-offset-4">
-		Find Invoices Until:  <%= date_field( "end_date", "end_date", value: @end_date) %>
+	<div class="col-xs-6 col-xs-offset-3">
+		           Find Invoices Until:  <%= date_field( "end_date", "end_date", value: @end_date) %>
 	</div>
-	<%= submit_tag "Search", class: 'btn btn-primary' %>
-	<button class = "btn btn-primary"><%= link_to "Reset", controller: "accounts", action: "contacts" %></button>
+		<%= submit_tag "Search", class: 'btn btn-primary' %>
+		<button class = "btn btn-primary"><%= link_to "Reset", controller: "accounts", action: "contacts" %></button>
+		<%= submit_tag "Send Reminder", class: 'btn btn-primary', id: "send_reminders"%>
 </div>
 
 <%= render "accounts_partials/contact_monthly_filter"%>
@@ -17,7 +18,7 @@
 <!-- invoice or due date displayed -->
 <div class="row" style="margin-top: 5px;">
 	<div class="col-xs-6 col-xs-offset-5">
-		<%= radio_button_tag(:date_column, "invoice_date", @checked_invoice_date, :onclick => "this.form.submit();") %> Invoice Date
+		<%= radio_button_tag(:date_column, "invoice_date", !@checked_due_date, :onclick => "this.form.submit();") %> Invoice Date
 		<span style="margin-left: 50px;">
 		<%= radio_button_tag(:date_column, "due_date", @checked_due_date, :onclick => "this.form.submit();") %>  Due Date
 		</span>
