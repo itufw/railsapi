@@ -66,9 +66,10 @@ class TaskController < ApplicationController
                 if "".eql? params[:button]
                   (params[:accounts_page] && !("".eql? params[:customer][:id])) ? (redirect_to(controller: 'accounts', action: 'contact_invoices', customer_id: params[:customer][:id]) && return) : (redirect_to(action: 'staff_task') && return)
                 else
+                  selected_invoices = (params[:selected_orders].nil?) ? [] : params[:selected_orders].split()
                   redirect_to(controller: 'task', action: 'add_task',\
                     parent_task: parent_task_id, account_customer: params[:customer][:id],\
-                    selected_invoices: params[:selected_orders].split(), selected_function: params[:task][:function]) && return
+                    selected_invoices: selected_invoices, selected_function: params[:task][:function]) && return
                 end
             else
                 flash[:error] = 'Fill the form!'
