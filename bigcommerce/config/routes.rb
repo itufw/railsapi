@@ -5,6 +5,10 @@ Rails.application.routes.draw do
   #post 'admin/update'
 
   get 'add_task', to: "task#add_task"
+  get '/redirect', to: 'calendar#redirect', as: 'redirect'
+  get '/callback', to: 'calendar#callback', as: 'callback'
+  get '/calendars', to: 'calendar#calendars', as: 'calendars'
+
 
   get '/rails/mailers' => "rails/mailers#index"
   get '/rails/mailers/*path' => "rails/mailers#preview"

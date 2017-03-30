@@ -15,3 +15,5 @@
 //= require bootsy
 //= require moment
 //= require bootstrap-datetimepicker
+//= require underscore
+//= require gmaps/google

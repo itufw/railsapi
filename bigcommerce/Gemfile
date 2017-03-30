@@ -83,3 +83,11 @@ gem 'bootsy'
 gem 'momentjs-rails', '>= 2.9.0'
 
 gem 'bootstrap3-datetimepicker-rails', '~> 4.17.47'
+
+gem 'google-api-client', require: 'google/apis/calendar_v3'
+# Implement underscore-rails to enable the google map
+gem 'underscore-rails'
+# google map for rails
+gem 'gmaps4rails'
+# convert street address to latitude and longitude
+gem 'geokit-rails'

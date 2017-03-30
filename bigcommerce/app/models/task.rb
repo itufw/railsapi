@@ -29,6 +29,22 @@ class Task < ActiveRecord::Base
     ActiveRecord::Base.connection.execute(sql)
   end
 
+  def auto_insert_from_calendar_event(event)
+    task = Task.new
+    task.start_date = event.start.date_time.to_s(:db)
+    task.end_date = event.end.date_time.to_s(:db)
+    task.created_at = event.created.to_s(:db)
+    task.updated_at = event.updated.to_s(:db)
+    task.description = event.summary
+    task.is_task = 1
+    response_staff = Staff.filter_by_email(task.creator.email)
+    task.response_staff = response_staff.id
+    task.last_modified_staff = response_staff.id
+    task.priority = 3
+    task.expired = 0
+    task.save
+  end
+
 
   def auto_insert_from_mailer(email_type, customer_id, staff_id, mailer_id, selected_orders)
     time = Time.now.to_s(:db)

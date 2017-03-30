@@ -29,7 +29,11 @@ class Staff < ActiveRecord::Base
 
 	def self.filter_by_ids(staff_ids)
 		return Staff.active if staff_ids.nil? || staff_ids.blank?
-		return where('staff.id IN (?)', staff_ids)
+		return where('staffs.id IN (?)', staff_ids)
+	end
+
+	def self.filter_by_email(email)
+		where("staff.email = \"#{email}\"").first
 	end
 
 	def self.nickname

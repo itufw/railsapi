@@ -15,7 +15,7 @@
           <%= "Following Task: "+ @parent_task unless @parent_task.nil? || ("".eql? @parent_task.to_s) || @parent_task.to_i == 0%>
           <br/>
           <%= label(:function, "Function:")%>
-          <%= f.collection_select :function, @function, :function, :function, {:include_blank => "Select a Function"}, {:class=>"function_selection"} %>
+          <%= f.collection_select :function, @function, :function, :function, {:include_blank => "Select a Function", :selected => @default_function}, {:class=>"function_selection"} %>
           <%= label(:subject_1, "Subject:")%>
           <%= f.collection_select :subject_1, @subjects, :id, :subject, {:prompt => "Select a Subject"}, {:class=>"subject_selection"} %>
       </div>
