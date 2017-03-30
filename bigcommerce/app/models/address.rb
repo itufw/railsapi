@@ -23,7 +23,7 @@ class Address < ActiveRecord::Base
 			address.country = a[:country]
 			address.phone, address.email = a[:phone], a[:email]
 			address.created_at, address.updated_at = time, time
-			address.lat, address.lng = lat, lng if lat.is_a? Numericre
+			address.lat, address.lng = lat, lng if lat.is_a? Numeric
 			address.save
 		end
 	end
