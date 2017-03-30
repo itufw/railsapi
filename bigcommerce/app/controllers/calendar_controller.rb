@@ -90,6 +90,9 @@ class CalendarController < ApplicationController
     selected_cust_type, selected_staff = map_filter(params)
 
     customers = Customer.all
+
+    customers = customers.select{|x| x.updated_at > '2017-03-01'}
+
     customers = customers.select{|x| selected_cust_type.include? x.cust_type_id.to_s } unless selected_cust_type.blank?
     customers = customers.select{|x| selected_staff.include? x.staff_id.to_s } unless selected_staff.blank?
 
