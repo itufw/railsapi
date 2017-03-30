@@ -135,4 +135,18 @@ module TaskHelper
       tasks = tasks.order_by_id('DESC')
       tasks
     end
+
+    def default_function_type(user_role)
+      case user_role
+      when "Accounts"
+        role = "Accounts"
+      when "Sales Executive"
+        role = "Sales"
+      when "Admin"
+        role = "Operations"
+      else
+        role = "Operations"
+      end
+      role
+    end
 end

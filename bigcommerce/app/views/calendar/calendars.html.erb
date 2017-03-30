@@ -1,0 +1,35 @@
+<script src="//maps.google.com/maps/api/js?key=AIzaSyB1HFWQ1DigWTnXGn_ZaUOk-v8hgGF3moI"></script>
+<script src="//cdn.rawgit.com/mahnunchik/markerclustererplus/master/dist/markerclusterer.min.js"></script>
+
+<ul>
+  <% @calendar_list.items.each do |calendar| %>
+    <li><%= calendar.summary %> (<%= calendar.id %>)</li>
+  <% end %>
+</ul>
+<ul>
+  <% @event_list.each do |event| %>
+    <% event.items.each do |item|%>
+    <li><%= item.summary %></li>
+    <% end %>
+  <% end %>
+</ul>
+
+
+<iframe src="https://calendar.google.com/calendar/embed?showTitle=0&amp;showPrint=0&amp;mode=WEEK&amp;height=400&amp;wkst=1&amp;bgcolor=%23FFFFFF&amp;src=<%=@current_user.email%>&amp;color=%231B887A&amp;ctz=Australia%2FSydney" style="border:solid 1px #777" width="600" height="400" frameborder="0" scrolling="no"></iframe>
+
+<div style='width: 800px;'>
+  <div id="customer_location" style='width: 800px; height: 400px;'></div>
+</div>
+
+<script>
+var handler = Gmaps.build('Google');
+handler.buildMap({ internal: {id: 'customer_location'}}, function(){
+  var markers = handler.addMarkers([
+    { lat:-37.813611, lng: 144.963056},
+    { lat:-37.923611, lng: 144.963056, description: "test"}
+  ]);
+  handler.bounds.extendWith(markers);
+  handler.fitMapToBounds();
+});
+
+</script>

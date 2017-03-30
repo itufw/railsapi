@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170321015504) do
+ActiveRecord::Schema.define(version: 20170327021643) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -40,8 +40,10 @@ ActiveRecord::Schema.define(version: 20170321015504) do
     t.text     "country",     limit: 255
     t.text     "phone",       limit: 255
     t.text     "email",       limit: 255
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+    t.decimal  "lat",                       precision: 12, scale: 7
+    t.decimal  "lng",                       precision: 12, scale: 7
   end
 
   add_index "addresses", ["customer_id"], name: "index_addresses_on_customer_id", using: :btree

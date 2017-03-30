@@ -168,7 +168,8 @@ class SalesController < ApplicationController
 
         # product_qty_h is a hash with structure {[product_id, date_id/date_ids] => qty}
         product_qty_h = OrderProduct.product_filter(product_filtered_ids).valid_orders.\
-        date_filter(@dates[0], @dates[-1]).staff_filter(staff_id).\
+        date_filter_end_date(@dates[-1]).staff_filter(staff_id).\
+        # date_filter(@dates[0], @dates[-1]).staff_filter(staff_id).\
         cust_style_filter(cust_style_id).send(date_function, @transform_column).send(sum_function)
 
         product_ids = []
@@ -192,8 +193,6 @@ class SalesController < ApplicationController
         # stats View!
         # helpers - > sales_helper
         @stats_info, @stats_sum = stats_info(@product_ids, @product_name_h, @transform_column, @inventory_h, @pending_stock_h) if @checked_stats
-
-
     end
 
 
