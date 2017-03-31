@@ -12,9 +12,8 @@
         <%= form_tag({:action => "map"}, {:method => "get"}) do %>
         <div class="col-md-4">
 
-          <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Sales Executive</a>
-              <ul class="dropdown-menu">
+            <div id="sales_menu"><a class="btn btn-secondary">Sales Executive</a></div>
+            <div id="sales_rep">
                 <% @staff.each do |person| %>
                 <li>
                   <%= check_box_tag 'selected_staff[]', person.id %>
@@ -22,21 +21,60 @@
                   &nbsp;&nbsp;
                 </li>
                 <% end %>
-              </ul>
-          </li>
+            </div>
 
-          <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Customer Type</a>
-              <ul class="dropdown-menu">
+            <div id="cust_type_menu"><a class="btn btn-secondary">Customer Type</a></div>
+            <div id="cust_type">
                 <% @customer_type.each do |cust| %>
                 <li>
-                  <%= check_box_tag 'selected_cust_type[]', cust.id %>
+                  <%= check_box_tag 'selected_cust_style[]', cust.id %>
                   <%= cust.name %>
                   &nbsp;&nbsp;
                 </li>
                 <% end %>
-              </ul>
-          </li>
+              </div>
+
+            <div id="order_menu">
+              <a class="btn btn-secondary">Total Order</a>
+            </div>
+            <div id="order_slider">
+              <table>
+                <% @colour_guide.each do |colour|%>
+                <tr>
+                  <td>
+                    <svg width="15" height="15">
+                        <rect width="15" height="15" style="fill:<%= colour %>;" />
+                    </svg>
+                  </td>
+                  <td>&nbsp;&nbsp;&nbsp;</td>
+                  <td>
+                    <input id="slider-<%= colour%>"/>
+                    <%= hidden_field_tag "order_range_#{colour}" %>
+                  </td>
+                </tr>
+                <% end %>
+              </table>
+            </div>
+
+            <div id="order_perior">
+              <%= label(:start_date, "Orders From")%>
+              <div class='input-group date' id='start_timepicker'>
+                <%= text_field_tag('start_time',"", placeholder: 'Start Timepicker', class: 'form-control') %>
+                  <span class="input-group-addon">
+                      <span class="glyphicon glyphicon-calendar"></span>
+                  </span>
+              </div>
+              <%= label(:end_date, "To")%>
+              <div class='input-group date' id='due_timepicker'>
+                <%= text_field_tag('due_time',"", placeholder: 'Due Date Timepicker', class: 'form-control') %>
+                <span class="input-group-addon">
+                  <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+              </div>
+            </div>
+
+
+
           <%= submit_tag "Search", class: 'btn btn-primary' %>
           <%= link_to "Reset", {controller: "calendar", action: "map"}, class: "btn btn-primary" %>
 
@@ -44,7 +82,7 @@
         <% end %>
     </div>
 </div>
-
+<!-- Google Map Component -->
 <script>
     var handler = Gmaps.build('Google');
     handler.buildMap({
@@ -79,4 +117,119 @@
             $('#due_timepicker').data("DateTimePicker").minDate(e.date);
         });
     });
+</script>
+<!-- basic Filters and order amount -->
+<script>
+ $("#sales_rep").hide();
+ $("#sales_menu").click(function(){
+   $("#sales_rep").toggle();
+ });
+
+ $("#cust_type").hide();
+ $("#cust_type_menu").click(function(){
+   $("#cust_type").toggle();
+ });
+
+ $("#slider-lightgreen").slider({
+     value: [0, 0],
+     min: 0,
+     max: 5000,
+     step: 5,
+     ticks: [0, 500, 1500, 3000, 5000],
+     ticks_positions: [0, 20, 40, 60, 80, 100],
+     ticks_labels: ['$0', '$500', '$1500', '$3000', '$5000']
+ });
+ $("#slider-lightgreen").on('change', function() {
+   $('input#order_range_lightgreen').attr('value', $(this).val());
+ });
+
+ $("#slider-green").slider({
+     value: [0, 500],
+     min: 0,
+     max: 5000,
+     step: 5,
+     ticks: [0, 500, 1500, 3000, 5000],
+     ticks_positions: [0, 20, 40, 60, 80, 100],
+     ticks_labels: ['$0', '$500', '$1500', '$3000', '$5000']
+ });
+ $("#slider-green").on('change', function() {
+   $('input#order_range_green').attr('value', $(this).val());
+ });
+
+
+ $("#slider-orange").slider({
+     value: [500, 1500],
+     min: 0,
+     max: 5000,
+     step: 5,
+     ticks: [0, 500, 1500, 3000, 5000],
+     ticks_positions: [0, 20, 40, 60, 80, 100],
+     ticks_labels: ['$0', '$500', '$1500', '$3000', '$5000']
+ });
+ $("#slider-orange").on('change', function() {
+   $('input#order_range_orange').attr('value', $(this).val());
+ });
+
+ $("#slider-red").slider({
+     value: [1500, 3000],
+     min: 0,
+     max: 5000,
+     step: 5,
+     ticks: [0, 500, 1500, 3000, 5000],
+     ticks_positions: [0, 20, 40, 60, 80, 100],
+     ticks_labels: ['$0', '$500', '$1500', '$3000', '$5000']
+ });
+ $("#slider-red").on('change', function() {
+   $('input#order_range_red').attr('value', $(this).val());
+ });
+
+
+  $("#slider-violet").slider({
+      value: [3000, 5500],
+      min: 0,
+      max: 5000,
+      step: 5,
+      ticks: [0, 500, 1500, 3000, 5000],
+      ticks_positions: [0, 20, 40, 60, 80, 100],
+      ticks_labels: ['$0', '$500', '$1500', '$3000', '$5000']
+  });
+  $("#slider-violet").on('change', function() {
+    $('input#order_range_violet').attr('value', $(this).val());
+  });
+
+  $("#slider-purple").slider({
+      value: [5000, 5500],
+      min: 0,
+      max: 5000,
+      step: 5,
+      ticks: [0, 500, 1500, 3000, 5000],
+      ticks_positions: [0, 20, 40, 60, 80, 100],
+      ticks_labels: ['$0', '$500', '$1500', '$3000', '$5000']
+  });
+   $("#slider-purple").on('change', function() {
+     $('input#order_range_purple').attr('value', $(this).val());
+   });
+
+</script>
+<!-- Time Picker -->
+<script>
+$(function () {
+    $('#due_timepicker').datetimepicker({
+      format: 'YYYY-MM-DD',
+      sideBySide: true
+    });
+
+    $('#start_timepicker').datetimepicker({
+      format: 'YYYY-MM-DD',
+      sideBySide: true,
+      useCurrent: false //Important! See issue #1075
+    });
+
+    $("#due_timepicker").on("dp.change", function (e) {
+        $('#start_timepicker').data("DateTimePicker").maxdate(e.date);
+    });
+    $("#start_timepicker").on("dp.change", function (e) {
+        $('#due_timepicker').data("DateTimePicker").minDate(e.date);
+    });
+});
 </script>
