@@ -87,45 +87,22 @@ class CalendarController < ApplicationController
   end
 
   def map
-    selected_cust_type, selected_staff = map_filter(params)
+    @colour_guide = ["lightgreen","green","orange","red","violet", "purple"]
+    # in Helper
+    # filter customers with attributes
+    customer_map, @staff, @start_date, @end_date = customer_filter(params, @colour_guide)
 
-    customers = Customer.all
+    @customer_type = CustStyle.all
 
-    customers = customers.select{|x| x.updated_at > '2017-03-01'}
-
-    customers = customers.select{|x| selected_cust_type.include? x.cust_type_id.to_s } unless selected_cust_type.blank?
-    customers = customers.select{|x| selected_staff.include? x.staff_id.to_s } unless selected_staff.blank?
-
-    customer_address = Address.has_lat_lng.group_by_customer.where("customer_id IN (?)", customers.map{|x| x.id})
-
-    @staff = customer_address.map{|x| x.customer.staff}.uniq
-    @customer_type = CustType.all
-
-    @hash = Gmaps4rails.build_markers(customer_address) do |customer, marker|
-      marker.lat customer.lat
-      marker.lng customer.lng
-      case customer.customer.cust_type_id
-      when 1
-        marker.picture({
-                        :url    => view_context.image_path("map_icons/people.png"),
+    @hash = Gmaps4rails.build_markers(customer_map.keys()) do |customer_id, marker|
+      marker.lat customer_map[customer_id]["lat"]
+      marker.lng customer_map[customer_id]["lng"]
+      marker.picture({
+                        :url    => view_context.image_path(customer_map[customer_id]["url"]),
                         :width  => 30,
                         :height => 30
                        })
-      when 2
-        marker.picture({
-                        :url    => view_context.image_path("map_icons/winebar.png"),
-                        :width  => 30,
-                        :height => 30
-                       })
-      else
-        marker.picture({
-                        :url    => view_context.image_path("map_icons/townhouse.png"),
-                        :width  => 30,
-                        :height => 30
-                       })
-      end
-      marker.infowindow "<a href=\"http://188.166.243.138/customer/summary?customer_id=#{customer.customer_id}&customer_name=#{customer.firstname}+#{customer.lastname}\">#{customer.firstname} #{customer.lastname}</a>"
-
+            marker.infowindow "<a href=\"http://188.166.243.138/customer/summary?customer_id=#{customer_id}&customer_name=#{customer_map[customer_id]["name"]}\">#{customer_map[customer_id]["name"]}</a>"
       end
 
   end

@@ -15,6 +15,7 @@
  *= require bootstrap
  *= require bootsy
  *= require bootstrap-datetimepicker
+ *= require bootstrap-slider
  */
 
 @media print {
