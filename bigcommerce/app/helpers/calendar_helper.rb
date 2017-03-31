@@ -53,7 +53,10 @@ module CalendarHelper
           url = "map_icons/people_#{category}.png"
         end
 
-        name = "" + customer.firstname + " " + customer.lastname
+        name = ""
+        name += customer.firstname unless customer.firstname.nil?
+        name += " "
+        name += customer.lastname unless customer.lastname.nil?
         map_pin = {
           "name"=> name,
           "lat" => customer_add.first.lat,
