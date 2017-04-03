@@ -23,10 +23,13 @@
         <% end %>
       </div>
 
-    <div id="order_menu">
-      <a class="btn btn-secondary">Total Order</a>
-    </div>
-    <div id="order_slider">
+      <div id="selector" class="btn-group">
+          <button type="button" class="btn btn-secondary active" value="Sales">Sales</button>
+          <button type="button" class="btn btn-secondary" value="Last_Order">Last Order Date</button>
+          <%= hidden_field_tag "filter_selector" %>
+      </div>
+
+    <div id="sales_slider">
       <table>
         <% @colour_guide.each do |colour|%>
         <tr>
@@ -42,6 +45,28 @@
           <td>
             <input id="slider-<%= colour%>"/>
             <%= hidden_field_tag "order_range_#{colour}" %>
+          </td>
+        </tr>
+        <% end %>
+      </table>
+    </div>
+
+    <div id="last_order_slider">
+      <table>
+        <% @colour_guide.each do |colour|%>
+        <tr>
+          <td>
+            <%= check_box_tag 'selected_colour[]', colour, (@colour_selected.include? colour) %>
+          </td>
+          <td>
+            <svg width="15" height="15" id="svg_<%= colour %>">
+                <rect width="15" height="15" style="fill:<%= colour %>;" id="cube_<%= colour %>" />
+            </svg>
+          </td>
+          <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+          <td>
+            <input id="slider-date-<%= colour%>"/>
+            <%= hidden_field_tag "date_range_#{colour}" %>
           </td>
         </tr>
         <% end %>
@@ -65,8 +90,7 @@
       </div>
     </div>
 
-
-
+    <br/><br/>
   <%= submit_tag "Search", class: 'btn btn-primary' %>
   <%= link_to "Reset", {controller: "calendar", action: "map"}, class: "btn btn-primary" %>
 
@@ -84,6 +108,52 @@
  $("#cust_type_menu").click(function(){
    $("#cust_type").toggle();
  });
+
+ $("#last_order_slider").hide();
+ $('#selector button').click(function() {
+    $(this).addClass('active').siblings().removeClass('active');
+    $('input#filter_selector').attr('value', $(this).val());
+
+    if($(this).val() == "Sales"){
+      $("#last_order_slider").hide();
+      $("#sales_slider").show();
+    }else{
+      $("#sales_slider").hide();
+      $("#last_order_slider").show();
+    };
+  });
+
+  var date_gap = 15
+  for(i = 0; i < <%=@colour_guide.length%>; i++) {
+    var colour_guide = ["purple", "violet", "red", "orange", "green", "lightgreen"];
+    $("#slider-date-"+colour_guide[i]).slider({
+        value: [date_gap*i, date_gap*(i+1)],
+        min: 0,
+        max: 90,
+        step: 6,
+        ticks: [0, 15, 30, 45, 60, 75],
+        ticks_positions: [0, 20, 40, 60, 80, 100],
+        ticks_labels: ['0 day','15', '30', '45', '60', '75']
+    });
+  };
+  $("#slider-date-purple").on('change', function() {
+    $("input#date_range_purple").attr('value', $(this).val());
+  });
+  $("#slider-date-violet").on('change', function() {
+    $("input#date_range_violet").attr('value', $(this).val());
+  });
+  $("#slider-date-red").on('change', function() {
+    $("input#date_range_red").attr('value', $(this).val());
+  });
+  $("#slider-date-orange").on('change', function() {
+    $("input#date_range_orange").attr('value', $(this).val());
+  });
+  $("#slider-date-green").on('change', function() {
+    $("input#date_range_green").attr('value', $(this).val());
+  });
+  $("#slider-date-lightgreen").on('change', function() {
+    $("input#date_range_lightgreen").attr('value', $(this).val());
+  });
 
  $("#slider-lightgreen").slider({
      value: [5000, 5000],
