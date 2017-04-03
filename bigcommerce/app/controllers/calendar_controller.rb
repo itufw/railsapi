@@ -87,10 +87,20 @@ class CalendarController < ApplicationController
   end
 
   def map
-    @colour_guide = ["lightgreen","green","orange","red","violet", "purple"]
+    @colour_guide = ["purple", "violet", "red", "orange", "green", "lightgreen"]
+
+    colour_range = { "lightgreen" => [5000, 10000],
+                     "green" => [3000,5000],
+                     "orange"=> [1500,3000],
+                     "red"   => [500, 1500],
+                     "violet"=> [0,   500],
+                     "purple"=> [0,0]
+                   }
+    @colour_selected = colour_guide_filter(params["selected_colour"],@colour_guide)
+
     # in Helper
     # filter customers with attributes
-    customer_map, @staff, @start_date, @end_date = customer_filter(params, @colour_guide)
+    customer_map, @staff, @start_date, @end_date = customer_filter(params, @colour_selected, colour_range)
 
     @customer_type = CustStyle.all
 
