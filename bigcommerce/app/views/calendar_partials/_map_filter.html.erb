@@ -243,7 +243,6 @@
    $("#slider-purple").on('change', function() {
      $('input#order_range_purple').attr('value', $(this).val());
    });
-
 </script>
 
 <!-- Time Picker -->
@@ -251,11 +250,13 @@
   $(function () {
       $('#due_timepicker').datetimepicker({
         format: 'YYYY-MM-DD',
+        defaultDate: "<%= @end_date.to_s%>",
         sideBySide: true
       });
 
       $('#start_timepicker').datetimepicker({
         format: 'YYYY-MM-DD',
+        defaultDate: "<%= @start_date.to_s%>",
         sideBySide: true,
         useCurrent: false //Important! See issue #1075
       });

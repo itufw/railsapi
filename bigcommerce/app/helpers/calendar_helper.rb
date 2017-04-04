@@ -34,7 +34,7 @@ module CalendarHelper
     end
   end
 
-  def add_map_pin(category, customer)
+  def add_map_pin(category, customer, sale_or_day, func)
       case customer.cust_style_id
       when 1
         url = "map_icons/bottle_shop_#{category}.png"
@@ -48,15 +48,25 @@ module CalendarHelper
       name += customer.firstname unless customer.firstname.nil?
       name += " "
       name += customer.lastname unless customer.lastname.nil?
+      case func
+      when "Sales"
+        infowindow = "Total Sales in this period: " + sale_or_day.to_s
+      when "Last_Order"
+        infowindow = "Last Orde in : " + sale_or_day.to_s + "  days"
+      end
+
       map_pin = {
         "name"=> name,
         "lat" => customer.lat,
         "lng" => customer.lng,
-        "url" => url
+        "url" => url,
+        "infowindow" => infowindow
       }
       map_pin
   end
 
+  # filter customer based on the last orde date
+  # default to the days started from today
   def customer_last_order_filter(params, colour_guide, colour_range_origin)
     selected_cust_style, selected_staff, colour_range = map_filter(params, colour_guide, colour_range_origin)
     start_date = date_check_map(params["start_time"], 0)
@@ -75,17 +85,18 @@ module CalendarHelper
       days_gap = 0 if days_gap < 0
       colour_range.keys.each do |colour|
         if days_gap.between?(colour_range["#{colour}"].min, colour_range["#{colour}"].max)
-          customer_map[customer.id] = add_map_pin(colour, customer)
+          customer_map[customer.id] = add_map_pin(colour, customer, days_gap, "Last_Order")
           break
         end #end if
       end #end colour guide for loop
     end #end customers for loop
 
     staff = Staff.filter_by_ids(customers.map{|x| x.staff_id}.uniq)
-    [customer_map, staff]
+    [customer_map, staff, start_date.to_s, end_date.to_s]
   end
 
-
+  # filter customer based on the sales for givin period
+  # default to pass 3 months
   def customer_filter(params, colour_guide, colour_range_origin)
     selected_cust_style, selected_staff, colour_range = map_filter(params, colour_guide, colour_range_origin)
     # default to one month ago until today
@@ -95,12 +106,11 @@ module CalendarHelper
     customers = Customer.joins(:addresses).select("addresses.lat, addresses.lng, customers.*").where("addresses.lat IS NOT NULL").group("customers.id")
 
     # calculate the customers who have sales record in given period
-    customers_sales = customers.joins(:orders).select("customers.id, sum(orders.total_inc_tax) as sales").where("orders.date_created < '#{end_date}' AND orders.date_created > '#{start_date}'").group("customers.id")
+    customers_sales = Customer.joins(:orders).select("customers.id, sum(orders.total_inc_tax) as sales").where("orders.date_created < '#{end_date}' AND orders.date_created > '#{start_date}'").group("customers.id")
     customers_sales_ids = customers_sales.map{|x| x.id}
 
     customers = customers.select{|x| selected_cust_style.include? x.cust_style_id.to_s } unless selected_cust_style.blank?
     customers = customers.select{|x| selected_staff.include? x.staff_id.to_s } unless selected_staff.blank?
-
 
     customer_map = {}
     customers.each do |customer|
@@ -108,14 +118,14 @@ module CalendarHelper
 
       colour_range.keys.each do |colour|
         if order_amount.between?(colour_range["#{colour}"].min, colour_range["#{colour}"].max)
-          customer_map[customer.id] = add_map_pin(colour, customer)
+          customer_map[customer.id] = add_map_pin(colour, customer, order_amount, "Sales")
           break
         end #end if
       end #end colour guide for loop
     end #end customers for loop
 
     staff = Staff.filter_by_ids(customers.map{|x| x.staff_id}.uniq)
-    [customer_map, staff]
+    [customer_map, staff, start_date.to_s, end_date.to_s]
   end
 
   def hash_map_pins(customer_map)
@@ -127,7 +137,9 @@ module CalendarHelper
                         :width  => 30,
                         :height => 30
                        })
-            marker.infowindow "<a href=\"http://188.166.243.138/customer/summary?customer_id=#{customer_id}&customer_name=#{customer_map[customer_id]["name"]}\">#{customer_map[customer_id]["name"]}</a>"
+            marker.infowindow "<a href=\"http://188.166.243.138/customer/summary?customer_id=#{customer_id}&customer_name=#{customer_map[customer_id]["name"]}\">#{customer_map[customer_id]["name"]}</a>
+                              <br/><br/>
+                              <p>#{customer_map[customer_id]["infowindow"]}<p>"
       end
     hash
   end

@@ -25,27 +25,4 @@
         handler.bounds.extendWith(markers);
         handler.fitMapToBounds();
     });
-
-    $(function () {
-        $('#due_timepicker').datetimepicker({
-          format: 'DD/MM/YYYY',
-          defaultDate: new Date(),
-          sideBySide: true
-        });
-        var dt = new Date();
-        dt.setMonth(dt.getMonth()-2);
-        $('#start_timepicker').datetimepicker({
-          format: 'DD/MM/YYYY',
-          defaultDate: dt,
-          sideBySide: true,
-          useCurrent: false //Important! See issue #1075
-        });
-
-        $("#due_timepicker").on("dp.change", function (e) {
-            $('#start_timepicker').data("DateTimePicker").maxdate(e.date);
-        });
-        $("#start_timepicker").on("dp.change", function (e) {
-            $('#due_timepicker').data("DateTimePicker").minDate(e.date);
-        });
-    });
 </script>
