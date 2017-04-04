@@ -1,7 +1,7 @@
 <%= form_tag({:action => "map"}, {:method => "get"}) do %>
 <div class="col-md-4">
 
-    <div id="sales_menu"><a class="btn btn-secondary">Sales Executive</a></div>
+    <div id="sales_menu"><a class="btn btn-default">Sales Executive</a></div>
     <div id="sales_rep">
         <% @staff.each do |person| %>
         <li>
@@ -11,8 +11,9 @@
         </li>
         <% end %>
     </div>
+    <br/><br/>
 
-    <div id="cust_type_menu"><a class="btn btn-secondary">Customer Type</a></div>
+    <div id="cust_type_menu"><a class="btn btn-default">Customer Type</a></div>
     <div id="cust_type">
         <% @customer_type.each do |cust| %>
         <li>
@@ -22,10 +23,11 @@
         </li>
         <% end %>
       </div>
+      <br/><br/>
 
       <div id="selector" class="btn-group">
-          <button type="button" class="btn btn-secondary active" value="Sales">Sales</button>
-          <button type="button" class="btn btn-secondary" value="Last_Order">Last Order Date</button>
+          <button type="button" class="btn btn-default <%= 'active' if @active_sales %>" value="Sales">Sales</button>
+          <button type="button" class="btn btn-default <%= 'active' unless @active_sales %>" value="Last_Order">Last Order Date</button>
           <%= hidden_field_tag "filter_selector" %>
       </div>
 
@@ -56,7 +58,7 @@
         <% @colour_guide.each do |colour|%>
         <tr>
           <td>
-            <%= check_box_tag 'selected_colour[]', colour, (@colour_selected.include? colour) %>
+            <%= check_box_tag 'selected_order_colour[]', colour, (@order_colour_selected.include? colour) %>
           </td>
           <td>
             <svg width="15" height="15" id="svg_<%= colour %>">
@@ -109,7 +111,14 @@
    $("#cust_type").toggle();
  });
 
- $("#last_order_slider").hide();
+ if($('#selector button.active').val() == "Sales"){
+   $("#sales_slider").show();
+   $("#last_order_slider").hide();
+ }else{
+   $("#last_order_slider").show();
+   $("#sales_slider").hide();
+ };
+
  $('#selector button').click(function() {
     $(this).addClass('active').siblings().removeClass('active');
     $('input#filter_selector').attr('value', $(this).val());
@@ -124,8 +133,8 @@
   });
 
   var date_gap = 15
-  for(i = 0; i < <%=@colour_guide.length%>; i++) {
-    var colour_guide = ["purple", "violet", "red", "orange", "green", "lightgreen"];
+  var colour_guide = ["lightgreen", "green", "orange", "red", "violet", "purple"];
+  for(i = 0; i < colour_guide.length; i++) {
     $("#slider-date-"+colour_guide[i]).slider({
         value: [date_gap*i, date_gap*(i+1)],
         min: 0,
