@@ -11,14 +11,14 @@ class Task < ActiveRecord::Base
     start_date = t.start_date.to_s(:db)
     end_date = t.end_date.to_s(:db)
     if t.parent_task != 0
-      task = "(#{t.id},\"#{start_date}\", \"#{end_date}\", '#{time}', '#{time}', '#{t.title}', '#{t.description}', #{t.is_task},\
+      task = "(#{t.id},\"#{start_date}\", \"#{end_date}\", '#{time}', '#{time}', '#{t.title}', \"#{t.description}\", #{t.is_task},\
               #{t.response_staff}, #{t.last_modified_staff}, '#{t.method}', '#{t.function}','#{t.subject_1}', 0,'#{t.parent_task}','#{t.priority}')"
       sql = "INSERT INTO `tasks`(`id`,`start_date`, `end_date`, `created_at`, `updated_at`,\
             `title`, `description`, `is_task`, `response_staff`, `last_modified_staff`, `method`,\
             `function`, `subject_1`, `expired`, `parent_task`, `priority`)\
             VALUES #{task}"
     else
-      task = "(#{t.id},\"#{start_date}\", \"#{end_date}\", '#{time}', '#{time}', '#{t.title}', '#{t.description}', #{t.is_task},\
+      task = "(#{t.id},\"#{start_date}\", \"#{end_date}\", '#{time}', '#{time}', '#{t.title}', \"#{t.description}\", #{t.is_task},\
               #{t.response_staff}, #{t.last_modified_staff}, '#{t.method}', '#{t.function}','#{t.subject_1}', 0, '#{t.priority}')"
       sql = "INSERT INTO `tasks`(`id`,`start_date`, `end_date`, `created_at`, `updated_at`,\
             `title`, `description`, `is_task`, `response_staff`, `last_modified_staff`, `method`,\
@@ -68,7 +68,7 @@ class Task < ActiveRecord::Base
     sql = "INSERT INTO `tasks`(`id`,`start_date`,`end_date`, `created_at`, `updated_at`,\
           `title`, `description`, `is_task`, `response_staff`, `last_modified_staff`,\
           `method`, `function`, `subject_1`, `expired`, `priority`)\
-          VALUES (#{task_id},'#{time}', '#{end_time}', '#{time}', '#{time}', '#{mailer_id}', '#{description}', 0,\
+          VALUES (#{task_id},'#{time}', '#{end_time}', '#{time}', '#{time}', '#{mailer_id}', \"#{description}\",, 0,\
                   #{staff_id}, #{staff_id}, 'Email', 'Accounting', '#{subject}', 0, 3)"
 
 
@@ -79,7 +79,7 @@ class Task < ActiveRecord::Base
         sql = "INSERT INTO `tasks`(`id`,`start_date`,`end_date`, `created_at`, `updated_at`,\
               `title`, `description`, `is_task`, `response_staff`, `last_modified_staff`,\
               `method`, `function`, `subject_1`, `expired`, `parent_task`, `priority`)\
-              VALUES (#{task_id},'#{time}', '#{end_time}', '#{time}', '#{time}', '#{mailer_id}', '#{description}', 0,\
+              VALUES (#{task_id},'#{time}', '#{end_time}', '#{time}', '#{time}', '#{mailer_id}', \"#{description}\", 0,\
                       #{staff_id}, #{staff_id}, 'Email', 'Accounting', '#{subject}', 0, #{parent_tasks.first.task_id}, 3)"
       end
 

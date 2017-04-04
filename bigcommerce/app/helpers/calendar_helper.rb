@@ -73,7 +73,8 @@ module CalendarHelper
     end_date = date_check_map(params["due_time"], 0)
 
     customers = Customer.joins(:addresses).select("addresses.lat, addresses.lng, customers.*").where("addresses.lat IS NOT NULL").group("customers.id")
-    customers = customers.joins(:orders).select("MAX(orders.date_created) as last_order_date, customers.id").order("orders.date_created DESC").group("customers.id")
+    # the Status check needs to be updated
+    customers = customers.joins(:orders).select("MAX(orders.date_created) as last_order_date, customers.id").where("orders.status_id IN (2, 3, 7, 8, 9, 10, 11, 12, 13)").order("orders.date_created DESC").group("customers.id")
     customers = customers.select{|x| selected_cust_style.include? x.cust_style_id.to_s } unless selected_cust_style.blank?
     customers = customers.select{|x| selected_staff.include? x.staff_id.to_s } unless selected_staff.blank?
 
@@ -106,7 +107,7 @@ module CalendarHelper
     customers = Customer.joins(:addresses).select("addresses.lat, addresses.lng, customers.*").where("addresses.lat IS NOT NULL").group("customers.id")
 
     # calculate the customers who have sales record in given period
-    customers_sales = Customer.joins(:orders).select("customers.id, sum(orders.total_inc_tax) as sales").where("orders.date_created < '#{end_date}' AND orders.date_created > '#{start_date}'").group("customers.id")
+    customers_sales = Customer.joins(:orders).select("customers.id, sum(orders.total_inc_tax) as sales").where("orders.status_id IN (2, 3, 7, 8, 9, 10, 11, 12, 13)").where("orders.date_created < '#{end_date}' AND orders.date_created > '#{start_date}'").group("customers.id")
     customers_sales_ids = customers_sales.map{|x| x.id}
 
     customers = customers.select{|x| selected_cust_style.include? x.cust_style_id.to_s } unless selected_cust_style.blank?
