@@ -113,9 +113,11 @@
 
  if($('#selector button.active').val() == "Sales"){
    $("#sales_slider").show();
+   $('input#filter_selector').attr('value', "Sales");
    $("#last_order_slider").hide();
  }else{
    $("#last_order_slider").show();
+   $('input#filter_selector').attr('value', "Last_Order");
    $("#sales_slider").hide();
  };
 
