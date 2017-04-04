@@ -1,7 +1,7 @@
 module CalendarHelper
   def sales_last_order(params)
-    return "Sales" if ((params["filter_selector"].nil?) || ("".eql?params["filter_selector"]) ||  ("Sales".eql?params["filter_selector"]))
-    return "Last_Order"
+    return "Last_Order" if ((params["filter_selector"].nil?) || ("".eql?params["filter_selector"]) ||  ("Last_Order".eql?params["filter_selector"]))
+    return "Sales"
   end
 
   def map_filter(params, colour_guide, colour_range_origin)
@@ -59,11 +59,11 @@ module CalendarHelper
 
   def customer_last_order_filter(params, colour_guide, colour_range_origin)
     selected_cust_style, selected_staff, colour_range = map_filter(params, colour_guide, colour_range_origin)
-    start_date = date_check_map(params["start_time"], 1)
+    start_date = date_check_map(params["start_time"], 0)
     end_date = date_check_map(params["due_time"], 0)
 
     customers = Customer.joins(:addresses).select("addresses.lat, addresses.lng, customers.*").where("addresses.lat IS NOT NULL").group("customers.id")
-    customers = customers.joins(:orders).select("orders.date_created as last_order_date, customers.id").order("orders.date_created DESC").group("customers.id")
+    customers = customers.joins(:orders).select("MAX(orders.date_created) as last_order_date, customers.id").order("orders.date_created DESC").group("customers.id")
     customers = customers.select{|x| selected_cust_style.include? x.cust_style_id.to_s } unless selected_cust_style.blank?
     customers = customers.select{|x| selected_staff.include? x.staff_id.to_s } unless selected_staff.blank?
 
@@ -71,7 +71,7 @@ module CalendarHelper
     start_date = (Date.parse start_date)
 
     customers.each do |customer|
-      days_gap = (customer.last_order_date.to_date - start_date).to_i
+      days_gap = (start_date - customer.last_order_date.to_date).to_i
       days_gap = 0 if days_gap < 0
       colour_range.keys.each do |colour|
         if days_gap.between?(colour_range["#{colour}"].min, colour_range["#{colour}"].max)
@@ -89,7 +89,7 @@ module CalendarHelper
   def customer_filter(params, colour_guide, colour_range_origin)
     selected_cust_style, selected_staff, colour_range = map_filter(params, colour_guide, colour_range_origin)
     # default to one month ago until today
-    start_date = date_check_map(params["start_time"], 1)
+    start_date = date_check_map(params["start_time"], 3)
     end_date = date_check_map(params["due_time"], 0)
 
     customers = Customer.joins(:addresses).select("addresses.lat, addresses.lng, customers.*").where("addresses.lat IS NOT NULL").group("customers.id")

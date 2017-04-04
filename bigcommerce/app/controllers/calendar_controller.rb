@@ -89,12 +89,14 @@ class CalendarController < ApplicationController
   def map
     @colour_guide = ["purple", "violet", "red", "orange", "green", "lightgreen"]
     @colour_selected = colour_guide_filter(params["selected_colour"],@colour_guide)
+    @order_colour_selected = colour_guide_filter(params["selected_order_colour"],@colour_guide)
+
     @customer_type = CustStyle.all
 
     # params["filter_selector"] = "Sales" || "Last_Order"
     case sales_last_order(params)
     when "Sales"
-      colour_range = { "lightgreen" => [5000, 10000],
+      colour_range = { "lightgreen" => [5000, 100000],
                        "green" => [3000,5000],
                        "orange"=> [1500,3000],
                        "red"   => [500, 1500],
@@ -103,21 +105,21 @@ class CalendarController < ApplicationController
                      }
       # in Helper
       # filter customers with attributes
+      @active_sales = true
       customer_map, @staff = customer_filter(params, @colour_selected, colour_range)
     when "Last_Order"
-      colour_range = { "lightgreen" => [75, 90],
-                       "green" => [60,75],
-                       "orange"=> [45,60],
-                       "red"   => [30,45],
-                       "violet"=> [15,30],
-                       "purple"=> [0,15]
+      colour_range = { "lightgreen" => [0, 15],
+                       "green" => [15,30],
+                       "orange"=> [30,45],
+                       "red"   => [45,60],
+                       "violet"=> [60,75],
+                       "purple"=> [75,3000]
                      }
-
-      customer_map, @staff = customer_last_order_filter(params, @colour_selected, colour_range)
+      @active_sales = false
+      customer_map, @staff = customer_last_order_filter(params, @order_colour_selected, colour_range)
     end
 
     @hash = hash_map_pins(customer_map)
-
   end
 
 end
