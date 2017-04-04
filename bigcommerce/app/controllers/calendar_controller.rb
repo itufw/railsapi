@@ -106,7 +106,7 @@ class CalendarController < ApplicationController
       # in Helper
       # filter customers with attributes
       @active_sales = true
-      customer_map, @staff = customer_filter(params, @colour_selected, colour_range)
+      customer_map, @staff, @start_date, @end_date = customer_filter(params, @colour_selected, colour_range)
     when "Last_Order"
       colour_range = { "lightgreen" => [0, 15],
                        "green" => [15,30],
@@ -116,10 +116,11 @@ class CalendarController < ApplicationController
                        "purple"=> [75,3000]
                      }
       @active_sales = false
-      customer_map, @staff = customer_last_order_filter(params, @order_colour_selected, colour_range)
+      customer_map, @staff, @start_date, @end_date = customer_last_order_filter(params, @order_colour_selected, colour_range)
     end
-
+    @hey = "2017-03-04"
     @hash = hash_map_pins(customer_map)
+
   end
 
 end
