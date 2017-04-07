@@ -9,7 +9,10 @@
             <div id="customer_location" style='width: 650px; height: 600px;'></div>
         </div>
 
-    <%= render "calendar_partials/map_filter"%>
+        <%= render "calendar_partials/map_filter"%>
+    </div>
+    <div class="row">
+      <%= render "partials/customer", customers: @customers %>
     </div>
 
 </div>

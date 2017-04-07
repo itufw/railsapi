@@ -2,8 +2,8 @@
 <script src="//cdn.rawgit.com/mahnunchik/markerclustererplus/master/dist/markerclusterer.min.js"></script>
 
 <ul>
-  <% @calendar_list.items.each do |calendar| %>
-    <li><%= calendar.summary %> (<%= calendar.id %>)</li>
+  <% @calendar_list.each do |calendar| %>
+    <li><a id="<%= calendar.id.split("@untappedwines.com").first %>"><%= calendar.summary %> (<%= calendar.id %>)</a></li>
   <% end %>
 </ul>
 <ul>
@@ -14,13 +14,28 @@
   <% end %>
 </ul>
 
+<% @calendar_list.map{|x| x.id}.each do |calendar_id| %>
+  <div id="calendar-<%=calendar_id.split("@untappedwines.com").first%>">
+    <iframe src="https://calendar.google.com/calendar/embed?showTitle=0&amp;showPrint=0&amp;mode=WEEK&amp;height=400&amp;wkst=1&amp;bgcolor=%23FFFFFF&amp;src=<%=calendar_id%>&amp;color=%231B887A&amp;ctz=Australia%2FSydney" style="border:solid 1px #777" width="600" height="400" frameborder="0" scrolling="no"></iframe>
+  </div>
+<% end %>
 
-<iframe src="https://calendar.google.com/calendar/embed?showTitle=0&amp;showPrint=0&amp;mode=WEEK&amp;height=400&amp;wkst=1&amp;bgcolor=%23FFFFFF&amp;src=<%=@current_user.email%>&amp;color=%231B887A&amp;ctz=Australia%2FSydney" style="border:solid 1px #777" width="600" height="400" frameborder="0" scrolling="no"></iframe>
+<script>
+  <%@calendar_list.each do |calendar|%>
+  $("#calendar-<%=calendar.id.split("@untappedwines.com").first%>").hide();
+  $("#<%=@current_user.email.split("@untappedwines.com").first%>").click(function(){
+    $("#calendar-<%=calendar.id.split("@untappedwines.com").first%>").toggle();
+  });
+  <% end %>
+</script>
 
-<div style='width: 800px;'>
+
+
+<!-- google map component -> pause! -->
+<!-- <div style='width: 800px;'>
   <div id="customer_location" style='width: 800px; height: 400px;'></div>
-</div>
-
+</div> -->
+<!--
 <script>
 var handler = Gmaps.build('Google');
 handler.buildMap({ internal: {id: 'customer_location'}}, function(){
@@ -32,4 +47,4 @@ handler.buildMap({ internal: {id: 'customer_location'}}, function(){
   handler.fitMapToBounds();
 });
 
-</script>
+</script> -->

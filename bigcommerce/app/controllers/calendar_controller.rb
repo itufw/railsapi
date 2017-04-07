@@ -1,8 +1,13 @@
 require 'calendar_helper.rb'
+require 'product_variations.rb'
+require 'models_filter.rb'
+
 class CalendarController < ApplicationController
   before_action :confirm_logged_in
 
   include CalendarHelper
+  include ProductVariations
+  include ModelsFilter
 
   def redirect
     client = Signet::OAuth2::Client.new({
@@ -47,9 +52,9 @@ class CalendarController < ApplicationController
 
     begin
       @current_user = Staff.filter_by_id(session[:user_id])
-      @calendar_list = service.list_calendar_lists
+      @calendar_list = service.list_calendar_lists.items.select{|x| x.id.include?"@untappedwines.com" }
       @event_list = []
-      @calendar_list.items.each do |calendar|
+      @calendar_list.each do |calendar|
         @event_list.append(service.list_events(calendar.id))
       end
     rescue Google::Apis::AuthorizationError => exception
@@ -87,39 +92,51 @@ class CalendarController < ApplicationController
   end
 
   def map
-    @colour_guide = ["purple", "violet", "red", "orange", "green", "lightgreen"]
+    @colour_guide = ["lightgreen", "green", "orange", "coral", "red", "crimson"]
+
     @colour_selected = colour_guide_filter(params["selected_colour"],@colour_guide)
     @order_colour_selected = colour_guide_filter(params["selected_order_colour"],@colour_guide)
 
     @customer_type = CustStyle.all
+    @customer_style_selected =  customer_style_filter(params[:selected_cust_style])
+
+    @staff = Staff.active_sales_staff
+    @staff_selected = staff_filter(params[:selected_staff])
+
+    @colour_range_sales = { "lightgreen" => [5000, 100000],
+                     "green" => [3000,5000],
+                     "orange"=> [1500,3000],
+                     "coral"   => [500, 1500],
+                     "red"=> [0,   500],
+                     "crimson"=> [0,0]
+                   }
+
 
     # params["filter_selector"] = "Sales" || "Last_Order"
     case sales_last_order(params)
     when "Sales"
-      colour_range = { "lightgreen" => [5000, 100000],
-                       "green" => [3000,5000],
-                       "orange"=> [1500,3000],
-                       "red"   => [500, 1500],
-                       "violet"=> [0,   500],
-                       "purple"=> [0,0]
-                     }
+
       # in Helper
       # filter customers with attributes
       @active_sales = true
-      customer_map, @staff, @start_date, @end_date = customer_filter(params, @colour_selected, colour_range)
+      customer_map, @start_date, @end_date = customer_filter(params, @colour_selected, @colour_range_sales, @customer_style_selected)
     when "Last_Order"
       colour_range = { "lightgreen" => [0, 15],
                        "green" => [15,30],
                        "orange"=> [30,45],
-                       "red"   => [45,60],
-                       "violet"=> [60,75],
-                       "purple"=> [75,3000]
+                       "coral"   => [45,60],
+                       "red"=> [60,75],
+                       "crimson"=> [75,3000]
                      }
       @active_sales = false
-      customer_map, @staff, @start_date, @end_date = customer_last_order_filter(params, @order_colour_selected, colour_range)
+      customer_map, @start_date, @end_date = customer_last_order_filter(params, @order_colour_selected, colour_range, @customer_style_selected)
     end
-    @hey = "2017-03-04"
     @hash = hash_map_pins(customer_map)
+
+    # customer table
+    order_function, direction = sort_order(params, 'order_by_name', 'ASC')
+    @per_page = params[:per_page] || Customer.per_page
+    @customers = Customer.filter_by_ids(customer_map.keys()).include_all.send(order_function, direction).paginate( per_page: @per_page, page: params[:page])
 
   end
 
