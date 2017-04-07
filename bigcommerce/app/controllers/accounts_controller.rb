@@ -44,7 +44,8 @@ class AccountsController < ApplicationController
         @monthly = params[:monthly] || 'monthly'
         @checked_monthly = ("monthly".eql? @monthly) ? true : false
 
-        @cn_op = credit_note_and_overpayment(@customer.xero_contact_id)
+        invoices = @customer.xero_contact.xero_invoices.has_amount_due
+        @cn_op = credit_note_and_overpayment(@customer.xero_contact_id, invoices.map{|x| x.invoice_number})
 
         # multiple contact people
         # xeroizer only provides email_address, the details of phone number should be discussed

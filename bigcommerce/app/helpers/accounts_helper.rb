@@ -31,9 +31,12 @@ module AccountsHelper
         [contacts, search_text, selected_staff]
     end
 
-    def credit_note_and_overpayment(xero_contact_id)
-        op = XeroOverpayment.get_remaining_credit(xero_contact_id).where('remaining_credit > 0')
-        cn = XeroCreditNote.get_remaining_credit(xero_contact_id).where('remaining_credit > 0')
+    def credit_note_and_overpayment(xero_contact_id, xero_invoices_ids)
+        op = XeroOverpayment.joins(:xero_op_allocations).get_remaining_credit(xero_contact_id).where('xero_overpayments.remaining_credit > 0 OR xero_op_allocations.invoice_number IN (?)', xero_invoices_ids)
+        cn = XeroCreditNote.joins(:xero_cn_allocations).get_remaining_credit(xero_contact_id).where('xero_credit_notes.remaining_credit > 0 OR xero_cn_allocations.invoice_number IN (?)', xero_invoices_ids)
+
+        # op = XeroOverpayment.get_remaining_credit(xero_contact_id).where('remaining_credit > 0')
+        # cn = XeroCreditNote.get_remaining_credit(xero_contact_id).where('remaining_credit > 0')
         cn_op = {}
 
         op.each do |o|
@@ -53,6 +56,7 @@ module AccountsHelper
                                             remaining_credit: c.remaining_credit, date: c.date, reference: c.reference,\
                                             status: c.credit_note_number }
         end
+        
         cn_op
     end
 

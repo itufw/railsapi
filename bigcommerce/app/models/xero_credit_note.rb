@@ -92,7 +92,7 @@ class XeroCreditNote < ActiveRecord::Base
 	end
 
 	def self.get_remaining_credit(credit_note_id)
-		where(" status in ( 'AUTHORISED', 'PAID' ) and xero_contact_id = '#{credit_note_id}'")
+		where(" xero_credit_notes.status in ( 'AUTHORISED', 'PAID' ) and xero_contact_id = '#{credit_note_id}'")
 	end
 
 	def self.sum_remaining_credit
