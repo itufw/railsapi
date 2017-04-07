@@ -121,4 +121,8 @@ class AdminController < ApplicationController
         end
         redirect_to action: 'index'
     end
+
+    def staff_order_update
+      redirect_to action: 'index'
+    end
 end

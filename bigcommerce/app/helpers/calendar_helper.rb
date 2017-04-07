@@ -4,16 +4,21 @@ module CalendarHelper
     return "Sales"
   end
 
-  def map_filter(params, colour_guide, colour_range_origin)
-    cust_type = params[:selected_cust_style] || []
+  def map_filter(params, colour_guide, colour_range_origin, sale_or_day)
     selected_staff = params[:selected_staff] || []
 
     colour_range = {}
 
     colour_guide.each do |colour|
-      colour_range["#{colour}"] = (("".eql? params["order_range_#{colour}"]) || params["order_range_#{colour}"].nil? )? colour_range_origin["#{colour}"] : params["order_range_#{colour}"].split(",").map(&:to_i)
+      if sale_or_day
+        colour_range["#{colour}"] = [params["order_range_#{colour}_min"].to_i, params["order_range_#{colour}_max"].to_i]
+        # colour_range["#{colour}"] = (("".eql? params["order_range_#{colour}"]) || params["order_range_#{colour}"].nil? )? colour_range_origin["#{colour}"] : params["order_range_#{colour}"].split(",").map(&:to_i)
+      else
+        colour_range["#{colour}"] = (("".eql? params["date_range_#{colour}"]) || params["date_range_#{colour}"].nil? )? colour_range_origin["#{colour}"] : params["date_range_#{colour}"].split(",").map(&:to_i)
+      end
+      colour_range["#{colour}"].append(1000000) if colour_range["#{colour}"].length == 1
     end
-    [cust_type, selected_staff, colour_range]
+    [selected_staff, colour_range]
   end
 
   def colour_guide_filter(selected_colour, colour_guide)
@@ -23,6 +28,24 @@ module CalendarHelper
       return colour_guide
     else
       return selected_colour
+    end
+  end
+
+  def customer_style_filter(customer_style_selected)
+    default_style = ["1", "2"]
+    if customer_style_selected.nil? || customer_style_selected.blank?
+      return default_style
+    else
+      return customer_style_selected
+    end
+  end
+
+  def staff_filter(staff_selected)
+    default_staff = []
+    if staff_selected.nil? || staff_selected.blank?
+      return default_staff
+    else
+      return staff_selected
     end
   end
 
@@ -52,7 +75,7 @@ module CalendarHelper
       when "Sales"
         infowindow = "Total Sales in this period: " + sale_or_day.to_s
       when "Last_Order"
-        infowindow = "Last Orde in : " + sale_or_day.to_s + "  days"
+        infowindow = "Last Order in : " + sale_or_day.to_s + "  days"
       end
 
       map_pin = {
@@ -67,8 +90,8 @@ module CalendarHelper
 
   # filter customer based on the last orde date
   # default to the days started from today
-  def customer_last_order_filter(params, colour_guide, colour_range_origin)
-    selected_cust_style, selected_staff, colour_range = map_filter(params, colour_guide, colour_range_origin)
+  def customer_last_order_filter(params, colour_guide, colour_range_origin, selected_cust_style)
+    selected_staff, colour_range = map_filter(params, colour_guide, colour_range_origin, false)
     start_date = date_check_map(params["start_time"], 0)
     end_date = date_check_map(params["due_time"], 0)
 
@@ -92,14 +115,14 @@ module CalendarHelper
       end #end colour guide for loop
     end #end customers for loop
 
-    staff = Staff.filter_by_ids(customers.map{|x| x.staff_id}.uniq)
-    [customer_map, staff, start_date.to_s, end_date.to_s]
+    [customer_map, start_date.to_s, end_date.to_s]
   end
 
   # filter customer based on the sales for givin period
   # default to pass 3 months
-  def customer_filter(params, colour_guide, colour_range_origin)
-    selected_cust_style, selected_staff, colour_range = map_filter(params, colour_guide, colour_range_origin)
+  def customer_filter(params, colour_guide, colour_range_origin, selected_cust_style)
+    selected_staff, colour_range = map_filter(params, colour_guide, colour_range_origin, true)
+
     # default to one month ago until today
     start_date = date_check_map(params["start_time"], 3)
     end_date = date_check_map(params["due_time"], 0)
@@ -125,8 +148,7 @@ module CalendarHelper
       end #end colour guide for loop
     end #end customers for loop
 
-    staff = Staff.filter_by_ids(customers.map{|x| x.staff_id}.uniq)
-    [customer_map, staff, start_date.to_s, end_date.to_s]
+    [customer_map, start_date.to_s, end_date.to_s]
   end
 
   def hash_map_pins(customer_map)

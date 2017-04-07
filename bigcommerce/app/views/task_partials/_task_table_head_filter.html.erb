@@ -60,7 +60,7 @@
         </th>
         <th id="staff_th">
           <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Customer</a>
+            <a class="" data-toggle="dropdown" href="#">Staff</a>
               <ul class="dropdown-menu">
                 <% @tasks.map{|x| x.task_relations}.map {|x| x.first}.compact.map {|x| x.staff_id}.uniq.each do |staff| %>
                 <% next if staff==0 || staff.nil?%>

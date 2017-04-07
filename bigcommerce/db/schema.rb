@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170327021643) do
+ActiveRecord::Schema.define(version: 20170407062325) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -527,6 +527,7 @@ ActiveRecord::Schema.define(version: 20170327021643) do
     t.integer  "can_update",       limit: 1
     t.integer  "pending_orders",   limit: 1
     t.string   "salesforce_email", limit: 255
+    t.integer  "staff_order",      limit: 4
   end
 
   add_index "staffs", ["active"], name: "index_staffs_on_active", using: :btree
