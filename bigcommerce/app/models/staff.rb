@@ -1,6 +1,8 @@
 require 'csv'
 
 class Staff < ActiveRecord::Base
+	include RailsSortable::Model
+
 	has_many :customers
 	has_many :orders
 
@@ -11,7 +13,7 @@ class Staff < ActiveRecord::Base
 	# validates :email, unique: true
 
 	has_secure_password
-
+	set_sortable :staff_order
 	# Create a new user
 	# Staff.create(name: , email: , password: , password_confirmation: )
 
@@ -52,5 +54,7 @@ class Staff < ActiveRecord::Base
 		find(staff_id).can_update
 	end
 
-
+	def self.order_by_order
+		order(:staff_order)
+	end
 end

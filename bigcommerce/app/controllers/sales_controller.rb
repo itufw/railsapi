@@ -24,15 +24,20 @@ class SalesController < ApplicationController
 
         @dates_this_week = this_week(date_given)
         @dates_last_week = last_week(@dates_this_week[0])
+        @dates_last_two_week = last_week(@dates_last_week[0])
+
 
         sum_function, @param_val, @sum_params = order_sum_param(params[:sum_param])
 
         # returns a hashmap like { date => order_totals }
         @sum_this_week = sum_orders(@dates_this_week[0], @dates_this_week[-1], :group_by_date_created, sum_function, nil)
         @sum_last_week = sum_orders(@dates_last_week[0], @dates_last_week[-1], :group_by_date_created, sum_function, nil)
+        @sum_last_two_week = sum_orders(@dates_last_two_week[0], @dates_last_two_week[-1], :group_by_date_created, sum_function, nil)
+
 
         @dates_paired_this_week = make_daily_dates_map(@dates_this_week)
         @dates_paired_last_week = make_daily_dates_map(@dates_last_week)
+        @dates_paired_last_two_week = make_daily_dates_map(@dates_last_two_week)
 
         # returns a hashmap like { [staff_id, date] => order_totals }
 
@@ -42,8 +47,13 @@ class SalesController < ApplicationController
         #@staff_nicknames = Staff.active_sales_staff.nickname.to_h
         @staff_sum_this_week
 
+        vc_group_number = 17
+        @cust_group_sum_this_week, @cust_group_name = cust_group_sales(vc_group_number, @dates_this_week[0], @dates_this_week[-1], "Vintage Cellars")
+
+
         @current_user = Staff.find(session[:user_id])
         @display_all = params[:display_all] || "No"
+
     end
 
     def get_current_end_date(params)

@@ -1,0 +1,15 @@
+<%#= dates_map is a hash like {date => date} when columns are single days, {week_num => [start_date, end_date]} when columns are weeks, {[month_num, year] => [start_date, end_date]} for months %>
+
+<%#= sums_dates_h are a hash like {[start_date, end_date] => sum} %>
+<td>
+	<%= cust_group_name%>
+</td>
+
+<% dates.each do |d| %>
+	<td class="num"><%= link_to ( exists_in_h_int(sums_dates_h, d) == 0 ? "" :\
+	 exists_in_h_int(sums_dates_h, d).integer? ? exists_in_h_int(sums_dates_h, d) : display_num(exists_in_h_int(sums_dates_h, d))),\
+	 controller: 'order', action: 'all', start_date: dates_map[d][0], end_date: dates_map[d][1], staff_nickname: staff_nickname, staff_id: staff_id, search: cust_group_name %></td>
+<% end %>
+
+
+<td class="num"><%= link_to display_num(sums_dates_h.values.sum), controller: 'order', action: 'all', start_date: total_cell_start_date(dates_map), end_date: total_cell_end_date(dates_map), staff_nickname: staff_nickname, staff_id: staff_id, search: cust_group_name %></td>

@@ -45,7 +45,7 @@ module CalendarHelper
     if staff.user_type.in?(["Sales Executive"])
          return [[staff],[session[:user_id]]]
     end
-    staff = Staff.active_sales_staff
+    staff = Staff.active_sales_staff.order_by_order
     default_staff = []
     if staff_selected.nil? || staff_selected.blank?
       return [staff,default_staff]

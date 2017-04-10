@@ -14,7 +14,7 @@ class TaskController < ApplicationController
         @task = Task.new
         @function = staff_function(session[:user_id])
 
-        @staffs = Staff.active
+        @staffs = Staff.active.order_by_order
         @current_user = Staff.find(session[:user_id])
 
         # Sales/ Operations/ Accounting
