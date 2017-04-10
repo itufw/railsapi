@@ -1,12 +1,10 @@
 require 'calendar_helper.rb'
-require 'product_variations.rb'
 require 'models_filter.rb'
 
 class CalendarController < ApplicationController
   before_action :confirm_logged_in
 
   include CalendarHelper
-  include ProductVariations
   include ModelsFilter
 
   def redirect
