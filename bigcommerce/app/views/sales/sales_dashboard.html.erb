@@ -40,9 +40,17 @@
 		<%= render "partials/daily_sums", sums_dates_h: @sum_last_week, dates: @dates_last_week, dates_map: @dates_paired_last_week, staff_nickname: nil, staff_id: nil %>
 	<tr>
 
+  <tr class = "italics">
+  	<td>Week Before</td>
+  	<%= render "partials/daily_sums", sums_dates_h: @sum_last_two_week, dates: @dates_last_two_week, dates_map: @dates_paired_last_two_week, staff_nickname: nil, staff_id: nil %>
+  <tr>
 	<tr class = "blank-row"><td colspan="9"></td><tr>
 
 	<tr>
 		<%= render "partials/staff_sums", sums_dates_staffs_h: @staff_sum_this_week, staffs: @staff_nicknames, dates: @dates_this_week, dates_map: @dates_paired_this_week, current_user: @current_user, display_all: @display_all %>
 	</tr>
+
+  <tr>
+    <%= render "sales_partials/cust_group_sums", sums_dates_h: @cust_group_sum_this_week, dates: @dates_this_week, dates_map: @dates_paired_this_week, cust_group_name: @cust_group_name, staff_nickname: nil, staff_id: nil %>
+  </tr>
 </table>

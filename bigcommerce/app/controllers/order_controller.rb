@@ -16,7 +16,7 @@ class OrderController < ApplicationController
      	@staff_nickname = params[:staff_nickname]
      	@start_date = params[:start_date]
      	@end_date = params[:end_date]
-     	@staffs = Staff.active_sales_staff
+     	@staffs = Staff.active_sales_staff.order_by_order
 
      	#@can_update_bool = allow_to_update(session[:user_id])
      	@staff, @status, orders, @search_text, @order_id = order_controller_filter(params, "display_report")

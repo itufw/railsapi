@@ -15,13 +15,13 @@ class CustomerController < ApplicationController
 	include CustomerHelper
 
   def all
-    @staffs = Staff.active_sales_staff
+    @staffs = Staff.active_sales_staff.order_by_order
     customers = filter(params, "display_report")
     display_(params, customers)
   end
 
 	def new_customers
-    @staffs = Staff.active_sales_staff
+    @staffs = Staff.active_sales_staff.order_by_order
     customers = filter(params, "display_report")
 
 		start_date = params[:start_date] || {:start_date => (Date.today - 14.days).to_date.to_s}

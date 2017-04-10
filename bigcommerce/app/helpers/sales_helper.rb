@@ -6,6 +6,17 @@ module SalesHelper
   include ProductVariations
   include TimePeriodStats
 
+  def cust_group_sales(cust_group_id, start_date, end_date, cust_group_name)
+     sales = Customer.joins(:orders).select("sum(orders.total_inc_tax) as sum, CAST(orders.date_created AS DATE) as date").\
+                where("customers.cust_group_id = #{cust_group_id}").where("orders.date_created < '#{end_date}' AND orders.date_created > '#{start_date}'").\
+                group("CAST(orders.date_created AS DATE)")
+      cust_group_sums = {}
+      sales.each do |daily_sale|
+        cust_group_sums[daily_sale.date] = daily_sale.sum
+      end
+      # cust_group_name = CustGroup.find(cust_group_id).name
+    [cust_group_sums,cust_group_name]
+  end
 
   # Takes input a date, a Hash like {[staff_id, date] => sum} and a hash of staffs like {staff_id => nickname}
   # Returns a Hash like {date => sum} where sum is the sum of order_totals/bottles

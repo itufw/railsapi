@@ -18,3 +18,5 @@
 //= require underscore
 //= require gmaps/google
 //= require bootstrap-slider
+//= require jquery-ui/widgets/sortable
+//= require rails_sortable

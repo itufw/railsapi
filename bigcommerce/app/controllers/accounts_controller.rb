@@ -23,13 +23,14 @@ class AccountsController < ApplicationController
         @checked_monthly = ("monthly".eql? @monthly) ? true : false
 
         @contacts, @search_text, @selected_staff =  contacts_selection(params, @end_date, @per_page, @date_column)
+        staffs = Staff.all.order_by_order
 
         @invoices = {}
         @staff_pair = {}
         @contacts.each do |c|
             @invoices[c.id] = c.xero_invoices.has_amount_due.period_select(@end_date)
-            staff = c.customer.staff
-            @staff_pair[c.id] = [staff.id, staff.nickname]
+            # staff = c.customer.staff
+            @staff_pair[c.id] = [c.staff_id, staffs.select{|x| x.id==c.staff_id}.first.nickname]
         end
 
     end

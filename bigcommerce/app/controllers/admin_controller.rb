@@ -17,7 +17,7 @@ class AdminController < ApplicationController
 
     # end
 
-    def index; end
+    def index;end
 
     # def scrape
 

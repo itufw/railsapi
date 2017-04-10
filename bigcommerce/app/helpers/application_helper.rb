@@ -42,7 +42,7 @@ module ApplicationHelper
     end
 
     def all_staffs
-        Staff.active_sales_staff
+        Staff.active_sales_staff.order_by_order
     end
 
     # Returns Staff's nickname
