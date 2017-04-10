@@ -96,8 +96,8 @@ module CalendarHelper
   # default to the days started from today
   def customer_last_order_filter(params, colour_guide, colour_range_origin, selected_cust_style, staffs)
     selected_staff, colour_range = map_filter(params, colour_guide, colour_range_origin, false)
-    start_date = date_check_map(params["start_time"], 0)
-    end_date = date_check_map(params["due_time"], 0)
+    start_date = (Date.parse date_check_map(params["start_time"], 0))
+    end_date = (Date.parse date_check_map(params["due_time"], 0))
 
     customers = Customer.joins(:addresses).select("addresses.lat, addresses.lng, customers.*").where("addresses.lat IS NOT NULL AND customers.staff_id IN (?)", staffs.map{|x| x.id}).group("customers.id")
     # the Status check needs to be updated
@@ -106,7 +106,6 @@ module CalendarHelper
     customers = customers.select{|x| selected_staff.include? x.staff_id.to_s } unless selected_staff.blank?
 
     customer_map = {}
-    start_date = (Date.parse start_date)
 
     customers.each do |customer|
       days_gap = (start_date - customer.last_order_date.to_date).to_i
@@ -128,8 +127,8 @@ module CalendarHelper
     selected_staff, colour_range = map_filter(params, colour_guide, colour_range_origin, true)
 
     # default to one month ago until today
-    start_date = date_check_map(params["start_time"], 3)
-    end_date = date_check_map(params["due_time"], 0)
+    start_date = (Date.parse date_check_map(params["start_time"], 3))
+    end_date = (Date.parse date_check_map(params["due_time"], 0))
 
     customers = Customer.joins(:addresses).select("addresses.lat, addresses.lng, customers.*").where("addresses.lat IS NOT NULL AND customers.staff_id IN (?)", staffs.map{|x| x.id}).group("customers.id")
 
