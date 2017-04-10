@@ -100,8 +100,7 @@ class CalendarController < ApplicationController
     @customer_type = CustStyle.all
     @customer_style_selected =  customer_style_filter(params[:selected_cust_style])
 
-    @staff = Staff.active_sales_staff
-    @staff_selected = staff_filter(params[:selected_staff])
+    @staff, @staff_selected = staff_filter(session, params[:selected_staff])
 
     @colour_range_sales = { "lightgreen" => [5000, 100000],
                      "green" => [3000,5000],
@@ -111,15 +110,13 @@ class CalendarController < ApplicationController
                      "crimson"=> [0,0]
                    }
 
-
-    # params["filter_selector"] = "Sales" || "Last_Order"
     case sales_last_order(params)
     when "Sales"
 
       # in Helper
       # filter customers with attributes
       @active_sales = true
-      customer_map, @start_date, @end_date = customer_filter(params, @colour_selected, @colour_range_sales, @customer_style_selected)
+      customer_map, @start_date, @end_date = customer_filter_map(params, @colour_selected, @colour_range_sales, @customer_style_selected, @staff)
     when "Last_Order"
       colour_range = { "lightgreen" => [0, 15],
                        "green" => [15,30],
@@ -129,7 +126,7 @@ class CalendarController < ApplicationController
                        "crimson"=> [75,3000]
                      }
       @active_sales = false
-      customer_map, @start_date, @end_date = customer_last_order_filter(params, @order_colour_selected, colour_range, @customer_style_selected)
+      customer_map, @start_date, @end_date = customer_last_order_filter(params, @order_colour_selected, colour_range, @customer_style_selected, @staff)
     end
     @hash = hash_map_pins(customer_map)
 

@@ -40,13 +40,17 @@ module CalendarHelper
     end
   end
 
-  def staff_filter(staff_selected)
+  def staff_filter(session,staff_selected)
+    staff = Staff.find(session[:user_id])
+    if staff.user_type.in?(["Sales Executive"])
+         return [[staff],[session[:user_id]]]
+    end
+    staff = Staff.active_sales_staff
     default_staff = []
     if staff_selected.nil? || staff_selected.blank?
-      return default_staff
-    else
-      return staff_selected
+      return [staff,default_staff]
     end
+    [staff,staff_selected]
   end
 
   def date_check_map(date,difference_month)
@@ -90,12 +94,12 @@ module CalendarHelper
 
   # filter customer based on the last orde date
   # default to the days started from today
-  def customer_last_order_filter(params, colour_guide, colour_range_origin, selected_cust_style)
+  def customer_last_order_filter(params, colour_guide, colour_range_origin, selected_cust_style, staffs)
     selected_staff, colour_range = map_filter(params, colour_guide, colour_range_origin, false)
     start_date = date_check_map(params["start_time"], 0)
     end_date = date_check_map(params["due_time"], 0)
 
-    customers = Customer.joins(:addresses).select("addresses.lat, addresses.lng, customers.*").where("addresses.lat IS NOT NULL").group("customers.id")
+    customers = Customer.joins(:addresses).select("addresses.lat, addresses.lng, customers.*").where("addresses.lat IS NOT NULL AND customers.staff_id IN (?)", staffs.map{|x| x.id}).group("customers.id")
     # the Status check needs to be updated
     customers = customers.joins(:orders).select("MAX(orders.date_created) as last_order_date, customers.id").where("orders.status_id IN (2, 3, 7, 8, 9, 10, 11, 12, 13)").order("orders.date_created DESC").group("customers.id")
     customers = customers.select{|x| selected_cust_style.include? x.cust_style_id.to_s } unless selected_cust_style.blank?
@@ -115,19 +119,19 @@ module CalendarHelper
       end #end colour guide for loop
     end #end customers for loop
 
-    [customer_map, start_date.to_s, end_date.to_s]
+    [customer_map, start_date, end_date]
   end
 
   # filter customer based on the sales for givin period
   # default to pass 3 months
-  def customer_filter(params, colour_guide, colour_range_origin, selected_cust_style)
+  def customer_filter_map(params, colour_guide, colour_range_origin, selected_cust_style, staffs)
     selected_staff, colour_range = map_filter(params, colour_guide, colour_range_origin, true)
 
     # default to one month ago until today
     start_date = date_check_map(params["start_time"], 3)
     end_date = date_check_map(params["due_time"], 0)
 
-    customers = Customer.joins(:addresses).select("addresses.lat, addresses.lng, customers.*").where("addresses.lat IS NOT NULL").group("customers.id")
+    customers = Customer.joins(:addresses).select("addresses.lat, addresses.lng, customers.*").where("addresses.lat IS NOT NULL AND customers.staff_id IN (?)", staffs.map{|x| x.id}).group("customers.id")
 
     # calculate the customers who have sales record in given period
     customers_sales = Customer.joins(:orders).select("customers.id, sum(orders.total_inc_tax) as sales").where("orders.status_id IN (2, 3, 7, 8, 9, 10, 11, 12, 13)").where("orders.date_created < '#{end_date}' AND orders.date_created > '#{start_date}'").group("customers.id")
@@ -148,7 +152,7 @@ module CalendarHelper
       end #end colour guide for loop
     end #end customers for loop
 
-    [customer_map, start_date.to_s, end_date.to_s]
+    [customer_map, start_date, end_date]
   end
 
   def hash_map_pins(customer_map)
