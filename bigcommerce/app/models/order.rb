@@ -361,6 +361,9 @@ class Order < ActiveRecord::Base
         includes(:order_products).sum('order_products.qty')
     end
 
+    def self.avg_bottle_price
+
+    end
     ######### ORDER BY FUNCTIONS ############
 
     def self.order_by_id(direction)
