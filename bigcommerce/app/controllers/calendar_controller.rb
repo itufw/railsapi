@@ -8,16 +8,15 @@ class CalendarController < ApplicationController
   include ModelsFilter
 
   def redirect
+    uri = (Rails.env.development?) ? "http://localhost:3000/callback" : "http://188.166.243.138.xip.io/callback"
     client = Signet::OAuth2::Client.new({
       client_id: Rails.application.secrets.google_client_id,
       client_secret: Rails.application.secrets.google_client_secret,
       authorization_uri: 'https://accounts.google.com/o/oauth2/auth',
       scope: Google::Apis::CalendarV3::AUTH_CALENDAR,
-      redirect_uri: "http://localhost:3000/callback"
+      redirect_uri: uri
     })
     redirect_to client.authorization_uri.to_s
-    # 4/0vKJMQag2JsPqId-smcPK3e8S2Ie28ydIwt4c6DHeAY
-    # redirect_to callback_url
   end
 
   def callback
