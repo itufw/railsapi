@@ -6,6 +6,7 @@
 		<% else %>
 			<td><%= nickname %></td>
 		<% end %>
+		
 		<% sums_dates_h = give_sum_date_h(id, sums_dates_staffs_h) %>
 		<%= render "partials/daily_sums", sums_dates_h: sums_dates_h, dates: dates, staff_nickname: nickname, staff_id: id, dates_map: dates_map %>
 	</tr>

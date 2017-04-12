@@ -50,11 +50,12 @@ class SalesController < ApplicationController
         @staff_sum_this_week
 
         vc_group_number = 17
-        @cust_group_sum_this_week, @cust_group_name = cust_group_sales(vc_group_number, @dates_this_week[0], @dates_this_week[-1], "Vintage Cellars")
+        @cust_group_sum_this_week, @cust_group_name = cust_group_sales(vc_group_number, @dates_this_week[0], @dates_this_week[-1], "Vintage Cellars", sum_function)
 
         @current_user = Staff.find(session[:user_id])
         @display_all = params[:display_all] || "No"
 
+        @avg_sum = sum_function.to_s.start_with? "avg"
     end
 
     def get_current_end_date(params)
@@ -120,6 +121,7 @@ class SalesController < ApplicationController
 
         @current_user = Staff.find(session[:user_id])
         @display_all = params[:display_all] || "No"
+        @avg_sum = sum_function.to_s.start_with? "avg"
     end
 
     def customer_dashboard

@@ -8,5 +8,5 @@
 	 controller: 'order', action: 'all', start_date: dates_map[d][0], end_date: dates_map[d][1], staff_nickname: staff_nickname, staff_id: staff_id %></td>
 <% end %>
 
-
-<td class="num"><%= link_to display_num(sums_dates_h.values.sum), controller: 'order', action: 'all', start_date: total_cell_start_date(dates_map), end_date: total_cell_end_date(dates_map), staff_nickname: staff_nickname, staff_id: staff_id %></td>
+<% total = @avg_sum ? sums_dates_h.values.sum/sums_dates_h.values.size.to_f : sums_dates_h.values.sum %>
+<td class="num"><%= link_to display_num(total), controller: 'order', action: 'all', start_date: total_cell_start_date(dates_map), end_date: total_cell_end_date(dates_map), staff_nickname: staff_nickname, staff_id: staff_id %></td>
