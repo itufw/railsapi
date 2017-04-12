@@ -88,7 +88,7 @@
               </ul>
           </li>
         </th>
-        <th>Due Date</th>
+        <th>Date</th>
         <th>
           <%= select_tag "display_options", options_for_select(["Task", "Note","All","Expired All"], selected: @selected_display), class:"form-control", :onchange => "this.form.submit();" unless @selected_display.nil?%>
         </th>
