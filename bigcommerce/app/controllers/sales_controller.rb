@@ -52,7 +52,6 @@ class SalesController < ApplicationController
         vc_group_number = 17
         @cust_group_sum_this_week, @cust_group_name = cust_group_sales(vc_group_number, @dates_this_week[0], @dates_this_week[-1], "Vintage Cellars")
 
-
         @current_user = Staff.find(session[:user_id])
         @display_all = params[:display_all] || "No"
 
