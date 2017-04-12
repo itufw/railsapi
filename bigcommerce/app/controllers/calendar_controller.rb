@@ -20,11 +20,13 @@ class CalendarController < ApplicationController
   end
 
   def callback
+    uri = (Rails.env.development?) ? "http://localhost:3000/callback" : "http://188.166.243.138.xip.io/callback"
+
     client = Signet::OAuth2::Client.new({
       client_id: Rails.application.secrets.google_client_id,
       client_secret: Rails.application.secrets.google_client_secret,
       token_credential_uri: 'https://accounts.google.com/o/oauth2/token',
-      redirect_uri: "http://localhost:3000/callback",
+      redirect_uri: uri,
       code: params[:code]
     })
 
