@@ -15,8 +15,9 @@ class CalendarController < ApplicationController
       scope: Google::Apis::CalendarV3::AUTH_CALENDAR,
       redirect_uri: "http://localhost:3000/callback"
     })
-
     redirect_to client.authorization_uri.to_s
+    # 4/0vKJMQag2JsPqId-smcPK3e8S2Ie28ydIwt4c6DHeAY
+    # redirect_to callback_url
   end
 
   def callback
