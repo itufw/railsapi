@@ -63,6 +63,12 @@
 		</th>
 	</tr>
 
+	<%
+		outstanding = 0
+		overdue = 0
+		total_amount = Array.new(6){0}
+	%>
+
 		<% contacts.each do |c| %>
 			<% sum_of_amount = Hash.new%>
 			<% sum_of_amount["invoice_date"] = Array.new(6){0}%>
@@ -77,6 +83,9 @@
 				<% interval = interval > 5 ? 5 : interval %>
 				<% sum_of_amount["due_date"][interval]+=i.amount_due%>
 			<% end%>
+			<!-- Sum up the total -->
+
+
 	<tr>
 		<td>
 			<%= check_box_tag 'selected_contacts[]', c.skype_user_name, false, class: "contact_name_checkbox" if overdue_customer(c) > 0 %>
@@ -98,14 +107,34 @@
 				<td>
 			<% end %>
 		</td>
+		<%
+			outstanding += outstanding_customer(c)
+			overdue += overdue_customer(c)
+		%>
 		<td><%= @staff_pair[c.id].last %></td>
 		<td class="num"><%= (outstanding_customer(c) == 0)? "-" : display_num(outstanding_customer(c))  %></td>
 		<td class="num"><%= (overdue_customer(c) == 0)? "-" : display_num(overdue_customer(c)) %></td>
-		<% sum_of_amount[date_column].each do |sum|%>
+		<% sum_of_amount[date_column].each_with_index do |sum, index|%>
+			<% total_amount[index] += sum %>
 			<td class="num"><%= (sum == 0)? "-" : display_num(sum) %></td>
 		<% end %>
 	</tr>
 	<% end %>
+
+
+	<tr>
+		<td colspan="11"></td>
+	</tr>
+	<tr>
+		<td>Total</td>
+		<td></td>
+		<td></td>
+		<td><%= display_num(outstanding)%></td>
+		<td><%= display_num(overdue)%></td>
+		<% total_amount.each do |sum|%>
+			<td class="num"><%= (sum == 0)? "-" : display_num(sum) %></td>
+		<% end %>
+	</tr>
 
 </table>
 
