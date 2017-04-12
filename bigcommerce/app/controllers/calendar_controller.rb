@@ -90,7 +90,7 @@ class CalendarController < ApplicationController
   end
 
   def map
-    @colour_guide = ["lightgreen", "green", "orange", "coral", "red", "crimson"]
+    @colour_guide = ["lightgreen", "green", "gold", "coral", "red", "maroon"]
 
     @colour_selected = colour_guide_filter(params["selected_colour"],@colour_guide)
     @order_colour_selected = colour_guide_filter(params["selected_order_colour"],@colour_guide)
@@ -102,10 +102,10 @@ class CalendarController < ApplicationController
 
     @colour_range_sales = { "lightgreen" => [5000, 100000],
                      "green" => [3000,5000],
-                     "orange"=> [1500,3000],
+                     "gold"=> [1500,3000],
                      "coral"   => [500, 1500],
                      "red"=> [0,   500],
-                     "crimson"=> [0,0]
+                     "maroon"=> [0,0]
                    }
 
     case sales_last_order(params)
@@ -118,10 +118,10 @@ class CalendarController < ApplicationController
     when "Last_Order"
       colour_range = { "lightgreen" => [0, 15],
                        "green" => [15,30],
-                       "orange"=> [30,45],
+                       "gold"=> [30,45],
                        "coral"   => [45,60],
                        "red"=> [60,75],
-                       "crimson"=> [75,3000]
+                       "maroon"=> [75,3000]
                      }
       @active_sales = false
       customer_map, @start_date, @end_date = customer_last_order_filter(params, @order_colour_selected, colour_range, @customer_style_selected, @staff)

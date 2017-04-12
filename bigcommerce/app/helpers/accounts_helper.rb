@@ -11,7 +11,7 @@ module AccountsHelper
       # select customers with the balance above zero
       contacts = XeroContact.joins(:customer).select("xero_contacts.*, customers.staff_id").\
                   search_filter(search_text).outstanding_is_greater_zero.is_customer.\
-                  paginate(per_page: per_page, page: params[:page])
+                  paginate(per_page: per_page, page: params[:page]).uniq
 
 
       contacts = contacts.where("customers.staff_id IN (?)", selected_staff) unless selected_staff.nil? || selected_staff.blank?

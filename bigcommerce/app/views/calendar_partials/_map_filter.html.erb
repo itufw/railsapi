@@ -172,7 +172,7 @@
   });
 
   var date_gap = 15
-  var colour_guide = ["lightgreen", "green", "orange", "coral", "red", "crimson"]
+  var colour_guide = ["lightgreen", "green", "gold", "coral", "red", "maroon"]
   for(i = 0; i < colour_guide.length - 1; i++) {
     $("#slider-date-"+colour_guide[i]).slider({
         value: [date_gap*i, date_gap*(i+1)],
@@ -185,8 +185,8 @@
     });
   };
 
-  // $("#slider-date-crimson").on('change', function() {
-  //   $("input#date_range_crimson").attr('value', $(this).val());
+  // $("#slider-date-maroon").on('change', function() {
+  //   $("input#date_range_maroon").attr('value', $(this).val());
   // });
   $("#slider-date-red").on('change', function() {
     $("input#date_range_red").attr('value', $(this).val());
@@ -194,8 +194,8 @@
   $("#slider-date-coral").on('change', function() {
     $("input#date_range_coral").attr('value', $(this).val());
   });
-  $("#slider-date-orange").on('change', function() {
-    $("input#date_range_orange").attr('value', $(this).val());
+  $("#slider-date-gold").on('change', function() {
+    $("input#date_range_gold").attr('value', $(this).val());
   });
   $("#slider-date-green").on('change', function() {
     $("input#date_range_green").attr('value', $(this).val());
@@ -222,14 +222,14 @@
  $("#slider-green").on('change', function() {
    $('input#order_range_green').attr('value', $(this).val());
  });
- $("#slider-orange").on('change', function() {
-   $('input#order_range_orange').attr('value', $(this).val());
+ $("#slider-gold").on('change', function() {
+   $('input#order_range_gold').attr('value', $(this).val());
  });
  $("#slider-red").on('change', function() {
    $('input#order_range_red').attr('value', $(this).val());
  });
- $("#slider-crimson").on('change', function() {
-   $('input#order_range_crimson').attr('value', $(this).val());
+ $("#slider-maroon").on('change', function() {
+   $('input#order_range_maroon').attr('value', $(this).val());
  });
 
 </script>
