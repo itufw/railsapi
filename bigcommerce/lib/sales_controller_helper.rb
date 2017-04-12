@@ -35,8 +35,8 @@ module SalesControllerHelper
   def order_sum_param(selected)
     sum_params_h = {"Order Totals" => :sum_total, "Bottles" => :sum_qty,\
      "Number of Orders" => :count_orders, "Avg. Order Total" => :avg_order_total,\
-      "Avg. Bottles" => :avg_order_qty, "New Customer" => :new_customer,\
-      "Avg. Bottle Price exGST" => :avg_bottle_price}
+      "Avg. Bottles" => :avg_order_qty, "Avg. Bottle Price exGST" => :avg_bottle_price,\
+      "New Customer" => :new_customer }
 
     if selected.nil?
       return sum_params_h["Order Totals"], "Order Totals", sum_params_h.keys

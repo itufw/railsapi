@@ -6,13 +6,29 @@ module SalesHelper
   include ProductVariations
   include TimePeriodStats
 
-  def cust_group_sales(cust_group_id, start_date, end_date, cust_group_name)
-     sales = Customer.joins(:orders).select("sum(orders.total_inc_tax) as sum, CAST(orders.date_created AS DATE) as date").\
+  def cust_group_sales(cust_group_id, start_date, end_date, cust_group_name, sum_function)
+      case sum_function
+      when :sum_qty
+        function = "sum(orders.qty)"
+      when :count_orders
+        function = "count(orders.id)"
+      when :avg_order_total
+        function = "avg(orders.total_inc_tax)"
+      when :avg_order_qty
+        function = "avg(orders.qty)"
+      when :avg_bottle_price
+        function = "sum(orders.qty) as qty, sum(orders.total_inc_tax)"
+        gst = 1 + TaxPercentage.gst_percentage * 0.01
+      else
+        function = "sum(orders.total_inc_tax)"
+      end
+
+     sales = Customer.joins(:orders).select(" #{function} as sum, CAST(orders.date_created AS DATE) as date").\
                 where("customers.cust_group_id = #{cust_group_id}").where("orders.date_created < '#{end_date}' AND orders.date_created > '#{start_date}'").\
                 group("CAST(orders.date_created AS DATE)")
       cust_group_sums = {}
       sales.each do |daily_sale|
-        cust_group_sums[daily_sale.date] = daily_sale.sum
+        cust_group_sums[daily_sale.date] = ((:avg_bottle_price).eql? sum_function) ? daily_sale.sum/(daily_sale.qty * gst) : daily_sale.sum
       end
       # cust_group_name = CustGroup.find(cust_group_id).name
     [cust_group_sums,cust_group_name]
@@ -25,7 +41,7 @@ module SalesHelper
     dates_total_h = Hash.new
     dates.each do |d|
       filter_by_date = sums_dates_staffs_h.select {|key, sum| new_key(key) == d && staff_is_active(key[0], staffs) == 1}
-      dates_total_h[d] = filter_by_date.values.sum
+      dates_total_h[d] = @avg_sum ? filter_by_date.values.sum/filter_by_date.values.size.to_f : filter_by_date.values.sum if filter_by_date.values.size>0
     end
     return dates_total_h
   end

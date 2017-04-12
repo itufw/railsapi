@@ -23,7 +23,7 @@
 		<% @dates_this_week.each do |day| %>
 			<th> <%= date_format(day) %></th>
 		<% end %>
-		<th>Total</th>
+		<th><%= @avg_sum ? "Average" : "Total" %></th>
 	</tr>
 
 	<%#= dates_map is a hash like {date => date} when columns are single days, {week_num => [start_date, end_date]} when columns are weeks, {[month_num, year] => [start_date, end_date]} for months %>

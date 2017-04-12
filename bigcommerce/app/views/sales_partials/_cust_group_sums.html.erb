@@ -12,4 +12,4 @@
 <% end %>
 
 
-<td class="num"><%= link_to display_num(sums_dates_h.values.sum), controller: 'order', action: 'all', start_date: total_cell_start_date(dates_map), end_date: total_cell_end_date(dates_map), staff_nickname: staff_nickname, staff_id: staff_id, search: cust_group_name %></td>
+<td class="num"><%= link_to display_num( @avg_sum ? sums_dates_h.values.sum/sums_dates_h.values.size.to_f : sums_dates_h.values.sum), controller: 'order', action: 'all', start_date: total_cell_start_date(dates_map), end_date: total_cell_end_date(dates_map), staff_nickname: staff_nickname, staff_id: staff_id, search: cust_group_name %></td>
