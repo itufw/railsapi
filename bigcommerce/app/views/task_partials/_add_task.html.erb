@@ -1,4 +1,4 @@
-  <%= form_for @task, :url => {:controller => "task", :action => "add_task"}  do |f| %>
+  <%= form_for @task, :url => {:controller => "task", :action => "add_task"}, :id => "task_append_form"  do |f| %>
   <%= hidden_field_tag :parent_task, @parent_task %>
   <%= hidden_field_tag :selected_orders, @selected_orders unless @selected_orders.blank?%>
   <%= hidden_field_tag :accounts_page, @customer_locked %>

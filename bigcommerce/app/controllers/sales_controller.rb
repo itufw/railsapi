@@ -201,7 +201,6 @@ class SalesController < ApplicationController
 
 
         @checked_stats = ("stats".eql? params[:display_column]) ? true : false
-        @checked_detailis = !@checked_stats
 
         # stats View!
         # helpers - > sales_helper
