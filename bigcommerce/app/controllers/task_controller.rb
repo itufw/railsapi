@@ -9,6 +9,7 @@ class TaskController < ApplicationController
     include TaskHelper
 
     def add_task
+
         @parent_task = params[:parent_task] || 0
 
         @task = Task.new
@@ -41,6 +42,7 @@ class TaskController < ApplicationController
 
         # for some sepcial input
         @selected_orders = params[:selected_invoices] || []
+
     end
 
     def staff_task
