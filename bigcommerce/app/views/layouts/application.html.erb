@@ -40,7 +40,7 @@
         </li>
 
         <li><%= link_to "Pending Orders", controller: "status", action: "pending", status_id: 1, status_name: "Pending" %></li>
-        <% if ["Admin", "Management", "Accounts"].include? session[:authority]%>
+        <% if user_full_right(session[:authority]) %>
           <li class="dropdown">
             <a class="" data-toggle="dropdown" href="#">Accounting
             <span class="caret"></span></a>
@@ -49,11 +49,12 @@
               <li><%= link_to "Different Orders", controller: "accounts", action: "different_orders" %></li>
             </ul>
           </li>
-          <% if ["Admin", "Management", "Accounts"].include? session[:authority]%>
-            <li><%= link_to "Admin", controller: "admin", action: "index" %></li>
-          <% end%>
+          <li><%= link_to "Admin", controller: "admin", action: "index" %></li>
+        <%else%>
+          <li><%= link_to "Password Update", controller: "admin", action: "admin" %></li>
         <% end%>
-        <% if ["Admin", "Management", "Accounts"].include? session[:authority]%>
+
+        <% if user_full_right(session[:authority])%>
           <li class="dropdown">
             <a class="" data-toggle="dropdown" href="#">Note
             <span class="caret"></span></a>
