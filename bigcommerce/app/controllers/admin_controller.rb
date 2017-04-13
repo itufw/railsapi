@@ -122,6 +122,29 @@ class AdminController < ApplicationController
         redirect_to action: 'index'
     end
 
+    def admin;end
+
+    def password_update_user
+      current_user = Staff.find(session[:user_id])
+      if current_user.can_update
+          if params[:staff].present? && params[:staff][:id].present?
+              staff_to_update = Staff.find(params[:staff][:id])
+              if params[:new_password].eql? params[:new_password_confirmation]
+                  staff_to_update.password_digest = BCrypt::Password.create(params[:new_password])
+                  staff_to_update.save!
+                  flash[:success] = 'Updated'
+              else
+                  flash[:error] = 'Passwords don\'t match'
+              end
+          else
+              flash[:error] = 'Select a Staff to Update'
+          end
+      else
+          flash[:error] = 'Not authorised to update'
+      end
+      redirect_to action: 'admin'
+    end
+
     def staff_order_update
       redirect_to action: 'index'
     end

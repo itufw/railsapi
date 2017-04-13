@@ -181,4 +181,11 @@ module ApplicationHelper
             'MEDIUM'
         end
     end
+
+    def user_full_right(authority)
+      if ["Admin", "Management", "Accounts"].include? session[:authority]
+        return true
+      end
+      return false
+    end
 end

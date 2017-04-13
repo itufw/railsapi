@@ -57,6 +57,7 @@ class CalendarController < ApplicationController
       @calendar_list.each do |calendar|
         @event_list.append(service.list_events(calendar.id))
       end
+      p = c
     rescue Google::Apis::AuthorizationError => exception
       response = client.refresh!
       session[:authorization] = session[:authorization].merge(response)
