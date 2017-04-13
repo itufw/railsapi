@@ -134,7 +134,7 @@ class AccountsController < ApplicationController
     end
 
     def different_orders
-        @all, @unpaid = different_orders_checked(params[:unpaid])
+        @all, unpaid = different_orders_checked(params[:unpaid])
 
         @orders = Order.total_dismatch.order_by_id('DESC')
         @credit_note_allocation = XeroCnAllocation.apply_to_orders(@orders.map(&:id)).group_by_orders.sum_applied_amount
