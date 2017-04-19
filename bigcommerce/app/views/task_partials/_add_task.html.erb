@@ -98,7 +98,7 @@ $(function () {
     });
 
     $("#due_timepicker").on("dp.change", function (e) {
-        $('#start_timepicker').data("DateTimePicker").date(e.date);
+        // $('#start_timepicker').data("DateTimePicker").date(e.date);
         $('#start_timepicker').data("DateTimePicker").maxdate(e.date);
     });
     $("#start_timepicker").on("dp.change", function (e) {
