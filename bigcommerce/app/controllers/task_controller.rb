@@ -59,6 +59,8 @@ class TaskController < ApplicationController
           @google_alive = true
         rescue Google::Apis::AuthorizationError => exception
           @google_alive = false
+        rescue
+          @google_alive = false
         end
 
     end
