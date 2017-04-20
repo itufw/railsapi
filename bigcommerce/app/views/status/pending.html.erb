@@ -8,9 +8,9 @@
         <button class="button not-default inline products-view" id="products-view-button">Products View</button>
     </div>
 </center>
+<%= form_tag({:controller => "status", :action => "pending"}, {:method => "get"}) do %>
 
 <div class="form-group" style="margin-top:100px;">
-    <%= form_tag({:controller => "status", :action => "pending"}, {:method => "get"}) do %>
 
     <div class="col-xs-3">
         <%= text_field_tag('search', @search_text, placeholder: 'Search for Product or Customer Name', class: 'form-control') %>
@@ -27,7 +27,6 @@
     <%= hidden_field_tag :status_name, @status_name %>
 
     <%= submit_tag "Filter", class: 'btn btn-primary' %>
-    <% end %>
 </div><br/>
 
 <h3 id="orders-view-heading" class="orders-view default"><%= @status_name %>
@@ -37,3 +36,4 @@
 <h3 id="products-view-heading" class="products-view not-default" style="text-align: center;"><%= @status_name %>
     Products</h3>
 <%= render "partials/product_status", products: @products %>
+<% end %>

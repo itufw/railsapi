@@ -17,6 +17,8 @@ module TaskHelper
             t.description = params[:task][:description]
             t.priority = params[:task][:priority].to_i
             t.parent_task = ((params[:parent_task] != 0) && (params[:parent_task].to_i.to_s == params[:parent_task]))? params[:parent_task] : 0
+            t.gcal_status = ("yes".eql? params[:event_column]) ? "pushed" : "na"
+
             # automatically add the parent task to new task
             unless ''.eql? selected_orders
                 parent_tasks = OrderAction.where('order_actions.order_id IN (?) AND task_id IS NOT NULL', selected_orders.split).order('created_at DESC')
@@ -27,9 +29,12 @@ module TaskHelper
                     add_order_action(order.to_i, t.id, t.is_task)
                 end
             end
-            Task.new.insert_or_update(t)
             customer_id = params['customer']['id'] != '' ? params['customer']['id'] : 0
             staff_id = params['staff']['id'] != '' ? params['staff']['id'] : 0
+
+            t.google_event_id = push_event_to_calendar(customer_id, t.description, staff_id, t.response_staff, t.start_date, t.end_date, t.subject_1, t.method).id if "yes".eql? params[:event_column]
+
+            Task.new.insert_or_update(t)
             TaskRelation.new.insert_or_update(t.id, customer_id, staff_id)
 
             return t.id
@@ -139,7 +144,7 @@ module TaskHelper
     def default_function_type(user_role)
       case user_role
       when "Accounts"
-        role = "Accounts"
+        role = "Accounting"
       when "Sales Executive"
         role = "Sales"
       when "Admin"
@@ -148,5 +153,81 @@ module TaskHelper
         role = "Operations"
       end
       role
+    end
+
+    def push_event_to_calendar(customer_id, description, staff, response_staff, start_time, end_time, subject, method)
+      client = Signet::OAuth2::Client.new(client_id: Rails.application.secrets.google_client_id,
+                                          client_secret: Rails.application.secrets.google_client_secret,
+                                          token_credential_uri: 'https://accounts.google.com/o/oauth2/token')
+
+      client.update!(
+        :additional_parameters => {"access_type" => "offline"}
+        )
+      client.update!(session[:authorization])
+
+
+
+      service = Google::Apis::CalendarV3::CalendarService.new
+      service.authorization = client
+
+      response_staff = Staff.find(response_staff)
+      response_staff_email = response_staff.email
+      assigned_staff = (staff==0)? response_staff : Staff.find(staff)
+
+      customer = Customer.where("customers.id = #{customer_id}")
+      customer = (customer.blank?) ? assigned_staff.nickname : customer.first.actual_name
+
+      address = combine_adress(Address.where("customer_id = #{customer_id}"))
+      task_subject = TaskSubject.find(subject).subject
+
+      event = Google::Apis::CalendarV3::Event.new({
+                                                  # start: Google::Apis::CalendarV3::EventDateTime.new(date: start_time),
+                                                  start: {
+                                                    date_time: start_time.strftime('%Y-%m-%dT%H:%M:%S'),
+                                                    time_zone: 'Australia/Melbourne',
+                                                  },
+                                                  # end: Google::Apis::CalendarV3::EventDateTime.new(date: end_time),
+                                                  end:{
+                                                    date_time: end_time.strftime('%Y-%m-%dT%H:%M:%S'),
+                                                    time_zone: 'Australia/Melbourne',
+                                                  },
+                                                  # colorID: "2",
+                                                  summary: task_subject + ": "+ customer,
+                                                  description: description,
+                                                  location: address,
+                                                  attendees: [
+                                                    {
+                                                      displayName: assigned_staff.nickname,
+                                                      email: assigned_staff.email
+                                                    }
+                                                  ]})
+                                                  # attendees: Google::Apis::CalendarV3::EventAttendee.new(email: Staff.find(staff).email)})
+
+
+      begin
+        gcal_event = service.insert_event(response_staff_email, event)
+        return gcal_event
+      rescue Google::Apis::AuthorizationError => exception
+        client.update!(
+          additional_parameters: {
+            grant_type: "refresh_token"
+          }
+        )
+          response = client.refresh!
+          session[:authorization] = session[:authorization].merge(response)
+          retry
+      end
+    end
+
+    def combine_adress(customer_address)
+      location = ""
+
+      return location if customer_address.nil? || customer_address.blank?
+      customer_address = customer_address.first
+
+      location += customer_address.street_1 + " "
+      location += customer_address.street_2 + " " unless customer_address.street_2.nil?
+      location += ", " + customer_address.city + ", " + customer_address.state + ", " + customer_address.country
+      location
     end
 end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170407062325) do
+ActiveRecord::Schema.define(version: 20170419051725) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -614,6 +614,8 @@ ActiveRecord::Schema.define(version: 20170407062325) do
     t.integer  "expired",             limit: 1
     t.integer  "priority",            limit: 1
     t.string   "accepted",            limit: 10
+    t.string   "google_event_id",     limit: 255
+    t.integer  "gcal_status",         limit: 4
   end
 
   create_table "tax_percentages", force: :cascade do |t|

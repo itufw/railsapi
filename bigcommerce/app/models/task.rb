@@ -6,27 +6,16 @@ class Task < ActiveRecord::Base
     belongs_to :parent, class_name: 'Task', foreign_key: 'parent_task'
     has_many :children, class_name: 'Task', foreign_key: 'parent_task'
 
+    enum gcal_status: [ :na, :pushed, :pulled, :unconfirmed ]
+
     def insert_or_update(t)
         time = Time.now.to_s(:db)
-        start_date = t.start_date.to_s(:db)
-        end_date = t.end_date.to_s(:db)
-        if t.parent_task != 0
-            task = "(#{t.id},\"#{start_date}\", \"#{end_date}\", '#{time}', '#{time}', '#{t.title}', \"#{t.description}\", #{t.is_task},\
-                    #{t.response_staff}, #{t.last_modified_staff}, '#{t.method}', '#{t.function}','#{t.subject_1}', 0,'#{t.parent_task}','#{t.priority}')"
-            sql = "INSERT INTO `tasks`(`id`,`start_date`, `end_date`, `created_at`, `updated_at`,\
-                  `title`, `description`, `is_task`, `response_staff`, `last_modified_staff`, `method`,\
-                  `function`, `subject_1`, `expired`, `parent_task`, `priority`)\
-                  VALUES #{task}"
-        else
-            task = "(#{t.id},\"#{start_date}\", \"#{end_date}\", '#{time}', '#{time}', '#{t.title}', \"#{t.description}\", #{t.is_task},\
-                    #{t.response_staff}, #{t.last_modified_staff}, '#{t.method}', '#{t.function}','#{t.subject_1}', 0, '#{t.priority}')"
-            sql = "INSERT INTO `tasks`(`id`,`start_date`, `end_date`, `created_at`, `updated_at`,\
-                  `title`, `description`, `is_task`, `response_staff`, `last_modified_staff`, `method`,\
-                  `function`, `subject_1`, `expired`, `priority`)\
-                  VALUES #{task}"
-        end
-
-        ActiveRecord::Base.connection.execute(sql)
+        t.start_date = t.start_date.to_s(:db)
+        t.end_date = t.end_date.to_s(:db)
+        t.created_at = time
+        t.updated_at = time
+        t.expired = 0
+        t.save
     end
 
     def auto_insert_from_calendar_event(event)

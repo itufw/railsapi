@@ -13,6 +13,10 @@ class CalendarController < ApplicationController
                                             client_secret: Rails.application.secrets.google_client_secret,
                                             authorization_uri: 'https://accounts.google.com/o/oauth2/auth',
                                             scope: Google::Apis::CalendarV3::AUTH_CALENDAR,
+                                            :additional_parameters => {
+                                              "access_type" => "offline",         # offline access
+                                              "include_granted_scopes" => "true"  # incremental auth
+                                            },
                                             redirect_uri: uri)
         redirect_to client.authorization_uri.to_s
     end
@@ -25,24 +29,23 @@ class CalendarController < ApplicationController
                                             token_credential_uri: 'https://accounts.google.com/o/oauth2/token',
                                             redirect_uri: uri,
                                             code: params[:code])
-
         response = client.fetch_access_token!
 
         session[:authorization] = response
-
         redirect_to calendars_url
     end
 
     def calendars
         client = Signet::OAuth2::Client.new(client_id: Rails.application.secrets.google_client_id,
                                             client_secret: Rails.application.secrets.google_client_secret,
+                                            :additional_parameters => {
+                                              "access_type" => "offline",         # offline access
+                                              "include_granted_scopes" => "true"  # incremental auth
+                                            },
                                             token_credential_uri: 'https://accounts.google.com/o/oauth2/token')
-
         client.update!(session[:authorization])
-
         service = Google::Apis::CalendarV3::CalendarService.new
         service.authorization = client
-
         begin
             @current_user = Staff.filter_by_id(session[:user_id])
             @calendar_list = service.list_calendar_lists.items.select { |x| x.id.include?'@untappedwines.com' }
@@ -50,10 +53,11 @@ class CalendarController < ApplicationController
             @calendar_list.each do |calendar|
                 @event_list.append(service.list_events(calendar.id))
             end
+            # event_to_task(@event_list)
+
         rescue Google::Apis::AuthorizationError => exception
             response = client.refresh!
             session[:authorization] = session[:authorization].merge(response)
-
             retry
         end
     end
@@ -71,7 +75,8 @@ class CalendarController < ApplicationController
         today = Date.today
 
         customer_address = Address.where("customer_id = #{params[:customer_id]}").first
-        address = ""+ customer_address.street_1.to_s + " " + customer_address.street_2.to_s + ", " + customer_address.city + ", " + customer_address.state + ", " + customer_address.state + ", " + customer_address.postcode + ", " + customer_address.country
+        address = combine_adress(customer_address)
+
         event = Google::Apis::CalendarV3::Event.new(start: Google::Apis::CalendarV3::EventDateTime.new(date: today),
                                                     end: Google::Apis::CalendarV3::EventDateTime.new(date: today + 1),
                                                     summary: params[:description],
@@ -84,6 +89,7 @@ class CalendarController < ApplicationController
     end
 
     def map
+
         @colour_guide = %w(lightgreen green gold coral red maroon)
 
         @colour_selected = colour_guide_filter(params['selected_colour'], @colour_guide)
@@ -94,6 +100,7 @@ class CalendarController < ApplicationController
 
         @staff, @staff_selected = staff_filter(session, params[:selected_staff])
 
+        @max_date = ((params[:date_range_maroon])&&(params[:date_range_maroon].to_i.to_s.eql? params[:date_range_maroon]))? params[:date_range_maroon].to_i : 90
         @colour_range_sales = { 'lightgreen' => [5000, 100_000],
                                 'green' => [3000, 5000],
                                 'gold' => [1500, 3000],

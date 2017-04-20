@@ -43,6 +43,24 @@ class TaskController < ApplicationController
         # for some sepcial input
         @selected_orders = params[:selected_invoices] || []
 
+
+        begin
+          client = Signet::OAuth2::Client.new(client_id: Rails.application.secrets.google_client_id,
+                                              client_secret: Rails.application.secrets.google_client_secret,
+                                              :additional_parameters => {
+                                                "access_type" => "offline",         # offline access
+                                                "include_granted_scopes" => "true"  # incremental auth
+                                              },
+                                              token_credential_uri: 'https://accounts.google.com/o/oauth2/token')
+          client.update!(session[:authorization])
+          service = Google::Apis::CalendarV3::CalendarService.new
+          service.authorization = client
+          lists = service.list_calendar_lists
+          @google_alive = true
+        rescue Google::Apis::AuthorizationError => exception
+          @google_alive = false
+        end
+
     end
 
     def staff_task
