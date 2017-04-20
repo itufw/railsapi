@@ -4,6 +4,8 @@
 <script src="//cdn.rawgit.com/mahnunchik/markerclustererplus/master/dist/markerclusterer.min.js"></script>
 
 <div class="container">
+  <%= form_tag({:action => "map"}, {:method => "get"}) do %>
+
     <div class="row">
         <div class='col-md-8'>
             <div id="customer_location" style='width: 650px; height: 600px;'></div>
@@ -14,6 +16,7 @@
     <div class="row">
       <%= render "partials/customer", customers: @customers %>
     </div>
+    <% end %>
 
 </div>
 <!-- Google Map Component -->

@@ -71,10 +71,15 @@ module CalendarHelper
         url = "map_icons/people_#{category}.png"
       end
 
-      name = ""
-      name += customer.firstname unless customer.firstname.nil?
-      name += " "
-      name += customer.lastname unless customer.lastname.nil?
+      if customer.actual_name.nil?
+        name = ""
+        name += customer.firstname unless customer.firstname.nil?
+        name += " "
+        name += customer.lastname unless customer.lastname.nil?
+      else
+        name = customer.actual_name
+      end
+
       case func
       when "Sales"
         infowindow = "Total Sales in this period: " + sale_or_day.to_s
@@ -169,4 +174,18 @@ module CalendarHelper
       end
     hash
   end
+
+  def event_to_task(event_list)
+    p = c
+    task_list = Task.where("google_event_id IS NOT NULL")
+    task_google_event_ids = task_list.map{|x| x.google_event_id}
+    event_list.each do |calendar_event|
+      items = calendar_event.items.select{|x| !(task_google_event_ids.include? x.id)}
+      items.each do |event|
+
+      end
+    end
+  end
+
+
 end

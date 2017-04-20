@@ -1,9 +1,9 @@
 <%= title @product_name  + " - " + @customer_name %>
 <h3><%= @customer_name %></h3><br/>
 <h3><%= @product_name %></h3>
+<%= form_tag({:action => "summary" }, {:method => "get"}) do %>
 
 <div style="margin-top: 50px;">
-<%= form_tag({:action => "summary" }, {:method => "get"}) do %>
 	<%= render "partials/overall_stats", sum_param: "Qty", supply_display_class: "none" %>
 
 	<%= hidden_field_tag :customer_id, @customer_id %>
@@ -11,7 +11,7 @@
    	<%= hidden_field_tag :customer_name, @product_id %>
    	<%= hidden_field_tag :customer_name, @product_name %>
 
-<% end %>
 </div>
 
 <%= render "partials/order", orders: @orders, display_class: "", product_ids: @product_ids %>
+<% end %>

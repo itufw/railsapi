@@ -72,6 +72,18 @@
           </br>
           </div>
       </div>
+      <% if @google_alive %>
+        <div class="row" style="margin-top: 5px;">
+        	<div class="col-xs-6 col-xs-offset-4">
+            <b>Add to Calendar:</b>
+        		<%= radio_button_tag(:event_column, "yes", false) %> Yes
+        		<span style="margin-left: 50px;">
+        		<%= radio_button_tag(:event_column, "no", true) %>  No
+        		</span>
+        	</div>
+        </div>
+      <% end %>
+
       <div class="col-xs-6 col-xs-offset-4">
           <%= button_tag(type: 'submit', class: "btn btn-primary") do %>
             <div id="create_button">Create Task!</div>

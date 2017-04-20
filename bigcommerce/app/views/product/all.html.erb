@@ -1,10 +1,10 @@
 <%= title "Products" %>
 <h3>Products</h3>
+<%= form_tag({:action => "all"}, {:method => "get"}) do %>
 
 <div class="form-group container-fluid">
-	<%= form_tag({:action => "all"}, {:method => "get"}) do %>
 	<%= render "partials/product_filter" %>
-<% end %>
 </div>
 
 <%= render "partials/product", pending_stock_h: @pending_stock_h %>
+<% end %>
