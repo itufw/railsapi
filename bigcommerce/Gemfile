@@ -96,3 +96,6 @@ gem 'gmaps4rails'
 gem 'geokit-rails'
 # bootstrap-slider-rails -> used in map component
 gem 'bootstrap-slider-rails'
+# live search gem
+gem 'filterrific'
+gem 'rails-jquery-autocomplete'

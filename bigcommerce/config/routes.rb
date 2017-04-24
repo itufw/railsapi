@@ -18,6 +18,9 @@ Rails.application.routes.draw do
   # this needs to be replaced sometime
   match ':controller(/:action(/:id))', via: [:get, :post]
   resources :posts
+  resources :tasks do
+    get :autocomplete_customer_actual_name, :on => :collection
+  end
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

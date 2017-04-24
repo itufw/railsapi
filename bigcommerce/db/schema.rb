@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170419051725) do
+ActiveRecord::Schema.define(version: 20170421042456) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -528,6 +528,8 @@ ActiveRecord::Schema.define(version: 20170419051725) do
     t.integer  "pending_orders",   limit: 1
     t.string   "salesforce_email", limit: 255
     t.integer  "staff_order",      limit: 4
+    t.string   "access_token",     limit: 255
+    t.string   "refresh_token",    limit: 255
   end
 
   add_index "staffs", ["active"], name: "index_staffs_on_active", using: :btree

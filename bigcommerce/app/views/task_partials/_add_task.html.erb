@@ -21,7 +21,7 @@
       </div>
       <div class="col-md-8 col-md-offset-4" id="task_function">
           <%= label(:method, "Method:")%>
-          <%= f.collection_select :method, @methods, :method, :method, {:prompt => "Select a Method"} %>
+          <%= f.collection_select :method, @methods, :method, :method, {:include_blank => "Select a Method", :selected => "Call"} %>
           <%= label(:priority, "Priority:")%>
           <%= f.collection_select :priority, TaskPriority.all, :id, :priority_level, {:selected => 3} %>
       </div>
@@ -98,35 +98,35 @@
 
 
 <script>
-$(function () {
-    $('#due_timepicker').datetimepicker({
-      defaultDate: new Date(),
-      sideBySide: true
-    });
-    $('#start_timepicker').datetimepicker({
-      defaultDate: new Date(),
-      sideBySide: true,
-      useCurrent: false //Important! See issue #1075
-    });
+  $(function () {
+      $('#due_timepicker').datetimepicker({
+        defaultDate: new Date(),
+        sideBySide: true
+      });
+      $('#start_timepicker').datetimepicker({
+        defaultDate: new Date(),
+        sideBySide: true,
+        useCurrent: false //Important! See issue #1075
+      });
 
-    // $("#due_timepicker").on("dp.change", function (e) {
-        // $('#start_timepicker').data("DateTimePicker").date(e.date);
-        // $('#start_timepicker').data("DateTimePicker").maxdate(e.date);
-    // });
-    // $("#start_timepicker").on("dp.change", function (e) {
-        // $('#due_timepicker').data("DateTimePicker").minDate(e.date);
-    // });
-});
+      // $("#due_timepicker").on("dp.change", function (e) {
+          // $('#start_timepicker').data("DateTimePicker").date(e.date);
+          // $('#start_timepicker').data("DateTimePicker").maxdate(e.date);
+      // });
+      // $("#start_timepicker").on("dp.change", function (e) {
+          // $('#due_timepicker').data("DateTimePicker").minDate(e.date);
+      // });
+  });
 
-$(".is_task_check").change(function () {
-  if($(this).val() == "Note"){
-    $(".task_due_date").hide();
-    $("#create_button").html("Create Note!");
-    $("#task_type_title").html("Note");
-  }else{
-    $(".task_due_date").show();
-    $("#create_button").html("Create Task!");
-    $("#task_type_title").html("Task");
-  };
-});
+  $(".is_task_check").change(function () {
+    if($(this).val() == "Note"){
+      $(".task_due_date").hide();
+      $("#create_button").html("Create Note!");
+      $("#task_type_title").html("Note");
+    }else{
+      $(".task_due_date").show();
+      $("#create_button").html("Create Task!");
+      $("#task_type_title").html("Task");
+    };
+  });
 </script>

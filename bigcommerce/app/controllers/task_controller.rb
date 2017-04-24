@@ -4,45 +4,26 @@ require 'task_helper.rb'
 class TaskController < ApplicationController
     before_action :confirm_logged_in
 
+    autocomplete :customer, :actual_name, :full => true
+
     include ModelsFilter
     include DatesHelper
     include TaskHelper
 
     def add_task
-
-        @parent_task = params[:parent_task] || 0
+      # task helper -> check if the customer has assigned
+      @parent_task, @customers, @customer_locked = lock_customer(params)
 
         @task = Task.new
-        @function = staff_function(session[:user_id])
 
         @staffs = Staff.active.order_by_order
         @current_user = Staff.find(session[:user_id])
 
-        # Sales/ Operations/ Accounting
-        @default_function = default_function_type(@current_user.user_type)
-        params[:selected_function] = params[:selected_function].nil? ? @default_function : params[:selected_function]
-
-        subjects = TaskSubject.all
-        @subjects = subjects.select { |x| x.function == params[:selected_function] }
-
-        @methods = TaskMethod.all
-        if params[:account_customer].nil? || params[:account_customer].blank?
-            @customers = Customer.filter_by_staff(params[:selected_staff])
-            @customer_locked = false
-        else
-            @customers = Customer.filter_by_ids(params[:account_customer])
-            @customer_locked = true
-        end
-
-        if @parent_task != 0
-            parent_task = Task.joins(:task_relations).find(@parent_task)
-            @customer_locked = true
-            @customers = Customer.filter_by_ids(parent_task.task_relations.map{|x| x.customer_id}.uniq) unless parent_task.task_relations.blank?
-        end
+        # task helper -> get the functions/subjects/methods from json request
+        @function, @subjects, @methods, @default_function = function_subjects_method(params, @current_user)
 
         # for some sepcial input
         @selected_orders = params[:selected_invoices] || []
-
 
         begin
           client = Signet::OAuth2::Client.new(client_id: Rails.application.secrets.google_client_id,
@@ -53,12 +34,15 @@ class TaskController < ApplicationController
                                               },
                                               token_credential_uri: 'https://accounts.google.com/o/oauth2/token')
           client.update!(session[:authorization])
+
           service = Google::Apis::CalendarV3::CalendarService.new
           service.authorization = client
           lists = service.list_calendar_lists
           @google_alive = true
         rescue Google::Apis::AuthorizationError => exception
-          @google_alive = false
+          response = client.refresh!
+          session[:authorization] = session[:authorization].merge(response)
+          retry
         rescue
           @google_alive = false
         end
