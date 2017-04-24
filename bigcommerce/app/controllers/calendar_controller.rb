@@ -36,6 +36,8 @@ class CalendarController < ApplicationController
     end
 
     def calendars
+      # p = c
+      # {"access_token"=>"ya29.GlszBOwNQ8VTGdG7I_8Svo6Iez-VADqUvC5AbxDpTVvo329xlzD0rwDyavPvFXKpZfvY2nLrNJKGFDzxQaOGvCY6S44nPcBPEQylTiwIPGwsHgB8pwN7D7R3aoxp", "expires_in"=>3600, "refresh_token"=>"1/t2PMHGM-8z_p733L_S_ZRhKU5nzDeArQqfZBFWrpQCA", "token_type"=>"Bearer"}
         client = Signet::OAuth2::Client.new(client_id: Rails.application.secrets.google_client_id,
                                             client_secret: Rails.application.secrets.google_client_secret,
                                             :additional_parameters => {
@@ -53,13 +55,48 @@ class CalendarController < ApplicationController
             @calendar_list.each do |calendar|
                 @event_list.append(service.list_events(calendar.id))
             end
-            # event_to_task(@event_list)
-
         rescue Google::Apis::AuthorizationError => exception
             response = client.refresh!
             session[:authorization] = session[:authorization].merge(response)
             retry
         end
+    end
+
+    def event_censor
+      client = Signet::OAuth2::Client.new(client_id: Rails.application.secrets.google_client_id,
+                                          client_secret: Rails.application.secrets.google_client_secret,
+                                          :additional_parameters => {
+                                            "access_type" => "offline",         # offline access
+                                            "include_granted_scopes" => "true"  # incremental auth
+                                          },
+                                          token_credential_uri: 'https://accounts.google.com/o/oauth2/token')
+      client.update!(session[:authorization])
+      service = Google::Apis::CalendarV3::CalendarService.new
+      service.authorization = client
+      begin
+        @methods = TaskMethod.all
+        @customers = Customer.all
+
+        task_list = Task.where("google_event_id IS NOT NULL")
+        task_google_event_ids = task_list.map{|x| x.google_event_id}
+
+          calendar_list = service.list_calendar_lists.items.select { |x| x.id.include?'@untappedwines.com' }
+          event_list = []
+          calendar_list.each do |calendar|
+              event_list.append(service.list_events(calendar.id))
+          end
+
+          @events = []
+          event_list.each do |calendar_event|
+            items = calendar_event.items.select{|x| !(task_google_event_ids.include? x.id)}
+            @events += items
+          end
+
+      rescue Google::Apis::AuthorizationError => exception
+          response = client.refresh!
+          session[:authorization] = session[:authorization].merge(response)
+          retry
+      end
     end
 
     def new_event

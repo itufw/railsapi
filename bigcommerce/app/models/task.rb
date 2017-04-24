@@ -86,6 +86,42 @@ class Task < ActiveRecord::Base
         TaskRelation.new.insert_or_update(task_id, customer_id, customer_staff_id)
     end
 
+    def insert_from_calendar(event)
+      task = Task.new
+      task.id = Time.now
+      task.start_date = event.start.date_time.to_s(:db)
+      task.end_date = event.end.date_time.to_s(:db)
+      task.created_at = event.created_at.to_s(:db)
+      task.updated_at = event.updated.to_s(:db)
+      # task.title
+      task.description = event.summary.to_s + "\n" + event.description.to_s
+      task.is_task = (event.attendees.nil?) ? 0 : 1
+
+      unless event.attendees.nil?
+        event.attendees.each do |attendee|
+          staff = Staff.where("staffs.email = #{attendee.email}")
+          next unless staff.count > 0
+          task_relations = TaskRelation.new
+          task_relations.task_id = task.id
+          task_relations.staff_id = staff.first.id
+          task_relations.created_at = task.created_at
+          task_relations.updated_at = task.updated_at
+          task_relations.save
+        end
+      end
+
+      staff = Staff.where("staffs.email = #{event.creator.email}")
+      task.response_staff = (staff.count > 0) ? staff.first.id : NULL
+      task.response_staff = (staff.count > 0) ? staff.first.id : NULL
+
+      task.expired = 0
+      task.priority = 3
+
+      task.google_event_id = event.id
+      task.gcal_status = :pulled
+      task.save
+    end
+
     def self.staff_tasks(staff_id)
         includes(:task_relations).where("tasks.response_staff = '#{staff_id}' or task_relations.staff_id = '#{staff_id}'").references(:task_relations)
     end

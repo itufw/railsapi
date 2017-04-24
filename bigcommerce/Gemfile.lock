@@ -98,6 +98,7 @@ GEM
       multipart-post (>= 1.2, < 3)
     faraday_middleware (0.10.1)
       faraday (>= 0.7.4, < 1.0)
+    filterrific (2.1.2)
     geokit (1.10.0)
     geokit-rails (2.2.0)
       geokit (~> 1.5)
@@ -189,6 +190,8 @@ GEM
       rails-deprecated_sanitizer (>= 1.0.1)
     rails-html-sanitizer (1.0.3)
       loofah (~> 2.0)
+    rails-jquery-autocomplete (1.0.3)
+      rails (>= 3.2)
     rails_sortable (0.1.0)
     railties (4.2.4)
       actionpack (= 4.2.4)
@@ -276,6 +279,7 @@ DEPENDENCIES
   bootsy
   byebug
   coffee-rails (~> 4.1.0)
+  filterrific
   geokit-rails
   gmaps4rails
   google-api-client
@@ -286,6 +290,7 @@ DEPENDENCIES
   mysql2 (~> 0.3.18)
   puma
   rails (= 4.2.4)
+  rails-jquery-autocomplete
   rails_sortable (= 0.1.0)
   roo (~> 1.13.2)
   sass-rails (~> 5.0)
@@ -305,4 +310,4 @@ DEPENDENCIES
   xeroizer!
 
 BUNDLED WITH
-   1.13.6
+   1.14.6

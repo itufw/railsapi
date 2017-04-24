@@ -230,4 +230,32 @@ module TaskHelper
       location += ", " + customer_address.city + ", " + customer_address.state + ", " + customer_address.country
       location
     end
+
+    def lock_customer(params)
+      parent_task = params[:parent_task] || 0
+      if parent_task != 0
+          parent_task = Task.joins(:task_relations).find(parent_task)
+          customer_locked = true
+          customers = Customer.filter_by_ids(parent_task.task_relations.map{|x| x.customer_id}.uniq) unless parent_task.task_relations.blank?
+      elsif params[:account_customer].nil? || params[:account_customer].blank?
+        customers = Customer.filter_by_staff(params[:selected_staff])
+        customer_locked = false
+      else
+        customers = Customer.filter_by_ids(params[:account_customer])
+        customer_locked = true
+      end
+      [parent_task,customers,customer_locked]
+    end
+
+    def function_subjects_method(params, current_user)
+      function = staff_function(session[:user_id])
+      # Sales/ Operations/ Accounting
+      default_function = default_function_type(current_user.user_type)
+      params[:selected_function] = params[:selected_function].nil? ? default_function : params[:selected_function]
+
+      subjects = TaskSubject.all
+      subjects = subjects.select { |x| x.function == params[:selected_function] }
+      methods = TaskMethod.all
+      [function, subjects, methods, default_function]
+    end
 end

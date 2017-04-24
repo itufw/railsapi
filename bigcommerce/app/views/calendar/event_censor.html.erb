@@ -1,0 +1,38 @@
+<%= title "Event From Calendars" %>
+<div>
+  <table>
+    <tr>
+      <th>Creator</th>
+      <th>&nbsp;&nbsp;&nbsp;</th>
+      <th>Summary</th>
+      <th>&nbsp;&nbsp;&nbsp;</th>
+      <th>Address</th>
+      <th>Customer</th>
+      <th>Method</th>
+    </tr>
+    <% @events.each do |event|%>
+    <tr>
+      <% staff = Staff.where("staffs.email = ? ", event.creator.email)
+         response_staff = (staff.count > 0) ? staff.first.nickname : nil %>
+      <td><%= response_staff %></td>
+      <td>&nbsp;&nbsp;&nbsp;</td>
+      <td><%= event.summary.to_s%><br/><%= event.description.to_s %></td>
+      <td>&nbsp;&nbsp;&nbsp;</td>
+      <td><%= event.location %></td>
+      <%
+        unless event.location.nil?
+          loc = event.location.split(",").first.split.select{|x| (x.to_i.to_s.casecmp(x) ) || !(["st","pl", "street","St"].includes? (x)) }
+          customer_list = @customers.select{|x| Regexp.union(loc) === x.actual_name }
+      %>
+        <td><%= collection_select :customer, :customer, customer_list, :id, :actual_name, {:include_blank => "Select a Customer"} %></td>
+
+      <%else%>
+        <td><%= collection_select :customer, :customer, @customers, :id, :actual_name, {:include_blank => "Select a Customer"} %></td>
+      <%
+        end
+      %>
+      <td><%= collection_select :method, :method, @methods, :method, :method, {:include_blank => "Select a Method", :selected => "Call"} %></td>
+    </tr>
+    <% end %>
+  </table>
+</div>

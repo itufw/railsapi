@@ -176,13 +176,14 @@ module CalendarHelper
   end
 
   def event_to_task(event_list)
-    p = c
     task_list = Task.where("google_event_id IS NOT NULL")
     task_google_event_ids = task_list.map{|x| x.google_event_id}
     event_list.each do |calendar_event|
       items = calendar_event.items.select{|x| !(task_google_event_ids.include? x.id)}
       items.each do |event|
+        unless event.attendees.nil?
 
+        end
       end
     end
   end
