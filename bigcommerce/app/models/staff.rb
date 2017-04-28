@@ -38,6 +38,11 @@ class Staff < ActiveRecord::Base
         where("staff.email = \"#{email}\"").first
     end
 
+    def self.filter_by_emails(emails)
+      return Staff.active if emails.nil? || emails.blank?
+      where('staffs.email IN (?)', emails)
+    end
+
     def self.nickname
         pluck('id, nickname')
     end
