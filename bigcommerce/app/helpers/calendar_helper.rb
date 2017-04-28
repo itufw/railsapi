@@ -188,5 +188,15 @@ module CalendarHelper
     end
   end
 
+  def collection_valid_check(params)
+    ["customer","method","subject"].each do |column|
+      if params[column]
+        if ((params[column][column].nil?) || ("".eql? params[column][column]))
+          return false
+        end
+      end
+    end
+
+  end
 
 end

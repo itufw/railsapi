@@ -99,3 +99,5 @@ gem 'bootstrap-slider-rails'
 # live search gem
 gem 'filterrific'
 gem 'rails-jquery-autocomplete'
+# fuzzy match
+gem 'fuzzy-string-match'

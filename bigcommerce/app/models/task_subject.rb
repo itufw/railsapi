@@ -24,4 +24,8 @@ class TaskSubject < ActiveRecord::Base
   def self.get_subjects
     select(:subject).distinct
   end
+
+  def self.sales_subjects
+    where(:function => "Sales")
+  end
 end

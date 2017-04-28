@@ -18,23 +18,61 @@ class Task < ActiveRecord::Base
         t.save
     end
 
+    def scrap_from_calendars(service)
+      new_events = []
+      tasks = Task.where("google_event_id IS NOT NULL").map{|x| x.google_event_id}
+      service.list_calendar_lists.items.select { |x| x.id.include?'@untappedwines.com' }.each do |calendar|
+        new_events += service.list_events(calendar.id).items
+      end
+
+      new_events.select{|x| !(tasks.include? x.id)}.each do |event|
+        auto_insert_from_calendar_event(event)
+      end
+      unconfirmed_task = Task.unconfirmed_event.map{|x| x.google_event_id}
+      return_events = new_events.select{|x| unconfirmed_task.include? x.id}
+
+      return return_events
+    end
+
     def auto_insert_from_calendar_event(event)
-        task_id = Time.now.to_i
 
         task = Task.new
-        task.id = task_id
         task.start_date = event.start.date_time.to_s(:db)
         task.end_date = event.end.date_time.to_s(:db)
         task.created_at = event.created.to_s(:db)
         task.updated_at = event.updated.to_s(:db)
         task.description = event.summary
         task.is_task = 1
-        response_staff = Staff.filter_by_email(task.creator.email)
-        task.response_staff = response_staff.id
-        task.last_modified_staff = response_staff.id
+
+        response_staff = Staff.where("staffs.email = \"#{event.creator.email}\"").active
+        response_staff = (response_staff.count > 0) ? response_staff.first.id : nil
+
+        task.response_staff = response_staff
+        task.last_modified_staff = response_staff
         task.priority = 3
-        task.expired = 0
+        task.expired = 1
+        task.google_event_id = event.id
+        task.gcal_status = :unconfirmed
         task.save
+    end
+
+    def update_event(event_id, method, subject, customer)
+      task = Task.where(:google_event_id => event_id)
+      return false unless task.count > 0
+      customer_id = ((customer.blank?) || (customer.nil?)) ? nil : customer["customer"]
+      method = method["method"]
+      subject = subject["subject"]
+
+      task = task.first
+      task.method = method
+      task.subject_1 = subject
+      task.function = "Sales"
+      task.expired = 0
+      task.gcal_status = :pulled
+      task.save
+
+      TaskRelation.new.link_relation(task.id, customer_id) unless customer_id.nil?
+      return true
     end
 
     def auto_insert_from_mailer(email_type, customer_id, staff_id, mailer_id, _selected_orders)
@@ -152,6 +190,10 @@ class Task < ActiveRecord::Base
 
     def self.order_by_id(direction)
         order('tasks.id ' + direction)
+    end
+
+    def self.unconfirmed_event
+      where(:gcal_status => 3)
     end
 
     def self.filter_by_params(priority, subject, method, staff_created, customers, staff)

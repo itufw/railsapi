@@ -17,4 +17,20 @@ class TaskRelation < ActiveRecord::Base
   def self.filter_by_staff_id(staff_id)
     where(staff_id: staff_id)
   end
+
+  def link_relation(task_id, customer_id, staff_id = nil)
+    time = Time.now.to_s(:db)
+
+    return if ((customer_id.nil?) && (staff_id.nil?))
+
+    task_relation = TaskRelation.new
+
+    task_relation.task_id = task_id
+    task_relation.customer_id = customer_id unless customer_id.nil?
+    task_relation.staff_id = staff_id unless staff_id.nil?
+    task_relation.created_at = time
+    task_relation.updated_at = time
+    task_relation.save
+
+  end
 end

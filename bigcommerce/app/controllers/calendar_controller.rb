@@ -1,5 +1,6 @@
 require 'calendar_helper.rb'
 require 'models_filter.rb'
+require 'fuzzystringmatch'
 
 class CalendarController < ApplicationController
     before_action :confirm_logged_in
@@ -73,25 +74,17 @@ class CalendarController < ApplicationController
       client.update!(session[:authorization])
       service = Google::Apis::CalendarV3::CalendarService.new
       service.authorization = client
+
       begin
+        @jarow = FuzzyStringMatch::JaroWinkler.create( :native)
+        @customers = Customer.all.order_by_name("ASC")
+
         @methods = TaskMethod.all
-        @customers = Customer.all
+        @subjects = TaskSubject.sales_subjects
 
-        task_list = Task.where("google_event_id IS NOT NULL")
-        task_google_event_ids = task_list.map{|x| x.google_event_id}
+        @events = Task.new.scrap_from_calendars(service)
 
-          calendar_list = service.list_calendar_lists.items.select { |x| x.id.include?'@untappedwines.com' }
-          event_list = []
-          calendar_list.each do |calendar|
-              event_list.append(service.list_events(calendar.id))
-          end
-
-          @events = []
-          event_list.each do |calendar_event|
-            items = calendar_event.items.select{|x| !(task_google_event_ids.include? x.id)}
-            @events += items
-          end
-
+        @staffs = Staff.filter_by_emails(@events.map{|x| x.creator.email}.uniq).active
       rescue Google::Apis::AuthorizationError => exception
           response = client.refresh!
           session[:authorization] = session[:authorization].merge(response)
@@ -99,31 +92,44 @@ class CalendarController < ApplicationController
       end
     end
 
-    def new_event
-        client = Signet::OAuth2::Client.new(client_id: Rails.application.secrets.google_client_id,
-                                            client_secret: Rails.application.secrets.google_client_secret,
-                                            token_credential_uri: 'https://accounts.google.com/o/oauth2/token')
-
-        client.update!(session[:authorization])
-
-        service = Google::Apis::CalendarV3::CalendarService.new
-        service.authorization = client
-
-        today = Date.today
-
-        customer_address = Address.where("customer_id = #{params[:customer_id]}").first
-        address = combine_adress(customer_address)
-
-        event = Google::Apis::CalendarV3::Event.new(start: Google::Apis::CalendarV3::EventDateTime.new(date: today),
-                                                    end: Google::Apis::CalendarV3::EventDateTime.new(date: today + 1),
-                                                    summary: params[:description],
-                                                    location: address,
-                                                    attendees: Google::Apis::CalendarV3::EventAttendee.new(email: params[:staff_email]))
-
-        service.insert_event(params[:calendar_id], event)
-
-        redirect_to calendars_url
+    def translate_events
+      if collection_valid_check(params)
+        if Task.new.update_event(params["event_id"], params["method"], params["subject"], params["customer"])
+          flash[:success] = "Done"
+        else
+          flash[:error] = "Something went wrong"
+        end
+      else
+        flash[:error] = 'Select Right Customer/Method/Subject.'
+      end
+      redirect_to :back
     end
+
+     def new_event
+       #     client = Signet::OAuth2::Client.new(client_id: Rails.application.secrets.google_client_id,
+    #                                         client_secret: Rails.application.secrets.google_client_secret,
+    #                                         token_credential_uri: 'https://accounts.google.com/o/oauth2/token')
+    #
+    #     client.update!(session[:authorization])
+    #
+    #     service = Google::Apis::CalendarV3::CalendarService.new
+    #     service.authorization = client
+    #
+    #     today = Date.today
+    #
+    #     customer_address = Address.where("customer_id = #{params[:customer_id]}").first
+    #     address = combine_adress(customer_address)
+    #
+    #     event = Google::Apis::CalendarV3::Event.new(start: Google::Apis::CalendarV3::EventDateTime.new(date: today),
+    #                                                 end: Google::Apis::CalendarV3::EventDateTime.new(date: today + 1),
+    #                                                 summary: params[:description],
+    #                                                 location: address,
+    #                                                 attendees: Google::Apis::CalendarV3::EventAttendee.new(email: params[:staff_email]))
+    #
+    #     service.insert_event(params[:calendar_id], event)
+    #
+    #     redirect_to calendars_url
+      end
 
     def map
 

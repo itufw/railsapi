@@ -13,6 +13,9 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
+    RubyInline (3.12.4)
+      ZenTest (~> 4.3)
+    ZenTest (4.11.1)
     actionmailer (4.2.4)
       actionpack (= 4.2.4)
       actionview (= 4.2.4)
@@ -99,6 +102,8 @@ GEM
     faraday_middleware (0.10.1)
       faraday (>= 0.7.4, < 1.0)
     filterrific (2.1.2)
+    fuzzy-string-match (1.0.0)
+      RubyInline (>= 3.8.6)
     geokit (1.10.0)
     geokit-rails (2.2.0)
       geokit (~> 1.5)
@@ -280,6 +285,7 @@ DEPENDENCIES
   byebug
   coffee-rails (~> 4.1.0)
   filterrific
+  fuzzy-string-match
   geokit-rails
   gmaps4rails
   google-api-client
