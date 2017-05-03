@@ -5,7 +5,7 @@
 <% dates.each do |d| %>
 	<td class="num"><%= link_to ( exists_in_h_int(sums_dates_h, d) == 0 ? "" :\
 	 exists_in_h_int(sums_dates_h, d).integer? ? exists_in_h_int(sums_dates_h, d) : display_num(exists_in_h_int(sums_dates_h, d))),\
-	 controller: 'order', action: 'all', start_date: dates_map[d][0], end_date: dates_map[d][1], staff_nickname: staff_nickname, staff_id: staff_id %></td>
+	 controller: 'order', action: 'all', start_date: dates_map[d][0], end_date: dates_map[d][1], staff_nickname: staff_nickname, sales_selected_staff_id: staff_id %></td>
 <% end %>
 
 <% total = @avg_sum ? sums_dates_h.values.sum/sums_dates_h.values.size.to_f : sums_dates_h.values.sum %>

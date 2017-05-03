@@ -50,12 +50,46 @@ class CalendarController < ApplicationController
         service = Google::Apis::CalendarV3::CalendarService.new
         service.authorization = client
         begin
-            @current_user = Staff.filter_by_id(session[:user_id])
-            @calendar_list = service.list_calendar_lists.items.select { |x| x.id.include?'@untappedwines.com' }
-            @event_list = []
-            @calendar_list.each do |calendar|
-                @event_list.append(service.list_events(calendar.id))
+          @staffs = Staff.active
+            @current_user = @staffs.select{|x| x.id == session[:user_id]}.first
+
+            staff_event = {}
+            @calendar_list = []
+            tasks = Task.joins(:task_relations).select("task_relations.customer_id, tasks.google_event_id").where("tasks.google_event_id IS NOT NULL")
+
+            service.list_calendar_lists.items.each do |calendar|
+              calendar_staff = @staffs.select{ |x| x.email == calendar.id }
+              next unless calendar_staff.count > 0
+
+              calendar_staff = calendar_staff.first
+              staff_event[calendar_staff.id] = service.list_events(calendar.id).items.map{|x| x.id}
+
+              @calendar_list.append(calendar)
             end
+
+            @event_customers = {}
+            staff_event.keys.each do |staff|
+              @event_customers[staff] = tasks.select{|x| staff_event[staff].include?x.google_event_id}.map{|x| x.customer_id}.uniq
+            end
+          @customers = Customer.all
+
+
+            @max_date = ((params[:date_range_maroon])&&(params[:date_range_maroon].to_i.to_s.eql? params[:date_range_maroon]))? params[:date_range_maroon].to_i : 90
+            @colour_guide = %w(lightgreen green gold coral red maroon)
+            @order_colour_selected = colour_guide_filter(params['selected_order_colour'], @colour_guide)
+            staff, staff_selected = staff_filter(session, params[:selected_staff])
+
+            colour_range = { 'lightgreen' => [0, 15],
+                             'green' => [15, 30],
+                             'gold' => [30, 45],
+                             'coral' => [45, 60],
+                             'red' => [60, 75],
+                             'maroon' => [75, 3000] }
+            @active_sales = false
+            customer_map, @start_date, @end_date = customer_last_order_filter(params, @order_colour_selected, colour_range, [], staff)
+            @hash = hash_map_pins(customer_map)
+
+
         rescue Google::Apis::AuthorizationError => exception
             response = client.refresh!
             session[:authorization] = session[:authorization].merge(response)
@@ -105,32 +139,6 @@ class CalendarController < ApplicationController
       redirect_to :back
     end
 
-     def new_event
-       #     client = Signet::OAuth2::Client.new(client_id: Rails.application.secrets.google_client_id,
-    #                                         client_secret: Rails.application.secrets.google_client_secret,
-    #                                         token_credential_uri: 'https://accounts.google.com/o/oauth2/token')
-    #
-    #     client.update!(session[:authorization])
-    #
-    #     service = Google::Apis::CalendarV3::CalendarService.new
-    #     service.authorization = client
-    #
-    #     today = Date.today
-    #
-    #     customer_address = Address.where("customer_id = #{params[:customer_id]}").first
-    #     address = combine_adress(customer_address)
-    #
-    #     event = Google::Apis::CalendarV3::Event.new(start: Google::Apis::CalendarV3::EventDateTime.new(date: today),
-    #                                                 end: Google::Apis::CalendarV3::EventDateTime.new(date: today + 1),
-    #                                                 summary: params[:description],
-    #                                                 location: address,
-    #                                                 attendees: Google::Apis::CalendarV3::EventAttendee.new(email: params[:staff_email]))
-    #
-    #     service.insert_event(params[:calendar_id], event)
-    #
-    #     redirect_to calendars_url
-      end
-
     def map
 
         @colour_guide = %w(lightgreen green gold coral red maroon)
@@ -176,3 +184,6 @@ class CalendarController < ApplicationController
         @customers = Customer.filter_by_ids(customer_map.keys).include_all.send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
     end
 end
+
+# event_markers = handler.addMarkers(<%=raw @hash.select{|x| @event_customers[calendar_staff.id].include?x[:customer_id]}.to_json %>);
+# customer_markers = handler.addMarkers(<%=raw @hash.select{|x| @customers.select{|y| y.staff_id == calendar_staff.id}.map{|y| y.id}.include?x[:cusomter_id]}.to_json%>);

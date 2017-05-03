@@ -39,6 +39,9 @@ module ModelsFilter
     # unless params["staff_id"].nil?
     #   return params["staff_id"], Staff.filter_by_id(params["staff_id"])
     # end
+    unless params["sales_selected_staff_id"].nil?
+      return params["sales_selected_staff_id"], Staff.filter_by_id(params["sales_selected_staff_id"])
+    end
     return nil, nil
   end
 

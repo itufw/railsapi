@@ -61,7 +61,7 @@ module CalendarHelper
     end
   end
 
-  def add_map_pin(category, customer, sale_or_day, func)
+  def add_map_pin(category, customer, infowindow)
       case customer.cust_style_id
       when 1
         url = "map_icons/bottle_shop_#{category}.png"
@@ -78,13 +78,6 @@ module CalendarHelper
         name += customer.lastname unless customer.lastname.nil?
       else
         name = customer.actual_name
-      end
-
-      case func
-      when "Sales"
-        infowindow = "Total Sales in this period: " + sale_or_day.to_s
-      when "Last_Order"
-        infowindow = "Last Order in : " + sale_or_day.to_s + "  days"
       end
 
       map_pin = {
@@ -117,7 +110,8 @@ module CalendarHelper
       days_gap = 0 if days_gap < 0
       colour_range.keys.each do |colour|
         if days_gap.between?(colour_range["#{colour}"].min, colour_range["#{colour}"].max)
-          customer_map[customer.id] = add_map_pin(colour, customer, days_gap, "Last_Order")
+          infowindow = "Last Order in : " + days_gap.to_s + "  days"
+          customer_map[customer.id] = add_map_pin(colour, customer, infowindow)
           break
         end #end if
       end #end colour guide for loop
@@ -150,7 +144,8 @@ module CalendarHelper
 
       colour_range.keys.each do |colour|
         if order_amount.between?(colour_range["#{colour}"].min, colour_range["#{colour}"].max)
-          customer_map[customer.id] = add_map_pin(colour, customer, order_amount, "Sales")
+          infowindow = "Total Sales in this period: " + order_amount.to_s
+          customer_map[customer.id] = add_map_pin(colour, customer, infowindow)
           break
         end #end if
       end #end colour guide for loop
@@ -168,25 +163,14 @@ module CalendarHelper
                         :width  => 30,
                         :height => 30
                        })
-            marker.infowindow "<a href=\"http://188.166.243.138/customer/summary?customer_id=#{customer_id}&customer_name=#{customer_map[customer_id]["name"]}\">#{customer_map[customer_id]["name"]}</a>
+      marker.infowindow "<a href=\"http://188.166.243.138/customer/summary?customer_id=#{customer_id}&customer_name=#{customer_map[customer_id]["name"]}\">#{customer_map[customer_id]["name"]}</a>
                               <br/><br/>
                               <p>#{customer_map[customer_id]["infowindow"]}<p>"
+      marker.json ({:customer_id => customer_id})
       end
     hash
   end
 
-  def event_to_task(event_list)
-    task_list = Task.where("google_event_id IS NOT NULL")
-    task_google_event_ids = task_list.map{|x| x.google_event_id}
-    event_list.each do |calendar_event|
-      items = calendar_event.items.select{|x| !(task_google_event_ids.include? x.id)}
-      items.each do |event|
-        unless event.attendees.nil?
-
-        end
-      end
-    end
-  end
 
   def collection_valid_check(params)
     ["customer","method","subject"].each do |column|
