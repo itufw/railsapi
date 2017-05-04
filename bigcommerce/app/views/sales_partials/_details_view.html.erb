@@ -13,15 +13,24 @@
 		<% end %>
 		<th>Total <%= render "partials/sort_arrows", order: 'order_by_total' %></th>
 		<% if @selected_lable != ''%>
+			<%= hidden_field_tag :showing_lables, @selected_lable %>
 			<th><%= ProductLable.find(@selected_lable).name %></th>
 		<% end %>
 	</tr>
+
+	<%
+			total_row_dates = {}
+			total_product = []
+	 		@dates_paired.keys.each do |d|
+			total_row_dates[d] = 0
+	 		end
+	%>
 
 	<% @product_ids.each do |id| %>
 	<tr>
 		<td><%= id %></td>
 		<td>
-			<%= check_box_tag 'selected_product[]', id, (@labled_product_list.include?id), class: "product_name_checkbox" if ([9,36].include?session[:user_id]) && (@checked_id) %>
+			<%= check_box_tag 'selected_product[]', id, (@product_order_number.keys.include?id), class: "product_name_checkbox" if ([9,36].include?session[:user_id]) && (@checked_id) %>
 			<%= link_to @product_name_h[id], controller: 'product', action: 'summary', product_id: id, product_name: @product_name_h[id], transform_column: @transform_column, total_stock: @inventory_h[id].to_i, pending_stock: @pending_stock_h[id].to_i %>
 		</td>
 		<td class="num"><%= display_num(@price_h[id]) %>
@@ -32,18 +41,36 @@
 		<%# @product_qty_h is like {[product_id, week_num] => qty} %>
 		<% sums_dates_h = give_sum_date_h(id, @product_qty_h) %>
 		<% @dates_paired.keys.each do |d| %>
-
+			<% total_row_dates[d] += exists_in_h(sums_dates_h, d).to_i %>
 			<td class="num"><%= exists_in_h(sums_dates_h, d) %></td>
 
 		<% end %>
 
 		<td class="num"><%= sums_dates_h.values.sum %></td>
+		<% total_product.append(sums_dates_h.values.sum) %>
 		<% if @selected_lable != ''%>
-			<td><%= (@labled_product_list.include?id) ? 'X' : '' %></td>
-			<%= hidden_field_tag :showing_lables, "lable" %>
+			<% if @checked_id %>
+				<td><%= text_field_tag("number_update_column_#{id}", @product_order_number[id], class: 'form-control') %></td>
+			<% else %>
+				<td><%= @product_order_number[id]%></td>
+			<%end%>
 		<% end %>
 	</tr>
 	<% end %>
+	</tr>
+
+	<!-- total -->
+	<tr>
+		<td colspan="3">Total</td>
+		<td class="num"><%= @inventory_h.values.map(&:to_i).sum + @pending_stock_h.values.map(&:to_i).sum %></td>
+		<td class="num"><%= @pending_stock_h.values.map(&:to_i).sum %></td>
+		<% @dates_paired.keys.each do |d| %>
+			<td class="num"><%= total_row_dates[d] %></td>
+		<% end %>
+		<td class="num"><%= total_product.sum%></td>
+		<% if @selected_lable != ''%>
+		<td><%= @product_order_number.values.sum %></td>
+		<% end %>
 	</tr>
 
 </table>

@@ -189,41 +189,49 @@ class SalesController < ApplicationController
 
     # lable filter
     update_or_delete = params[:showing_lables].nil?
-
     @selected_lable = (params['product_lable'].nil?) ? '' : params['product_lable']['id']
-    @labled_product_list = []
-    if @checked_id && (@selected_lable != '')
+    @product_order_number = {}
+
+    if @checked_id
       if ([9, 36].include?session[:user_id]) && ('Update' == params[:commit])
         if update_or_delete
-          ProductLableRelation.new.update_lables(params['selected_product'], @selected_lable) if (!params['selected_product'].blank?)
+          update_lables(params['selected_product'], @selected_lable) if (!params['selected_product'].blank?)
         else
-          ProductLableRelation.new.destroy_lables(params['selected_product'], @selected_lable)
+          destroy_lables(params[:showing_lables], params['selected_product'], params)
         end
       end
-      @labled_product_list = ProductLableRelation.lable_filter(@selected_lable).map(&:product_id)
-      product_ids = product_ids.uniq.select { |x| @labled_product_list.include?x }
     end
 
-    # filter for on order
-    # @on_order = params['on_order'] == 'yes' ? true : false
-    # @on_order_products = []
-    #
-    #   if @checked_id
-    #     Product.where('products.id IN (?)', params['selected_product']).update_all 'on_order = 1' if  (!params['selected_product'].blank?) && ([9, 36].include?session[:user_id])
-    #     @on_order_products = Product.where('on_order = 1').map(&:id)
-    #   elsif @checked_no_ws
-    #     Product.where('products.no_ws_id IN (?)', params['selected_product']).update_all 'on_order = 1' if  (!params['selected_product'].blank?) && ([9, 36].include?session[:user_id])
-    #     @on_order_products = ProductNoVintage.joins(:products).select('product_no_vintages.id, count(products.id) as numbers, sum(products.on_order) as sum_up').group('product_no_vintages.id')
-    #     @on_order_products = @on_order_products.select{|x| x.numbers == x.sum_up}.map(&:id)
-    #   elsif @checked_no_vintage
-    #     Product.where('products.no_vintage_id IN (?)', params['selected_product']).update_all 'on_order = 1' if  (!params['selected_product'].blank?) && ([9, 36].include?session[:user_id])
-    #     @on_order_products = ProductNoWs.joins(:products).select('product_no_ws.id, count(products.id) as numbers, sum(products.on_order) as sum_up').group('product_no_ws.id')
-    #     @on_order_products = @on_order_products.select{|x| x.numbers == x.sum_up}.map(&:id)
-    #   end
-    #
-    # if @on_order
-    #   product_ids = product_ids.uniq.select { |x| @on_order_products.include?x }
-    # end
+    if @selected_lable != ''
+      labled_product_list = ProductLableRelation.lable_filter(@selected_lable)
+      p_list = Product.where('products.id IN (?)', labled_product_list.map(&:product_id))
+
+      if @checked_id
+        labled_product_list.each do |p|
+          @product_order_number[p.product_id] = 0 if @product_order_number[p.product_id].nil?
+          @product_order_number[p.product_id] += p.number unless p.number.nil?
+        end
+        product_ids = product_ids.uniq.select { |x| labled_product_list.map(&:product_id).include?x }
+
+      elsif @checked_no_ws
+        labled_product_list.each do |p|
+          product = p_list.select { |x| x.id == p.product_id}.first
+          @product_order_number[product.product_no_ws_id] = 0 if @product_order_number[product.product_no_ws_id].nil?
+          @product_order_number[product.product_no_ws_id] += p.number unless p.number.nil?
+        end
+        no_ws_ids = p_list.map(&:product_no_ws_id)
+        product_ids = product_ids.uniq.select { |x| no_ws_ids.include?x }
+
+      elsif @checked_no_vintage
+        labled_product_list.each do |p|
+          product = p_list.select { |x| x.id == p.product_id}.first
+          @product_order_number[product.product_no_vintage_id] = 0 if @product_order_number[product.product_no_vintage_id].nil?
+          @product_order_number[product.product_no_vintage_id] += p.number unless p.number.nil?
+        end
+        no_vintage_ids = p_list.map(&:product_no_vintage_id)
+        product_ids = product_ids.uniq.select { |x| no_vintage_ids.include?x }
+      end
+    end
 
     # get the array of valid product_id
     # this function is located in helpers -> sales_helper
@@ -240,6 +248,5 @@ class SalesController < ApplicationController
     # stats View!
     # helpers - > sales_helper
     @stats_info, @stats_sum = stats_info(@product_ids, @product_name_h, @transform_column, @inventory_h, @pending_stock_h) if @checked_stats
-
   end
 end
