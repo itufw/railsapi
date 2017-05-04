@@ -213,4 +213,13 @@ class Task < ActiveRecord::Base
         task.priority = priority
         task.save!
     end
+
+    # calendar gem requests
+    def start_time
+      self.start_date
+    end
+
+    def end_time
+      self.end_date
+    end
 end

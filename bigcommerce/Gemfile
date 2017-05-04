@@ -101,3 +101,5 @@ gem 'filterrific'
 gem 'rails-jquery-autocomplete'
 # fuzzy match
 gem 'fuzzy-string-match'
+# calendar gem
+gem 'simple_calendar'

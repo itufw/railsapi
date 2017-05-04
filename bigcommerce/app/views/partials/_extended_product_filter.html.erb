@@ -18,13 +18,13 @@
 	<div class="col-md-2" style="margin-left: 35px;">
 	    <%= collection_select(:product_sub_type, :id, @product_sub_types, :id, :name, {:include_blank => 'Varietals'}, {:class => 'form-control'}) %>
 	</div>
-
 	<div class="col-md-2">
 		<%= collection_select(:producer, :id, @producers, :id, :name, {:include_blank => 'Wineries'}, {:class => 'form-control'}) %>
 	</div>
-
 	<div class="col-md-2">
 		<%= collection_select(:producer_region, :id, @producer_regions, :id, :name, {:include_blank => 'Regions'}, {:class => 'form-control'}) %>
 	</div>
+	<div class="col-md-2">
+		<%= collection_select(:product_lable, :id, ProductLable.all, :id, :name, {:include_blank => 'Lables', :selected => @selected_lable}, {:class => 'form-control'}) %>
+	</div>
 </div>
-

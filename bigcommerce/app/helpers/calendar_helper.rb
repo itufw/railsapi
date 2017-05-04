@@ -1,34 +1,21 @@
 module CalendarHelper
   def sales_last_order(params)
-    return "Last_Order" if ((params["filter_selector"].nil?) || ("".eql?params["filter_selector"]) ||  ("Last_Order".eql?params["filter_selector"]))
-    return "Sales"
+    return 'Last_Order' if ((params["filter_selector"].nil?) || ("".eql?params["filter_selector"]) ||  ("Last_Order".eql?params["filter_selector"]))
+    'Sales'
   end
 
   def map_filter(params, colour_guide, colour_range_origin, sale_or_day)
     selected_staff = params[:selected_staff] || []
-
     colour_range = {}
-
     colour_guide.each do |colour|
-      if sale_or_day
-        colour_range["#{colour}"] = [params["order_range_#{colour}_min"].to_i, params["order_range_#{colour}_max"].to_i]
-        # colour_range["#{colour}"] = (("".eql? params["order_range_#{colour}"]) || params["order_range_#{colour}"].nil? )? colour_range_origin["#{colour}"] : params["order_range_#{colour}"].split(",").map(&:to_i)
-      else
-        colour_range["#{colour}"] = (("".eql? params["date_range_#{colour}"]) || params["date_range_#{colour}"].nil? )? colour_range_origin["#{colour}"] : params["date_range_#{colour}"].split(",").map(&:to_i)
-      end
-      colour_range["#{colour}"].append(1000000) if colour_range["#{colour}"].length == 1
+      # sale_or_day
+      # false for Last order Date
+      # true for sales
+      colour_range[colour] = [params["order_range_#{colour}_min"].to_i, params["order_range_#{colour}_max"].to_i] if sale_or_day
+      colour_range[colour] = (("".eql? params["date_range_#{colour}"]) || params["date_range_#{colour}"].nil? )? colour_range_origin["#{colour}"] : params["date_range_#{colour}"].split(",").map(&:to_i) if !sale_or_day
+      colour_range[colour].append(1_000_000) if colour_range[colour].length == 1
     end
     [selected_staff, colour_range]
-  end
-
-  def colour_guide_filter(selected_colour, colour_guide)
-    if selected_colour.nil?
-      return colour_guide
-    elsif selected_colour.blank?
-      return colour_guide
-    else
-      return selected_colour
-    end
   end
 
   def customer_style_filter(customer_style_selected)
@@ -43,23 +30,17 @@ module CalendarHelper
   def staff_filter(session,staff_selected)
     staff = Staff.find(session[:user_id])
     if staff.user_type.in?(["Sales Executive"])
-         return [[staff],[session[:user_id]]]
+      return [[staff], [session[:user_id]]]
     end
     staff = Staff.active_sales_staff.order_by_order
     default_staff = []
     if staff_selected.nil? || staff_selected.blank?
       return [staff,default_staff]
     end
-    [staff,staff_selected]
+    [staff, staff_selected]
   end
 
-  def date_check_map(date,difference_month)
-    if (date.nil?)|| ("".eql? date)
-      return (Date.today()-difference_month.month).to_s(:db)
-    else
-      return date
-    end
-  end
+
 
   def add_map_pin(category, customer, infowindow)
       case customer.cust_style_id
@@ -90,12 +71,66 @@ module CalendarHelper
       map_pin
   end
 
+  # --------------------------------------
+  # splited functions from map filter
+  # return date -> for datepicker
+  def date_check_map(date, difference, month = 'month')
+    diff = 'month' == month ? difference.month : difference.days
+    return (Date.today - diff).to_s(:db) if date.nil? || (''.eql? date)
+    date
+  end
+
+  # return [start_date, end_date]
+  def time_picker(params, difference, month = 'month')
+    start_date = date_check_map(params['start_time'], difference, month)
+    end_date = date_check_map(params['due_time'], difference, month)
+    [(Date.parse start_date), (Date.parse end_date)]
+  end
+
+  # filter unselected colours out
+  # [sales selected colour, orders selected colour, colour_guide, max_day]
+  def colour_selected(params)
+    colour_guide = %w[lightgreen green gold coral red maroon]
+    sales = orders = colour_guide
+
+    sales_s = params['selected_colour']
+    orders_s = params['selected_order_colour']
+
+    sales = sales_s unless sales_s.blank?
+    orders = orders_s unless orders_s.blank?
+
+    max_day = max_date(params[:date_range_maroon])
+    [sales, orders, colour_guide, max_day]
+  end
+
+  # max_date for maroon
+  def max_date(date)
+    max = 90
+    max = date.to_i if date.to_i.to_s == date
+    max
+  end
+
+  # --------------------------------------
+
+  def calendar_filter(params, colour_guide, staffs)
+    colour_range = {
+      'lightgreen' => [0, 15], 'green' => [15, 30], 'gold' => [30, 45],
+      'coral' => [45, 60], 'red' => [60, 75], 'maroon' => [75, 3000]
+    }
+    selected_staff, colour_range = map_filter(params, colour_guide, colour_range, false)
+    start_date, end_date = time_picker(params, 0)
+
+  end
+
   # filter customer based on the last orde date
   # default to the days started from today
-  def customer_last_order_filter(params, colour_guide, colour_range_origin, selected_cust_style, staffs)
-    selected_staff, colour_range = map_filter(params, colour_guide, colour_range_origin, false)
-    start_date = (Date.parse date_check_map(params["start_time"], 0))
-    end_date = (Date.parse date_check_map(params["due_time"], 0))
+  def customer_last_order_filter(params, colour_guide, selected_cust_style, staffs)
+    colour_range = {
+      'lightgreen' => [0, 15], 'green' => [15, 30], 'gold' => [30, 45],
+      'coral' => [45, 60], 'red' => [60, 75], 'maroon' => [75, 3000]
+    }
+    selected_staff, colour_range = map_filter(params, colour_guide, colour_range, false)
+    start_date, end_date = time_picker(params, 0)
 
     customers = Customer.joins(:addresses).select("addresses.lat, addresses.lng, customers.*").where("addresses.lat IS NOT NULL AND customers.staff_id IN (?)", staffs.map{|x| x.id}).group("customers.id")
     # the Status check needs to be updated
@@ -126,8 +161,7 @@ module CalendarHelper
     selected_staff, colour_range = map_filter(params, colour_guide, colour_range_origin, true)
 
     # default to one month ago until today
-    start_date = (Date.parse date_check_map(params["start_time"], 3))
-    end_date = (Date.parse date_check_map(params["due_time"], 0))
+    start_date, end_date = time_picker(params, 3)
 
     customers = Customer.joins(:addresses).select("addresses.lat, addresses.lng, customers.*").where("addresses.lat IS NOT NULL AND customers.staff_id IN (?)", staffs.map{|x| x.id}).group("customers.id")
 
@@ -181,6 +215,20 @@ module CalendarHelper
       end
     end
 
+  end
+
+  def staff_access_token_update(user_session, authorization)
+    return nil if authorization.nil?
+
+    staff = Staff.find(user_session)
+    staff.access_token = authorization["access_token"]
+    if !(authorization["refresh_token"].nil?)
+      staff.refresh_token = authorization["refresh_token"]
+    elsif !(staff.refresh_token.nil?)
+      authorization["refresh_token"] = staff.refresh_token
+    end
+    staff.save
+    return authorization
   end
 
 end
