@@ -11,6 +11,10 @@
   <% @stats_info.first[1]["time_period"].keys.each do |t| %>
     <th><%= t %></th>
   <% end %>
+  <% if @selected_lable != ''%>
+    <%= hidden_field_tag :showing_lables, @selected_lable %>
+    <th><%= ProductLable.find(@selected_lable).name %></th>
+  <% end %>
 </tr>
 <tr>
   <td></td>
@@ -22,6 +26,16 @@
   <% @stats_sum.each do |sum|%>
     <th class="num"><%= display_overall_stat(sum, sum_param) %></th>
   <% end %>
+  <% if @selected_lable != '' %>
+    <%
+        total_number = 0
+        @stats_info.keys.each do |id|
+          total_number += @product_order_number[id]
+        end
+    %>
+    <th><%= total_number %></th>
+  <% end %>
+
 </tr>
 <% @stats_info.keys.each do |id|%>
 <tr>
@@ -32,6 +46,13 @@
   <td class="num"><%= @pending_stock_h[id].to_i %>
   <% @stats_info[id]["time_period"].each do |key, value| %>
     <td class="num"><%= display_overall_stat(value[0], sum_param) %></td>
+  <% end %>
+  <% if @selected_lable != '' %>
+    <% if @checked_id %>
+      <td><%= text_field_tag("number_update_column_#{id}", @product_order_number[id], class: 'form-control') %></td>
+    <% else %>
+      <td><%= @product_order_number[id]%></td>
+    <%end%>
   <% end %>
 </tr>
 <%end%>
