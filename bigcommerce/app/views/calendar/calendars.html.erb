@@ -30,7 +30,8 @@
           <lable for="customer_checkbox">Customer</lable>
           <br/><br/>
       <div id="customer_location" style='width: 300px; height: 300px;'></div>
-      <a id="filter_on">hey</a>
+      <button type="button" class="btn btn-default" id="filter_on">Filter</button>
+      <div id = "time_picker"><%= render 'calendar_partials/calendar_time_picker'%></div>
     </div>
 
     <div class='col-md-4' id = "calendar_map_filter">
@@ -39,7 +40,16 @@
 
   </div>
 </div>
-
+<div>
+  <%= month_calendar events: @tasks do |date, meetings| %>
+      <%= date %>
+      <% meetings.each do |meeting| %>
+        <div>
+          <%= meeting.description%>
+        </div>
+      <% end %>
+  <% end %>
+</div>
 
 <script>
   var handler = Gmaps.build('Google');
@@ -115,8 +125,10 @@
   });
 
   $("#calendar_map_filter").hide();
+  $("#time_picker").hide();
   $("#filter_on").click(function(){
     $("#calendar_map_filter").toggle();
+    $("#time_picker").toggle();
   });
 
 

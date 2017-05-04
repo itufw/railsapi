@@ -12,12 +12,18 @@
 			<th> <%= date %><%= render "partials/sort_arrows", order: "order_by_date_#{date_key}" %></th>
 		<% end %>
 		<th>Total <%= render "partials/sort_arrows", order: 'order_by_total' %></th>
+		<% if @selected_lable != ''%>
+			<th><%= ProductLable.find(@selected_lable).name %></th>
+		<% end %>
 	</tr>
 
 	<% @product_ids.each do |id| %>
 	<tr>
 		<td><%= id %></td>
-		<td><%= link_to @product_name_h[id], controller: 'product', action: 'summary', product_id: id, product_name: @product_name_h[id], transform_column: @transform_column, total_stock: @inventory_h[id].to_i, pending_stock: @pending_stock_h[id].to_i %></td>
+		<td>
+			<%= check_box_tag 'selected_product[]', id, (@labled_product_list.include?id), class: "product_name_checkbox" if ([9,36].include?session[:user_id]) && (@checked_id) %>
+			<%= link_to @product_name_h[id], controller: 'product', action: 'summary', product_id: id, product_name: @product_name_h[id], transform_column: @transform_column, total_stock: @inventory_h[id].to_i, pending_stock: @pending_stock_h[id].to_i %>
+		</td>
 		<td class="num"><%= display_num(@price_h[id]) %>
 
 		<td class="num"><%= @inventory_h[id].to_i + @pending_stock_h[id].to_i %>
@@ -32,7 +38,10 @@
 		<% end %>
 
 		<td class="num"><%= sums_dates_h.values.sum %></td>
-
+		<% if @selected_lable != ''%>
+			<td><%= (@labled_product_list.include?id) ? 'X' : '' %></td>
+			<%= hidden_field_tag :showing_lables, "lable" %>
+		<% end %>
 	</tr>
 	<% end %>
 	</tr>

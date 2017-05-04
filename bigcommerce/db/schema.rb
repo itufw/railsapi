@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170421042456) do
+ActiveRecord::Schema.define(version: 20170504023357) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -369,6 +369,19 @@ ActiveRecord::Schema.define(version: 20170421042456) do
   add_index "product_categories", ["category_id"], name: "index_product_categories_on_category_id", using: :btree
   add_index "product_categories", ["product_id"], name: "index_product_categories_on_product_id", using: :btree
 
+  create_table "product_lable_relations", force: :cascade do |t|
+    t.integer  "product_id",       limit: 4
+    t.integer  "product_lable_id", limit: 4
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+  end
+
+  create_table "product_lables", force: :cascade do |t|
+    t.string   "name",       limit: 30, null: false
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
+  end
+
   create_table "product_no_vintages", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -481,6 +494,7 @@ ActiveRecord::Schema.define(version: 20170421042456) do
     t.integer  "product_package_type_id",   limit: 4
     t.integer  "product_no_vintage_id",     limit: 4
     t.integer  "product_no_ws_id",          limit: 4
+    t.integer  "on_order",                  limit: 1
   end
 
   create_table "revisions", force: :cascade do |t|
