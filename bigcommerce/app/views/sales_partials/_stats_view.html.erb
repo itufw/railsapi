@@ -29,7 +29,7 @@
   <% if @selected_lable != '' %>
     <%
         total_number = 0
-        @stats_info.keys.each do |id|
+        (@stats_info.keys & @product_order_number.keys).each do |id|
           total_number += @product_order_number[id]
         end
     %>
