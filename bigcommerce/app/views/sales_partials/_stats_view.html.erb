@@ -17,7 +17,7 @@
     <th><%= ProductLable.find(@selected_lable).name %></th>
   <% end %>
 </tr>
-<% unless @pending_stock_h.keys.blank?%>
+<% unless @stats_info.blank?%>
 <tr>
   <td></td>
   <th> Total </th>
