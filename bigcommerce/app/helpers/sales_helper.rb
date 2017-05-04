@@ -182,6 +182,29 @@ module SalesHelper
     return stats_info, stats_sum
   end
 
+  def update_lables(product_ids, lable)
+    relations = ProductLableRelation.lable_filter(lable)
+    product_ids.each do |product|
+      next if relations.map(&:product_id).include?product
+      ProductLableRelation.new do |p|
+        p.product_id = product
+        p.product_lable_id = lable
+        p.save
+      end
+    end
+  end
 
+  def destroy_lables(lable, product_ids, params)
+    relations = ProductLableRelation.lable_filter(lable)
+    product_ids = [] if product_ids.nil?
+    relations.each do |relation|
+      if product_ids.include?relation.product_id.to_s
+        relation.number = params["number_update_column_#{relation.product_id}"].to_i unless params["number_update_column_#{relation.product_id}"].nil?
+        relation.save
+      else
+        relation.destroy
+      end
+    end
+  end
 
 end

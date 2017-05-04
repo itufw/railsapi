@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170504023357) do
+ActiveRecord::Schema.define(version: 20170504051948) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -374,6 +374,7 @@ ActiveRecord::Schema.define(version: 20170504023357) do
     t.integer  "product_lable_id", limit: 4
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false
+    t.integer  "number",           limit: 4
   end
 
   create_table "product_lables", force: :cascade do |t|
