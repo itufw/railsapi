@@ -17,6 +17,7 @@
     <th><%= ProductLable.find(@selected_lable).name %></th>
   <% end %>
 </tr>
+<% unless @stats_info.keys.blank?%>
 <tr>
   <td></td>
   <th> Total </th>
@@ -29,15 +30,15 @@
   <% end %>
   <% if @selected_lable != '' %>
     <%
-        # total_number = 0
-        # (@stats_info.keys & @product_order_number.keys).each do |id|
-        #   total_number += @product_order_number[id]
-        # end
+        total_number = 0
+        (@stats_info.keys & @product_order_number.keys).each do |id|
+          total_number += @product_order_number[id]
+        end
     %>
-    <th><%= 0 %></th>
+    <th><%= total_number %></th>
   <% end %>
-
 </tr>
+<% end %>
 <% @stats_info.keys.each do |id|%>
 <tr>
   <td><%= id %></td>
