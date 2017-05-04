@@ -21,6 +21,7 @@
 	<%
 			total_row_dates = {}
 			total_product = []
+			total_number = 0
 	 		@dates_paired.keys.each do |d|
 			total_row_dates[d] = 0
 	 		end
@@ -48,7 +49,9 @@
 
 		<td class="num"><%= sums_dates_h.values.sum %></td>
 		<% total_product.append(sums_dates_h.values.sum) %>
-		<% if @selected_lable != ''%>
+		<% if @selected_lable != ''
+			total_number += @product_order_number[id]
+			%>
 			<% if @checked_id %>
 				<td><%= text_field_tag("number_update_column_#{id}", @product_order_number[id], class: 'form-control') %></td>
 			<% else %>
@@ -69,7 +72,7 @@
 		<% end %>
 		<td class="num"><%= total_product.sum%></td>
 		<% if @selected_lable != ''%>
-		<td><%= @product_order_number.values.sum %></td>
+			<td><%= total_number %></td>
 		<% end %>
 	</tr>
 

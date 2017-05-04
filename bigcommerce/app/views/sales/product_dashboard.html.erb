@@ -26,11 +26,11 @@
 
 </div>
 
-<% if @checked_stats %>
-	<div>
-		<%= render "sales_partials/stats_view", sum_param: "Qty", supply_display_class: "" %>
-	</div>
-<% else %>
-	<%= render "sales_partials/details_view" %>
-<% end %>
+	<% if @checked_stats %>
+		<div>
+			<%= render "sales_partials/stats_view", sum_param: "Qty", supply_display_class: "" %>
+		</div>
+	<% else %>
+		<%= render "sales_partials/details_view" %>
+	<% end %>
 <% end %>
