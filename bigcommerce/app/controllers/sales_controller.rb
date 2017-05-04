@@ -243,8 +243,8 @@ class SalesController < ApplicationController
     # this function is located in helpers -> sales_helper
     @product_ids = sort_by_arrows(params, @price_h, @product_name_h, @inventory_h, @pending_stock_h, @product_qty_h, @product_ids)
 
-    @checked_stats = 'stats'.eql? params[:stats_column] ? true : false
-    @temp_check = params[:stats_column]
+    @checked_stats = 'stats' == params[:stats_column] ? true : false
+
     # stats View!
     # helpers - > sales_helper
     @stats_info, @stats_sum = stats_info(@product_ids, @product_name_h, @transform_column, @inventory_h, @pending_stock_h) if @checked_stats
