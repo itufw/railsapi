@@ -8,8 +8,10 @@
   <th>Total Stock</th>
   <th>Pending Stock</th>
   <%# @overall_stats has structure {time_period => [sum, avg, supply]} %>
-  <% @stats_info.first[1]["time_period"].keys.each do |t| %>
-    <th><%= t %></th>
+  <% unless @stats_info.blank?%>
+    <% @stats_info.first[1]["time_period"].keys.each do |t| %>
+      <th><%= t %></th>
+    <% end %>
   <% end %>
 
   <% if @selected_lable != ''%>
