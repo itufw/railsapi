@@ -40,8 +40,6 @@ module CalendarHelper
     [staff, staff_selected]
   end
 
-
-
   def add_map_pin(category, customer, infowindow)
       case customer.cust_style_id
       when 1
@@ -66,7 +64,8 @@ module CalendarHelper
         "lat" => customer.lat,
         "lng" => customer.lng,
         "url" => url,
-        "infowindow" => infowindow
+        "infowindow" => infowindow,
+        'staff' => customer.staff_id
       }
       map_pin
   end
@@ -110,16 +109,74 @@ module CalendarHelper
     max
   end
 
-  # --------------------------------------
+  def add_event_pin(customer, event)
+    name = (customer.actual_name.nil?) ? customer.firstname.to_s + ' ' + customer.lastname.to_s : customer.actual_name.to_s
 
-  def calendar_filter(params, colour_guide, staffs)
+    infowindow = event.description
+
+    map_pin = {
+      'name' => name, 'lat' => customer.lat, 'lng' => customer.lng,
+      'customer_id' => event.customer_id,
+      'url' => 'map_icons/blue_dot.png', 'infowindow' => infowindow,
+      'date' => event.start_date, 'event_id' => event.google_event_id,
+      'creator' => event.response_staff, 'participant' => event.staff_id
+    }
+
+    map_pin
+  end
+
+  # --------------------------------------
+  # events are the tasks
+  def calendar_filter(params, colour_guide, staffs, events)
     colour_range = {
       'lightgreen' => [0, 15], 'green' => [15, 30], 'gold' => [30, 45],
       'coral' => [45, 60], 'red' => [60, 75], 'maroon' => [75, 3000]
     }
-    selected_staff, colour_range = map_filter(params, colour_guide, colour_range, false)
+    _, colour_range = map_filter(params, colour_guide, colour_range, false)
     start_date, end_date = time_picker(params, 0)
+    customers = Customer.joins(:addresses).select("addresses.lat, addresses.lng, customers.*").where("addresses.lat IS NOT NULL AND (customers.staff_id IN (?) OR customers.id IN (?))", staffs.map(&:id), events.map(&:customer_id)).group("customers.id")
+    customers = customers.joins(:orders).select("MAX(orders.date_created) as last_order_date, customers.id").where("orders.status_id IN (2, 3, 7, 8, 9, 10, 11, 12, 13)").order("orders.date_created DESC").group("customers.id")
 
+    # customer pins -> based on last order date
+    customer_map = {}
+    customers.each do |customer|
+      days_gap = (start_date - customer.last_order_date.to_date).to_i
+      days_gap = 0 if days_gap < 0
+      colour_range.keys.each do |colour|
+        if days_gap.between?(colour_range["#{colour}"].min, colour_range["#{colour}"].max)
+          infowindow = "Last Order in : " + days_gap.to_s + "  days"
+          customer_map[customer.id] = add_map_pin(colour, customer, infowindow)
+          break
+        end # end if
+      end # end colour guide for loop
+    end # end customers for loop
+
+    event_map = {}
+    events.each do |event|
+      customer = customers.select { |x| x.id == event.customer_id }.first
+      event_map[event.google_event_id] = add_event_pin(customer, event) unless customer.nil?
+    end
+    [customer_map, event_map, start_date, end_date]
+  end
+
+  # turn events to map_pins
+  def hash_event_pins(event)
+    hash = Gmaps4rails.build_markers(event.keys()) do |event_id, marker|
+      marker.lat event[event_id]["lat"]
+      marker.lng event[event_id]["lng"]
+      marker.picture({ url: view_context.image_path(event[event_id]["url"]),
+                        width: 30,
+                        height: 30 })
+      marker.infowindow "<a href=\"http://188.166.243.138/customer/summary?customer_id=#{event[event_id]['customer_id']}&customer_name=#{event[event_id]['name']}\">#{event[event_id]['name']}</a>
+                              <br/><br/>
+                              <p>#{event[event_id]['infowindow']}<p>"
+      marker.json({
+        date: event[event_id]['date'],
+        participant: event[event_id]['participant'],
+        creator: event[event_id]['creator']
+        })
+    end
+    hash
   end
 
   # filter customer based on the last orde date
@@ -200,7 +257,10 @@ module CalendarHelper
       marker.infowindow "<a href=\"http://188.166.243.138/customer/summary?customer_id=#{customer_id}&customer_name=#{customer_map[customer_id]["name"]}\">#{customer_map[customer_id]["name"]}</a>
                               <br/><br/>
                               <p>#{customer_map[customer_id]["infowindow"]}<p>"
-      marker.json ({:customer_id => customer_id})
+      marker.json ({
+        :customer_id => customer_id,
+        :staff_id => customer_map[customer_id]['staff_id']
+        })
       end
     hash
   end
