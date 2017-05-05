@@ -60,7 +60,7 @@ class CalendarController < ApplicationController
 
       staff_event = {}
       @calendar_list = []
-      tasks = Task.joins(:task_relations).select('task_relations.customer_id, tasks.google_event_id, tasks.start_date, tasks.end_date, tasks.description').where("tasks.google_event_id IS NOT NULL")
+      tasks = Task.joins(:task_relations).select('task_relations.customer_id, tasks.google_event_id, tasks.start_date, tasks.end_date, tasks.description').where('tasks.google_event_id IS NOT NULL')
       service.list_calendar_lists.items.each do |calendar|
         calendar_staff = @staffs.select { |x| x.email == calendar.id }
         next unless calendar_staff.count > 0
@@ -97,84 +97,103 @@ class CalendarController < ApplicationController
     end
   end
 
-    def event_censor
-      client = Signet::OAuth2::Client.new(client_id: Rails.application.secrets.google_client_id,
-                                          client_secret: Rails.application.secrets.google_client_secret,
-                                          :additional_parameters => {
-                                            "access_type" => "offline",         # offline access
-                                            "include_granted_scopes" => "true"  # incremental auth
-                                          },
-                                          token_credential_uri: 'https://accounts.google.com/o/oauth2/token')
-      client.update!(session[:authorization])
-      service = Google::Apis::CalendarV3::CalendarService.new
-      service.authorization = client
+  def local_calendar
+    @current_user = Staff.find(session[:user_id])
+    # tempary use, it should be assigned based on the current users' right
+    @staffs = Staff.where('staffs.id IN (?)', [36, 9])
+    # @staffs = Staff.active
+    @events = Task.joins(:task_relations).select('task_relations.*, tasks.*').where('tasks.google_event_id IS NOT NULL AND (task_relations.staff_id IN (?) OR tasks.response_staff IN (?))', @staffs.map(&:id), @staffs.map(&:id))
 
-      begin
-        @jarow = FuzzyStringMatch::JaroWinkler.create(:native)
-        @customers = Customer.all.order_by_name('ASC')
+    @customers = Customer.all
+    _, @order_colour_selected, @colour_guide, @max_date =
+      colour_selected(params)
+    customer_map, event_map, @start_date, @end_date = \
+      calendar_filter(params, @order_colour_selected, @staffs, @events)
 
-        @methods = TaskMethod.all
-        @subjects = TaskSubject.sales_subjects
+    @hash = hash_map_pins(customer_map)
+    @event_hash = hash_event_pins(event_map)
+    params[:start_date] = params[:start_date] || Date.current.beginning_of_month.to_s
+    @current_month = (Date.parse params[:start_date]).beginning_of_month
+  end
 
-        @events = Task.new.scrap_from_calendars(service)
+  def event_censor
+    client = Signet::OAuth2::Client.new(client_id: Rails.application.secrets.google_client_id,
+                                        client_secret: Rails.application.secrets.google_client_secret,
+                                        additional_parameters: {
+                                          'access_type' => 'offline',         # offline access
+                                          'include_granted_scopes' => 'true'  # incremental auth
+                                        },
+                                        token_credential_uri: 'https://accounts.google.com/o/oauth2/token')
+    client.update!(session[:authorization])
+    service = Google::Apis::CalendarV3::CalendarService.new
+    service.authorization = client
 
-        @staffs = Staff.filter_by_emails(@events.map{|x| x.creator.email}.uniq).active
-      rescue Google::Apis::AuthorizationError
-          response = client.refresh!
-          session[:authorization] = session[:authorization].merge(response)
-          retry
-      end
+    begin
+      @jarow = FuzzyStringMatch::JaroWinkler.create(:native)
+      @customers = Customer.all.order_by_name('ASC')
+
+      @methods = TaskMethod.all
+      @subjects = TaskSubject.sales_subjects
+
+      @events = Task.new.scrap_from_calendars(service)
+
+      @staffs = Staff.filter_by_emails(@events.map { |x| x.creator.email }.uniq).active
+    rescue Google::Apis::AuthorizationError
+      response = client.refresh!
+      session[:authorization] = session[:authorization].merge(response)
+      retry
     end
+  end
 
-    def translate_events
-      if collection_valid_check(params)
-        if Task.new.update_event(params["event_id"], params["method"], params["subject"], params["customer"])
-          flash[:success] = "Done"
-        else
-          flash[:error] = "Something went wrong"
-        end
+  def translate_events
+    if collection_valid_check(params)
+      if Task.new.update_event(params['event_id'], params['method'], params['subject'], params['customer'])
+        flash[:success] = 'Done'
       else
-        flash[:error] = 'Select Right Customer/Method/Subject.'
+        flash[:error] = 'Something went wrong'
       end
-      redirect_to :back
+    else
+      flash[:error] = 'Select Right Customer/Method/Subject.'
     end
+    redirect_to :back
+  end
 
-    def map
-      @colour_selected, @order_colour_selected, @colour_guide, @max_date =
-        colour_selected(params)
+  def map
+    @colour_selected, @order_colour_selected, @colour_guide, @max_date =
+      colour_selected(params)
 
-      @customer_type = CustStyle.all
-      @customer_style_selected =
-        customer_style_filter(params[:selected_cust_style])
+    @customer_type = CustStyle.all
+    @customer_style_selected =
+      customer_style_filter(params[:selected_cust_style])
 
-      @staff, @staff_selected =
-        staff_filter(session, params[:selected_staff])
+    @staff, @staff_selected =
+      staff_filter(session, params[:selected_staff])
 
-      @colour_range_sales = { 'lightgreen' => [5000, 100_000],
-                                'green' => [3000, 5000],
-                                'gold' => [1500, 3000],
-                                'coral' => [500, 1500],
-                                'red' => [0, 500],
-                                'maroon' => [0, 0] }
+    @colour_range_sales = { 'lightgreen' => [5000, 100_000],
+                            'green' => [3000, 5000],
+                            'gold' => [1500, 3000],
+                            'coral' => [500, 1500],
+                            'red' => [0, 500],
+                            'maroon' => [0, 0] }
 
-        case sales_last_order(params)
-        when 'Sales'
+    case sales_last_order(params)
+    when 'Sales'
 
-            # in Helper
-            # filter customers with attributes
-            @active_sales = true
-            customer_map, @start_date, @end_date = customer_filter_map(params, @colour_selected, @colour_range_sales, @customer_style_selected, @staff)
-        when 'Last_Order'
-            @active_sales = false
-            customer_map, @start_date, @end_date = customer_last_order_filter(params, @order_colour_selected, @customer_style_selected, @staff)
-        end
-        @hash = hash_map_pins(customer_map)
-
-        # customer table
-        order_function, direction = sort_order(params, 'order_by_name', 'ASC')
-        @per_page = params[:per_page] || Customer.per_page
-        @customers = Customer.filter_by_ids(customer_map.keys).include_all.send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
+      # in Helper
+      # filter customers with attributes
+      @active_sales = true
+      customer_map, @start_date, @end_date = customer_filter_map(params, @colour_selected, @colour_range_sales, @customer_style_selected, @staff)
+    when 'Last_Order'
+      @active_sales = false
+      customer_map, @start_date, @end_date = customer_last_order_filter(params, @order_colour_selected, @customer_style_selected, @staff)
     end
+    @hash = hash_map_pins(customer_map)
+
+    # customer table
+    order_function, direction = sort_order(params, 'order_by_name', 'ASC')
+    @per_page = params[:per_page] || Customer.per_page
+    @customers = Customer.filter_by_ids(customer_map.keys).include_all.send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
+  end
 end
 
 # event_markers = handler.addMarkers(<%=raw @hash.select{|x| @event_customers[calendar_staff.id].include?x[:customer_id]}.to_json %>);

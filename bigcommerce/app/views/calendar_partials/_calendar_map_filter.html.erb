@@ -63,11 +63,9 @@
     if ($(this).val() == "Sales") {
       $("#last_order_slider").hide();
       $("#sales_slider").show();
-      $('#start_timepicker').data("DateTimePicker").date('<%= (@start_date - 3.months).to_s%>');
     } else {
       $("#sales_slider").hide();
       $("#last_order_slider").show();
-      $('#start_timepicker').data("DateTimePicker").date('<%= @start_date.to_s%>');
     };
   });
 
