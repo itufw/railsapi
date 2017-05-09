@@ -3,6 +3,8 @@
 <script src="//maps.google.com/maps/api/js?key=AIzaSyB1HFWQ1DigWTnXGn_ZaUOk-v8hgGF3moI"></script>
 <script src="//cdn.rawgit.com/mahnunchik/markerclustererplus/master/dist/markerclusterer.min.js"></script>
 
+
+
 <div class="container">
   <div class="row">
     <div class='col-md-8'>
@@ -13,10 +15,10 @@
       </div>
 
       <% @staffs.each do |staff|%>
-        <div id="calendar-staff-<%= staff.id%>">
+        <div class="calendar-staff" id="calendar-staff-<%= staff.id%>" >
           <%= month_calendar events: @events do |date, meetings| %>
             <%if date >= @current_month.beginning_of_month && date <= @current_month.end_of_month%>
-              <a class="calendar-date" date="<%=date%>"><%= date.strftime('%e %b') %></a>
+              <a class="calendar-date" date="<%=date%>" staff-id="<%= staff.id%>"><%= date.strftime('%e %b') %></a>
             <% else %>
               <%= date.strftime('%e %b') %>
             <% end %>
@@ -51,6 +53,8 @@
 
 <!-- staff calendar selector -->
 <script>
+
+
   var handler = Gmaps.build('Google');
   handler.buildMap({
       internal: {
@@ -125,6 +129,8 @@
 
   // date selector
   $(".calendar-date").click(function(){
+    console.log('date '+'<%= @calendar_date %>');
+    console.log('staff '+'<%= @calendar_staff%>');
     <%
       selected_staff = nil
       @staffs.each do |staff|
@@ -134,29 +140,11 @@
       };
     <% end %>
 
-    <% selected_date = @current_month%>
-    var jq_date = '<%=@current_month %>';
-    var begin_date = new Date(jq_date.split("-")[0], parseInt(jq_date.split("-")[1]) - 1, jq_date.split("-")[2]);
-    var end_month = new Date();
-    var d = new Date();
-    d.setDate(begin_date.getDate());
-    end_month.setDate(begin_date.getDate()+30);
-
-    for (d; d< end_month; d.setDate(d.getDate()+1)){
-      if($(this).attr('date') == (d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate())){
-        alert("equal");
-        alert(d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate());
-        break;
-      }else{
-        <% selected_date = selected_date + 1.day  %>
-      };
-    };
-
     if ($("#event_checkbox").attr('checked')){
       handler.removeMarkers(event_markers);
       event_markers = null;
       <%unless selected_staff.nil? %>
-        event_markers = handler.addMarkers(<%=raw @event_hash.select{|x| ([x[:creator], x[:participant]].include?selected_staff) && (selected_date == x[:date].to_date.to_s)}.to_json %>);
+        event_markers = handler.addMarkers(<%=raw @event_hash.select{|x| @datedate == x[:date].to_date.to_s}.to_json %>);
       <% end %>
     }
   });

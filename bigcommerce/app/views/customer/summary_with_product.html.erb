@@ -1,6 +1,8 @@
 <%= title @product_name  + " - " + @customer_name %>
 <h3><%= @customer_name %></h3><br/>
-<h3><%= @product_name %></h3>
+<h3><%= link_to @product_name, controller: 'product', action: 'summary', product_id: @product_id, product_name: @product_name, transform_column: @transform_column, pending_stock: @pending_stock, total_stock: @total_stock %></h3>
+<h4>Total Stock: <%= @total_stock %></h4>
+
 <%= form_tag({:action => "summary" }, {:method => "get"}) do %>
 
 <div style="margin-top: 50px;">
