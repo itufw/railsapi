@@ -59,6 +59,11 @@ class CustomerController < ApplicationController
     # overall_stats has structure {time_period_name => [sum, average, supply]}
     @overall_stats = overall_stats_with_product(params, @product_ids)
     display_orders(params, Order.customer_filter([@customer_id]).product_filter(@product_ids))
+
+		products = Product.send('group_by_' + @transform_column)
+		total_stock = products.sum(:inventory)
+		@pending_stock = (OrderProduct.product_filter(products.pluck("id")).product_pending_stock('group_by_' + @transform_column))[@product_id]
+		@total_stock = total_stock[@product_id.to_i].to_i+@pending_stock.to_i
   end
 
   def overall_stats_(params)

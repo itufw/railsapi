@@ -3,6 +3,8 @@ require 'models_filter.rb'
 require 'fuzzystringmatch'
 
 class CalendarController < ApplicationController
+
+  skip_before_action :verify_authenticity_token
   before_action :confirm_logged_in
   include CalendarHelper
   include ModelsFilter
@@ -98,6 +100,9 @@ class CalendarController < ApplicationController
   end
 
   def local_calendar
+    @calendar_date = params[:calendar_date_selected].nil? ? "date" : params[:calendar_date_selected]
+    @calendar_staff = params[:calendar_staff_selected].nil? ? "staff" : params[:calendar_staff_selected]
+
     @current_user = Staff.find(session[:user_id])
     # tempary use, it should be assigned based on the current users' right
     @staffs = Staff.where('staffs.id IN (?)', [36, 9])
