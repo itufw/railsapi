@@ -161,6 +161,22 @@ class XeroInvoice < ActiveRecord::Base
         end
      end
 
+     def self.over(xero_invoice)
+       if xero_invoice && xero_invoice.status == 'AUTHORISED' && xero_invoice.amount_due > 0
+         date_diff = Date.today().mjd - xero_invoice.due_date.to_date.mjd
+         return unless date_diff > 0
+         if date_diff < 15
+           ['Over', xero_invoice.amount_due]
+         elsif date_diff < 30
+           ['Over-15', xero_invoice.amount_due]
+         elsif date_diff < 60
+           ['Over-30', xero_invoice.amount_due]
+         elsif date_diff
+           ['Over-60', xero_invoice.amount_due]
+         end
+       end
+     end
+
     def self.sum_amount_due
         sum('xero_invoices.amount_due')
       end

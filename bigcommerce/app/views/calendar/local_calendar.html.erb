@@ -4,20 +4,23 @@
 <script src="//cdn.rawgit.com/mahnunchik/markerclustererplus/master/dist/markerclusterer.min.js"></script>
 
 
+<div id="patient-name">
+
+</div>
 
 <div class="container">
   <div class="row">
     <div class='col-md-8'>
       <div id="selector" class="btn-group">
         <% @staffs.each do |staff|%>
-          <button type="button" class="btn btn-default" id="calendar-button-<%= staff.id %>"><%= staff.nickname %></button>
+          <button type="button" class="btn btn-default calendar-staff-selector" id="calendar-button-<%= staff.id %>" staff-id="<%= staff.id%>"><%= staff.nickname %></button>
         <% end %>
       </div>
 
       <% @staffs.each do |staff|%>
         <div class="calendar-staff" id="calendar-staff-<%= staff.id%>" >
           <%= month_calendar events: @events do |date, meetings| %>
-            <%if date >= @current_month.beginning_of_month && date <= @current_month.end_of_month%>
+            <%if (date >= @current_month.beginning_of_month) && (date <= @current_month.end_of_month)%>
               <a class="calendar-date" date="<%=date%>" staff-id="<%= staff.id%>"><%= date.strftime('%e %b') %></a>
             <% else %>
               <%= date.strftime('%e %b') %>
@@ -53,106 +56,50 @@
 
 <!-- staff calendar selector -->
 <script>
-
-
-  var handler = Gmaps.build('Google');
-  handler.buildMap({
-      internal: {
-          id: 'customer_location'
-      }
-  }, function () {
-  });
-  var event_markers = null;
-  var customer_markers = null;
-
-  <%@staffs.each do |staff|%>
-    $("#calendar-staff-<%= staff.id%>").hide();
-    $("#calendar-button-<%= staff.id %>").click(function(){
-
-      <%@staffs.each do |staff|%>
-        $("#calendar-staff-<%= staff.id%>").hide();
-      <% end %>
-
-      $("#calendar-staff-<%= staff.id%>").toggle();
-      handler.removeMarkers(event_markers);
-      handler.removeMarkers(customer_markers);
-      event_markers, customer_markers = null;
-      if ($('#event_checkbox').attr('checked'))
-        event_markers = handler.addMarkers(<%=raw @event_hash.select{|x| ([x[:creator], x[:participant]].include?staff.id) && (@current_month.beginning_of_month == x[:date].beginning_of_month)}.to_json %>);
-      if ($('#customer_checkbox').attr('checked'))
-        customer_markers = handler.addMarkers(<%=raw @hash.select{|x| x[:staff_id]==staff.id }.to_json%>);
-      if (event_markers != null){
-        handler.bounds.extendWith(event_markers);
-        handler.fitMapToBounds();
-      }else if (customer_markers != null) {
-        handler.bounds.extendWith(customer_markers);
-        handler.fitMapToBounds();
-      };
-    });
-  <% end %>
-
-  $('#event_checkbox').attr('checked',true);
-
-  $('input').click(function(){
-    <%
-      selected_staff = nil
-      @staffs.each do |staff|
-    %>
-    if ($("#calendar-staff-<%= staff.id%>").is(":visible")){
-      <% selected_staff = staff %>
-    };
-    <% end %>
-    if ($(this).val() == "event"){
-      if ($(this).attr('checked')){
-        $('#event_checkbox').attr('checked',false);
-        handler.removeMarkers(event_markers);
-        event_markers = null;
-      }else{
-        $('#event_checkbox').attr('checked',true);
-        <%unless selected_staff.nil? %>
-          event_markers = handler.addMarkers(<%=raw @event_hash.select{|x| ([x[:creator], x[:participant]].include?selected_staff) && (@current_month.beginning_of_month == x[:date].beginning_of_month)}.to_json %>);
-        <% end %>
-      };
-    }else{
-      if ($(this).attr('checked')){
-        $('#customer_checkbox').attr('checked',false);
-        handler.removeMarkers(customer_markers);
-        customer_markers = null;
-      }else{
-        $('#customer_checkbox').attr('checked',true);
-        <%unless selected_staff.nil? %>
-          customer_markers = handler.addMarkers(<%=raw @hash.select{|x| x[:staff_id]==selected_staff }.to_json%>);
-        <% end %>
-      }
-    };
-  });
-
-  // date selector
-  $(".calendar-date").click(function(){
-    console.log('date '+'<%= @calendar_date %>');
-    console.log('staff '+'<%= @calendar_staff%>');
-    <%
-      selected_staff = nil
-      @staffs.each do |staff|
-    %>
-      if ($("#calendar-staff-<%= staff.id%>").is(":visible")){
-        <% selected_staff = staff %>
-      };
-    <% end %>
-
-    if ($("#event_checkbox").attr('checked')){
-      handler.removeMarkers(event_markers);
-      event_markers = null;
-      <%unless selected_staff.nil? %>
-        event_markers = handler.addMarkers(<%=raw @event_hash.select{|x| @datedate == x[:date].to_date.to_s}.to_json %>);
-      <% end %>
+var handler = Gmaps.build('Google');
+handler.buildMap({
+    internal: {
+        id: 'customer_location'
     }
+}, function () {
+});
+
+var event_markers = null;
+var customer_markers = null;
+
+<%@staffs.each do |staff|%>
+  $("#calendar-staff-<%= staff.id%>").hide();
+  $("#calendar-button-<%= staff.id %>").click(function(){
+
+    <%@staffs.each do |staff|%>
+      $("#calendar-staff-<%= staff.id%>").hide();
+    <% end %>
+
+    $("#calendar-staff-<%= staff.id%>").toggle();
+    handler.removeMarkers(event_markers);
+    handler.removeMarkers(customer_markers);
+    event_markers, customer_markers = null;
+    if ($('#event_checkbox').is(':checked'))
+      event_markers = handler.addMarkers(<%=raw @event_hash.select{|x| ([x[:creator], x[:participant]].include?staff.id) && (@current_month.beginning_of_month == x[:date].beginning_of_month)}.to_json %>);
+    if ($('#customer_checkbox').is(':checked'))
+      customer_markers = handler.addMarkers(<%=raw @hash.select{|x| x[:staff_id]==staff.id }.to_json%>);
+
+    if (event_markers != null && event_markers.length != 0){
+      handler.bounds.extendWith(event_markers);
+      handler.fitMapToBounds();
+    }else if (customer_markers != null) {
+      handler.bounds.extendWith(customer_markers);
+      handler.fitMapToBounds();
+    };
+
   });
+<% end %>
 
-
-// hide filter
+  // hide filter
   $("#calendar_map_filter").hide();
   $("#filter_on").click(function(){
     $("#calendar_map_filter").toggle();
   });
+
+  $('#event_checkbox').attr('checked',true);
 </script>

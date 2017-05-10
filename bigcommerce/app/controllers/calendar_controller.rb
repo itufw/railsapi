@@ -100,12 +100,12 @@ class CalendarController < ApplicationController
   end
 
   def local_calendar
-    @calendar_date = params[:calendar_date_selected].nil? ? "date" : params[:calendar_date_selected]
-    @calendar_staff = params[:calendar_staff_selected].nil? ? "staff" : params[:calendar_staff_selected]
+    @calendar_date = params[:calendar_date_selected]
+    @calendar_staff = params[:calendar_staff_selected]
 
     @current_user = Staff.find(session[:user_id])
     # tempary use, it should be assigned based on the current users' right
-    @staffs = Staff.where('staffs.id IN (?)', [36, 9])
+    @staffs = Staff.where('staffs.id IN (?)', [9, 36, 18])
     # @staffs = Staff.active
     @events = Task.joins(:task_relations).select('task_relations.*, tasks.*').where('tasks.google_event_id IS NOT NULL AND (task_relations.staff_id IN (?) OR tasks.response_staff IN (?))', @staffs.map(&:id), @staffs.map(&:id))
 
