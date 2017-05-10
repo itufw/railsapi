@@ -1,14 +1,15 @@
 require 'models_filter.rb'
 require 'dates_helper.rb'
 require 'task_helper.rb'
+
+# Task controller -> includes Task helper and add tasks
 class TaskController < ApplicationController
-    before_action :confirm_logged_in
+  before_action :confirm_logged_in
+  autocomplete :customer, :actual_name, full: true
 
-    autocomplete :customer, :actual_name, :full => true
-
-    include ModelsFilter
-    include DatesHelper
-    include TaskHelper
+  include ModelsFilter
+  include DatesHelper
+  include TaskHelper
 
     def add_task
       # task helper -> check if the customer has assigned
@@ -39,8 +40,12 @@ class TaskController < ApplicationController
           service.authorization = client
           lists = service.list_calendar_lists
           @google_alive = true
-        rescue Google::Apis::AuthorizationError => exception
-          response = client.refresh!
+        rescue Google::Apis::AuthorizationError
+          begin
+            response = client.refresh!
+          rescue
+            redirect_to controller: 'calendar', action: 'redirect', event: 'event' && return
+          end
           session[:authorization] = session[:authorization].merge(response)
           retry
         rescue

@@ -9,7 +9,7 @@
             <span class="caret"></span></a>
             <ul class="dropdown-menu">
               <% @staffs.each do |staff| %>
-              <li id="staff-<%= staff.id%>">
+              <li class="staff-dropdown" id="staff-<%= staff.id%>">
                 <%= staff.nickname %>
               </li>
               <% end %>
@@ -33,7 +33,7 @@
       <%
         response_staff = @staffs.select{|x| x.email == event.creator.email}
       %>
-      <tr id="<%= (response_staff.nil?) ? event.creator.email : 'event-staff-'+response_staff.first.id.to_s%>">
+      <tr class="google-event-line  staff-event-<%= (response_staff.nil?) ? event.creator.email : response_staff.first.id.to_s%> ">
         <td><%= (response_staff.nil?) ? event.creator.email : response_staff.first.nickname %></td>
         <td>&nbsp;&nbsp;&nbsp;</td>
         <td><%= event.summary.to_s%><br/><%= event.description.to_s %></td>
@@ -66,9 +66,10 @@
 </div>
 
 <script>
-$("#event-table tbody tr #event-staff-36").hide();
-
-$("li #staff-36").click(function(){
-  $("#event-table tbody tr #event-staff-36").toggle();
-});
+<% @staffs.each do |staff| %>
+  $("#staff-<%= staff.id%>").click(function(){
+    $(".google-event-line").hide();
+    $(".staff-event-<%=staff.id%>").toggle();
+  });
+<% end %>
 </script>

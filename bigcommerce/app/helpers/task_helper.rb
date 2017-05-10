@@ -205,7 +205,7 @@ module TaskHelper
 
 
       begin
-        gcal_event = service.insert_event(response_staff_email, event)
+        gcal_event = service.insert_event(response_staff_email, event, send_notifications: true)
         return gcal_event
       rescue Google::Apis::AuthorizationError => exception
         client.update!(

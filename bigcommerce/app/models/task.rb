@@ -161,7 +161,7 @@ class Task < ActiveRecord::Base
     end
 
     def self.staff_tasks(staff_id)
-        includes(:task_relations).where("tasks.response_staff = '#{staff_id}' or task_relations.staff_id = '#{staff_id}'").references(:task_relations)
+      includes(:task_relations).where("tasks.response_staff = '#{staff_id}' or task_relations.staff_id = '#{staff_id}'").references(:task_relations).where('tasks.gcal_status <> 3')
     end
 
     def self.order_tasks(order_id)
@@ -177,15 +177,15 @@ class Task < ActiveRecord::Base
     end
 
     def self.active_tasks
-        where('tasks.expired = 0')
+      where('tasks.expired = 0')
     end
 
     def self.is_task
-        where('tasks.is_task = 1')
+      where('tasks.is_task = 1')
     end
 
     def self.is_note
-        where('tasks.is_task = 0')
+      where('tasks.is_task = 0')
     end
 
     def self.order_by_id(direction)

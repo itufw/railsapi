@@ -22,7 +22,7 @@ class CalendarController < ApplicationController
       },
       redirect_uri: uri
     )
-    redirect_to client.authorization_uri.to_s
+    redirect_to client.authorization_uri.to_s, event: params[:event]
   end
 
   def callback
@@ -38,7 +38,11 @@ class CalendarController < ApplicationController
     response = client.fetch_access_token!
 
     session[:authorization] = staff_access_token_update(session[:user_id], response)
-    redirect_to calendars_url
+    if params[:event]
+      redirect_to controller: 'task', action: 'add_task'
+    else
+      redirect_to action: 'event_censor'
+    end
   end
 
   def calendars
@@ -144,9 +148,14 @@ class CalendarController < ApplicationController
 
       @staffs = Staff.filter_by_emails(@events.map { |x| x.creator.email }.uniq).active
     rescue Google::Apis::AuthorizationError
-      response = client.refresh!
+      begin
+        response = client.refresh!
+      rescue
+        redirect_to action: redirect && return
+      end
       session[:authorization] = session[:authorization].merge(response)
       retry
+
     end
   end
 
@@ -200,6 +209,3 @@ class CalendarController < ApplicationController
     @customers = Customer.filter_by_ids(customer_map.keys).include_all.send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
   end
 end
-
-# event_markers = handler.addMarkers(<%=raw @hash.select{|x| @event_customers[calendar_staff.id].include?x[:customer_id]}.to_json %>);
-# customer_markers = handler.addMarkers(<%=raw @hash.select{|x| @customers.select{|y| y.staff_id == calendar_staff.id}.map{|y| y.id}.include?x[:cusomter_id]}.to_json%>);

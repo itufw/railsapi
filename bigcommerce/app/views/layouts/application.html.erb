@@ -67,6 +67,9 @@
                                 <% if user_full_right(session[:authority]) %>
                                 <li><%= link_to "Calendar", controller: "calendar", action: "local_calendar" %></li>
                                 <% end %>
+                                <%if it_working(session[:user_id])%>
+                                <li><%= link_to "Event Censor", controller: "calendar", action: "event_censor" %></li>
+                                <% end %>
                             </ul>
                         </li>
                     </ul>
