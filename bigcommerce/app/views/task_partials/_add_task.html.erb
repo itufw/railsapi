@@ -1,4 +1,4 @@
-  <%= form_for @task, :url => {:controller => "task", :action => "add_task"}  do |f| %>
+  <%= form_for @task, :url => {:controller => "task", :action => "add_task"}, :id => "task_append_form"  do |f| %>
   <%= hidden_field_tag :parent_task, @parent_task %>
   <%= hidden_field_tag :selected_orders, @selected_orders unless @selected_orders.blank?%>
   <%= hidden_field_tag :accounts_page, @customer_locked %>
@@ -15,13 +15,13 @@
           <%= "Following Task: "+ @parent_task unless @parent_task.nil? || ("".eql? @parent_task.to_s) || @parent_task.to_i == 0%>
           <br/>
           <%= label(:function, "Function:")%>
-          <%= f.collection_select :function, @function, :function, :function, {:include_blank => "Select a Function"}, {:class=>"function_selection"} %>
+          <%= f.collection_select :function, @function, :function, :function, {:include_blank => "Select a Function", :selected => @default_function}, {:class=>"function_selection"} %>
           <%= label(:subject_1, "Subject:")%>
           <%= f.collection_select :subject_1, @subjects, :id, :subject, {:prompt => "Select a Subject"}, {:class=>"subject_selection"} %>
       </div>
       <div class="col-md-8 col-md-offset-4" id="task_function">
           <%= label(:method, "Method:")%>
-          <%= f.collection_select :method, @methods, :method, :method, {:prompt => "Select a Method"} %>
+          <%= f.collection_select :method, @methods, :method, :method, {:include_blank => "Select a Method", :selected => "Call"} %>
           <%= label(:priority, "Priority:")%>
           <%= f.collection_select :priority, TaskPriority.all, :id, :priority_level, {:selected => 3} %>
       </div>
@@ -72,6 +72,18 @@
           </br>
           </div>
       </div>
+      <% if @google_alive %>
+        <div class="row" style="margin-top: 5px;">
+        	<div class="col-xs-6 col-xs-offset-4">
+            <b>Add to Calendar:</b>
+        		<%= radio_button_tag(:event_column, "yes", false) %> Yes
+        		<span style="margin-left: 50px;">
+        		<%= radio_button_tag(:event_column, "no", true) %>  No
+        		</span>
+        	</div>
+        </div>
+      <% end %>
+
       <div class="col-xs-6 col-xs-offset-4">
           <%= button_tag(type: 'submit', class: "btn btn-primary") do %>
             <div id="create_button">Create Task!</div>
@@ -86,35 +98,35 @@
 
 
 <script>
-$(function () {
-    $('#due_timepicker').datetimepicker({
-      defaultDate: new Date(),
-      sideBySide: true
-    });
-    $('#start_timepicker').datetimepicker({
-      defaultDate: new Date(),
-      sideBySide: true,
-      useCurrent: false //Important! See issue #1075
-    });
+  $(function () {
+      $('#due_timepicker').datetimepicker({
+        defaultDate: new Date(),
+        sideBySide: true
+      });
+      $('#start_timepicker').datetimepicker({
+        defaultDate: new Date(),
+        sideBySide: true,
+        useCurrent: false //Important! See issue #1075
+      });
 
-    $("#due_timepicker").on("dp.change", function (e) {
-        $('#start_timepicker').data("DateTimePicker").date(e.date);
-        $('#start_timepicker').data("DateTimePicker").maxdate(e.date);
-    });
-    $("#start_timepicker").on("dp.change", function (e) {
-        $('#due_timepicker').data("DateTimePicker").minDate(e.date);
-    });
-});
+      // $("#due_timepicker").on("dp.change", function (e) {
+          // $('#start_timepicker').data("DateTimePicker").date(e.date);
+          // $('#start_timepicker').data("DateTimePicker").maxdate(e.date);
+      // });
+      // $("#start_timepicker").on("dp.change", function (e) {
+          // $('#due_timepicker').data("DateTimePicker").minDate(e.date);
+      // });
+  });
 
-$(".is_task_check").change(function () {
-  if($(this).val() == "Note"){
-    $(".task_due_date").hide();
-    $("#create_button").html("Create Note!");
-    $("#task_type_title").html("Note");
-  }else{
-    $(".task_due_date").show();
-    $("#create_button").html("Create Task!");
-    $("#task_type_title").html("Task");
-  };
-});
+  $(".is_task_check").change(function () {
+    if($(this).val() == "Note"){
+      $(".task_due_date").hide();
+      $("#create_button").html("Create Note!");
+      $("#task_type_title").html("Note");
+    }else{
+      $(".task_due_date").show();
+      $("#create_button").html("Create Task!");
+      $("#task_type_title").html("Task");
+    };
+  });
 </script>

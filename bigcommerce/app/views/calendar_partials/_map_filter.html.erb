@@ -1,0 +1,314 @@
+<div class="col-md-4">
+  <div class="row">
+    <div class="col-md-4">
+      <div id="sales_menu">
+        <a class="btn btn-default">Sales Executive</a>
+      </div>
+      <div id="sales_rep">
+        <% @staff.each do |person| %>
+        <li>
+          <%= check_box_tag 'selected_staff[]', person.id, (@staff_selected.include? person.id.to_s) %>
+          <%= person.nickname %>
+          &nbsp;&nbsp;
+        </li>
+        <% end %>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div id="cust_type_menu">
+        <a class="btn btn-default">Customer Type</a>
+      </div>
+      <div id="cust_type">
+        <% @customer_type.each do |cust| %>
+        <li>
+          <%= check_box_tag 'selected_cust_style[]', cust.id,  (@customer_style_selected.include? cust.id.to_s)%>
+          <%= cust.name %>
+          &nbsp;&nbsp;
+        </li>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <br/><br/>
+  <div id="selector" class="btn-group">
+    <button type="button" class="btn btn-default <%= 'active' if @active_sales %>" value="Sales">Sales</button>
+    <button type="button" class="btn btn-default <%= 'active' unless @active_sales %>" value="Last_Order">Last Order Date</button>
+    <%= hidden_field_tag "filter_selector" %>
+  </div>
+
+  <div id="sales_slider">
+    <table>
+      <% @colour_guide.each do |colour|%>
+      <tr>
+        <td>
+          <%= check_box_tag 'selected_colour[]', colour, (@colour_selected.include? colour) %>
+        </td>
+        <td>
+          <svg width="15" height="15" id="svg_<%= colour %>">
+            <rect width="15" height="15" style="fill:<%= colour %>;" id="cube_<%= colour %>"/>
+          </svg>
+        </td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td>
+          <!-- <input id="slider-<%= colour%>"/> -->
+          <!-- <%= hidden_field_tag "order_range_#{colour}" %> -->
+          $<%= text_field_tag "order_range_#{colour}_min",@colour_range_sales[colour].min , placeholder: 'Sale Starts From', :size => 3%>
+          TO $<%= text_field_tag "order_range_#{colour}_max",@colour_range_sales[colour].max, placeholder: 'Sale Limit', :size => 3 %>
+        </td>
+      </tr>
+      <% end %>
+    </table>
+  </div>
+
+  <div id="last_order_slider">
+    <table>
+      <% @colour_guide.each do |colour|%>
+      <tr>
+        <td>
+          <%= check_box_tag 'selected_order_colour[]', colour, (@order_colour_selected.include? colour) %>
+        </td>
+        <td>
+          <svg width="15" height="15" id="svg_<%= colour %>">
+            <rect width="15" height="15" style="fill:<%= colour %>;" id="cube_<%= colour %>"/>
+          </svg>
+        </td>
+        <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <% unless colour.eql? @colour_guide.last %>
+        <td>
+          <input id="slider-date-<%= colour%>"/>
+          <%= hidden_field_tag "date_range_#{colour}" %>
+        </td>
+      <% else %>
+        <td>
+          <%= label(:last_order_date, "Over ")%>
+          <%= text_field_tag "date_range_#{colour}", @max_date, placeholder: 'Last Order Date before' %>
+          Days
+        </td>
+        <% end %>
+      </tr>
+      <% end %>
+    </table>
+  </div>
+
+  <div id="order_perior">
+    <%= label(:start_date, "Orders From")%>
+    <div class='input-group date' id='start_timepicker'>
+      <%= text_field_tag('start_time',"", placeholder: 'Start Timepicker', class: 'form-control') %>
+      <span class="input-group-addon">
+        <span class="glyphicon glyphicon-calendar"></span>
+      </span>
+    </div>
+    <%= label(:end_date, "To")%>
+    <div class='input-group date' id='due_timepicker'>
+      <%= text_field_tag('due_time',"", placeholder: 'Due Date Timepicker', class: 'form-control') %>
+      <span class="input-group-addon">
+        <span class="glyphicon glyphicon-calendar"></span>
+      </span>
+    </div>
+  </div>
+
+  <br/><br/>
+  <%= submit_tag "Search", class: 'btn btn-primary' %>
+  <%= link_to "Reset", {controller: "calendar", action: "map"}, class: "btn btn-primary" %>
+
+</div>
+
+<!-- Time Picker -->
+<script>
+  $(function () {
+    $('#due_timepicker').datetimepicker({format: 'YYYY-MM-DD', defaultDate: "<%= @end_date.to_s%>", sideBySide: true});
+
+    $('#start_timepicker').datetimepicker({
+      format: 'YYYY-MM-DD', defaultDate: "<%= @start_date.to_s%>", sideBySide: true, useCurrent: false //Important! See issue #1075
+    });
+
+    $("#due_timepicker").on("dp.change", function (e) {
+      $('#start_timepicker').data("DateTimePicker").maxdate(e.date);
+    });
+    $("#start_timepicker").on("dp.change", function (e) {
+      $('#due_timepicker').data("DateTimePicker").minDate(e.date);
+    });
+  });
+</script>
+
+<!-- basic Filters and order amount -->
+<script>
+  $("#sales_rep").hide();
+  $("#sales_menu").click(function () {
+    $("#sales_rep").toggle();
+  });
+
+  $("#cust_type").hide();
+  $("#cust_type_menu").click(function () {
+    $("#cust_type").toggle();
+  });
+
+  if ($('#selector button.active').val() == "Sales") {
+    $("#sales_slider").show();
+    $('input#filter_selector').attr('value', "Sales");
+    $("#last_order_slider").hide();
+  } else {
+    $("#last_order_slider").show();
+    $('input#filter_selector').attr('value', "Last_Order");
+    $("#sales_slider").hide();
+  };
+
+  $('#selector button').click(function () {
+    $(this).addClass('active').siblings().removeClass('active');
+    $('input#filter_selector').attr('value', $(this).val());
+
+    if ($(this).val() == "Sales") {
+      $("#last_order_slider").hide();
+      $("#sales_slider").show();
+      $('#start_timepicker').data("DateTimePicker").date('<%= (@start_date - 3.months).to_s%>');
+    } else {
+      $("#sales_slider").hide();
+      $("#last_order_slider").show();
+      $('#start_timepicker').data("DateTimePicker").date('<%= @start_date.to_s%>');
+    };
+  });
+
+  var date_gap = 15
+  var colour_guide = [
+    "lightgreen",
+    "green",
+    "gold",
+    "coral",
+    "red",
+    "maroon"
+  ]
+  for (i = 0; i < colour_guide.length - 2; i++) {
+    $("#slider-date-" + colour_guide[i]).slider({
+      value: [
+        date_gap * i,
+        date_gap * (i + 1)
+      ],
+      min: 0,
+      max: 90,
+      step: 6,
+      ticks: [
+        0,
+        15,
+        30,
+        45,
+        60,
+        75
+      ],
+      ticks_positions: [
+        0,
+        20,
+        40,
+        60,
+        80,
+        100
+      ],
+      ticks_labels: [
+        '0 day',
+        '15',
+        '30',
+        '45',
+        '60',
+        '75'
+      ]
+    });
+  };
+  // parseInt(<%=@max_date%>)
+  $("#slider-date-" + colour_guide[colour_guide.length - 2]).slider({
+    value: [
+      date_gap * 4,
+      parseInt(<%=@max_date%>)
+    ],
+    min: 0,
+    max: 90,
+    step: 6,
+    ticks: [
+      0,
+      15,
+      30,
+      45,
+      60,
+      parseInt(<%=@max_date%>)
+    ],
+    ticks_positions: [
+      0,
+      20,
+      40,
+      60,
+      80,
+      100
+    ],
+    ticks_labels: [
+      '0 day',
+      '15',
+      '30',
+      '45',
+      '60',
+      '<%=@max_date%>'
+    ]
+  });
+
+  $("#slider-date-red").on('change', function () {
+    $("input#date_range_red").attr('value', $(this).val());
+  });
+  $("#slider-date-coral").on('change', function () {
+    $("input#date_range_coral").attr('value', $(this).val());
+  });
+  $("#slider-date-gold").on('change', function () {
+    $("input#date_range_gold").attr('value', $(this).val());
+  });
+  $("#slider-date-green").on('change', function () {
+    $("input#date_range_green").attr('value', $(this).val());
+  });
+  $("#slider-date-lightgreen").on('change', function () {
+    $("input#date_range_lightgreen").attr('value', $(this).val());
+  });
+
+  sales_gap = [
+    0,
+    500,
+    1500,
+    3000,
+    5000,
+    10000,
+    10000
+  ]
+  for (i = 0; i < colour_guide.length; i++) {
+    $("#slider-" + colour_guide[i]).slider({
+      value: [
+        sales_gap * i,
+        sales_gap * (i + 1)
+      ],
+      min: 0,
+      max: 100000,
+      step: 5,
+      ticks: [
+        0, 500, 1500, 3000, 5000
+      ],
+      ticks_positions: [
+        0,
+        20,
+        40,
+        60,
+        80,
+        100
+      ],
+      ticks_labels: ['$0', '$500', '$1500', '$3000', '$5000']
+    });
+  }
+  $("#slider-lightgreen").on('change', function () {
+    $('input#order_range_lightgreen').attr('value', $(this).val());
+  });
+  $("#slider-green").on('change', function () {
+    $('input#order_range_green').attr('value', $(this).val());
+  });
+  $("#slider-gold").on('change', function () {
+    $('input#order_range_gold').attr('value', $(this).val());
+  });
+  $("#slider-red").on('change', function () {
+    $('input#order_range_red').attr('value', $(this).val());
+  });
+  $("#slider-maroon").on('change', function () {
+    $('input#order_range_maroon').attr('value', $(this).val());
+  });
+</script>

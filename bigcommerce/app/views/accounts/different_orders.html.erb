@@ -5,7 +5,7 @@
 	<%= form_tag({:action => "different_orders"}, {:method => "get"}) do %>
 <div class="row" style="margin-top: 5px;">
 	<div class="col-xs-6 col-xs-offset-5">
-		<%= radio_button_tag(:unpaid, "unpaid", @unpaid, :onclick => "this.form.submit();") %> Unpaid Orders
+		<%= radio_button_tag(:unpaid, "unpaid", !@all, :onclick => "this.form.submit();") %> Unpaid Orders
 		<span style="margin-left: 50px;">
 		<%= radio_button_tag(:unpaid, "all", @all, :onclick => "this.form.submit();") %>  All Orders
 		</span>
@@ -28,8 +28,8 @@
   <% @orders.each do |order|%>
   <% credit_note_allocation = @credit_note_allocation["#{order.id}"] || 0%>
   <% xero_items_sum = @xero_line_items_sum["#{order.xero_invoice.xero_invoice_id}"] || 0%>
-  <% next if (order.total_inc_tax == (order.xero_invoice.total - credit_note_allocation))%>
-  <% next if (@unpaid && (order.xero_invoice.amount_due == 0))%>
+  <% next if ((order.total_inc_tax == (order.xero_invoice.total - credit_note_allocation)) && (order.qty == xero_items_sum.round))%>
+  <% next if (!@all && (order.xero_invoice.amount_due == 0))%>
 
 	<tr>
     <td class="num"><%= link_to order.id, controller: 'order', action: 'details', order_id: order.id%></td>

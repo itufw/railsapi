@@ -1,0 +1,135 @@
+<%= title "Calendar" %>
+
+<script src="//maps.google.com/maps/api/js?key=AIzaSyB1HFWQ1DigWTnXGn_ZaUOk-v8hgGF3moI"></script>
+<script src="//cdn.rawgit.com/mahnunchik/markerclustererplus/master/dist/markerclusterer.min.js"></script>
+
+<div class="container">
+  <div class="row">
+    <div class='col-md-4'>
+
+      <div id="selector" class="btn-group">
+        <% @calendar_list.each do |calendar| %>
+          <button type="button" class="btn btn-default" id="<%= calendar.id.split("@untappedwines.com").first %>"><%= calendar.summary %></button>
+        <% end %>
+      </div>
+      <% @calendar_list.map{|x| x.id}.each do |calendar_id| %>
+        <div id="calendar-<%=calendar_id.split("@untappedwines.com").first%>">
+          <%= calendar_id.split("@untappedwines.com").first %>
+          <br/>
+          <iframe src="https://calendar.google.com/calendar/embed?showTitle=0&amp;showPrint=0&amp;mode=WEEK&amp;height=400&amp;wkst=1&amp;bgcolor=%23FFFFFF&amp;src=<%=calendar_id%>&amp;color=%231B887A&amp;ctz=Australia%2FSydney" style="border:solid 1px #777" width="350" height="350" frameborder="0" scrolling="no"></iframe>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- google map component -->
+    <div class='col-md-4'>
+          <input type="checkbox" value="event" id="event_checkbox"/>
+          <lable for="event_checkbox">Event</lable>
+
+          <input type="checkbox" value="customer" id="customer_checkbox"/>
+          <lable for="customer_checkbox">Customer</lable>
+          <br/><br/>
+      <div id="customer_location" style='width: 300px; height: 300px;'></div>
+      <button type="button" class="btn btn-default" id="filter_on">Filter</button>
+      <div id = "time_picker"><%= render 'calendar_partials/calendar_time_picker'%></div>
+    </div>
+
+    <div class='col-md-4' id = "calendar_map_filter">
+      <%= render 'calendar_partials/calendar_map_filter'%>
+    </div>
+
+  </div>
+</div>
+<div>
+  <%= month_calendar events: @tasks do |date, meetings| %>
+      <%= date %>
+      <% meetings.each do |meeting| %>
+        <div>
+          <%= meeting.description%>
+        </div>
+      <% end %>
+  <% end %>
+</div>
+
+<script>
+  var handler = Gmaps.build('Google');
+  handler.buildMap({
+      internal: {
+          id: 'customer_location'
+      }
+  }, function () {
+  });
+  var event_markers = null;
+  var customer_markers = null;
+
+  <%@calendar_list.each do |calendar|
+      calendar_staff = @staffs.select{ |x| x.email == calendar.id }.first
+  %>
+    $("#calendar-<%=calendar.id.split("@untappedwines.com").first%>").hide();
+    $("#<%=calendar.id.split("@untappedwines.com").first%>").click(function(){
+      $("#calendar-<%=calendar.id.split("@untappedwines.com").first%>").toggle();
+      handler.removeMarkers(event_markers);
+      handler.removeMarkers(customer_markers);
+      event_markers, customer_markers = null;
+
+      if ($('#event_checkbox').attr('checked'))
+        event_markers = handler.addMarkers(<%=raw @hash.select{|x| @event_customers[calendar_staff.id].include?x[:customer_id]}.to_json %>);
+      if ($('#customer_checkbox').attr('checked'))
+        customer_markers = handler.addMarkers(<%=raw @hash.select{|x| @customers.select{|y| y.staff_id == calendar_staff.id}.map{|y| y.id}.include?x[:cusomter_id]}.to_json%>);
+
+      if (event_markers != null){
+        handler.bounds.extendWith(event_markers);
+        handler.fitMapToBounds();
+      }else if (customer_markers != null) {
+        handler.bounds.extendWith(customer_markers);
+        handler.fitMapToBounds();
+      }
+    });
+  <% end %>
+
+  $('#event_checkbox').attr('checked',true);
+  $('input').click(function(){
+    var calendar_staff = null;
+    <%
+    selected_staff = nil
+    @calendar_list.each do |calendar|
+    %>
+    if ($("#calendar-<%=calendar.id.split("@untappedwines.com").first%>").is(":visible")){
+      <% selected_staff = @staffs.select{ |x| x.email == calendar.id }.first %>
+    };
+    <% end %>
+
+    if ($(this).val() == "event"){
+      if ($(this).attr('checked')){
+        $('#event_checkbox').attr('checked',false);
+        handler.removeMarkers(event_markers);
+        event_markers = null;
+      }else{
+        $('#event_checkbox').attr('checked',true);
+        <%unless selected_staff.nil? %>
+          event_markers = handler.addMarkers(<%=raw @hash.select{|x| @event_customers[selected_staff.id].include?x[:customer_id]}.to_json %>);
+        <% end %>
+      }
+    }else{
+      if ($(this).attr('checked')){
+        $('#customer_checkbox').attr('checked',false);
+        handler.removeMarkers(customer_markers);
+        customer_markers = null;
+      }else{
+        $('#customer_checkbox').attr('checked',true);
+        <%unless selected_staff.nil? %>
+          customer_markers = handler.addMarkers(<%=raw @hash.select{|x| @customers.select{|y| y.staff_id == selected_staff.id}.map{|y| y.id}.include?x[:cusomter_id]}.to_json%>);
+        <% end %>
+      }
+    };
+  });
+
+  $("#calendar_map_filter").hide();
+  $("#time_picker").hide();
+  $("#filter_on").click(function(){
+    $("#calendar_map_filter").toggle();
+    $("#time_picker").toggle();
+  });
+
+
+</script>

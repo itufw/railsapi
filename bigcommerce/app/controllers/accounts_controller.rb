@@ -23,13 +23,14 @@ class AccountsController < ApplicationController
         @checked_monthly = ("monthly".eql? @monthly) ? true : false
 
         @contacts, @search_text, @selected_staff =  contacts_selection(params, @end_date, @per_page, @date_column)
+        staffs = Staff.all.order_by_order
 
         @invoices = {}
         @staff_pair = {}
         @contacts.each do |c|
             @invoices[c.id] = c.xero_invoices.has_amount_due.period_select(@end_date)
-            staff = c.customer.staff
-            @staff_pair[c.id] = [staff.id, staff.nickname]
+            # staff = c.customer.staff
+            @staff_pair[c.id] = [c.staff_id, staffs.select{|x| x.id==c.staff_id}.first.nickname]
         end
 
     end
@@ -44,7 +45,8 @@ class AccountsController < ApplicationController
         @monthly = params[:monthly] || 'monthly'
         @checked_monthly = ("monthly".eql? @monthly) ? true : false
 
-        @cn_op = credit_note_and_overpayment(@customer.xero_contact_id)
+        invoices = @customer.xero_contact.xero_invoices.has_amount_due
+        @cn_op = credit_note_and_overpayment(@customer.xero_contact_id, invoices.map{|x| x.invoice_number})
 
         # multiple contact people
         # xeroizer only provides email_address, the details of phone number should be discussed
@@ -132,7 +134,7 @@ class AccountsController < ApplicationController
     end
 
     def different_orders
-        @all, @unpaid = different_orders_checked(params[:unpaid])
+        @all, unpaid = different_orders_checked(params[:unpaid])
 
         @orders = Order.total_dismatch.order_by_id('DESC')
         @credit_note_allocation = XeroCnAllocation.apply_to_orders(@orders.map(&:id)).group_by_orders.sum_applied_amount

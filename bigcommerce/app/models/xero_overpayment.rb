@@ -92,7 +92,7 @@ class XeroOverpayment < ActiveRecord::Base
 	end
 
 	def self.get_remaining_credit(overpayment_id)
-		where(" status in ( 'AUTHORISED', 'PAID' ) and xero_contact_id = '#{overpayment_id}'")
+		where(" xero_overpayments.status in ( 'AUTHORISED', 'PAID' ) and xero_contact_id = '#{overpayment_id}'")
 	end
 
 	def self.sum_remaining_credit

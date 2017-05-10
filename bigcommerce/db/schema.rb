@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170321015504) do
+ActiveRecord::Schema.define(version: 20170504051948) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -40,8 +40,10 @@ ActiveRecord::Schema.define(version: 20170321015504) do
     t.text     "country",     limit: 255
     t.text     "phone",       limit: 255
     t.text     "email",       limit: 255
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+    t.decimal  "lat",                       precision: 12, scale: 7
+    t.decimal  "lng",                       precision: 12, scale: 7
   end
 
   add_index "addresses", ["customer_id"], name: "index_addresses_on_customer_id", using: :btree
@@ -367,6 +369,20 @@ ActiveRecord::Schema.define(version: 20170321015504) do
   add_index "product_categories", ["category_id"], name: "index_product_categories_on_category_id", using: :btree
   add_index "product_categories", ["product_id"], name: "index_product_categories_on_product_id", using: :btree
 
+  create_table "product_lable_relations", force: :cascade do |t|
+    t.integer  "product_id",       limit: 4
+    t.integer  "product_lable_id", limit: 4
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+    t.integer  "number",           limit: 4
+  end
+
+  create_table "product_lables", force: :cascade do |t|
+    t.string   "name",       limit: 30, null: false
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
+  end
+
   create_table "product_no_vintages", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -479,6 +495,7 @@ ActiveRecord::Schema.define(version: 20170321015504) do
     t.integer  "product_package_type_id",   limit: 4
     t.integer  "product_no_vintage_id",     limit: 4
     t.integer  "product_no_ws_id",          limit: 4
+    t.integer  "on_order",                  limit: 1
   end
 
   create_table "revisions", force: :cascade do |t|
@@ -525,6 +542,9 @@ ActiveRecord::Schema.define(version: 20170321015504) do
     t.integer  "can_update",       limit: 1
     t.integer  "pending_orders",   limit: 1
     t.string   "salesforce_email", limit: 255
+    t.integer  "staff_order",      limit: 4
+    t.string   "access_token",     limit: 255
+    t.string   "refresh_token",    limit: 255
   end
 
   add_index "staffs", ["active"], name: "index_staffs_on_active", using: :btree
@@ -611,6 +631,8 @@ ActiveRecord::Schema.define(version: 20170321015504) do
     t.integer  "expired",             limit: 1
     t.integer  "priority",            limit: 1
     t.string   "accepted",            limit: 10
+    t.string   "google_event_id",     limit: 255
+    t.integer  "gcal_status",         limit: 4
   end
 
   create_table "tax_percentages", force: :cascade do |t|

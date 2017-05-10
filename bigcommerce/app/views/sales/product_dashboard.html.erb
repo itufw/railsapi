@@ -1,7 +1,6 @@
 <%= title "Detailed Products Dashboard" %>
 
 <h3>Products Sales</h3>
-
 <div class="form-group container-fluid">
 	<%= form_tag({:action => "product_dashboard"}, {:method => "get"}) do %>
 	<%= render "partials/extended_product_filter" %>
@@ -21,16 +20,16 @@
 			<%= submit_tag "Submit", class: 'btn btn-primary' %>
 			</span>
 			<button class = "btn btn-primary"><%= link_to "Reset", action: "product_dashboard" %></button>
+			<%= submit_tag "Update", class: 'btn btn-primary' if [9,36].include?session[:user_id]%>
 		</div>
 	</div>
 
-<% end %>
 </div>
-
-<% if @checked_stats %>
-	<div>
-		<%= render "sales_partials/stats_view", sum_param: "Qty", supply_display_class: "" %>
-	</div>
-<% else %>
-	<%= render "sales_partials/details_view" %>
+	<% if @checked_stats %>
+		<div>
+			<%= render "sales_partials/stats_view", sum_param: "Qty", supply_display_class: "" %>
+		</div>
+	<% else %>
+		<%= render "sales_partials/details_view" %>
+	<% end %>
 <% end %>

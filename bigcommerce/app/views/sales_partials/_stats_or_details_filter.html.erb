@@ -1,8 +1,8 @@
 <div class="col-md-4">
   <span style="margin-left: 50px;">
-  <%= radio_button_tag(:display_column, "stats", @checked_stats) %> Stats
+  <%= radio_button_tag(:stats_column, "stats", @checked_stats) %> Stats
   </span>
   <span style="margin-left: 50px;">
-  <%= radio_button_tag(:display_column, "details", @checked_detailis) %>  Details
+  <%= radio_button_tag(:stats_column, "details", !@checked_stats) %>  Details
   </span>
 </div>
