@@ -4,10 +4,19 @@
 $(document).ready ->
   $(".calendar-date").on "click", ->
     $.ajax
-      url: "/local_calendar"
-      type: "POST"
+      url: "/calendar/local_calendar"
+      type: "GET"
       dataType: "script"
       data:{
         calendar_date_selected: $(this).attr('date'),
+        calendar_staff_selected: $(this).attr('staff-id')
+      };
+  $(".calendar-staff-selector").on "click", ->
+    $.ajax
+      url: "/calendar/local_calendar"
+      type: "GET"
+      dataType: "script"
+      data:{
+        calendar_date_selected: '2017-05-01',
         calendar_staff_selected: $(this).attr('staff-id')
       };

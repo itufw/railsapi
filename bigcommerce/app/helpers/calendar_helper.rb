@@ -58,14 +58,13 @@ module CalendarHelper
       else
         name = customer.actual_name
       end
-
       map_pin = {
         "name"=> name,
         "lat" => customer.lat,
         "lng" => customer.lng,
         "url" => url,
         "infowindow" => infowindow,
-        'staff' => customer.staff_id
+        "staff_id" => customer.staff_id
       }
       map_pin
   end

@@ -1,0 +1,37 @@
+$("#event_checkbox").click(function(){
+  <% selected_staff = @staffs.find(@calendar_staff) %>
+  if ($(this).is(':checked')){
+    handler.removeMarkers(event_markers);
+    event_markers = null;
+    <%unless selected_staff.nil? %>
+      event_markers = handler.addMarkers(<%=raw @event_hash.select{|x| ([x[:creator], x[:participant]].include?selected_staff.id) && ((@current_month - 1.month) == x[:date].beginning_of_month.to_date)}.to_json %>);
+    <% end %>
+  }else{
+    handler.removeMarkers(event_markers);
+    event_markers = null;
+  };
+});
+
+$("#customer_checkbox").click(function(){
+  <% selected_staff = @staffs.find(@calendar_staff) %>
+  if ($(this).is(':checked')){
+    handler.removeMarkers(customer_markers);
+    customer_markers = null;
+    <%unless selected_staff.nil? %>
+      customer_markers = handler.addMarkers(<%=raw @hash.select{|x| x[:staff_id]==selected_staff.id }.to_json%>);
+    <% end %>
+  }else{
+    handler.removeMarkers(customer_markers);
+    customer_markers = null;
+  };
+});
+
+$(".calendar-date").click(function(){
+  <%
+    selected_staff = @staffs.find(@calendar_staff)
+    selected_date = @calendar_date
+  %>
+  handler.removeMarkers(event_markers);
+  event_markers = null;
+  event_markers = handler.addMarkers(<%=raw @event_hash.select{|x| ([x[:creator], x[:participant]].include?selected_staff.id) && ((Date.parse selected_date) == x[:date].to_date)}.to_json %>);
+});
