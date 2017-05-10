@@ -84,6 +84,16 @@ class OrderProduct < ActiveRecord::Base
 		return all
 	end
 
+	def self.date_filter_end_date(end_date)
+		if (!end_date.nil?)
+			if !end_date.to_s.empty?
+				end_time = Time.parse(end_date.to_s)
+				return includes(:order).where('orders.date_created <= ?', end_time.strftime("%Y-%m-%d %H:%M:%S")).references(:orders)
+			end
+		end
+		return all
+		end
+
 	def self.product_pending_stock(group_by)
 		includes([{:order => :status}]).where('orders.status_id = 1').references(:orders).send(group_by).sum_qty
 	end

@@ -5,6 +5,16 @@ module SalesControllerHelper
   def sum_orders(start_date, end_date, group_by_date_function, sum_function, staff_id)
     if (:new_customer).eql? sum_function
       return Customer.create_date_filter(start_date, end_date.next_day).send(group_by_date_function).filter_by_staff(staff_id).count_id
+    elsif (:avg_bottle_price).eql? sum_function
+      orders = Order.date_filter(start_date, end_date.next_day).valid_order.staff_filter(staff_id).send(group_by_date_function)
+      bottles = orders.send("sum_qty")
+      price = orders.send("sum_total")
+      gst = TaxPercentage.gst_percentage * 0.01
+      avg_bottle_price = {}
+      bottles.keys().each do |date|
+        avg_bottle_price[date] = price[date]/ (bottles[date]*(1+gst))
+      end
+      return avg_bottle_price
     else
       return Order.date_filter(start_date, end_date.next_day).valid_order.staff_filter(staff_id).send(group_by_date_function).send(sum_function)
     end
@@ -25,7 +35,8 @@ module SalesControllerHelper
   def order_sum_param(selected)
     sum_params_h = {"Order Totals" => :sum_total, "Bottles" => :sum_qty,\
      "Number of Orders" => :count_orders, "Avg. Order Total" => :avg_order_total,\
-      "Avg. Bottles" => :avg_order_qty, "New Customer" => :new_customer}
+      "Avg. Bottles" => :avg_order_qty, "Avg. Bottle Price exGST" => :avg_bottle_price,\
+      "New Customer" => :new_customer }
 
     if selected.nil?
       return sum_params_h["Order Totals"], "Order Totals", sum_params_h.keys

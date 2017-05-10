@@ -23,7 +23,7 @@
                 <%  else %>
                       <td class="last_week">
                 <%  end %>
-                  <%=date_format_orders(task.end_date)%>
+                  <%=date_format_orders(task.start_date)%>
                 </td>
                 <% is_task = (1==task.is_task)? "task" : "note"%>
                 <td class=<%=is_task%> ><%=is_task.upcase%></td>

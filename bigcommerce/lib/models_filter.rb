@@ -35,8 +35,12 @@ module ModelsFilter
 
     # case when the structure of params is different
     # when does this happen? what pages?
-    unless params["staff_id"].nil?
-      return params["staff_id"], Staff.filter_by_id(params["staff_id"])
+    # TODO to check the error here -> why it occured
+    # unless params["staff_id"].nil?
+    #   return params["staff_id"], Staff.filter_by_id(params["staff_id"])
+    # end
+    unless params["sales_selected_staff_id"].nil?
+      return params["sales_selected_staff_id"], Staff.filter_by_id(params["sales_selected_staff_id"])
     end
     return nil, nil
   end

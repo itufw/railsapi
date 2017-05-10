@@ -4,37 +4,53 @@ require 'task_helper.rb'
 class TaskController < ApplicationController
     before_action :confirm_logged_in
 
+    autocomplete :customer, :actual_name, :full => true
+
     include ModelsFilter
     include DatesHelper
     include TaskHelper
 
     def add_task
+      # task helper -> check if the customer has assigned
+      @parent_task, @customers, @customer_locked = lock_customer(params)
+
         @task = Task.new
-        @function = staff_function(session[:user_id])
 
-        subjects = TaskSubject.all
-        @subjects = subjects.select{ |x| x.function == params[:selected_function]}
-
-        @parent_task = params[:parent_task] || 0
-
-        @methods = TaskMethod.all
-        if params[:account_customer].nil? || params[:account_customer].blank?
-            @customers = Customer.filter_by_staff(params[:selected_staff])
-            @customer_locked = false
-        else
-            @customers = Customer.filter_by_ids(params[:account_customer])
-            @customer_locked = true
-        end
-
-        @staffs = Staff.active
+        @staffs = Staff.active.order_by_order
         @current_user = Staff.find(session[:user_id])
+
+        # task helper -> get the functions/subjects/methods from json request
+        @function, @subjects, @methods, @default_function = function_subjects_method(params, @current_user)
 
         # for some sepcial input
         @selected_orders = params[:selected_invoices] || []
+
+        begin
+          client = Signet::OAuth2::Client.new(client_id: Rails.application.secrets.google_client_id,
+                                              client_secret: Rails.application.secrets.google_client_secret,
+                                              :additional_parameters => {
+                                                "access_type" => "offline",         # offline access
+                                                "include_granted_scopes" => "true"  # incremental auth
+                                              },
+                                              token_credential_uri: 'https://accounts.google.com/o/oauth2/token')
+          client.update!(session[:authorization])
+
+          service = Google::Apis::CalendarV3::CalendarService.new
+          service.authorization = client
+          lists = service.list_calendar_lists
+          @google_alive = true
+        rescue Google::Apis::AuthorizationError => exception
+          response = client.refresh!
+          session[:authorization] = session[:authorization].merge(response)
+          retry
+        rescue
+          @google_alive = false
+        end
+
     end
 
     def staff_task
-        @selected_display = params[:display_options] || "All"
+        @selected_display = params[:display_options] || 'All'
         @tasks = staff_task_display(params, session[:user_id])
     end
 
@@ -63,12 +79,13 @@ class TaskController < ApplicationController
             parent_task_id = new_task_record(params, session[:user_id], selected_orders)
             if parent_task_id > 0
                 flash[:success] = 'Created new Task!'
-                if "".eql? params[:button]
-                  (params[:accounts_page] && !("".eql? params[:customer][:id])) ? (redirect_to(controller: 'accounts', action: 'contact_invoices', customer_id: params[:customer][:id]) && return) : (redirect_to(action: 'staff_task') && return)
+                if ''.eql? params[:button]
+                    params[:accounts_page] && !(''.eql? params[:customer][:id]) ? (redirect_to(controller: 'accounts', action: 'contact_invoices', customer_id: params[:customer][:id]) && return) : (redirect_to(action: 'staff_task') && return)
                 else
-                  redirect_to(controller: 'task', action: 'add_task',\
-                    parent_task: parent_task_id, account_customer: params[:customer][:id],\
-                    selected_invoices: params[:selected_orders].split(), selected_function: params[:task][:function]) && return
+                    selected_invoices = params[:selected_orders].nil? ? [] : params[:selected_orders].split
+                    redirect_to(controller: 'task', action: 'add_task',\
+                                parent_task: parent_task_id, account_customer: params[:customer][:id],\
+                                selected_invoices: selected_invoices, selected_function: params[:task][:function]) && return
                 end
             else
                 flash[:error] = 'Fill the form!'
@@ -95,12 +112,12 @@ class TaskController < ApplicationController
     end
 
     def update_priority
-      task_id = params[:task_id]
-      priority = params[:priority]
+        task_id = params[:task_id]
+        priority = params[:priority]
 
-      Task.priority_change(task_id, priority)
+        Task.priority_change(task_id, priority)
 
-      flash[:success] = "Priority Successfully Changed."
-      redirect_to request.referrer
+        flash[:success] = 'Priority Successfully Changed.'
+        redirect_to request.referrer
     end
 end

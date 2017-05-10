@@ -1,0 +1,105 @@
+<%= title "Calendar" %>
+
+<script src="//maps.google.com/maps/api/js?key=AIzaSyB1HFWQ1DigWTnXGn_ZaUOk-v8hgGF3moI"></script>
+<script src="//cdn.rawgit.com/mahnunchik/markerclustererplus/master/dist/markerclusterer.min.js"></script>
+
+
+<div id="patient-name">
+
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class='col-md-8'>
+      <div id="selector" class="btn-group">
+        <% @staffs.each do |staff|%>
+          <button type="button" class="btn btn-default calendar-staff-selector" id="calendar-button-<%= staff.id %>" staff-id="<%= staff.id%>"><%= staff.nickname %></button>
+        <% end %>
+      </div>
+
+      <% @staffs.each do |staff|%>
+        <div class="calendar-staff" id="calendar-staff-<%= staff.id%>" >
+          <%= month_calendar events: @events do |date, meetings| %>
+            <%if (date >= @current_month.beginning_of_month) && (date <= @current_month.end_of_month)%>
+              <a class="calendar-date" date="<%=date%>" staff-id="<%= staff.id%>"><%= date.strftime('%e %b') %></a>
+            <% else %>
+              <%= date.strftime('%e %b') %>
+            <% end %>
+              <% meetings.each do |meeting| %>
+              <% next unless [meeting.staff_id, meeting.response_staff].include?staff.id%>
+                <div>
+                  <%= meeting.description%>
+                </div>
+              <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- google map component -->
+    <div class='col-md-4'>
+          <input type="checkbox" value="event" id="event_checkbox"/>
+          <lable for="event_checkbox">Event</lable>
+
+          <input type="checkbox" value="customer" id="customer_checkbox"/>
+          <lable for="customer_checkbox">Customer</lable>
+          <br/><br/>
+      <div id="customer_location" style='width: 300px; height: 300px;'></div>
+      <button type="button" class="btn btn-default" id="filter_on">Filter</button>
+      <div id = "calendar_map_filter">
+        <%= render 'calendar_partials/calendar_map_filter'%>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- staff calendar selector -->
+<script>
+var handler = Gmaps.build('Google');
+handler.buildMap({
+    internal: {
+        id: 'customer_location'
+    }
+}, function () {
+});
+
+var event_markers = null;
+var customer_markers = null;
+
+<%@staffs.each do |staff|%>
+  $("#calendar-staff-<%= staff.id%>").hide();
+  $("#calendar-button-<%= staff.id %>").click(function(){
+
+    <%@staffs.each do |staff|%>
+      $("#calendar-staff-<%= staff.id%>").hide();
+    <% end %>
+
+    $("#calendar-staff-<%= staff.id%>").toggle();
+    handler.removeMarkers(event_markers);
+    handler.removeMarkers(customer_markers);
+    event_markers, customer_markers = null;
+    if ($('#event_checkbox').is(':checked'))
+      event_markers = handler.addMarkers(<%=raw @event_hash.select{|x| ([x[:creator], x[:participant]].include?staff.id) && (@current_month.beginning_of_month == x[:date].beginning_of_month)}.to_json %>);
+    if ($('#customer_checkbox').is(':checked'))
+      customer_markers = handler.addMarkers(<%=raw @hash.select{|x| x[:staff_id]==staff.id }.to_json%>);
+
+    if (event_markers != null && event_markers.length != 0){
+      handler.bounds.extendWith(event_markers);
+      handler.fitMapToBounds();
+    }else if (customer_markers != null) {
+      handler.bounds.extendWith(customer_markers);
+      handler.fitMapToBounds();
+    };
+
+  });
+<% end %>
+
+  // hide filter
+  $("#calendar_map_filter").hide();
+  $("#filter_on").click(function(){
+    $("#calendar_map_filter").toggle();
+  });
+
+  $('#event_checkbox').attr('checked',true);
+</script>

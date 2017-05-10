@@ -60,7 +60,7 @@
         </th>
         <th id="staff_th">
           <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Customer</a>
+            <a class="" data-toggle="dropdown" href="#">Staff</a>
               <ul class="dropdown-menu">
                 <% @tasks.map{|x| x.task_relations}.map {|x| x.first}.compact.map {|x| x.staff_id}.uniq.each do |staff| %>
                 <% next if staff==0 || staff.nil?%>
@@ -88,7 +88,7 @@
               </ul>
           </li>
         </th>
-        <th>Due Date</th>
+        <th>Date</th>
         <th>
           <%= select_tag "display_options", options_for_select(["Task", "Note","All","Expired All"], selected: @selected_display), class:"form-control", :onchange => "this.form.submit();" unless @selected_display.nil?%>
         </th>

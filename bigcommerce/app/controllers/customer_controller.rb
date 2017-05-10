@@ -15,13 +15,13 @@ class CustomerController < ApplicationController
 	include CustomerHelper
 
   def all
-    @staffs = Staff.active_sales_staff
+    @staffs = Staff.active_sales_staff.order_by_order
     customers = filter(params, "display_report")
     display_(params, customers)
   end
 
 	def new_customers
-    @staffs = Staff.active_sales_staff
+    @staffs = Staff.active_sales_staff.order_by_order
     customers = filter(params, "display_report")
 
 		start_date = params[:start_date] || {:start_date => (Date.today - 14.days).to_date.to_s}
@@ -59,6 +59,11 @@ class CustomerController < ApplicationController
     # overall_stats has structure {time_period_name => [sum, average, supply]}
     @overall_stats = overall_stats_with_product(params, @product_ids)
     display_orders(params, Order.customer_filter([@customer_id]).product_filter(@product_ids))
+
+		products = Product.send('group_by_' + @transform_column)
+		total_stock = products.sum(:inventory)
+		@pending_stock = (OrderProduct.product_filter(products.pluck("id")).product_pending_stock('group_by_' + @transform_column))[@product_id]
+		@total_stock = total_stock[@product_id.to_i].to_i+@pending_stock.to_i
   end
 
   def overall_stats_(params)

@@ -42,7 +42,7 @@ module ApplicationHelper
     end
 
     def all_staffs
-        Staff.active_sales_staff
+        Staff.active_sales_staff.order_by_order
     end
 
     # Returns Staff's nickname
@@ -180,5 +180,12 @@ module ApplicationHelper
         else
             'MEDIUM'
         end
+    end
+
+    def user_full_right(authority)
+      if ["Admin", "Management", "Accounts"].include? session[:authority]
+        return true
+      end
+      return false
     end
 end

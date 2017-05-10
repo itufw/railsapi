@@ -5,22 +5,27 @@ include RakeTaskHelper
 namespace :xero_invoice_sync do
 	task :sync => :environment do
 
-		if can_start_xero_sync
+		begin
+			if can_start_xero_sync
 
-			start_time = Time.now
+				start_time = Time.now
 
-			XeroRevision.start_update
+				XeroRevision.start_update
 
-			puts "Xero Sync #{start_time} started"
+				puts "Xero Sync #{start_time} started"
 
-			XeroController.new.link_bigc_xero_orders
-			puts "Xero Invoices are linked to Orders"
+				XeroController.new.link_bigc_xero_orders
+				puts "Xero Invoices are linked to Orders"
 
-			XeroController.new.export_invoices_to_xero
-			puts "Invoices are exported"
-			puts "Xero Sync #{Time.now} ended"
+				XeroController.new.export_invoices_to_xero
+				puts "Invoices are exported"
+				puts "Xero Sync #{Time.now} ended"
 
-			XeroRevision.end_update(start_time, Time.now)
+				XeroRevision.end_update(start_time, Time.now)
+			end
+		rescue Exception => ex
+			puts "An error of type #{ex.class} happened, message is #{ex.message}"
 		end
+
 	end
 end

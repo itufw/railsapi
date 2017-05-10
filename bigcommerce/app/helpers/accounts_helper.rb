@@ -2,17 +2,23 @@ module AccountsHelper
     include ActionView::Helpers::NumberHelper
 
     def contacts_selection(params, end_date, per_page, date_column)
-        contacts_unfiltered, search_text = contact_param_filter(params)
 
-        # select customers with the balance above zero
-        contacts = contacts_unfiltered.outstanding_is_greater_zero.is_customer
+      # search the customer
+      search_text = params[:search]
+      # filter based on the staff
+      selected_staff = params[:selected_staff]
 
-        # filter based on the staff
-        selected_staff = params[:selected_staff]
-        contacts = contacts.filter_by_staff(selected_staff) unless selected_staff.nil? || selected_staff.blank?
+      # select customers with the balance above zero
+      contacts = XeroContact.joins(:customer).select("xero_contacts.*, customers.staff_id").\
+                  search_filter(search_text).outstanding_is_greater_zero.is_customer.\
+                  paginate(per_page: per_page, page: params[:page]).uniq
 
-        # sorting via sort_order -> find the function called order_by_name
-        order_function, direction = sort_order(params, 'order_by_name', 'ASC')
+
+      contacts = contacts.where("customers.staff_id IN (?)", selected_staff) unless selected_staff.nil? || selected_staff.blank?
+
+
+      # sorting via sort_order -> find the function called order_by_name
+      order_function, direction = sort_order(params, 'order_by_name', 'ASC')
 
         if params[:selected_months].blank?
             contacts = contacts.period_select(end_date)
@@ -27,13 +33,15 @@ module AccountsHelper
         else
             contacts = contacts.send(order_function, direction)
         end
-        contacts = contacts.paginate(per_page: per_page, page: params[:page])
         [contacts, search_text, selected_staff]
     end
 
-    def credit_note_and_overpayment(xero_contact_id)
-        op = XeroOverpayment.get_remaining_credit(xero_contact_id).where('remaining_credit > 0')
-        cn = XeroCreditNote.get_remaining_credit(xero_contact_id).where('remaining_credit > 0')
+    def credit_note_and_overpayment(xero_contact_id, xero_invoices_ids)
+        op = XeroOverpayment.joins(:xero_op_allocations).get_remaining_credit(xero_contact_id).where('xero_overpayments.remaining_credit > 0 OR xero_op_allocations.invoice_number IN (?)', xero_invoices_ids)
+        cn = XeroCreditNote.joins(:xero_cn_allocations).get_remaining_credit(xero_contact_id).where('xero_credit_notes.remaining_credit > 0 OR xero_cn_allocations.invoice_number IN (?)', xero_invoices_ids)
+
+        # op = XeroOverpayment.get_remaining_credit(xero_contact_id).where('remaining_credit > 0')
+        # cn = XeroCreditNote.get_remaining_credit(xero_contact_id).where('remaining_credit > 0')
         cn_op = {}
 
         op.each do |o|
@@ -53,6 +61,7 @@ module AccountsHelper
                                             remaining_credit: c.remaining_credit, date: c.date, reference: c.reference,\
                                             status: c.credit_note_number }
         end
+
         cn_op
     end
 

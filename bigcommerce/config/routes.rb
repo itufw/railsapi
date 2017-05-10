@@ -5,15 +5,24 @@ Rails.application.routes.draw do
   #post 'admin/update'
 
   get 'add_task', to: "task#add_task"
+  get 'local_calendar', to: "calendar#local_calendar"
+  get '/redirect', to: 'calendar#redirect', as: 'redirect'
+  get '/callback', to: 'calendar#callback', as: 'callback'
+  get '/calendars', to: 'calendar#calendars', as: 'calendars'
+
 
   get '/rails/mailers' => "rails/mailers#index"
   get '/rails/mailers/*path' => "rails/mailers#preview"
 
   post 'add_task', to: "task#task_record"
+  post 'local_calendar', to: "calendar#local_calendar"
 
   # this needs to be replaced sometime
   match ':controller(/:action(/:id))', via: [:get, :post]
   resources :posts
+  resources :tasks do
+    get :autocomplete_customer_actual_name, :on => :collection
+  end
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
