@@ -104,6 +104,7 @@ GEM
     filterrific (2.1.2)
     fuzzy-string-match (1.0.0)
       RubyInline (>= 3.8.6)
+    geocoder (1.4.3)
     geokit (1.10.0)
     geokit-rails (2.2.0)
       geokit (~> 1.5)
@@ -288,6 +289,7 @@ DEPENDENCIES
   coffee-rails (~> 4.1.0)
   filterrific
   fuzzy-string-match
+  geocoder
   geokit-rails
   gmaps4rails
   google-api-client

@@ -109,7 +109,11 @@ class CalendarController < ApplicationController
 
     @current_user = Staff.find(session[:user_id])
     # tempary use, it should be assigned based on the current users' right
-    @staffs = Staff.where('staffs.id IN (?)', [9, 36, 18])
+    if session[:user_id] == 18
+      @staffs = Staff.where('staffs.id IN (?)', [18])
+    else
+      @staffs = Staff.where('staffs.id IN (?)', [9, 36, 18])
+    end
     # @staffs = Staff.active
     @events = Task.joins(:task_relations).select('task_relations.*, tasks.*').where('tasks.google_event_id IS NOT NULL AND (task_relations.staff_id IN (?) OR tasks.response_staff IN (?))', @staffs.map(&:id), @staffs.map(&:id))
 
@@ -159,7 +163,14 @@ class CalendarController < ApplicationController
     end
   end
 
+  # handle the requests for updating events
   def translate_events
+    if params['submit'] == 'reject'
+      Task.new.reject_event(params['event_id'])
+      redirect_to action: 'event_censor'
+      return
+    end
+
     if collection_valid_check(params)
       if Task.new.update_event(params['event_id'], params['method'], params['subject'], params['customer'])
         flash[:success] = 'Done'

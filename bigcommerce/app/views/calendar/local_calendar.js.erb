@@ -1,3 +1,4 @@
+
 $("#event_checkbox").click(function(){
   <% selected_staff = @staffs.find(@calendar_staff) %>
   if ($(this).is(':checked')){
@@ -15,6 +16,7 @@ $("#event_checkbox").click(function(){
 $("#customer_checkbox").click(function(){
   <% selected_staff = @staffs.find(@calendar_staff) %>
   if ($(this).is(':checked')){
+
     handler.removeMarkers(customer_markers);
     customer_markers = null;
     <%unless selected_staff.nil? %>

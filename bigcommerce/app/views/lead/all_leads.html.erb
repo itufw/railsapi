@@ -1,0 +1,13 @@
+<%= title "Leads" %>
+<h3>Leads</h3>
+
+<%= form_tag({:controller => "lead", :action => 'all_leads'}, {:method => "get"}) do %>
+
+<div class="form-group" style="margin-left:300px;margin-top:50px;">
+	<%= render "partials/customer_filter" %>
+	<%= submit_tag "Filter", class: 'btn btn-primary' %>
+</div>
+
+<%= render "lead_partials/leads", leads: @leads %>
+
+<% end %>
