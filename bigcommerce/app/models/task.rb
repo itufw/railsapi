@@ -6,7 +6,7 @@ class Task < ActiveRecord::Base
     belongs_to :parent, class_name: 'Task', foreign_key: 'parent_task'
     has_many :children, class_name: 'Task', foreign_key: 'parent_task'
 
-    enum gcal_status: [ :na, :pushed, :pulled, :unconfirmed ]
+    enum gcal_status: [ :na, :pushed, :pulled, :unconfirmed, :rejected ]
 
     def insert_or_update(t)
         time = Time.now.to_s(:db)
@@ -21,7 +21,7 @@ class Task < ActiveRecord::Base
     def scrap_from_calendars(service)
       new_events = []
       tasks = Task.where("google_event_id IS NOT NULL").map{|x| x.google_event_id}
-      service.list_calendar_lists.items.select { |x| x.id.include?'@untappedwines.com' }.each do |calendar|
+      service.list_calendar_lists.items.select { |x| (x.id.include?'@untappedwines.com') || (x.id.include?'wyliewoodburn@gmail.com') }.each do |calendar|
         new_events += service.list_events(calendar.id).items
       end
 
@@ -72,6 +72,15 @@ class Task < ActiveRecord::Base
       task.save
 
       TaskRelation.new.link_relation(task.id, customer_id) unless customer_id.nil?
+      return true
+    end
+
+    def reject_event(event_id)
+      task = Task.where(google_event_id: event_id)
+      return false unless task.count > 0
+      task = task.first
+      task.gcal_status = :rejected
+      task.save
       return true
     end
 

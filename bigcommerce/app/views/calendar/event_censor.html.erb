@@ -20,7 +20,6 @@
       <th>Summary</th>
       <th>Time</th>
       <th>&nbsp;&nbsp;&nbsp;</th>
-      <th>Address</th>
       <th>Customer</th>
       <th>Method</th>
       <th>Subjects</th>
@@ -33,18 +32,18 @@
       <%
         response_staff = @staffs.select{|x| x.email == event.creator.email}
       %>
-      <tr class="google-event-line  staff-event-<%= (response_staff.nil?) ? event.creator.email : response_staff.first.id.to_s%> ">
-        <td><%= (response_staff.nil?) ? event.creator.email : response_staff.first.nickname %></td>
+      <tr class="google-event-line  staff-event-<%= (response_staff.nil? || response_staff.blank?) ? event.creator.email : response_staff.first.id.to_s%> ">
+        <td><%= (response_staff.nil? || response_staff.blank?) ? event.creator.email : response_staff.first.nickname %></td>
         <td>&nbsp;&nbsp;&nbsp;</td>
         <td><%= event.summary.to_s%><br/><%= event.description.to_s %></td>
         <td><%= event.start.date_time.strftime("%m-%d %H:%M")%> --
             <%= event.end.date_time.strftime("%H:%M")%>
         </td>
         <td>&nbsp;&nbsp;&nbsp;</td>
-        <td><%= event.location %></td>
         <%
-          unless event.location.nil?
-            loc = event.location.split(",").first.split.select{|x| (x.to_i.to_s.casecmp(x)<0) && !(["st","pl","street","St"].include?(x))}
+          unless event.summary.nil?
+            # loc = event.location.split(",").first.split.select{|x| (x.to_i.to_s.casecmp(x)<0) && !(["st","pl","street","St"].include?(x))}
+            loc = event.summary.split(" ")
             customer_list = @customers.select{|x| Regexp.union(loc) === x.actual_name }
             customer_list = customer_list.sort_by! {|x| @jarow.getDistance(loc.join(" "), x.actual_name) }.reverse
         %>
@@ -55,8 +54,11 @@
         <td><%= collection_select :method, :method, @methods, :method, :method, {:include_blank => "Select a Method", :selected => "Meeting"} %></td>
         <td><%= collection_select :subject, :subject, @subjects, :id, :subject, {:include_blank => "Select a Subject"} %></td>
         <td>
-          <%= button_tag(type: 'submit') do%>
+          <%= button_tag(type: 'submit', name: 'submit', class: "btn btn-default", value: 'confirm') do%>
             <span class="glyphicon glyphicon-plus"></span>
+          <% end %>
+          <%= button_tag(type: 'submit', name: 'submit', class: "btn btn-default", value: 'reject') do%>
+            <span class="glyphicon glyphicon-remove"></span>
           <% end %>
         </td>
       </tr>

@@ -31,6 +31,18 @@
                         <li><%= link_to "Orders", controller: "order", action: "all" %></li>
                         <li><%= link_to "Customers", controller: "customer", action: "all" %></li>
 
+                        <% if it_working(session[:user_id])%>
+                        <li class="dropdown">
+                          <a class="" data-toggle="dropdown" href="#">Leads
+                            <span class="caret"></span>
+                          </a>
+                          <ul class="dropdown-menu">
+                            <li><%= link_to "All", controller: "lead", action: "all_leads" %></li>
+                            <li><%= link_to "Create", controller: "lead", action: "create_leads" %></li>
+                          </ul>
+                        </li>
+                        <% end %>
+
                         <li class="dropdown">
                             <a class="" data-toggle="dropdown" href="#">Products
                                 <span class="caret"></span>
@@ -64,11 +76,9 @@
                             <ul class="dropdown-menu">
                                 <li><%= link_to "My Note", controller: "task", action: "staff_task" %></li>
                                 <li><%= link_to "Add Note", controller: "task", action: "add_task" %></li>
-                                <% if user_full_right(session[:authority]) %>
+                                <% if user_full_right(session[:authority]) || session[:user_id] ==18 %>
                                 <li><%= link_to "Calendar", controller: "calendar", action: "local_calendar" %></li>
-                                <% end %>
-                                <%if it_working(session[:user_id])%>
-                                <li><%= link_to "Event Censor", controller: "calendar", action: "event_censor" %></li>
+                                <li><%= link_to "Events Check", controller: "calendar", action: "event_censor" %></li>
                                 <% end %>
                             </ul>
                         </li>

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170504051948) do
+ActiveRecord::Schema.define(version: 20170512035327) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -127,6 +127,31 @@ ActiveRecord::Schema.define(version: 20170504051948) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
+
+  create_table "customer_leads", force: :cascade do |t|
+    t.text     "firstname",     limit: 255
+    t.text     "lastname",      limit: 255
+    t.text     "company",       limit: 255
+    t.text     "email",         limit: 255
+    t.text     "phone",         limit: 255
+    t.text     "actual_name",   limit: 65535
+    t.text     "region",        limit: 65535
+    t.integer  "staff_id",      limit: 4
+    t.integer  "cust_type_id",  limit: 4
+    t.integer  "cust_group_id", limit: 4
+    t.integer  "cust_style_id", limit: 4
+    t.datetime "date_created"
+    t.datetime "date_modified"
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+    t.float    "latitude",      limit: 24
+    t.float    "longitude",     limit: 24
+    t.text     "address",       limit: 65535
+  end
+
+  add_index "customer_leads", ["cust_group_id"], name: "index_customer_leads_on_cust_group_id", using: :btree
+  add_index "customer_leads", ["cust_type_id"], name: "index_customer_leads_on_cust_type_id", using: :btree
+  add_index "customer_leads", ["staff_id"], name: "index_customer_leads_on_staff_id", using: :btree
 
   create_table "customers", force: :cascade do |t|
     t.text     "firstname",               limit: 255

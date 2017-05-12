@@ -4,6 +4,7 @@ class Staff < ActiveRecord::Base
     include RailsSortable::Model
 
     has_many :customers
+    has_many :customer_leads
     has_many :orders
 
     has_many :staff_time_periods

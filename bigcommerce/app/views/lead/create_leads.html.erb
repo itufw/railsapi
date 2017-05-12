@@ -1,0 +1,53 @@
+<%= title "Create Lead"%>
+<h3>Create Lead</h3>
+<br/>
+
+<%= form_for @customer_lead, url: {action: "create_leads_handler"}, method: "POST", html: {class: "form-group", style: "padding-left: 50px;"} do |f| %>
+
+  <%= f.label :firstname, class: 'margin-from-top label-new' %>
+  <%= f.text_field :firstname, class: 'form-control quarter-size' %>
+  <br/><br/>
+
+  <%= f.label :lastname, class: 'margin-from-top label-new' %>
+  <%= f.text_field :lastname, class: 'form-control quarter-size' %>
+  <br/><br/>
+
+  <%= f.label :actual_name, class: 'margin-from-top label-new' %>
+  <%= f.text_field :actual_name, class: 'form-control quarter-size' %>
+  <br/><br/>
+
+  <%= f.label :email, class: 'margin-from-top label-new' %>
+  <%= f.text_field :email, class: 'form-control quarter-size' %>
+  <br/><br/>
+
+  <%= f.label :phone, class: 'margin-from-top label-new' %>
+  <%= f.text_field :phone, class: 'form-control quarter-size' %>
+  <br/><br/>
+
+  <%= f.label :region, class: 'margin-from-top label-new' %>
+  <%= f.text_field :region, class: 'form-control quarter-size' %>
+  <br/><br/>
+
+  <%= f.label :address, class: 'margin-from-top label-new' %>
+  <%= f.text_field :address, class: 'form-control quarter-size' %>
+  <br/><br/>
+
+  <%= f.label :staff, class: 'margin-from-top label-new' %>
+  <%= f.collection_select :staff_id, Staff.active_sales_staff, :id, :nickname, {selected: @customer_lead.staff_id}, {class: "form-control quarter-size"} %>
+  <br/><br/>
+
+  <%= f.label :type, class: 'margin-from-top label-new' %>
+  <%= f.collection_select :cust_type_id, CustType.all, :id, :name, {selected: @customer_lead.cust_style_id, :include_blank => 'Not Assigned'}, {class: "form-control quarter-size"} %><br/><br/>
+
+
+  <%= f.label :channel, class: 'margin-from-top label-new' %>
+  <%= f.collection_select :cust_style_id, CustStyle.all, :id, :name, {selected: @customer_lead.cust_style_id, :include_blank => 'Not Assigned'}, {class: "form-control quarter-size"} %><br/><br/>
+
+  <%= f.label :group, class: 'margin-from-top label-new' %>
+  <%= f.collection_select :cust_group_id, CustGroup.all, :id, :name, {selected: @customer_lead.cust_group_id, :include_blank => 'Not Assigned'}, {class: "form-control quarter-size"} %><br/><br/>
+
+
+  <%= f.submit "Create!", class: 'btn btn-primary' %>
+<% end %>
+
+<p style="padding-left: 50px;"><%= link_to "Go Back to Customer Profile", action: 'summary', customer_id: @customer_id, customer_name: @customer_name %></p>

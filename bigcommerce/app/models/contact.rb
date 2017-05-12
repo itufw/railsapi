@@ -3,6 +3,7 @@ require 'xero_connection.rb'
 class Contact < ActiveRecord::Base
   belongs_to :xero_contact
   belongs_to :customer
+  belongs_to :customer_lead
 
   # DO NOT USE
   def download_data_from_api(modified_since_time)

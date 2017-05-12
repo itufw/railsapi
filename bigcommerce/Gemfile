@@ -94,6 +94,7 @@ gem 'underscore-rails'
 gem 'gmaps4rails'
 # convert street address to latitude and longitude
 gem 'geokit-rails'
+gem 'geocoder'
 # bootstrap-slider-rails -> used in map component
 gem 'bootstrap-slider-rails'
 # live search gem
