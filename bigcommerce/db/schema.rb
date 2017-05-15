@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170512035327) do
+ActiveRecord::Schema.define(version: 20170515021707) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -616,15 +616,16 @@ ActiveRecord::Schema.define(version: 20170512035327) do
   end
 
   create_table "task_relations", force: :cascade do |t|
-    t.integer  "task_id",         limit: 4
-    t.integer  "contact_id",      limit: 4
-    t.integer  "customer_id",     limit: 4
-    t.integer  "cust_group_id",   limit: 4
-    t.integer  "staff_id",        limit: 4
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.integer  "task_id",          limit: 4
+    t.integer  "contact_id",       limit: 4
+    t.integer  "customer_id",      limit: 4
+    t.integer  "cust_group_id",    limit: 4
+    t.integer  "staff_id",         limit: 4
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
     t.datetime "completed_date"
-    t.integer  "completed_staff", limit: 4
+    t.integer  "completed_staff",  limit: 4
+    t.integer  "customer_lead_id", limit: 4
   end
 
   create_table "task_subjects", force: :cascade do |t|

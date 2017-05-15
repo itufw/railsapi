@@ -1,4 +1,6 @@
 require 'lead_helper.rb'
+# handle lead requests
+# including create/edit
 class LeadController < ApplicationController
   before_action :confirm_logged_in
   include LeadHelper
@@ -10,6 +12,7 @@ class LeadController < ApplicationController
 
   def create_leads
     @customer_lead = CustomerLead.new
+    @customer_lead_button = true
   end
 
   def edit_leads
@@ -18,20 +21,25 @@ class LeadController < ApplicationController
   end
 
   def create_leads_handler
-    if params['customer_lead']['id']
-      id = params['customer_lead']['id']
-      @customer_lead = CustomerLead.filter_by_id(id)
-    else
-      @customer_lead = CustomerLead.new
-    end
-    p = c
-    # TODO below
+    @customer_lead = CustomerLead.new
     if @customer_lead.update_attributes(lead_params)
       flash[:success] = 'Successfully Created.'
-      redirect_to action: 'create_leads'
+      redirect_to action: 'all_leads'
     else
       flash[:error] = 'Unsuccessful.'
       render 'create_leads'
+    end
+  end
+
+  def edit_leads_handler
+    id = params['customer_lead']['id']
+    @customer_lead = CustomerLead.filter_by_id(id)
+    if @customer_lead.update_attributes(lead_params)
+      flash[:success] = 'Successfully Modified.'
+      redirect_to action: 'all_leads'
+    else
+      flash[:error] = 'Unsuccessful.'
+      render 'edit_leads', lead_name: lead_params[:actual_name], lead_id: id
     end
   end
 

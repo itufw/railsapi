@@ -144,6 +144,7 @@ class CalendarController < ApplicationController
     begin
       @jarow = FuzzyStringMatch::JaroWinkler.create(:native)
       @customers = Customer.all.order_by_name('ASC')
+      @leads = CustomerLead.all.order_by_name('ASC')
 
       @methods = TaskMethod.all
       @subjects = TaskSubject.sales_subjects

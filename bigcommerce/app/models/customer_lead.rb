@@ -4,6 +4,7 @@ require 'clean_data.rb'
 class CustomerLead < ActiveRecord::Base
   include CleanData
   has_many :contacts
+  has_many :tasks, through: :task_relations
   belongs_to :cust_type
   belongs_to :cust_group
   belongs_to :cust_style
@@ -46,4 +47,13 @@ class CustomerLead < ActiveRecord::Base
   def self.filter_by_id(lead_id)
     find(lead_id)
   end
+
+  def self.order_by_name(direction)
+    order('actual_name ' + direction)
+  end
+
+  def self.order_by_staff(direction)
+    includes(:staff).order('staffs.nickname ' + direction)
+  end
+
 end
