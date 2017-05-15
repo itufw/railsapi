@@ -51,7 +51,7 @@
             lead_list = @leads.select{|x| Regexp.union(loc) === x.actual_name }
             lead_list = lead_list.each {|x| x.actual_name = x.actual_name.to_s + ', (Lead)'}
             lead_list = lead_list.sort_by! {|x| @jarow.getDistance(loc.join(" "), x.actual_name) }.reverse
-            customer_list += lead_list
+            customer_list = lead_list + customer_list
         %>
           <td><%= collection_select :customer, :customer, customer_list, ->(ob) {"#{ob.id}|#{ob.actual_name}"}, :actual_name, {:include_blank => "Select a Customer"} %></td>
         <%else%>
