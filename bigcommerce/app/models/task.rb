@@ -18,28 +18,8 @@ class Task < ActiveRecord::Base
         t.save
     end
 
-    def scrap_from_calendars(service)
-      new_events = []
-      tasks = Task.where("google_event_id IS NOT NULL").map{|x| x.google_event_id}
-      staff_calendars = StaffCalendarAddress.all
-      addresses = staff_calendars.map { |x| x.calendar_address}
-      service.list_calendar_lists.items.select { |x| addresses.include?x.id }.each do |calendar|
-        new_events += service.list_events(calendar.id).items
-      end
-
-      new_events.select{|x| !(tasks.include? x.id)}.each do |event|
-        staff_id = staff_calendars.select {|x| x.calendar_address == event.creator.email}.first
-        auto_insert_from_calendar_event(event, staff_id)
-      end
-      unconfirmed_task = Task.unconfirmed_event.map{|x| x.google_event_id}
-      return_events = new_events.select{|x| unconfirmed_task.include? x.id}
-
-      return return_events
-    end
-
     def auto_insert_from_calendar_event(event, staff_id)
-
-        task = Task.new
+        task = self
         task.start_date = event.start.date_time.to_s(:db)
         task.end_date = event.end.date_time.to_s(:db)
         task.created_at = event.created.to_s(:db)
