@@ -149,7 +149,7 @@ class CalendarController < ApplicationController
       @methods = TaskMethod.all
       @subjects = TaskSubject.sales_subjects
 
-      @events = Task.new.scrap_from_calendars(service)
+      @events = scrap_from_calendars(service)
 
       @staff_calendars = StaffCalendarAddress.filter_by_addresses(@events.map { |x| x.creator.email })
       @staffs = Staff.filter_by_ids(@staff_calendars.map(&:staff_id)).active
