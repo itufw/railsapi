@@ -78,7 +78,11 @@
                                 <li><%= link_to "Add Note", controller: "task", action: "add_task" %></li>
                                 <% if user_full_right(session[:authority]) || session[:user_id] ==18 %>
                                 <li><%= link_to "Calendar", controller: "calendar", action: "local_calendar" %></li>
+                                <% if Rails.env.development? %>
                                 <li><%= link_to "Events Check", controller: "calendar", action: "event_censor" %></li>
+                                <% else %>
+                                <li><%= link_to "Events Check", "http://188.166.243.138.xip.io/redirect" %></li>
+                                <% end %>
                                 <% end %>
                             </ul>
                         </li>
