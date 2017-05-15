@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170515021707) do
+ActiveRecord::Schema.define(version: 20170515034001) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -530,6 +530,15 @@ ActiveRecord::Schema.define(version: 20170515021707) do
     t.datetime "updated_at",              null: false
     t.integer  "attempt_count", limit: 4
   end
+
+  create_table "staff_calendar_addresses", force: :cascade do |t|
+    t.integer  "staff_id",         limit: 4
+    t.text     "calendar_address", limit: 65535
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+  end
+
+  add_index "staff_calendar_addresses", ["staff_id"], name: "index_staff_calendar_addresses_on_staff_id", using: :btree
 
   create_table "staff_time_periods", force: :cascade do |t|
     t.integer  "staff_id",         limit: 4
