@@ -8,6 +8,7 @@ class Staff < ActiveRecord::Base
     has_many :orders
 
     has_many :staff_time_periods
+    has_many :staff_calendar_addresses
     has_one :default_average_period
     has_one :default_start_date
 
@@ -37,6 +38,10 @@ class Staff < ActiveRecord::Base
 
     def self.filter_by_email(email)
         where("staff.email = \"#{email}\"").first
+    end
+
+    def self.filter_by_calendar_email(emails)
+      joins(:staff_calendar_addresses).where('staff_calendar_addresses.calendar_address IN (?)', emails.uniq)
     end
 
     def self.filter_by_emails(emails)

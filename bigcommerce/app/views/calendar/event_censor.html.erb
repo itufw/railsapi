@@ -30,7 +30,8 @@
     	<%= form_tag({:action => "translate_events"}, {:method => "get"}) do %>
       <%= hidden_field_tag :event_id , event.id %>
       <%
-        response_staff = @staffs.select{|x| x.email == event.creator.email}
+        staff = @staff_calendars.select{|x| x.calendar_address == event.creator.email}.first
+        response_staff = @staffs.select{|x| x.id == staff.staff_id }
       %>
       <tr class="google-event-line  staff-event-<%= (response_staff.nil? || response_staff.blank?) ? event.creator.email : response_staff.first.id.to_s%> ">
         <td><%= (response_staff.nil? || response_staff.blank?) ? event.creator.email : response_staff.first.nickname %></td>

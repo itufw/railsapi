@@ -21,12 +21,15 @@ class Task < ActiveRecord::Base
     def scrap_from_calendars(service)
       new_events = []
       tasks = Task.where("google_event_id IS NOT NULL").map{|x| x.google_event_id}
-      service.list_calendar_lists.items.select { |x| (x.id.include?'@untappedwines.com') || (x.id.include?'wyliewoodburn@gmail.com') }.each do |calendar|
+      staff_calendars = StaffCalendarAddress.all
+      addresses = staff_calendars.map { |x| x.calendar_address}
+      service.list_calendar_lists.items.select { |x| addresses.include?x.id }.each do |calendar|
         new_events += service.list_events(calendar.id).items
       end
 
       new_events.select{|x| !(tasks.include? x.id)}.each do |event|
-        auto_insert_from_calendar_event(event)
+        staff_id = staff_calendars.select {|x| x.calendar_address == event.creator.email}.first
+        auto_insert_from_calendar_event(event, staff_id)
       end
       unconfirmed_task = Task.unconfirmed_event.map{|x| x.google_event_id}
       return_events = new_events.select{|x| unconfirmed_task.include? x.id}
@@ -34,7 +37,7 @@ class Task < ActiveRecord::Base
       return return_events
     end
 
-    def auto_insert_from_calendar_event(event)
+    def auto_insert_from_calendar_event(event, staff_id)
 
         task = Task.new
         task.start_date = event.start.date_time.to_s(:db)
@@ -44,8 +47,7 @@ class Task < ActiveRecord::Base
         task.description = event.summary
         task.is_task = 1
 
-        response_staff = Staff.where("staffs.email = \"#{event.creator.email}\"").active
-        response_staff = (response_staff.count > 0) ? response_staff.first.id : nil
+        response_staff = staff_id
 
         task.response_staff = response_staff
         task.last_modified_staff = response_staff
@@ -159,7 +161,7 @@ class Task < ActiveRecord::Base
 
       staff = Staff.where("staffs.email = #{event.creator.email}")
       task.response_staff = (staff.count > 0) ? staff.first.id : NULL
-      task.response_staff = (staff.count > 0) ? staff.first.id : NULL
+      task.last_modified_staff = (staff.count > 0) ? staff.first.id : NULL
 
       task.expired = 0
       task.priority = 3

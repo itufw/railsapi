@@ -45,63 +45,63 @@ class CalendarController < ApplicationController
     end
   end
 
-  def calendars
-    # Token for one time only authorization
-    # {"token_type"=>"Bearer"}
-    client = Signet::OAuth2::Client.new(
-      client_id: Rails.application.secrets.google_client_id,
-      client_secret: Rails.application.secrets.google_client_secret,
-      additional_parameters: {
-        access_type: 'offline', # offline access
-        include_granted_scopes: true # incremental auth
-      },
-      token_credential_uri: 'https://accounts.google.com/o/oauth2/token'
-    )
-    client.update!(session[:authorization])
-    service = Google::Apis::CalendarV3::CalendarService.new
-    service.authorization = client
-    begin
-      @staffs = Staff.active
-      @current_user = @staffs.select { |x| x.id == session[:user_id] }.first
-
-      staff_event = {}
-      @calendar_list = []
-      tasks = Task.joins(:task_relations).select('task_relations.customer_id, tasks.google_event_id, tasks.start_date, tasks.end_date, tasks.description').where('tasks.google_event_id IS NOT NULL')
-      service.list_calendar_lists.items.each do |calendar|
-        calendar_staff = @staffs.select { |x| x.email == calendar.id }
-        next unless calendar_staff.count > 0
-
-        calendar_staff = calendar_staff.first
-        staff_event[calendar_staff.id] = \
-          service.list_events(calendar.id).items.map(&:id)
-        @calendar_list.append(calendar)
-      end
-      @event_customers = {}
-      @tasks = []
-      staff_event.keys.each do |staff|
-        temp_task = tasks.select { |x| staff_event[staff].include?x.google_event_id }
-        @tasks += temp_task
-        @event_customers[staff] = \
-          temp_task.map(&:customer_id).uniq
-      end
-
-      @customers = Customer.all
-      _, @order_colour_selected, @colour_guide, @max_date =
-        colour_selected(params)
-
-      staff, = staff_filter(session, params[:selected_staff])
-      customer_map, @start_date, @end_date = customer_last_order_filter(\
-        params, @order_colour_selected, [], staff
-      )
-      @hash = hash_map_pins(customer_map)
-      flash[:error] = 'Please Log in as untapped google account and try again' \
-        if @calendar_list.blank?
-    rescue Google::Apis::AuthorizationError
-      response = client.refresh!
-      session[:authorization] = session[:authorization].merge(response)
-      retry
-    end
-  end
+  # def calendars
+  #   # Token for one time only authorization
+  #   # {"token_type"=>"Bearer"}
+  #   client = Signet::OAuth2::Client.new(
+  #     client_id: Rails.application.secrets.google_client_id,
+  #     client_secret: Rails.application.secrets.google_client_secret,
+  #     additional_parameters: {
+  #       access_type: 'offline', # offline access
+  #       include_granted_scopes: true # incremental auth
+  #     },
+  #     token_credential_uri: 'https://accounts.google.com/o/oauth2/token'
+  #   )
+  #   client.update!(session[:authorization])
+  #   service = Google::Apis::CalendarV3::CalendarService.new
+  #   service.authorization = client
+  #   begin
+  #     @staffs = Staff.active
+  #     @current_user = @staffs.select { |x| x.id == session[:user_id] }.first
+  #
+  #     staff_event = {}
+  #     @calendar_list = []
+  #     tasks = Task.joins(:task_relations).select('task_relations.customer_id, tasks.google_event_id, tasks.start_date, tasks.end_date, tasks.description').where('tasks.google_event_id IS NOT NULL')
+  #     service.list_calendar_lists.items.each do |calendar|
+  #       calendar_staff = @staffs.select { |x| x.email == calendar.id }
+  #       next unless calendar_staff.count > 0
+  #
+  #       calendar_staff = calendar_staff.first
+  #       staff_event[calendar_staff.id] = \
+  #         service.list_events(calendar.id).items.map(&:id)
+  #       @calendar_list.append(calendar)
+  #     end
+  #     @event_customers = {}
+  #     @tasks = []
+  #     staff_event.keys.each do |staff|
+  #       temp_task = tasks.select { |x| staff_event[staff].include?x.google_event_id }
+  #       @tasks += temp_task
+  #       @event_customers[staff] = \
+  #         temp_task.map(&:customer_id).uniq
+  #     end
+  #
+  #     @customers = Customer.all
+  #     _, @order_colour_selected, @colour_guide, @max_date =
+  #       colour_selected(params)
+  #
+  #     staff, = staff_filter(session, params[:selected_staff])
+  #     customer_map, @start_date, @end_date = customer_last_order_filter(\
+  #       params, @order_colour_selected, [], staff
+  #     )
+  #     @hash = hash_map_pins(customer_map)
+  #     flash[:error] = 'Please Log in as untapped google account and try again' \
+  #       if @calendar_list.blank?
+  #   rescue Google::Apis::AuthorizationError
+  #     response = client.refresh!
+  #     session[:authorization] = session[:authorization].merge(response)
+  #     retry
+  #   end
+  # end
 
   def local_calendar
     @calendar_date = params[:calendar_date_selected]
@@ -151,7 +151,8 @@ class CalendarController < ApplicationController
 
       @events = Task.new.scrap_from_calendars(service)
 
-      @staffs = Staff.filter_by_emails(@events.map { |x| x.creator.email }.uniq).active
+      @staff_calendars = StaffCalendarAddress.filter_by_addresses(@events.map { |x| x.creator.email })
+      @staffs = Staff.filter_by_ids(@staff_calendars.map(&:staff_id)).active
     rescue Google::Apis::AuthorizationError
       begin
         response = client.refresh!
