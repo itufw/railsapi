@@ -12,4 +12,14 @@ module LeadHelper
 
     [leads, search_text]
   end
+
+  def lead_type_name(lead)
+    return 'Region' unless lead.region.nil? || lead.region == ''
+    'Customer'
+  end
+
+  def lead_address(lead)
+    return lead.address if lead.region.nil? || lead.region == ''
+    lead.address.split(',')[1, lead.address.length].join(',')
+  end
 end

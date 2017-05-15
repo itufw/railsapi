@@ -60,8 +60,8 @@ module CalendarHelper
       end
       map_pin = {
         "name"=> name,
-        "lat" => customer.lat,
-        "lng" => customer.lng,
+        "lat" => customer.latitude,
+        "lng" => customer.longitude,
         "url" => url,
         "infowindow" => infowindow,
         "staff_id" => customer.staff_id
@@ -108,15 +108,15 @@ module CalendarHelper
     max
   end
 
-  def add_event_pin(customer, event)
+  def add_event_pin(customer, event, current_customer = true)
     name = (customer.actual_name.nil?) ? customer.firstname.to_s + ' ' + customer.lastname.to_s : customer.actual_name.to_s
 
     infowindow = event.description
-
+    url = 'map_icons/blue_' + (current_customer ? 'dot' : 'triangle') + '.png'
     map_pin = {
-      'name' => name, 'lat' => customer.lat, 'lng' => customer.lng,
+      'name' => name, 'lat' => customer.latitude, 'lng' => customer.longitude,
       'customer_id' => event.customer_id,
-      'url' => 'map_icons/blue_dot.png', 'infowindow' => infowindow,
+      'url' => url, 'infowindow' => infowindow,
       'date' => event.start_date, 'event_id' => event.google_event_id,
       'creator' => event.response_staff, 'participant' => event.staff_id
     }
@@ -133,9 +133,10 @@ module CalendarHelper
     }
     _, colour_range = map_filter(params, colour_guide, colour_range, false)
     start_date, end_date = time_picker(params, 0)
-    customers = Customer.joins(:addresses).select("addresses.lat, addresses.lng, customers.*").where("addresses.lat IS NOT NULL AND (customers.staff_id IN (?) OR customers.id IN (?))", staffs.map(&:id), events.map(&:customer_id)).group("customers.id")
+    customers = Customer.joins(:addresses).select("addresses.lat AS latitude, addresses.lng AS longitude, customers.*").where("addresses.lat IS NOT NULL AND (customers.staff_id IN (?) OR customers.id IN (?))", staffs.map(&:id), events.map(&:customer_id)).group("customers.id")
     customers = customers.joins(:orders).select("MAX(orders.date_created) as last_order_date, customers.id").where("orders.status_id IN (2, 3, 7, 8, 9, 10, 11, 12, 13)").order("orders.date_created DESC").group("customers.id")
 
+    leads = CustomerLead.all
     # customer pins -> based on last order date
     customer_map = {}
     customers.each do |customer|
@@ -153,7 +154,12 @@ module CalendarHelper
     event_map = {}
     events.each do |event|
       customer = customers.select { |x| x.id == event.customer_id }.first
-      event_map[event.google_event_id] = add_event_pin(customer, event) unless customer.nil?
+      if !customer.nil?
+        event_map[event.google_event_id] = add_event_pin(customer, event)
+      else
+        lead = leads.select { |x| x.id == event.customer_lead_id}.first
+        event_map[event.google_event_id] = add_event_pin(lead, event, false) unless lead.nil?
+      end
     end
     [customer_map, event_map, start_date, end_date]
   end
@@ -166,9 +172,15 @@ module CalendarHelper
       marker.picture({ url: view_context.image_path(event[event_id]["url"]),
                         width: 30,
                         height: 30 })
-      marker.infowindow "<a href=\"http://188.166.243.138/customer/summary?customer_id=#{event[event_id]['customer_id']}&customer_name=#{event[event_id]['name']}\">#{event[event_id]['name']}</a>
-                              <br/><br/>
-                              <p>#{event[event_id]['infowindow']}<p>"
+      if event[event_id]['customer_id'].nil?
+        marker.infowindow "</a>#{event[event_id]['name']}</a>
+                                <br/><br/>
+                                <p>#{event[event_id]['infowindow']}<p>"
+      else
+        marker.infowindow "<a href=\"http://188.166.243.138/customer/summary?customer_id=#{event[event_id]['customer_id']}&customer_name=#{event[event_id]['name']}\">#{event[event_id]['name']}</a>
+                                <br/><br/>
+                                <p>#{event[event_id]['infowindow']}<p>"
+      end
       marker.json({
         date: event[event_id]['date'],
         participant: event[event_id]['participant'],
@@ -188,7 +200,7 @@ module CalendarHelper
     selected_staff, colour_range = map_filter(params, colour_guide, colour_range, false)
     start_date, end_date = time_picker(params, 0)
 
-    customers = Customer.joins(:addresses).select("addresses.lat, addresses.lng, customers.*").where("addresses.lat IS NOT NULL AND customers.staff_id IN (?)", staffs.map{|x| x.id}).group("customers.id")
+    customers = Customer.joins(:addresses).select("addresses.lat AS latitude, addresses.lng AS longitude, customers.*").where("addresses.lat IS NOT NULL AND customers.staff_id IN (?)", staffs.map{|x| x.id}).group("customers.id")
     # the Status check needs to be updated
     customers = customers.joins(:orders).select("MAX(orders.date_created) as last_order_date, customers.id").where("orders.status_id IN (2, 3, 7, 8, 9, 10, 11, 12, 13)").order("orders.date_created DESC").group("customers.id")
     customers = customers.select{|x| selected_cust_style.include? x.cust_style_id.to_s } unless selected_cust_style.blank?
@@ -219,7 +231,7 @@ module CalendarHelper
     # default to one month ago until today
     start_date, end_date = time_picker(params, 3)
 
-    customers = Customer.joins(:addresses).select("addresses.lat, addresses.lng, customers.*").where("addresses.lat IS NOT NULL AND customers.staff_id IN (?)", staffs.map{|x| x.id}).group("customers.id")
+    customers = Customer.joins(:addresses).select("addresses.lat AS latitude, addresses.lng AS longitude, customers.*").where("addresses.lat IS NOT NULL AND customers.staff_id IN (?)", staffs.map{|x| x.id}).group("customers.id")
 
     # calculate the customers who have sales record in given period
     customers_sales = Customer.joins(:orders).select("customers.id, sum(orders.total_inc_tax) as sales").where("orders.status_id IN (2, 3, 7, 8, 9, 10, 11, 12, 13)").where("orders.date_created < '#{end_date}' AND orders.date_created > '#{start_date}'").group("customers.id")
