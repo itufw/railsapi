@@ -13,7 +13,7 @@ class TaskController < ApplicationController
 
     def add_task
       # task helper -> check if the customer has assigned
-      @parent_task, @customers, @customer_locked = lock_customer(params)
+      @parent_task, @customers, @customer_locked, @leads = lock_customer(params)
 
         @task = Task.new
 

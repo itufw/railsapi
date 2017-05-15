@@ -39,6 +39,10 @@
           </br>
           <%= label(:customer, "Customer:")%>
             <%= collection_select(:customer, :id, @customers, :id, :actual_name, {:include_blank => 'Active Customer'}, {:class => 'customer_selection'}) %>
+          </br>
+          <%= label(:customer, "Lead:")%>
+            <%= collection_select(:lead, :id, @leads, :id, :actual_name, {:include_blank => 'Active Leads'}, {:class => 'lead_selection'}) %>
+
         <% else %>
           <%= label(:staff, "Staff:")%>
             <%= collection_select(:staff, :id, @staffs, :id, :nickname, {:selected => @current_user.id}) %>
