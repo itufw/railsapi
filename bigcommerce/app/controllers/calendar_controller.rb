@@ -165,6 +165,18 @@ class CalendarController < ApplicationController
     end
   end
 
+  def event_check_offline
+    @jarow = FuzzyStringMatch::JaroWinkler.create(:native)
+    @customers = Customer.all.order_by_name('ASC')
+    @leads = CustomerLead.all.order_by_name('ASC')
+
+    @methods = TaskMethod.all
+    @subjects = TaskSubject.sales_subjects
+
+    @events = Task.unconfirmed_event.order_by_staff('ASC')
+    @staffs = Staff.filter_by_ids(@events.map(&:response_staff).uniq)
+  end
+
   # handle the requests for updating events
   def translate_events
     if params['submit'] == 'reject'
