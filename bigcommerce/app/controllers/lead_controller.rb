@@ -12,6 +12,8 @@ class LeadController < ApplicationController
 
   def create_leads
     @customer_lead = CustomerLead.new
+    @google_client = grab_from_google(params, @customer_lead)
+  
     @customer_lead_button = true
   end
 
