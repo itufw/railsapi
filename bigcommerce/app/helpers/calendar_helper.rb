@@ -322,4 +322,91 @@ module CalendarHelper
 
     return return_events
   end
+
+  # -----------------push events to google calendar ---------------------
+  def push_pending_events_to_google
+    client = Signet::OAuth2::Client.new(client_id: Rails.application.secrets.google_client_id,
+                                        client_secret: Rails.application.secrets.google_client_secret,
+                                        token_credential_uri: 'https://accounts.google.com/o/oauth2/token')
+
+    client.update!(
+      :additional_parameters => {"access_type" => "offline"}
+      )
+    client.update!(session[:authorization])
+
+    service = Google::Apis::CalendarV3::CalendarService.new
+    service.authorization = client
+
+    tasks = Task.pending_event
+    tasks.each do |t|
+      t_relations = t.task_relations
+      customer_id = t_relations.map(&:customer_id).compact
+      customer_id = (customer_id.blank?) ? 0 : customer_id.first
+      staff_id = t_relations.map(&:staff_id).compact
+      staff_id = (staff_id.blank?) ? 0 : staff_id.first
+      t.google_event_id = push_event(customer_id, t.description, staff_id, t.response_staff, t.start_date, t.end_date, t.subject_1, t.method, service, client).id
+      t.gcal_status = "pushed"
+      t.save
+    end
+  end
+
+  def combine_adress(customer_address)
+    location = ""
+
+    return location if customer_address.nil? || customer_address.blank?
+    customer_address = customer_address.first
+
+    location += customer_address.street_1 + " "
+    location += customer_address.street_2 + " " unless customer_address.street_2.nil?
+    location += ", " + customer_address.city + ", " + customer_address.state + ", " + customer_address.country
+    location
+  end
+
+  def push_event(customer_id, description, staff, response_staff, start_time, end_time, subject, method, service, client)
+    response_staff = Staff.find(response_staff)
+    response_staff_email = response_staff.email
+    assigned_staff = (staff==0)? response_staff : Staff.find(staff)
+
+    customer = Customer.where("customers.id = #{customer_id}")
+    customer = (customer.blank?) ? assigned_staff.nickname : customer.first.actual_name
+
+    attendee_email = assigned_staff.staff_calendar_addresses.first
+    attendee_email = (attendee_email.nil?) ? 'it@untappedwines.com' : attendee_email.calendar_address
+
+    address = combine_adress(Address.where("customer_id = #{customer_id}")) if customer_id != 0
+    task_subject = TaskSubject.find(subject).subject
+
+    event = Google::Apis::CalendarV3::Event.new({
+                                                start: {
+                                                  date_time: start_time.strftime('%Y-%m-%dT%H:%M:%S'),
+                                                  time_zone: 'Australia/Melbourne',
+                                                },
+                                                end:{
+                                                  date_time: end_time.strftime('%Y-%m-%dT%H:%M:%S'),
+                                                  time_zone: 'Australia/Melbourne',
+                                                },
+                                                # colorID: "2",
+                                                summary: customer,
+                                                description: task_subject + ": "+ customer + "\n" +description + "\n Created By:" + response_staff.nickname,
+                                                location: address,
+                                                attendees: [
+                                                  {
+                                                    displayName: assigned_staff.nickname,
+                                                    email: attendee_email
+                                                  }
+                                                ]})
+    begin
+      gcal_event = service.insert_event(response_staff_email, event, send_notifications: true)
+      return gcal_event
+    rescue Google::Apis::AuthorizationError
+      client.update!(
+        additional_parameters: {
+          grant_type: 'refresh_token'
+        }
+      )
+      response = client.refresh!
+      session[:authorization] = session[:authorization].merge(response)
+      retry
+    end
+  end
 end

@@ -6,7 +6,7 @@ class Task < ActiveRecord::Base
     belongs_to :parent, class_name: 'Task', foreign_key: 'parent_task'
     has_many :children, class_name: 'Task', foreign_key: 'parent_task'
 
-    enum gcal_status: [ :na, :pushed, :pulled, :unconfirmed, :rejected ]
+    enum gcal_status: [ :na, :pushed, :pulled, :unconfirmed, :rejected, :pending ]
 
     def insert_or_update(t)
         time = Time.now.to_s(:db)
@@ -172,7 +172,7 @@ class Task < ActiveRecord::Base
     end
 
     def self.task_children(task_id)
-        where("tasks.parent_task = #{task_id}")
+      where("tasks.parent_task = #{task_id}")
     end
 
     def self.active_tasks
@@ -188,7 +188,7 @@ class Task < ActiveRecord::Base
     end
 
     def self.order_by_id(direction)
-        order('tasks.id ' + direction)
+      order('tasks.id ' + direction)
     end
 
     def self.order_by_staff(direction)
@@ -196,10 +196,12 @@ class Task < ActiveRecord::Base
     end
 
     def self.unconfirmed_event
-      where(:gcal_status => 3)
+      where(gcal_status: 3)
     end
 
-
+    def self.pending_event
+      where(gcal_status: 5)
+    end
 
     def self.filter_by_params(priority, subject, method, staff_created, customers, staff)
         sql = ''

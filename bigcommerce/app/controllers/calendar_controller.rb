@@ -111,6 +111,8 @@ class CalendarController < ApplicationController
     # tempary use, it should be assigned based on the current users' right
     if session[:user_id] == 18
       @staffs = Staff.where('staffs.id IN (?)', [18])
+    elsif session[:user_id] == 35
+      @staffs = Staff.where('staffs.id IN (?)', [35])
     else
       @staffs = Staff.where('staffs.id IN (?)', [9, 36, 18, 35])
     end
@@ -141,7 +143,12 @@ class CalendarController < ApplicationController
     service = Google::Apis::CalendarV3::CalendarService.new
     service.authorization = client
 
+
+
     begin
+      # function in calendar_helper
+      push_pending_events_to_google
+
       @jarow = FuzzyStringMatch::JaroWinkler.create(:native)
       @customers = Customer.all.order_by_name('ASC')
       @leads = CustomerLead.all.order_by_name('ASC')
