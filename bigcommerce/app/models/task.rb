@@ -20,8 +20,16 @@ class Task < ActiveRecord::Base
 
     def auto_insert_from_calendar_event(event, staff_id)
         task = self
-        task.start_date = event.start.date_time.to_s(:db)
-        task.end_date = event.end.date_time.to_s(:db)
+        if event.start.date_time.nil?
+          task.start_date = event.start.date.to_s
+        else
+          task.start_date = event.start.date_time.to_s(:db)
+        end
+        if event.end.date_time.nil?
+          task.end_date = event.end.date.to_s
+        else
+          task.end_date = event.end.date_time.to_s(:db)
+        end
         task.created_at = event.created.to_s(:db)
         task.updated_at = event.updated.to_s(:db)
         task.description = event.summary

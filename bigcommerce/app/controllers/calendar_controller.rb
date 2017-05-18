@@ -112,7 +112,7 @@ class CalendarController < ApplicationController
     if session[:user_id] == 18
       @staffs = Staff.where('staffs.id IN (?)', [18])
     else
-      @staffs = Staff.where('staffs.id IN (?)', [9, 36, 18])
+      @staffs = Staff.where('staffs.id IN (?)', [9, 36, 18, 35])
     end
     # @staffs = Staff.active
     @events = Task.joins(:task_relations).select('task_relations.*, tasks.*').where('tasks.google_event_id IS NOT NULL AND (task_relations.staff_id IN (?) OR tasks.response_staff IN (?))', @staffs.map(&:id), @staffs.map(&:id))

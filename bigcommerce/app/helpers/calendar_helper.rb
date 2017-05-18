@@ -312,7 +312,9 @@ module CalendarHelper
     end
 
     new_events.select{|x| !(tasks.include? x.id)}.each do |event|
-      staff_id = staff_calendars.select {|x| x.calendar_address == event.creator.email}.first.staff_id
+      staff_id = staff_calendars.select {|x| x.calendar_address == event.creator.email}.first
+      next if staff_id.blank?
+      staff_id = staff_id.staff_id
       Task.new.auto_insert_from_calendar_event(event, staff_id)
     end
     unconfirmed_task = Task.unconfirmed_event.map{|x| x.google_event_id}
