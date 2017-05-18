@@ -191,9 +191,15 @@ class Task < ActiveRecord::Base
         order('tasks.id ' + direction)
     end
 
+    def self.order_by_staff(direction)
+      order('tasks.response_staff ' + direction)
+    end
+
     def self.unconfirmed_event
       where(:gcal_status => 3)
     end
+
+
 
     def self.filter_by_params(priority, subject, method, staff_created, customers, staff)
         sql = ''
