@@ -92,6 +92,8 @@ gem 'google-api-client', require: 'google/apis/calendar_v3'
 gem 'underscore-rails'
 # google map for rails
 gem 'gmaps4rails'
+# google places for rails
+gem 'google_places'
 # convert street address to latitude and longitude
 gem 'geokit-rails'
 gem 'geocoder'
