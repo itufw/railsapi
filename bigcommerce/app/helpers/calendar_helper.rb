@@ -1,4 +1,10 @@
 module CalendarHelper
+
+  def user_full_right(_authority)
+    return true if %w[Admin Management Accounts].include? session[:authority]
+    false
+  end
+
   def sales_last_order(params)
     return 'Last_Order' if ((params["filter_selector"].nil?) || ("".eql?params["filter_selector"]) ||  ("Last_Order".eql?params["filter_selector"]))
     'Sales'
@@ -110,9 +116,8 @@ module CalendarHelper
 
   def add_event_pin(customer, event, current_customer = true)
     name = (customer.actual_name.nil?) ? customer.firstname.to_s + ' ' + customer.lastname.to_s : customer.actual_name.to_s
-
     infowindow = event.description
-    url = 'map_icons/blue_' + (current_customer ? 'dot' : 'triangle') + '.png'
+    url = 'map_icons/daysofweek_' + event.start_date.strftime("%a").downcase.to_s + '_' + (current_customer ? 'yellow' : 'black') + '.png'
     map_pin = {
       'name' => name, 'lat' => customer.latitude, 'lng' => customer.longitude,
       'customer_id' => event.customer_id,

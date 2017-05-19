@@ -195,6 +195,10 @@ class Task < ActiveRecord::Base
       order('tasks.response_staff ' + direction)
     end
 
+    def self.filter_by_staff(staff_id)
+      includes(:task_relations).where('tasks.response_staff = ? OR task_relations.staff_id = ?', staff_id, staff_id).references(:task_relations)
+    end
+
     def self.unconfirmed_event
       where(gcal_status: 3)
     end

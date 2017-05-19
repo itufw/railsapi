@@ -21,7 +21,9 @@
     <br/>
     <div class="customer_leads_field">
       <%= f.text_field :email, placeholder: 'Email', maxlength: 100 %>
-      <br/><br/>
+      <br/>
+        <a href="<%= @google_client.website%>"><%= f.label :website%>: <%= @google_client.website%></a>
+      <br/>
       <%= f.text_field :phone, placeholder: 'phone number', maxlength:50 %>
       <%= f.text_field :mobile_phone, placeholder: 'mobile number', maxlength:50 %>
       <br/>
