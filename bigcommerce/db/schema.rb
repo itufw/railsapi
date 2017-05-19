@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170515034001) do
+ActiveRecord::Schema.define(version: 20170519014016) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -147,6 +147,7 @@ ActiveRecord::Schema.define(version: 20170515034001) do
     t.float    "latitude",      limit: 24
     t.float    "longitude",     limit: 24
     t.text     "address",       limit: 65535
+    t.text     "mobile_phone",  limit: 65535
   end
 
   add_index "customer_leads", ["cust_group_id"], name: "index_customer_leads_on_cust_group_id", using: :btree

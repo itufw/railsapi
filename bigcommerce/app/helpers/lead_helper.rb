@@ -29,30 +29,36 @@ module LeadHelper
     staff_id = params['staff_id']
     return nil if customer_name.nil? || staff_id.nil?
 
-    staff = Staff.find(staff_id)
-
     client = GooglePlaces::Client.new('AIzaSyBvfTZH0XCVEJQTgR9QDYt18XIeV5MIkPI')
-    spot = client.spots_by_query(customer_name + "near #{staff.state}", types: places_tags).first
+    spot = spot_details(client, customer_lead, customer_name, staff_id)
     return nil if spot.nil?
 
     customer_lead.staff_id = staff_id
-    customer_lead.actual_name = spot.name
-    customer_lead.address = spot.formatted_address
     # default customer type to wholesale
     customer_lead.cust_type_id = 2
-    if spot.types.include? ['bar']
-      customer_lead.cust_style_id = 6
-    elsif spot.types.include? ['liquor_store']
-      customer_lead.cust_style_id = 1
-    else
-      customer_lead.cust_style_id = 2
-    end
-
+    customer_lead.cust_style_id = spot_style(spot.types)
+    # detailed spot
     spot
   end
 
   def places_tags
-    %w[bar cafe casino liquor_store night_club restaurant shopping_mall store]
+    %w[bar cafe liquor_store night_club restaurant shopping_mall store]
   end
 
+  def spot_style(spot_types)
+    return 6 if spot_types.include? 'bar'
+    return 1 if spot_types.include? 'liquor_store'
+    2
+  end
+
+  def spot_details(client, customer_lead, customer_name, staff_id)
+    staff = Staff.find(staff_id)
+    spot = client.spots_by_query(customer_name + "near #{staff.state}", types: places_tags).first
+    return nil if spot.nil?
+    place = client.spot(spot.place_id)
+    customer_lead.phone = place.formatted_phone_number
+    customer_lead.actual_name = place.name
+    customer_lead.address = place.formatted_address
+    place
+  end
 end
