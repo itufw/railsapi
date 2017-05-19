@@ -109,14 +109,14 @@ class CalendarController < ApplicationController
 
     @current_user = Staff.find(session[:user_id])
     # tempary use, it should be assigned based on the current users' right
-    if session[:user_id] == 18
-      @staffs = Staff.where('staffs.id IN (?)', [18])
-    elsif session[:user_id] == 35
-      @staffs = Staff.where('staffs.id IN (?)', [35])
+    if session[:user_id] == 36
+      @staffs = Staff.where('(active = 1 and user_type LIKE "Sales%") OR staffs.id = 36')
+    elsif user_full_right(session[:authority])
+      @staffs = Staff.active_sales_staff
     else
-      @staffs = Staff.where('staffs.id IN (?)', [9, 36, 18, 35])
+      @staffs = Staff.where(id: session[:user_id])
     end
-    # @staffs = Staff.active
+
     @events = Task.joins(:task_relations).select('task_relations.*, tasks.*').where('tasks.google_event_id IS NOT NULL AND (task_relations.staff_id IN (?) OR tasks.response_staff IN (?))', @staffs.map(&:id), @staffs.map(&:id))
 
     @customers = Customer.all
@@ -131,6 +131,8 @@ class CalendarController < ApplicationController
     @current_month = (Date.parse params[:start_date]).beginning_of_month
   end
 
+  # online version
+  # event sync
   def event_censor
     client = Signet::OAuth2::Client.new(client_id: Rails.application.secrets.google_client_id,
                                         client_secret: Rails.application.secrets.google_client_secret,
@@ -180,7 +182,11 @@ class CalendarController < ApplicationController
     @methods = TaskMethod.all
     @subjects = TaskSubject.sales_subjects
 
-    @events = Task.unconfirmed_event.order_by_staff('ASC')
+    if user_full_right(session[:authority])
+      @events = Task.unconfirmed_event.order_by_staff('ASC')
+    else
+      @events = Task.unconfirmed_event.filter_by_staff(session[:user_id]).order_by_staff('ASC')
+    end
     @staffs = Staff.filter_by_ids(@events.map(&:response_staff).uniq)
   end
 
