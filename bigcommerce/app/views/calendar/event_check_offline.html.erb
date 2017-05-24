@@ -1,4 +1,4 @@
-<%= title "Event From Calendars - OFFLINE" %>
+<%= title "Event From Calendars" %>
 <div>
   <table id="event-table">
   <thead>
@@ -17,7 +17,7 @@
         </li>
       </th>
       <th>&nbsp;&nbsp;&nbsp;</th>
-      <th>Summary</th>
+      <th style="width: 300px">Summary</th>
       <th>Time</th>
       <th>&nbsp;&nbsp;&nbsp;</th>
       <th>Customer</th>
@@ -35,32 +35,50 @@
       <tr class="google-event-line  staff-event-<%= response_staff.first.id.to_s%> ">
         <td><%= response_staff.first.nickname %></td>
         <td>&nbsp;&nbsp;&nbsp;</td>
-        <td><%= event.description.to_s %></td>
+        <td>
+          <%= event.description.to_s %> <br/>
+          <%= event.location.to_s %> <br/>
+          <%= event.summary[0...200] unless event.summary.nil?%>
+        </td>
 
-        <td><%= event.start_date.strftime("%m-%d %H:%M")%> --
+        <td><%= event.start_date.strftime("%d/%m %H:%M")%> --
             <%= event.end_date.strftime("%H:%M")%>
         </td>
 
         <td>&nbsp;&nbsp;&nbsp;</td>
         <%
           unless event.description.nil?
-            # loc = event.location.split(",").first.split.select{|x| (x.to_i.to_s.casecmp(x)<0) && !(["st","pl","street","St"].include?(x))}
-            loc = event.description.split("\n")
-            loc = loc.first.split(' ')
-            customer_list = @customers.select{|x| Regexp.union(loc) === x.actual_name }
-            customer_list = customer_list.sort_by! {|x| @jarow.getDistance(loc.join(" "), x.actual_name) }.reverse
+            if event.location.nil?
+              loc = event.description.split("\n")
+              loc = loc.first.split(' ')
+              customer_list = @customers.select{|x| Regexp.union(loc) === x.actual_name }[0..5]
+              customer_list = customer_list.sort_by! {|x| @jarow.getDistance(loc.join(" "), x.actual_name) }.reverse
 
-            lead_list = @leads.select{|x| Regexp.union(loc) === x.actual_name }
-            lead_list = lead_list.each {|x| x.actual_name = x.actual_name.to_s + ', (Lead)'}
-            lead_list = lead_list.sort_by! {|x| @jarow.getDistance(loc.join(" "), x.actual_name) }.reverse
-            customer_list = lead_list + customer_list
+              lead_list = @leads.select{|x| Regexp.union(loc) === x.actual_name }
+              lead_list = lead_list.each {|x| x.actual_name = x.actual_name.to_s + ', (Lead)'}
+              lead_list = lead_list.sort_by! {|x| @jarow.getDistance(loc.join(" "), x.actual_name) }.reverse
+              customer_list = lead_list + customer_list
+
+              other_customer = @customers.reject{ |x| customer_list.map(&:actual_name).include?x.actual_name || x.actual_name.nil? || (x.actual_name == '')}
+              customer_list += other_customer.sort_by! {|x| @jarow.getDistance(event.description.to_s, x.actual_name.to_s) }.reverse
+            else
+              loc = event.location.split(",").first.split.select{|x| (x.to_i.to_s.casecmp(x)<0) && !(["st","pl","street","St"].include?(x))}[0,2]
+              customer_list = @customers.select{|x| Regexp.union(loc) === x.actual_name }
+              customer_list = customer_list.sort_by! {|x| @jarow.getDistance(loc.join(" "), x.actual_name) }.reverse
+              lead_list = @leads.select{|x| Regexp.union(loc) === x.actual_name }
+              lead_list = lead_list.each {|x| x.actual_name = x.actual_name.to_s + ', (Lead)'}
+              lead_list = lead_list.sort_by! {|x| @jarow.getDistance(loc.join(" "), x.actual_name) }.reverse
+              customer_list = lead_list + customer_list
+            end
         %>
-          <td><%= collection_select :customer, :customer, customer_list, ->(ob) {"#{ob.id}|#{ob.actual_name}"}, :actual_name, {:include_blank => "Select a Customer"} %></td>
+          <td>
+            <%= collection_select :customer, :customer, customer_list, ->(ob) {"#{ob.id}|#{ob.actual_name}"}, :actual_name, {:include_blank => "Select a Customer"}, :style => "width: 150px" %>
+          </td>
         <%else%>
           <td></td>
         <%end%>
-        <td><%= collection_select :method, :method, @methods, :method, :method, {:include_blank => "Select a Method", :selected => "Meeting"} %></td>
-        <td><%= collection_select :subject, :subject, @subjects, :id, :subject, {:include_blank => "Select a Subject"} %></td>
+        <td><%= collection_select :method, :method, @methods, :method, :method, {:include_blank => "Select a Method", :selected => "Meeting"}, :style => "width: 80px" %></td>
+        <td><%= collection_select :subject, :subject, @subjects, :id, :subject, {:include_blank => "Select a Subject", :selected => 2}, :style => "width: 80px" %></td>
         <td>
           <%= button_tag(type: 'submit', name: 'submit', class: "btn btn-default", value: 'confirm') do%>
             <span class="glyphicon glyphicon-plus"></span>

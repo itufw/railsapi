@@ -307,25 +307,32 @@ module CalendarHelper
     return authorization
   end
 
+  # scrap events from google calendar
+  def update_google_events(new_events, tasks, staff_calendars, unconfirm)
+    new_events.select { |x| (!tasks.include?x.id) || (unconfirm.include?x.id) }.each do |event|
+      if unconfirm.include? event.id
+        task = Task.filter_by_google_event_id(event.id).first
+        task.auto_update_from_calendar_event(event) unless task.nil?
+      else
+        # filter the staff
+        staff_address = staff_calendars.select { |x| x.calendar_address == event.creator.email}.first
+        next if staff_address.blank?
+        Task.new.auto_insert_from_calendar_event(event, staff_address.staff_id)
+      end
+    end
+  end
+
   def scrap_from_calendars(service)
     new_events = []
-    tasks = Task.where("google_event_id IS NOT NULL").map{|x| x.google_event_id}
+    tasks = Task.where('google_event_id IS NOT NULL').map(&:google_event_id)
+    unconfirmed_task = Task.unconfirmed_event.map(&:google_event_id)
+
     staff_calendars = StaffCalendarAddress.all
-    addresses = staff_calendars.map { |x| x.calendar_address}
-    service.list_calendar_lists.items.select { |x| addresses.include?x.id }.each do |calendar|
+    service.list_calendar_lists.items.select { |x| staff_calendars.map(&:calendar_address).include?x.id }.each do |calendar|
       new_events += service.list_events(calendar.id).items
     end
 
-    new_events.select{|x| !(tasks.include? x.id)}.each do |event|
-      staff_id = staff_calendars.select {|x| x.calendar_address == event.creator.email}.first
-      next if staff_id.blank?
-      staff_id = staff_id.staff_id
-      Task.new.auto_insert_from_calendar_event(event, staff_id)
-    end
-    unconfirmed_task = Task.unconfirmed_event.map{|x| x.google_event_id}
-    return_events = new_events.select{|x| unconfirmed_task.include? x.id}
-
-    return return_events
+    update_google_events(new_events, tasks, staff_calendars, unconfirmed_task)
   end
 
   # -----------------push events to google calendar ---------------------

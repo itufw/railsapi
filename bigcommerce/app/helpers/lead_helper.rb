@@ -59,6 +59,7 @@ module LeadHelper
     customer_lead.phone = place.formatted_phone_number
     customer_lead.actual_name = place.name
     customer_lead.address = place.formatted_address
+    customer_lead.website = place.website
     place
   end
 end

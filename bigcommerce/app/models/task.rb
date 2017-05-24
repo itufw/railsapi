@@ -18,6 +18,7 @@ class Task < ActiveRecord::Base
         t.save
     end
 
+    # Google Calendar insert or update
     def auto_insert_from_calendar_event(event, staff_id)
         task = self
         if event.start.date_time.nil?
@@ -33,6 +34,8 @@ class Task < ActiveRecord::Base
         task.created_at = event.created.to_s(:db)
         task.updated_at = event.updated.to_s(:db)
         task.description = event.summary
+        task.location = event.location
+        task.summary = event.description
         task.is_task = 1
 
         response_staff = staff_id
@@ -44,6 +47,24 @@ class Task < ActiveRecord::Base
         task.google_event_id = event.id
         task.gcal_status = :unconfirmed
         task.save
+    end
+
+    def auto_update_from_calendar_event(event)
+      task = self
+      if event.start.date_time.nil?
+        task.start_date = event.start.date.to_s
+      else
+        task.start_date = event.start.date_time.to_s(:db)
+      end
+      if event.end.date_time.nil?
+        task.end_date = event.end.date.to_s
+      else
+        task.end_date = event.end.date_time.to_s(:db)
+      end
+      task.description = event.summary
+      task.location = event.location
+      task.summary = event.description
+      task.save
     end
 
     def update_event(event_id, method, subject, customer)
@@ -197,6 +218,10 @@ class Task < ActiveRecord::Base
 
     def self.filter_by_staff(staff_id)
       includes(:task_relations).where('tasks.response_staff = ? OR task_relations.staff_id = ?', staff_id, staff_id).references(:task_relations)
+    end
+
+    def self.filter_by_google_event_id(google_id)
+      where('tasks.google_event_id = ? ', google_id)
     end
 
     def self.unconfirmed_event
