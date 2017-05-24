@@ -145,23 +145,12 @@ class CalendarController < ApplicationController
     service = Google::Apis::CalendarV3::CalendarService.new
     service.authorization = client
 
-
-
     begin
       # function in calendar_helper
       push_pending_events_to_google
-
-      @jarow = FuzzyStringMatch::JaroWinkler.create(:native)
-      @customers = Customer.all.order_by_name('ASC')
-      @leads = CustomerLead.all.order_by_name('ASC')
-
-      @methods = TaskMethod.all
-      @subjects = TaskSubject.sales_subjects
-
-      @events = scrap_from_calendars(service)
-
-      @staff_calendars = StaffCalendarAddress.filter_by_addresses(@events.map { |x| x.creator.email })
-      @staffs = Staff.filter_by_ids(@staff_calendars.map(&:staff_id)).active
+      scrap_from_calendars(service)
+      redirect_to action: 'event_check_offline'
+      return
     rescue Google::Apis::AuthorizationError
       begin
         response = client.refresh!
@@ -170,8 +159,8 @@ class CalendarController < ApplicationController
       end
       session[:authorization] = session[:authorization].merge(response)
       retry
-
     end
+    redirect_to action: 'event_check_offline'
   end
 
   def event_check_offline
@@ -193,8 +182,10 @@ class CalendarController < ApplicationController
   # handle the requests for updating events
   def translate_events
     if params['submit'] == 'reject'
-      Task.new.reject_event(params['event_id'])
-      redirect_to action: 'event_censor'
+      task = Task.filter_by_google_event_id(params['event_id'])
+      task.gcal_status = :rejected
+      task.save
+      redirect_to action: 'event_check_offline'
       return
     end
 

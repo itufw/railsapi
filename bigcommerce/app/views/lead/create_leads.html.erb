@@ -10,11 +10,11 @@
       <button type="button" class="btn btn-default <%= 'active' unless @customer_lead_button %>" value="region">Region Lead</button>
     </div>
     <br/>
+    <%= f.text_field :actual_name, placeholder: 'Company Name', maxlength: 100 %>
+    <br/><br/>
     <div class="customer_leads_field">
-      <%= f.text_field :actual_name, placeholder: 'Company Name', maxlength: 100 %>
-      <br/><br/>
-      <%= f.text_field :firstname, placeholder: 'First Name', maxlength: 50 %>
-      <%= f.text_field :lastname, placeholder: 'Last Name', maxlength: 50 %>
+      <%= f.text_field :firstname, placeholder: 'First Name', maxlength: 45 %>
+      <%= f.text_field :lastname, placeholder: 'Last Name', maxlength: 45 %>
     </div>
     <br/>
     <%= f.text_field :address, placeholder: 'Address', size: 100 %>
@@ -22,10 +22,12 @@
     <div class="customer_leads_field">
       <%= f.text_field :email, placeholder: 'Email', maxlength: 100 %>
       <br/>
-        <a href="<%= @google_client.website%>"><%= f.label :website%>: <%= @google_client.website%></a>
+        <% unless @google_client.nil? %>
+        <a href="<%= @google_client.website%>"><%= f.label :website%>:<%= f.text_field :website, placeholder: 'website', maxlength:40 %></a>
+        <% end %>
       <br/>
-      <%= f.text_field :phone, placeholder: 'phone number', maxlength:50 %>
-      <%= f.text_field :mobile_phone, placeholder: 'mobile number', maxlength:50 %>
+      <%= f.text_field :phone, placeholder: 'phone number', maxlength:45 %>
+      <%= f.text_field :mobile_phone, placeholder: 'mobile number', maxlength: 45 %>
       <br/>
     </div>
 
