@@ -1,3 +1,5 @@
+var app = window.app = {};
+
 $(document.body).ready(
     function () {
         var change = function () {

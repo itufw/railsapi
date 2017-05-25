@@ -55,6 +55,7 @@
   </div>
   <div class="col-md-4 customer_leads_field">
     <% unless @google_client.nil? %>
+      <%= hidden_field_tag google: 'google'%>
       <% unless @google_client.photos.blank? %>
         <% url = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + @google_client.photos.first.photo_reference + "&key=AIzaSyBvfTZH0XCVEJQTgR9QDYt18XIeV5MIkPI"%>
         <%= image_tag "#{url}"%>

@@ -15,6 +15,8 @@ class Product < ActiveRecord::Base
   has_many :product_lable_relations
   has_many :product_lable, through: :product_lable_relations
 
+  has_many :product_notes
+
   belongs_to :product_type
   belongs_to :product_sub_type
   belongs_to :product_size
@@ -253,5 +255,13 @@ class Product < ActiveRecord::Base
 
   def self.product_inventory(group_by_transform_column)
     send(group_by_transform_column).sum(:inventory)
+  end
+
+  def self.stock?
+    where('products.inventory > 0')
+  end
+
+  def self.autocomplete(term)
+    where('LOWER(name) LIKE ?', term.downcase)
   end
 end
