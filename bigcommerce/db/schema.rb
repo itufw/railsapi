@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170524024710) do
+ActiveRecord::Schema.define(version: 20170524065622) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -366,6 +366,15 @@ ActiveRecord::Schema.define(version: 20170524024710) do
   add_index "orders", ["staff_id"], name: "index_orders_on_staff_id", using: :btree
   add_index "orders", ["status_id"], name: "index_orders_on_status_id", using: :btree
 
+  create_table "portfolios", force: :cascade do |t|
+    t.datetime "date_start"
+    t.datetime "date_end"
+    t.text     "name",       limit: 65535
+    t.text     "pipe",       limit: 65535
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
   create_table "producer_countries", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.string   "short_name", limit: 255
@@ -425,6 +434,19 @@ ActiveRecord::Schema.define(version: 20170524024710) do
   end
 
   add_index "product_no_ws", ["product_no_vintage_id"], name: "index_product_no_ws_on_product_no_vintage_id", using: :btree
+
+  create_table "product_notes", force: :cascade do |t|
+    t.integer  "task_id",    limit: 4
+    t.integer  "created_by", limit: 4
+    t.integer  "product_id", limit: 4
+    t.integer  "rating",     limit: 4
+    t.text     "note",       limit: 65535
+    t.string   "intention",  limit: 255
+    t.decimal  "price",                    precision: 7, scale: 3
+    t.decimal  "price_luc",                precision: 7, scale: 3
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
+  end
 
   create_table "product_package_types", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -673,6 +695,7 @@ ActiveRecord::Schema.define(version: 20170524024710) do
     t.integer  "gcal_status",         limit: 4
     t.text     "location",            limit: 65535
     t.text     "summary",             limit: 65535
+    t.integer  "portfolio_id",        limit: 4
   end
 
   create_table "tax_percentages", force: :cascade do |t|

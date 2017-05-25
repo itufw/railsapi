@@ -49,4 +49,9 @@ class Contact < ActiveRecord::Base
     where("contacts.xero_contact_id = '#{xero_contact_id}'")
   end
 
+  def self.filter_by_customer(customer_ids)
+    return all if customer_ids.nil?
+    where('contacts.customer_id IN (?)', customer_ids)
+  end
+
 end

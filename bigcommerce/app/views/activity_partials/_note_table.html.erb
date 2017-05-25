@@ -1,0 +1,106 @@
+<%= form_for @note, :url => {:controller => "activity", :action => "add_note"}, :id => "note_append_form"  do |f| %>
+
+<div class="row">
+  <div class="col-md-8">
+    <table>
+      <tr>
+        <th><%= text_field_tag 'customer', nil, placeholder: 'Search Customer', style: 'width: 100px'%></th>
+        <th><%= text_field_tag 'contact', nil, placeholder: 'Search Contact', style: 'width: 100px'%></th>
+      </tr>
+    </table>
+    <br/>
+  </div>
+
+    <div class="col-md-8">
+        <%= label(:function, "Function:")%>
+        <%= f.collection_select :function, @function, :function, :function, {:include_blank => "Select a Function", :selected => @function_role}, {class:"function_selection", style: 'width: 80px'} %>
+        <%= label(:subject_1, "Subject:")%>
+        <%= f.collection_select :subject_1, @subjects, :id, :subject, {:prompt => "Select a Subject"}, {class: "subject_selection", style: 'width: 80px'} %>
+    </div>
+    <div class="col-md-8">
+        <%= label(:method, "Method:")%>
+        <%= f.collection_select :method, @methods, :method, :method, {:include_blank => "Select a Method", :selected => "Meeting"}, style: 'width: 80px' %>
+        <%= label(:priority, "Priority:")%>
+        <%= f.collection_select :priority, TaskPriority.all, :id, :priority_level, {:selected => 3}, style: 'width: 80px' %>
+        <br/>
+        <%= label(:promotion, "Promotion:")%>
+        <%= select_tag "promotion", options_for_select(@promotion.map{|x| (x*100).to_s + "%"})%>
+        <%= label(:portfolio, "Portfolio:")%>
+        <%= f.collection_select :portfolio_id, @portfolio, :id, :name, {:include_blank => "Select a Portfolio"}, style: 'width: 80px' %>
+        <br/>
+        <%= label(:end_date, "Date")%>
+        <div class='input-group date' id='due_timepicker', style='width: 200px'>
+          <%= f.text_field :start_date, placeholder: 'Timepicker', class: 'form-control' %>
+          <span class="input-group-addon">
+            <span class="glyphicon glyphicon-calendar"></span>
+          </span>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        Note:
+        <br/>
+        <%= f.text_area :description, :rows=>10, :cols=>30	%>
+    </div>
+
+    <div class="col-md-8">
+      <%= label(:wine, "Wine:")%>
+      <%= autocomplete_field_tag 'product', '', autocomplete_products_name_activity_index_path%>
+      <%= f.autocomplete_field :response_staff, autocomplete_products_name_activity_index_path, size: 75%>
+      <%= text_field_tag 'search', nil, placeholder: 'Search Product', style: 'width: 80px'%>
+      <table class="table table-striped table-bordered table-hover table-responsive" style="margin-top: 0px;">
+        <tr style="color: white; background-color: #043483; width: 90%; padding: 5px">
+          <th>Product #</th>
+          <th>Wine</th>
+          <th>Price(LUC)</th>
+          <th>Price</th>
+          <th>Notes</th>
+          <!-- Ratio Button -->
+          <th>Buy</th>
+          <th>Rating</th>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>2</td>
+          <td>3</td>
+          <td>4</td>
+          <td>5</td>
+          <td>6</td>
+          <td>7</td>
+        </tr>
+      </table>
+      <%= label(:creator, "Creator:")%>
+      <%= session[:username] %>
+      <%= label(:create_date, "Create Date") %>
+      <%= Date.today%>
+    </div>
+
+    <div class="col-md-8">
+      <%= label(:invoice, "Invoices:")%>
+      <div>
+        <table class="table table-striped table-bordered table-hover table-responsive" style="margin-top: -10px;">
+          <tr class="info">
+            <th>Invoice#</th>
+            <th>Date</th>
+            <th>Due Date</th>
+            <th>Overdue Days</th>
+            <th>Total</th>
+            <th>Amount Paid</th>
+            <th>Amount Credited</th>
+            <th>Amount Due</th>
+          </tr>
+        </table>
+      </div>
+    </div>
+</div>
+<% end %>
+
+
+<script>
+$(function () {
+    $('#due_timepicker').datetimepicker({
+      defaultDate: new Date(),
+      sideBySide: true
+    });
+});
+</script>

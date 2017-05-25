@@ -13,6 +13,13 @@ class CustomerController < ApplicationController
   include DatesHelper
   include CustomerHelper
 
+  def customer_detail
+    get_id_and_name(params)
+    @overall_stats = overall_stats_(params)
+    # rewrite the function in customer helper
+    @orders, @per_page = latest_orders(params, Order.customer_filter([@customer_id]))
+  end
+
   def all
     @staffs = Staff.active_sales_staff.order_by_order
     customers = filter(params, 'display_report')

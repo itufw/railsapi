@@ -3,6 +3,8 @@ class Task < ActiveRecord::Base
     has_many :task_relations
     has_many :task_priorities
     has_many :order_actions
+    has_many :product_notes
+    has_one :portfolio
     belongs_to :parent, class_name: 'Task', foreign_key: 'parent_task'
     has_many :children, class_name: 'Task', foreign_key: 'parent_task'
 

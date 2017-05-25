@@ -26,7 +26,8 @@ class LeadController < ApplicationController
     @customer_lead = CustomerLead.new
     if @customer_lead.update_attributes(lead_params)
       flash[:success] = 'Successfully Created.'
-      redirect_to action: 'all_leads'
+      # redirect_to action: 'all_leads'
+      redirect_to controller: 'calendar', action: 'event_check_offline'
     else
       flash[:error] = 'Unsuccessful.'
       render 'create_leads'
@@ -52,6 +53,6 @@ class LeadController < ApplicationController
     params.require(:customer_lead).permit(:firstname, :lastname, :actual_name,\
                                           :staff_id, :cust_style_id, \
                                           :cust_group_id, :cust_type_id, \
-                                          :address, :region)
+                                          :address, :region, :website)
   end
 end

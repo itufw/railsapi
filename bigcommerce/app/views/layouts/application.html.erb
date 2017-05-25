@@ -87,6 +87,9 @@
                                 <% end %>
                             </ul>
                         </li>
+                        <% if it_working(session[:user_id])%>
+                        <li><%= link_to "activity", controller: 'activity', action: 'add_note'%></li>
+                        <% end %>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         <li><%= link_to "Hi," + "  " + session[:username] %></li>
