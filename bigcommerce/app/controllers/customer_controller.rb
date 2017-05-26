@@ -55,7 +55,7 @@ class CustomerController < ApplicationController
     get_id_and_name(params)
     @product_id = params[:product_id]
     @product_name = params[:product_name]
-    @transform_column = params[:transform_column]
+    @transform_column = params[:transform_column] || 'product_id'
 
     # either we want stats for a product_id or for products based on a product_no_vintage_id
     # or based on a product_no_ws_id
