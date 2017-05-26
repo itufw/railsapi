@@ -4,7 +4,7 @@ require 'activity_helper.rb'
 class ActivityController < ApplicationController
   before_action :confirm_logged_in
 
-  autocomplete :products, :name, full: true
+  autocomplete :product, :name, full: true
 
   include ActivityHelper
 
@@ -19,13 +19,6 @@ class ActivityController < ApplicationController
       = function_search(params)
     # @products = product_search
     @note = Task.new
-
-    respond_to do |format|
-      format.html
-      format.json { @products = Product.autocomplete(params[:wine]) }
-    end
   end
-
-  
 
 end
