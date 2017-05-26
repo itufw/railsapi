@@ -6,9 +6,7 @@
     <%= autocomplete_field_tag 'product', '', autocomplete_product_name_activity_index_path, placeholder: 'Search Product', id_element: '#product_id'%>
   </div>
   <br/>
-  <%= button_tag(type: 'submit', name: 'submit', class: "btn btn-default", value: 'confirm') do%>
-    <span class="glyphicon glyphicon-plus"></span>
-  <% end %>
+    <button type="button" class="btn btn-default" id="sample-10">Last 10 Samples</button>
   <br/>
   <table class="table table-striped table-bordered table-hover table-responsive" style="margin-top: 0px;" id="product_table">
     <tr style="width: 90%; padding: 5px" class="info">

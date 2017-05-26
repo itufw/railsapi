@@ -261,6 +261,11 @@ class Product < ActiveRecord::Base
     where('products.inventory > 0')
   end
 
+  def self.sample_products(staff_id = nil, row = 10)
+    return joins(:orders).where('orders.qty> 0 AND orders.total_inc_tax = 0').order("orders.id DESC").limit(row) if staff_id.nil?
+    joins(:orders).where('orders.qty> 0 AND orders.total_inc_tax = 0 AND orders.staff_id = ?', staff_id).order("orders.id DESC").limit(row)
+  end
+
   def self.autocomplete(term)
     where('LOWER(name) LIKE ?', term.downcase)
   end
