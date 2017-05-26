@@ -6,6 +6,7 @@ Rails.application.routes.draw do
 
   get 'add_task', to: 'task#add_task'
   get 'local_calendar', to: 'calendar#local_calendar'
+  # Google
   get '/redirect', to: 'calendar#redirect', as: 'redirect'
   get '/callback', to: 'calendar#callback', as: 'callback'
   get '/calendars', to: 'calendar#calendars', as: 'calendars'
@@ -13,15 +14,16 @@ Rails.application.routes.draw do
   get '/rails/mailers' => 'rails/mailers#index'
   get '/rails/mailers/*path' => 'rails/mailers#preview'
 
+  get 'activity/add_note', to: 'activity#add_note'
+  resources :activity do
+    get :autocomplete_product_name, on: :collection
+  end
+
   post 'add_task', to: 'task#task_record'
   post 'local_calendar', to: 'calendar#local_calendar'
 
   # this needs to be replaced sometime
   match ':controller(/:action(/:id))', via: %i[get post]
-
-  resources :activity do
-    get :autocomplete_products_name, on: :collection
-  end
 
   # The priority is based upon order of creation: first created ->
   # highest priority.
