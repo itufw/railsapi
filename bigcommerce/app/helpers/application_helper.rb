@@ -189,4 +189,13 @@ module ApplicationHelper
     return true if staff_id == 36
     false
   end
+
+  def update_missing_staff_id
+    orders = Order.where(staff_id: nil)
+    orders.each do |o|
+      next if o.customer_id < 1
+      o.staff_id = Customer.find(o.customer_id).staff_id
+      o.save
+    end
+  end
 end

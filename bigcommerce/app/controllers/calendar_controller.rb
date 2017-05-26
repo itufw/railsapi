@@ -176,6 +176,7 @@ class CalendarController < ApplicationController
     else
       @events = Task.unconfirmed_event.filter_by_staff(session[:user_id]).order_by_staff('ASC')
     end
+
     @staffs = Staff.filter_by_ids(@events.map(&:response_staff).uniq)
   end
 

@@ -19,6 +19,9 @@ class ActivityController < ApplicationController
       = function_search(params)
     # @products = product_search
     @note = Task.new
+
+    @wine = Product.new
+
   end
 
 end

@@ -53,7 +53,9 @@ module LeadHelper
 
   def spot_details(client, customer_lead, customer_name, staff_id)
     staff = Staff.find(staff_id)
-    spot = client.spots_by_query(customer_name + "near #{staff.state}", types: places_tags).first
+    # TODO build the filter column for this
+    # spot = client.spots_by_query(customer_name + "near #{staff.state}", types: places_tags).first
+    spot = client.spots_by_query(customer_name + "near #{staff.state}").first
     return nil if spot.nil?
     place = client.spot(spot.place_id)
     customer_lead.phone = place.formatted_phone_number
