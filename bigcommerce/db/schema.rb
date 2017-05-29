@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170524065622) do
+ActiveRecord::Schema.define(version: 20170529053214) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -548,6 +548,14 @@ ActiveRecord::Schema.define(version: 20170524065622) do
     t.integer  "on_order",                  limit: 1
   end
 
+  create_table "promotions", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "date_start"
+    t.datetime "date_end"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "revisions", force: :cascade do |t|
     t.datetime "start_time"
     t.datetime "end_time"
@@ -604,6 +612,7 @@ ActiveRecord::Schema.define(version: 20170524065622) do
     t.integer  "staff_order",      limit: 4
     t.string   "access_token",     limit: 255
     t.string   "refresh_token",    limit: 255
+    t.integer  "pick_up_id",       limit: 4
   end
 
   add_index "staffs", ["active"], name: "index_staffs_on_active", using: :btree
@@ -696,6 +705,7 @@ ActiveRecord::Schema.define(version: 20170524065622) do
     t.text     "location",            limit: 65535
     t.text     "summary",             limit: 65535
     t.integer  "portfolio_id",        limit: 4
+    t.integer  "promotion_id",        limit: 4
   end
 
   create_table "tax_percentages", force: :cascade do |t|

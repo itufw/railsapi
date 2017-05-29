@@ -15,7 +15,7 @@
       <%= f.collection_select :method, @methods, :method, :method, {:include_blank => "Select a Method", :selected => "Meeting"}, style: 'width: 80px' %>
       <br/>
       <%= label(:promotion, "Promotion:")%>
-      <%= select_tag "promotion", options_for_select(@promotion.map{|x| (x*100).to_s + "%"})%>
+      <%= f.collection_select :promotion_id, @promotion, :id, :name, {:include_blank => "Select a Campaign"}, style: 'width: 80px' %>
       <%= label(:portfolio, "Portfolio:")%>
       <%= f.collection_select :portfolio_id, @portfolio, :id, :name, {:include_blank => "Select a Portfolio"}, style: 'width: 80px' %>
       <br/>

@@ -18,6 +18,8 @@ Rails.application.routes.draw do
   get '/activity/add_note', to: 'activity#add_note'
   resources :activity do
     get :autocomplete_product_name, on: :collection
+    get :autocomplete_customer_actual_name, on: :collection
+    get :autocomplete_customer_lead_firstname, on: :collection
   end
 
   post 'add_task', to: 'task#task_record'

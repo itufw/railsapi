@@ -263,7 +263,8 @@ class Product < ActiveRecord::Base
 
   def self.sample_products(staff_id = nil, row = 10)
     return joins(:orders).where('orders.qty> 0 AND orders.total_inc_tax = 0').group('products.id').order("orders.id DESC").limit(row) if staff_id.nil?
-    joins(:orders).where('orders.qty> 0 AND orders.total_inc_tax = 0 AND orders.staff_id = ?', staff_id).group('products.id').order("orders.id DESC").limit(row)
+    customer_id = Staff.find(staff_id).pick_up_id
+    joins(:orders).where('orders.qty> 0 AND orders.total_inc_tax = 0 AND orders.customer_id = ?', customer_id).group('products.id').order("orders.id DESC").limit(row)
   end
 
   def self.autocomplete(term)

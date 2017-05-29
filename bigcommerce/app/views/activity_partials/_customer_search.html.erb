@@ -1,8 +1,13 @@
 <div class="col-md-8">
-  <table>
+  <table id="customer_table">
     <tr>
-      <th><%= text_field_tag 'customer', nil, placeholder: 'Search Customer', style: 'width: 100px'%></th>
-      <th><%= text_field_tag 'contact', nil, placeholder: 'Search Contact', style: 'width: 100px'%></th>
+      <th>Customer</th>
+      <th>
+        <div class="col-md-8">
+          <%= autocomplete_field_tag 'customer_name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search' %>
+          <i class="glyphicon glyphicon-plus activity-customers" title="Include Customer"></i>
+        </div>
+      </th>
     </tr>
   </table>
   <br/>

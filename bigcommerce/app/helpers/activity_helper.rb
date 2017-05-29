@@ -39,7 +39,7 @@ module ActivityHelper
     # Sales/ Operations/ Accounting
     default_function = default_function_type(session[:authority])
     params[:selected_function] = params[:selected_function] || default_function
-    promotion = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1].reverse
+    promotion = Promotion.all
 
     subjects = TaskSubject.all
     subjects = subjects.select { |x| x.function == params[:selected_function] }
