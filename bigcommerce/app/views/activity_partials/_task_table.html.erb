@@ -19,38 +19,8 @@
     <span class="glyphicon glyphicon-calendar"></span>
   </span>
 </div>
-
-
-
-<div class="col-md-8">
-  <div class="col-md-4">
-    Note:
-    <br/>
-    <%= f.text_area :description, :rows=>10, :cols=>30	%>
-  </div>
-  <div class="col-md-8">
-    <br/><br/><br/>
-      <%= label(:subject_1, "Subject:")%>
-      <%= f.collection_select :subject_1, @subjects, :id, :subject, {:prompt => "Select a Subject"}, {class: "subject_selection", style: 'width: 80px'} %>
-      <%= label(:function, "Function:")%>
-      <%= f.collection_select :function, @function, :function, :function, {:include_blank => "Select a Function", :selected => @function_role}, {class:"function_selection", style: 'width: 80px'} %>
-      <br/>
-      <%= label(:method, "Method:")%>
-      <%= f.collection_select :method, @methods, :method, :method, {:include_blank => "Select a Method", :selected => "Meeting"}, style: 'width: 80px' %>
-      <br/>
-      <%= label(:promotion, "Promotion:")%>
-      <%= f.collection_select :promotion_id, @promotion, :id, :name, {:include_blank => "Select a Campaign"}, style: 'width: 80px' %>
-      <%= label(:portfolio, "Portfolio:")%>
-      <%= f.collection_select :portfolio_id, @portfolio, :id, :name, {:include_blank => "Select a Portfolio"}, style: 'width: 80px' %>
-      <br/>
-      <%= label(:end_date, "Date")%>
-      <div class='input-group date' id='due_timepicker', style='width: 200px'>
-        <%= f.text_field :start_date, placeholder: 'Timepicker', class: 'form-control' %>
-        <span class="input-group-addon">
-          <span class="glyphicon glyphicon-calendar"></span>
-        </span>
-      </div>
-  </div>
+<%= autocomplete_field_tag 'staffs', '', autocomplete_staff_nickname_activity_index_path, placeholder: 'Search Staff', id: 'staff_search' %>
+<i class="glyphicon glyphicon-plus activity-staff" title="Include Staff"></i>
 
 </div>
 

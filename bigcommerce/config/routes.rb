@@ -23,6 +23,7 @@ Rails.application.routes.draw do
     get :autocomplete_product_name, on: :collection
     get :autocomplete_customer_actual_name, on: :collection
     get :autocomplete_customer_lead_firstname, on: :collection
+    get :autocomplete_staff_nickname, on: :collection
   end
 
   post 'add_task', to: 'task#task_record'

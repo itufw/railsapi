@@ -7,6 +7,7 @@ class ActivityController < ApplicationController
   autocomplete :product, :name, full: true
   autocomplete :customer, :actual_name, full: true
   autocomplete :customer_lead, :firstname, full: true
+  autocomplete :staff, :nickname
 
   include ActivityHelper
 
@@ -39,6 +40,9 @@ class ActivityController < ApplicationController
   # following Dropbox -> pages -> Activity
   def add_activity
     @task = Task.new
+    @function, @subjects, @methods, @function_role, @promotion, @portfolio \
+      = function_search(params)
+      
   end
 
 end
