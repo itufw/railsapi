@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   get 'add_task', to: 'task#add_task'
   get 'local_calendar', to: 'calendar#local_calendar'
   get 'add_note', to: 'activity#add_note'
+  get 'add_activity', to: 'activity#add_activity'
   # Google
   get '/redirect', to: 'calendar#redirect', as: 'redirect'
   get '/callback', to: 'calendar#callback', as: 'callback'
@@ -16,6 +17,8 @@ Rails.application.routes.draw do
   get '/rails/mailers/*path' => 'rails/mailers#preview'
 
   get '/activity/add_note', to: 'activity#add_note'
+  get '/activity/add_activity', to: 'activity#add_activity'
+
   resources :activity do
     get :autocomplete_product_name, on: :collection
     get :autocomplete_customer_actual_name, on: :collection

@@ -35,4 +35,10 @@ class ActivityController < ApplicationController
     # @products = Product.sample_products(session[:user_id], 10)
   end
 
+  # insert task
+  # following Dropbox -> pages -> Activity
+  def add_activity
+    @task = Task.new
+  end
+
 end
