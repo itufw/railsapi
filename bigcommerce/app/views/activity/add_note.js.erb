@@ -12,17 +12,26 @@ $('.add_row_product').click(function(){
             '<tr id="tr_<%=append_product.id%>">',
                 '<td><%= append_product.id%></td>',
                 '<td><%= append_product.name%></td>',
-                '<td class="num"><%= append_product.calculated_price * (1 + wet)%></td>',
-                '<td><%= text_field_tag 'discount '+append_product.id.to_s,  100, placeholder: 'Discount'%> %</td>',
-                '<td class="num price_editable"><%= text_field_tag 'price '+append_product.id.to_s, (append_product.calculated_price * (1 + wet)).toFixed(2) , placeholder: 'Price'%></td>',
+                '<td class="num" ><%= append_product.calculated_price * (1 + wet)%></td>',
+                '<td><%= text_field_tag 'discount '+append_product.id.to_s,  0, placeholder: 'Discount', size: 3 %> %</td>',
+                '<td class="num price_editable"><%= text_field_tag 'price '+append_product.id.to_s, (append_product.calculated_price * (1 + wet)).toFixed(2) , placeholder: 'Price', size: 5%></td>',
                 '<td><%= text_field_tag 'note '+append_product.id.to_s, ''%></td>',
                 '<td><%= check_box_tag 'buy_wine[]', append_product.id.to_s%> </td>',
                 '<td>Star</td>',
                 '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
             '</tr>'
             ].join(''));
-            $('price_'+<%= append_product.id %>).onchange(function(){
-              
+
+            $('#price_<%= product.id %>').on('input',function(){
+              var d = $('#price_<%= product.id %>').val();
+              var c = '<%= product.calculated_price * (1 + wet)%>';
+              $('#discount_<%= product.id %>').val((100 - (d/c*100)).toFixed(0));
+            });
+
+            $('#discount_<%= product.id %>').on('input',function(){
+              var d = $('#discount_<%= product.id %>').val();
+              var c = '<%= product.calculated_price * (1 + wet)%>';
+              $('#price_<%= product.id %>').val(((1-d*0.01)*c).toFixed(2));
             });
 
             $('.remove_row').click(function(){
@@ -38,20 +47,37 @@ $('.wine-list-product').click(function(){
   <%
       product = @products.select { |x| x.id == @product_selected.to_i }.first
       unless product.nil?
+        wet = TaxPercentage.wet_percentage
+
   %>
   if($('#tr_<%=product.id%>').length == 0){
     $('#product_table').append([
       '<tr id="tr_<%=product.id%>">',
           '<td><%= product.id%></td>',
           '<td><%= product.name%></td>',
-          '<td><%= product.calculated_price%></td>',
-          '<td><%= text_field_tag 'price '+product.id.to_s, product.calculated_price, placeholder: 'Price'%></td>',
+          '<td class="num"><%= product.calculated_price * (1 + wet)%></td>',
+          '<td><%= text_field_tag 'discount '+product.id.to_s,  0, placeholder: 'Discount', size: 3 %> %</td>',
+          '<td><%= text_field_tag 'price '+product.id.to_s, product.calculated_price * (1 + wet), placeholder: 'Price', size: 5%></td>',
           '<td><%= text_field_tag 'note '+product.id.to_s, ''%></td>',
           '<td><%= check_box_tag 'buy_wine[]', product.id.to_s%> </td>',
           '<td>Star</td>',
           '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
       '</tr>'
       ].join(''));
+
+      $('#price_<%= product.id %>').on('input',function(){
+        var d = $('#price_<%= product.id %>').val();
+        var c = '<%= product.calculated_price * (1 + wet)%>';
+        $('#discount_<%= product.id %>').val((100 - (d/c*100)).toFixed(0));
+      });
+
+      $('#discount_<%= product.id %>').on('input',function(){
+        var d = $('#discount_<%= product.id %>').val();
+        var c = '<%= product.calculated_price * (1 + wet)%>';
+        $('#price_<%= product.id %>').val(((1-d*0.01)*c).toFixed(2));
+      });
+
+
       $('.remove_row').click(function(){
         $(this).parent().parent().remove();
       });
