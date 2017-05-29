@@ -1,5 +1,9 @@
 <%= title 'Activity Add Task'%>
 
+<%= form_for @task, :url => {:controller => "activity", :action => "add_task"}, :id => "task_append_form"  do |f| %>
+
 <div class="row">
   <%= render 'activity_partials/customer_search'%>
+  <%= render 'activity_partials/task_table', f: f%>
 </div>
+<% end %>
