@@ -52,4 +52,11 @@ module ActivityHelper
     products = Product.stock?
     [products]
   end
+
+  def product_click(products, product_selected)
+    return nil if product_selected.nil?
+    product = products.select { |x| x.id == product_selected }.first
+    return nil if product.nil?
+    product
+  end
 end

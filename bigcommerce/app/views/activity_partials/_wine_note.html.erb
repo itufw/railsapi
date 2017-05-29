@@ -3,11 +3,21 @@
     <%= label(:wine, "Wine:")%>
   </div>
   <div class="col-md-8">
-    <%= autocomplete_field_tag 'product', '', autocomplete_product_name_activity_index_path, placeholder: 'Search Product', id_element: '#product_id'%>
+    <%= autocomplete_field_tag 'product', '', autocomplete_product_name_activity_index_path, placeholder: 'Search Product', id_element: '#product_id', id: 'product_search'%>
+    <i class="glyphicon glyphicon-plus add_row_product" title="Add in the table"></i>
   </div>
   <br/>
-    <button type="button" class="btn btn-default" id="sample-10">Last 10 Samples</button>
+    <button type="button" class="btn btn-default" id="sample-20">Last 20 Samples</button>
   <br/>
+
+  <div class="wine-list">
+    <% @products.each do |product|%>
+      <div class='col-xs-6 wine-list-product' id='<%= product.id%>'>
+        <a><%= product.name%></a>
+      </div>
+    <% end %>
+  </div>
+
   <table class="table table-striped table-bordered table-hover table-responsive" style="margin-top: 0px;" id="product_table">
     <tr style="width: 90%; padding: 5px" class="info">
       <th>Product #</th>
@@ -15,18 +25,8 @@
       <th>Price(LUC)</th>
       <th>Price</th>
       <th>Notes</th>
-      <!-- Ratio Button -->
       <th>Buy</th>
       <th>Rating</th>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>2</td>
-      <td>3</td>
-      <td>4</td>
-      <td>5</td>
-      <td>6</td>
-      <td>7</td>
     </tr>
   </table>
   <%= label(:creator, "Creator:")%>
@@ -34,3 +34,11 @@
   <%= label(:create_date, "Create Date") %>
   <%= Date.today%>
 </div>
+
+<script>
+  $('.wine-list-product').hide();
+  $('#sample-20').click(function(){
+    $('.wine-list-product').toggle();
+  });
+
+</script>

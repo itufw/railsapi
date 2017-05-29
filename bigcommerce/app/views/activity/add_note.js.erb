@@ -1,2 +1,52 @@
-<%= @product.save %>
-$("#product_table").append('<%= j render(@product)%>');
+$('.add_row_product').click(function(){
+  <%unless @search_text.nil?
+    products = Product.where('products.name = ?', @search_text)
+    append_product = products.first
+  end
+  unless append_product.nil?%>
+  if ($('#product_search').val() != ""){
+        if($('#tr_<%=append_product.id%>').length == 0){
+          $('#product_table').append([
+            '<tr id="tr_<%=append_product.id%>">',
+                '<td><%= append_product.id%></td>',
+                '<td><%= append_product.name%></td>',
+                '<td><%= append_product.calculated_price%></td>',
+                '<td><%= text_field_tag 'price '+append_product.id.to_s, append_product.calculated_price, placeholder: 'Price'%></td>',
+                '<td><%= text_field_tag 'note '+append_product.id.to_s, ''%></td>',
+                '<td><%= check_box_tag 'buy_wine[]', append_product.id.to_s%> </td>',
+                '<td>Star</td>',
+                '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
+            '</tr>'
+            ].join(''));
+            $('.remove_row').click(function(){
+              $(this).parent().parent().remove();
+            });
+          }
+  }
+  <%end%>
+});
+
+$('.wine-list-product').click(function(){
+  <%
+      product = @products.select { |x| x.id == @product_selected.to_i }.first
+      unless product.nil?
+  %>
+  if($('#tr_<%=product.id%>').length == 0){
+    $('#product_table').append([
+      '<tr id="tr_<%=product.id%>">',
+          '<td><%= product.id%></td>',
+          '<td><%= product.name%></td>',
+          '<td><%= product.calculated_price%></td>',
+          '<td><%= text_field_tag 'price '+product.id.to_s, product.calculated_price, placeholder: 'Price'%></td>',
+          '<td><%= text_field_tag 'note '+product.id.to_s, ''%></td>',
+          '<td><%= check_box_tag 'buy_wine[]', product.id.to_s%> </td>',
+          '<td>Star</td>',
+          '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
+      '</tr>'
+      ].join(''));
+      $('.remove_row').click(function(){
+        $(this).parent().parent().remove();
+      });
+    }
+  <% end %>
+});

@@ -183,7 +183,8 @@ class CalendarController < ApplicationController
   # handle the requests for updating events
   def translate_events
     if params['submit'] == 'reject'
-      task = Task.filter_by_google_event_id(params['event_id'])
+      tasks = Task.filter_by_google_event_id(params['event_id'])
+      task = tasks.first
       task.gcal_status = :rejected
       task.save
       redirect_to action: 'event_check_offline'
