@@ -24,6 +24,7 @@ class LeadController < ApplicationController
 
   def create_leads_handler
     @customer_lead = CustomerLead.new
+    lead_params[:firstname] = lead_params[:actual_name] if lead_params[:firstname].nil?
     if @customer_lead.update_attributes(lead_params)
       flash[:success] = 'Successfully Created.'
       # redirect_to action: 'all_leads'

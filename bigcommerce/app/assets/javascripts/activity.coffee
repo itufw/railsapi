@@ -10,6 +10,16 @@ $(document).ready ->
       data:{
         product_search_text: $("#product_search").val()
       };
+
+  $('.activity-customers').on "click", ->
+    $.ajax
+      url: "/activity/add_note"
+      type: "GET"
+      dataType: "script"
+      data:{
+        customer_search_text: $("#customer_search").val()
+      };
+
   $('.wine-list-product').on "click", ->
     $.ajax
       url: "/activity/add_note"

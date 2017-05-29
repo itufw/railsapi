@@ -3,21 +3,28 @@ $('.add_row_product').click(function(){
     products = Product.where('products.name = ?', @search_text)
     append_product = products.first
   end
-  unless append_product.nil?%>
+  unless append_product.nil?
+    wet = TaxPercentage.wet_percentage
+  %>
   if ($('#product_search').val() != ""){
         if($('#tr_<%=append_product.id%>').length == 0){
           $('#product_table').append([
             '<tr id="tr_<%=append_product.id%>">',
                 '<td><%= append_product.id%></td>',
                 '<td><%= append_product.name%></td>',
-                '<td><%= append_product.calculated_price%></td>',
-                '<td><%= text_field_tag 'price '+append_product.id.to_s, append_product.calculated_price, placeholder: 'Price'%></td>',
+                '<td class="num"><%= append_product.calculated_price * (1 + wet)%></td>',
+                '<td><%= text_field_tag 'discount '+append_product.id.to_s,  100, placeholder: 'Discount'%> %</td>',
+                '<td class="num price_editable"><%= text_field_tag 'price '+append_product.id.to_s, (append_product.calculated_price * (1 + wet)).toFixed(2) , placeholder: 'Price'%></td>',
                 '<td><%= text_field_tag 'note '+append_product.id.to_s, ''%></td>',
                 '<td><%= check_box_tag 'buy_wine[]', append_product.id.to_s%> </td>',
                 '<td>Star</td>',
                 '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
             '</tr>'
             ].join(''));
+            $('price_'+<%= append_product.id %>).onchange(function(){
+              
+            });
+
             $('.remove_row').click(function(){
               $(this).parent().parent().remove();
             });
@@ -25,6 +32,7 @@ $('.add_row_product').click(function(){
   }
   <%end%>
 });
+
 
 $('.wine-list-product').click(function(){
   <%
@@ -49,4 +57,49 @@ $('.wine-list-product').click(function(){
       });
     }
   <% end %>
+});
+
+
+$('.activity-customers').click(function(){
+  <%
+    customer = @customer_text==nil ? nil : Customer.where('customers.actual_name = ?', @customer_text).first
+    unless customer.nil?
+      invoices = nil
+      invoices = XeroInvoice.where('xero_invoices.xero_contact_id = ? AND xero_invoices.amount_due > 0', customer.xero_contact_id) unless customer.xero_contact_id.nil?
+  %>
+  if ($('#customer_search').val() != ""){
+        if($('#tr_customer_<%=customer.id%>').length == 0){
+          $('#customer_table').append([
+            '<tr id="tr_customer_<%=customer.id%>">',
+                '<td><%= customer.actual_name%></td>',
+                '<td><i class="glyphicon glyphicon-remove remove_customer" title="remove"></i></td>',
+            '</tr>'
+            ].join(''));
+          <% invoices.each do |invoice|%>
+          $('#invoice_table').append([
+            '<tr class="tr_invoice_<%=customer.id%>">',
+                '<td><%= invoice.invoice_number%></td>',
+                '<td><%= invoice.date.to_date.strftime("%d/%-m/%y")%></td>',
+                '<td class="num"><%= invoice.sub_total%></td>',
+                '<td class="num"><%= invoice.amount_due%></td>',
+                '<td><%= invoice.due_date.to_date.strftime("%d/%-m/%y")%></td>',
+                '<td><%= Date.today.mjd - invoice.due_date.to_date.mjd%> Days</td>',
+                '<td><%= text_field_tag 'note '+invoice.invoice_number.to_s, ''%></td>',
+                '<td>Promise to pay Date</td>',
+                '<td><i class="glyphicon glyphicon-remove remove_invoice" title="remove"></i></td>',
+            '</tr>'
+          ].join(''));
+            $('.remove_invoice').click(function(){
+              $(this).parent().parent().remove();
+            });
+          <% end %>
+          $('.remove_customer').click(function(){
+            var att = $(this).parent().parent().attr('id').split('_');
+            var customer_id = att[att.length -1 ]
+            $('.tr_invoice_'+customer_id).remove();
+            $(this).parent().parent().remove();
+          });
+        }
+  }
+  <%end%>
 });
