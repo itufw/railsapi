@@ -1,0 +1,11 @@
+<% @products.each do |product|%>
+  <tr id="tr_<%=product.id%>">
+    <%= form_for product, remote: true do |f| %>
+      <td><%= product.id%></td>
+      <td><%= product.name%></td>
+      <td><%= product.price%></td>
+      <td></td>
+      <td></td>
+    <% end %>
+  </tr>
+<% end %>
