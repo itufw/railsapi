@@ -33,16 +33,48 @@ class ActivityController < ApplicationController
     @customer_text = params[:customer_search_text] || nil
 
     # production version
-    # @products = Product.sample_products(session[:user_id], 10)
+    # @products = Product.sample_products(session[:user_id], 20)
+  end
+
+  def save_note
+    note = note_save(note_params, session[:user_id], params[:task][:start_date])
+    product_note_save(params, session[:user_id], note.id)
+    relation_save(params, note.id)
+    flash[:success] = "Note Saved!"
+    redirect_to action: 'add_note'
   end
 
   # insert task
   # following Dropbox -> pages -> Activity
   def add_activity
     @task = Task.new
+    # Testing parent note:
+    params[:note_id] = '1496206134'
+
+    if params[:note_id] && Task.where('tasks.id = ?', params[:note_id]).count > 0
+      @task.parent_task = params[:note_id]
+      @wine_note_list = ProductNote.filter_task(params[:note_id])
+    end
+
     @function, @subjects, @methods, @function_role, @promotion, @portfolio \
       = function_search(params)
-      
+
+    @products = Product.sample_products(35, 20)
+    # @products = Product.sample_products(session[:user_id], 20)
+
+
+    @staff_text = params[:staff_search_text]
   end
 
+  def save_task
+    p =c
+  end
+
+  # -----------private --------------------
+  private
+
+  def note_params
+    params.require(:task).permit(:description, :subject_1, :function, :method,\
+                                 :promotion_id, :portfolio_id)
+  end
 end

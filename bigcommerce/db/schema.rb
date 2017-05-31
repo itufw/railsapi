@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170529053214) do
+ActiveRecord::Schema.define(version: 20170531064750) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -436,16 +436,17 @@ ActiveRecord::Schema.define(version: 20170529053214) do
   add_index "product_no_ws", ["product_no_vintage_id"], name: "index_product_no_ws_on_product_no_vintage_id", using: :btree
 
   create_table "product_notes", force: :cascade do |t|
-    t.integer  "task_id",    limit: 4
-    t.integer  "created_by", limit: 4
-    t.integer  "product_id", limit: 4
-    t.integer  "rating",     limit: 4
-    t.text     "note",       limit: 65535
-    t.string   "intention",  limit: 255
-    t.decimal  "price",                    precision: 7, scale: 3
-    t.decimal  "price_luc",                precision: 7, scale: 3
-    t.datetime "created_at",                                       null: false
-    t.datetime "updated_at",                                       null: false
+    t.integer  "task_id",      limit: 4
+    t.integer  "created_by",   limit: 4
+    t.integer  "product_id",   limit: 4
+    t.integer  "rating",       limit: 4
+    t.text     "note",         limit: 65535
+    t.string   "intention",    limit: 255
+    t.decimal  "price",                      precision: 7, scale: 3
+    t.decimal  "price_luc",                  precision: 7, scale: 3
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+    t.string   "product_name", limit: 255
   end
 
   create_table "product_package_types", force: :cascade do |t|

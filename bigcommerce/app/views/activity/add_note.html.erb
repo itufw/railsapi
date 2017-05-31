@@ -1,11 +1,16 @@
 <%= title 'Activity Add Note'%>
 
-<%= form_for @note, :url => {:controller => "activity", :action => "add_note"}, :id => "note_append_form"  do |f| %>
+<%= form_for @note, :url => {:controller => "activity", :action => "save_note"}, :id => "note_append_form"  do |f| %>
 
 <div class="row">
   <%= render 'activity_partials/customer_search', f: f%>
   <%= render 'activity_partials/note_table', f: f%>
   <%= render 'activity_partials/wine_note', f: f%>
-  <%= render 'activity_partials/invoice_table', f: f%>
+  <div class="col-md-8">
+  <%= button_tag(type: 'submit', class: 'btn btn-primary') do %>
+    <div> Save </div>
+  <% end %>
+  </div>
+  <%= render 'activity_partials/invoice_table'%>
 </div>
 <% end %>

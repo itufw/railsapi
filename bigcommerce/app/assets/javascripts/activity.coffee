@@ -20,6 +20,15 @@ $(document).ready ->
         customer_search_text: $("#customer_search").val()
       };
 
+  $('.activity-staffs').on "click", ->
+    $.ajax
+      url: "/activity/add_activity"
+      type: "GET"
+      dataType: "script"
+      data:{
+        staff_search_text: $("#staff_search").val()
+      };
+
   $('.wine-list-product').on "click", ->
     $.ajax
       url: "/activity/add_note"

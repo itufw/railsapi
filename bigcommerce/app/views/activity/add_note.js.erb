@@ -11,10 +11,10 @@ $('.add_row_product').click(function(){
           $('#product_table').append([
             '<tr id="tr_<%=append_product.id%>">',
                 '<td><%= append_product.id%></td>',
-                '<td><%= append_product.name%></td>',
-                '<td class="num" ><%= append_product.calculated_price * (1 + wet)%></td>',
+                '<td><%= text_field_tag 'product_name '+append_product.name, readonly:true %></td>',
+                '<td class="num"><%= text_field_tag 'price_luc '+append_product.id.to_s, append_product.calculated_price * (1 + wet), readonly: true%></td>',
                 '<td><%= text_field_tag 'discount '+append_product.id.to_s,  0, placeholder: 'Discount', size: 3 %> %</td>',
-                '<td class="num price_editable"><%= text_field_tag 'price '+append_product.id.to_s, (append_product.calculated_price * (1 + wet)).toFixed(2) , placeholder: 'Price', size: 5%></td>',
+                '<td><%= text_field_tag 'price '+append_product.id.to_s, append_product.calculated_price * (1 + wet), placeholder: 'Price', size: 5%></td>',
                 '<td><%= text_field_tag 'note '+append_product.id.to_s, ''%></td>',
                 '<td><%= check_box_tag 'buy_wine[]', append_product.id.to_s%> </td>',
                 '<td>Star</td>',
@@ -22,16 +22,16 @@ $('.add_row_product').click(function(){
             '</tr>'
             ].join(''));
 
-            $('#price_<%= product.id %>').on('input',function(){
-              var d = $('#price_<%= product.id %>').val();
-              var c = '<%= product.calculated_price * (1 + wet)%>';
-              $('#discount_<%= product.id %>').val((100 - (d/c*100)).toFixed(0));
+            $('#price_<%= append_product.id %>').on('input',function(){
+              var d = $('#price_<%= append_product.id %>').val();
+              var c = '<%= append_product.calculated_price * (1 + wet)%>';
+              $('#discount_<%= append_product.id %>').val((100 - (d/c*100)).toFixed(0));
             });
 
-            $('#discount_<%= product.id %>').on('input',function(){
-              var d = $('#discount_<%= product.id %>').val();
-              var c = '<%= product.calculated_price * (1 + wet)%>';
-              $('#price_<%= product.id %>').val(((1-d*0.01)*c).toFixed(2));
+            $('#discount_<%= append_product.id %>').on('input',function(){
+              var d = $('#discount_<%= append_product.id %>').val();
+              var c = '<%= append_product.calculated_price * (1 + wet)%>';
+              $('#price_<%= append_product.id %>').val(((1-d*0.01)*c).toFixed(2));
             });
 
             $('.remove_row').click(function(){
@@ -54,8 +54,8 @@ $('.wine-list-product').click(function(){
     $('#product_table').append([
       '<tr id="tr_<%=product.id%>">',
           '<td><%= product.id%></td>',
-          '<td><%= product.name%></td>',
-          '<td class="num"><%= product.calculated_price * (1 + wet)%></td>',
+          '<td><%= text_field_tag 'product_name '+product.name, readonly:true %></td>',
+          '<td class="num"><%= text_field_tag 'price_luc '+product.id.to_s, product.calculated_price * (1 + wet), readonly: true%></td>',
           '<td><%= text_field_tag 'discount '+product.id.to_s,  0, placeholder: 'Discount', size: 3 %> %</td>',
           '<td><%= text_field_tag 'price '+product.id.to_s, product.calculated_price * (1 + wet), placeholder: 'Price', size: 5%></td>',
           '<td><%= text_field_tag 'note '+product.id.to_s, ''%></td>',
@@ -97,21 +97,20 @@ $('.activity-customers').click(function(){
         if($('#tr_customer_<%=customer.id%>').length == 0){
           $('#customer_table').append([
             '<tr id="tr_customer_<%=customer.id%>">',
-                '<td><%= customer.actual_name%></td>',
+                '<td><%= text_field_tag 'customer '+customer.id.to_s, customer.actual_name, readonly: true %></td>',
                 '<td><i class="glyphicon glyphicon-remove remove_customer" title="remove"></i></td>',
             '</tr>'
             ].join(''));
           <% invoices.each do |invoice|%>
           $('#invoice_table').append([
             '<tr class="tr_invoice_<%=customer.id%>">',
+                '<td><%= customer.actual_name%></td>',
                 '<td><%= invoice.invoice_number%></td>',
                 '<td><%= invoice.date.to_date.strftime("%d/%-m/%y")%></td>',
                 '<td class="num"><%= invoice.sub_total%></td>',
                 '<td class="num"><%= invoice.amount_due%></td>',
                 '<td><%= invoice.due_date.to_date.strftime("%d/%-m/%y")%></td>',
                 '<td><%= Date.today.mjd - invoice.due_date.to_date.mjd%> Days</td>',
-                '<td><%= text_field_tag 'note '+invoice.invoice_number.to_s, ''%></td>',
-                '<td>Promise to pay Date</td>',
                 '<td><i class="glyphicon glyphicon-remove remove_invoice" title="remove"></i></td>',
             '</tr>'
           ].join(''));

@@ -1,41 +1,122 @@
-<%= label(:subject_1, "Subject:")%>
-<%= f.collection_select :subject_1, @subjects, :id, :subject, {:prompt => "Select a Subject"}, {class: "subject_selection", style: 'width: 80px'} %>
-<%= label(:function, "Function:")%>
-<%= f.collection_select :function, @function, :function, :function, {:include_blank => "Select a Function", :selected => @function_role}, {class:"function_selection", style: 'width: 80px'} %>
-<%= label(:method, "Method:")%>
-<%= f.collection_select :method, @methods, :method, :method, {:include_blank => "Select a Method", :selected => "Meeting"}, style: 'width: 80px' %>
-<br/>
-<%= label(:start_date, "Start")%>
-<div class='input-group date' id='start_timepicker', style='width: 200px'>
-  <%= f.text_field :start_date, placeholder: 'Timepicker', class: 'form-control' %>
-  <span class="input-group-addon">
-    <span class="glyphicon glyphicon-calendar"></span>
-  </span>
-</div>
-<%= label(:end_date, "end")%>
-<div class='input-group date' id='due_timepicker', style='width: 200px'>
-  <%= f.text_field :end_date, placeholder: 'Timepicker', class: 'form-control' %>
-  <span class="input-group-addon">
-    <span class="glyphicon glyphicon-calendar"></span>
-  </span>
-</div>
-<%= autocomplete_field_tag 'staffs', '', autocomplete_staff_nickname_activity_index_path, placeholder: 'Search Staff', id: 'staff_search' %>
-<i class="glyphicon glyphicon-plus activity-staff" title="Include Staff"></i>
+<div class="col-md-8">
+  <div class="col-md-4">
+    Task:
+    <br/>
+    <%= f.text_area :description, :rows=>10, :cols=>35	%>
+  </div>
+  <div class="col-md-8">
+    <%= label(:subject_1, "Subject:")%>
+    <%= f.collection_select :subject_1, @subjects, :id, :subject, {:prompt => "Select a Subject"}, {class: "subject_selection", style: 'width: 80px'} %>
+    <%= label(:function, "Function:")%>
+    <%= f.collection_select :function, @function, :function, :function, {:include_blank => "Select a Function", :selected => @function_role}, {class:"function_selection", style: 'width: 80px'} %>
+    <%= label(:method, "Method:")%>
+    <%= f.collection_select :method, @methods, :method, :method, {:include_blank => "Select a Method", :selected => "Meeting"}, style: 'width: 80px' %>
+    <br/>
+    <table id="staff_table">
+      <tr>
+        <td>
+          <%= autocomplete_field_tag 'staffs', '', autocomplete_staff_nickname_activity_index_path, placeholder: 'Search Staff', id: 'staff_search' %>
+          <i class="glyphicon glyphicon-plus activity-staffs" title="Include Staff"></i>
+        </td>
+      </tr>
+    </table>
 
+    <!-- Date picker -->
+    <div id="calendar_timepicker">
+      <%= label(:start_date, "Start")%>
+      <div class='input-group date' id='start_timepicker', style='width: 200px'>
+        <%= f.text_field :start_date, placeholder: 'Timepicker', class: 'form-control' %>
+        <span class="input-group-addon">
+          <span class="glyphicon glyphicon-calendar"></span>
+        </span>
+      </div>
+      <%= label(:end_date, "end")%>
+      <div class='input-group date' id='due_timepicker', style='width: 200px'>
+        <%= f.text_field :end_date, placeholder: 'Timepicker', class: 'form-control' %>
+        <span class="input-group-addon">
+          <span class="glyphicon glyphicon-calendar"></span>
+        </span>
+      </div>
+    </div>
+
+    <div id="task_timepicker">
+      <%= label(:start_date, "Start")%>
+      <div class='input-group date' id='task_start_timepicker', style='width: 200px'>
+        <%= f.text_field :start_date, placeholder: 'Timepicker', class: 'form-control' %>
+        <span class="input-group-addon">
+          <span class="glyphicon glyphicon-calendar"></span>
+        </span>
+      </div>
+      <%= label(:end_date, "Due")%>
+      <div class="btn group" role="group" data-toggle="buttons" aria-label="Task Due">
+        <label class="btn btn-secondary">
+          <%= radio_button_tag(:task_due, "1", false) %> 1 Day
+        </label>
+        <label class="btn btn-secondary">
+          <%= radio_button_tag(:task_due, "2", false) %> 2 Days
+        </label>
+        <label class="btn btn-secondary">
+          <%= radio_button_tag(:task_due, "3", false) %> 3 Days
+        </label>
+        <br/>
+        <label class="btn btn-secondary">
+          <%= radio_button_tag(:task_due, "7", true) %> 1 Week
+        </label>
+        <label class="btn btn-secondary">
+          <%= radio_button_tag(:task_due, "14", false) %> 2 Weeks
+        </label>
+        <label class="btn btn-secondary">
+          <%= radio_button_tag(:task_due, "28", false) %> 4 Weeks
+        </label>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top: 5px;" id="calendar_radio">
+        <b>Add to Calendar:</b>
+        <%= radio_button_tag(:event_column, "yes", false) %> Yes
+        <span style="margin-left: 50px;">
+        <%= radio_button_tag(:event_column, "no", true) %>  No
+        </span>
+    </div>
+  </div>
+  <%= label(:creator, "Creator:")%>
+  <%= session[:username] %>
+  <%= label(:create_date, "Create Date") %>
+  <%= Date.today%>
 </div>
 
 <script>
 $(function () {
-    $('#due_timepicker').datetimepicker({
-      defaultDate: new Date(),
-      sideBySide: true
+  $('#start_timepicker').datetimepicker({
+    defaultDate: new Date(),
+    sideBySide: true
+  });
+  $('#due_timepicker').datetimepicker({
+    defaultDate: new Date(),
+    sideBySide: true
+  });
+  $('#task_start_timepicker').datetimepicker({
+    format: 'YYYY-MM-DD',
+    defaultDate: new Date(),
+    sideBySide: true
+  });
+});
+
+
+
+$('#calendar_timepicker').hide();
+
+$(document).ready(function(){
+    $('input[type=radio][name=event_column]').on('change',function(){
+      console.log("here");
+      if(this.value == 'yes'){
+        $('#calendar_timepicker').show();
+        $('#task_timepicker').hide();
+      }else{
+        $('#calendar_timepicker').hide();
+        $('#task_timepicker').show();
+      }
     });
 });
 
-$(function () {
-    $('#start_timepicker').datetimepicker({
-      defaultDate: new Date(),
-      sideBySide: true
-    });
-});
 </script>

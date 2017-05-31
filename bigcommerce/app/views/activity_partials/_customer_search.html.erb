@@ -2,12 +2,10 @@
   <table id="customer_table">
     <tr>
       <th>Customer</th>
-      <th>
-        <div class="col-md-8">
+      <td>
           <%= autocomplete_field_tag 'customer_name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search' %>
           <i class="glyphicon glyphicon-plus activity-customers" title="Include Customer"></i>
-        </div>
-      </th>
+      </td>
     </tr>
   </table>
   <br/>
