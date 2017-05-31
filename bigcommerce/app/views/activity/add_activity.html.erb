@@ -1,9 +1,19 @@
 <%= title 'Activity Add Task'%>
 
-<%= form_for @task, :url => {:controller => "activity", :action => "add_task"}, :id => "task_append_form"  do |f| %>
+<%= form_for @task, :url => {:controller => "activity", :action => "save_task"}, :id => "task_append_form"  do |f| %>
 
 <div class="row">
   <%= render 'activity_partials/customer_search'%>
   <%= render 'activity_partials/task_table', f: f%>
+  <% if @task.parent_task.nil?%>
+    <%= render 'activity_partials/wine_note', f: f%>
+  <% else %>
+    <%= render 'activity_partials/wine_note_saved'%>
+  <% end %>
+  <div class="col-md-8">
+    <%= button_tag(type: 'submit', class: 'btn btn-primary') do %>
+      <div> Save </div>
+    <% end %>
+  </div>
 </div>
 <% end %>

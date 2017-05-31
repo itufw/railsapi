@@ -59,4 +59,55 @@ module ActivityHelper
     return nil if product.nil?
     product
   end
+
+  # ------------------------------------------
+  # insert or update for db
+  def note_save(note_params, staff_id, start_date, parent_task = nil)
+    note = Task.new
+    note.response_staff = staff_id
+    note.last_modified_staff = staff_id
+    note.is_task = 0
+    note.parent_task = parent_task unless parent_task.nil?
+    date = DateTime.strptime(start_date, '%m/%d/%Y %l:%M %P')
+    note.start_date = date
+    note.end_date = date + 1.month
+    note.update_attributes(note_params)
+    note.save
+    note
+  end
+
+  def relation_save(params, task_id)
+    customers = params.keys.select { |x| x.start_with?('customer ') }.map(&:split).map(&:last)
+    customers.each do |customer_id|
+      tr = TaskRelation.new
+      tr.task_id = task_id
+      tr.customer_id = customer_id
+      tr.save
+    end
+  end
+
+  def product_note_save(params, staff_id, task_id)
+    product_list = params.keys.select { |x| x.start_with?('note ') }.map(&:split).map(&:last)
+    product_list.each do |product_id|
+      pn_save(product_id, staff_id, task_id, params['buy_wine'])
+    end
+  end
+
+  def pn_save(product_id, staff_id, task_id, buy_list)
+    pn = ProductNote.new
+    pn.task_id = task_id
+    pn.created_by = staff_id
+    pn.product_id = product_id
+    # TODO
+    # pn.rating is missing
+    pn.note = params['note ' + product_id]
+    pn.price = params['price ' + product_id]
+    pn.product_name = params['product_name ' + product_id]
+    pn.price_luc = params['price_luc ' + product_id]
+    pn.intention = (buy_list.include? product_id) ? 1 : 0
+    pn.save
+  end
+
+  # -------------------------
+  # Task insert
 end

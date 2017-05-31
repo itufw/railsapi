@@ -43,7 +43,6 @@ module AccountsHelper
         # op = XeroOverpayment.get_remaining_credit(xero_contact_id).where('remaining_credit > 0')
         # cn = XeroCreditNote.get_remaining_credit(xero_contact_id).where('remaining_credit > 0')
         cn_op = {}
-
         op.each do |o|
             reference = ''
             op_allocation = XeroOpAllocation.where("xero_overpayment_id = '#{o.xero_overpayment_id}' ")
