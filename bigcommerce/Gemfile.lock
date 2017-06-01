@@ -1,4 +1,11 @@
 GIT
+  remote: git://github.com/berikin/rails-rateit.git
+  revision: 35004859279195c619e1075d2616c226c3d447aa
+  specs:
+    rails-rateit (1.0.22)
+      railties (>= 3.2, < 5.0)
+
+GIT
   remote: https://github.com/hinammehra/xeroizer.git
   revision: 4f09bf28f1d4904fb2f876989f81b5f57c2a5c39
   specs:
@@ -307,6 +314,7 @@ DEPENDENCIES
   puma
   rails (= 4.2.4)
   rails-jquery-autocomplete
+  rails-rateit (~> 1.0.22)!
   rails_sortable (= 0.1.0)
   roo (~> 1.13.2)
   sass-rails (~> 5.0)

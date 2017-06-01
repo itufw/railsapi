@@ -1,0 +1,12 @@
+<%= title 'Customer '+@customer.actual_name %>
+<h3><%= @customer.actual_name %></h3>
+<center><%= link_to "Edit", action: 'edit', customer_id: @customer.id, customer_name: @customer.actual_name %></center>
+<button class="button" style="float: right;margin-top:-60px;margin-right:30px;"><%= link_to "Top Products", action: 'top_products', customer_id: @customer.id, customer_name: @customer.actual_name %></button>
+
+<div class="row">
+  <div class="col-md-8 sale_section" style="margin-top: 50px;">
+    <%= render "customer_partials/stats", sum_param: "$", supply_display_class: "none" %>
+    <%= render "partials/order", orders: @orders, display_class: "none", product_ids: nil %>
+  </div>
+
+</div>
