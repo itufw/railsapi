@@ -28,10 +28,10 @@
 var CompleteForm = function(){
   if (($('input[id*=customer ]').length > 1) && ($('textarea[id=task_description]').val() != "") && ($('#task_subject_1 option:selected').val()!="")){
     $('.complete_form').show();
-    $('.incomlete_form').hide();
+    $('.incomplete_form').hide();
   }else{
     $('.complete_form').hide();
-    $('.incomlete_form').show();
+    $('.incomplete_form').show();
   };
 };
 
