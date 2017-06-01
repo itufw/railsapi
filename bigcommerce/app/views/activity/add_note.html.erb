@@ -6,11 +6,45 @@
   <%= render 'activity_partials/customer_search', f: f%>
   <%= render 'activity_partials/note_table', f: f%>
   <%= render 'activity_partials/wine_note', f: f%>
-  <div class="col-md-8">
+  <div class="col-md-8 complete_form">
   <%= button_tag(type: 'submit', class: 'btn btn-primary') do %>
     <div> Save </div>
   <% end %>
+  <%= button_tag(type: 'submit', class: 'btn btn-primary', value: 'new_task') do %>
+    <div> Save and New Task </div>
+  <% end %>
+  </div>
+  <div class="col-md-8 incomplete_form">
+    <button name="button" class="btn btn-secondary disabled" disabled>
+      <div>Save</div>
+    </button>
   </div>
   <%= render 'activity_partials/invoice_table'%>
 </div>
 <% end %>
+
+<script>
+
+var CompleteForm = function(){
+  if (($('input[id*=customer ]').length > 1) && ($('textarea[id=task_description]').val() != "") && ($('#task_subject_1 option:selected').val()!="")){
+    $('.complete_form').show();
+    $('.incomlete_form').hide();
+  }else{
+    $('.complete_form').hide();
+    $('.incomlete_form').show();
+  };
+};
+
+$('.complete_form').hide();
+
+$('.activity-customers').click(function(){
+  CompleteForm();
+});
+$('.remove_customer').click(function(){
+  CompleteForm();
+});
+
+$('#task_subject_1').on('change',function(){
+  CompleteForm();
+});
+</script>

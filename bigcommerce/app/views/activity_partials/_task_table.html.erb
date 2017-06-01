@@ -23,13 +23,6 @@
 
     <!-- Date picker -->
     <div id="calendar_timepicker">
-      <%= label(:start_date, "Start")%>
-      <div class='input-group date' id='start_timepicker', style='width: 200px'>
-        <%= f.text_field :start_date, placeholder: 'Timepicker', class: 'form-control' %>
-        <span class="input-group-addon">
-          <span class="glyphicon glyphicon-calendar"></span>
-        </span>
-      </div>
       <%= label(:end_date, "end")%>
       <div class='input-group date' id='due_timepicker', style='width: 200px'>
         <%= f.text_field :end_date, placeholder: 'Timepicker', class: 'form-control' %>
@@ -37,16 +30,16 @@
           <span class="glyphicon glyphicon-calendar"></span>
         </span>
       </div>
-    </div>
-
-    <div id="task_timepicker">
       <%= label(:start_date, "Start")%>
-      <div class='input-group date' id='task_start_timepicker', style='width: 200px'>
+      <div class='input-group date' id='start_timepicker', style='width: 200px'>
         <%= f.text_field :start_date, placeholder: 'Timepicker', class: 'form-control' %>
         <span class="input-group-addon">
           <span class="glyphicon glyphicon-calendar"></span>
         </span>
       </div>
+    </div>
+
+    <div id="task_timepicker">
       <%= label(:end_date, "Due")%>
       <div class="btn group" role="group" data-toggle="buttons" aria-label="Task Due">
         <label class="btn btn-secondary">
@@ -88,34 +81,37 @@
 <script>
 $(function () {
   $('#start_timepicker').datetimepicker({
-    defaultDate: new Date(),
-    sideBySide: true
-  });
-  $('#due_timepicker').datetimepicker({
-    defaultDate: new Date(),
-    sideBySide: true
-  });
-  $('#task_start_timepicker').datetimepicker({
     format: 'YYYY-MM-DD',
     defaultDate: new Date(),
     sideBySide: true
   });
+  $('#due_timepicker').datetimepicker({
+    format: 'YYYY-MM-DD',
+    defaultDate: new Date(),
+    sideBySide: true
+  });
+
+  $('#start_timepicker').on("dp.change",function(e){
+    $('#due_timepicker').data("DateTimePicker").minDate(e.date);
+  });
 });
-
-
-
-$('#calendar_timepicker').hide();
 
 $(document).ready(function(){
     $('input[type=radio][name=event_column]').on('change',function(){
-      console.log("here");
       if(this.value == 'yes'){
-        $('#calendar_timepicker').show();
+        $('#due_timepicker').datetimepicker('format', 'YYYY-MM-DD hh:mm a');
+        $('#start_timepicker').datetimepicker('format', 'YYYY-MM-DD hh:mm a');
+        $('#due_timepicker').data("DateTimePicker").date($('#start_timepicker').data("DateTimePicker").date().add("hours", '1'));
         $('#task_timepicker').hide();
       }else{
-        $('#calendar_timepicker').hide();
+        $('#due_timepicker').datetimepicker('format', 'YYYY-MM-DD');
+        $('#start_timepicker').datetimepicker('format', 'YYYY-MM-DD');
         $('#task_timepicker').show();
       }
+    });
+
+    $('input[type=radio][name=task_due]').on('change',function(){
+      $('#due_timepicker').data("DateTimePicker").date($('#start_timepicker').data("DateTimePicker").date().add("days", this.value));
     });
 });
 

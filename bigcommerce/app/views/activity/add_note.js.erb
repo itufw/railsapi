@@ -11,13 +11,16 @@ $('.add_row_product').click(function(){
           $('#product_table').append([
             '<tr id="tr_<%=append_product.id%>">',
                 '<td><%= append_product.id%></td>',
-                '<td><%= text_field_tag 'product_name '+append_product.name, readonly:true %></td>',
+                '<td><%= text_field_tag 'product_name '+append_product.id, append_product.name, readonly:true %></td>',
                 '<td class="num"><%= text_field_tag 'price_luc '+append_product.id.to_s, append_product.calculated_price * (1 + wet), readonly: true%></td>',
                 '<td><%= text_field_tag 'discount '+append_product.id.to_s,  0, placeholder: 'Discount', size: 3 %> %</td>',
                 '<td><%= text_field_tag 'price '+append_product.id.to_s, append_product.calculated_price * (1 + wet), placeholder: 'Price', size: 5%></td>',
                 '<td><%= text_field_tag 'note '+append_product.id.to_s, ''%></td>',
                 '<td><%= check_box_tag 'buy_wine[]', append_product.id.to_s%> </td>',
-                '<td>Star</td>',
+                '<td>',
+                    '<%= number_field_tag(:rating, nil, {min: 1, max:5, step:1, id: 'rate_'+append_product.id.to_s}) %>',
+                    '<%=rateit(type:"span", backingfld: '#rate_'+append_product.id.to_s, max:5, min:1, step:1, resetable:'false')%>',
+                '</td>',
                 '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
             '</tr>'
             ].join(''));
@@ -54,13 +57,16 @@ $('.wine-list-product').click(function(){
     $('#product_table').append([
       '<tr id="tr_<%=product.id%>">',
           '<td><%= product.id%></td>',
-          '<td><%= text_field_tag 'product_name '+product.name, readonly:true %></td>',
+          '<td><%= text_field_tag 'product_name '+ product.id.to_s,product.name, readonly:true %></td>',
           '<td class="num"><%= text_field_tag 'price_luc '+product.id.to_s, product.calculated_price * (1 + wet), readonly: true%></td>',
           '<td><%= text_field_tag 'discount '+product.id.to_s,  0, placeholder: 'Discount', size: 3 %> %</td>',
           '<td><%= text_field_tag 'price '+product.id.to_s, product.calculated_price * (1 + wet), placeholder: 'Price', size: 5%></td>',
           '<td><%= text_field_tag 'note '+product.id.to_s, ''%></td>',
           '<td><%= check_box_tag 'buy_wine[]', product.id.to_s%> </td>',
-          '<td>Star</td>',
+          '<td>',
+            '<%= number_field_tag("rate "+product.id.to_s, 1, {min: 1, max:5, step:1, id: "rate_"+product.id.to_s}) %>',
+            '<%= rateit(type:"span", backingfld: "#rate_"+product.id.to_s, max:5, min:1, step:1, resetable:"false")%>',
+          '</td>',
           '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
       '</tr>'
       ].join(''));

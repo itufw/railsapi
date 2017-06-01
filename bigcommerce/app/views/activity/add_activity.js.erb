@@ -1,10 +1,7 @@
 $('.activity-staffs').click(function(){
-  console.log($('#staff_search').val());
-  console.log('<%=@staff_text%>');
-
   if ($('#staff_search').val() != ""){
     <%
-      staff = @staff_text==nil ? nil : Staff.where('staffs.nickname = ?', @staff_text).first
+      staff = @staff_text==nil ? nil : @staff.select {|x| x.nickname==@staff_text }.first
       unless staff.nil?
     %>
         if($('#tr_staff_<%=staff.id%>').length == 0){
@@ -19,5 +16,5 @@ $('.activity-staffs').click(function(){
           });
         }
   }
-  <%end%>
+  <% end %>
 });

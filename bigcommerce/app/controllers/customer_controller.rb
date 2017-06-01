@@ -13,11 +13,12 @@ class CustomerController < ApplicationController
   include DatesHelper
   include CustomerHelper
 
-  def customer_detail
-    get_id_and_name(params)
+  # NEW CUSTOMER PAGE
+  def contact
+    @customer = Customer.find('1699')
     @overall_stats = overall_stats_(params)
-    # rewrite the function in customer helper
-    @orders, @per_page = latest_orders(params, Order.customer_filter([@customer_id]))
+    @orders, @per_page = latest_orders(params, Order.customer_filter([@customer.id]))
+
   end
 
   def all
