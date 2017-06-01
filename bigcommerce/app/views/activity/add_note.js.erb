@@ -4,7 +4,7 @@ $('.add_row_product').click(function(){
     append_product = products.first
   end
   unless append_product.nil?
-    wet = TaxPercentage.wet_percentage
+    wet = TaxPercentage.wet_percentage * 0.01
   %>
   if ($('#product_search').val() != ""){
         if($('#tr_<%=append_product.id%>').length == 0){
@@ -12,9 +12,9 @@ $('.add_row_product').click(function(){
             '<tr id="tr_<%=append_product.id%>">',
                 '<td><%= append_product.id%></td>',
                 '<td><%= text_field_tag 'product_name '+append_product.id, append_product.name, readonly:true %></td>',
-                '<td class="num"><%= text_field_tag 'price_luc '+append_product.id.to_s, append_product.calculated_price * (1 + wet), readonly: true%></td>',
+                '<td class="num"><%= text_field_tag 'price_luc '+append_product.id.to_s, "%.2f" %(append_product.calculated_price * (1 + wet)), readonly: true%></td>',
                 '<td><%= text_field_tag 'discount '+append_product.id.to_s,  0, placeholder: 'Discount', size: 3 %> %</td>',
-                '<td><%= text_field_tag 'price '+append_product.id.to_s, append_product.calculated_price * (1 + wet), placeholder: 'Price', size: 5%></td>',
+                '<td><%= text_field_tag 'price '+append_product.id.to_s,"%.2f" %(append_product.calculated_price * (1 + wet)), placeholder: 'Price', size: 5%></td>',
                 '<td><%= text_field_tag 'note '+append_product.id.to_s, ''%></td>',
                 '<td><%= check_box_tag 'buy_wine[]', append_product.id.to_s%> </td>',
                 '<td>',
@@ -50,17 +50,16 @@ $('.wine-list-product').click(function(){
   <%
       product = @products.select { |x| x.id == @product_selected.to_i }.first
       unless product.nil?
-        wet = TaxPercentage.wet_percentage
-
+        wet = TaxPercentage.wet_percentage * 0.01
   %>
   if($('#tr_<%=product.id%>').length == 0){
     $('#product_table').append([
       '<tr id="tr_<%=product.id%>">',
           '<td><%= product.id%></td>',
           '<td><%= text_field_tag 'product_name '+ product.id.to_s,product.name, readonly:true %></td>',
-          '<td class="num"><%= text_field_tag 'price_luc '+product.id.to_s, product.calculated_price * (1 + wet), readonly: true%></td>',
+          '<td class="num"><%= text_field_tag 'price_luc '+product.id.to_s, "%.2f" %(product.calculated_price * (1 + wet)), readonly: true%></td>',
           '<td><%= text_field_tag 'discount '+product.id.to_s,  0, placeholder: 'Discount', size: 3 %> %</td>',
-          '<td><%= text_field_tag 'price '+product.id.to_s, product.calculated_price * (1 + wet), placeholder: 'Price', size: 5%></td>',
+          '<td><%= text_field_tag 'price '+product.id.to_s, "%.2f" %(product.calculated_price * (1 + wet)), placeholder: 'Price', size: 5%></td>',
           '<td><%= text_field_tag 'note '+product.id.to_s, ''%></td>',
           '<td><%= check_box_tag 'buy_wine[]', product.id.to_s%> </td>',
           '<td>',
