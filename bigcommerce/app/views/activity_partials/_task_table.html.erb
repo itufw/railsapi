@@ -101,7 +101,6 @@ $(document).ready(function(){
       if(this.value == 'yes'){
         $('#due_timepicker').datetimepicker('format', 'YYYY-MM-DD hh:mm a');
         $('#start_timepicker').datetimepicker('format', 'YYYY-MM-DD hh:mm a');
-        $('#start_timepicker').data("DateTimePicker").date($('#start_timepicker').data("DateTimePicker").date().add("hours", '12'));
         $('#due_timepicker').data("DateTimePicker").date($('#start_timepicker').data("DateTimePicker").date().add("hours", '1'));
         $('#task_timepicker').hide();
       }else{

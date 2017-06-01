@@ -113,7 +113,7 @@ module ActivityHelper
     pn.price = params['price ' + product_id]
     pn.product_name = params['product_name ' + product_id]
     pn.price_luc = params['price_luc ' + product_id]
-    pn.intention = (buy_list.include? product_id) ? 1 : 0
+    pn.intention = (buy_list.include? product_id) ? 1 : 0 unless buy_list.nil?
     pn.save
   end
 
