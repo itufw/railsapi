@@ -354,9 +354,10 @@ module CalendarHelper
       t_relations = t.task_relations
       customer_id = t_relations.map(&:customer_id).compact
       customer_id = (customer_id.blank?) ? 0 : customer_id.first
-      staff_id = t_relations.map(&:staff_id).compact
-      staff_id = (staff_id.blank?) ? 0 : staff_id.first
-      t.google_event_id = push_event(customer_id, t.description, staff_id, t.response_staff, t.start_date, t.end_date, t.subject_1, t.method, service, client).id
+      staff_ids = t_relations.map(&:staff_id).compact
+      staff_ids.delete(0)
+      next if staff_ids.blank?
+      t.google_event_id = push_event(customer_id, t.description, staff_ids, t.response_staff, t.start_date, t.end_date, t.subject_1, t.method, service, client).id
       t.gcal_status = "pushed"
       t.save
     end
@@ -374,9 +375,22 @@ module CalendarHelper
     location
   end
 
-  def push_event(customer_id, description, staff, response_staff, start_time, end_time, subject, method, service, client)
+  def push_event(customer_id, description, staff_ids, response_staff, start_time, end_time, subject, method, service, client)
     response_staff = Staff.find(response_staff)
     response_staff_email = response_staff.email
+
+    staffs = Staff.filter_by_ids(staff_ids.append(response_staff))
+    staff_calendar_addresses = StaffCalendarAddress.filter_by_ids(staffs)
+    # TODO
+    response_staff = staffs.select { |x| x.id.to_s == response_staff.to_s }
+    attendee_list = []
+    staffs.each do |staff|
+      atten = {
+        displayName: staff.nickname,
+        email: staff.email
+      }
+    end
+
     assigned_staff = (staff==0)? response_staff : Staff.find(staff)
 
     customer = Customer.where("customers.id = #{customer_id}")
