@@ -39,7 +39,7 @@ class ActivityController < ApplicationController
   def save_note
     note = note_save(note_params, session[:user_id])
     product_note_save(params, session[:user_id], note.id)
-    relation_save(params, note.id)
+    relation_save(params, note)
     flash[:success] = 'Note Saved!'
     redirect_to action: 'add_activity', note_id: note.id && return if 'new_task' == params[:button]
     redirect_to action: 'add_note'
