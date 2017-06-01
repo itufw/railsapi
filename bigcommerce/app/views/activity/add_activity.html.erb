@@ -26,10 +26,10 @@
 var TaskCompleteForm = function(){
   if (($('input[id*=staff ]').length > 1) && ($('input[id*=customer ]').length > 1) && ($('#task_subject_1 option:selected').val()!="")){
     $('.complete_form').show();
-    $('.incomlete_form').hide();
+    $('.incomplete_form').hide();
   }else{
     $('.complete_form').hide();
-    $('.incomlete_form').show();
+    $('.incomplete_form').show();
   };
 };
 $('.complete_form').hide();
