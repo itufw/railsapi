@@ -28,4 +28,8 @@ class TaskSubject < ActiveRecord::Base
   def self.sales_subjects
     where(:function => "Sales")
   end
+
+  def self.filter_by_ids(ids)
+    where('task_subjects.id IN (?)', ids)
+  end
 end
