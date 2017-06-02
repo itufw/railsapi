@@ -23,6 +23,10 @@ class Staff < ActiveRecord::Base
         where('active = 1 and user_type LIKE "Sales%"')
     end
 
+    def self.active_sales_staff_plus(staff_id)
+        where('(active = 1 and user_type LIKE "Sales%") OR (id = ?)', staff_id)
+    end
+
     def self.active
         where('active = 1')
     end
