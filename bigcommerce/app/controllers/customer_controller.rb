@@ -159,6 +159,19 @@ class CustomerController < ApplicationController
     redirect_to request.referrer
   end
 
+  def update_order_staff
+    order_id = params[:order_id]
+    staff_id = params[:staff_id]
+
+    order = Order.find(order_id)
+    order.staff_id = staff_id
+    order.save
+    
+    # render html: "#{customer_id}, #{staff_id}".html_safe
+    flash[:success] = 'Staff Successfully Changed.'
+    redirect_to request.referrer
+  end
+
   # Displays Stats for all the products the customer has ordered
   def top_products
     get_id_and_name(params)
