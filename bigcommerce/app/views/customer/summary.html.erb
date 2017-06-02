@@ -7,13 +7,31 @@
 
 <%= form_tag({:action => "summary" }, {:method => "get"}) do %>
 
-<div style="margin-top: 50px;">
-	<%= render "partials/overall_stats", sum_param: "$", supply_display_class: "none" %>
+	<div style="margin-top: 10px;">
+			<%= render "accounts_partials/invoice_header", customer: @customer %>
+	</div>
 
-	<%= hidden_field_tag :customer_id, @customer_id %>
-   	<%= hidden_field_tag :customer_name, @customer_name %>
+	<div class="sales_stats" style="margin-top: 10px;">
+		<%= render "partials/overall_stats", sum_param: "$", supply_display_class: "none" %>
+		<%= hidden_field_tag :customer_id, @customer_id %>
+	  <%= hidden_field_tag :customer_name, @customer_name %>
+	</div>
 
-</div>
+	<div class="account_stats">
+		<%= render 'accounts_partials/account_stats', customer: @customer, amount_due: @amount_due%>
+	</div>
 
-<%= render "partials/order", orders: @orders, display_class: "none", product_ids: nil %>
+	<div class="customer_activity">
+		<%= render 'customer_partials/activity'%>
+	</div>
+
+	<%= render "partials/order", orders: @orders, display_class: "none", product_ids: nil %>
 <% end %>
+
+<script>
+	$('.activity-section').hide();
+
+	<% if current_user_sales?(session[:authority]) %>
+		$('.accounts-stats-section').hide();
+	<% end %>
+</script>

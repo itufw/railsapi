@@ -198,4 +198,9 @@ module ApplicationHelper
       o.save
     end
   end
+
+  def current_user_sales?(_authority)
+    return true if %w['Sales Executive'].include? session[:authority]
+    false
+  end
 end

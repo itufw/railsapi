@@ -3,12 +3,12 @@
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
 .table-fixed thead {
-  width: 97%;
+  width: 100%;
 }
 .table-fixed tbody {
-  height: 230px;
+  height: 100px;
   overflow-y: auto;
-  width: 97%;
+  width: 100%;
 }
 .table-fixed thead, .table-fixed tbody, .table-fixed tr, .table-fixed td, .table-fixed th {
   display: block;
@@ -17,5 +17,5 @@
   float: left;
   border-bottom-width: 0;
 }
-.table-fixed tbody tr:nth-child(even) {background: #CCC}
-.table-fixed tbody tr:nth-child(odd) {background: #FFF}
+// .table-fixed tbody tr:nth-child(even) {background: #CCC}
+// .table-fixed tbody tr:nth-child(odd) {background: #FFF}
