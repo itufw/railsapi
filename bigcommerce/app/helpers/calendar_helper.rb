@@ -375,29 +375,28 @@ module CalendarHelper
     location
   end
 
+  # TODO
+  # TODO
+  # TODO
+  # TODO
   def push_event(customer_id, description, staff_ids, response_staff, start_time, end_time, subject, method, service, client)
-    response_staff = Staff.find(response_staff)
-    response_staff_email = response_staff.email
 
     staffs = Staff.filter_by_ids(staff_ids.append(response_staff))
-    staff_calendar_addresses = StaffCalendarAddress.filter_by_ids(staffs)
-    # TODO
-    response_staff = staffs.select { |x| x.id.to_s == response_staff.to_s }
+    staff_calendar_addresses = StaffCalendarAddress.filter_by_ids(staff_ids)
+    response_staff = staffs.select { |x| x.id.to_s == response_staff.to_s }.first
+    response_staff_email = response_staff.email
+
     attendee_list = []
     staffs.each do |staff|
-      atten = {
+      attend = {
         displayName: staff.nickname,
-        email: staff.email
+        email: staff_calendar_addresses.select{|x|x.staff_id == staff.id}.first.calendar_address
       }
+      attendee_list.append(attend)
     end
 
-    assigned_staff = (staff==0)? response_staff : Staff.find(staff)
-
     customer = Customer.where("customers.id = #{customer_id}")
-    customer = (customer.blank?) ? assigned_staff.nickname : customer.first.actual_name
-
-    attendee_email = assigned_staff.staff_calendar_addresses.first
-    attendee_email = (attendee_email.nil?) ? 'it@untappedwines.com' : attendee_email.calendar_address
+    customer = (customer.blank?) ? 'No Customer' : customer.first.actual_name
 
     address = combine_adress(Address.where("customer_id = #{customer_id}")) if customer_id != 0
     task_subject = TaskSubject.find(subject).subject
@@ -415,12 +414,8 @@ module CalendarHelper
                                                 summary: customer,
                                                 description: task_subject + ": "+ customer + "\n" +description + "\n Created By:" + response_staff.nickname,
                                                 location: address,
-                                                attendees: [
-                                                  {
-                                                    displayName: assigned_staff.nickname,
-                                                    email: attendee_email
-                                                  }
-                                                ]})
+                                                attendees: attendee_list
+                                                })
     begin
       gcal_event = service.insert_event(response_staff_email, event, send_notifications: true)
       return gcal_event

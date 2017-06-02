@@ -86,6 +86,6 @@ class ActivityController < ApplicationController
   def note_params
     params.require(:task).permit(:description, :subject_1, :function, :method,\
                                  :promotion_id, :portfolio_id, :start_date, \
-                                 :end_date)
+                                 :end_date, :priority)
   end
 end

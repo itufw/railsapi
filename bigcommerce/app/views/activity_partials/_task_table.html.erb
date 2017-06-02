@@ -9,6 +9,11 @@
     <%= f.collection_select :subject_1, @subjects, :id, :subject, {:prompt => "Select a Subject"}, {class: "subject_selection", style: 'width: 80px'} %>
     <%= label(:function, "Function:")%>
     <%= f.collection_select :function, @function, :function, :function, {:include_blank => "Select a Function", :selected => @function_role}, {class:"function_selection", style: 'width: 80px'} %>
+    <br/>
+    <%= label(:priority, "Priority:")%>
+    <%= f.number_field :priority, {min: 1, max:6, step:1, id: 'task_priority'}%>
+    <%= rateit(type:"span", backingfld: '#task_priority', max:6, min:1, step:1, resetable:'false')%>
+
     <%= label(:method, "Method:")%>
     <%= f.collection_select :method, @methods, :method, :method, {:include_blank => "Select a Method", :selected => "Meeting"}, style: 'width: 80px' %>
     <br/>
@@ -111,7 +116,8 @@ $(document).ready(function(){
     });
 
     $('input[type=radio][name=task_due]').on('change',function(){
-      $('#due_timepicker').data("DateTimePicker").date($('#start_timepicker').data("DateTimePicker").date().add("days", this.value));
+      $('#start_timepicker').data("DateTimePicker").date($('#start_timepicker').data("DateTimePicker").date().add("days", this.value));
+      $('#due_timepicker').data("DateTimePicker").date($('#start_timepicker').data("DateTimePicker").date());
     });
 });
 

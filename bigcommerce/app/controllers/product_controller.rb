@@ -32,6 +32,9 @@ class ProductController < ApplicationController
 
   # Displays Overall Stats and Top Customers for Product
   def summary
+    params[:direction] = params[:direction] || -1
+    params[:order_col] = params[:order_col] || 'Last Quarter'
+
     params_for_one_product(params)
     transform(params)
     # total_stock is inventory in bigcommerce + pending stock
