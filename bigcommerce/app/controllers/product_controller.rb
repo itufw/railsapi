@@ -85,7 +85,6 @@ class ProductController < ApplicationController
         [product_ids, customers_filtered_ids], :group_by_customerid, :sum_order_product_qty,\
       params[:order_col], params[:direction]
     )
-
     if already_sorted
       @top_customers = get_id_activerecord_h(Customer.include_all.filter_by_ids(@customer_ids))
     else

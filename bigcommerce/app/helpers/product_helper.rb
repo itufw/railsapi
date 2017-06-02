@@ -6,6 +6,7 @@ module ProductHelper
     customer_pendings = sort_pending_stock(customer_pendings, params[:order_col], params[:direction])
     customer_id_sort = []
     customer_pendings.each do |c_p|
+      next unless customer_ids.include? c_p.customer_id
       customer_pendings_hash[c_p.customer_id] = c_p.qty
       customer_id_sort.append(c_p.customer_id)
     end
