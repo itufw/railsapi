@@ -5,6 +5,7 @@ class Task < ActiveRecord::Base
   has_many :order_actions
   has_many :product_notes
   has_one :portfolio
+  belongs_to :staff, class_name: 'Staff', foreign_key: :response_staff
   belongs_to :parent, class_name: 'Task', foreign_key: 'parent_task'
   has_many :children, class_name: 'Task', foreign_key: 'parent_task'
 
@@ -130,7 +131,7 @@ class Task < ActiveRecord::Base
       order_action.task_id = task_id
       order_action.save!
     end
-    
+
       # parent_tasks = OrderAction.where("order_actions.order_id = ? AND task_id IS NOT NULL", order.to_i).order("created_at DESC")
       # unless ((parent_tasks.nil?)||(parent_tasks.blank?))
       # sql = "INSERT INTO `tasks`(`id`,`start_date`,`end_date`, `created_at`, `updated_at`,\
@@ -207,6 +208,10 @@ class Task < ActiveRecord::Base
 
   def self.active_tasks
     where('tasks.expired = 0')
+  end
+
+  def self.expired?
+    where('tasks.expired != 1')
   end
 
   def self.is_task
