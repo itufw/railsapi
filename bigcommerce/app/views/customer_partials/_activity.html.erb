@@ -1,21 +1,86 @@
+<%= label(:activity, "Activity:")%>
+<table>
+  <tr>
+    <td id="staff_th">
+      <li class="dropdown">
+        <a class="" data-toggle="dropdown" href="#">Staff</a>
+          <ul class="dropdown-menu">
+            <% @activity.map(&:staff).uniq.each do |staff| %>
+            <li>
+              <%= check_box_tag 'selected_staff[]', staff.id %>
+              <%= staff.nickname %>
+              &nbsp;&nbsp;
+            </li>
+            <% end %>
+          </ul>
+      </li>
+    </td>
+    <td id="subject_th">
+      <li class="dropdown">
+        <a class="" data-toggle="dropdown" href="#">Subject</a>
+          <ul class="dropdown-menu">
+            <% @subjects.each do |subject| %>
+            <li>
+              <%= check_box_tag 'selected_subject[]', subject.id %>
+              <%= subject.subject %>
+              &nbsp;&nbsp;
+            </li>
+            <% end %>
+          </ul>
+      </li>
+    </td>
+    <td id="function_th">
+      <li class="dropdown">
+        <a class="" data-toggle="dropdown" href="#">Function</a>
+          <ul class="dropdown-menu">
+            <% @activity.map(&:function).uniq.each do |function| %>
+            <li>
+              <%= check_box_tag 'selected_function[]', function %>
+              <%= function %>
+              &nbsp;&nbsp;
+            </li>
+            <% end %>
+          </ul>
+      </li>
+    </td>
+    <td id="method_th">
+      <li class="dropdown">
+        <a class="" data-toggle="dropdown" href="#">Method</a>
+          <ul class="dropdown-menu">
+            <% @activity.map(&:method).uniq.each do |method| %>
+            <li>
+              <%= check_box_tag 'selected_method[]', method %>
+              <%= method %>
+              &nbsp;&nbsp;
+            </li>
+            <% end %>
+          </ul>
+      </li>
+    </td>
+  </tr>
+</table>
+
 <table class="table table-fixed">
   <thead>
     <tr>
       <th class="col-xs-2">#</th>
       <th class="col-xs-8">Note</th>
-      <th class="col-xs-2">Date</th>
+      <th class="col-xs-2">Due</th>
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <td class="col-xs-2">#</td>
-      <td class="col-xs-8">Note</td>
-      <td class="col-xs-2">Date</td>
+    <% @activity.each do |task|%>
+    <tr class="staff_<%= task.staff.id%> method_<%= task.method%> ">
+      <td class="col-xs-2">
+        <%= task.start_date.strftime("%m-%d")%>
+        <%= @subjects.select {|x| x.id.to_s==task.subject_1}.map(&:subject).first%>
+        <br/>
+        <%= task.staff.nickname%>
+        <%= task.method%>
+      </td>
+      <td class="col-xs-8"><%= task.description%></td>
+      <td class="col-xs-2"><%= task.end_date.strftime("%m-%d") %></td>
     </tr>
-    <tr>
-      <td>23</td>
-      <td>23</td>
-      <td>23</td>
-    </tr>
+    <% end %>
   </tbody>
 </table>

@@ -15,9 +15,11 @@ class CustomerController < ApplicationController
 
   # NEW CUSTOMER PAGE
   def contact
-    @customer = Customer.find('1699')
+    @customer = Customer.find('1807')
     @overall_stats = overall_stats_(params)
     @orders, @per_page = latest_orders(params, Order.customer_filter([@customer.id]))
+    @activity = Task.joins(:staff).customer_tasks(@customer.id).expired?
+    @subjects = TaskSubject.filter_by_ids(@activity.map(&:subject_1).compact)
 
   end
 
