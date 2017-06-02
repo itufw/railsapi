@@ -1,86 +1,138 @@
-<%= label(:activity, "Activity:")%>
-<table>
-  <tr>
-    <td id="staff_th">
-      <li class="dropdown">
-        <a class="" data-toggle="dropdown" href="#">Staff</a>
-          <ul class="dropdown-menu">
-            <% @activity.map(&:staff).uniq.each do |staff| %>
-            <li>
-              <%= check_box_tag 'selected_staff[]', staff.id %>
-              <%= staff.nickname %>
-              &nbsp;&nbsp;
-            </li>
-            <% end %>
-          </ul>
-      </li>
-    </td>
-    <td id="subject_th">
-      <li class="dropdown">
-        <a class="" data-toggle="dropdown" href="#">Subject</a>
-          <ul class="dropdown-menu">
-            <% @subjects.each do |subject| %>
-            <li>
-              <%= check_box_tag 'selected_subject[]', subject.id %>
-              <%= subject.subject %>
-              &nbsp;&nbsp;
-            </li>
-            <% end %>
-          </ul>
-      </li>
-    </td>
-    <td id="function_th">
-      <li class="dropdown">
-        <a class="" data-toggle="dropdown" href="#">Function</a>
-          <ul class="dropdown-menu">
-            <% @activity.map(&:function).uniq.each do |function| %>
-            <li>
-              <%= check_box_tag 'selected_function[]', function %>
-              <%= function %>
-              &nbsp;&nbsp;
-            </li>
-            <% end %>
-          </ul>
-      </li>
-    </td>
-    <td id="method_th">
-      <li class="dropdown">
-        <a class="" data-toggle="dropdown" href="#">Method</a>
-          <ul class="dropdown-menu">
-            <% @activity.map(&:method).uniq.each do |method| %>
-            <li>
-              <%= check_box_tag 'selected_method[]', method %>
-              <%= method %>
-              &nbsp;&nbsp;
-            </li>
-            <% end %>
-          </ul>
-      </li>
-    </td>
-  </tr>
-</table>
 
-<table class="table table-fixed">
+<div class="btn group activity-section" role="group" data-toggle="buttons" aria-label="activity_filter">
+  <%= label(:activity, "Activity:")%>
+  <br/>
+  <label class="btn btn-secondary">
+    <%= radio_button_tag(:activity_filter, "staff", false) %>
+    <li class="dropdown">
+      <a class="" data-toggle="dropdown" href="#">Staff</a>
+        <ul class="dropdown-menu">
+          <% @activity.map(&:staff).uniq.each do |staff| %>
+          <li id="filter_staff_<%=staff.id%>">
+            <%= staff.nickname %>
+            &nbsp;&nbsp;
+          </li>
+          <% end %>
+        </ul>
+    </li>
+  </label>
+  <label class="btn btn-secondary">
+    <%= radio_button_tag(:activity_filter, "subject", false) %>
+    <li class="dropdown">
+      <a class="" data-toggle="dropdown" href="#">Subject</a>
+        <ul class="dropdown-menu">
+          <% @subjects.each do |subject| %>
+          <li id="filter_subject_<%=subject.id%>">
+            <%= subject.subject %>
+            &nbsp;&nbsp;
+          </li>
+          <% end %>
+        </ul>
+    </li>
+  </label>
+  <label class="btn btn-secondary">
+    <%= radio_button_tag(:activity_filter, "function", false) %>
+    <li class="dropdown">
+      <a class="" data-toggle="dropdown" href="#">Function</a>
+        <ul class="dropdown-menu">
+          <% @activity.map(&:function).uniq.each do |function| %>
+          <li id="filter_function_<%=function%>">
+            <%= function %>
+            &nbsp;&nbsp;
+          </li>
+          <% end %>
+        </ul>
+    </li>
+  </label>
+  <label class="btn btn-secondary">
+    <%= radio_button_tag(:activity_filter, "method", false) %>
+    <li class="dropdown">
+      <a class="" data-toggle="dropdown" href="#">Method</a>
+        <ul class="dropdown-menu">
+          <% @activity.map(&:method).uniq.each do |method| %>
+          <li id="filter_method_<%=method%>">
+            <%= method %>
+            &nbsp;&nbsp;
+          </li>
+          <% end %>
+        </ul>
+    </li>
+  </label>
+</div>
+
+<table class="table table-striped table-bordered table-hover table-responsive table-fixed" style="margin-top: -10px">
   <thead>
-    <tr>
-      <th class="col-xs-2">#</th>
-      <th class="col-xs-8">Note</th>
-      <th class="col-xs-2">Due</th>
+    <tr class="info activity-bar">
+      <th class="col-md-4">Activity</th>
+      <th class="col-md-7">Note</th>
+      <th class="col-md-1">Due</th>
     </tr>
   </thead>
-  <tbody>
+  <tbody class="activity-section">
     <% @activity.each do |task|%>
-    <tr class="staff_<%= task.staff.id%> method_<%= task.method%> ">
-      <td class="col-xs-2">
-        <%= task.start_date.strftime("%m-%d")%>
-        <%= @subjects.select {|x| x.id.to_s==task.subject_1}.map(&:subject).first%>
+    <tr class="activity_tr staff_<%= task.staff.id%> method_<%= task.method%> subject_<%= task.subject_1%> function_<%=task.function%>">
+      <td class="col-md-4">
+        <div class="col-md-4">
+          <%= task.start_date.strftime("%d/%m")%>
+        </div>
+        <div class="col-md-8">
+          <%= @subjects.select {|x| x.id.to_s==task.subject_1}.map(&:subject).first%>
+        </div>
         <br/>
-        <%= task.staff.nickname%>
-        <%= task.method%>
+        <div class="col-xs-4">
+          <%= task.staff.nickname%>
+        </div>
+        <div class="col-xs-8">
+          <%= task.method%>
+        </div>
       </td>
-      <td class="col-xs-8"><%= task.description%></td>
-      <td class="col-xs-2"><%= task.end_date.strftime("%m-%d") %></td>
+      <td class="col-md-8"><%= task.description%></td>
+      <td class="col-md-2"><%= task.end_date.strftime("%d/%m") %></td>
     </tr>
     <% end %>
   </tbody>
 </table>
+
+
+<script>
+
+$('.activity-bar').click(function(){
+  $('.activity-section').toggle();
+});
+
+
+$('label[for*=activity_Activity]').click(function(){
+  $('.activity_tr').show();
+});
+
+
+<% @activity.map(&:staff).uniq.each do |staff| %>
+  $('#filter_staff_<%=staff.id%>').click(function(){
+    $('.activity_tr').hide();
+    $('.activity_tr.staff_<%= staff.id%>').show();
+  });
+<% end %>
+
+<% @activity.map(&:function).uniq.each do |function| %>
+  $("#filter_function_<%=function%>").click(function(){
+    $('.activity_tr').hide();
+    $('.activity_tr.function_<%= function%>').show();
+  });
+<% end %>
+
+<% @activity.map(&:method).uniq.each do |method| %>
+  $("#filter_method_<%=method%>").click(function(){
+    $('.activity_tr').hide();
+    $('.activity_tr.method_<%= method%>').show();
+  });
+<% end %>
+
+
+<% @subjects.each do |subject| %>
+  $("#filter_subject_<%=subject.id%>").click(function(){
+    $('.activity_tr').hide();
+    $('.activity_tr.subject_<%= subject.id%>').show();
+  });
+<% end %>
+
+</script>

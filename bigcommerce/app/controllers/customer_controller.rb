@@ -3,6 +3,7 @@ require 'product_variations.rb'
 require 'models_filter.rb'
 require 'dates_helper.rb'
 require 'customer_helper.rb'
+require 'accounts_helper.rb'
 
 class CustomerController < ApplicationController
   before_action :confirm_logged_in
@@ -12,6 +13,7 @@ class CustomerController < ApplicationController
   include ModelsFilter
   include DatesHelper
   include CustomerHelper
+  include AccountsHelper
 
   # NEW CUSTOMER PAGE
   def contact
@@ -52,6 +54,21 @@ class CustomerController < ApplicationController
     # overall_stats has structure {time_period_name => [sum, average, supply]}
     @overall_stats = overall_stats_(params)
     display_orders(params, Order.customer_filter([@customer_id]))
+
+    # task section
+    @activity = Task.joins(:staff).customer_tasks(@customer_id).expired?
+    @subjects = TaskSubject.filter_by_ids(@activity.map(&:subject_1).compact)
+
+    # -------------------
+    # accounts
+    # multiple contact people
+    # xeroizer only provides email_address, the details of phone number should be discussed
+    @customer = Customer.find(@customer_id)
+    @contact_people = XeroContactPerson.all_contact_people(@customer.xero_contact_id)
+    @contacts_phone = Contact.filter_by_xero_contact_id(@customer.xero_contact_id)
+    # calculate the invoice table based
+    # function located in helper -> accounts_helper
+    @amount_due = get_invoice_table(@customer_id, true, Date.today)
   end
 
   def summary_with_product
