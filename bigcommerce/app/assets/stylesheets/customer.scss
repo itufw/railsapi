@@ -8,7 +8,7 @@
 .table-fixed tbody {
   height: 230px;
   overflow-y: auto;
-  width: 100%;
+  width: 97%;
 }
 .table-fixed thead, .table-fixed tbody, .table-fixed tr, .table-fixed td, .table-fixed th {
   display: block;
@@ -17,3 +17,5 @@
   float: left;
   border-bottom-width: 0;
 }
+.table-fixed tbody tr:nth-child(even) {background: #CCC}
+.table-fixed tbody tr:nth-child(odd) {background: #FFF}
