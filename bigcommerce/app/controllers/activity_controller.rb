@@ -53,24 +53,36 @@ class ActivityController < ApplicationController
       redirect_to action: 'add_activity', note_id: note.id
       return
     end
-    redirect_to action: 'add_note'
+    redirect_to :back
   end
 
   # insert task
   # following Dropbox -> pages -> Activity
   def add_activity
-    @customer_text = params[:customer_search_text] || nil
 
     @task = Task.new
-
-    if params[:note_id] && Task.where('tasks.id = ?', params[:note_id]).count > 0
-      @task.parent_task = params[:note_id]
-      @wine_note_list = ProductNote.filter_task(params[:note_id])
+    parent_function = nil
+    if params[:note_id]
+      parents = Task.where('tasks.id = ?', params[:note_id])
+      if parents.count > 0
+        parent = parents.first
+        parent_function = parent.function
+        parent_relation = parent.task_relations
+        @task.parent_task = params[:note_id]
+        @wine_note_list = ProductNote.filter_task(params[:note_id])
+      end
     end
 
-    @staff = Staff.active
+    @default_method = (parent.nil?) ? 'Meeting' : parent.method
+    @default_subject = (parent.nil?) ? nil : parent.subject_1
+    @default_customers = (parent.nil?) ? nil : Customer.filter_by_ids(parent_relation.map(&:customer_id).uniq.compact)
+    @default_staff = (parent.nil?) ? [session[:user_id]] : parent_relation.map(&:staff_id).append(session[:user_id]).append(parent.response_staff).uniq.compact
+
+
     @function, @subjects, @methods, @function_role, @promotion, @portfolio \
-      = function_search(params)
+      = function_search(params, parent_function)
+    @staff = Staff.active
+
 
       # @products = Product.sample_products(session[:user_id], 20)
       if %w['Sales Executive'].include? session[:authority]
@@ -84,10 +96,10 @@ class ActivityController < ApplicationController
 
   def save_task
     task = note_save(note_params, session[:user_id])
-    relation_save(params, task)
+    customer_id = relation_save(params, task)
     task_product_note(params, task, session[:user_id])
     flash[:success] = 'Task Saved!'
-    redirect_to action: 'add_activity'
+    redirect_to controller: 'customer', action: 'summary', customer_id: customer_id, customer_name: Customer.find(customer_id).actual_name
   end
 
   def history

@@ -7,6 +7,19 @@
           <i class="glyphicon glyphicon-plus activity-customers" title="Include Customer"></i>
       </td>
     </tr>
+    <% unless @default_customers.nil?%>
+      <% @default_customers.each do |customer| %>
+        <tr id="tr_customer_<%=customer.id%>">
+          <td><%= text_field_tag 'customer '+customer.id.to_s, customer.actual_name, readonly: true %></td>
+          <td><i class="glyphicon glyphicon-remove remove_customer" title="remove"></i></td>
+        </tr>
+      <% end %>
+    <% end %>
   </table>
   <br/>
 </div>
+<script>
+  $('.remove_customer').click(function(){
+    $(this).parent().parent().remove();
+  });
+</script>

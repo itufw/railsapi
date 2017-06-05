@@ -6,7 +6,7 @@
   </div>
   <div class="col-md-8">
     <%= label(:subject_1, "Subject:")%>
-    <%= f.collection_select :subject_1, @subjects, :id, :subject, {:prompt => "Select a Subject"}, {class: "subject_selection", style: 'width: 80px'} %>
+    <%= f.collection_select :subject_1, @subjects, :id, :subject, {:prompt => "Select a Subject", selected: @default_subject}, {class: "subject_selection", style: 'width: 80px'} %>
     <%= label(:function, "Function:")%>
     <%= f.collection_select :function, @function, :function, :function, {:include_blank => "Select a Function", :selected => @function_role}, {class:"function_selection", style: 'width: 80px'} %>
     <br/>
@@ -15,7 +15,7 @@
     <%= rateit(type:"span", backingfld: '#task_priority', max:6, min:1, step:1, resetable:'false')%>
 
     <%= label(:method, "Method:")%>
-    <%= f.collection_select :method, @methods, :method, :method, {:include_blank => "Select a Method", :selected => "Meeting"}, style: 'width: 80px' %>
+    <%= f.collection_select :method, @methods, :method, :method, {:include_blank => "Select a Method", :selected => @default_method}, style: 'width: 80px' %>
     <br/>
     <table id="staff_table">
       <tr>
@@ -24,6 +24,13 @@
           <i class="glyphicon glyphicon-plus activity-staffs" title="Include Staff"></i>
         </td>
       </tr>
+      <% @default_staff.each do |staff_id| %>
+        <tr id="tr_staff_<%=staff_id%>">
+          <td><%= text_field_tag 'staff '+staff_id.to_s, @staff.find(staff_id).nickname, readonly: true %></td>
+          <td><i class="glyphicon glyphicon-remove remove_staff" title="remove"></i></td>
+        </tr>
+      <% end %>
+
     </table>
 
     <!-- Date picker -->
@@ -84,6 +91,14 @@
 </div>
 
 <script>
+
+
+
+$('.remove_staff').click(function(){
+  $(this).parent().parent().remove();
+});
+
+
 $(function () {
   $('#start_timepicker').datetimepicker({
     format: 'YYYY-MM-DD',

@@ -159,6 +159,7 @@ class Customer < ActiveRecord::Base
 
 	def self.filter_by_ids(ids_array)
 		return Customer.all if ids_array.nil?
+		return nil if ids_array.blank?
 		return where('customers.id IN (?)', ids_array)
 	end
 
