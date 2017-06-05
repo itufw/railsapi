@@ -11,7 +11,7 @@ $('.add_row_product').click(function(){
           $('#product_table').append([
             '<tr id="tr_<%=append_product.id%>">',
                 '<td><%= append_product.id%></td>',
-                '<td><%= text_field_tag 'product_name '+append_product.id, append_product.name, readonly:true %></td>',
+                '<td><%= text_field_tag 'product_name '+append_product.id.to_s, append_product.name, readonly:true %></td>',
                 '<td class="num"><%= text_field_tag 'price_luc '+append_product.id.to_s, "%.2f" %(append_product.calculated_price * (1 + wet)), readonly: true%></td>',
                 '<td><%= text_field_tag 'discount '+append_product.id.to_s,  0, placeholder: 'Discount', size: 3 %> %</td>',
                 '<td><%= text_field_tag 'price '+append_product.id.to_s,"%.2f" %(append_product.calculated_price * (1 + wet)), placeholder: 'Price', size: 5%></td>',
