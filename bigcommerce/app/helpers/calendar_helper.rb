@@ -315,7 +315,7 @@ module CalendarHelper
         task.auto_update_from_calendar_event(event) unless task.nil?
       else
         # filter the staff
-        staff_address = staff_calendars.select { |x| x.calendar_address == event.creator.email}.first
+        staff_address = staff_calendars.select { |x| [event.organizer.email, event.creator.email].include? x.calendar_address}.first
         next if staff_address.blank?
         Task.new.auto_insert_from_calendar_event(event, staff_address.staff_id)
       end
@@ -331,7 +331,6 @@ module CalendarHelper
     service.list_calendar_lists.items.select { |x| staff_calendars.map(&:calendar_address).include?x.id }.each do |calendar|
       new_events += service.list_events(calendar.id).items
     end
-
     update_google_events(new_events, tasks, staff_calendars, unconfirmed_task)
   end
 
