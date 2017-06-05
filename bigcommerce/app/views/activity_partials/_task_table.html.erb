@@ -1,0 +1,139 @@
+<div class="col-md-8">
+  <div class="col-md-4">
+    Task:
+    <br/>
+    <%= f.text_area :description, :rows=>10, :cols=>35	%>
+  </div>
+  <div class="col-md-8">
+    <%= label(:subject_1, "Subject:")%>
+    <%= f.collection_select :subject_1, @subjects, :id, :subject, {:prompt => "Select a Subject", selected: @default_subject}, {class: "subject_selection", style: 'width: 80px'} %>
+    <%= label(:function, "Function:")%>
+    <%= f.collection_select :function, @function, :function, :function, {:include_blank => "Select a Function", :selected => @function_role}, {class:"function_selection", style: 'width: 80px'} %>
+    <br/>
+    <%= label(:priority, "Priority:")%>
+    <%= f.number_field :priority, {min: 1, max:6, step:1, id: 'task_priority'}%>
+    <%= rateit(type:"span", backingfld: '#task_priority', max:6, min:1, step:1, resetable:'false')%>
+
+    <%= label(:method, "Method:")%>
+    <%= f.collection_select :method, @methods, :method, :method, {:include_blank => "Select a Method", :selected => @default_method}, style: 'width: 80px' %>
+    <br/>
+    <table id="staff_table">
+      <tr>
+        <td>
+          <%= autocomplete_field_tag 'staffs', '', autocomplete_staff_nickname_activity_index_path, placeholder: 'Search Staff', id: 'staff_search' %>
+          <i class="glyphicon glyphicon-plus activity-staffs" title="Include Staff"></i>
+        </td>
+      </tr>
+      <% @default_staff.each do |staff_id| %>
+        <tr id="tr_staff_<%=staff_id%>">
+          <td><%= text_field_tag 'staff '+staff_id.to_s, @staff.find(staff_id).nickname, readonly: true %></td>
+          <td><i class="glyphicon glyphicon-remove remove_staff" title="remove"></i></td>
+        </tr>
+      <% end %>
+
+    </table>
+
+    <!-- Date picker -->
+    <div id="calendar_timepicker">
+      <%= label(:end_date, "end")%>
+      <div class='input-group date' id='due_timepicker', style='width: 200px'>
+        <%= f.text_field :end_date, placeholder: 'Timepicker', class: 'form-control' %>
+        <span class="input-group-addon">
+          <span class="glyphicon glyphicon-calendar"></span>
+        </span>
+      </div>
+      <%= label(:start_date, "Start")%>
+      <div class='input-group date' id='start_timepicker', style='width: 200px'>
+        <%= f.text_field :start_date, placeholder: 'Timepicker', class: 'form-control' %>
+        <span class="input-group-addon">
+          <span class="glyphicon glyphicon-calendar"></span>
+        </span>
+      </div>
+    </div>
+
+    <div id="task_timepicker">
+      <%= label(:end_date, "Due")%>
+      <div class="btn group" role="group" data-toggle="buttons" aria-label="Task Due">
+        <label class="btn btn-secondary">
+          <%= radio_button_tag(:task_due, "1", false) %> 1 Day
+        </label>
+        <label class="btn btn-secondary">
+          <%= radio_button_tag(:task_due, "2", false) %> 2 Days
+        </label>
+        <label class="btn btn-secondary">
+          <%= radio_button_tag(:task_due, "3", false) %> 3 Days
+        </label>
+        <br/>
+        <label class="btn btn-secondary">
+          <%= radio_button_tag(:task_due, "7", true) %> 1 Week
+        </label>
+        <label class="btn btn-secondary">
+          <%= radio_button_tag(:task_due, "14", false) %> 2 Weeks
+        </label>
+        <label class="btn btn-secondary">
+          <%= radio_button_tag(:task_due, "28", false) %> 4 Weeks
+        </label>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top: 5px;" id="calendar_radio">
+        <b>Add to Calendar:</b>
+        <%= radio_button_tag(:event_column, "yes", false) %> Yes
+        <span style="margin-left: 50px;">
+        <%= radio_button_tag(:event_column, "no", true) %>  No
+        </span>
+    </div>
+  </div>
+  <%= label(:creator, "Creator:")%>
+  <%= session[:username] %>
+  <%= label(:create_date, "Create Date") %>
+  <%= Date.today%>
+</div>
+
+<script>
+
+
+
+$('.remove_staff').click(function(){
+  $(this).parent().parent().remove();
+});
+
+
+$(function () {
+  $('#start_timepicker').datetimepicker({
+    format: 'YYYY-MM-DD',
+    defaultDate: new Date(),
+    sideBySide: true
+  });
+  $('#due_timepicker').datetimepicker({
+    format: 'YYYY-MM-DD',
+    defaultDate: new Date(),
+    sideBySide: true
+  });
+
+  $('#start_timepicker').on("dp.change",function(e){
+    $('#due_timepicker').data("DateTimePicker").minDate(e.date);
+  });
+});
+
+$(document).ready(function(){
+    $('input[type=radio][name=event_column]').on('change',function(){
+      if(this.value == 'yes'){
+        $('#due_timepicker').datetimepicker('format', 'YYYY-MM-DD hh:mm a');
+        $('#start_timepicker').datetimepicker('format', 'YYYY-MM-DD hh:mm a');
+        $('#due_timepicker').data("DateTimePicker").date($('#start_timepicker').data("DateTimePicker").date().add("hours", '1'));
+        $('#task_timepicker').hide();
+      }else{
+        $('#due_timepicker').datetimepicker('format', 'YYYY-MM-DD');
+        $('#start_timepicker').datetimepicker('format', 'YYYY-MM-DD');
+        $('#task_timepicker').show();
+      }
+    });
+
+    $('input[type=radio][name=task_due]').on('change',function(){
+      $('#start_timepicker').data("DateTimePicker").date($('#start_timepicker').data("DateTimePicker").date().add("days", this.value));
+      $('#due_timepicker').data("DateTimePicker").date($('#start_timepicker').data("DateTimePicker").date());
+    });
+});
+
+</script>

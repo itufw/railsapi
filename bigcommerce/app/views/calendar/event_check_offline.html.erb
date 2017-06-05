@@ -1,0 +1,110 @@
+<%= title "Event From Calendars" %>
+<div>
+  <table id="event-table">
+  <thead>
+    <tr>
+      <th>
+        <li class="dropdown">
+          <a class="" data-toggle="dropdown" href="#">Creator
+            <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <% @staffs.each do |staff| %>
+              <li class="staff-dropdown" id="staff-<%= staff.id%>">
+                <%= staff.nickname %>
+              </li>
+              <% end %>
+            </ul>
+        </li>
+      </th>
+      <th>&nbsp;&nbsp;&nbsp;</th>
+      <th style="width: 300px">Summary</th>
+      <th>Time</th>
+      <th>&nbsp;&nbsp;&nbsp;</th>
+      <th>Customer</th>
+      <th>Method</th>
+      <th>Subjects</th>
+      <th>&nbsp;&nbsp;&nbsp;</th>
+    </tr>
+  </thead>
+    <% @events.each do |event|%>
+    	<%= form_tag({:action => "translate_events"}, {:method => "get"}) do %>
+      <%= hidden_field_tag :event_id , event.google_event_id %>
+      <%
+        response_staff = @staffs.select{|x| x.id == event.response_staff }
+      %>
+      <tr class="google-event-line  staff-event-<%= response_staff.first.id.to_s%> ">
+        <td><%= response_staff.first.nickname %></td>
+        <td>&nbsp;&nbsp;&nbsp;</td>
+        <td>
+          <%= event.description.to_s %> <br/>
+          <%= event.location.to_s %> <br/>
+          <%= event.summary[0...200] unless event.summary.nil?%>
+        </td>
+
+        <td><%= event.start_date.strftime("%d/%m %H:%M")%> --
+            <%= event.end_date.strftime("%H:%M")%>
+        </td>
+
+        <td>&nbsp;&nbsp;&nbsp;</td>
+        <%
+          unless event.description.nil?
+            if event.location.nil?
+              loc = event.description.split("\n")
+              loc = loc.first.split(/[ ()\/]/)
+              loc = loc.map {|x| x = x.downcase}
+              customer_list = @customers.select{|x|  !x.actual_name.nil? && Regexp.union(loc) === x.actual_name.downcase }[0..5]
+              customer_list = customer_list.sort_by! {|x| @jarow.getDistance(loc.join(" "), x.actual_name) }.reverse
+
+              lead_list = @leads.select{|x| Regexp.union(loc) === x.actual_name.downcase }
+              lead_list = lead_list.each {|x| x.actual_name = x.actual_name.to_s + ', (Lead)'}
+              lead_list = lead_list.sort_by! {|x| @jarow.getDistance(loc.join(" "), x.actual_name) }.reverse
+              customer_list = lead_list + customer_list
+
+              other_customer = @customers.reject{ |x| customer_list.map(&:actual_name).include?x.actual_name || x.actual_name.nil? || (x.actual_name == '')}
+              customer_list += other_customer.sort_by! {|x| @jarow.getDistance(event.description.to_s, x.actual_name.to_s) }.reverse
+            else
+              loc = event.location.split(",").first.split.select{|x| (x.to_i.to_s.casecmp(x)<0) && !(["st","pl","street","St"].include?(x))}
+              loc = loc.map {|x| x = x.downcase}
+              customer_list = @customers.select{|x| !x.actual_name.nil? && Regexp.union(loc) === x.actual_name.downcase }
+              customer_list = customer_list.sort_by! {|x| @jarow.getDistance(loc.join(" "), x.actual_name) }.reverse
+              lead_list = @leads.select{|x| Regexp.union(loc) === x.actual_name.downcase }
+              lead_list = lead_list.each {|x| x.actual_name = x.actual_name.to_s + ', (Lead)'}
+              lead_list = lead_list.sort_by! {|x| @jarow.getDistance(loc.join(" "), x.actual_name) }.reverse
+
+              customer_list = lead_list + customer_list
+
+              other_customer = @customers.reject{ |x| customer_list.map(&:actual_name).include?x.actual_name || x.actual_name.nil? || (x.actual_name == '')}
+              customer_list += other_customer.sort_by! {|x| @jarow.getDistance(event.description.to_s, x.actual_name.to_s) }.reverse
+            end
+        %>
+          <td>
+            <%= collection_select :customer, :customer, customer_list, ->(ob) {"#{ob.id}|#{ob.actual_name}"}, :actual_name, {:include_blank => "Select a Customer"}, :style => "width: 150px" %>
+          </td>
+        <%else%>
+          <td></td>
+        <%end%>
+        <td><%= collection_select :method, :method, @methods, :method, :method, {:include_blank => "Select a Method", :selected => "Meeting"}, :style => "width: 80px" %></td>
+        <td><%= collection_select :subject, :subject, @subjects, :id, :subject, {:include_blank => "Select a Subject", :selected => 2}, :style => "width: 80px" %></td>
+        <td>
+          <%= button_tag(type: 'submit', name: 'submit', class: "btn btn-default", value: 'confirm') do%>
+            <span class="glyphicon glyphicon-plus"></span>
+          <% end %>
+          <%= button_tag(type: 'submit', name: 'submit', class: "btn btn-default", value: 'reject') do%>
+            <span class="glyphicon glyphicon-remove"></span>
+          <% end %>
+          <%= link_to '<i class="glyphicon glyphicon-pencil" title="Create Lead"></i>'.html_safe, controller: "lead", action: "create_leads", customer_name: event.description.split("\n").first.to_s + event.location.to_s, staff_id: response_staff.first.id%>
+        </td>
+      </tr>
+      <% end %>
+    <% end %>
+  </table>
+</div>
+
+<script>
+<% @staffs.each do |staff| %>
+  $("#staff-<%= staff.id%>").click(function(){
+    $(".google-event-line").hide();
+    $(".staff-event-<%=staff.id%>").toggle();
+  });
+<% end %>
+</script>

@@ -92,8 +92,11 @@ gem 'google-api-client', require: 'google/apis/calendar_v3'
 gem 'underscore-rails'
 # google map for rails
 gem 'gmaps4rails'
+# google places for rails
+gem 'google_places'
 # convert street address to latitude and longitude
 gem 'geokit-rails'
+gem 'geocoder'
 # bootstrap-slider-rails -> used in map component
 gem 'bootstrap-slider-rails'
 # live search gem
@@ -103,3 +106,5 @@ gem 'rails-jquery-autocomplete'
 gem 'fuzzy-string-match'
 # calendar gem
 gem 'simple_calendar'
+# product note rate it
+gem 'rails-rateit', '~> 1.0.22', github:'berikin/rails-rateit'

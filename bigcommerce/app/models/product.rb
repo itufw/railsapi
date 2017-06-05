@@ -15,6 +15,8 @@ class Product < ActiveRecord::Base
   has_many :product_lable_relations
   has_many :product_lable, through: :product_lable_relations
 
+  has_many :product_notes
+
   belongs_to :product_type
   belongs_to :product_sub_type
   belongs_to :product_size
@@ -253,5 +255,19 @@ class Product < ActiveRecord::Base
 
   def self.product_inventory(group_by_transform_column)
     send(group_by_transform_column).sum(:inventory)
+  end
+
+  def self.stock?
+    where('products.inventory > 0')
+  end
+
+  def self.sample_products(staff_id = nil, row = 10)
+    return joins(:orders).where('orders.qty> 0 AND orders.total_inc_tax = 0').group('products.id').order("orders.id DESC").limit(row) if staff_id.nil?
+    customer_id = Staff.find(staff_id).pick_up_id
+    joins(:orders).where('orders.qty> 0 AND orders.total_inc_tax = 0 AND orders.customer_id = ?', customer_id).group('products.id').order("orders.id DESC").limit(row)
+  end
+
+  def self.autocomplete(term)
+    where('LOWER(name) LIKE ?', term.downcase)
   end
 end

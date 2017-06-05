@@ -16,6 +16,8 @@
  *= require bootsy
  *= require bootstrap-datetimepicker
  *= require bootstrap-slider
+ *= require simple_calendar
+ *= require rateit
  */
 
 @media print {

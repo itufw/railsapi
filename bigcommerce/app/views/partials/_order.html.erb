@@ -36,7 +36,7 @@
 		<td class="num"><%= order.qty %></td>
 		<td class="num"><%= display_num(order.total_inc_tax) %></td>
 
-		<%= render "partials/staff_update_form", customer: order.customer, staff: order.staff, can_update_staff: allow_to_update(session[:user_id]) %>
+		<%= render "customer_partials/order_staff_update", customer: order.customer, staff_id: order.staff_id, order_id: order.id, can_update_staff: allow_to_update(session[:user_id]) %>
 		<% invoice_status = invoice_status(order.xero_invoice) %>
 		<td class=<%= invoice_status[0].downcase %>><%= invoice_status[0] %></td>
 	</tr>
@@ -48,6 +48,7 @@
 			cust_name = customer_name(order.customer)
 		%>
 		<% order_products.each do |op| %>
+			<%next if op.product.nil?%>
 			<%= link_to op.product.name, controller: 'customer', action: 'summary_with_product', product_id: op.product.id, product_name: op.product.name, customer_id: cust_id, customer_name: cust_name %>
 			<br/>
 			&nbsp;&nbsp;&nbsp;

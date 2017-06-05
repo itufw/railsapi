@@ -31,6 +31,18 @@
                         <li><%= link_to "Orders", controller: "order", action: "all" %></li>
                         <li><%= link_to "Customers", controller: "customer", action: "all" %></li>
 
+                        <% if user_full_right(session[:authority])%>
+                        <li class="dropdown">
+                          <a class="" data-toggle="dropdown" href="#">Leads
+                            <span class="caret"></span>
+                          </a>
+                          <ul class="dropdown-menu">
+                            <li><%= link_to "All", controller: "lead", action: "all_leads" %></li>
+                            <li><%= link_to "Create", controller: "lead", action: "create_leads" %></li>
+                          </ul>
+                        </li>
+                        <% end %>
+
                         <li class="dropdown">
                             <a class="" data-toggle="dropdown" href="#">Products
                                 <span class="caret"></span>
@@ -63,12 +75,33 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><%= link_to "My Note", controller: "task", action: "staff_task" %></li>
-                                <li><%= link_to "Add Note", controller: "task", action: "add_task" %></li>
+                                <li><%= link_to "Add Note", controller: 'activity', action: 'add_note'%></li>
+                                <li><%= link_to "Add Task", controller: 'activity', action: 'add_activity'%></li>                                <li><%= link_to "Calendar", controller: "calendar", action: "local_calendar" %></li>
                                 <% if user_full_right(session[:authority]) %>
-                                <li><%= link_to "Calendar", controller: "calendar", action: "local_calendar" %></li>
+                                  <li><%= link_to "Events Check", controller: "calendar", action: "event_check_offline" %></li>
+                                  <% if Rails.env.development? %>
+                                  <li><%= link_to "Sync", controller: "calendar", action: "event_censor" %></li>
+                                  <% else %>
+                                  <li><%= link_to "Sync", "http://188.166.243.138.xip.io/redirect" %></li>
+                                  <% end %>
                                 <% end %>
                             </ul>
                         </li>
+                        <% if it_working(session[:user_id])%>
+
+                        <li class="dropdown">
+                          <a class="" data-toggle="dropdown" href="#">Event
+                              <span class="caret"></span>
+                          </a>
+                          <ul class="dropdown-menu">
+                            <li><%= link_to "My Note", controller: "task", action: "staff_task" %></li>
+                            <li><%= link_to "Add Note", controller: "task", action: "add_task" %></li>
+                            <li>Activity down there<li>
+                            <li><%= link_to "Add Note", controller: 'activity', action: 'add_note'%></li>
+                            <li><%= link_to "Add Task", controller: 'activity', action: 'add_activity'%></li>
+                          </ul>
+                        </li>
+                        <% end %>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         <li><%= link_to "Hi," + "  " + session[:username] %></li>

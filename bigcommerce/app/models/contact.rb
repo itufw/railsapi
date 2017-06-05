@@ -3,6 +3,7 @@ require 'xero_connection.rb'
 class Contact < ActiveRecord::Base
   belongs_to :xero_contact
   belongs_to :customer
+  belongs_to :customer_lead
 
   # DO NOT USE
   def download_data_from_api(modified_since_time)
@@ -46,6 +47,11 @@ class Contact < ActiveRecord::Base
 
   def self.filter_by_xero_contact_id(xero_contact_id)
     where("contacts.xero_contact_id = '#{xero_contact_id}'")
+  end
+
+  def self.filter_by_customer(customer_ids)
+    return all if customer_ids.nil?
+    where('contacts.customer_id IN (?)', customer_ids)
   end
 
 end

@@ -1,4 +1,11 @@
 GIT
+  remote: git://github.com/berikin/rails-rateit.git
+  revision: 35004859279195c619e1075d2616c226c3d447aa
+  specs:
+    rails-rateit (1.0.22)
+      railties (>= 3.2, < 5.0)
+
+GIT
   remote: https://github.com/hinammehra/xeroizer.git
   revision: 4f09bf28f1d4904fb2f876989f81b5f57c2a5c39
   specs:
@@ -104,6 +111,7 @@ GEM
     filterrific (2.1.2)
     fuzzy-string-match (1.0.0)
       RubyInline (>= 3.8.6)
+    geocoder (1.4.3)
     geokit (1.10.0)
     geokit-rails (2.2.0)
       geokit (~> 1.5)
@@ -120,6 +128,8 @@ GEM
       mime-types (>= 1.6)
       representable (~> 3.0)
       retriable (>= 2.0, < 4.0)
+    google_places (0.33.0)
+      httparty (>= 0.13.1, < 0.14.1)
     googleauth (0.5.1)
       faraday (~> 0.9)
       jwt (~> 1.4)
@@ -129,6 +139,8 @@ GEM
       os (~> 0.9)
       signet (~> 0.7)
     hashie (3.4.6)
+    httparty (0.14.0)
+      multi_xml (>= 0.5.2)
     httpclient (2.8.3)
     hurley (0.2)
     i18n (0.8.1)
@@ -162,6 +174,7 @@ GEM
     momentjs-rails (2.17.1)
       railties (>= 3.1)
     multi_json (1.12.1)
+    multi_xml (0.6.0)
     multipart-post (2.0.0)
     mysql2 (0.3.21)
     mysql2 (0.3.21-x86-mingw32)
@@ -288,9 +301,11 @@ DEPENDENCIES
   coffee-rails (~> 4.1.0)
   filterrific
   fuzzy-string-match
+  geocoder
   geokit-rails
   gmaps4rails
   google-api-client
+  google_places
   jbuilder (~> 2.0)
   jquery-rails
   jquery-ui-rails
@@ -299,6 +314,7 @@ DEPENDENCIES
   puma
   rails (= 4.2.4)
   rails-jquery-autocomplete
+  rails-rateit (~> 1.0.22)!
   rails_sortable (= 0.1.0)
   roo (~> 1.13.2)
   sass-rails (~> 5.0)

@@ -1,0 +1,29 @@
+<table class = "table table-striped table-bordered table-hover table-responsive" style="margin-top: 10px;">
+	<tr class="info">
+		<th></th>
+		<%# @overall_stats has structure {time_period => [sum, avg, supply]} %>
+		<% @overall_stats.keys.each do |t| %>
+			<th><%= t %></th>
+		<% end %>
+	</tr>
+
+	<tr>
+		<td>Total <%= sum_param %></td>
+		<% @overall_stats.each do |t, a| %>
+			<td class="num"><%= display_overall_stat(a[0], sum_param) %></td>
+		<% end %>
+	</tr>
+	<tr>
+		<td><%= @selected_period.capitalize %> Average</td>
+		<% @overall_stats.each do |t, a| %>
+			<td class="num"><%= display_num(a[1]) %></td>
+		<% end %>
+	</tr>
+
+	<tr class = <%= supply_display_class %>>
+		<td><%= @selected_period.capitalize %> Supply</td>
+		<% @overall_stats.each do |t, a| %>
+			<td class="num"><%= display_num(a[2]) %></td>
+		<% end %>
+	</tr>
+</table>

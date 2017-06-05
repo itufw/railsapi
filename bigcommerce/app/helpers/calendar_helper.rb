@@ -1,4 +1,10 @@
 module CalendarHelper
+
+  def user_full_right(_authority)
+    return true if %w[Admin Management Accounts].include? session[:authority]
+    false
+  end
+
   def sales_last_order(params)
     return 'Last_Order' if ((params["filter_selector"].nil?) || ("".eql?params["filter_selector"]) ||  ("Last_Order".eql?params["filter_selector"]))
     'Sales'
@@ -60,8 +66,8 @@ module CalendarHelper
       end
       map_pin = {
         "name"=> name,
-        "lat" => customer.lat,
-        "lng" => customer.lng,
+        "lat" => customer.latitude,
+        "lng" => customer.longitude,
         "url" => url,
         "infowindow" => infowindow,
         "staff_id" => customer.staff_id
@@ -108,15 +114,14 @@ module CalendarHelper
     max
   end
 
-  def add_event_pin(customer, event)
+  def add_event_pin(customer, event, current_customer = true)
     name = (customer.actual_name.nil?) ? customer.firstname.to_s + ' ' + customer.lastname.to_s : customer.actual_name.to_s
-
     infowindow = event.description
-
+    url = 'map_icons/daysofweek_' + event.start_date.strftime("%a").downcase.to_s + '_' + (current_customer ? 'yellow' : 'black') + '.png'
     map_pin = {
-      'name' => name, 'lat' => customer.lat, 'lng' => customer.lng,
+      'name' => name, 'lat' => customer.latitude, 'lng' => customer.longitude,
       'customer_id' => event.customer_id,
-      'url' => 'map_icons/blue_dot.png', 'infowindow' => infowindow,
+      'url' => url, 'infowindow' => infowindow,
       'date' => event.start_date, 'event_id' => event.google_event_id,
       'creator' => event.response_staff, 'participant' => event.staff_id
     }
@@ -133,9 +138,10 @@ module CalendarHelper
     }
     _, colour_range = map_filter(params, colour_guide, colour_range, false)
     start_date, end_date = time_picker(params, 0)
-    customers = Customer.joins(:addresses).select("addresses.lat, addresses.lng, customers.*").where("addresses.lat IS NOT NULL AND (customers.staff_id IN (?) OR customers.id IN (?))", staffs.map(&:id), events.map(&:customer_id)).group("customers.id")
+    customers = Customer.joins(:addresses).select("addresses.lat AS latitude, addresses.lng AS longitude, customers.*").where("addresses.lat IS NOT NULL AND (customers.staff_id IN (?) OR customers.id IN (?))", staffs.map(&:id), events.map(&:customer_id)).group("customers.id")
     customers = customers.joins(:orders).select("MAX(orders.date_created) as last_order_date, customers.id").where("orders.status_id IN (2, 3, 7, 8, 9, 10, 11, 12, 13)").order("orders.date_created DESC").group("customers.id")
 
+    leads = CustomerLead.all
     # customer pins -> based on last order date
     customer_map = {}
     customers.each do |customer|
@@ -153,7 +159,12 @@ module CalendarHelper
     event_map = {}
     events.each do |event|
       customer = customers.select { |x| x.id == event.customer_id }.first
-      event_map[event.google_event_id] = add_event_pin(customer, event) unless customer.nil?
+      if !customer.nil?
+        event_map[event.google_event_id] = add_event_pin(customer, event)
+      else
+        lead = leads.select { |x| x.id == event.customer_lead_id}.first
+        event_map[event.google_event_id] = add_event_pin(lead, event, false) unless lead.nil?
+      end
     end
     [customer_map, event_map, start_date, end_date]
   end
@@ -166,9 +177,15 @@ module CalendarHelper
       marker.picture({ url: view_context.image_path(event[event_id]["url"]),
                         width: 30,
                         height: 30 })
-      marker.infowindow "<a href=\"http://188.166.243.138/customer/summary?customer_id=#{event[event_id]['customer_id']}&customer_name=#{event[event_id]['name']}\">#{event[event_id]['name']}</a>
-                              <br/><br/>
-                              <p>#{event[event_id]['infowindow']}<p>"
+      if event[event_id]['customer_id'].nil?
+        marker.infowindow "</a>#{event[event_id]['name']}</a>
+                                <br/><br/>
+                                <p>#{event[event_id]['infowindow']}<p>"
+      else
+        marker.infowindow "<a href=\"http://188.166.243.138/customer/summary?customer_id=#{event[event_id]['customer_id']}&customer_name=#{event[event_id]['name']}\">#{event[event_id]['name']}</a>
+                                <br/><br/>
+                                <p>#{event[event_id]['infowindow']}<p>"
+      end
       marker.json({
         date: event[event_id]['date'],
         participant: event[event_id]['participant'],
@@ -188,7 +205,7 @@ module CalendarHelper
     selected_staff, colour_range = map_filter(params, colour_guide, colour_range, false)
     start_date, end_date = time_picker(params, 0)
 
-    customers = Customer.joins(:addresses).select("addresses.lat, addresses.lng, customers.*").where("addresses.lat IS NOT NULL AND customers.staff_id IN (?)", staffs.map{|x| x.id}).group("customers.id")
+    customers = Customer.joins(:addresses).select("addresses.lat AS latitude, addresses.lng AS longitude, customers.*").where("addresses.lat IS NOT NULL AND customers.staff_id IN (?)", staffs.map{|x| x.id}).group("customers.id")
     # the Status check needs to be updated
     customers = customers.joins(:orders).select("MAX(orders.date_created) as last_order_date, customers.id").where("orders.status_id IN (2, 3, 7, 8, 9, 10, 11, 12, 13)").order("orders.date_created DESC").group("customers.id")
     customers = customers.select{|x| selected_cust_style.include? x.cust_style_id.to_s } unless selected_cust_style.blank?
@@ -219,7 +236,7 @@ module CalendarHelper
     # default to one month ago until today
     start_date, end_date = time_picker(params, 3)
 
-    customers = Customer.joins(:addresses).select("addresses.lat, addresses.lng, customers.*").where("addresses.lat IS NOT NULL AND customers.staff_id IN (?)", staffs.map{|x| x.id}).group("customers.id")
+    customers = Customer.joins(:addresses).select("addresses.lat AS latitude, addresses.lng AS longitude, customers.*").where("addresses.lat IS NOT NULL AND customers.staff_id IN (?)", staffs.map{|x| x.id}).group("customers.id")
 
     # calculate the customers who have sales record in given period
     customers_sales = Customer.joins(:orders).select("customers.id, sum(orders.total_inc_tax) as sales").where("orders.status_id IN (2, 3, 7, 8, 9, 10, 11, 12, 13)").where("orders.date_created < '#{end_date}' AND orders.date_created > '#{start_date}'").group("customers.id")
@@ -290,4 +307,126 @@ module CalendarHelper
     return authorization
   end
 
+  # scrap events from google calendar
+  def update_google_events(new_events, tasks, staff_calendars, unconfirm)
+    new_events.select { |x| (!tasks.include?x.id) || (unconfirm.include?x.id) }.each do |event|
+      if unconfirm.include? event.id
+        task = Task.filter_by_google_event_id(event.id).first
+        task.auto_update_from_calendar_event(event) unless task.nil?
+      else
+        # filter the staff
+        staff_address = staff_calendars.select { |x| [event.organizer.email, event.creator.email].include? x.calendar_address}.first
+        next if staff_address.blank?
+        Task.new.auto_insert_from_calendar_event(event, staff_address.staff_id)
+      end
+    end
+  end
+
+  def scrap_from_calendars(service)
+    new_events = []
+    tasks = Task.where('google_event_id IS NOT NULL').map(&:google_event_id)
+    unconfirmed_task = Task.unconfirmed_event.map(&:google_event_id)
+
+    staff_calendars = StaffCalendarAddress.all
+    service.list_calendar_lists.items.select { |x| staff_calendars.map(&:calendar_address).include?x.id }.each do |calendar|
+      new_events += service.list_events(calendar.id).items
+    end
+    update_google_events(new_events, tasks, staff_calendars, unconfirmed_task)
+  end
+
+  # -----------------push events to google calendar ---------------------
+  def push_pending_events_to_google
+    client = Signet::OAuth2::Client.new(client_id: Rails.application.secrets.google_client_id,
+                                        client_secret: Rails.application.secrets.google_client_secret,
+                                        token_credential_uri: 'https://accounts.google.com/o/oauth2/token')
+
+    client.update!(
+      :additional_parameters => {"access_type" => "offline"}
+      )
+    client.update!(session[:authorization])
+
+    service = Google::Apis::CalendarV3::CalendarService.new
+    service.authorization = client
+
+    tasks = Task.pending_event
+    tasks.each do |t|
+      t_relations = t.task_relations
+      customer_id = t_relations.map(&:customer_id).compact
+      customer_id = (customer_id.blank?) ? 0 : customer_id.first
+      staff_ids = t_relations.map(&:staff_id).compact
+      staff_ids.delete(0)
+      next if staff_ids.blank?
+      t.google_event_id = push_event(customer_id, t.description, staff_ids, t.response_staff, t.start_date, t.end_date, t.subject_1, t.method, service, client).id
+      t.gcal_status = "pushed"
+      t.save
+    end
+  end
+
+  def combine_adress(customer_address)
+    location = ""
+
+    return location if customer_address.nil? || customer_address.blank?
+    customer_address = customer_address.first
+
+    location += customer_address.street_1 + " "
+    location += customer_address.street_2 + " " unless customer_address.street_2.nil?
+    location += ", " + customer_address.city + ", " + customer_address.state + ", " + customer_address.country
+    location
+  end
+
+  # TODO
+  # TODO
+  # TODO
+  # TODO
+  def push_event(customer_id, description, staff_ids, response_staff, start_time, end_time, subject, method, service, client)
+
+    staffs = Staff.filter_by_ids(staff_ids.append(response_staff))
+    staff_calendar_addresses = StaffCalendarAddress.filter_by_ids(staff_ids)
+    response_staff = staffs.select { |x| x.id.to_s == response_staff.to_s }.first
+    response_staff_email = response_staff.email
+
+    attendee_list = []
+    staffs.each do |staff|
+      attend = {
+        displayName: staff.nickname,
+        email: staff_calendar_addresses.select{|x|x.staff_id == staff.id}.first.calendar_address
+      }
+      attendee_list.append(attend)
+    end
+
+    customer = Customer.where("customers.id = #{customer_id}")
+    customer = (customer.blank?) ? 'No Customer' : customer.first.actual_name
+
+    address = combine_adress(Address.where("customer_id = #{customer_id}")) if customer_id != 0
+    task_subject = TaskSubject.find(subject).subject
+
+    event = Google::Apis::CalendarV3::Event.new({
+                                                start: {
+                                                  date_time: start_time.strftime('%Y-%m-%dT%H:%M:%S'),
+                                                  time_zone: 'Australia/Melbourne',
+                                                },
+                                                end:{
+                                                  date_time: end_time.strftime('%Y-%m-%dT%H:%M:%S'),
+                                                  time_zone: 'Australia/Melbourne',
+                                                },
+                                                # colorID: "2",
+                                                summary: customer,
+                                                description: task_subject + ": "+ customer + "\n" +description + "\n Created By:" + response_staff.nickname,
+                                                location: address,
+                                                attendees: attendee_list
+                                                })
+    begin
+      gcal_event = service.insert_event(response_staff_email, event, send_notifications: true)
+      return gcal_event
+    rescue Google::Apis::AuthorizationError
+      client.update!(
+        additional_parameters: {
+          grant_type: 'refresh_token'
+        }
+      )
+      response = client.refresh!
+      session[:authorization] = session[:authorization].merge(response)
+      retry
+    end
+  end
 end

@@ -1,0 +1,21 @@
+// Place all the styles related to the Lead controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+.table-fixed thead {
+  width: 100%;
+}
+.table-fixed tbody {
+  height: 100px;
+  overflow-y: auto;
+  width: 100%;
+}
+.table-fixed thead, .table-fixed tbody, .table-fixed tr, .table-fixed td, .table-fixed th {
+  display: block;
+}
+.table-fixed tbody td, .table-fixed thead > tr> th {
+  float: left;
+  border-bottom-width: 0;
+}
+// .table-fixed tbody tr:nth-child(even) {background: #CCC}
+// .table-fixed tbody tr:nth-child(odd) {background: #FFF}

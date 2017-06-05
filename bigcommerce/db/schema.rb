@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170504051948) do
+ActiveRecord::Schema.define(version: 20170601024845) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -127,6 +127,34 @@ ActiveRecord::Schema.define(version: 20170504051948) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
+
+  create_table "customer_leads", force: :cascade do |t|
+    t.text     "firstname",     limit: 255
+    t.text     "lastname",      limit: 255
+    t.text     "company",       limit: 255
+    t.text     "email",         limit: 255
+    t.text     "phone",         limit: 255
+    t.text     "actual_name",   limit: 65535
+    t.text     "region",        limit: 65535
+    t.integer  "staff_id",      limit: 4
+    t.integer  "cust_type_id",  limit: 4
+    t.integer  "cust_group_id", limit: 4
+    t.integer  "cust_style_id", limit: 4
+    t.datetime "date_created"
+    t.datetime "date_modified"
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+    t.float    "latitude",      limit: 24
+    t.float    "longitude",     limit: 24
+    t.text     "address",       limit: 65535
+    t.text     "mobile_phone",  limit: 65535
+    t.text     "website",       limit: 65535
+    t.text     "img",           limit: 65535
+  end
+
+  add_index "customer_leads", ["cust_group_id"], name: "index_customer_leads_on_cust_group_id", using: :btree
+  add_index "customer_leads", ["cust_type_id"], name: "index_customer_leads_on_cust_type_id", using: :btree
+  add_index "customer_leads", ["staff_id"], name: "index_customer_leads_on_staff_id", using: :btree
 
   create_table "customers", force: :cascade do |t|
     t.text     "firstname",               limit: 255
@@ -338,6 +366,15 @@ ActiveRecord::Schema.define(version: 20170504051948) do
   add_index "orders", ["staff_id"], name: "index_orders_on_staff_id", using: :btree
   add_index "orders", ["status_id"], name: "index_orders_on_status_id", using: :btree
 
+  create_table "portfolios", force: :cascade do |t|
+    t.datetime "date_start"
+    t.datetime "date_end"
+    t.text     "name",       limit: 65535
+    t.text     "pipe",       limit: 65535
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
   create_table "producer_countries", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.string   "short_name", limit: 255
@@ -397,6 +434,20 @@ ActiveRecord::Schema.define(version: 20170504051948) do
   end
 
   add_index "product_no_ws", ["product_no_vintage_id"], name: "index_product_no_ws_on_product_no_vintage_id", using: :btree
+
+  create_table "product_notes", force: :cascade do |t|
+    t.integer  "task_id",      limit: 4
+    t.integer  "created_by",   limit: 4
+    t.integer  "product_id",   limit: 4
+    t.integer  "rating",       limit: 4
+    t.text     "note",         limit: 65535
+    t.string   "intention",    limit: 255
+    t.decimal  "price",                      precision: 7, scale: 3
+    t.decimal  "price_luc",                  precision: 7, scale: 3
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+    t.string   "product_name", limit: 255
+  end
 
   create_table "product_package_types", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -498,6 +549,14 @@ ActiveRecord::Schema.define(version: 20170504051948) do
     t.integer  "on_order",                  limit: 1
   end
 
+  create_table "promotions", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "date_start"
+    t.datetime "date_end"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "revisions", force: :cascade do |t|
     t.datetime "start_time"
     t.datetime "end_time"
@@ -505,6 +564,15 @@ ActiveRecord::Schema.define(version: 20170504051948) do
     t.datetime "updated_at",              null: false
     t.integer  "attempt_count", limit: 4
   end
+
+  create_table "staff_calendar_addresses", force: :cascade do |t|
+    t.integer  "staff_id",         limit: 4
+    t.text     "calendar_address", limit: 65535
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+  end
+
+  add_index "staff_calendar_addresses", ["staff_id"], name: "index_staff_calendar_addresses_on_staff_id", using: :btree
 
   create_table "staff_time_periods", force: :cascade do |t|
     t.integer  "staff_id",         limit: 4
@@ -545,6 +613,7 @@ ActiveRecord::Schema.define(version: 20170504051948) do
     t.integer  "staff_order",      limit: 4
     t.string   "access_token",     limit: 255
     t.string   "refresh_token",    limit: 255
+    t.integer  "pick_up_id",       limit: 4
   end
 
   add_index "staffs", ["active"], name: "index_staffs_on_active", using: :btree
@@ -591,15 +660,16 @@ ActiveRecord::Schema.define(version: 20170504051948) do
   end
 
   create_table "task_relations", force: :cascade do |t|
-    t.integer  "task_id",         limit: 4
-    t.integer  "contact_id",      limit: 4
-    t.integer  "customer_id",     limit: 4
-    t.integer  "cust_group_id",   limit: 4
-    t.integer  "staff_id",        limit: 4
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.integer  "task_id",          limit: 4
+    t.integer  "contact_id",       limit: 4
+    t.integer  "customer_id",      limit: 4
+    t.integer  "cust_group_id",    limit: 4
+    t.integer  "staff_id",         limit: 4
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
     t.datetime "completed_date"
-    t.integer  "completed_staff", limit: 4
+    t.integer  "completed_staff",  limit: 4
+    t.integer  "customer_lead_id", limit: 4
   end
 
   create_table "task_subjects", force: :cascade do |t|
@@ -633,6 +703,11 @@ ActiveRecord::Schema.define(version: 20170504051948) do
     t.string   "accepted",            limit: 10
     t.string   "google_event_id",     limit: 255
     t.integer  "gcal_status",         limit: 4
+    t.text     "location",            limit: 65535
+    t.text     "summary",             limit: 65535
+    t.integer  "portfolio_id",        limit: 4
+    t.integer  "promotion_id",        limit: 4
+    t.string   "pro_note_include",    limit: 255
   end
 
   create_table "tax_percentages", force: :cascade do |t|

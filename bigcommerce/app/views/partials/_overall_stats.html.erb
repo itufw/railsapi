@@ -1,25 +1,25 @@
-	<div class="col-xs-2" style="float: left;">
+	<div class="col-xs-2  sales-stats-section" style="float: left;">
 	<%= render "partials/period_select" %>
 	</div>
-	<%= submit_tag "Change", class: 'btn btn-primary' %>
+	<%= submit_tag "Change", class: 'btn btn-primary sales-stats-section' %>
 
-<table class = "table table-striped table-bordered table-hover table-responsive" style="margin-top: -40px;">
+<table class = "table table-striped table-bordered table-hover table-responsive" style="margin-top: -10px;">
 
-	<tr class="info">
-		<th></th>
+	<tr class="info sales-stats-bar">
+		<th style="color: red">Sales Stats</th>
 		<%# @overall_stats has structure {time_period => [sum, avg, supply]} %>
 		<% @overall_stats.keys.each do |t| %>
 			<th><%= t %></th>
 		<% end %>
 	</tr>
 
-	<tr>
+	<tr class="sales-stats-section">
 		<td>Total <%= sum_param %></td>
 		<% @overall_stats.each do |t, a| %>
 			<td class="num"><%= display_overall_stat(a[0], sum_param) %></td>
 		<% end %>
 	</tr>
-	<tr>
+	<tr class="sales-stats-section">
 		<td><%= @selected_period.capitalize %> Average</td>
 		<% @overall_stats.each do |t, a| %>
 			<td class="num"><%= display_num(a[1]) %></td>
@@ -33,3 +33,9 @@
 		<% end %>
 	</tr>
 </table>
+
+<script>
+	$('.sales-stats-bar').click(function(){
+		$('.sales-stats-section').toggle();
+	});
+</script>
