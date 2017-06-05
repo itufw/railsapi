@@ -6,7 +6,7 @@
 <table class = "table table-striped table-bordered table-hover table-responsive" style="margin-top: -10px;">
 
 	<tr class="info sales-stats-bar">
-		<th>Sales Stats</th>
+		<th style="color: red">Sales Stats</th>
 		<%# @overall_stats has structure {time_period => [sum, avg, supply]} %>
 		<% @overall_stats.keys.each do |t| %>
 			<th><%= t %></th>
