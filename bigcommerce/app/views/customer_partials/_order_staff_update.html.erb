@@ -10,6 +10,6 @@
 
 		<% end %>
 	<% else %>
-		<%= staff_nickname_direct(staff) %>
+		<%= Staff.find(staff_id).nickname %>
 	<% end %>
 </td>
