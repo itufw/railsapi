@@ -50,4 +50,24 @@ $('.remove_staff').click(function(){
 $('#task_subject_1').on('change',function(){
   TaskCompleteForm();
 });
+
+<%
+  customer = @customer_text==nil ? nil : Customer.where('customers.actual_name = ?', @customer_text).first
+  unless customer.nil?
+%>
+      if($('#tr_customer_<%=customer.id%>').length == 0){
+        $('#customer_table').append([
+          '<tr id="tr_customer_<%=customer.id%>">',
+              '<td><%= text_field_tag 'customer '+customer.id.to_s, customer.actual_name, readonly: true %></td>',
+              '<td><i class="glyphicon glyphicon-remove remove_customer" title="remove"></i></td>',
+          '</tr>'
+          ].join(''));
+        $('.remove_customer').click(function(){
+          var att = $(this).parent().parent().attr('id').split('_');
+          var customer_id = att[att.length -1 ]
+          $(this).parent().parent().remove();
+        });
+      }
+<%end%>
+
 </script>
