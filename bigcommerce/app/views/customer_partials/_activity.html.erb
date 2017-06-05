@@ -1,7 +1,5 @@
 
 <div class="btn group activity-section" role="group" data-toggle="buttons" aria-label="activity_filter">
-  <%= label(:activity, "Activity:", style: 'font-size: 30px')%>
-  <br/>
   <label class="btn btn-secondary">
     <%= radio_button_tag(:activity_filter, "staff", false) %>
     <li class="dropdown">
@@ -63,13 +61,13 @@
 <div>
   <button style="float: right;"><%= link_to "New Note", controller: 'activity', action: 'add_note', customer_id: @customer_id, customer_search_text: @customer_name %></button>
   <button style="float: right;"><%= link_to "New Task", controller: 'activity', action: 'add_activity', customer_id: @customer_id, customer_search_text: @customer_name %></button>
-  <button style="float: right;"><%= link_to "Called", controller: 'activity', action: 'add_note', customer_id: @customer_id, customer_search_text: @customer_name %></button>
+  <button style="float: right;"><%= link_to "Called", controller: 'activity', action: 'add_note', customer_id: @customer_id, customer_search_text: @customer_name, selected_method: 'Call' %></button>
 </div>
 
 <table class="table table-striped table-bordered table-hover table-responsive table-fixed" style="margin-top: -10px">
   <thead>
     <tr class="info activity-bar">
-      <th class="col-md-4" style="color: red">Activity</th>
+      <th class="col-md-4" style="color: red" id="activity_show">Activity</th>
       <th class="col-md-7">Note</th>
       <th class="col-md-1">Due</th>
     </tr>
@@ -92,7 +90,7 @@
           <%= task.method%>
         </div>
       </td>
-      <td class="col-md-8"><%= task.description%></td>
+      <td class="col-md-8"><%= link_to task.description,controller: "task", action: "task_details", task_id: task.id%></td>
       <td class="col-md-2"><%= task.end_date.strftime("%d/%m") %></td>
     </tr>
     <% end %>
@@ -102,12 +100,12 @@
 
 <script>
 
-$('.activity-bar').click(function(){
+$('#activity_show').click(function(){
   $('.activity-section').toggle();
 });
 
 
-$('label[for*=activity_Activity]').click(function(){
+$('.activity-bar').click(function(){
   $('.activity_tr').show();
 });
 
