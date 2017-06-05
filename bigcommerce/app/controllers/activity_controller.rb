@@ -22,6 +22,9 @@ class ActivityController < ApplicationController
       = function_search(params)
     # @products = product_search
     @note = Task.new
+    if params[:note_id] && Task.where('tasks.id = ?', params[:note_id]).count > 0
+      @note.parent_task = params[:note_id]
+    end
 
     # TEST VERSION
     # @products = Product.sample_products(35, 20)
@@ -32,6 +35,7 @@ class ActivityController < ApplicationController
 
     @customer_text = params[:customer_search_text] || nil
 
+    @selected_method = params[:selected_method] || 'Meeting'
     # production version
     if %w['Sales Executive'].include? session[:authority]
       @products = Product.sample_products(session[:user_id], 20)

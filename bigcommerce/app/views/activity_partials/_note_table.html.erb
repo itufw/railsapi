@@ -12,7 +12,7 @@
       <%= f.collection_select :function, @function, :function, :function, {:include_blank => "Select a Function", :selected => @function_role}, {class:"function_selection", style: 'width: 80px'} %>
       <br/>
       <%= label(:method, "Method:")%>
-      <%= f.collection_select :method, @methods, :method, :method, {:include_blank => "Select a Method", :selected => "Meeting"}, style: 'width: 80px' %>
+      <%= f.collection_select :method, @methods, :method, :method, {:include_blank => "Select a Method", :selected => @selected_method}, style: 'width: 80px' %>
       <br/>
       <%= label(:promotion, "Promotion:")%>
       <%= f.collection_select :promotion_id, @promotion, :id, :name, {:include_blank => "Select a Campaign"}, style: 'width: 80px' %>
