@@ -149,11 +149,12 @@ class CustomerController < ApplicationController
   end
 
   def update_staff
+    p = c
+
     customer_id = params[:customer_id]
     staff_id = params[:staff_id]
 
     Customer.staff_change(staff_id, customer_id)
-
     # render html: "#{customer_id}, #{staff_id}".html_safe
     flash[:success] = 'Staff Successfully Changed.'
     redirect_to request.referrer
@@ -166,7 +167,7 @@ class CustomerController < ApplicationController
     order = Order.find(order_id)
     order.staff_id = staff_id
     order.save
-    
+
     # render html: "#{customer_id}, #{staff_id}".html_safe
     flash[:success] = 'Staff Successfully Changed.'
     redirect_to request.referrer

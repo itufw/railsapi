@@ -24,7 +24,7 @@ class ActivityController < ApplicationController
     @note = Task.new
 
     # TEST VERSION
-    @products = Product.sample_products(35, 20)
+    # @products = Product.sample_products(35, 20)
 
     @search_text = params[:product_search_text] || nil
 
@@ -33,7 +33,11 @@ class ActivityController < ApplicationController
     @customer_text = params[:customer_search_text] || nil
 
     # production version
-    # @products = Product.sample_products(session[:user_id], 20)
+    if %w['Sales Executive'].include? session[:authority]
+      @products = Product.sample_products(session[:user_id], 20)
+    else
+      @products = Product.sample_products(35, 20)
+    end
   end
 
   def save_note
@@ -51,6 +55,8 @@ class ActivityController < ApplicationController
   # insert task
   # following Dropbox -> pages -> Activity
   def add_activity
+    @customer_text = params[:customer_search_text] || nil
+
     @task = Task.new
 
     if params[:note_id] && Task.where('tasks.id = ?', params[:note_id]).count > 0
@@ -62,8 +68,12 @@ class ActivityController < ApplicationController
     @function, @subjects, @methods, @function_role, @promotion, @portfolio \
       = function_search(params)
 
-    @products = Product.sample_products(35, 20)
-    # @products = Product.sample_products(session[:user_id], 20)
+      # @products = Product.sample_products(session[:user_id], 20)
+      if %w['Sales Executive'].include? session[:authority]
+        @products = Product.sample_products(session[:user_id], 20)
+      else
+        @products = Product.sample_products(35, 20)
+      end
 
     @staff_text = params[:staff_search_text]
   end

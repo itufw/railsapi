@@ -167,7 +167,9 @@ module AccountsHelper
     end
 
     def get_invoice_table(customer_id, monthly, date)
-        invoice = XeroContact.where(skype_user_name: customer_id).first.xero_invoices.has_amount_due.period_select(@end_date)
+        invoice = XeroContact.where(skype_user_name: customer_id).first
+        return nil if invoice.nil?
+        invoice = invoice.xero_invoices.has_amount_due.period_select(@end_date)
         date =	Date.strptime(date.to_s, '%Y-%m-%d')
         sum_of_amount = {}
         sum_of_amount['invoice_date'] = Array.new(6) { 0 }
