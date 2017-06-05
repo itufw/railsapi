@@ -149,8 +149,6 @@ class CustomerController < ApplicationController
   end
 
   def update_staff
-    p = c
-
     customer_id = params[:customer_id]
     staff_id = params[:staff_id]
 
