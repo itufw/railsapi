@@ -22,6 +22,8 @@
 		<%= hidden_field_tag :customer_id, @customer_id %>
 	  <%= hidden_field_tag :customer_name, @customer_name %>
 	</div>
+<!-- End Form -->
+<% end %>
 
 	<% unless @amount_due.nil?%>
 		<div class="account_stats" style="margin-top: 50px;">
@@ -30,7 +32,6 @@
 	<% end %>
 
 	<%= render "partials/order", orders: @orders, display_class: "none", product_ids: nil %>
-<% end %>
 
 <script>
 	// $('.activity-section').hide();
