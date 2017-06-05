@@ -34,10 +34,14 @@ module ActivityHelper
 
   # function collection ; subject collection; methods collection;
   # default function value; promotion rate
-  def function_search(params)
+  def function_search(params, parent_task_function = nil)
     function = staff_function(session[:user_id])
     # Sales/ Operations/ Accounting
-    default_function = default_function_type(session[:authority])
+    if parent_task_function.nil?
+      default_function = default_function_type(session[:authority])
+    else
+      default_function = parent_task_function
+    end
     params[:selected_function] = params[:selected_function] || default_function
     promotion = Promotion.all
 
@@ -93,6 +97,7 @@ module ActivityHelper
       tr.save
     end
     task.save
+    customers.first
   end
 
   def product_note_save(params, staff_id, task_id)
