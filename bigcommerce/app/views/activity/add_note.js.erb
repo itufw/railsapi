@@ -1,0 +1,135 @@
+$('.add_row_product').click(function(){
+  <%unless @search_text.nil?
+    products = Product.where('products.name = ?', @search_text)
+    append_product = products.first
+  end
+  unless append_product.nil?
+    wet = TaxPercentage.wet_percentage * 0.01
+  %>
+  if ($('#product_search').val() != ""){
+        if($('#tr_<%=append_product.id%>').length == 0){
+          $('#product_table').append([
+            '<tr id="tr_<%=append_product.id%>">',
+                '<td><%= append_product.id%></td>',
+                '<td><%= text_field_tag 'product_name '+append_product.id.to_s, append_product.name, readonly:true %></td>',
+                '<td class="num"><%= text_field_tag 'price_luc '+append_product.id.to_s, "%.2f" %(append_product.calculated_price * (1 + wet)), readonly: true%></td>',
+                '<td><%= text_field_tag 'discount '+append_product.id.to_s,  0, placeholder: 'Discount', size: 3 %> %</td>',
+                '<td><%= text_field_tag 'price '+append_product.id.to_s,"%.2f" %(append_product.calculated_price * (1 + wet)), placeholder: 'Price', size: 5%></td>',
+                '<td><%= text_field_tag 'note '+append_product.id.to_s, ''%></td>',
+                '<td><%= check_box_tag 'buy_wine[]', append_product.id.to_s%> </td>',
+                '<td>',
+                    '<%= number_field_tag(:rating, nil, {min: 1, max:5, step:1, id: 'rate_'+append_product.id.to_s}) %>',
+                    '<%=rateit(type:"span", backingfld: '#rate_'+append_product.id.to_s, max:5, min:1, step:1, resetable:'false')%>',
+                '</td>',
+                '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
+            '</tr>'
+            ].join(''));
+
+            $('#price_<%= append_product.id %>').on('input',function(){
+              var d = $('#price_<%= append_product.id %>').val();
+              var c = '<%= append_product.calculated_price * (1 + wet)%>';
+              $('#discount_<%= append_product.id %>').val((100 - (d/c*100)).toFixed(0));
+            });
+
+            $('#discount_<%= append_product.id %>').on('input',function(){
+              var d = $('#discount_<%= append_product.id %>').val();
+              var c = '<%= append_product.calculated_price * (1 + wet)%>';
+              $('#price_<%= append_product.id %>').val(((1-d*0.01)*c).toFixed(2));
+            });
+
+            $('.remove_row').click(function(){
+              $(this).parent().parent().remove();
+            });
+          }
+  }
+  <%end%>
+});
+
+
+$('.wine-list-product').click(function(){
+  <%
+      product = @products.select { |x| x.id == @product_selected.to_i }.first
+      unless product.nil?
+        wet = TaxPercentage.wet_percentage * 0.01
+  %>
+  if($('#tr_<%=product.id%>').length == 0){
+    $('#product_table').append([
+      '<tr id="tr_<%=product.id%>">',
+          '<td><%= product.id%></td>',
+          '<td><%= text_field_tag 'product_name '+ product.id.to_s,product.name, readonly:true %></td>',
+          '<td class="num"><%= text_field_tag 'price_luc '+product.id.to_s, "%.2f" %(product.calculated_price * (1 + wet)), readonly: true%></td>',
+          '<td><%= text_field_tag 'discount '+product.id.to_s,  0, placeholder: 'Discount', size: 3 %> %</td>',
+          '<td><%= text_field_tag 'price '+product.id.to_s, "%.2f" %(product.calculated_price * (1 + wet)), placeholder: 'Price', size: 5%></td>',
+          '<td><%= text_field_tag 'note '+product.id.to_s, ''%></td>',
+          '<td><%= check_box_tag 'buy_wine[]', product.id.to_s%> </td>',
+          '<td>',
+            '<%= number_field_tag("rate "+product.id.to_s, 1, {min: 1, max:5, step:1, id: "rate_"+product.id.to_s}) %>',
+            '<%= rateit(type:"span", backingfld: "#rate_"+product.id.to_s, max:5, min:1, step:1, resetable:"false")%>',
+          '</td>',
+          '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
+      '</tr>'
+      ].join(''));
+
+      $('#price_<%= product.id %>').on('input',function(){
+        var d = $('#price_<%= product.id %>').val();
+        var c = '<%= product.calculated_price * (1 + wet)%>';
+        $('#discount_<%= product.id %>').val((100 - (d/c*100)).toFixed(0));
+      });
+
+      $('#discount_<%= product.id %>').on('input',function(){
+        var d = $('#discount_<%= product.id %>').val();
+        var c = '<%= product.calculated_price * (1 + wet)%>';
+        $('#price_<%= product.id %>').val(((1-d*0.01)*c).toFixed(2));
+      });
+
+
+      $('.remove_row').click(function(){
+        $(this).parent().parent().remove();
+      });
+    }
+  <% end %>
+});
+
+
+$('.activity-customers').click(function(){
+  <%
+    customer = @customer_text==nil ? nil : Customer.where('customers.actual_name = ?', @customer_text).first
+    unless customer.nil?
+      invoices = nil
+      invoices = XeroInvoice.where('xero_invoices.xero_contact_id = ? AND xero_invoices.amount_due > 0', customer.xero_contact_id) unless customer.xero_contact_id.nil?
+  %>
+  if ($('#customer_search').val() != ""){
+        if($('#tr_customer_<%=customer.id%>').length == 0){
+          $('#customer_table').append([
+            '<tr id="tr_customer_<%=customer.id%>">',
+                '<td><%= text_field_tag 'customer '+customer.id.to_s, customer.actual_name, readonly: true %></td>',
+                '<td><i class="glyphicon glyphicon-remove remove_customer" title="remove"></i></td>',
+            '</tr>'
+            ].join(''));
+          <% invoices.each do |invoice|%>
+          $('#invoice_table').append([
+            '<tr class="tr_invoice_<%=customer.id%>">',
+                '<td><%= customer.actual_name%></td>',
+                '<td><%= invoice.invoice_number%></td>',
+                '<td><%= invoice.date.to_date.strftime("%d/%-m/%y")%></td>',
+                '<td class="num"><%= invoice.sub_total%></td>',
+                '<td class="num"><%= invoice.amount_due%></td>',
+                '<td><%= invoice.due_date.to_date.strftime("%d/%-m/%y")%></td>',
+                '<td><%= Date.today.mjd - invoice.due_date.to_date.mjd%> Days</td>',
+                '<td><i class="glyphicon glyphicon-remove remove_invoice" title="remove"></i></td>',
+            '</tr>'
+          ].join(''));
+            $('.remove_invoice').click(function(){
+              $(this).parent().parent().remove();
+            });
+          <% end %>
+          $('.remove_customer').click(function(){
+            var att = $(this).parent().parent().attr('id').split('_');
+            var customer_id = att[att.length -1 ]
+            $('.tr_invoice_'+customer_id).remove();
+            $(this).parent().parent().remove();
+          });
+        }
+  }
+  <%end%>
+});

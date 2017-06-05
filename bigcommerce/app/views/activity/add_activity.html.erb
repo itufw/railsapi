@@ -1,0 +1,55 @@
+<%= title 'Activity Add Task'%>
+
+<%= form_for @task, :url => {:controller => "activity", :action => "save_task"}, :id => "task_append_form"  do |f| %>
+
+<div class="row">
+  <%= render 'activity_partials/customer_search'%>
+  <%= render 'activity_partials/task_table', f: f%>
+  <% if @task.parent_task.nil?%>
+    <%= render 'activity_partials/wine_note', f: f%>
+  <% else %>
+    <%= render 'activity_partials/wine_note_saved'%>
+  <% end %>
+  <div class="col-md-8 complete_form">
+    <%= button_tag(type: 'submit', class: 'btn btn-primary') do %>
+      <div> Save </div>
+    <% end %>
+  </div>
+  <div class="col-md-8 incomplete_form">
+    <button type="button" class="btn btn-secondary disabled" disabled>
+      <div>Save</div>
+    </button>
+  </div>
+</div>
+<% end %>
+<script>
+var TaskCompleteForm = function(){
+  if (($('input[id*=staff ]').length > 1) && ($('input[id*=customer ]').length > 1) && ($('#task_subject_1 option:selected').val()!="")){
+    $('.complete_form').show();
+    $('.incomplete_form').hide();
+  }else{
+    $('.complete_form').hide();
+    $('.incomplete_form').show();
+  };
+};
+$('.complete_form').hide();
+
+$('.activity-customers').click(function(){
+  TaskCompleteForm();
+});
+$('.remove_customer').click(function(){
+  TaskCompleteForm();
+});
+$('.activity-staffs').click(function(){
+  TaskCompleteForm();
+});
+$('.remove_staff').click(function(){
+  TaskCompleteForm();
+});
+
+$('#task_subject_1').on('change',function(){
+  TaskCompleteForm();
+});
+
+
+</script>

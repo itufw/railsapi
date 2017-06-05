@@ -2,29 +2,39 @@ Rails.application.routes.draw do
   mount Bootsy::Engine => '/bootsy', as: 'bootsy'
 
   root 'sales#sales_dashboard'
-  #post 'admin/update'
+  # post 'admin/update'
 
-  get 'add_task', to: "task#add_task"
-  get 'local_calendar', to: "calendar#local_calendar"
+  get 'add_task', to: 'task#add_task'
+  get 'local_calendar', to: 'calendar#local_calendar'
+  get 'add_note', to: 'activity#add_note'
+  get 'add_activity', to: 'activity#add_activity'
+  # Google
   get '/redirect', to: 'calendar#redirect', as: 'redirect'
   get '/callback', to: 'calendar#callback', as: 'callback'
   get '/calendars', to: 'calendar#calendars', as: 'calendars'
 
+  get '/rails/mailers' => 'rails/mailers#index'
+  get '/rails/mailers/*path' => 'rails/mailers#preview'
 
-  get '/rails/mailers' => "rails/mailers#index"
-  get '/rails/mailers/*path' => "rails/mailers#preview"
+  get '/activity/add_note', to: 'activity#add_note'
+  get '/activity/add_activity', to: 'activity#add_activity'
 
-  post 'add_task', to: "task#task_record"
-  post 'local_calendar', to: "calendar#local_calendar"
-
-  # this needs to be replaced sometime
-  match ':controller(/:action(/:id))', via: [:get, :post]
-  resources :posts
-  resources :tasks do
-    get :autocomplete_customer_actual_name, :on => :collection
+  resources :activity do
+    get :autocomplete_product_name, on: :collection
+    get :autocomplete_customer_actual_name, on: :collection
+    get :autocomplete_customer_lead_firstname, on: :collection
+    get :autocomplete_staff_nickname, on: :collection
   end
 
-  # The priority is based upon order of creation: first created -> highest priority.
+  post 'add_task', to: 'task#task_record'
+  post 'local_calendar', to: 'calendar#local_calendar'
+  post 'add_note', to: 'activity#add_note'
+
+  # this needs to be replaced sometime
+  match ':controller(/:action(/:id))', via: %i[get post]
+
+  # The priority is based upon order of creation: first created ->
+  # highest priority.
   # See how all your routes lay out with "rake routes".
 
   # You can have the root of your site routed with "root"
@@ -36,7 +46,8 @@ Rails.application.routes.draw do
   # Example of named route that can be invoked with purchase_url(id: product.id)
   #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
 
-  # Example resource route (maps HTTP verbs to controller actions automatically):
+  # Example resource
+  # route (maps HTTP verbs to controller actions automatically):
   #   resources :products
 
   # Example resource route with options:

@@ -39,6 +39,10 @@
           </br>
           <%= label(:customer, "Customer:")%>
             <%= collection_select(:customer, :id, @customers, :id, :actual_name, {:include_blank => 'Active Customer'}, {:class => 'customer_selection'}) %>
+          </br>
+          <%= label(:customer, "Lead:")%>
+            <%= collection_select(:lead, :id, @leads, :id, :actual_name, {:include_blank => 'Active Leads'}, {:class => 'lead_selection'}) %>
+
         <% else %>
           <%= label(:staff, "Staff:")%>
             <%= collection_select(:staff, :id, @staffs, :id, :nickname, {:selected => @current_user.id}) %>
@@ -72,7 +76,6 @@
           </br>
           </div>
       </div>
-      <% if @google_alive %>
         <div class="row" style="margin-top: 5px;">
         	<div class="col-xs-6 col-xs-offset-4">
             <b>Add to Calendar:</b>
@@ -82,7 +85,6 @@
         		</span>
         	</div>
         </div>
-      <% end %>
 
       <div class="col-xs-6 col-xs-offset-4">
           <%= button_tag(type: 'submit', class: "btn btn-primary") do %>
@@ -109,13 +111,13 @@
         useCurrent: false //Important! See issue #1075
       });
 
-      // $("#due_timepicker").on("dp.change", function (e) {
+      $("#due_timepicker").on("dp.change", function (e) {
           // $('#start_timepicker').data("DateTimePicker").date(e.date);
-          // $('#start_timepicker').data("DateTimePicker").maxdate(e.date);
-      // });
-      // $("#start_timepicker").on("dp.change", function (e) {
-          // $('#due_timepicker').data("DateTimePicker").minDate(e.date);
-      // });
+          $('#start_timepicker').data("DateTimePicker").maxdate(e.date);
+      });
+      $("#start_timepicker").on("dp.change", function (e) {
+          $('#due_timepicker').data("DateTimePicker").minDate(e.date);
+      });
   });
 
   $(".is_task_check").change(function () {

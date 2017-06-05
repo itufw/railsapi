@@ -42,6 +42,7 @@
 		<th>Customer <%= render "partials/sort_arrows", order: 'order_by_name' %></th>
 		<th>Staff <%= render "partials/sort_arrows", order: 'order_by_staff' %></th>
 		<th>Channel <%= render "partials/sort_arrows", order: 'order_by_style' %></th>
+		<th>Pending Stock</th>
 		<% @time_periods.each do |t| %>
 			<th><%= t %><%= render "partials/sort_arrows", order: t %></th>
 		<% end %>
@@ -52,6 +53,7 @@
 		<td><%= link_to customer_name(@top_customers[id]), controller: 'customer', action: 'summary_with_product', product_id: @product_id, product_name: @product_name, customer_id: id, customer_name: customer_name(@top_customers[id]), transform_column: @transform_column %></td>
 		<td><%= staff_nickname(@top_customers[id]) %></td>
 		<td><%= customer_style_name(@top_customers[id]) %></td>
+		<td><%= @customer_pendings[id] %></td>
 		<% @time_periods.each do |t| %>
 			<td><%= exists_in_h(@top_customers_timeperiod_h[t], id) %></td>
 		<% end %>

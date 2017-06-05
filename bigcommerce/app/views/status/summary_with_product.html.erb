@@ -28,7 +28,7 @@
 <% end %>
 </div>
 
-<%= form_tag({:controller => "sales", :action => "orders_and_stats_for_product_and_status"}, {:method => "get"}) do %>
+<%= form_tag({:action => "summary_with_product"}, {:method => "get"}) do %>
 <div class="form-group" style="margin-left:550px;">
    <%= render "partials/staff_filter" %>
    <%= render "partials/status_hidden_fields" %>

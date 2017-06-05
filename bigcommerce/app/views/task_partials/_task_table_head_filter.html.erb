@@ -48,7 +48,7 @@
             <a class="" data-toggle="dropdown" href="#">Customer</a>
               <ul class="dropdown-menu">
                 <% @tasks.map{|x| x.task_relations}.map {|x| x.first}.compact.map {|x| x.customer_id}.uniq.each do |customer| %>
-                <% next if customer==0%>
+                <% next if customer==0 || customer == nil%>
                 <li>
                   <%= check_box_tag 'selected_customer[]', customer %>
                   <%= Customer.find(customer).actual_name %>

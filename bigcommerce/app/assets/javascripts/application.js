@@ -22,3 +22,4 @@
 //= require jquery-ui/widgets/autocomplete
 //= require autocomplete-rails
 //= require rails_sortable
+//= require jquery.rateit
