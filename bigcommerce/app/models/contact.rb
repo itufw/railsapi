@@ -54,4 +54,8 @@ class Contact < ActiveRecord::Base
     where('contacts.customer_id IN (?)', customer_ids)
   end
 
+  def self.sales_force
+    where('contacts.salesforce_contact_id IS NOT NULL')
+  end
+
 end

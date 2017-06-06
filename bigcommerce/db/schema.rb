@@ -11,7 +11,59 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170601024845) do
+ActiveRecord::Schema.define(version: 20170606044737) do
+
+  create_table "SalesForce_account", id: false, force: :cascade do |t|
+    t.string "Id",                          limit: 18
+    t.string "Name",                        limit: 52
+    t.string "ParentId",                    limit: 18
+    t.string "BillingStreet",               limit: 93
+    t.string "BillingCity",                 limit: 26
+    t.string "BillingState",                limit: 3
+    t.string "BillingPostalCode",           limit: 4
+    t.string "BillingCountry",              limit: 9
+    t.string "ShippingStreet",              limit: 100
+    t.string "ShippingCity",                limit: 16
+    t.string "ShippingState",               limit: 17
+    t.string "ShippingPostalCode",          limit: 4
+    t.string "ShippingCountry",             limit: 10
+    t.string "Phone",                       limit: 27
+    t.string "Fax",                         limit: 14
+    t.string "Website",                     limit: 217
+    t.string "Description",                 limit: 2783
+    t.string "Rating",                      limit: 8
+    t.string "OwnerId",                     limit: 18
+    t.string "LastModifiedDate",            limit: 10
+    t.string "LastActivityDate",            limit: 10
+    t.string "Wine_Notes__c",               limit: 618
+    t.string "Lead_Type__c",                limit: 25
+    t.string "Payment_Requirements__c",     limit: 143
+    t.string "Credit_App_Received_Date__c", limit: 13
+    t.string "Credit_App_Type__c",          limit: 11
+    t.string "Email_for_Sales__c",          limit: 40
+    t.string "Email_for_Accounts__c",       limit: 42
+    t.string "Customer_Type__c",            limit: 9
+    t.string "Useful_Information__c",       limit: 673
+    t.string "CustRef__c",                  limit: 8
+  end
+
+  create_table "SalesForce_contact", id: false, force: :cascade do |t|
+    t.string "Id",                        limit: 18
+    t.string "AccountId",                 limit: 18
+    t.string "FirstName",                 limit: 39
+    t.string "LastName",                  limit: 44
+    t.string "Phone",                     limit: 30
+    t.string "Fax",                       limit: 18
+    t.string "MobilePhone",               limit: 30
+    t.string "Email",                     limit: 45
+    t.string "Title",                     limit: 58
+    t.string "Role",                      limit: 20
+    t.string "OwnerId",                   limit: 18
+    t.string "LastModifiedDate",          limit: 8
+    t.string "LastActivityDate",          limit: 8
+    t.string "Preferred_Contact_Time__c", limit: 132
+    t.string "Time_Unavailable__c",       limit: 179
+  end
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -92,15 +144,27 @@ ActiveRecord::Schema.define(version: 20170601024845) do
 
   add_index "categories", ["parent_id"], name: "index_categories_on_parent_id", using: :btree
 
+  create_table "contact_roles", force: :cascade do |t|
+    t.string   "role",              limit: 255
+    t.string   "staff_role",        limit: 255
+    t.integer  "contact_role_sort", limit: 4
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+  end
+
   create_table "contacts", force: :cascade do |t|
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
-    t.string   "name",            limit: 255
-    t.string   "number",          limit: 255
-    t.string   "area_code",       limit: 255
-    t.string   "phone_type",      limit: 255
-    t.string   "xero_contact_id", limit: 36
-    t.integer  "customer_id",     limit: 4
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+    t.string   "name",                     limit: 255
+    t.string   "number",                   limit: 255
+    t.string   "area_code",                limit: 255
+    t.string   "phone_type",               limit: 255
+    t.string   "xero_contact_id",          limit: 36
+    t.integer  "customer_id",              limit: 4
+    t.string   "salesforce_contact_id",    limit: 255
+    t.string   "personal_number",          limit: 255
+    t.text     "preferred_contact_number", limit: 65535
+    t.text     "time_unavailable",         limit: 65535
   end
 
   create_table "coupons", force: :cascade do |t|
@@ -108,6 +172,19 @@ ActiveRecord::Schema.define(version: 20170601024845) do
     t.text     "code",       limit: 255, null: false
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+  end
+
+  create_table "cust_contacts", force: :cascade do |t|
+    t.integer  "customer_id",       limit: 4
+    t.integer  "contact_id",        limit: 4
+    t.string   "position",          limit: 255
+    t.string   "title",             limit: 255
+    t.string   "phone",             limit: 255
+    t.string   "fax",               limit: 255
+    t.string   "email",             limit: 255
+    t.integer  "c_receive_invoice", limit: 4
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
   end
 
   create_table "cust_groups", force: :cascade do |t|
@@ -177,8 +254,23 @@ ActiveRecord::Schema.define(version: 20170601024845) do
     t.integer  "cust_style_id",           limit: 4
     t.string   "region",                  limit: 255
     t.string   "xero_contact_id",         limit: 36
-    t.integer  "num_days",                limit: 4
-    t.integer  "end_of_month",            limit: 4
+    t.string   "salesforce_id",           limit: 255
+    t.string   "salesforce_owner_id",     limit: 255
+    t.string   "fax",                     limit: 255
+    t.string   "website",                 limit: 255
+    t.text     "description",             limit: 65535
+    t.string   "note",                    limit: 255
+    t.text     "payment_requirement",     limit: 65535
+    t.string   "email_for_sales",         limit: 255
+    t.string   "email_for_accounts",      limit: 255
+    t.string   "street",                  limit: 255
+    t.string   "city",                    limit: 255
+    t.string   "state",                   limit: 255
+    t.string   "postcode",                limit: 255
+    t.string   "country",                 limit: 255
+    t.text     "address",                 limit: 65535
+    t.float    "latitude",                limit: 24
+    t.float    "longitude",               limit: 24
   end
 
   add_index "customers", ["cust_group_id"], name: "index_customers_on_cust_group_id", using: :btree
@@ -682,7 +774,7 @@ ActiveRecord::Schema.define(version: 20170601024845) do
 
   create_table "tasks", force: :cascade do |t|
     t.datetime "start_date",                        null: false
-    t.datetime "end_date",                          null: false
+    t.datetime "end_date"
     t.datetime "created_at",                        null: false
     t.datetime "updated_at",                        null: false
     t.string   "title",               limit: 255
