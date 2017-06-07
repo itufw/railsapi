@@ -5,6 +5,8 @@
       <h5>Sales Rep.: <%= staff.nickname %></h5>
       <p>Ph: <%= num_to_phone(staff.contact_number) unless staff.contact_number.nil? %></p>
       <p>Email: <%= mail_to(staff.email) unless staff.email.nil? %></p>
+      <p>Email for Sales: <%= mail_to(@customer.email_for_sales) unless @customer.email_for_sales.nil? %></p>
+      <p>Email for Accounts: <%= mail_to(@customer.email_for_accounts) unless @customer.email_for_accounts.nil? %></p>
     </div>
   </div>
   <h5>  Contacts:</h5>
@@ -19,6 +21,8 @@
               <%= label_tag :position, contact.position%>
               <br/>
               <%= num_to_phone(contact.phone) %>
+              <br/>
+              <%= mail_to(contact.email) unless contact.email.nil? %>
             </p>
           </div>
       <% end %>
