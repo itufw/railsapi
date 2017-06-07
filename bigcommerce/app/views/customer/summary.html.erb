@@ -9,7 +9,7 @@
 <!-- Headers -->
 <% unless @amount_due.nil?%>
 	<div style="margin-top: 10px;">
-			<%= render "accounts_partials/invoice_header", customer: @customer %>
+			<%= render "customer_partials/summary_header", customer: @customer %>
 	</div>
 <% end %>
 

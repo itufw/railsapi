@@ -4,6 +4,7 @@ class Contact < ActiveRecord::Base
   belongs_to :xero_contact
   belongs_to :customer
   belongs_to :customer_lead
+  has_many :cus_contact
 
   # DO NOT USE
   def download_data_from_api(modified_since_time)
@@ -56,6 +57,10 @@ class Contact < ActiveRecord::Base
 
   def self.sales_force
     where('contacts.salesforce_contact_id IS NOT NULL')
+  end
+
+  def self.xero_contact
+    where('contacts.xero_contact_id IS NOT NULL')
   end
 
 end

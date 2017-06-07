@@ -60,12 +60,9 @@ class CustomerController < ApplicationController
     @subjects = TaskSubject.filter_by_ids(@activity.map(&:subject_1).compact)
 
     # -------------------
-    # accounts
     # multiple contact people
-    # xeroizer only provides email_address, the details of phone number should be discussed
     @customer = Customer.find(@customer_id)
-    @contact_people = XeroContactPerson.all_contact_people(@customer.xero_contact_id)
-    @contacts_phone = Contact.filter_by_xero_contact_id(@customer.xero_contact_id)
+    @contacts = @customer.cust_contacts
     # calculate the invoice table based
     # function located in helper -> accounts_helper
     @amount_due = get_invoice_table(@customer_id, true, Date.today)
