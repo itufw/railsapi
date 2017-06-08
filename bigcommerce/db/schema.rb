@@ -11,10 +11,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170606044737) do
+ActiveRecord::Schema.define(version: 20170608021051) do
 
-  create_table "SalesForce_account", id: false, force: :cascade do |t|
-    t.string "Id",                          limit: 18
+  create_table "SalesForce_account", primary_key: "Id", force: :cascade do |t|
     t.string "Name",                        limit: 52
     t.string "ParentId",                    limit: 18
     t.string "BillingStreet",               limit: 93
@@ -63,6 +62,45 @@ ActiveRecord::Schema.define(version: 20170606044737) do
     t.string "LastActivityDate",          limit: 8
     t.string "Preferred_Contact_Time__c", limit: 132
     t.string "Time_Unavailable__c",       limit: 179
+  end
+
+  create_table "SalesForce_lead", primary_key: "Id", force: :cascade do |t|
+    t.string "FirstName",                 limit: 38
+    t.string "LastName",                  limit: 39
+    t.string "Title",                     limit: 52
+    t.string "Company",                   limit: 53
+    t.string "Street",                    limit: 118
+    t.string "City",                      limit: 20
+    t.string "State",                     limit: 3
+    t.string "PostalCode",                limit: 4
+    t.string "Country",                   limit: 9
+    t.string "Phone",                     limit: 26
+    t.string "MobilePhone",               limit: 23
+    t.string "Fax",                       limit: 10
+    t.string "Email",                     limit: 43
+    t.string "Website",                   limit: 240
+    t.string "CreatedDate",               limit: 14
+    t.string "LastModifiedDate",          limit: 14
+    t.string "SystemModstamp",            limit: 14
+    t.string "LastActivityDate",          limit: 13
+    t.string "LastTransferDate",          limit: 14
+    t.string "Preferred_Contact_Time__c", limit: 79
+    t.string "Time_Unavailable__c",       limit: 74
+    t.string "Useful_Information__c",     limit: 477
+    t.string "CustomerType__c",           limit: 9
+  end
+
+  create_table "TABLE 71", id: false, force: :cascade do |t|
+    t.string  "Id",           limit: 18
+    t.string  "Subject",      limit: 172
+    t.string  "ActivityDate", limit: 10
+    t.string  "Status",       limit: 11
+    t.string  "OwnerId",      limit: 18
+    t.text    "Description",  limit: 16777215
+    t.string  "AccountId",    limit: 18
+    t.integer "IsClosed",     limit: 4
+    t.string  "CreatedDate",  limit: 10
+    t.string  "CreatedById",  limit: 18
   end
 
   create_table "account_emails", force: :cascade do |t|
@@ -153,8 +191,8 @@ ActiveRecord::Schema.define(version: 20170606044737) do
   end
 
   create_table "contacts", force: :cascade do |t|
-    t.datetime "created_at",                             null: false
-    t.datetime "updated_at",                             null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "name",                     limit: 255
     t.string   "number",                   limit: 255
     t.string   "area_code",                limit: 255
@@ -269,8 +307,6 @@ ActiveRecord::Schema.define(version: 20170606044737) do
     t.string   "postcode",                limit: 255
     t.string   "country",                 limit: 255
     t.text     "address",                 limit: 65535
-    t.float    "latitude",                limit: 24
-    t.float    "longitude",               limit: 24
   end
 
   add_index "customers", ["cust_group_id"], name: "index_customers_on_cust_group_id", using: :btree
