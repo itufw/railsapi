@@ -65,7 +65,7 @@ class CustomerController < ApplicationController
     @contacts = @customer.cust_contacts
     # calculate the invoice table based
     # function located in helper -> accounts_helper
-    @amount_due = get_invoice_table(@customer_id, true, Date.today)
+    @amount_due = get_invoice_table(@customer_id, 'monthly', Date.today)
   end
 
   def summary_with_product

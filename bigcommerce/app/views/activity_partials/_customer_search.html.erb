@@ -1,21 +1,36 @@
 <div class="col-md-8">
-  <table id="customer_table">
-    <tr>
-      <th>Customer</th>
-      <td>
-          <%= autocomplete_field_tag 'customer_name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search' %>
-          <i class="glyphicon glyphicon-plus activity-customers" title="Include Customer"></i>
-      </td>
-    </tr>
-    <% unless @default_customers.nil?%>
-      <% @default_customers.each do |customer| %>
-        <tr id="tr_customer_<%=customer.id%>">
-          <td><%= text_field_tag 'customer '+customer.id.to_s, customer.actual_name, readonly: true %></td>
-          <td><i class="glyphicon glyphicon-remove remove_customer" title="remove"></i></td>
+  <div class="col-md-4">
+    <table id="customer_table">
+      <thead>
+        <tr>
+          <th>Customer</th>
+          <td>
+              <%= autocomplete_field_tag 'customer_name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search',size: 15 %>
+              <i class="glyphicon glyphicon-plus activity-customers" title="Include Customer"></i>
+          </td>
         </tr>
+      </thead>
+      <% unless @default_customers.nil?%>
+        <% @default_customers.each do |customer| %>
+          <tr id="tr_customer_<%=customer.id%>">
+            <td><%= text_field_tag 'customer '+customer.id.to_s, customer.actual_name, readonly: true %></td>
+            <td><i class="glyphicon glyphicon-remove remove_customer" title="remove"></i></td>
+          </tr>
+        <% end %>
       <% end %>
-    <% end %>
-  </table>
+    </table>
+  </div>
+  <div class="col-md-4">
+    <table id="contact_table">
+      <tr>
+        <th>Contact</th>
+        <td>
+            <%= autocomplete_field_tag 'contact_name', '', autocomplete_contact_name_activity_index_path, placeholder: 'Search Contact', id: 'contact_search',size: 15 %>
+            <i class="glyphicon glyphicon-plus activity-contacts" title="Include Contact"></i>
+        </td>
+      </tr>
+    </table>
+  </div>
   <br/>
 </div>
 <script>
