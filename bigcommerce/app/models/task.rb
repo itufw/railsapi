@@ -11,6 +11,8 @@ class Task < ActiveRecord::Base
 
   enum gcal_status: %i[na pushed pulled unconfirmed rejected pending]
 
+  self.per_page = 5
+
   def insert_or_update(t)
     time = Time.now.to_s(:db)
     t.start_date = t.start_date.to_s(:db)
