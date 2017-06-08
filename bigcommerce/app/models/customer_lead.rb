@@ -16,6 +16,8 @@ class CustomerLead < ActiveRecord::Base
   reverse_geocoded_by :latitude, :longitude
   after_validation :reverse_geocode
 
+  scoped_search on: [:firstname, :lastname, :company, :actual_name, :address]
+
   self.per_page = 15
 
   def self.update_coordinates
