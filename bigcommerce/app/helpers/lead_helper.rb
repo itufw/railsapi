@@ -3,12 +3,15 @@ require 'models_filter.rb'
 module LeadHelper
   include ModelsFilter
 
-  def lead_filter(params)
+  def lead_filter(params, per_page)
     search_text = params['search']
     cust_style_id, = collection_param_filter(params, :cust_style, CustStyle)
     staff_id, = collection_param_filter(params, :staff, Staff)
 
-    leads = CustomerLead.search(search_text).filter_staff(staff_id).filter_cust_style(cust_style_id)
+    order_function = params[:order_col] || 'order_by_name'
+    direction = params[:direction] == '1' ? 'DESC' : 'ASC'
+
+    leads = CustomerLead.search(search_text).filter_staff(staff_id).filter_cust_style(cust_style_id).send(order_function, direction).paginate( per_page: per_page, page: params[:page])
 
     [leads, search_text]
   end

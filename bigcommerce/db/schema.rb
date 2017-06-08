@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170608021051) do
+ActiveRecord::Schema.define(version: 20170608030717) do
 
   create_table "SalesForce_account", primary_key: "Id", force: :cascade do |t|
     t.string "Name",                        limit: 52
@@ -88,19 +88,6 @@ ActiveRecord::Schema.define(version: 20170608021051) do
     t.string "Time_Unavailable__c",       limit: 74
     t.string "Useful_Information__c",     limit: 477
     t.string "CustomerType__c",           limit: 9
-  end
-
-  create_table "TABLE 71", id: false, force: :cascade do |t|
-    t.string  "Id",           limit: 18
-    t.string  "Subject",      limit: 172
-    t.string  "ActivityDate", limit: 10
-    t.string  "Status",       limit: 11
-    t.string  "OwnerId",      limit: 18
-    t.text    "Description",  limit: 16777215
-    t.string  "AccountId",    limit: 18
-    t.integer "IsClosed",     limit: 4
-    t.string  "CreatedDate",  limit: 10
-    t.string  "CreatedById",  limit: 18
   end
 
   create_table "account_emails", force: :cascade do |t|
@@ -244,27 +231,35 @@ ActiveRecord::Schema.define(version: 20170608021051) do
   end
 
   create_table "customer_leads", force: :cascade do |t|
-    t.text     "firstname",     limit: 255
-    t.text     "lastname",      limit: 255
-    t.text     "company",       limit: 255
-    t.text     "email",         limit: 255
-    t.text     "phone",         limit: 255
-    t.text     "actual_name",   limit: 65535
-    t.text     "region",        limit: 65535
-    t.integer  "staff_id",      limit: 4
-    t.integer  "cust_type_id",  limit: 4
-    t.integer  "cust_group_id", limit: 4
-    t.integer  "cust_style_id", limit: 4
+    t.text     "firstname",              limit: 255
+    t.text     "lastname",               limit: 255
+    t.text     "company",                limit: 255
+    t.text     "email",                  limit: 255
+    t.text     "phone",                  limit: 255
+    t.text     "actual_name",            limit: 65535
+    t.text     "region",                 limit: 65535
+    t.integer  "staff_id",               limit: 4
+    t.integer  "cust_type_id",           limit: 4
+    t.integer  "cust_group_id",          limit: 4
+    t.integer  "cust_style_id",          limit: 4
     t.datetime "date_created"
     t.datetime "date_modified"
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
-    t.float    "latitude",      limit: 24
-    t.float    "longitude",     limit: 24
-    t.text     "address",       limit: 65535
-    t.text     "mobile_phone",  limit: 65535
-    t.text     "website",       limit: 65535
-    t.text     "img",           limit: 65535
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
+    t.float    "latitude",               limit: 24
+    t.float    "longitude",              limit: 24
+    t.text     "address",                limit: 65535
+    t.text     "mobile_phone",           limit: 65535
+    t.text     "website",                limit: 65535
+    t.text     "img",                    limit: 65535
+    t.string   "salesforce_lead_id",     limit: 255
+    t.string   "street",                 limit: 255
+    t.string   "city",                   limit: 255
+    t.string   "state",                  limit: 255
+    t.string   "postalcode",             limit: 255
+    t.string   "country",                limit: 255
+    t.string   "perferred_contact_time", limit: 255
+    t.text     "useful_information",     limit: 65535
   end
 
   add_index "customer_leads", ["cust_group_id"], name: "index_customer_leads_on_cust_group_id", using: :btree

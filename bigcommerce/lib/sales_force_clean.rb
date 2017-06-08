@@ -1,5 +1,15 @@
 # clean sales force data
 module SalesForceClean
+  def update_lead_address
+    leads = CustomerLead.where('street IS NOT NULL')
+    leads.each do |lead|
+      address = lead.street.to_s + ' ' + lead.city.to_s + ' ' + lead.state.to_s\
+        + lead.postalcode.to_s + ' ' + lead.country.to_s
+      lead.address = address
+      lead.save
+    end
+  end
+
   def assign_phone_number_from_contact
     cust_contact = CustContact.joins(:customer).select('state, cust_contacts.*')
     cust_contact.each do |relation|

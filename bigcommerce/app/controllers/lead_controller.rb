@@ -6,8 +6,18 @@ class LeadController < ApplicationController
   include LeadHelper
 
   def all_leads
-    @staffs = Staff.active_sales_staff.order_by_order
-    @leads, @search_text = lead_filter(params)
+    @per_page = params[:per_page] || CustomerLead.per_page
+    @leads, @search_text = lead_filter(params, @per_page)
+  end
+
+  def update_lead_staff
+    lead_id = params[:lead_id]
+    staff_id = params[:staff_id]
+
+    CustomerLead.staff_change(staff_id, lead_id)
+    # render html: "#{customer_id}, #{staff_id}".html_safe
+    flash[:success] = 'Staff Successfully Changed.'
+    redirect_to request.referrer
   end
 
   def create_leads
