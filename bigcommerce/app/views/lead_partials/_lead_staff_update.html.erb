@@ -1,0 +1,14 @@
+<td class="col-xs-2">
+	<% if can_update_staff and !staff_id.nil? %>
+
+		<%= form_tag :controller => "lead", :action => "update_lead_staff" do %>
+
+		<%= select_tag(:staff_id, options_from_collection_for_select(Staff.active_sales_staff_plus(staff_id), :id, :nickname, staff_id), html_options = {:class => 'form-control', :onchange => "this.form.submit()"}) %>
+
+    <%= hidden_field_tag :lead_id, lead_id %>
+
+		<% end %>
+	<% else %>
+		<%= Staff.find(staff_id).nickname %>
+	<% end %>
+</td>
