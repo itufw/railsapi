@@ -7,6 +7,7 @@ class ActivityController < ApplicationController
   autocomplete :product, :name, full: true
   autocomplete :customer, :actual_name, full: true
   autocomplete :customer_lead, :firstname, full: true
+  autocomplete :contact, :name, display_value: :display_position, scopes: :sales_force
   autocomplete :staff, :nickname
 
   include ActivityHelper
@@ -37,7 +38,7 @@ class ActivityController < ApplicationController
 
     @selected_method = params[:selected_method] || 'Meeting'
     # production version
-    if %w['Sales Executive'].include? session[:authority]
+    if 'Sales Executive' == session[:authority]
       @products = Product.sample_products(session[:user_id], 20)
     else
       @products = Product.sample_products(35, 20)

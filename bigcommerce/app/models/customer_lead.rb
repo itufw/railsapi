@@ -31,11 +31,6 @@ class CustomerLead < ActiveRecord::Base
     address
   end
 
-  def self.search(name = nil)
-    return all if name.nil?
-    where("customer_leads.actual_name LIKE \"%#{name}%\"")
-  end
-
   def self.staff_change(staff_id, lead_id)
     lead = filter_by_id(lead_id)
     lead.staff_id = staff_id.to_i

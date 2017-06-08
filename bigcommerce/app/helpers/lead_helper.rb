@@ -11,7 +11,7 @@ module LeadHelper
     order_function = params[:order_col] || 'order_by_name'
     direction = params[:direction] == '1' ? 'DESC' : 'ASC'
 
-    leads = CustomerLead.search(search_text).filter_staff(staff_id).filter_cust_style(cust_style_id).send(order_function, direction).paginate( per_page: per_page, page: params[:page])
+    leads = CustomerLead.search_for(search_text).filter_staff(staff_id).filter_cust_style(cust_style_id).send(order_function, direction).paginate( per_page: per_page, page: params[:page])
 
     [leads, search_text]
   end
