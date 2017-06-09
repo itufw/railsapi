@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170608030717) do
+ActiveRecord::Schema.define(version: 20170609052326) do
 
   create_table "SalesForce_account", primary_key: "Id", force: :cascade do |t|
     t.string "Name",                        limit: 52
@@ -44,6 +44,85 @@ ActiveRecord::Schema.define(version: 20170608030717) do
     t.string "Customer_Type__c",            limit: 9
     t.string "Useful_Information__c",       limit: 673
     t.string "CustRef__c",                  limit: 8
+  end
+
+  create_table "SalesForce_account_full", id: false, force: :cascade do |t|
+    t.string  "Id",                          limit: 18
+    t.integer "IsDeleted",                   limit: 4
+    t.string  "MasterRecordId",              limit: 10
+    t.string  "Name",                        limit: 52
+    t.string  "Type",                        limit: 8
+    t.string  "ParentId",                    limit: 18
+    t.string  "BillingStreet",               limit: 93
+    t.string  "BillingCity",                 limit: 26
+    t.string  "BillingState",                limit: 15
+    t.string  "BillingPostalCode",           limit: 7
+    t.string  "BillingCountry",              limit: 16
+    t.string  "BillingLatitude",             limit: 10
+    t.string  "BillingLongitude",            limit: 10
+    t.string  "BillingGeocodeAccuracy",      limit: 10
+    t.string  "ShippingStreet",              limit: 100
+    t.string  "ShippingCity",                limit: 16
+    t.string  "ShippingState",               limit: 17
+    t.string  "ShippingPostalCode",          limit: 7
+    t.string  "ShippingCountry",             limit: 10
+    t.string  "ShippingLatitude",            limit: 10
+    t.string  "ShippingLongitude",           limit: 10
+    t.string  "ShippingGeocodeAccuracy",     limit: 10
+    t.string  "Phone",                       limit: 27
+    t.string  "Fax",                         limit: 14
+    t.string  "AccountNumber",               limit: 10
+    t.string  "Website",                     limit: 217
+    t.string  "Sic",                         limit: 10
+    t.string  "Industry",                    limit: 14
+    t.string  "AnnualRevenue",               limit: 9
+    t.string  "NumberOfEmployees",           limit: 5
+    t.string  "Ownership",                   limit: 10
+    t.string  "TickerSymbol",                limit: 10
+    t.string  "Description",                 limit: 2783
+    t.string  "Rating",                      limit: 8
+    t.string  "Site",                        limit: 10
+    t.string  "OwnerId",                     limit: 18
+    t.string  "CreatedDate",                 limit: 14
+    t.string  "CreatedById",                 limit: 18
+    t.string  "LastModifiedDate",            limit: 14
+    t.string  "LastModifiedById",            limit: 18
+    t.string  "SystemModstamp",              limit: 14
+    t.string  "LastActivityDate",            limit: 13
+    t.string  "Jigsaw",                      limit: 10
+    t.string  "JigsawCompanyId",             limit: 10
+    t.string  "AccountSource",               limit: 10
+    t.string  "SicDesc",                     limit: 10
+    t.string  "Source__c",                   limit: 23
+    t.string  "Source_Reference__c",         limit: 165
+    t.string  "Wine_Notes__c",               limit: 618
+    t.string  "Portfolio_Provided__c",       limit: 1
+    t.string  "Tasting_No__c",               limit: 8
+    t.string  "Tasting_Date_Last__c",        limit: 13
+    t.string  "Remove__c",                   limit: 1
+    t.string  "Lead_Type__c",                limit: 25
+    t.string  "Food_Style__c",               limit: 17
+    t.string  "Size__c",                     limit: 6
+    t.string  "Main_Price_Av__c",            limit: 8
+    t.string  "Wines_Sourced__c",            limit: 30
+    t.string  "Wines_On_Premises__c",        limit: 9
+    t.string  "Wines_By_The_Glass__c",       limit: 7
+    t.string  "Wine_Price_Av__c",            limit: 23
+    t.string  "Sth_Am_Wines__c",             limit: 226
+    t.string  "Spanish_Wines__c",            limit: 257
+    t.string  "Wine_Notes_linked__c",        limit: 10
+    t.string  "Payment_Requirements__c",     limit: 143
+    t.string  "Credit_App_Received_Date__c", limit: 13
+    t.string  "Credit_App_Type__c",          limit: 11
+    t.string  "Email_for_Sales__c",          limit: 40
+    t.string  "Email_for_Accounts__c",       limit: 42
+    t.string  "Customer_Type__c",            limit: 9
+    t.string  "Useful_Information__c",       limit: 673
+    t.string  "Preferred_Contact_Time__c",   limit: 29
+    t.string  "Time_Unavailable__c",         limit: 23
+    t.string  "CustRef__c",                  limit: 8
+    t.string  "Welcome_Email_Sent__c",       limit: 1
+    t.string  "Date_Welcome_Email_Sent__c",  limit: 13
   end
 
   create_table "SalesForce_contact", id: false, force: :cascade do |t|
@@ -88,6 +167,45 @@ ActiveRecord::Schema.define(version: 20170608030717) do
     t.string "Time_Unavailable__c",       limit: 74
     t.string "Useful_Information__c",     limit: 477
     t.string "CustomerType__c",           limit: 9
+  end
+
+  create_table "SalesForce_task", primary_key: "Id", force: :cascade do |t|
+    t.string "WhoId",        limit: 18
+    t.string "WhatId",       limit: 18
+    t.string "Title",        limit: 172
+    t.string "ActivityDate", limit: 8
+    t.string "Status",       limit: 11
+    t.string "Priority",     limit: 6
+    t.string "OwnerId",      limit: 18
+    t.text   "Description",  limit: 16777215
+    t.string "CreatedDate",  limit: 8
+    t.string "CreatedById",  limit: 18
+    t.string "AccountId",    limit: 18
+    t.string "Method",       limit: 7
+    t.string "Subject",      limit: 27
+    t.string "Function",     limit: 10
+  end
+
+  create_table "SalesForce_user", id: false, force: :cascade do |t|
+    t.string  "Id",                     limit: 18
+    t.string  "Username",               limit: 34
+    t.string  "FirstName",              limit: 10
+    t.string  "LastName",               limit: 13
+    t.string  "CompanyName",            limit: 19
+    t.string  "Department",             limit: 10
+    t.string  "Title",                  limit: 29
+    t.string  "Email",                  limit: 34
+    t.string  "Phone",                  limit: 12
+    t.string  "Fax",                    limit: 10
+    t.string  "MobilePhone",            limit: 15
+    t.string  "Alias",                  limit: 8
+    t.string  "CommunityNickname",      limit: 31
+    t.integer "IsActive",               limit: 4
+    t.integer "IsSystemControlled",     limit: 4
+    t.string  "UserType",               limit: 16
+    t.string  "EmployeeNumber",         limit: 9
+    t.string  "LastLoginDate",          limit: 14
+    t.string  "LastPasswordChangeDate", limit: 14
   end
 
   create_table "account_emails", force: :cascade do |t|
@@ -831,6 +949,7 @@ ActiveRecord::Schema.define(version: 20170608030717) do
     t.integer  "portfolio_id",        limit: 4
     t.integer  "promotion_id",        limit: 4
     t.string   "pro_note_include",    limit: 255
+    t.string   "salesforce_task_id",  limit: 255
   end
 
   create_table "tax_percentages", force: :cascade do |t|
