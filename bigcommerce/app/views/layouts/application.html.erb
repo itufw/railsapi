@@ -29,19 +29,16 @@
                         </li>
 
                         <li><%= link_to "Orders", controller: "order", action: "all" %></li>
-                        <li><%= link_to "Customers", controller: "customer", action: "all" %></li>
 
-                        <% if user_full_right(session[:authority])%>
                         <li class="dropdown">
-                          <a class="" data-toggle="dropdown" href="#">Leads
+                          <a class="" data-toggle="dropdown" href="#">Customers
                             <span class="caret"></span>
                           </a>
                           <ul class="dropdown-menu">
-                            <li><%= link_to "All", controller: "lead", action: "all_leads" %></li>
-                            <li><%= link_to "Create", controller: "lead", action: "create_leads" %></li>
+                            <li><%= link_to "Customers", controller: "customer", action: "all" %></li>
+                            <li><%= link_to "Leads", controller: "lead", action: "all_leads" %></li>
                           </ul>
                         </li>
-                        <% end %>
 
                         <li class="dropdown">
                             <a class="" data-toggle="dropdown" href="#">Products
