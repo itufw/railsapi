@@ -76,7 +76,7 @@
     <tr class="activity_tr staff_<%= task.staff.id%> method_<%= task.method%> subject_<%= task.subject_1%> function_<%=task.function%>">
       <td class="col-md-4">
         <div class="col-md-4">
-          <%= task.start_date.strftime("%d/%m")%>
+          <%= task.start_date.strftime("%d/%m/%Y")%>
         </div>
         <div class="col-md-8">
           <%= @subjects.select {|x| x.id.to_s==task.subject_1}.map(&:subject).first%>

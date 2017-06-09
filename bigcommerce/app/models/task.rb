@@ -204,6 +204,10 @@ class Task < ActiveRecord::Base
     includes(:task_relations).where("task_relations.customer_id = '#{customer_id}'").references(:task_relations)
   end
 
+  def self.lead_tasks(lead_id)
+    includes(:task_relations).where("task_relations.customer_lead_id = '#{lead_id}'").references(:task_relations)
+  end
+
   def self.task_children(task_id)
     where("tasks.parent_task = #{task_id}")
   end

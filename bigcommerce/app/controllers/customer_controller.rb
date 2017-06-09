@@ -58,7 +58,6 @@ class CustomerController < ApplicationController
     # task section
     @activity = Task.joins(:staff).customer_tasks(@customer_id).expired?.order_by_id('DESC')
     @subjects = TaskSubject.filter_by_ids(@activity.map(&:subject_1).compact)
-
     # -------------------
     # multiple contact people
     @customer = Customer.find(@customer_id)
