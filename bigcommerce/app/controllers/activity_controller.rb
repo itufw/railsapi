@@ -77,8 +77,8 @@ class ActivityController < ApplicationController
     @default_method = (parent.nil?) ? 'Meeting' : parent.method
     @default_subject = (parent.nil?) ? nil : parent.subject_1
     @default_customers = (parent.nil?) ? nil : Customer.filter_by_ids(parent_relation.map(&:customer_id).uniq.compact)
+    @default_customers = Customer.filter_by_ids([params[:customer_id]]) if params[:customer_id] && @default_customers.nil?
     @default_staff = (parent.nil?) ? [session[:user_id]] : parent_relation.map(&:staff_id).append(session[:user_id]).append(parent.response_staff).uniq.compact
-
 
     @function, @subjects, @methods, @function_role, @promotion, @portfolio \
       = function_search(params, parent_function)
