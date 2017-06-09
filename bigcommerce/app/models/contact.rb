@@ -4,6 +4,7 @@ class Contact < ActiveRecord::Base
   belongs_to :xero_contact
   belongs_to :customer
   belongs_to :customer_lead
+  has_many :cust_contacts
 
   # DO NOT USE
   def download_data_from_api(modified_since_time)
@@ -54,4 +55,18 @@ class Contact < ActiveRecord::Base
     where('contacts.customer_id IN (?)', customer_ids)
   end
 
+  def self.sales_force
+    where('contacts.salesforce_contact_id IS NOT NULL')
+  end
+
+  def self.xero_contact
+    where('contacts.xero_contact_id IS NOT NULL')
+  end
+
+  def display_position
+    relation = self.cust_contacts
+    names = relation.map(&:customer).map(&:actual_name)
+    position = relation.map(&:position)
+    self.name.to_s + names.zip(position).map { |x, y| '|' + x.to_s + ':' + y.to_s }.join(' ')
+  end
 end

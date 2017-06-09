@@ -7,7 +7,7 @@
 	<%= render "partials/customer_filter" %>
 	<%= submit_tag "Filter", class: 'btn btn-primary' %>
 </div>
-
+<%= render 'partials/paginate', objects: @leads%>
 <%= render "lead_partials/leads", leads: @leads %>
 
 <% end %>
