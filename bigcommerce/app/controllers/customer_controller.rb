@@ -56,7 +56,7 @@ class CustomerController < ApplicationController
     display_orders(params, Order.customer_filter([@customer_id]))
 
     # task section
-    @activity = Task.joins(:staff).customer_tasks(@customer_id).expired?
+    @activity = Task.joins(:staff).customer_tasks(@customer_id).expired?.order_by_id('DESC')
     @subjects = TaskSubject.filter_by_ids(@activity.map(&:subject_1).compact)
 
     # -------------------

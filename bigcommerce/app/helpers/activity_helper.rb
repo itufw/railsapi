@@ -73,7 +73,7 @@ module ActivityHelper
     note.update_attributes(note_params)
     note.is_task = (note.end_date.nil?) ? 0 : 1
     note.expired = 0
-    note.end_date = note.start_date + 1.month if note.end_date.nil?
+    note.end_date = note.start_date if note.end_date.nil?
     note.parent_task = parent_task unless parent_task.nil?
     note.save
     note
