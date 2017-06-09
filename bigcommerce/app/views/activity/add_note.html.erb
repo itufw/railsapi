@@ -15,6 +15,7 @@
   <% end %>
   </div>
   <div class="col-md-8 incomplete_form">
+    <p style="color: red" class="activity_reminder">Please Select Subject / Customer</p>
     <button name="button" class="btn btn-secondary disabled" disabled>
       <div>Save</div>
     </button>
@@ -33,8 +34,7 @@
       if($('#tr_customer_<%=customer.id%>').length == 0){
         $('#customer_table').append([
           '<tr id="tr_customer_<%=customer.id%>">',
-              '<td><%= text_field_tag 'customer '+customer.id.to_s, customer.actual_name, readonly: true %></td>',
-              '<td><i class="glyphicon glyphicon-remove remove_customer" title="remove"></i></td>',
+              '<td colspan="2"><%= text_field_tag 'customer '+customer.id.to_s, customer.actual_name, readonly: true %><i class="glyphicon glyphicon-remove remove_customer" title="remove"></i></td>',
           '</tr>'
           ].join(''));
         <% invoices.each do |invoice|%>
