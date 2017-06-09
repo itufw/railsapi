@@ -164,19 +164,27 @@ class CalendarController < ApplicationController
   end
 
   def event_check_offline
+
+    @per_page = params[:per_page] || 5
     @jarow = FuzzyStringMatch::JaroWinkler.create(:native)
-    @customers = Customer.all.order_by_name('ASC')
-    @leads = CustomerLead.all.order_by_name('ASC')
 
     @methods = TaskMethod.all
     @subjects = TaskSubject.sales_subjects
 
     if user_full_right(session[:authority])
-      @events = Task.unconfirmed_event.order_by_staff('ASC')
+      @events = Task.unconfirmed_event.order_by_staff('ASC').paginate(per_page: @per_page, page: params[:page])
     else
       @events = Task.unconfirmed_event.filter_by_staff(session[:user_id]).order_by_staff('ASC')
     end
 
+    des = @events.map { |x| x.description.split('\n').first }
+    loc = @events.map { |x| x.location.split(/[,\n]/).first unless x.location.nil? }
+    pattern = (des + loc).uniq.compact.map(&:downcase).join(' OR ')
+
+    @customers = Customer.search_for(pattern).order_by_name('ASC')
+    @leads = CustomerLead.search_for(pattern).order_by_name('ASC')
+
+    @customers_all = Customer.all
     @staffs = Staff.filter_by_ids(@events.map(&:response_staff).uniq)
   end
 

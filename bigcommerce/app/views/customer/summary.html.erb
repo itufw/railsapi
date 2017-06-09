@@ -5,13 +5,26 @@
 
 <button class="button" style="float: right;margin-top:-60px;margin-right:30px;"><%= link_to "Top Products", action: 'top_products', customer_id: @customer_id, customer_name: @customer_name %></button>
 
+<% unless @amount_due.nil?%>
+<div style="float: right;margin-top:-60px;margin-right:400px;">
+	<p style="color: red; font-size: 25px"><%= @amount_due['due_date'].sum %></p>
+	<br/>
+	<p style="color: black; font-size: 25px"><%= @amount_due['invoice_date'].sum %></p>
+</div>
+<% end %>
+
+<!-- Headers -->
+<% unless @amount_due.nil?%>
+	<div style="margin-top: 10px;">
+			<%= render "customer_partials/summary_header", customer: @customer %>
+	</div>
+<% end %>
+
+
+
 <%= form_tag({:action => "summary" }, {:method => "get"}) do %>
 
-	<% unless @amount_due.nil?%>
-		<div style="margin-top: 10px;">
-				<%= render "accounts_partials/invoice_header", customer: @customer %>
-		</div>
-	<% end %>
+
 	<div class="customer_activity">
 		<%= render 'customer_partials/activity'%>
 	</div>

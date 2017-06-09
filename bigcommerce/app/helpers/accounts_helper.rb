@@ -39,6 +39,9 @@ module AccountsHelper
     def credit_note_and_overpayment(xero_contact_id, xero_invoices_ids)
         op = XeroOverpayment.joins(:xero_op_allocations).get_remaining_credit(xero_contact_id).where('xero_overpayments.remaining_credit > 0 OR xero_op_allocations.invoice_number IN (?)', xero_invoices_ids)
         cn = XeroCreditNote.joins(:xero_cn_allocations).get_remaining_credit(xero_contact_id).where('xero_credit_notes.remaining_credit > 0 OR xero_cn_allocations.invoice_number IN (?)', xero_invoices_ids)
+        cn_s = XeroCreditNote.get_remaining_credit(xero_contact_id).where('xero_credit_notes.remaining_credit > 0')
+        cn += cn_s
+        cn = cn.uniq
 
         # op = XeroOverpayment.get_remaining_credit(xero_contact_id).where('remaining_credit > 0')
         # cn = XeroCreditNote.get_remaining_credit(xero_contact_id).where('remaining_credit > 0')
@@ -169,12 +172,12 @@ module AccountsHelper
     def get_invoice_table(customer_id, monthly, date)
         invoice = XeroContact.where(skype_user_name: customer_id).first
         return nil if invoice.nil?
-        invoice = invoice.xero_invoices.has_amount_due.period_select(@end_date)
+        invoice = invoice.xero_invoices.has_amount_due
+        invoice = invoice.period_select(@end_date) unless @end_date.nil?
         date =	Date.strptime(date.to_s, '%Y-%m-%d')
         sum_of_amount = {}
         sum_of_amount['invoice_date'] = Array.new(6) { 0 }
         sum_of_amount['due_date'] = Array.new(6) { 0 }
-
         invoice.each do |i|
             interval = ('monthly'.eql? monthly) ? ((date.year * 12 + date.month) - (i.date.to_date.year * 12 + i.date.to_date.month)) : ((date.mjd - i.date.to_date.mjd) / 15)
             interval = interval > 5 ? 5 : interval

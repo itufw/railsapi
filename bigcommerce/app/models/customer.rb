@@ -7,6 +7,7 @@ class Customer < ActiveRecord::Base
 	has_many :orders
 	has_many :addresses
 	has_many :contacts
+	has_many :cust_contacts
 	belongs_to :cust_type
 	belongs_to :cust_group
 	belongs_to :cust_style
