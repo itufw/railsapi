@@ -19,12 +19,12 @@ class ActivityController < ApplicationController
       = customer_search(params)
 
     # activity helper -> get the functions/subjects/methods from json request
-    @function, @subjects, @methods, @function_role, @promotion, @portfolio \
-      = function_search(params)
+    @function, @subjects = function_search(params)
     # @products = product_search
     @note = Task.new
     if params[:note_id] && Task.where('tasks.id = ?', params[:note_id]).count > 0
       @note.parent_task = params[:note_id]
+      @parent = Task.find(@note.parent_task)
     end
 
     # TEST VERSION
@@ -73,6 +73,7 @@ class ActivityController < ApplicationController
         @wine_note_list = ProductNote.filter_task(params[:note_id])
       end
     end
+    @parent = parent
 
     @default_method = (parent.nil?) ? 'Meeting' : parent.method
     @default_subject = (parent.nil?) ? nil : parent.subject_1
@@ -80,8 +81,7 @@ class ActivityController < ApplicationController
     @default_customers = Customer.filter_by_ids([params[:customer_id]]) if params[:customer_id] && @default_customers.nil?
     @default_staff = (parent.nil?) ? [session[:user_id]] : parent_relation.map(&:staff_id).append(session[:user_id]).append(parent.response_staff).uniq.compact
 
-    @function, @subjects, @methods, @function_role, @promotion, @portfolio \
-      = function_search(params, parent_function)
+    @function, @subjects = function_search(params, parent_function)
     @staff = Staff.active
 
 
@@ -103,8 +103,27 @@ class ActivityController < ApplicationController
     redirect_to controller: 'customer', action: 'summary', customer_id: customer_id, customer_name: Customer.find(customer_id).actual_name
   end
 
-  def history
+  def activity_edit
+    @activity = Task.find(params[:note_id])
+    if @activity.nil?
+      flash[:error] = 'Error'
+      redirect_to :back
+    end
+    @function, @subjects = function_search(params)
+    @staff = Staff.active
+    if 'Sales Executive' == session[:authority]
+      @products = Product.sample_products(session[:user_id], 20)
+    else
+      @products = Product.sample_products(35, 20)
+    end
+  end
 
+  def update
+    activity = note_update(note_params, session[:staff_id], params[:activity_id])
+    customer_id = relation_save(params, activity)
+
+    task_product_note(params, activity, session[:user_id])
+    redirect_to controller: 'customer', action: 'summary', customer_id: customer_id, customer_name: Customer.find(customer_id).actual_name
   end
 
   # -----------private --------------------

@@ -43,13 +43,11 @@ module ActivityHelper
       default_function = parent_task_function
     end
     params[:selected_function] = params[:selected_function] || default_function
-    promotion = Promotion.all
 
     subjects = TaskSubject.all
     subjects = subjects.select { |x| x.function == params[:selected_function] }
-    methods = TaskMethod.all
-    portfolio = Portfolio.all
-    [function, subjects, methods, default_function, promotion, portfolio]
+
+    [function, subjects]
   end
 
   def product_search
@@ -79,7 +77,22 @@ module ActivityHelper
     note
   end
 
+  def note_update(note_params, staff_id, activity_id)
+    note = Task.find(activity_id)
+    note.update_attributes(note_params)
+    note.last_modified_staff = staff_id
+    note.updated_at = Time.now()
+    note.save
+    note
+  end
+
+  def relation_destory(activity_id)
+    TaskRelation.where('task_id = ?', activity_id).destroy_all
+  end
+
   def relation_save(params, task)
+    relation_destory(task.id)
+
     task_id = task.id
     task.gcal_status = ('yes' == params['event_column']) ? 'pending' : 'na'
     customers = params.keys.select { |x| x.start_with?('customer ') }.map(&:split).map(&:last)
@@ -100,7 +113,12 @@ module ActivityHelper
     customers.first
   end
 
+  def product_note_version_update(activity_id)
+    ProductNote.where('task_id = ?', activity_id).update_all('version = version + 1')
+  end
+
   def product_note_save(params, staff_id, task_id)
+    product_note_version_update(task_id)
     product_list = params.keys.select { |x| x.start_with?('note ') }.map(&:split).map(&:last)
     product_list.each do |product_id|
       pn_save(product_id, staff_id, task_id, params['buy_wine'])
@@ -118,6 +136,7 @@ module ActivityHelper
     pn.product_name = params['product_name ' + product_id]
     pn.price_luc = params['price_luc ' + product_id]
     pn.intention = (buy_list.include? product_id) ? 1 : 0 unless buy_list.nil?
+    pn.version = 0
     pn.save
   end
 

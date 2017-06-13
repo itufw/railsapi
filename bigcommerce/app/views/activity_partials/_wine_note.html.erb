@@ -11,7 +11,7 @@
   <br/>
 
   <div class="wine-list">
-    <% @products.each do |product|%>
+    <% products.each do |product|%>
       <div class='col-xs-6 wine-list-product' id='<%= product.id%>'>
         <a><%= product.name%></a>
       </div>
@@ -29,6 +29,30 @@
       <th>Buy</th>
       <th>Rating</th>
     </tr>
+    <% unless activity.nil?
+        begin
+          activity.product_notes.each do |p_note|
+    %>
+      <tr id="tr_<%=p_note.product_id%>">
+        <td><%= p_note.product_id%></td>
+        <td><%= text_field_tag 'product_name '+p_note.product_id.to_s, p_note.product_name, readonly:true %></td>
+        <td class="num"><%= text_field_tag 'price_luc '+p_note.product_id.to_s, "%.2f" %(p_note.price_luc), readonly: true%></td>
+        <td><%= text_field_tag 'discount '+p_note.product_id.to_s, 100 - (p_note.price * 100 / p_note.price_luc).to_i, placeholder: 'Discount', size: 3 %> %</td>
+        <td><%= text_field_tag 'price '+p_note.product_id.to_s,"%.2f" %(p_note.price), placeholder: 'Price', size: 5%></td>
+        <td><%= text_field_tag 'note '+p_note.product_id.to_s, p_note.note%></td>
+        <td><%= check_box_tag 'buy_wine[]', p_note.product_id.to_s, (p_note.intention == 1 ? true : false)%> </td>
+        <td>
+            <%= number_field_tag(:rating, nil, {min: 1, max:5, step:1, id: 'rate_'+p_note.product_id.to_s}) %>
+            <%=rateit(type:"span", backingfld: '#rate_'+p_note.product_id.to_s, max:5, min:1, step:1, resetable:'false')%>
+        </td>
+        <td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>
+      </tr>
+    <%
+          end
+        rescue
+        end
+    %>
+    <% end %>
   </table>
   <%= label(:creator, "Creator:")%>
   <%= session[:username] %>

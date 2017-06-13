@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   get 'local_calendar', to: 'calendar#local_calendar'
   get 'add_note', to: 'activity#add_note'
   get 'add_activity', to: 'activity#add_activity'
+  get 'activity_edit', to: 'activity#activity_edit'
   # Google
   get '/redirect', to: 'calendar#redirect', as: 'redirect'
   get '/callback', to: 'calendar#callback', as: 'callback'
