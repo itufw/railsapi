@@ -3,7 +3,7 @@
 <%= form_for @task, :url => {:controller => "activity", :action => "save_task"}, :id => "task_append_form"  do |f| %>
 
 <div class="row">
-  <%= render 'activity_partials/customer_search', acitivity: @parent%>
+  <%= render 'activity_partials/customer_search', activity: @parent%>
   <%= render 'activity_partials/task_table', f: f, activity: @parent%>
   <% if @task.parent_task.nil?%>
     <%= render 'activity_partials/wine_note', activity: @parent, products: @products%>
