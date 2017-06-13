@@ -3,8 +3,8 @@
 <div class="container">
 	<div class="row">
 		<div class="col-md-12 col-md-offset-10">
-
-			<button class="btn btn-primary"><%= link_to "Add Note/Task", controller: "task", action: "add_task"%></button>
+			<button class="btn btn-primary"><%= link_to "Add Note", controller: "activity", action: "add_note"%></button>
+			<button class="btn btn-primary"><%= link_to "Add Task", controller: "activity", action: "add_activity"%></button>
 		</div>
 	</div>
 	<%= form_tag({:controller => "task", :action => "staff_task"}, {:method => "get"}) do %>
