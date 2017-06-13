@@ -184,8 +184,8 @@ class CustomerController < ApplicationController
     where_query = 'OrderProduct.valid_orders.order_customer_filter(%s).product_filter(%s)' % [[@customer_id], Product.all.pluck('id')]
 
     # default sorting with name
-    order_col = params[:order_col] || '0'
-    order_direction = params[:direction] || '1'
+    order_col = params[:order_col] || 'Last Quarter'
+    order_direction = params[:direction] || '-1'
 
     # hash has a structure {"time_period" => {product_id => stock}}
     # product_ids can be either product ids or even
