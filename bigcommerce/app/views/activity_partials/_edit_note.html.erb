@@ -1,17 +1,10 @@
-<%= title 'Activity Add Note'%>
-
-<%= form_for @note, :url => {:controller => "activity", :action => "save_note"}, :id => "note_append_form"  do |f| %>
-
 <div class="row">
-  <%= render 'activity_partials/customer_search', activity: @parent%>
-  <%= render 'activity_partials/note_table', f: f, activity: @parent%>
-  <%= render 'activity_partials/wine_note', activity: @parent, products: @products %>
+  <%= render 'activity_partials/customer_search', activity: activity%>
+  <%= render 'activity_partials/note_table', f: f, activity: activity%>
+  <%= render 'activity_partials/wine_note', activity: activity, products: @products%>
   <div class="col-md-8 complete_form">
   <%= button_tag(type: 'submit', class: 'btn btn-primary') do %>
-    <div> Save </div>
-  <% end %>
-  <%= button_tag(type: 'submit', class: 'btn btn-primary', value: 'new_task') do %>
-    <div> Save and New Task </div>
+    <div> Edit </div>
   <% end %>
   </div>
   <div class="col-md-8 incomplete_form">
@@ -22,7 +15,6 @@
   </div>
   <%= render 'activity_partials/invoice_table'%>
 </div>
-<% end %>
 
 <script>
 <%
@@ -72,8 +64,7 @@ var CompleteForm = function(){
     $('.incomplete_form').show();
   };
 };
-
-$('.complete_form').hide();
+CompleteForm();
 
 $('.activity-customers').click(function(){
   CompleteForm();

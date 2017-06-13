@@ -1,0 +1,9 @@
+<%= title 'Edit Activity'%>
+<%= form_for @activity, :url => {:controller => "activity", :action => "update"}, :id => "note_edit_form"  do |f| %>
+<%= hidden_field_tag :activity_id , @activity.id %>
+  <% if @activity.is_task == 0%>
+    <%= render 'activity_partials/edit_note', activity: @activity, f: f%>
+  <% else %>
+    <%= render 'activity_partials/edit_task', activity: @activity, f: f%>
+  <% end %>
+<% end %>
