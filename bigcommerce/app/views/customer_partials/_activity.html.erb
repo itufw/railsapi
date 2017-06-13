@@ -55,6 +55,10 @@
         </ul>
     </li>
   </label>
+  <label>
+    <%= radio_button_tag(:expired, "expired", false) %>
+    <%= radio_button_tag(:expired, "notexpired", true) %>
+  </label>
 </div>
 
 <div style="margin-top: -35px">
@@ -72,7 +76,7 @@
     </tr>
   </thead>
   <tbody class="activity-section">
-    <% @activity.each do |task|%>
+    <% @activity.select{ |x| x.expired == 0 }.each do |task|%>
     <tr class="activity_tr staff_<%= task.staff.id%> method_<%= task.method%> subject_<%= task.subject_1%> function_<%=task.function%>">
       <td class="col-md-4">
         <div class="col-md-4">
@@ -93,11 +97,35 @@
       <td class="col-md-2"><%= task.end_date.strftime("%d/%m") %></td>
     </tr>
     <% end %>
+    <div class="expired_tasks">
+      <% @activity.select { |x| x.expired == 1}.each do |task| %>
+        <tr class="activity_tr staff_<%= task.staff.id%> method_<%= task.method%> subject_<%= task.subject_1%> function_<%=task.function%>">
+          <td class="col-md-4">
+            <div class="col-md-4">
+              <%= task.start_date.strftime("%d/%m/%Y")%>
+            </div>
+            <div class="col-md-8">
+              <%= @subjects.select {|x| x.id.to_s==task.subject_1}.map(&:subject).first%>
+            </div>
+            <br/>
+            <div class="col-xs-4">
+              <%= task.staff.nickname%>
+            </div>
+            <div class="col-xs-8">
+              <%= task.method%>
+            </div>
+          </td>
+          <td class="col-md-8"><%= link_to task.description,controller: "task", action: "task_details", task_id: task.id%></td>
+          <td class="col-md-2"><%= task.end_date.strftime("%d/%m") %></td>
+        </tr>
+      <% end %>
+    </div>
   </tbody>
 </table>
 
 
 <script>
+$('.expired_tasks').hide();
 
 $('#activity_show').click(function(){
   $('.activity-section').toggle();

@@ -8,8 +8,8 @@
 <% xero_contact = @customer.xero_contact %>
 <% unless xero_contact.nil?%>
 <div style="float: right;margin-top:-60px;margin-right:200px;">
-	<p style="color: red; font-size: 20px"><%= display_num(overdue_customer(xero_contact)) %></p>
-	<p style="color: black; font-size: 20px"><%= display_num(outstanding_customer(xero_contact))%></p>
+	<p style="color: red"><%= display_num(overdue_customer(xero_contact)) %></p>
+	<p style="color: black"><%= display_num(outstanding_customer(xero_contact))%></p>
 </div>
 <%end%>
 <!-- Headers -->
