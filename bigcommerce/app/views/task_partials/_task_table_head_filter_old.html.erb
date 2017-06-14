@@ -4,11 +4,11 @@
           <li class="dropdown">
             <a class="" data-toggle="dropdown" href="#">Priority</a>
               <ul class="dropdown-menu">
-                <%
-                  task_priorities = TaskPriority.where('id IN (?)',   @tasks.select{|x| x.is_task==1}.map(&:priority).uniq.compact)
-                  task_priorities.each do |priority| %>
+                <% task_priorities = TaskPriority.all%>
+                <% @tasks.map {|x| x.priority}.uniq.compact.each do |priority| %>
                 <li>
-                  <a id="filter_priority_<%= priority.id%>"><%= priority.priority_level %></a>
+                  <%= check_box_tag 'selected_priority[]', priority %>
+                  <%= task_priorities[priority.to_i - 1].priority_level %>
                   &nbsp;&nbsp;
                 </li>
                 <% end %>
@@ -19,9 +19,10 @@
           <li class="dropdown">
             <a class="" data-toggle="dropdown" href="#">Func/Sub</a>
               <ul class="dropdown-menu">
-                <% TaskSubject.where('id IN (?)', @tasks.map(&:subject_1).uniq.compact).each do |subject| %>
+                <% @tasks.map {|x| x.subject_1}.uniq.each do |subject| %>
                 <li>
-                  <a id="filter_subject_<%= subject.id%>"><%= subject.subject %></a>
+                  <%= check_box_tag 'selected_subject[]', subject %>
+                  <%= TaskSubject.find(subject).subject %>
                   &nbsp;&nbsp;
                 </li>
                 <% end %>
@@ -32,9 +33,10 @@
           <li class="dropdown">
             <a class="" data-toggle="dropdown" href="#">Method</a>
               <ul class="dropdown-menu">
-                <% @tasks.map(&:method).uniq.each do |method| %>
+                <% @tasks.map {|x| x.method}.uniq.each do |method| %>
                 <li>
-                  <a id="filter_method_<%= method%>"><%= method %></a>
+                  <%= check_box_tag 'selected_method[]', method %>
+                  <%= method %>
                   &nbsp;&nbsp;
                 </li>
                 <% end %>
@@ -42,16 +44,15 @@
           </li>
         </th>
         <th>Description</th>
-
-        <% relations = TaskRelation.filter_by_task_ids(@tasks.map(&:id)) %>
-
         <th id="customer_th">
           <li class="dropdown">
             <a class="" data-toggle="dropdown" href="#">Customer</a>
               <ul class="dropdown-menu">
-                <% Customer.filter_by_ids(relations.map(&:customer_id).compact).each do |customer|%>
+                <% @tasks.map{|x| x.task_relations}.map {|x| x.first}.compact.map {|x| x.customer_id}.uniq.each do |customer| %>
+                <% next if customer==0 || customer == nil%>
                 <li>
-                  <a id="filter_customer_<%= customer.id%>"><%= customer.actual_name %></a>
+                  <%= check_box_tag 'selected_customer[]', customer %>
+                  <%= Customer.find(customer).actual_name %>
                   &nbsp;&nbsp;
                 </li>
                 <% end %>
@@ -62,9 +63,11 @@
           <li class="dropdown">
             <a class="" data-toggle="dropdown" href="#">Staff</a>
               <ul class="dropdown-menu">
-                <% Staff.filter_by_ids(relations.map(&:staff_id).compact).each do |staff|%>
+                <% @tasks.map{|x| x.task_relations}.map {|x| x.first}.compact.map {|x| x.staff_id}.uniq.each do |staff| %>
+                <% next if staff==0 || staff.nil?%>
                 <li>
-                  <a id="filter_staff_<%= staff.id%>"><%= staff.nickname %></a>
+                  <%= check_box_tag 'selected_staff[]', staff %>
+                  <%= Staff.find(staff).nickname %>
                   &nbsp;&nbsp;
                 </li>
                 <% end %>
@@ -75,23 +78,23 @@
           <li class="dropdown">
             <a class="" data-toggle="dropdown" href="#">Created By</a>
               <ul class="dropdown-menu">
-                <% Staff.filter_by_ids(@tasks.map(&:response_staff).uniq).each do |staff| %>
+                <% @tasks.map{|x| x.response_staff}.uniq.each do |staff| %>
+                <% next if staff==0 || staff.nil?%>
                 <li>
-                  <a id="filter_creator_<%= staff.id%>"><%= staff.nickname %></a>
+                  <%= check_box_tag 'selected_staff_created[]', staff %>
+                  <%= Staff.find(staff).nickname %>
                   &nbsp;&nbsp;
                 </li>
                 <% end %>
               </ul>
           </li>
         </th>
-        <th><%= date_column_name %></th>
+        <th>Date</th>
+        <th>
+          <%= select_tag "display_options", options_for_select(["Task", "Note","All","Expired All"], selected: @selected_display), class:"form-control", :onchange => "this.form.submit();" unless @selected_display.nil?%>
+        </th>
+        <th>
+          <%= submit_tag "Search", class: 'btn btn-primary' unless @selected_display.nil? %>
+        </th>
     </tr>
 </thead>
-
-
-<script type="text/javascript">
-  $('li a[id*=filter_]').click(function(){
-    $('tr.activity_record').hide();
-    $('tr.activity_record.'+ this.id.split('filter_')[1]).show();
-  });
-</script>
