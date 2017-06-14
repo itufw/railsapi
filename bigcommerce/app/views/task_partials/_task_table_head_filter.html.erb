@@ -85,6 +85,7 @@
           </li>
         </th>
         <th><%= date_column_name %></th>
+        <th><a class="show_all">Show All</a></th>
     </tr>
 </thead>
 
@@ -93,5 +94,9 @@
   $('li a[id*=filter_]').click(function(){
     $('tr.activity_record').hide();
     $('tr.activity_record.'+ this.id.split('filter_')[1]).show();
+  });
+
+  $('a.show_all').click(function(){
+    $('tr.activity_record').show();
   });
 </script>

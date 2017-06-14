@@ -245,7 +245,7 @@ class Task < ActiveRecord::Base
   end
 
   def self.order_by_create_date(direction)
-    order('tasks.create_date ' + direction)
+    order('tasks.created_at ' + direction)
   end
 
   def self.filter_by_start_date(start_date, end_date)
@@ -253,7 +253,7 @@ class Task < ActiveRecord::Base
   end
 
   def self.filter_by_create_date(start_date, end_date)
-    where('tasks.created_date > ? AND tasks.created_date < ?', start_date, end_date)
+    where('tasks.created_at > ? AND tasks.created_at < ?', start_date, end_date)
   end
 
   def self.filter_by_ids(tasks_ids)
