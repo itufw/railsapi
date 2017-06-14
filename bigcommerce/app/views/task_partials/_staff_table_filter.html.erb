@@ -1,0 +1,67 @@
+<div class="row">
+	<div class="col-xs-2">
+      <%= label_tag :creator, 'Creator:'%>
+	    <%= collection_select(:staff, :creator, Staff.active, :id, :nickname, {:include_blank => 'All', selected: session[:user_id]}, {:class => 'form-control'}) %>
+
+			<%= label_tag :status, 'Type:'%>
+			<%= select_tag "display_options", options_for_select(["Task", "Note","All","Expired All"], selected: @selected_display), class:"form-control" unless @selected_display.nil?%>
+
+	</div>
+	<div class="col-xs-2">
+      <%= label_tag :staff, 'Staff:'%>
+      <% if user_full_right(session[:authority]) %>
+       <%= collection_select(:staff, :assigned, Staff.active, :id, :nickname, {:include_blank => 'All', selected: session[:user_id]}, {:class => 'form-control'}) %>
+      <% else %>
+        <%= collection_select(:staff, :assigned, Staff.filter_by_id(session[:user_id]), :id, :nickname, {:class => 'form-control'}) %>
+      <% end %>
+	</div>
+
+	<div class="col-xs-3">
+		<%= label(:start_date, "Start")%>
+	  <div class='input-group date' id='start_timepicker', style='width: 200px'>
+	    <%= text_field_tag('start_date',"", placeholder: 'Start Timepicker', class: 'form-control') %>
+	    <span class="input-group-addon">
+	      <span class="glyphicon glyphicon-calendar"></span>
+	    </span>
+	  </div>
+	  <%= label(:end_date, "end")%>
+	  <div class='input-group date' id='due_timepicker', style='width: 200px'>
+	    <%= text_field_tag('end_date',"", placeholder: 'End Timepicker', class: 'form-control') %>
+	    <span class="input-group-addon" style="height: 26px">
+	      <span class="glyphicon glyphicon-calendar"></span>
+	    </span>
+	  </div>
+	</div>
+
+  <div class="col-xs-2">
+    <%= label(:filter, "Filter By Date:")%>
+    <div>
+      <%= radio_button_tag(:date_column, "create_date", @date_column=='create_date') %> Create
+      <span style="margin-left: 50px;">
+      <%= radio_button_tag(:date_column, "start_date", @date_column=='start_date') %>  Start
+      <span style="margin-left: 50px;">
+      <%= radio_button_tag(:date_column, "due_date", @date_column=='due_date') %>  Due
+      </span>
+    </div>
+    <%= submit_tag "Search", class: 'btn btn-primary' %>
+  </div>
+</div>
+
+
+<script>
+$(function () {
+  $('#start_timepicker').datetimepicker({
+    format: 'YYYY-MM-DD',
+    defaultDate: '<%= @start_date%>',
+    sideBySide: true
+  });
+  $('#due_timepicker').datetimepicker({
+    format: 'YYYY-MM-DD',
+    defaultDate: '<%= @end_date%>',
+    sideBySide: true
+  });
+  $('#start_timepicker').on("dp.change",function(e){
+    $('#due_timepicker').data("DateTimePicker").minDate(e.date);
+  });
+});
+</script>

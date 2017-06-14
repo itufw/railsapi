@@ -1,17 +1,41 @@
 <div class="col-md-12">
     <table class="table table-hover table-responsive task_table" style="margin-top: 5px;" id = "task_table">
-      <%= render "task_partials/task_table_head_filter" %>
+      <%= render "task_partials/task_table_head_filter", date_column_name: @date_column.split('_').map{|x| x.first.upcase+x[1..x.length]}.join(' ') %>
             <% @tasks.each do |task|%>
-            <tr>
+            <%
+              customers, staffs = task_customer_staff(task.task_relations)
+              customers_filter = ('-'.eql?customers) ? ' ' : customers.map(&:id).map{|x| 'customer_'+x.to_s}.join(' ')
+              staffs_filter = ('-'.eql?staffs) ? ' ' :staffs.map(&:id).map{ |x| 'staff_'+x.to_s}.join(' ')
+              priority_filter = (task.is_task.zero?) ? ' ' : 'priority_'+task.priority.to_s
+            %>
 
+            <tr class="activity_record <%=priority_filter%> creator_<%=task.response_staff%> method_<%=task.method%> subject_<%=task.subject_1%> <%= customers_filter %> <%= staffs_filter %>">
+              <% if task.is_task==1 %>
                 <td class="<%=task_priority_display(task.priority).downcase%>"><%= render "task_partials/priority_update_cell", task_id: task.id, priority: task.priority %></td>
-
-                <td><%=task.function.byteslice(0,3) + "/" + TaskSubject.where("id ='#{task.subject_1}'").first.subject%></td>
+              <% else %>
+                <td></td>
+              <% end %>
+                <td><%=task.function.byteslice(0,3) + "/" + @subjects.select {|x| x.id.to_s == task.subject_1}.first.subject%></td>
                 <td><%=task.method%></td>
                 <td><%= link_to task.description,controller: "task", action: "task_details", task_id: task.id%></td>
-                <% customer, staff = task_customer_staff(task.task_relations) %>
-                <td><%= ("-".eql? customer) ? "-" : customer.actual_name %></td>
-                <td><%= ("-".eql? staff) ? "-" : staff.nickname %></td>
+                <td>
+                  <% if '-'.eql? customers%>
+                    <%= '-' %>
+                  <% else %>
+                    <% customers.each do |customer| %>
+                      <%= link_to customer.actual_name, controller: 'customer', action: 'summary', customer_id: customer.id, customer_name: customer.actual_name %>
+                    <% end %>
+                  <% end %>
+                </td>
+                <td>
+                  <% if '-'.eql? staffs%>
+                    <%= '-' %>
+                  <% else %>
+                    <% staffs.each do |staff| %>
+                      <%= staff.nickname %>
+                    <% end %>
+                  <% end %>
+                </td>
                 <td><%=Staff.find(task.response_staff).nickname%></td>
 
                 <% task_week = task.end_date.strftime("%U")
