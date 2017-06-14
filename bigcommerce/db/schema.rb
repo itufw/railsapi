@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170613051435) do
+ActiveRecord::Schema.define(version: 20170613062007) do
 
   create_table "SalesForce_account", primary_key: "Id", force: :cascade do |t|
     t.string "Name",                        limit: 52
@@ -815,6 +815,14 @@ ActiveRecord::Schema.define(version: 20170613051435) do
   end
 
   add_index "staff_calendar_addresses", ["staff_id"], name: "index_staff_calendar_addresses_on_staff_id", using: :btree
+
+  create_table "staff_daily_samples", id: false, force: :cascade do |t|
+    t.integer  "staff_id",   limit: 4
+    t.integer  "product_id", limit: 4
+    t.date     "date"
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+  end
 
   create_table "staff_time_periods", force: :cascade do |t|
     t.integer  "staff_id",         limit: 4
