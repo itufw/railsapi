@@ -140,24 +140,6 @@ module ApplicationHelper
     "#{num[0..1]} #{num[2..5]} #{num[6..9]}"
   end
 
-  # task_display_hepler
-  def task_customer_staff(task_relation)
-    customer = ''
-    staff = ''
-    if task_relation.nil? || task_relation.blank?
-      customer = '-'
-      staff = '-'
-    else
-      task_relation = task_relation.first
-      customer = '-' if task_relation.customer_id.nil? || (task_relation.customer_id == 0)
-      staff    = '-' if task_relation.staff_id.nil? || (task_relation.staff_id == 0)
-    end
-
-    customer = '-' == customer ? '-' : Customer.find(task_relation.customer_id)
-    staff = '-' == staff ? '-' : Staff.find(task_relation.staff_id)
-    [customer, staff]
-  end
-
   def fetch_note_children(notes)
     children = []
     notes.each do |n|

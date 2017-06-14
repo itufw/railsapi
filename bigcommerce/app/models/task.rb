@@ -236,6 +236,38 @@ class Task < ActiveRecord::Base
     order('tasks.response_staff ' + direction)
   end
 
+  def self.order_by_start_date(direction)
+    order('tasks.start_date ' + direction)
+  end
+
+  def self.order_by_due_date(direction)
+    order('tasks.due_date ' + direction)
+  end
+
+  def self.order_by_create_date(direction)
+    order('tasks.created_at ' + direction)
+  end
+
+  def self.filter_by_start_date(start_date, end_date)
+    where('tasks.start_date > ? AND tasks.start_date < ?', start_date, end_date)
+  end
+
+  def self.filter_by_create_date(start_date, end_date)
+    where('tasks.created_at > ? AND tasks.created_at < ?', start_date, end_date)
+  end
+
+  def self.filter_by_ids(tasks_ids)
+    where('tasks.id IN (?)', tasks_ids)
+  end
+
+  def self.filter_by_end_date(start_date, end_date)
+    where('tasks.end_date > ? AND tasks.end_date < ?', start_date, end_date)
+  end
+
+  def self.filter_by_response(staff_id)
+    where('tasks.response_staff = ? ', staff_id)
+  end
+
   def self.filter_by_staff(staff_id)
     includes(:task_relations).where('tasks.response_staff = ? OR task_relations.staff_id = ?', staff_id, staff_id).references(:task_relations)
   end

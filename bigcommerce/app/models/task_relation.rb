@@ -19,6 +19,14 @@ class TaskRelation < ActiveRecord::Base
     where(staff_id: staff_id)
   end
 
+  def self.filter_by_staff_ids(staff_ids)
+    where('staff_id IN (?)', staff_ids)
+  end
+
+  def self.filter_by_task_ids(task_ids)
+    where('task_id IN (?)', task_ids)
+  end
+
   def link_relation(task_id, customer_id, staff_id = nil)
     time = Time.now.to_s(:db)
 

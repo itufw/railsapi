@@ -28,8 +28,14 @@ class TaskController < ApplicationController
   end
 
   def staff_task
+
+    @start_date = params[:start_date] || (Date.today - 1.month).to_s
+    @end_date = params[:end_date] || Date.today.to_s
+    @date_column = params[:date_column] || 'start_date'
+    @subjects = TaskSubject.all
+
     @selected_display = params[:display_options] || 'All'
-    @tasks = staff_task_display(params, session[:user_id])
+    @tasks = staff_task_display(params, @selected_display)
   end
 
   def task_details
