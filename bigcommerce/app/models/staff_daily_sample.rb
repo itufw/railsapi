@@ -14,10 +14,6 @@ class StaffDailySample < ActiveRecord::Base
     where('staff_id = ? AND product_id = ?', staff_id, product_id)
   end
 
-  def self.delete_samples(staff_id)
-    where('staff_id = ?', staff_id).destroy_all
-  end
-
   def self.staff_samples(staff_id)
     where('staff_id = ?', staff_id)
   end
