@@ -63,39 +63,10 @@
   <button style="float: right;"><%= link_to "Log a Call", controller: 'activity', action: 'add_note', customer_id: @customer_id, customer_search_text: @customer_name, selected_method: 'Call' %></button>
 </div>
 
-<table class="table table-striped table-bordered table-hover table-responsive table-fixed" style="margin-top: -10px">
-  <thead>
-    <tr class="info activity-bar">
-      <th class="col-md-4" style="color: red" id="activity_show">Activity</th>
-      <th class="col-md-7">Note</th>
-      <th class="col-md-1">Due</th>
-    </tr>
-  </thead>
-  <tbody class="activity-section">
-    <% @activity.each do |task|%>
-    <tr class="activity_tr staff_<%= task.staff.id%> method_<%= task.method%> subject_<%= task.subject_1%> function_<%=task.function%>">
-      <td class="col-md-4">
-        <div class="col-md-4">
-          <%= task.start_date.strftime("%d/%m")%>
-        </div>
-        <div class="col-md-8">
-          <%= @subjects.select {|x| x.id.to_s==task.subject_1}.map(&:subject).first%>
-        </div>
-        <br/>
-        <div class="col-xs-4">
-          <%= task.staff.nickname%>
-        </div>
-        <div class="col-xs-8">
-          <%= task.method%>
-        </div>
-      </td>
-      <td class="col-md-8"><%= link_to task.description,controller: "task", action: "task_details", task_id: task.id%></td>
-      <td class="col-md-2"><%= task.end_date.strftime("%d/%m") %></td>
-    </tr>
-    <% end %>
-  </tbody>
-</table>
-
+<%= render 'customer_partials/activity_table', table_name: 'Activity', activities: @activity.select { |x| x.expired == 0}%>
+<div class="expired_tasks">
+  <%= render 'customer_partials/activity_table', table_name: 'Expired Activity', activities: @activity.select { |x| x.expired == 1}%>
+</div>
 
 <script>
 

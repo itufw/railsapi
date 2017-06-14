@@ -179,8 +179,7 @@ class CalendarController < ApplicationController
 
     des = @events.map { |x| x.description.split('\n').first }
     loc = @events.map { |x| x.location.split(/[,\n]/).first unless x.location.nil? }
-    pattern = (des + loc).uniq.compact.map(&:downcase).join(' OR ')
-
+    pattern = '"' + (des + loc).uniq.compact.map(&:downcase).join('" OR "') + '"'
     @customers = Customer.search_for(pattern).order_by_name('ASC')
     @leads = CustomerLead.search_for(pattern).order_by_name('ASC')
 

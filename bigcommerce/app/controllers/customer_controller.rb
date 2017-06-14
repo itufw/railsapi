@@ -56,9 +56,8 @@ class CustomerController < ApplicationController
     display_orders(params, Order.customer_filter([@customer_id]))
 
     # task section
-    @activity = Task.joins(:staff).customer_tasks(@customer_id).expired?.order_by_id('DESC')
+    @activity = Task.joins(:staff).customer_tasks(@customer_id).order_by_id('DESC')
     @subjects = TaskSubject.filter_by_ids(@activity.map(&:subject_1).compact)
-
     # -------------------
     # multiple contact people
     @customer = Customer.find(@customer_id)
@@ -185,8 +184,8 @@ class CustomerController < ApplicationController
     where_query = 'OrderProduct.valid_orders.order_customer_filter(%s).product_filter(%s)' % [[@customer_id], Product.all.pluck('id')]
 
     # default sorting with name
-    order_col = params[:order_col] || '0'
-    order_direction = params[:direction] || '1'
+    order_col = params[:order_col] || 'Last Quarter'
+    order_direction = params[:direction] || '-1'
 
     # hash has a structure {"time_period" => {product_id => stock}}
     # product_ids can be either product ids or even

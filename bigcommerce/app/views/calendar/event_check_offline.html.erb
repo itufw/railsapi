@@ -53,29 +53,30 @@
               loc = event.description.split("\n")
               loc = loc.first.split(/[ ()\/]/)
               loc = loc.map {|x| x = x.downcase}
-              customer_list = @customers.select{|x|  !x.actual_name.nil? && Regexp.union(loc) === x.actual_name.downcase }[0..5]
+              customer_list = @customers.select{|x|  x.staff_id == response_staff.first.id && !x.actual_name.nil? && Regexp.union(loc) === x.actual_name.downcase }[0..5]
 
-              lead_list = @leads.select{|x| Regexp.union(loc) === x.actual_name.downcase }[0..5]
+              lead_list = @leads.select{|x| x.staff_id == response_staff.first.id && Regexp.union(loc) === x.actual_name.downcase }[0..5]
               lead_list = lead_list.each {|x| x.actual_name = x.actual_name.to_s + ', (Lead)'}
 
               customer_list = lead_list + customer_list
-
               customer_list = customer_list.sort_by! {|x| @jarow.getDistance(loc.join(" "), x.actual_name) }.reverse
 
-              other_customer = @customers_all.reject{ |x| customer_list.map(&:actual_name).include?x.actual_name || x.actual_name.nil? || (x.actual_name == '')}
+              other_customer = @customers_all.select {|x| x.staff_id == response_staff.first.id}
+              other_customer = other_customer.reject{ |x| customer_list.map(&:actual_name).include?x.actual_name || x.actual_name.nil? || (x.actual_name == '')}
               customer_list += other_customer.sort_by! {|x| @jarow.getDistance(event.description.to_s, x.actual_name.to_s) }.reverse
             else
               loc = event.location.split(",").first.split.select{|x| (x.to_i.to_s.casecmp(x)<0) && !(["st","pl","street","St"].include?(x))}
               loc = loc.map {|x| x = x.downcase}
-              customer_list = @customers.select{|x| !x.actual_name.nil? && Regexp.union(loc) === x.actual_name.downcase }
+              customer_list = @customers.select{|x| x.staff_id == response_staff.first.id && !x.actual_name.nil? && Regexp.union(loc) === x.actual_name.downcase }
 
-              lead_list = @leads.select{|x| Regexp.union(loc) === x.actual_name.downcase }
+              lead_list = @leads.select{|x| x.staff_id == response_staff.first.id && Regexp.union(loc) === x.actual_name.downcase }
               lead_list = lead_list.each {|x| x.actual_name = x.actual_name.to_s + ', (Lead)'}
 
               customer_list = lead_list + customer_list
               customer_list = customer_list.sort_by! {|x| @jarow.getDistance(loc.join(" "), x.actual_name) }.reverse
 
-              other_customer = @customers_all.reject{ |x| customer_list.map(&:actual_name).include?x.actual_name || x.actual_name.nil? || (x.actual_name == '')}
+              other_customer = @customers_all.select {|x| x.staff_id == response_staff.first.id}
+              other_customer = other_customer.reject{ |x| customer_list.map(&:actual_name).include?x.actual_name || x.actual_name.nil? || (x.actual_name == '')}
               customer_list += other_customer.sort_by! {|x| @jarow.getDistance(event.description.to_s, x.actual_name.to_s) }.reverse
             end
         %>
