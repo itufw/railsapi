@@ -29,7 +29,7 @@ class Staff < ActiveRecord::Base
     end
 
     def self.active
-        where('active = 1')
+        where('active = 1').order('user_type DESC, staff_order ASC')
     end
 
     def self.filter_by_id(staff_id)
