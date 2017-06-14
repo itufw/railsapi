@@ -1,0 +1,7 @@
+<%= title @lead.actual_name %>
+<h3>Lead: <%= @lead.actual_name %></h3>
+
+<center><%= link_to 'Edit', controller: 'lead', action: 'edit_leads', lead_id: @lead.id, lead_name: @lead.actual_name %></center>
+<div class="customer_activity">
+  <%= render 'customer_partials/activity'%>
+</div>

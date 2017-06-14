@@ -132,3 +132,15 @@ $('.activity-customers').click(function(){
   }
   <%end%>
 });
+
+$('.save-as-sample').click(function(){
+  <%
+   unless @sample_products.nil?
+    StaffDailySample.delete_all(staff_id: session[:user_id])
+     @sample_products.split('tr_').each do |product_id|
+      next if product_id.nil? || product_id == ''
+      StaffDailySample.new.staff_record(session[:user_id], product_id)
+     end
+   end
+  %>
+});

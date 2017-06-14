@@ -139,4 +139,5 @@ class ProductController < ApplicationController
     @total_stock = params[:total_stock].to_i
     @pending_stock = params[:pending_stock].to_i
   end
+
 end

@@ -12,7 +12,7 @@
 	<% leads.each do |l| %>
 	<tr>
 		<%= render 'lead_partials/lead_staff_update', lead_id: l.id, staff_id: l.staff_id, can_update_staff: allow_to_update(session[:user_id])%>
-		<td><%= link_to l.actual_name, controller: 'lead', action: 'edit_leads', lead_id: l.id, lead_name: l.actual_name %></td>
+		<td><%= link_to l.actual_name, controller: 'lead', action: 'summary', lead_id: l.id%></td>
 		<td><%= lead_type_name(l) %></td>
 		<td><%= customer_style_name(l) %></td>
 		<td><%= lead_address(l)%></td>

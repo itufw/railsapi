@@ -1,18 +1,14 @@
-<%= title 'Activity Add Task'%>
-
-<%= form_for @task, :url => {:controller => "activity", :action => "save_task"}, :id => "task_append_form"  do |f| %>
-
 <div class="row">
-  <%= render 'activity_partials/customer_search', activity: @parent%>
-  <%= render 'activity_partials/task_table', f: f, activity: @parent%>
-  <% if @task.parent_task.nil?%>
-    <%= render 'activity_partials/wine_note', activity: @parent, products: @products%>
+  <%= render 'activity_partials/customer_search', activity: activity%>
+  <%= render 'activity_partials/task_table', f: f, activity: activity%>
+  <% if activity.parent_task.nil?%>
+    <%= render 'activity_partials/wine_note', activity: activity, products: @products%>
   <% else %>
     <%= render 'activity_partials/wine_note_saved'%>
   <% end %>
   <div class="col-md-8 complete_form">
     <%= button_tag(type: 'submit', class: 'btn btn-primary') do %>
-      <div> Save </div>
+      <div> Edit </div>
     <% end %>
   </div>
   <div class="col-md-8 incomplete_form">
@@ -22,7 +18,6 @@
     </button>
   </div>
 </div>
-<% end %>
 <script>
 var TaskCompleteForm = function(){
   if (($('input[id*=staff ]').length > 1) && ($('input[id*=customer ]').length > 1) && ($('#task_subject_1 option:selected').val()!="")){

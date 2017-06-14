@@ -16,6 +16,7 @@ class Product < ActiveRecord::Base
   has_many :product_lable, through: :product_lable_relations
 
   has_many :product_notes
+  has_many :staff_daily_samples
 
   belongs_to :product_type
   belongs_to :product_sub_type

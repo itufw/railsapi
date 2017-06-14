@@ -125,20 +125,17 @@ module TaskHelper
 
       case task_selected_display
       when "All"
-        tasks = Task.active_tasks.staff_tasks(user_id)
+        tasks = Task.active_tasks.staff_tasks(user_id).filter_by_params(priority, subject, method, staff_created, customers, staff).order_by_id('DESC')
       when "Task"
-        tasks = Task.active_tasks.is_task.staff_tasks(user_id)
+        tasks = Task.active_tasks.is_task.staff_tasks(user_id).filter_by_params(priority, subject, method, staff_created, customers, staff).order_by_id('DESC')
       when "Note"
-        tasks = Task.active_tasks.is_note.staff_tasks(user_id)
+        tasks = Task.active_tasks.is_note.staff_tasks(user_id).filter_by_params(priority, subject, method, staff_created, customers, staff).order_by_id('DESC')
       when "Expired All"
-        tasks = Task.staff_tasks(user_id)
+        tasks = Task.staff_tasks(user_id).filter_by_params(priority, subject, method, staff_created, customers, staff).order_by_id('DESC')
       else
-        tasks = Task.active_tasks.staff_tasks(user_id)
+        tasks = Task.active_tasks.staff_tasks(user_id).filter_by_params(priority, subject, method, staff_created, customers, staff).order_by_id('DESC')
       end
 
-      tasks = tasks.filter_by_params(priority, subject, method, staff_created, customers, staff)
-
-      tasks = tasks.order_by_id('DESC')
       tasks
     end
 

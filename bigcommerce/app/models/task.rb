@@ -193,7 +193,7 @@ class Task < ActiveRecord::Base
   end
 
   def self.staff_tasks(staff_id)
-    includes(:task_relations).where("tasks.response_staff = '#{staff_id}' or task_relations.staff_id = '#{staff_id}'").references(:task_relations).where('tasks.gcal_status <> 3')
+    includes(:task_relations).where("tasks.response_staff = '#{staff_id}' or task_relations.staff_id = '#{staff_id}'").references(:task_relations).where('tasks.gcal_status NOT IN (3, 4) OR tasks.gcal_status IS NULL')
   end
 
   def self.order_tasks(order_id)
@@ -202,6 +202,10 @@ class Task < ActiveRecord::Base
 
   def self.customer_tasks(customer_id)
     includes(:task_relations).where("task_relations.customer_id = '#{customer_id}'").references(:task_relations)
+  end
+
+  def self.lead_tasks(lead_id)
+    includes(:task_relations).where("task_relations.customer_lead_id = '#{lead_id}'").references(:task_relations)
   end
 
   def self.task_children(task_id)
@@ -257,7 +261,7 @@ class Task < ActiveRecord::Base
     sql += "tasks.id in (#{TaskRelation.select('task_id').where('customer_id IN (?)', customers).map(&:task_id).join(',')}) OR " unless customers.nil? || customers.blank?
     sql += "tasks.id in (#{TaskRelation.select('task_id').where('staff_id IN (?)', staff).map(&:task_id).join(',')}) OR " unless staff.nil? || staff.blank?
     sql = sql[0..-4] unless sql.length < 5
-    where(sql)
+    where(sql) unless sql!= ''
   end
 
   def self.priority_change(task_id, priority)

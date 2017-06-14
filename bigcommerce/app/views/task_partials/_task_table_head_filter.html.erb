@@ -4,10 +4,11 @@
           <li class="dropdown">
             <a class="" data-toggle="dropdown" href="#">Priority</a>
               <ul class="dropdown-menu">
-                <% @tasks.map {|x| x.priority}.uniq.each do |priority| %>
+                <% task_priorities = TaskPriority.all%>
+                <% @tasks.map {|x| x.priority}.uniq.compact.each do |priority| %>
                 <li>
                   <%= check_box_tag 'selected_priority[]', priority %>
-                  <%= TaskPriority.find(priority).priority_level %>
+                  <%= task_priorities[priority.to_i - 1].priority_level %>
                   &nbsp;&nbsp;
                 </li>
                 <% end %>
