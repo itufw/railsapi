@@ -1,6 +1,7 @@
 <%= title 'Activity Add Note'%>
 
 <%= form_for @note, :url => {:controller => "activity", :action => "save_note"}, :id => "note_append_form"  do |f| %>
+<%= hidden_field_tag :completed_parent , @completed_parent %>
 
 <div class="row">
   <%= render 'activity_partials/customer_search', activity: @parent%>
@@ -73,7 +74,7 @@ var CompleteForm = function(){
   };
 };
 
-$('.complete_form').hide();
+CompleteForm();
 
 $('.activity-customers').click(function(){
   CompleteForm();

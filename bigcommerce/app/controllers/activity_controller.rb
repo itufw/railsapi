@@ -25,6 +25,7 @@ class ActivityController < ApplicationController
     if params[:note_id] && Task.where('tasks.id = ?', params[:note_id]).count > 0
       @note.parent_task = params[:note_id]
       @parent = Task.find(@note.parent_task)
+      @completed_parent = params[:task_type] || 'no'
     end
 
     # Sample products from table
@@ -51,6 +52,16 @@ class ActivityController < ApplicationController
 
   def save_note
     note = note_save(note_params, session[:user_id])
+
+    # complted: task_control_icon -> add_note -> save_note
+    if note.parent_task && params[:completed_parent] == 'completed'
+      parent = Task.find(note.parent_task)
+      parent.expired = 1
+      parent.completed_date = Date.today.to_s(:db)
+      parent.completed_staff = session[:user_id]
+      parent.save
+    end
+
     product_note_save(params, session[:user_id], note.id)
     relation_save(params, note)
     flash[:success] = 'Note Saved!'
