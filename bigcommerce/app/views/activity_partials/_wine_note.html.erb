@@ -71,6 +71,10 @@
     $('.wine-list-product').toggle();
   });
 
+  $('.remove_row').click(function(){
+    $(this).parent().parent().remove();
+  });
+
   $('.save-as-sample').click(function(){
     var sample_array = "";
     $('#product_table tr[id *= "tr_"]').each(function(){
@@ -82,7 +86,7 @@
   $('.load-samples').click(function(){
     <%
     wet = TaxPercentage.wet_percentage * 0.01
-    
+
     Product.filter_by_ids(StaffDailySample.staff_samples(session[:user_id]).map(&:product_id).compact.uniq).each do |product|
       next if product.nil?
     %>
