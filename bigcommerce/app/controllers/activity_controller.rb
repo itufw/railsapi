@@ -27,6 +27,10 @@ class ActivityController < ApplicationController
       @parent = Task.find(@note.parent_task)
     end
 
+    # Sample products from table
+    # ['tr_1000','tr_2000']
+    @sample_products = params[:sample_products] || nil
+
     # TEST VERSION
     # @products = Product.sample_products(35, 20)
 
@@ -60,7 +64,6 @@ class ActivityController < ApplicationController
   # insert task
   # following Dropbox -> pages -> Activity
   def add_activity
-
     @task = Task.new
     parent_function = nil
     if params[:note_id]
@@ -68,22 +71,14 @@ class ActivityController < ApplicationController
       if parents.count > 0
         parent = parents.first
         parent_function = parent.function
-        parent_relation = parent.task_relations
         @task.parent_task = params[:note_id]
         @wine_note_list = ProductNote.filter_task(params[:note_id])
       end
     end
     @parent = parent
 
-    @default_method = (parent.nil?) ? 'Meeting' : parent.method
-    @default_subject = (parent.nil?) ? nil : parent.subject_1
-    @default_customers = (parent.nil?) ? nil : Customer.filter_by_ids(parent_relation.map(&:customer_id).uniq.compact)
-    @default_customers = Customer.filter_by_ids([params[:customer_id]]) if params[:customer_id] && @default_customers.nil?
-    @default_staff = (parent.nil?) ? [session[:user_id]] : parent_relation.map(&:staff_id).append(session[:user_id]).append(parent.response_staff).uniq.compact
-
     @function, @subjects = function_search(params, parent_function)
     @staff = Staff.active
-
 
       # @products = Product.sample_products(session[:user_id], 20)
       if %w['Sales Executive'].include? session[:authority]
@@ -125,6 +120,7 @@ class ActivityController < ApplicationController
     task_product_note(params, activity, session[:user_id])
     redirect_to controller: 'customer', action: 'summary', customer_id: customer_id, customer_name: Customer.find(customer_id).actual_name
   end
+
 
   # -----------private --------------------
   private

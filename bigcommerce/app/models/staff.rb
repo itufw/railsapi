@@ -6,6 +6,7 @@ class Staff < ActiveRecord::Base
     has_many :customers
     has_many :customer_leads
     has_many :orders
+    has_many :staff_daily_samples
 
     has_many :staff_time_periods
     has_many :staff_calendar_addresses

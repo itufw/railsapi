@@ -8,6 +8,8 @@
   </div>
   <br/>
     <button type="button" class="btn btn-default" id="sample-20">Last 20 Samples</button>
+    <button type="button" class="btn btn-default load-samples">Load Samples</button>
+    <button type="button" class="btn btn-default save-as-sample">Save as Samples</button>
   <br/>
 
   <div class="wine-list">
@@ -60,9 +62,65 @@
   <%= Date.today%>
 </div>
 
+<div class='hidden_samples'></div>
+
 <script>
+  $('.hidden_samples').hide();
   $('.wine-list-product').hide();
   $('#sample-20').click(function(){
     $('.wine-list-product').toggle();
+  });
+
+  $('.save-as-sample').click(function(){
+    var sample_array = "";
+    $('#product_table tr[id *= "tr_"]').each(function(){
+      sample_array += this.id.toString();
+    });
+    $('.hidden_samples').val(sample_array);
+  });
+
+  $('.load-samples').click(function(){
+    <%
+    wet = TaxPercentage.wet_percentage * 0.01
+    
+    Product.filter_by_ids(StaffDailySample.staff_samples(session[:user_id]).map(&:product_id).compact.uniq).each do |product|
+      next if product.nil?
+    %>
+    if($('#tr_<%=product.id%>').length == 0){
+      $('#product_table').append([
+        '<tr id="tr_<%=product.id%>">',
+            '<td><%= product.id%></td>',
+            '<td><%= text_field_tag 'product_name '+ product.id.to_s,product.name, readonly:true %></td>',
+            '<td class="num"><%= text_field_tag 'price_luc '+product.id.to_s, "%.2f" %(product.calculated_price * (1 + wet)), readonly: true%></td>',
+            '<td><%= text_field_tag 'discount '+product.id.to_s,  0, placeholder: 'Discount', size: 3 %> %</td>',
+            '<td><%= text_field_tag 'price '+product.id.to_s, "%.2f" %(product.calculated_price * (1 + wet)), placeholder: 'Price', size: 5%></td>',
+            '<td><%= text_field_tag 'note '+product.id.to_s, ''%></td>',
+            '<td><%= check_box_tag 'buy_wine[]', product.id.to_s%> </td>',
+            '<td>',
+              '<%= number_field_tag("rate "+product.id.to_s, 1, {min: 1, max:5, step:1, id: "rate_"+product.id.to_s}) %>',
+              '<%= rateit(type:"span", backingfld: "#rate_"+product.id.to_s, max:5, min:1, step:1, resetable:"false")%>',
+            '</td>',
+            '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
+        '</tr>'
+        ].join(''));
+
+        $('#price_<%= product.id %>').on('input',function(){
+          var d = $('#price_<%= product.id %>').val();
+          var c = '<%= product.calculated_price * (1 + wet)%>';
+          $('#discount_<%= product.id %>').val((100 - (d/c*100)).toFixed(0));
+        });
+
+        $('#discount_<%= product.id %>').on('input',function(){
+          var d = $('#discount_<%= product.id %>').val();
+          var c = '<%= product.calculated_price * (1 + wet)%>';
+          $('#price_<%= product.id %>').val(((1-d*0.01)*c).toFixed(2));
+        });
+
+
+        $('.remove_row').click(function(){
+          $(this).parent().parent().remove();
+        });
+      }
+    <% end %>
   });
 </script>

@@ -37,3 +37,12 @@ $(document).ready ->
       data:{
         product_selected: $(this).attr('id')
       };
+
+  $(".save-as-sample").on "click", ->
+    $.ajax
+      url: "/activity/add_note"
+      type: "GET"
+      dataType: "script"
+      data:{
+        sample_products: $('.hidden_samples').val()
+      };
