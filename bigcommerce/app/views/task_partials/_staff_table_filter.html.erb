@@ -1,19 +1,20 @@
 <div class="row">
 	<div class="col-xs-2">
-      <%= label_tag :creator, 'Creator:'%>
-	    <%= collection_select(:staff, :creator, Staff.active, :id, :nickname, {:include_blank => 'All', selected: session[:user_id]}, {:class => 'form-control'}) %>
 
-			<%= label_tag :status, 'Type:'%>
-			<%= select_tag "display_options", options_for_select(["Task", "Note","All","Expired All"], selected: @selected_display), class:"form-control" unless @selected_display.nil?%>
+		<%= label_tag :staff, 'Assigned:'%>
+		<% if user_full_right(session[:authority]) %>
+		 <%= collection_select(:staff, :assigned, Staff.active, :id, :nickname, {:include_blank => 'All', selected: @selected_creator}, {:class => 'form-control'}) %>
+		<% else %>
+			<%= collection_select(:staff, :assigned, Staff.filter_by_id(session[:user_id]), :id, :nickname, {:class => 'form-control'}) %>
+		<% end %>
+
+		<%= label_tag :status, 'Type:'%>
+		<%= select_tag "display_options", options_for_select(["Task", "Note","All","Expired All"], selected: @selected_display), class:"form-control" unless @selected_display.nil?%>
 
 	</div>
 	<div class="col-xs-2">
-      <%= label_tag :staff, 'Staff:'%>
-      <% if user_full_right(session[:authority]) %>
-       <%= collection_select(:staff, :assigned, Staff.active, :id, :nickname, {:include_blank => 'All', selected: session[:user_id]}, {:class => 'form-control'}) %>
-      <% else %>
-        <%= collection_select(:staff, :assigned, Staff.filter_by_id(session[:user_id]), :id, :nickname, {:class => 'form-control'}) %>
-      <% end %>
+		<%= label_tag :creator, 'Creator:'%>
+		<%= collection_select(:staff, :creator, Staff.active, :id, :nickname, {:include_blank => 'All', selected: @selected_assigned}, {:class => 'form-control'}) %>
 	</div>
 
 	<div class="col-xs-3">
@@ -33,7 +34,7 @@
 	  </div>
 	</div>
 
-  <div class="col-xs-2">
+  <div class="col-xs-3">
     <%= label(:filter, "Filter By Date:")%>
     <div>
       <%= radio_button_tag(:date_column, "create_date", @date_column=='create_date') %> Create
@@ -51,12 +52,12 @@
 <script>
 $(function () {
   $('#start_timepicker').datetimepicker({
-    format: 'YYYY-MM-DD',
+    format: 'DD-MM-YYYY',
     defaultDate: '<%= @start_date%>',
     sideBySide: true
   });
   $('#due_timepicker').datetimepicker({
-    format: 'YYYY-MM-DD',
+    format: 'DD-MM-YYYY',
     defaultDate: '<%= @end_date%>',
     sideBySide: true
   });

@@ -60,7 +60,7 @@
         </th>
         <th id="staff_th">
           <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Staff</a>
+            <a class="" data-toggle="dropdown" href="#">Assigned</a>
               <ul class="dropdown-menu">
                 <% Staff.filter_by_ids(relations.map(&:staff_id).compact).each do |staff|%>
                 <li>
