@@ -138,14 +138,13 @@ module TaskHelper
       else
         tasks = Task.active_tasks
       end
-
       tasks = tasks.filter_by_responses(selected_creator).filter_by_ids(task_relations.map(&:task_id)).send('filter_by_' + date_column, start_date, end_date).send('order_by_' + date_column, order)
       [tasks, collection_default_staff(selected_creator), collection_default_staff(selected_staff)]
     end
 
     def collection_default_staff(staffs)
       return 0 if staffs.count > 1
-      staffs.first
+      staffs.first.to_i
     end
 
     def default_function_type(user_role)
@@ -201,9 +200,15 @@ module TaskHelper
       customer.delete(0)
       staff = task_relation.map(&:staff_id).compact.uniq
       staff.delete(0)
+      leads = task_relation.map(&:customer_lead_id).compact.uniq
+      leads.delete(0)
 
-      customer = (customer.blank?) ? '-' : Customer.filter_by_ids(customer)
+      customer = Customer.filter_by_ids(customer)
+      lead = CustomerLead.filter_by_ids(leads)
+      mix_customer = []
+      mix_customer += customer unless customer.nil?
+      mix_customer += lead unless lead.nil?
       staff = (staff.blank?) ? '-' : Staff.filter_by_ids(staff)
-      [customer, staff]
+      [mix_customer, staff]
     end
 end
