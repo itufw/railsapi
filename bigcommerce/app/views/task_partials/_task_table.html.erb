@@ -1,6 +1,6 @@
 <div class="col-md-12">
     <table class="table table-hover table-responsive task_table" style="margin-top: 5px;" id = "task_table">
-      <%= render "task_partials/task_table_head_filter", date_column_name: @date_column.split('_').map{|x| x.first.upcase+x[1..x.length]}.join(' ') %>
+      <%= render "task_partials/task_table_head_filter", date_column_name: @date_column.split('_').map{|x| x.first.upcase+x[1..x.length]}.join(' ') unless @date_column.nil?%>
             <% @tasks.each do |task|%>
             <%
               customers, staffs = task_customer_staff(task.task_relations)

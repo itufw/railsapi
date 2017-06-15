@@ -6,7 +6,7 @@ class ActivityController < ApplicationController
 
   autocomplete :product, :name, full: true
   autocomplete :customer, :actual_name, full: true
-  autocomplete :customer_lead, :firstname, full: true
+  autocomplete :customer_lead, :actual_name, full: true
   autocomplete :contact, :name, display_value: :display_position, scopes: :sales_force
   autocomplete :staff, :nickname
 
@@ -41,6 +41,8 @@ class ActivityController < ApplicationController
 
     @customer_text = params[:customer_search_text] || nil
 
+    @lead_text = params[:lead_search_text] || nil
+
     @selected_method = params[:selected_method] || 'Meeting'
     # production version
     if 'Sales Executive' == session[:authority]
@@ -48,6 +50,7 @@ class ActivityController < ApplicationController
     else
       @products = Product.sample_products(35, 20)
     end
+  
   end
 
   def save_note

@@ -56,7 +56,7 @@
 <%end%>
 
 var CompleteForm = function(){
-  if (($('input[id*=customer ]').length > 1) && ($('textarea[id=task_description]').val() != "") && ($('#task_subject_1 option:selected').val()!="")){
+  if ((($('input[id*=customer ]').length > 1) || ($('tr[id*=tr_lead ]').length > 0)) && ($('textarea[id=task_description]').val() != "") && ($('#task_subject_1 option:selected').val()!="")){
     $('.complete_form').show();
     $('.incomplete_form').hide();
   }else{
