@@ -29,13 +29,15 @@ class TaskController < ApplicationController
 
   def staff_task
 
-    @start_date = params[:start_date] || (Date.today - 1.month).to_s
-    @end_date = params[:end_date] || Date.today.to_s
+    @start_date = params[:start_date] ? params[:start_date].split('-').reverse.join('-') : (Date.today - 1.month).to_s
+    @end_date = params[:end_date] ? params[:end_date].split('-').reverse.join('-') : Date.today.to_s
     @date_column = params[:date_column] || 'start_date'
     @subjects = TaskSubject.all
 
+
     @selected_display = params[:display_options] || 'All'
-    @tasks = staff_task_display(params, @selected_display)
+    @tasks, @selected_creator, @selected_assigned = \
+      staff_task_display(params, @selected_display)
   end
 
   def task_details

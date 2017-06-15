@@ -268,6 +268,14 @@ class Task < ActiveRecord::Base
     where('tasks.response_staff = ? ', staff_id)
   end
 
+  def self.filter_by_responses(staff_ids)
+    where('tasks.response_staff IN (?)', staff_ids)
+  end
+
+  def self.filter_by_responses_relations(staff_ids, tasks_ids)
+    where('tasks.response_staff IN (?) OR tasks.id IN (?)', staff_ids, tasks_ids)
+  end
+
   def self.filter_by_staff(staff_id)
     includes(:task_relations).where('tasks.response_staff = ? OR task_relations.staff_id = ?', staff_id, staff_id).references(:task_relations)
   end
