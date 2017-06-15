@@ -59,6 +59,7 @@ class LeadController < ApplicationController
 
   def summary
     @lead = CustomerLead.filter_by_id(params['lead_id'])
+    @lead_name = @lead.actual_name
     # task section
     @activity = Task.joins(:staff).lead_tasks(@lead.id).expired?.order_by_id('DESC')
     @subjects = TaskSubject.filter_by_ids(@activity.map(&:subject_1).compact)

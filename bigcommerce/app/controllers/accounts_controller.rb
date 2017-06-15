@@ -58,6 +58,8 @@ class AccountsController < ApplicationController
         @amount_due = get_invoice_table(@customer.id, @monthly, @end_date)
 
         @tasks = Task.active_tasks.customer_tasks(@customer.id).order_by_id('DESC')
+
+        @subjects = TaskSubject.all
     end
 
     def email_edit
