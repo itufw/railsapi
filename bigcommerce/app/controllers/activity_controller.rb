@@ -6,7 +6,7 @@ class ActivityController < ApplicationController
 
   autocomplete :product, :name, full: true
   autocomplete :customer, :actual_name, full: true
-  autocomplete :customer_lead, :firstname, full: true
+  autocomplete :customer_lead, :actual_name, full: true
   autocomplete :contact, :name, display_value: :display_position, scopes: :sales_force
   autocomplete :staff, :nickname
 
@@ -25,6 +25,7 @@ class ActivityController < ApplicationController
     if params[:note_id] && Task.where('tasks.id = ?', params[:note_id]).count > 0
       @note.parent_task = params[:note_id]
       @parent = Task.find(@note.parent_task)
+      @completed_parent = params[:task_type] || 'no'
     end
 
     # Sample products from table
@@ -40,6 +41,8 @@ class ActivityController < ApplicationController
 
     @customer_text = params[:customer_search_text] || nil
 
+    @lead_text = params[:lead_search_text] || nil
+
     @selected_method = params[:selected_method] || 'Meeting'
     # production version
     if 'Sales Executive' == session[:authority]
@@ -47,10 +50,21 @@ class ActivityController < ApplicationController
     else
       @products = Product.sample_products(35, 20)
     end
+
   end
 
   def save_note
     note = note_save(note_params, session[:user_id])
+
+    # complted: task_control_icon -> add_note -> save_note
+    if note.parent_task && params[:completed_parent] == 'completed'
+      parent = Task.find(note.parent_task)
+      parent.expired = 1
+      parent.completed_date = Date.today.to_s(:db)
+      parent.completed_staff = session[:user_id]
+      parent.save
+    end
+
     product_note_save(params, session[:user_id], note.id)
     relation_save(params, note)
     flash[:success] = 'Note Saved!'

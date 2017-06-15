@@ -25,7 +25,7 @@
 <% end %>
 <script>
 var TaskCompleteForm = function(){
-  if (($('input[id*=staff ]').length > 1) && ($('input[id*=customer ]').length > 1) && ($('#task_subject_1 option:selected').val()!="")){
+  if (($('input[id*=staff ]').length > 1) && (($('input[id*=customer ]').length > 1) || ($('tr[id*=tr_lead ]').length > 0)) && ($('#task_subject_1 option:selected').val()!="")){
     $('.complete_form').show();
     $('.incomplete_form').hide();
   }else{

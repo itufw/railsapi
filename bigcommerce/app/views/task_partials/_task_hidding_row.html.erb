@@ -13,6 +13,7 @@ unless task_parent.nil?%>
 <%= link_to "#" + task.id.to_s, {controller: "task", action: "task_details", task_id: task.id},{ style: "color: blue;"} %>
 <br/>
 <%= task.description%>
+<br/>
 <a>Created At: <%= date_format_orders(task.created_at) %></a>
 <br/>
 <a>Start: <%= date_format_orders(task.start_date) %></a>

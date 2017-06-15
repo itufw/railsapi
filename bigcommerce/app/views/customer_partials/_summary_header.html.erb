@@ -3,7 +3,7 @@
     <div class="col-xs-4">
       <% staff = customer.staff %>
       <h5>Sales Rep.: <%= staff.nickname %></h5>
-      <p>Ph: <%= num_to_phone(staff.contact_number) unless staff.contact_number.nil? %></p>
+      <p>Ph: <a href="tel:<%=staff.contact_number%>"><%= num_to_phone(staff.contact_number) unless staff.contact_number.nil? %></a></p>
       <p>Email: <%= mail_to(staff.email) unless staff.email.nil? %></p>
       <p>Email for Sales: <%= mail_to(@customer.email_for_sales) unless @customer.email_for_sales.nil? %></p>
       <p>Email for Accounts: <%= mail_to(@customer.email_for_accounts) unless @customer.email_for_accounts.nil? %></p>
@@ -20,7 +20,7 @@
               <br/>
               <%= label_tag :position, contact.position%>
               <br/>
-              <%= num_to_phone(contact.phone) %>
+                <a href="tel:<%=contact.phone%>"><%= num_to_phone(contact.phone) %></a>
               <br/>
               <%= mail_to(contact.email) unless contact.email.nil? %>
             </p>

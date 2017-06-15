@@ -10,7 +10,7 @@
 	<%= form_tag({:controller => "task", :action => "staff_task"}, {:method => "get"}) do %>
 		<%= render 'task_partials/staff_table_filter' %>
 	<div class="row" id="task_row">
-		<%= render "task_partials/task_table"%>
+		<%= render "task_partials/task_table" unless @tasks.blank?%>
 	</div>
 
 	<% end %>

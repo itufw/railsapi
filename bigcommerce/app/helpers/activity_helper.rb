@@ -97,16 +97,13 @@ module ActivityHelper
     task.gcal_status = ('yes' == params['event_column']) ? 'pending' : 'na'
     customers = params.keys.select { |x| x.start_with?('customer ') }.map(&:split).map(&:last)
     staffs = params.keys.select { |x| x.start_with?('staff ') }.map(&:split).map(&:last)
-    customers.each do |customer_id|
+    leads = params.keys.select { |x| x.start_with?('lead ') }.map(&:split).map(&:last)
+    [customers, staffs, leads].max_by(&:length).each do |f|
       tr = TaskRelation.new
       tr.task_id = task_id
-      tr.customer_id = customer_id
+      tr.customer_id = customers.delete_at(0)
       tr.staff_id = staffs.delete_at(0)
-      tr.save
-    end
-    staffs.each do |staff_id|
-      tr = TaskRelation.new
-      tr.staff_id = staff_id
+      tr.customer_lead_id = leads.delete_at(0)
       tr.save
     end
     task.save
