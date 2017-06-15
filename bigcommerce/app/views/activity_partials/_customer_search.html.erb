@@ -1,3 +1,6 @@
+<%
+  relations = (activity.nil?) ? nil : activity.task_relations
+%>
 <div class="col-md-8">
   <div class="col-md-4">
     <table id="customer_table">
@@ -10,14 +13,37 @@
           </td>
         </tr>
       </thead>
-      <% unless activity.nil?
+      <% unless relations.nil?
           begin
-            customers = Customer.filter_by_ids(activity.task_relations.uniq.compact.map(&:customer_id))
+            customers = Customer.filter_by_ids(relations.uniq.compact.map(&:customer_id))
             customers.each do|customer| %>
               <tr id="tr_customer_<%=customer.id%>">
                 <td colspan="2"><%= text_field_tag 'customer '+customer.id.to_s, customer.actual_name, readonly: true %><i class="glyphicon glyphicon-remove remove_customer" title="remove"></i></td>
               </tr>
-            <% end
+        <% end
+          rescue
+          end
+        %>
+      <% end %>
+    </table>
+  </div>
+  <div class="col-md-4">
+    <table id="lead_table">
+      <tr>
+        <th>Lead</th>
+        <td>
+            <%= autocomplete_field_tag 'lead_name', '', autocomplete_customer_lead_actual_name_activity_index_path, placeholder: 'Search Lead', id: 'lead_search',size: 15 %>
+            <i class="glyphicon glyphicon-plus activity-leads" title="Include Lead"></i>
+        </td>
+      </tr>
+      <% unless relations.nil?
+          begin
+            leads = CustomerLead.filter_by_ids(relations.uniq.compact.map(&:customer_lead_id))
+            leads.each do|lead| %>
+              <tr id="tr_lead_<%=lead.id%>">
+                <td colspan="2"><%= text_field_tag 'lead '+lead.id.to_s, lead.actual_name, readonly: true %><i class="glyphicon glyphicon-remove remove_lead" title="remove"></i></td>
+              </tr>
+        <% end
           rescue
           end
         %>
@@ -39,6 +65,9 @@
 </div>
 <script>
   $('.remove_customer').click(function(){
+    $(this).parent().parent().remove();
+  });
+  $('.remove_lead').click(function(){
     $(this).parent().parent().remove();
   });
 </script>

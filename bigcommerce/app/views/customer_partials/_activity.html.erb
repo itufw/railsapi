@@ -58,9 +58,9 @@
 </div>
 
 <div style="margin-top: -35px">
-  <button style="float: right;"><%= link_to "New Note", controller: 'activity', action: 'add_note', customer_id: @customer_id, customer_search_text: @customer_name %></button>
-  <button style="float: right;"><%= link_to "New Task", controller: 'activity', action: 'add_activity', customer_id: @customer_id, customer_search_text: @customer_name %></button>
-  <button style="float: right;"><%= link_to "Log a Call", controller: 'activity', action: 'add_note', customer_id: @customer_id, customer_search_text: @customer_name, selected_method: 'Call' %></button>
+  <button style="float: right;"><%= link_to "New Note", controller: 'activity', action: 'add_note', customer_id: @customer_id, customer_search_text: @customer_name, lead_search_text: @lead_name %></button>
+  <button style="float: right;"><%= link_to "New Task", controller: 'activity', action: 'add_activity', customer_id: @customer_id, customer_search_text: @customer_name, lead_search_text: @lead_name %></button>
+  <button style="float: right;"><%= link_to "Log a Call", controller: 'activity', action: 'add_note', customer_id: @customer_id, customer_search_text: @customer_name, lead_search_text: @lead_name, selected_method: 'Call' %></button>
 </div>
 
 <%= render 'customer_partials/activity_table', table_name: 'Activity', activities: @activity.select { |x| x.expired == 0}%>

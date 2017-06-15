@@ -49,7 +49,13 @@
           <li class="dropdown">
             <a class="" data-toggle="dropdown" href="#">Customer</a>
               <ul class="dropdown-menu">
-                <% Customer.filter_by_ids(relations.map(&:customer_id).compact).each do |customer|%>
+                <% customers = Customer.filter_by_ids(relations.map(&:customer_id).compact) %>
+                <% lead = CustomerLead.filter_by_ids(relations.map(&:customer_lead_id).compact)
+                  mix_customer = []
+                  mix_customer += customers unless customers.nil?
+                  mix_customer += lead unless lead.nil?
+                %>
+                <% mix_customer.each do |customer|%>
                 <li>
                   <a id="filter_customer_<%= customer.id%>"><%= customer.actual_name %></a>
                   &nbsp;&nbsp;
@@ -60,7 +66,7 @@
         </th>
         <th id="staff_th">
           <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Staff</a>
+            <a class="" data-toggle="dropdown" href="#">Assigned</a>
               <ul class="dropdown-menu">
                 <% Staff.filter_by_ids(relations.map(&:staff_id).compact).each do |staff|%>
                 <li>

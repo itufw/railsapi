@@ -133,6 +133,28 @@ $('.activity-customers').click(function(){
   <%end%>
 });
 
+
+$('.activity-leads').click(function(){
+  <%
+    lead = @lead_text==nil ? nil : CustomerLead.where('actual_name = ?', @lead_text).first
+    unless lead.nil?
+  %>
+  if ($('#lead_search').val() != ""){
+        if($('#tr_lead_<%=lead.id%>').length == 0){
+          $('#lead_table').append([
+            '<tr id="tr_lead_<%=lead.id%>">',
+                '<td colspan="2"><%= text_field_tag 'lead '+lead.id.to_s, lead.actual_name, readonly: true %><i class="glyphicon glyphicon-remove remove_lead" title="remove"></i></td>',
+            '</tr>'
+            ].join(''));
+          $('.remove_lead').click(function(){
+            $(this).parent().parent().remove();
+          });
+        }
+  }
+  <%end%>
+});
+
+
 $('.save-as-sample').click(function(){
   <%
    unless @sample_products.nil?
