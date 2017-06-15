@@ -50,7 +50,7 @@ class ActivityController < ApplicationController
     else
       @products = Product.sample_products(35, 20)
     end
-  
+
   end
 
   def save_note

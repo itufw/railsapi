@@ -7,7 +7,7 @@
               customers, staffs = task_customer_staff(task.task_relations)
               customers_filter = ('-'.eql?customers) ? ' ' : customers.map(&:id).map{|x| 'customer_'+x.to_s}.join(' ')
               staffs_filter = ('-'.eql?staffs) ? ' ' :staffs.map(&:id).map{ |x| 'staff_'+x.to_s}.join(' ')
-              priority_filter = (task.is_task.zero?) ? ' ' : 'priority_'+task.priority.to_s
+              priority_filter = (task.is_task.nil? || task.is_task.zero?) ? ' ' : 'priority_'+task.priority.to_s
             %>
 
             <tr class="activity_record <%=priority_filter%> creator_<%=task.response_staff%> method_<%=task.method%> subject_<%=task.subject_1%> <%= customers_filter %> <%= staffs_filter %>">
