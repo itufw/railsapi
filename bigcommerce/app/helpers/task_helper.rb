@@ -116,7 +116,7 @@ module TaskHelper
 
     def staff_task_display(params, task_selected_display)
 
-      selected_staff = (params[:staff] && params[:staff][:assigned] && !params[:staff][:assigned]=='') ? [params[:staff][:assigned]] : Staff.active.map(&:id)
+      selected_staff = (params[:staff] && params[:staff][:assigned] && params[:staff][:assigned]!='') ? [params[:staff][:assigned]] : [0]
 
       selected_creator = (params[:staff] && params[:staff][:creator]) ? [params[:staff][:creator]] : [session[:user_id]]
       selected_creator = Staff.active.map(&:id) if selected_creator == ['']
@@ -126,7 +126,6 @@ module TaskHelper
       start_date = params[:start_date] ? params[:start_date].split('-').reverse.join('-') : (Date.today - 1.month).to_s
       end_date = params[:end_date] ? params[:end_date].split('-').reverse.join('-') : Date.today.to_s
 
-      task_relations = TaskRelation.filter_by_staff_ids(selected_staff)
 
       case task_selected_display
       when "Task"
@@ -138,7 +137,14 @@ module TaskHelper
       else
         tasks = Task.active_tasks
       end
-      tasks = tasks.filter_by_responses(selected_creator).filter_by_ids(task_relations.map(&:task_id)).send('filter_by_' + date_column, start_date, end_date).send('order_by_' + date_column, order)
+
+      if selected_staff.first != 0
+        task_relations = TaskRelation.filter_by_staff_ids(selected_staff)
+        tasks = tasks.filter_by_responses(selected_creator).filter_by_ids(task_relations.map(&:task_id)).send('filter_by_' + date_column, start_date, end_date).send('order_by_' + date_column, order)
+      else
+        tasks = tasks.filter_by_responses(selected_creator).send('filter_by_' + date_column, start_date, end_date).send('order_by_' + date_column, order)
+      end
+
       [tasks, collection_default_staff(selected_creator), collection_default_staff(selected_staff)]
     end
 
