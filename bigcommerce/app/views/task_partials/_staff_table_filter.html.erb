@@ -3,7 +3,7 @@
 
 		<%= label_tag :staff, 'Assigned:'%>
 		<% if user_full_right(session[:authority]) %>
-		 <%= collection_select(:staff, :assigned, Staff.active, :id, :nickname, {:include_blank => 'All', selected: @selected_creator}, {:class => 'form-control'}) %>
+		 <%= collection_select(:staff, :assigned, Staff.active, :id, :nickname, {:include_blank => 'All', selected: @selected_assigned}, {:class => 'form-control'}) %>
 		<% else %>
 			<%= collection_select(:staff, :assigned, Staff.filter_by_id(session[:user_id]), :id, :nickname, {:class => 'form-control'}) %>
 		<% end %>
@@ -14,7 +14,7 @@
 	</div>
 	<div class="col-xs-2">
 		<%= label_tag :creator, 'Creator:'%>
-		<%= collection_select(:staff, :creator, Staff.active, :id, :nickname, {:include_blank => 'All', selected: @selected_assigned}, {:class => 'form-control'}) %>
+		<%= collection_select(:staff, :creator, Staff.active, :id, :nickname, {:include_blank => 'All', selected: @selected_creator}, {:class => 'form-control'}) %>
 	</div>
 
 	<div class="col-xs-3">

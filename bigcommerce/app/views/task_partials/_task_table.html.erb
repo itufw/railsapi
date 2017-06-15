@@ -24,7 +24,11 @@
                     <%= '-' %>
                   <% else %>
                     <% customers.each do |customer| %>
-                      <%= link_to customer.actual_name, controller: 'customer', action: 'summary', customer_id: customer.id, customer_name: customer.actual_name %>
+                      <% if customer.is_a?(Customer) %>
+                        <p style="color: green"><%= link_to customer.actual_name, controller: 'customer', action: 'summary', customer_id: customer.id, customer_name: customer.actual_name %></p>
+                      <% else %>
+                        <p style="color: blue"><%= link_to customer.actual_name, controller: 'lead', action:'summary', lead_id: customer.id %></p>
+                      <% end %>
                     <% end %>
                   <% end %>
                 </td>
@@ -61,6 +65,7 @@
                   <%=date_format_orders(task_date)%>
                 </td>
                 <% is_task = (1==task.is_task)? "task" : "note"%>
+                <% is_task = 'event' unless task.google_event_id.nil?%>
                 <td class=<%=is_task%> ><%=is_task.upcase%></td>
                 <td>
                   <%=render "task_partials/control_icon", task: task%>
