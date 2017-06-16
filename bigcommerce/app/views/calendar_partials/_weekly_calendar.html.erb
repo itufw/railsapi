@@ -1,0 +1,10 @@
+<div class="weekly-calendar" id="calendar-weekly-staff-<%= staff_id%>" >
+  <%= week_calendar events: @events do |date, meetings| %>
+    <a class="calendar-date" date="<%=date%>" staff-id="<%= staff_id%>"><%= date.strftime('%e %b') %></a>
+    <% meetings.select { |x| [x.staff_id, x.response_staff].include? staff_id }.each do |meeting| %>
+      <div>
+        <%= meeting.description[0..5] %><% '...' if meeting.description.length > 5%>
+      </div>
+    <% end %>
+  <% end %>
+</div>

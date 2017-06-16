@@ -190,7 +190,7 @@ module TaskHelper
       function = staff_function(session[:user_id])
       # Sales/ Operations/ Accounting
       default_function = default_function_type(current_user.user_type)
-      params[:selected_function] = params[:selected_function].nil? ? default_function : params[:selected_function]
+      params[:selected_function] = params[:selected_function] || default_function
 
       subjects = TaskSubject.all
       subjects = subjects.select { |x| x.function == params[:selected_function] }

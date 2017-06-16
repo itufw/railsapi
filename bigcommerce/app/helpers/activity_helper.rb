@@ -34,13 +34,13 @@ module ActivityHelper
 
   # function collection ; subject collection; methods collection;
   # default function value; promotion rate
-  def function_search(params, parent_task_function = nil)
+  def function_search(params, parent_task = nil)
     function = staff_function(session[:user_id])
     # Sales/ Operations/ Accounting
-    if parent_task_function.nil?
+    if parent_task.nil?
       default_function = default_function_type(session[:authority])
     else
-      default_function = parent_task_function
+      default_function = parent_task.function || default_function_type(session[:authority])
     end
     params[:selected_function] = params[:selected_function] || default_function
 
@@ -96,6 +96,7 @@ module ActivityHelper
     task_id = task.id
     task.gcal_status = ('yes' == params['event_column']) ? 'pending' : 'na'
     customers = params.keys.select { |x| x.start_with?('customer ') }.map(&:split).map(&:last)
+    customer_id = customers.first
     staffs = params.keys.select { |x| x.start_with?('staff ') }.map(&:split).map(&:last)
     leads = params.keys.select { |x| x.start_with?('lead ') }.map(&:split).map(&:last)
     [customers, staffs, leads].max_by(&:length).each do |f|
@@ -107,7 +108,7 @@ module ActivityHelper
       tr.save
     end
     task.save
-    customers.first
+    customer_id
   end
 
   def product_note_version_update(activity_id)
