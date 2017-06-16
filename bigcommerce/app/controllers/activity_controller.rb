@@ -18,8 +18,6 @@ class ActivityController < ApplicationController
     @customers, @contacts \
       = customer_search(params)
 
-    # activity helper -> get the functions/subjects/methods from json request
-    @function, @subjects = function_search(params)
     # @products = product_search
     @note = Task.new
     if params[:note_id] && Task.where('tasks.id = ?', params[:note_id]).count > 0
@@ -27,6 +25,10 @@ class ActivityController < ApplicationController
       @parent = Task.find(@note.parent_task)
       @completed_parent = params[:task_type] || 'no'
     end
+
+
+    # activity helper -> get the functions/subjects/methods from json request
+    @function, @subjects = function_search(params, @parent)
 
     # Sample products from table
     # ['tr_1000','tr_2000']
@@ -79,19 +81,17 @@ class ActivityController < ApplicationController
   # following Dropbox -> pages -> Activity
   def add_activity
     @task = Task.new
-    parent_function = nil
     if params[:note_id]
       parents = Task.where('tasks.id = ?', params[:note_id])
       if parents.count > 0
         parent = parents.first
-        parent_function = parent.function
         @task.parent_task = params[:note_id]
         @wine_note_list = ProductNote.filter_task(params[:note_id])
       end
     end
     @parent = parent
 
-    @function, @subjects = function_search(params, parent_function)
+    @function, @subjects = function_search(params, @parent)
     @staff = Staff.active
 
       # @products = Product.sample_products(session[:user_id], 20)

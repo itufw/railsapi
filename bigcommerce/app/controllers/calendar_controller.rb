@@ -45,6 +45,8 @@ class CalendarController < ApplicationController
   end
 
   def local_calendar
+    @start_date = params[:start_date] || Date.today.beginning_of_week
+
     @calendar_date = params[:calendar_date_selected]
     @calendar_staff = params[:calendar_staff_selected]
 

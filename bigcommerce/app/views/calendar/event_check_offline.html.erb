@@ -69,7 +69,7 @@
               loc = loc.map {|x| x = x.downcase}
               customer_list = @customers.select{|x| x.staff_id == response_staff.first.id && !x.actual_name.nil? && Regexp.union(loc) === x.actual_name.downcase }
 
-              lead_list = @leads.select{|x| x.staff_id == response_staff.first.id && Regexp.union(loc) === x.actual_name.downcase }
+              lead_list = @leads.select{|x| (x.staff_id == response_staff.first.id)&& (Regexp.union(loc) === x.actual_name.downcase) }
               lead_list = lead_list.each {|x| x.actual_name = x.actual_name.to_s + ', (Lead)'}
 
               customer_list = lead_list + customer_list
