@@ -17,6 +17,5 @@ $(document).ready ->
       type: "GET"
       dataType: "script"
       data:{
-        calendar_date_selected: '2017-05-01',
         calendar_staff_selected: $(this).attr('staff-id')
       };
