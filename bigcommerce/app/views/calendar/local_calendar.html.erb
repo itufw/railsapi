@@ -49,6 +49,13 @@
           <% end %>
         </div>
       <% end %>
+
+      <div class="weekly-calendar">
+        <%= week_calendar start_date: @start_date  do |date| %>
+            <a class="calendar-date" date="<%=date%>"><%= date.strftime('%e %b') %></a>
+        <% end %>
+      </div>
+
     </div>
 
   </div>
