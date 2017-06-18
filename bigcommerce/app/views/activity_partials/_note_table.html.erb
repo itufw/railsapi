@@ -22,17 +22,17 @@
     %>
     <br/><br/><br/>
       <%= label(:subject_1, "Subject:")%>
-      <%= f.collection_select :subject_1, @subjects, :id, :subject, {:prompt => "Select a Subject", :selected => selected_subject}, {class: "subject_selection", style: 'width: 80px'} %>
+      <%= f.collection_select :subject_1, @subjects, :id, :subject, {:prompt => "Select a Subject"}, {class: "subject_selection", style: 'width: 80px'} %>
       <%= label(:function, "Function:")%>
-      <%= f.collection_select :function, @function, :function, :function, {:include_blank => "Select a Function", :selected => selected_function}, {class:"function_selection", style: 'width: 80px'} %>
+      <%= f.collection_select :function, @function, :function, :function, {:include_blank => "Select a Function"}, {class:"function_selection", style: 'width: 80px'} %>
       <br/>
       <%= label(:method, "Method:")%>
-      <%= f.collection_select :method, TaskMethod.all, :method, :method, {:include_blank => "Select a Method", :selected => selected_method}, style: 'width: 80px' %>
+      <%= f.collection_select :method, TaskMethod.all, :method, :method, {:include_blank => "Select a Method"}, style: 'width: 80px' %>
       <br/>
       <%= label(:promotion, "Promotion:")%>
-      <%= f.collection_select :promotion_id, Promotion.all, :id, :name, {:include_blank => "Select a Campaign", :selected => selected_promotion}, style: 'width: 80px' %>
+      <%= f.collection_select :promotion_id, Promotion.all, :id, :name, {:include_blank => "Select a Campaign"}, style: 'width: 80px' %>
       <%= label(:portfolio, "Portfolio:")%>
-      <%= f.collection_select :portfolio_id, Portfolio.all, :id, :name, {:include_blank => "Select a Portfolio", :selected => selected_portfolio}, style: 'width: 80px' %>
+      <%= f.collection_select :portfolio_id, Portfolio.all, :id, :name, {:include_blank => "Select a Portfolio"}, style: 'width: 80px' %>
       <br/>
       <%= label(:end_date, "Date")%>
       <div class='input-group date' id='due_timepicker', style='width: 200px'>

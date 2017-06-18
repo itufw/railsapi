@@ -45,9 +45,7 @@ class CalendarController < ApplicationController
   end
 
   def local_calendar
-    @start_date = params[:start_date] || Date.today.beginning_of_week
-
-    @calendar_date = params[:calendar_date_selected]
+    @selected_date = params[:calendar_date_selected]
     @calendar_staff = params[:calendar_staff_selected]
 
     @current_user = Staff.find(session[:user_id])
@@ -70,7 +68,7 @@ class CalendarController < ApplicationController
 
     @hash = hash_map_pins(customer_map)
     @event_hash = hash_event_pins(event_map)
-    params[:start_date] = params[:start_date] || Date.current.beginning_of_month.to_s
+    params[:start_date] = params[:start_date] || Date.current.to_s
     @current_month = (Date.parse params[:start_date]).beginning_of_month
   end
 
