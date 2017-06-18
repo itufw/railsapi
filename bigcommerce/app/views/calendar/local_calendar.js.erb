@@ -31,7 +31,7 @@ $("#customer_checkbox").click(function(){
 $(".calendar-date").click(function(){
   <%
     selected_staff = @staffs.find(@calendar_staff)
-    selected_date = @calendar_date
+    selected_date = @selected_date || Date.today.to_s
   %>
   handler.removeMarkers(event_markers);
   event_markers = null;

@@ -24,6 +24,17 @@ class ActivityController < ApplicationController
       @note.parent_task = params[:note_id]
       @parent = Task.find(@note.parent_task)
       @completed_parent = params[:task_type] || 'no'
+
+      @note.function = @parent.function
+      @note.subject_1 = @parent.subject_1
+      @note.promotion_id = @parent.promotion_id
+      @note.portfolio_id = @parent.portfolio_id
+    else
+      @note.method = params[:selected_method] || 'Meeting'
+      @note.function = default_function_type(session[:authority])
+      @note.subject_1 = 0
+      @note.promotion_id = 0
+      @note.portfolio_id = 0
     end
 
 
@@ -45,7 +56,6 @@ class ActivityController < ApplicationController
 
     @lead_text = params[:lead_search_text] || nil
 
-    @selected_method = params[:selected_method] || 'Meeting'
     # production version
     if 'Sales Executive' == session[:authority]
       @products = Product.sample_products(session[:user_id], 20)

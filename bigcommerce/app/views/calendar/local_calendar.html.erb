@@ -13,7 +13,6 @@
     <div class='col-md-6'>
       <input type="checkbox" value="event" id="event_checkbox"/>
       <lable for="event_checkbox">Event</lable>
-
       <input type="checkbox" value="customer" id="customer_checkbox"/>
       <lable for="customer_checkbox">Customer</lable>
       <br/><br/>
@@ -31,31 +30,13 @@
           <button type="button" class="btn btn-default calendar-staff-selector" id="calendar-button-<%= staff.id %>" staff-id="<%= staff.id%>"><%= staff.nickname %></button>
         <% end %>
       </div>
-
-      <% @staffs.each do |staff|%>
-        <div class="calendar-staff" id="calendar-staff-<%= staff.id%>" >
-          <%= month_calendar events: @events do |date, meetings| %>
-            <%if (date >= @current_month.beginning_of_month) && (date <= @current_month.end_of_month)%>
-              <a class="calendar-date" date="<%=date%>" staff-id="<%= staff.id%>"><%= date.strftime('%e %b') %></a>
-            <% else %>
-              <%= date.strftime('%e %b') %>
-            <% end %>
-              <% meetings.each do |meeting| %>
-              <% next unless [meeting.staff_id, meeting.response_staff].include?staff.id%>
-                <div>
-                  <%= meeting.description%>
-                </div>
-              <% end %>
-          <% end %>
-        </div>
-      <% end %>
-
-      <div class="weekly-calendar">
-        <%= week_calendar start_date: @start_date  do |date| %>
-            <a class="calendar-date" date="<%=date%>"><%= date.strftime('%e %b') %></a>
-        <% end %>
+      <div class="btn group" role="group" data-toggle="buttons" aria-label="calendar_radio">
+        <label type="button" class="btn btn-default"><%= radio_button_tag(:calendar_radio, "monthly") %> Month</label>
+        <label type="button" class="btn btn-default"><%= radio_button_tag(:calendar_radio, "weekly") %> Week</label>
       </div>
 
+      <div id="monthly_calendar"></div>
+      <div id="weekly_calendar"></div>
     </div>
 
   </div>
@@ -63,6 +44,8 @@
 
 <!-- staff calendar selector -->
 <script>
+$('#monthly_calendar').html('<%=j render 'calendar_partials/monthly_calendar', staff_id: session[:user_id] %>');
+
 var handler = Gmaps.build('Google');
 handler.buildMap({
     internal: {
@@ -75,14 +58,16 @@ var event_markers = null;
 var customer_markers = null;
 
 <%@staffs.each do |staff|%>
-  $("#calendar-staff-<%= staff.id%>").hide();
   $("#calendar-button-<%= staff.id %>").click(function(){
+    if ($('div[aria-label="calendar_radio"] label.active input').val() == "monthly"){
+      $('#monthly_calendar').html('<%=j render 'calendar_partials/monthly_calendar', staff_id: staff.id %>');
+      $('#weekly_calendar').html('');
+    }
+    else{
+      $('#monthly_calendar').html('');
+      $('#weekly_calendar').html('<%=j render 'calendar_partials/weekly_calendar', staff_id: staff.id %>');
+    }
 
-    <%@staffs.each do |staff|%>
-      $("#calendar-staff-<%= staff.id%>").hide();
-    <% end %>
-
-    $("#calendar-staff-<%= staff.id%>").toggle();
     handler.removeMarkers(event_markers);
     handler.removeMarkers(customer_markers);
     event_markers, customer_markers = null;
@@ -98,7 +83,6 @@ var customer_markers = null;
       handler.bounds.extendWith(customer_markers);
       handler.fitMapToBounds();
     };
-
   });
 <% end %>
 
