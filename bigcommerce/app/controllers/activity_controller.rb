@@ -18,9 +18,6 @@ class ActivityController < ApplicationController
     @customers, @contacts \
       = customer_search(params)
 
-    # activity helper -> get the functions/subjects/methods from json request
-    @function, @subjects = function_search(params, @parent)
-
     # @products = product_search
     @note = Task.new
     if params[:note_id] && Task.where('tasks.id = ?', params[:note_id]).count > 0
@@ -39,6 +36,10 @@ class ActivityController < ApplicationController
       @note.promotion_id = 0
       @note.portfolio_id = 0
     end
+
+
+    # activity helper -> get the functions/subjects/methods from json request
+    @function, @subjects = function_search(params, @parent)
 
     # Sample products from table
     # ['tr_1000','tr_2000']
