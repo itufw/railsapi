@@ -45,7 +45,6 @@ class CalendarController < ApplicationController
   end
 
   def local_calendar
-
     @selected_date = params[:calendar_date_selected]
     @calendar_staff = params[:calendar_staff_selected]
 
