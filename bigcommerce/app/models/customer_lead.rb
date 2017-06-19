@@ -42,6 +42,11 @@ class CustomerLead < ActiveRecord::Base
     where('customer_leads.staff_id = ?', staff_id)
   end
 
+  def self.filter_by_staff(staff_id)
+    return where(:staff_id => staff_id) unless (staff_id.nil? && staff_id.blank?)
+    all
+  end
+
   def self.filter_cust_style(cust_style = nil)
     return all if cust_style.nil?
     where('customer_leads.cust_style_id = ?', cust_style)
