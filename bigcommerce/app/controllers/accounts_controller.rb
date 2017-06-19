@@ -25,14 +25,11 @@ class AccountsController < ApplicationController
         @contacts, @search_text, @selected_staff =  contacts_selection(params, @end_date, @per_page, @date_column)
         staffs = Staff.all.order_by_order
 
-        @invoices = {}
         @staff_pair = {}
         @contacts.each do |c|
-            @invoices[c.id] = c.xero_invoices.has_amount_due.period_select(@end_date)
             # staff = c.customer.staff
             @staff_pair[c.id] = [c.staff_id, staffs.select{|x| x.id==c.staff_id}.first.nickname]
         end
-
     end
 
     def contact_invoices
@@ -74,7 +71,7 @@ class AccountsController < ApplicationController
         end
 
         if 'Add Note/Task'.eql? params[:commit]
-            redirect_to(controller: 'task', action: 'add_task', account_customer: customer_id, selected_invoices: selected_invoices) && return
+            redirect_to(controller: 'activity', action: 'add_note', customer_id: customer_id, customer_search_text: Customer.find(customer_id).actual_name) && return
         end
         @cn_op = (params[:cn_op].nil?) ? {} : unzip_cn_op(params[:cn_op])
         @total_remaining_credit = (@cn_op.map { |x| x[:remaining_credit] }).sum
