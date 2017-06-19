@@ -45,14 +45,10 @@ class CalendarController < ApplicationController
   end
 
   def local_calendar
-    @selected_date = params[:calendar_date_selected]
-    @calendar_staff = params[:calendar_staff_selected]
-
-
-    @current_user = Staff.find(session[:user_id])
     # tempary use, it should be assigned based on the current users' right
     if session[:user_id] == 36
-      @staffs = Staff.where('(active = 1 and user_type LIKE "Sales%") OR staffs.id = 36')
+      @staffs = Staff.where('id IN (35, 36)')
+      # @staffs = Staff.where('(active = 1 and user_type LIKE "Sales%") OR staffs.id = 36')
     elsif user_full_right(session[:authority])
       @staffs = Staff.active_sales_staff
     else
@@ -61,7 +57,9 @@ class CalendarController < ApplicationController
 
     @events = Task.joins(:task_relations).select('task_relations.*, tasks.*').where('tasks.google_event_id IS NOT NULL AND (task_relations.staff_id IN (?) OR tasks.response_staff IN (?))', @staffs.map(&:id), @staffs.map(&:id))
 
-    @customers = Customer.all
+    @customers = Customer.filter_by_staff(@staffs.map(&:id))
+    @leads = CustomerLead.filter_by_staff(@staffs.map(&:id))
+
     _, @order_colour_selected, @colour_guide, @max_date =
       colour_selected(params)
     customer_map, event_map, @start_date, @end_date = \
@@ -70,6 +68,9 @@ class CalendarController < ApplicationController
     @hash = hash_map_pins(customer_map)
     @event_hash = hash_event_pins(event_map)
     params[:start_date] = params[:start_date] || Date.current.to_s
+
+    @selected_date = params[:calendar_date_selected]
+    @calendar_staff = params[:calendar_staff_selected]
   end
 
   # online version

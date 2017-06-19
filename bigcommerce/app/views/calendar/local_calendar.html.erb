@@ -30,6 +30,7 @@
           <button type="button" class="btn btn-default calendar-staff-selector" id="calendar-button-<%= staff.id %>" staff-id="<%= staff.id%>"><%= staff.nickname %></button>
         <% end %>
       </div>
+      <br/>
       <div class="btn group" role="group" data-toggle="buttons" aria-label="calendar_radio">
         <label type="button" class="btn btn-default"><%= radio_button_tag(:calendar_radio, "monthly") %> Month</label>
         <label type="button" class="btn btn-default"><%= radio_button_tag(:calendar_radio, "weekly") %> Week</label>

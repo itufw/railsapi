@@ -3,7 +3,15 @@
     <a class="calendar-date" date="<%=date%>" staff-id="<%= staff_id%>"><%= date.strftime('%e %b') %></a>
     <% meetings.select { |x| [x.staff_id, x.response_staff].include? staff_id }.each do |meeting| %>
       <div>
-        <%= meeting.description[0..5] %><% '...' if meeting.description.length > 5%>
+        <%begin%>
+          <p style="color: green;"><%= @customers.find(meeting.customer_id).actual_name %></p>
+        <%rescue%>
+          <%begin%>
+          <p style="color: blue;"><%= @leads.find(meeting.customer_lead_id).actual_name%></p>
+          <%rescue%>
+          <%= meeting.description[0..5] %><% '...' if meeting.description.length > 5%>
+          <%end%>
+        <%end%>
       </div>
     <% end %>
   <% end %>
