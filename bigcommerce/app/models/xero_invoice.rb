@@ -185,6 +185,11 @@ class XeroInvoice < ActiveRecord::Base
         group(DATE_FORMAT('xero_invoices.date', '%Y-%m-01'))
       end
 
+    def self.filter_by_contact_id(contact_id)
+      return where(xero_contact_id: contact_id) unless contact_id.nil? || contact_id.blank?
+      all
+    end
+
     def self.group_by_week
         group('WEEK(xero_invoices.date)')
       end
