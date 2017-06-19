@@ -43,7 +43,7 @@ class XeroCreditNote < ActiveRecord::Base
 		credit_note = xero.CreditNote.all(modified_since: modified_since_time)
 		credit_note.each do |c|
 			insert_or_update_credit_note(c)
-			XeroCNLineItem.new.download_line_items_from_api(xero, c.credit_note_number)
+			XeroCNLineItem.new.download_line_items_from_api(xero, c)
 		end
 	end
 

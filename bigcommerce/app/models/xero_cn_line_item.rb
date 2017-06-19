@@ -6,9 +6,9 @@ class XeroCNLineItem < ActiveRecord::Base
 
     belongs_to :xero_credit_note
 
-    def download_line_items_from_api(xero, credit_note_number)
-      if credit_note_number.start_with?("CN")
-        credit_note = xero.CreditNote.find(credit_note_number)
+    def download_line_items_from_api(xero, credit_note)
+      return if credit_note.nil?
+      if credit_note.credit_note_number.start_with?("CN")
         update_data_from_api(credit_note.line_items, credit_note.credit_note_id) unless credit_note.nil?
       end
     end
@@ -16,7 +16,7 @@ class XeroCNLineItem < ActiveRecord::Base
     def update_data_from_api(invoice_line_items, credit_note_id)
         invoice_line_items.each do |li|
             time = Time.now.to_s(:db)
-            next unless cn_line_item_doesnt_exist(li.line_item_id, description)
+            next unless cn_line_item_doesnt_exist(credit_note_id, li.description)
             line_amount = li.line_amount(true) || 1
 
             sql = "INSERT INTO xero_cn_line_items (xero_cn_line_item_id,\
@@ -30,6 +30,6 @@ class XeroCNLineItem < ActiveRecord::Base
      end
 
     def cn_line_item_doesnt_exist(credit_note_id, description)
-        return (XeroCNLineItem.where("xero_cn_line_items.xero_credit_note_id = '#{credit_note_id}' AND xero_cn_line_items.description = \"#{description}\"").count == 0)
+        return (XeroCNLineItem.where("xero_cn_line_items.xero_credit_note_id = '#{credit_note_id}' AND xero_cn_line_items.description LIKE \"#{description}\"").count == 0)
     end
 end

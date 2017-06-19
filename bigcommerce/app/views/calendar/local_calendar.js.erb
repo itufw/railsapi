@@ -1,11 +1,13 @@
-
 $("#event_checkbox").click(function(){
   <% selected_staff = @staffs.find(@calendar_staff) %>
   if ($(this).is(':checked')){
     handler.removeMarkers(event_markers);
     event_markers = null;
     <%unless selected_staff.nil? %>
-      event_markers = handler.addMarkers(<%=raw @event_hash.select{|x| ([x[:creator], x[:participant]].include?selected_staff.id) && ((@current_month - 1.month) == x[:date].beginning_of_month.to_date)}.to_json %>);
+      if ($('div[aria-label="calendar_radio"] label.active input').val() == "monthly")
+        event_markers = handler.addMarkers(<%=raw @event_hash.select{|x| ([x[:creator], x[:participant]].include?selected_staff.id) && (@start_date.beginning_of_month == x[:date].beginning_of_month)}.to_json %>);
+      else
+        event_markers = handler.addMarkers(<%=raw @event_hash.select{|x| ([x[:creator], x[:participant]].include?selected_staff.id) && (@start_date.beginning_of_week == x[:date].beginning_of_week)}.to_json %>);
     <% end %>
   }else{
     handler.removeMarkers(event_markers);
