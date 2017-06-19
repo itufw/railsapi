@@ -48,6 +48,7 @@ class CalendarController < ApplicationController
     @selected_date = params[:calendar_date_selected]
     @calendar_staff = params[:calendar_staff_selected]
 
+
     @current_user = Staff.find(session[:user_id])
     # tempary use, it should be assigned based on the current users' right
     if session[:user_id] == 36
@@ -69,7 +70,6 @@ class CalendarController < ApplicationController
     @hash = hash_map_pins(customer_map)
     @event_hash = hash_event_pins(event_map)
     params[:start_date] = params[:start_date] || Date.current.to_s
-    @current_month = (Date.parse params[:start_date]).beginning_of_month
   end
 
   # online version
