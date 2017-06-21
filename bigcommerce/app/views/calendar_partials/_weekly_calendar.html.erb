@@ -1,9 +1,17 @@
-<div class="weekly-calendar" id="calendar-weekly-staff-<%= staff_id%>" >
-  <%= week_calendar events: @events do |date, meetings| %>
-    <a class="calendar-date" date="<%=date%>" staff-id="<%= staff_id%>"><%= date.strftime('%e %b') %></a>
-    <% meetings.select { |x| [x.staff_id, x.response_staff].include? staff_id }.each do |meeting| %>
+<div class="monthly-calendar" id="calendar-staff-<%= staff_id%>" >
+  <%= week_calendar events: events do |date, meetings| %>
+    <%= link_to date.strftime('%e %b'), fetch_calendar_date_path(calendar_date_selected: date, calendar_staff_selected: staff_id), :remote => true %>
+    <% meetings.each do |meeting| %>
       <div>
-        <%= meeting.description[0..5] %><% '...' if meeting.description.length > 5%>
+        <%begin%>
+          <p style="color: green;"><%= Customer.find(meeting.customer_id).actual_name %></p>
+        <%rescue%>
+          <%begin%>
+          <p style="color: blue;"><%= CustomerLead.find(meeting.customer_lead_id).actual_name%></p>
+          <%rescue%>
+          <%= meeting.description[0..5] %><% '...' if meeting.description.length > 5%>
+          <%end%>
+        <%end%>
       </div>
     <% end %>
   <% end %>

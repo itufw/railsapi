@@ -8,8 +8,7 @@ $(document).ready ->
       type: "GET"
       dataType: "script"
       data:{
-        calendar_date_selected: $(this).attr('date'),
-        calendar_staff_selected: $(this).attr('staff-id')
+        calendar_date_selected: $(this).attr('date')
       };
   $(".calendar-staff-selector").on "click", ->
     $.ajax
