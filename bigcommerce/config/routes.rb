@@ -14,6 +14,10 @@ Rails.application.routes.draw do
   get '/callback', to: 'calendar#callback', as: 'callback'
   get '/calendars', to: 'calendar#calendars', as: 'calendars'
 
+  get '/fetch_calendar', to: 'calendar#fetch_calendar', as: 'fetch_calendar'
+  get '/fetch_calendar_date', to: 'calendar#fetch_calendar_date', as: 'fetch_calendar_date'
+
+
   get '/rails/mailers' => 'rails/mailers#index'
   get '/rails/mailers/*path' => 'rails/mailers#preview'
 

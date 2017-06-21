@@ -1,0 +1,34 @@
+  <% start_date = Date.parse @start_date %>
+
+  handler.removeMarkers(event_markers);
+  handler.removeMarkers(customer_markers);
+  event_markers, customer_markers = null;
+
+  <% events = get_events_details(@calendar_staff, start_date.beginning_of_month, start_date.end_of_month) %>
+
+  // calendar update
+  if (calendar_radio.find('label.active').attr('date') == 'weekly'){
+    calendar_table.html("<%=j render 'calendar_partials/weekly_calendar', staff_id: @calendar_staff, events: events%>");
+    // map pins update
+    if (event_checkbox.is(':checked'))
+      event_markers = handler.addMarkers(<%=raw get_events_pins(events.select{ |x| x.start_date >= start_date.beginning_of_week && x.end_date<= start_date.end_of_week}).to_json %>);
+  }
+  else {
+    calendar_table.html("<%=j render 'calendar_partials/monthly_calendar', staff_id: @calendar_staff, events: events%>");
+    if (event_checkbox.is(':checked'))
+      event_markers = handler.addMarkers(<%=raw get_events_pins(events).to_json %>);
+  }
+
+
+  if (customer_checkbox.is(':checked')){
+    customer_markers = handler.addMarkers(<%=raw get_customers_pins(@calendar_staff, start_date).to_json%>);
+  }
+
+
+  if (event_markers != null && event_markers.length != 0){
+    handler.bounds.extendWith(event_markers);
+    handler.fitMapToBounds();
+  }else if (customer_markers != null) {
+    handler.bounds.extendWith(customer_markers);
+    handler.fitMapToBounds();
+  };

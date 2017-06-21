@@ -45,32 +45,37 @@ class CalendarController < ApplicationController
   end
 
   def local_calendar
+
     # tempary use, it should be assigned based on the current users' right
     if session[:user_id] == 36
-      @staffs = Staff.where('id IN (35, 36)')
-      # @staffs = Staff.where('(active = 1 and user_type LIKE "Sales%") OR staffs.id = 36')
+      @staffs = Staff.where('(active = 1 and user_type LIKE "Sales%") OR staffs.id = 36')
     elsif user_full_right(session[:authority])
       @staffs = Staff.active_sales_staff
     else
       @staffs = Staff.where(id: session[:user_id])
     end
 
-    @events = Task.joins(:task_relations).select('task_relations.*, tasks.*').where('tasks.google_event_id IS NOT NULL AND (task_relations.staff_id IN (?) OR tasks.response_staff IN (?))', @staffs.map(&:id), @staffs.map(&:id))
-
-    @customers = Customer.filter_by_staff(@staffs.map(&:id))
-    @leads = CustomerLead.filter_by_staff(@staffs.map(&:id))
-
     _, @order_colour_selected, @colour_guide, @max_date =
       colour_selected(params)
-    customer_map, event_map, @start_date, @end_date = \
-      calendar_filter(params, @order_colour_selected, @staffs, @events)
-
-    @hash = hash_map_pins(customer_map)
-    @event_hash = hash_event_pins(event_map)
+      
     params[:start_date] = params[:start_date] || Date.current.to_s
+    @start_date = Date.parse params[:start_date]
+  end
 
-    @selected_date = params[:calendar_date_selected]
+  def fetch_calendar
     @calendar_staff = params[:calendar_staff_selected]
+    @start_date = params[:start_date] || Date.today.to_s
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def fetch_calendar_date
+    @calendar_date  = params[:calendar_date_selected] || Date.today.to_s
+    @calendar_staff = params[:calendar_staff_selected]
+    respond_to do |format|
+      format.js
+    end
   end
 
   # online version

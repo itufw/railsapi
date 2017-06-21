@@ -1,0 +1,10 @@
+<% calendar_date = Date.parse @calendar_date %>
+handler.removeMarkers(event_markers);
+
+<% events = get_events_details(@calendar_staff, calendar_date, calendar_date + 1.day) %>
+event_markers = handler.addMarkers(<%=raw get_events_pins(events).to_json %>);
+
+if (event_markers != null && event_markers.length != 0){
+  handler.bounds.extendWith(event_markers);
+  handler.fitMapToBounds();
+}
