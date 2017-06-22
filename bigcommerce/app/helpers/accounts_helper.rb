@@ -14,7 +14,8 @@ module AccountsHelper
 
       contacts = contacts.where("customers.staff_id IN (?)", selected_staff) unless selected_staff.nil? || selected_staff.blank?
 
-      contacts = (params[:selected_months].blank?) ? contacts.period_select(end_date) : contacts.limited_period_select(params[:selected_months], date_column)
+      # contacts = (params[:selected_months].blank?) ? contacts.period_select(end_date.to_s) : contacts.limited_period_select(params[:selected_months], date_column)
+      contacts = (params[:selected_months].blank?) ? contacts : contacts.limited_period_select(params[:selected_months], date_column)
 
       # sorting via sort_order -> find the function called order_by_name
       order_function, direction = sort_order(params, 'order_by_name', 'ASC')
@@ -28,7 +29,6 @@ module AccountsHelper
       end
 
       contacts = contacts.paginate(per_page: per_page, page: params[:page])
-
       [contacts, search_text, selected_staff]
     end
 

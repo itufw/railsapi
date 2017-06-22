@@ -103,4 +103,8 @@ class XeroCreditNote < ActiveRecord::Base
 		where('remaining_credit > 0 AND status = "AUTHORISED"')
 	end
 
+	def self.period_select(until_date)
+		credit_above_zero.where("xero_credit_notes.date <= '#{until_date}'")
+	end
+
 end

@@ -210,7 +210,7 @@ class XeroInvoice < ActiveRecord::Base
     end
 
     def self.period_select(until_date)
-        where("(xero_invoices.date < '#{until_date}' or xero_invoices.due_date < '#{until_date}') and xero_invoices.amount_due > 0 ")
+        where("(xero_invoices.date <= '#{until_date}' or xero_invoices.due_date <= '#{until_date}') and xero_invoices.amount_due > 0 ")
       end
 
     def self.limited_period_select_due_date(select_days)
