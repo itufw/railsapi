@@ -71,7 +71,8 @@ class AccountsController < ApplicationController
         end
 
         if 'Add Note/Task'.eql? params[:commit]
-            redirect_to(controller: 'activity', action: 'add_note', customer_id: customer_id, customer_search_text: Customer.find(customer_id).actual_name) && return
+          redirect_to(controller: 'task', action: 'add_task', account_customer: customer_id, selected_invoices: selected_invoices) && return
+            # redirect_to(controller: 'activity', action: 'add_note', customer_id: customer_id, customer_search_text: Customer.find(customer_id).actual_name) && return
         end
         @cn_op = (params[:cn_op].nil?) ? {} : unzip_cn_op(params[:cn_op])
         @total_remaining_credit = (@cn_op.map { |x| x[:remaining_credit] }).sum
