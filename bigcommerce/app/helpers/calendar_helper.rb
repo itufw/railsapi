@@ -364,8 +364,8 @@ module CalendarHelper
 
   # scrap events from google calendar
   def update_google_events(new_events, tasks, staff_calendars, unconfirm)
-    new_events.select { |x| (!tasks.include?x.id) || (unconfirm.include?x.id) }.each do |event|
-      if unconfirm.include? event.id
+    new_events.each do |event|
+      if !tasks.include? event.id
         task = Task.filter_by_google_event_id(event.id).first
         task.auto_update_from_calendar_event(event) unless task.nil?
       else
