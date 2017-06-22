@@ -1,0 +1,22 @@
+$('#customer_checkbox').click(function(){
+  if ($(this).is(':checked')){
+    handler.removeMarkers(customer_markers);
+    customer_markers = null;
+    customer_markers = handler.addMarkers(<%=raw get_customers_pins(@selected_staff, @start_date).to_json%>);
+  }else{
+    handler.removeMarkers(customer_markers);
+    customer_markers = null;
+  }
+});
+
+$('#event_checkbox').click(function(){
+  if ($(this).is(':checked')){
+    handler.removeMarkers(event_markers);
+    event_markers = null;
+    <% events = get_events_details(@calendar_staff, @start_date.beginning_of_month, @start_date.end_of_month) %>
+    event_markers = handler.addMarkers(<%=raw get_events_pins(events).to_json %>);
+  }else{
+    handler.removeMarkers(event_markers);
+    event_markers = null;
+  }
+});

@@ -57,7 +57,8 @@ class CalendarController < ApplicationController
 
     _, @order_colour_selected, @colour_guide, @max_date =
       colour_selected(params)
-      
+
+    @selected_staff = params[:calendar_staff_selected]
     params[:start_date] = params[:start_date] || Date.current.to_s
     @start_date = Date.parse params[:start_date]
   end
