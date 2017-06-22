@@ -4,6 +4,7 @@
 </span>
 
 <table class = "table table-striped table-bordered table-hover table-responsive orders-view default" id = "orders-view-table">
+	<thead>
 	<tr>
 		<th>Sales Rep <%= render "partials/sort_arrows", order: 'order_by_staff' %></th>
 		<th>Date</th>
@@ -16,9 +17,9 @@
 		<th>Invoice Status</th>
 		<th>Last Order Date</th>
 	</tr>
-
+	</thead>
 	<% orders.each do |order| %>
-	<tr>
+	<tr class='odd'>
 		<%= render "partials/staff_update_form", customer: order.customer, staff: order.staff, can_update_staff: allow_to_update(session[:user_id]) %>
 
 		<td><%= date_format_orders(order.date_created) %></td>
@@ -36,6 +37,25 @@
 		<td class = <%= invoice_status[0].downcase %> ><%= invoice_status[0] %></td>
 		<td><%= date_format_orders(last_order_date[order.id]) %></td>
 	</tr>
+	<tr>
+		<td colspan="8">
+		<%
+			order_products = order.order_products
+			cust_id = order.customer_id
+			cust_name = customer_name(order.customer)
+		%>
+		<% order_products.each do |op| %>
+			<%next if op.product.nil?%>
+			<%= link_to op.product.name, controller: 'customer', action: 'summary_with_product', product_id: op.product.id, product_name: op.product.name, customer_id: cust_id, customer_name: cust_name %>
+			<br/>
+			&nbsp;&nbsp;&nbsp;
+			Qty:<%= op.qty %>
+			&nbsp;&nbsp;&nbsp;
+			<%= display_num(op.price_inc_tax) %>
+			<br/><br/>
+		<% end %>
+		</td>
+	</tr>
 	<% end %>
 
 </table>
@@ -43,3 +63,14 @@
 <span class="orders-view default" id = "orders-view-table" style="float:right;">
 <%= paginate(orders) %>
 </span>
+
+<script>
+$("table.orders-view tbody tr:not(.odd)").hide();
+
+$("table.orders-view tbody tr.odd").click(function () {
+    var trToToggle = $(this).next("tr");
+    $("table.orders-view tbody tr:not(.odd)").not(trToToggle).hide();
+    $(trToToggle).toggle();
+    $(this).find(".arrow").toggleClass("up");
+});
+</script>

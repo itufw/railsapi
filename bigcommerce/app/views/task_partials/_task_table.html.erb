@@ -16,7 +16,7 @@
               <% else %>
                 <td></td>
               <% end %>
-                <td><%=task.function.byteslice(0,3) + "/" + @subjects.select {|x| x.id.to_s == task.subject_1}.first.subject%></td>
+                <td><%=task.function.byteslice(0,3) + "/" + TaskSubject.find(task.subject_1).subject%></td>
                 <td><%=task.method%></td>
                 <td><%= link_to task.description,controller: "task", action: "task_details", task_id: task.id%></td>
                 <td>
