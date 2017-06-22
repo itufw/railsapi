@@ -1,21 +1,32 @@
-
 <%if @date_column == 'due_date'%>
   <% if "monthly".eql? @monthly %>
 
     <% for time_gap in 0..4%>
       <% sum = invoices.select{ |x| x.due_date.beginning_of_month == (@end_date - time_gap.month).beginning_of_month}.map(&:amount_due).sum %>
+      <% sum -= overpayments.select{ |x| x.date.beginning_of_month == (@end_date - time_gap.month).beginning_of_month}.map(&:remaining_credit).sum unless overpayments.blank?%>
+      <% sum -= credit_notes.select{ |x| x.date.beginning_of_month == (@end_date - time_gap.month).beginning_of_month}.map(&:remaining_credit).sum unless credit_notes.blank?%>
+
       <td class="num"><%= (sum == 0)? "-" : display_num(sum) %></td>
     <% end %>
     <% sum = invoices.select{ |x| x.due_date <= (@end_date - 5.month).end_of_month}.map(&:amount_due).sum %>
+    <% sum -= overpayments.select{ |x| x.date <= (@end_date - 5.month).end_of_month }.map(&:remaining_credit).sum unless overpayments.blank?%>
+    <% sum -= credit_notes.select{ |x| x.date <= (@end_date - 5.month).end_of_month }.map(&:remaining_credit).sum unless credit_notes.blank?%>
+
     <td class="num"><%= (sum == 0)? "-" : display_num(sum) %></td>
 
   <% else %>
     <% for time_gap in 0..4%>
       <% sum = invoices.select{ |x| x.due_date > (@end_date - ((time_gap+1)*15).days) && x.due_date<= (@end_date - (time_gap*15).days)}.map(&:amount_due).sum %>
+      <% sum -= overpayments.select{ |x| x.date > (@end_date - ((time_gap+1)*15).days) && x.date<= (@end_date - (time_gap*15).days) }.map(&:remaining_credit).sum unless overpayments.blank?%>
+      <% sum -= credit_notes.select{ |x| x.date > (@end_date - ((time_gap+1)*15).days) && x.date<= (@end_date - (time_gap*15).days)}.map(&:remaining_credit).sum unless credit_notes.blank?%>
+
       <td class="num"><%= (sum == 0)? "-" : display_num(sum) %></td>
     <% end %>
 
     <% sum = invoices.select{ |x| x.due_date <= (@end_date - (4*15).days )}.map(&:amount_due).sum %>
+    <% sum -= overpayments.select{ |x| x.date <= (@end_date - (4*15).days ) }.map(&:remaining_credit).sum unless overpayments.blank?%>
+    <% sum -= credit_notes.select{ |x| x.date <= (@end_date - (4*15).days ) }.map(&:remaining_credit).sum unless credit_notes.blank?%>
+
     <td class="num"><%= (sum == 0)? "-" : display_num(sum) %></td>
 
   <% end %>
@@ -26,18 +37,30 @@
 
   <% for time_gap in 0..4%>
       <% sum = invoices.select{ |x| x.date.beginning_of_month == (@end_date - time_gap.month).beginning_of_month}.map(&:amount_due).sum %>
+      <% sum -= overpayments.select{ |x| x.date.beginning_of_month == (@end_date - time_gap.month).beginning_of_month}.map(&:remaining_credit).sum unless overpayments.blank?%>
+      <% sum -= credit_notes.select{ |x| x.date.beginning_of_month == (@end_date - time_gap.month).beginning_of_month}.map(&:remaining_credit).sum unless credit_notes.blank?%>
+
       <td class="num"><%= (sum == 0)? "-" : display_num(sum) %></td>
     <% end %>
     <% sum = invoices.select{ |x| x.date <= (@end_date - 5.month).end_of_month}.map(&:amount_due).sum %>
+    <% sum -= overpayments.select{ |x| x.date <= (@end_date - 5.month).end_of_month }.map(&:remaining_credit).sum unless overpayments.blank?%>
+    <% sum -= credit_notes.select{ |x| x.date <= (@end_date - 5.month).end_of_month }.map(&:remaining_credit).sum unless credit_notes.blank?%>
+
     <td class="num"><%= (sum == 0)? "-" : display_num(sum) %></td>
 
   <% else %>
   <% for time_gap in 0..4%>
       <% sum = invoices.select{ |x| x.date > (@end_date - ((time_gap+1)*15).days) && x.date<= (@end_date - (time_gap*15).days)}.map(&:amount_due).sum %>
+      <% sum -= overpayments.select{ |x| x.date > (@end_date - ((time_gap+1)*15).days) && x.date<= (@end_date - (time_gap*15).days) }.map(&:remaining_credit).sum unless overpayments.blank?%>
+      <% sum -= credit_notes.select{ |x| x.date > (@end_date - ((time_gap+1)*15).days) && x.date<= (@end_date - (time_gap*15).days)}.map(&:remaining_credit).sum unless credit_notes.blank?%>
+
       <td class="num"><%= (sum == 0)? "-" : display_num(sum) %></td>
     <% end %>
 
     <% sum = invoices.select{ |x| x.date <= (@end_date - (4*15).days )}.map(&:amount_due).sum %>
+    <% sum -= overpayments.select{ |x| x.date <= (@end_date - (4*15).days ) }.map(&:remaining_credit).sum unless overpayments.blank?%>
+    <% sum -= credit_notes.select{ |x| x.date <= (@end_date - (4*15).days ) }.map(&:remaining_credit).sum unless credit_notes.blank?%>
+
     <td class="num"><%= (sum == 0)? "-" : display_num(sum) %></td>
 
   <% end %>
