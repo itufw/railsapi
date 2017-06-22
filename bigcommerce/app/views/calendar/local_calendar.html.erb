@@ -72,4 +72,8 @@ $("#filter_on").click(function(){
   calendar_table.html("<%=j render 'calendar_partials/monthly_calendar', staff_id: @calendar_staff, events: events%>");
   if (event_checkbox.is(':checked'))
     event_markers = handler.addMarkers(<%=raw get_events_pins(events).to_json %>);
+
+  if (event_markers != null && event_markers.length != 0){
+    handler.bounds.extendWith(event_markers);
+    handler.fitMapToBounds();}
 </script>
