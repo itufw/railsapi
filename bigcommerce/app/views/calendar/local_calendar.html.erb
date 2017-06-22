@@ -23,7 +23,7 @@
     <div class='col-md-6'>
       <div id="selector" class="btn-group">
         <% @staffs.each do |staff|%>
-          <label type="button" class="btn btn-default staff-select"><%= link_to staff.nickname, fetch_calendar_path(calendar_staff_selected: staff.id, start_date: @start_date), :remote => true %></label>
+          <label type="button" class="btn btn-default staff-select"><%= link_to staff.nickname, fetch_calendar_path(calendar_staff_selected: staff.id, start_date: @start_date), remote: true, staff_id: staff.id.to_s %></label>
         <% end %>
       </div>
       <br/>
@@ -32,8 +32,7 @@
         <label type="button" class="btn btn-default calendar_radio" date='weekly'><%= radio_button_tag(:calendar_radio, "weekly") %> Week</label>
       </div>
 
-      <div id="calendar_table">
-      </div>
+      <div id="calendar_table"></div>
     </div>
 
   </div>
@@ -57,12 +56,20 @@ var calendar_radio = $('div[aria-label=calendar_radio]');
 var event_checkbox = $('#event_checkbox');
 var customer_checkbox = $('#customer_checkbox');
 
+$('#event_checkbox').attr('checked',true);
 
   // hide filter
 $("#calendar_map_filter").hide();
 $("#filter_on").click(function(){
   $("#calendar_map_filter").toggle();
 });
+</script>
 
-$('#event_checkbox').attr('checked',true);
+<script type="text/javascript">
+<% events = get_events_details(session[:user_id], @start_date.beginning_of_month, @start_date.end_of_month) %>
+
+// calendar update
+  calendar_table.html("<%=j render 'calendar_partials/monthly_calendar', staff_id: @calendar_staff, events: events%>");
+  if (event_checkbox.is(':checked'))
+    event_markers = handler.addMarkers(<%=raw get_events_pins(events).to_json %>);
 </script>

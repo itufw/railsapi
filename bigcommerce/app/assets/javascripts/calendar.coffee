@@ -2,19 +2,11 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://coffeescript.org/
 $(document).ready ->
-  $(".calendar-date").on "click", ->
+  $(".staff-select").on "click", ->
     $.ajax
       url: "/calendar/local_calendar"
       type: "GET"
       dataType: "script"
       data:{
-        calendar_date_selected: $(this).attr('date')
-      };
-  $(".calendar-staff-selector").on "click", ->
-    $.ajax
-      url: "/calendar/local_calendar"
-      type: "GET"
-      dataType: "script"
-      data:{
-        calendar_staff_selected: $(this).attr('staff-id')
+        calendar_staff_selected: $(this).find('a').attr('staff_id')
       };
