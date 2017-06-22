@@ -1,18 +1,49 @@
-<div class="monthly-calendar" id="calendar-staff-<%= staff_id%>" >
-  <%= week_calendar events: events do |date, meetings| %>
-    <%= link_to date.strftime('%e %b'), fetch_calendar_date_path(calendar_date_selected: date, calendar_staff_selected: staff_id), :remote => true %>
-    <% meetings.each do |meeting| %>
-      <div>
-        <%begin%>
-          <p style="color: green;"><%= Customer.find(meeting.customer_id).actual_name %></p>
-        <%rescue%>
-          <%begin%>
-          <p style="color: blue;"><%= CustomerLead.find(meeting.customer_lead_id).actual_name%></p>
-          <%rescue%>
-          <%= meeting.description[0..5] %><% '...' if meeting.description.length > 5%>
-          <%end%>
-        <%end%>
-      </div>
-    <% end %>
-  <% end %>
+<div class="weekly-calendar" id="calendar-staff-<%= staff_id%>" >
+  <% date = Date.parse @start_date %>
+  <table class="table table-striped">
+      <thead>
+        <tr>
+            <th></th>
+            <th>Mon</th>
+            <th>Tue</th>
+            <th>Wed</th>
+            <th>Thu</th>
+            <th>Fri</th>
+            <th>Sat</th>
+            <th>Sun</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <td></td>
+        <% (date.beginning_of_week .. date.end_of_week).each do |day|%>
+          <td class="day wday-<%= (day - date.beginning_of_week + 1).to_i%> <%= (day == date) ? 'today' : (day > date) ? 'future' : 'past'%> <%= (day.month == date.month) ? 'current' : (day > date) ? 'future' : 'past' %>-month">
+            <%= link_to day.strftime('%e %b'), fetch_calendar_date_path(calendar_date_selected: day, calendar_staff_selected: staff_id), :remote => true %>
+          </td>
+        <% end %>
+
+        <% for hour in 8..20 do %>
+          <tr>
+            <td><%= hour %></td>
+            <% (date.beginning_of_week .. date.end_of_week).each do |day|%>
+              <td class="weekly-calendar-hour">
+                <% events.select { |x| x.start_date.strftime('%Y-%m-%d %H') == (day.to_datetime + hour.hours).strftime('%Y-%m-%d %H')}.each do |meeting|%>
+                  <div>
+                    <%begin%>
+                      <p style="color: green;"><%= meeting.start_date.strftime('%-H') + ' ' + Customer.find(meeting.customer_id).actual_name %></p>
+                    <%rescue%>
+                      <%begin%>
+                      <p style="color: blue;"><%= meeting.start_date.strftime('%-H') + ' ' + CustomerLead.find(meeting.customer_lead_id).actual_name%></p>
+                      <%rescue%>
+                      <%= meeting.start_date.strftime('%-H') + ' ' + meeting.description[0..5] %><% '...' if meeting.description.length > 5%>
+                      <%end%>
+                    <%end%>
+                  </div>
+                <% end %>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
 </div>
