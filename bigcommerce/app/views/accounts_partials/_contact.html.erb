@@ -62,15 +62,15 @@
 		</th>
 	</tr>
 
-	<% total_invoices = XeroInvoice.has_amount_due.period_select(@end_date)%>
+	<% total_invoices = XeroInvoice.where('status = "AUTHORISED"').has_amount_due.period_select(@end_date)%>
 	<% total_overpayments = XeroOverpayment.credit_above_zero%>
 	<% total_creditnote = XeroCreditNote.credit_above_zero%>
 	<tr>
 		<td>Total</td>
 		<td></td>
 		<td></td>
-		<td class="num"><%= display_num(total_invoices.map(&:amount_due).sum)%></td>
-		<td class="num"><%= display_num(total_invoices.select{|x| x.due_date < @end_date }.map(&:amount_due).sum)%></td>
+		<td class="num"><%= display_num(total_invoices.map(&:amount_due).sum - total_overpayments.map(&:remaining_credit).sum - total_creditnote.map(&:remaining_credit).sum)%></td>
+		<td class="num"><%= display_num(total_invoices.select{|x| x.due_date < @end_date }.map(&:amount_due).sum  - total_overpayments.select{|x| x.date < @end_date }.map(&:remaining_credit).sum - total_creditnote.select{|x| x.date < @end_date }.map(&:remaining_credit).sum )%></td>
 		<%= render 'accounts_partials/contact_monthly_due', invoices: total_invoices, overpayments: total_overpayments, credit_notes: total_creditnote%>
 	</tr>
 	<tr>
