@@ -99,5 +99,9 @@ class XeroOverpayment < ActiveRecord::Base
 		sum('remaining_credit')
 	end
 
+	def self.credit_above_zero
+		where('remaining_credit > 0 AND status = "AUTHORISED"')
+	end
+
 
 end

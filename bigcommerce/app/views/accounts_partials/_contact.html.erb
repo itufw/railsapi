@@ -63,13 +63,15 @@
 	</tr>
 
 	<% total_invoices = XeroInvoice.has_amount_due.period_select(@end_date)%>
+	<% total_overpayments = XeroOverpayment.credit_above_zero%>
+	<% total_creditnote = XeroCreditNote.credit_above_zero%>
 	<tr>
 		<td>Total</td>
 		<td></td>
 		<td></td>
 		<td class="num"><%= display_num(total_invoices.map(&:amount_due).sum)%></td>
 		<td class="num"><%= display_num(total_invoices.select{|x| x.due_date < @end_date }.map(&:amount_due).sum)%></td>
-		<%= render 'accounts_partials/contact_monthly_due', invoices: total_invoices%>
+		<%= render 'accounts_partials/contact_monthly_due', invoices: total_invoices, overpayments: total_overpayments, credit_notes: total_creditnote%>
 	</tr>
 	<tr>
 		<td colspan="11"></td>
@@ -100,7 +102,7 @@
 			<td><%= @staff_pair[c.id].last %></td>
 			<td class="num"><%= (outstanding_customer(c) == 0)? "-" : display_num(outstanding_customer(c))  %></td>
 			<td class="num"><%= (overdue_customer(c) == 0)? "-" : display_num(overdue_customer(c)) %></td>
-			<%= render 'accounts_partials/contact_monthly_due', invoices: c.xero_invoices.has_amount_due.period_select(@end_date)%>
+			<%= render 'accounts_partials/contact_monthly_due', invoices: c.xero_invoices.has_amount_due.period_select(@end_date), overpayments: c.xero_overpayments.credit_above_zero, credit_notes: c.xero_credit_notes.credit_above_zero%>
 		</tr>
 	<% end %>
 </table>
