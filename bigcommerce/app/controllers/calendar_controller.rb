@@ -121,13 +121,18 @@ class CalendarController < ApplicationController
     @methods = TaskMethod.all
     @subjects = TaskSubject.sales_subjects
 
+
     if user_full_right(session[:authority])
-      @events = Task.unconfirmed_event.order_by_staff('ASC')
+      if params[:selected_staff].nil?
+        @events = Task.unconfirmed_event.order_by_staff('ASC').paginate(per_page: @per_page, page: params[:page])
+      else
+        @events = Task.filter_by_response(params[:selected_staff]).unconfirmed_event.order_by_staff('ASC').paginate(per_page: @per_page, page: params[:page])
+      end
     else
       @events = Task.unconfirmed_event.filter_by_staff(session[:user_id]).order_by_staff('ASC')
     end
 
-    @staffs = Staff.filter_by_ids(@events.map(&:response_staff).uniq)
+    @staffs = Staff.filter_by_ids(Task.unconfirmed_event.map(&:response_staff).uniq)
 
     des = @events.map { |x| x.description.split('\n').first }
     loc = @events.map { |x| x.location.split(/[,\n]/).first unless x.location.nil? }

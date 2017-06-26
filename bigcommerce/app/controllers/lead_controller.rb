@@ -22,8 +22,9 @@ class LeadController < ApplicationController
 
   def create_leads
     @customer_lead = CustomerLead.new
-    @google_client = grab_from_google(params, @customer_lead)
-
+    @google_client, @google_spots = grab_from_google(params, @customer_lead)
+    @spot = spot_details(@google_client, @customer_lead, @google_spots.first) unless @google_spots.blank?
+    
     @customer_lead_button = true
   end
 
