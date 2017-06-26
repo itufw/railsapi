@@ -62,6 +62,10 @@ class CustomerLead < ActiveRecord::Base
     where('id IN (?)', lead_ids)
   end
 
+  def self.filter_by_name(actual_name)
+    where('actual_name LIKE ?', actual_name)
+  end
+
   def self.order_by_name(direction)
     order('actual_name ' + direction)
   end

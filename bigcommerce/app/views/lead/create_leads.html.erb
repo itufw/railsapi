@@ -5,7 +5,7 @@
 <% @staff = Staff.find(session[:user_id]) if @staff.nil? %>
 
 <div class="row">
-  <div class="col-md-4">
+  <div class="col-md-4 col-md-offset-4">
     <%= form_tag({:controller => "lead", :action => "create_leads"}, {:method => "get"}) do %>
     <%= text_field_tag('search', @search_text, placeholder: 'Search from Google', class: 'form-control') %>
     <%= hidden_field_tag :staff_id, @staff.id %>
@@ -25,7 +25,7 @@
     <% end %>
   <% end %>
 </div>
-
+<br/><br/>
   <div class="row">
     <div class="col-md-8 lead_form">
       <% customer_lead, spot = spot_details(@google_spots.first.place_id, @staff.id ) unless @google_spots.blank? %>
