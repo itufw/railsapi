@@ -51,6 +51,19 @@ module SalesForceClean
     end
   end
 
+  def import_into_customer_tags
+    customers = Customer.all
+    customers.each do |customer|
+      CustomerTag.new.insert_customer(customer)
+    end
+    CustomerLead.all.each do |lead|
+      CustomerTag.new.insert_lead(lead)
+    end
+    Contact.sales_force.each do |contact|
+      CustomerTag.new.insert_contact(contact)
+    end
+  end
+
   private
 
   def contact_numbers(personal_number, state)

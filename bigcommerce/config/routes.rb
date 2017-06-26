@@ -16,7 +16,9 @@ Rails.application.routes.draw do
 
   get '/fetch_calendar', to: 'calendar#fetch_calendar', as: 'fetch_calendar'
   get '/fetch_calendar_date', to: 'calendar#fetch_calendar_date', as: 'fetch_calendar_date'
-
+  get '/event_check_offline', to: 'calendar#event_check_offline', as: 'event_check_offline'
+  get '/translate_events', to: 'calendar#translate_events'
+  get '/event_censor', to:'calendar#event_censor'
 
   get '/rails/mailers' => 'rails/mailers#index'
   get '/rails/mailers/*path' => 'rails/mailers#preview'
@@ -31,6 +33,10 @@ Rails.application.routes.draw do
     get :autocomplete_contact_name, on: :collection
     get :autocomplete_customer_lead_actual_name, on: :collection
     get :autocomplete_staff_nickname, on: :collection
+  end
+
+  resources :calendar do
+    get :autocomplete_customer_tag_name, on: :collection
   end
 
   post 'add_task', to: 'task#task_record'

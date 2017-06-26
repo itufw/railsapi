@@ -21,6 +21,8 @@ class CustomerLead < ActiveRecord::Base
   self.per_page = 15
 
   def self.update_coordinates
+    CustomerTag.new.insert_lead(self)
+
     coordinate = Geocoder.coordinates(:address)
     self.latitude = coordinate.first
     self.longitude = coordinate.last

@@ -5,6 +5,9 @@ require 'fuzzystringmatch'
 class CalendarController < ApplicationController
   skip_before_action :verify_authenticity_token
   before_action :confirm_logged_in
+
+  autocomplete :customer_tag, :name, extra_data: [:customer_id]
+
   include CalendarHelper
   include ModelsFilter
 
@@ -130,8 +133,8 @@ class CalendarController < ApplicationController
     @customers = Customer.search_for(pattern).order_by_name('ASC')
     @leads = CustomerLead.search_for(pattern).order_by_name('ASC')
 
-    @customers_all = Customer.all
     @staffs = Staff.filter_by_ids(@events.map(&:response_staff).uniq)
+
   end
 
   # handle the requests for updating events

@@ -74,6 +74,7 @@ class Customer < ActiveRecord::Base
 			sql = "INSERT INTO customers(id, firstname, lastname, company, email, phone,\
 			store_credit, registration_ip_address, notes, date_created, date_modified,\
 			created_at, updated_at, cust_type_id, staff_id) VALUES #{cust}"
+
 		else
 
 			sql = "UPDATE customers SET firstname = '#{firstname}', lastname = '#{lastname}', company = '#{company}',\
