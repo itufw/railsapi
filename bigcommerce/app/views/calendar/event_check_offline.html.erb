@@ -1,6 +1,11 @@
 <%= title "Event From Calendars" %>
 <%= render 'partials/paginate', objects: @events %>
 <div>
+  <div>
+    Search:
+      <%= autocomplete_field_tag 'name', '', autocomplete_customer_tag_name_calendar_index_path, placeholder: 'Search Customer', id: 'event_check_search', size: 15 %>
+  </div>
+
   <table id="event-table">
   <thead>
     <tr>
@@ -61,9 +66,6 @@
               customer_list = lead_list + customer_list
               customer_list = customer_list.sort_by! {|x| @jarow.getDistance(loc.join(" "), x.actual_name) }.reverse
 
-              other_customer = @customers_all.select {|x| x.staff_id == response_staff.first.id}
-              other_customer = other_customer.reject{ |x| customer_list.map(&:actual_name).include?x.actual_name || x.actual_name.nil? || (x.actual_name == '')}
-              customer_list += other_customer.sort_by! {|x| @jarow.getDistance(event.description.to_s, x.actual_name.to_s) }.reverse
             else
               loc = event.location.split(",").first.split.select{|x| (x.to_i.to_s.casecmp(x)<0) && !(["st","pl","street","St"].include?(x))}
               loc = loc.map {|x| x = x.downcase}
@@ -74,11 +76,7 @@
 
               customer_list = lead_list + customer_list
               customer_list = customer_list.sort_by! {|x| @jarow.getDistance(loc.join(" "), x.actual_name) }.reverse
-
-              other_customer = @customers_all.select {|x| x.staff_id == response_staff.first.id}
-              other_customer = other_customer.reject{ |x| customer_list.map(&:actual_name).include?x.actual_name || x.actual_name.nil? || (x.actual_name == '')}
-              customer_list += other_customer.sort_by! {|x| @jarow.getDistance(event.description.to_s, x.actual_name.to_s) }.reverse
-            end
+              end
         %>
           <td>
             <%= collection_select :customer, :customer, customer_list, ->(ob) {"#{ob.id}|#{ob.actual_name}"}, :actual_name, {:include_blank => "Select a Customer"}, :style => "width: 150px" %>
@@ -110,4 +108,9 @@
     $(".staff-event-<%=staff.id%>").toggle();
   });
 <% end %>
+
+$('#event_check_search').bind('railsAutocomplete.select', function(event, data){
+  $('select[id=customer_customer]').append($('<option value='+ data.item.id + '|' + data.item.value+'>'+ data.item.value +'</option>'));
+});
+
 </script>

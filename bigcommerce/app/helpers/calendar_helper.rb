@@ -363,11 +363,25 @@ module CalendarHelper
   end
 
   # scrap events from google calendar
-  def update_google_events(new_events, tasks, staff_calendars, unconfirm)
+  def update_google_events(new_events, staff_calendars, unconfirm)
     new_events.each do |event|
-      if !tasks.include? event.id
-        task = Task.filter_by_google_event_id(event.id).first
-        task.auto_update_from_calendar_event(event) unless task.nil?
+      task = Task.filter_by_google_event_id(event.id).first
+
+      if !task.nil?
+        task.start_date = if event.start.date_time.nil?
+                            event.start.date.to_s
+                          else
+                            event.start.date_time.to_s(:db)
+                          end
+          task.end_date = if event.end.date_time.nil?
+                            event.end.date.to_s
+                          else
+                            event.end.date_time.to_s(:db)
+                          end
+          task.description = event.summary
+          task.location = event.location
+          task.summary = event.description
+          task.save
       else
         # filter the staff
         staff_address = staff_calendars.select { |x| [event.organizer.email, event.creator.email].include? x.calendar_address}.first
@@ -379,14 +393,13 @@ module CalendarHelper
 
   def scrap_from_calendars(service)
     new_events = []
-    tasks = Task.where('google_event_id IS NOT NULL').map(&:google_event_id)
     unconfirmed_task = Task.unconfirmed_event.map(&:google_event_id)
 
     staff_calendars = StaffCalendarAddress.all
     service.list_calendar_lists.items.select { |x| staff_calendars.map(&:calendar_address).include?x.id }.each do |calendar|
       new_events += service.list_events(calendar.id).items
     end
-    update_google_events(new_events, tasks, staff_calendars, unconfirmed_task)
+    update_google_events(new_events, staff_calendars, unconfirmed_task)
   end
 
   # -----------------push events to google calendar ---------------------
