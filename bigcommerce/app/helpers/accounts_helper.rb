@@ -34,6 +34,8 @@ module AccountsHelper
 
     def credit_note_and_overpayment(xero_contact_id, xero_invoices_ids)
         op = XeroOverpayment.joins(:xero_op_allocations).get_remaining_credit(xero_contact_id).where('xero_overpayments.remaining_credit > 0 OR xero_op_allocations.invoice_number IN (?)', xero_invoices_ids)
+        op += XeroOverpayment.get_remaining_credit(xero_contact_id).where('xero_overpayments.remaining_credit > 0')
+        op = op.uniq
         cn = XeroCreditNote.joins(:xero_cn_allocations).get_remaining_credit(xero_contact_id).where('xero_credit_notes.remaining_credit > 0 OR xero_cn_allocations.invoice_number IN (?)', xero_invoices_ids)
         cn_s = XeroCreditNote.get_remaining_credit(xero_contact_id).where('xero_credit_notes.remaining_credit > 0')
         cn += cn_s

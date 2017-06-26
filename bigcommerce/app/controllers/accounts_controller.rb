@@ -44,7 +44,6 @@ class AccountsController < ApplicationController
 
         invoices = @customer.xero_contact.xero_invoices.has_amount_due
         @cn_op = credit_note_and_overpayment(@customer.xero_contact_id, invoices.map{|x| x.invoice_number})
-
         # multiple contact people
         # xeroizer only provides email_address, the details of phone number should be discussed
         @contact_people = XeroContactPerson.all_contact_people(@customer.xero_contact_id)
