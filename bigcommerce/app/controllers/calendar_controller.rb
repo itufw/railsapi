@@ -122,10 +122,12 @@ class CalendarController < ApplicationController
     @subjects = TaskSubject.sales_subjects
 
     if user_full_right(session[:authority])
-      @events = Task.unconfirmed_event.order_by_staff('ASC').paginate(per_page: @per_page, page: params[:page])
+      @events = Task.unconfirmed_event.order_by_staff('ASC')
     else
       @events = Task.unconfirmed_event.filter_by_staff(session[:user_id]).order_by_staff('ASC')
     end
+
+    @staffs = Staff.filter_by_ids(@events.map(&:response_staff).uniq)
 
     des = @events.map { |x| x.description.split('\n').first }
     loc = @events.map { |x| x.location.split(/[,\n]/).first unless x.location.nil? }
@@ -133,7 +135,6 @@ class CalendarController < ApplicationController
     @customers = Customer.search_for(pattern).order_by_name('ASC')
     @leads = CustomerLead.search_for(pattern).order_by_name('ASC')
 
-    @staffs = Staff.filter_by_ids(@events.map(&:response_staff).uniq)
 
   end
 
