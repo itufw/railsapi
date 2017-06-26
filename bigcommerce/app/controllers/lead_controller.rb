@@ -51,6 +51,11 @@ class LeadController < ApplicationController
   end
 
   def create_leads_handler
+    if CustomerLead.filter_by_name(lead_params[:actual_name]).count > 0
+      flash[:error] = "Leads already exists"
+      render :back
+      return
+    end
     @customer_lead = CustomerLead.new
     lead_params[:firstname] = lead_params[:actual_name] if lead_params[:firstname].nil?
     if @customer_lead.update_attributes(lead_params)
