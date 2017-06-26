@@ -1,12 +1,11 @@
 <%= title "Event From Calendars" %>
-<%= render 'partials/paginate', objects: @events %>
 <div>
   <div>
     Search:
       <%= autocomplete_field_tag 'name', '', autocomplete_customer_tag_name_calendar_index_path, placeholder: 'Search Customer', id: 'event_check_search', size: 15 %>
   </div>
 
-  <table id="event-table">
+  <table id="event-table" border="1">
   <thead>
     <tr>
       <th>
@@ -38,7 +37,7 @@
       <%
         response_staff = @staffs.select{|x| x.id == event.response_staff }
       %>
-      <tr class="google-event-line  staff-event-<%= response_staff.first.id.to_s%> ">
+      <tr class="google-event-line  staff-event-<%= response_staff.first.id.to_s%>">
         <td><%= response_staff.first.nickname %></td>
         <td>&nbsp;&nbsp;&nbsp;</td>
         <td>
