@@ -1,0 +1,50 @@
+    <% customer_lead = CustomerLead.new if customer_lead.nil? %>
+    <%= form_for customer_lead, url: {action: "create_leads_handler"}, method: "POST", html: {class: "form-group", style: "padding-left: 50px;"} do |f| %>
+
+    <div id="selector" class="btn-group">
+      <button type="button" class="btn btn-default <%= 'active' if @customer_lead_button %>" value="customer">Customer Lead</button>
+      <button type="button" class="btn btn-default <%= 'active' unless @customer_lead_button %>" value="region">Region Lead</button>
+    </div>
+    <br/>
+    <%= f.text_field :actual_name, placeholder: 'Company Name', maxlength: 100 %>
+    <br/><br/>
+    <div class="customer_leads_field">
+      <%= f.text_field :firstname, placeholder: 'First Name', maxlength: 45 %>
+      <%= f.text_field :lastname, placeholder: 'Last Name', maxlength: 45 %>
+    </div>
+    <br/>
+    <%= f.text_field :address, placeholder: 'Address', size: 100 %>
+    <br/>
+    <div class="customer_leads_field">
+      <%= f.text_field :email, placeholder: 'Email', maxlength: 100 %>
+      <br/>
+        <% unless spot.nil? %>
+        <a href="<%= spot.website%>"><%= f.label :website%>:<%= f.text_field :website, placeholder: 'website', maxlength:40 %></a>
+        <% end %>
+      <br/>
+      <%= f.text_field :phone, placeholder: 'phone number', maxlength:45 %>
+      <%= f.text_field :mobile_phone, placeholder: 'mobile number', maxlength: 45 %>
+      <br/>
+    </div>
+
+    <div class="region_leads_field">
+      <br/>
+      <%= f.text_field :region, placeholder: 'Region', size: 50 %>
+      <br/>
+    </div>
+
+      <%= f.label :staff, class: 'margin-from-top label-new' %>
+      <%= f.collection_select :staff_id, Staff.active_sales_staff, :id, :nickname%>
+
+      <%= f.label :channel, class: 'margin-from-top label-new' %>
+      <%= f.collection_select :cust_style_id, CustStyle.all, :id, :name, {:include_blank => 'Not Assigned'}%><br/>
+
+    <div class="customer_leads_field">
+      <%= f.label :type, class: 'margin-from-top label-new' %>
+      <%= f.collection_select :cust_type_id, CustType.all, :id, :name, {:include_blank => 'Not Assigned'} %>
+
+      <%= f.label :group, class: 'margin-from-top label-new' %>
+      <%= f.collection_select :cust_group_id, CustGroup.all, :id, :name, {:include_blank => 'Not Assigned'} %><br/>
+    </div>
+      <%= f.submit "Create!", class: 'btn btn-primary' %>
+    <% end %>

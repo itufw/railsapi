@@ -21,11 +21,28 @@ class LeadController < ApplicationController
   end
 
   def create_leads
-    @customer_lead = CustomerLead.new
-    @google_client, @google_spots = grab_from_google(params, @customer_lead)
-    @spot = spot_details(@google_client, @customer_lead, @google_spots.first) unless @google_spots.blank?
-    
+    customer_name = params['customer_name']
+    staff_id = params['staff_id']
+    @staff = Staff.find(staff_id) unless staff_id.nil?
+
+    @search_text = params[:search]
+    if !@search_text.nil?
+      @google_spots = grab_from_google(@search_text)
+    elsif !customer_name.nil? && !staff_id.nil?
+      query = customer_name + "near #{@staff.state}"
+      @google_spots = grab_from_google(query)
+    end
+
     @customer_lead_button = true
+  end
+
+  def fetch_lead
+    @customer_lead, @spot = spot_details(params[:place_id], params[:staff_id] ) unless params[:place_id].nil?
+    @customer_lead_button = true
+
+    respond_to do |format|
+      format.js
+    end
   end
 
   def edit_leads

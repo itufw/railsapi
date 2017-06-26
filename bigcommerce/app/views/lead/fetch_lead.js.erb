@@ -1,0 +1,19 @@
+lead_form.html("<%= j render 'lead_partials/lead_creation_form', customer_lead: @customer_lead, spot: @spot %>");
+lead_pictures.html("<%= j render 'lead_partials/lead_pictures', spot: @spot%>");
+
+<% unless @spot.nil?%>
+  markers = handler.addMarkers([
+    {
+      "lat": '<%= @spot.lat %>',
+      "lng": '<%= @spot.lng %>',
+      "picture": {
+        "url": '<%= @spot.icon%>',
+        "width":  50,
+        "height": 50
+      }
+    }
+  ]);
+  handler.bounds.extendWith(markers);
+  handler.fitMapToBounds();
+  handler.getMap().setZoom(15);
+<% end %>

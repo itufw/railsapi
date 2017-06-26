@@ -20,6 +20,8 @@ Rails.application.routes.draw do
   get '/translate_events', to: 'calendar#translate_events'
   get '/event_censor', to:'calendar#event_censor'
 
+  get '/fetch_lead', to: 'lead#fetch_lead', as: 'fetch_lead'
+
   get '/rails/mailers' => 'rails/mailers#index'
   get '/rails/mailers/*path' => 'rails/mailers#preview'
 
