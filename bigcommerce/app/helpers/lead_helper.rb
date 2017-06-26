@@ -27,19 +27,12 @@ module LeadHelper
   end
 
   # get information from google places api
-  def grab_from_google(params, customer_lead)
-    customer_name = params['customer_name']
-    staff_id = params['staff_id']
-    return nil if customer_name.nil? || staff_id.nil?
-
+  def grab_from_google(query)
     client = GooglePlaces::Client.new('AIzaSyBvfTZH0XCVEJQTgR9QDYt18XIeV5MIkPI')
-    staff = Staff.find(staff_id)
-    spots = client.spots_by_query(customer_name + "near #{staff.state}")
+    spots = client.spots_by_query(query)
 
-    customer_lead.staff_id = staff_id
-    customer_lead.cust_type_id = 2
     # detailed spot
-    [client, spots]
+    spots
   end
 
   def places_tags
@@ -52,15 +45,19 @@ module LeadHelper
     2
   end
 
-  def spot_details(client, customer_lead, spot)
-    place = client.spot(spot.place_id)
+  def spot_details(place_id, staff_id)
+    client = GooglePlaces::Client.new('AIzaSyBvfTZH0XCVEJQTgR9QDYt18XIeV5MIkPI')
+    place = client.spot(place_id)
 
+    customer_lead = CustomerLead.new
+    customer_lead.staff_id = staff_id
+    customer_lead.cust_type_id = 2
     customer_lead.phone = place.formatted_phone_number
     customer_lead.actual_name = place.name
     customer_lead.address = place.formatted_address
     customer_lead.website = place.website
-    customer_lead.cust_style_id = spot_style(spot.types)
+    customer_lead.cust_style_id = spot_style(place.types)
 
-    place
+    [customer_lead, place]
   end
 end
