@@ -1,11 +1,16 @@
 <%= title "Event From Calendars" %>
-<div>
-  <div>
+<%= render 'partials/paginate', objects: @events %>
+
+<div class="row">
+  <div class="col-md-4">
     Search:
       <%= autocomplete_field_tag 'name', '', autocomplete_customer_tag_name_calendar_index_path, placeholder: 'Search Customer', id: 'event_check_search', size: 15 %>
   </div>
+</div>
 
-  <table id="event-table" border="1">
+
+<div class="row">
+  <table id="event-table" border = "1">
   <thead>
     <tr>
       <th>
@@ -15,7 +20,7 @@
             <ul class="dropdown-menu">
               <% @staffs.each do |staff| %>
               <li class="staff-dropdown" id="staff-<%= staff.id%>">
-                <%= staff.nickname %>
+                <%= link_to staff.nickname, controller: 'calendar', action: 'event_check_offline', selected_staff: staff.id %>
               </li>
               <% end %>
             </ul>

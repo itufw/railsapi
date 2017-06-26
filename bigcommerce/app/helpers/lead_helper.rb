@@ -33,15 +33,13 @@ module LeadHelper
     return nil if customer_name.nil? || staff_id.nil?
 
     client = GooglePlaces::Client.new('AIzaSyBvfTZH0XCVEJQTgR9QDYt18XIeV5MIkPI')
-    spot = spot_details(client, customer_lead, customer_name, staff_id)
-    return nil if spot.nil?
+    staff = Staff.find(staff_id)
+    spots = client.spots_by_query(customer_name + "near #{staff.state}")
 
     customer_lead.staff_id = staff_id
-    # default customer type to wholesale
     customer_lead.cust_type_id = 2
-    customer_lead.cust_style_id = spot_style(spot.types)
     # detailed spot
-    spot
+    [client, spots]
   end
 
   def places_tags
@@ -54,17 +52,15 @@ module LeadHelper
     2
   end
 
-  def spot_details(client, customer_lead, customer_name, staff_id)
-    staff = Staff.find(staff_id)
-    # TODO build the filter column for this
-    # spot = client.spots_by_query(customer_name + "near #{staff.state}", types: places_tags).first
-    spot = client.spots_by_query(customer_name + "near #{staff.state}").first
-    return nil if spot.nil?
+  def spot_details(client, customer_lead, spot)
     place = client.spot(spot.place_id)
+
     customer_lead.phone = place.formatted_phone_number
     customer_lead.actual_name = place.name
     customer_lead.address = place.formatted_address
     customer_lead.website = place.website
+    customer_lead.cust_style_id = spot_style(spot.types)
+
     place
   end
 end
