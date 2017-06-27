@@ -1,0 +1,39 @@
+<%= title "Create Contact"%>
+<h3>Create Contact</h3>
+<br/>
+
+
+<div class="row">
+  <% @contact = Contact.new if @contact.nil? %>
+  <%= form_for @contact, url: {action: "create_contact"}, method: "POST", html: {class: "form-group", style: "padding-left: 50px;"} do |f| %>
+    <%= render 'contact_partials/contact_creation_form', f: f %>
+    <%= render 'contact_partials/contact_customer_form'%>
+    <div class="col-md-4 col-md-offset-6 submit_button">
+      <%= f.submit "Create!", class: 'btn btn-primary' %>
+    </div>
+  <% end %>
+</div>
+
+<div class="col-md-4 col-md-offset-6">
+  <p style="padding-left: 50px;"><%= link_to "Go Back to Contacts", action: 'all_contacts'%></p>
+</div>
+
+<script type="text/javascript">
+$('.submit_button').hide();
+
+$('input').blur(function(){
+  if ($('input[id=contact_name]').val() != '' && $('input[name=customer_id]').val() != '' && $('select[id=role_role]').find(':selected').val() != ''){
+    $('.submit_button').show();
+  }else{
+    $('.submit_button').hide();
+  }
+});
+
+$('select').change(function(){
+  if ($('input[id=contact_name]').val() != '' && $('input[name=customer_id]').val() != '' && $('select[id=role_role]').find(':selected').val() != ''){
+    $('.submit_button').show();
+  }else{
+    $('.submit_button').hide();
+  }
+});
+</script>
