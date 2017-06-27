@@ -1,0 +1,14 @@
+<div class="col-md-4 append_role_<%= contact_role.customer_id%>">
+  <%= text_field_tag('customer_id_' + @customer_count.to_s, contact_role.customer_id, readonly: true, size: 5) %>
+  &nbsp;&nbsp;&nbsp;
+  <%= text_field_tag('customer_name_' + @customer_count.to_s, contact_role.customer.actual_name, placeholder: 'Customer Name', readonly: true, size: 40) %>
+  <i class="glyphicon glyphicon-remove cust_contact_<%= contact_role.id%>" title="Delete"></i>
+  <i class="glyphicon glyphicon-plus cust_contact_<%= contact_role.id%>" title="Active"></i>
+  <br/><br/>
+  <%= collection_select(:role, :role, ContactRole.all, :role, :role, {:include_blank => 'All Position', selected: contact_role.position }, {:class => 'form-control'}) %>
+  <%= text_field_tag('title_' + @customer_count.to_s, contact_role.title, placeholder: 'Title', class: 'form-control') %>
+  <%= text_field_tag('phone_' + @customer_count.to_s, contact_role.phone, placeholder: 'Phone', class: 'form-control') %>
+  <%= text_field_tag('fax_' + @customer_count.to_s, contact_role.fax, placeholder: 'Fax', class: 'form-control') %>
+  <%= text_field_tag('email_' + @customer_count.to_s, contact_role.email, placeholder: 'Email', class: 'form-control') %>
+  <%= text_field_tag('status_' + @customer_count.to_s, 'Active', placeholder: 'Status', class: 'form-control', readonly: true) %>
+</div>

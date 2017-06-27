@@ -1,0 +1,35 @@
+
+  <div class="col-md-8 col-md-offset-2">
+    <%= label(:customer,'Customer:')%>
+    <br/>
+    Search:
+      <%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_contact_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 15 %>
+    <br/>
+    <br/>
+    <%= text_field_tag('customer_id', '', readonly: true, size: 5) %>
+    &nbsp;&nbsp;&nbsp;
+    <%= text_field_tag('customer_name', '', placeholder: 'Customer Name', readonly: true, size: 40) %>
+    <br/><br/>
+    <%= render 'partials/contact_role_filter'%>
+    <%= text_field_tag('title', '', placeholder: 'Title', class: 'form-control') %>
+    <%= text_field_tag('phone', '', placeholder: 'Phone', class: 'form-control') %>
+    <%= text_field_tag('fax', '', placeholder: 'Fax', class: 'form-control') %>
+    <%= text_field_tag('email', '', placeholder: 'Email', class: 'form-control') %>
+  </div>
+
+  <div class="row" style="margin-top: 5px;">
+  	<div class="col-xs-6 col-xs-offset-5">
+      <%= label(:invoice_receivable, 'Receive Invoice')%>
+  		<%= radio_button_tag(:c_receive_invoice, 1) %> Yes
+  		<span style="margin-left: 50px;">
+  		<%= radio_button_tag(:c_receive_invoice, 0) %>  No
+  		</span>
+  	</div>
+  </div>
+
+  <script type="text/javascript">
+  $('#customer_search').bind('railsAutocomplete.select', function(event, data){
+    $('input[name=customer_id]').val(data.item.id);
+    $('input[name=customer_name]').val(data.item.value);
+  });
+  </script>

@@ -37,6 +37,7 @@
                           <ul class="dropdown-menu">
                             <li><%= link_to "Customers", controller: "customer", action: "all" %></li>
                             <li><%= link_to "Leads", controller: "lead", action: "all_leads" %></li>
+                            <li><%= link_to "Contacts", controller: "contact", action: "all_contacts" %></li>
                           </ul>
                         </li>
 
@@ -73,9 +74,10 @@
                             <ul class="dropdown-menu">
                                 <li><%= link_to "My Note", controller: "task", action: "staff_task" %></li>
                                 <li><%= link_to "Add Note", controller: 'activity', action: 'add_note'%></li>
-                                <li><%= link_to "Add Task", controller: 'activity', action: 'add_activity'%></li>                                <li><%= link_to "Calendar", controller: "calendar", action: "local_calendar" %></li>
+                                <li><%= link_to "Add Task", controller: 'activity', action: 'add_activity'%></li>
+                                <li><%= link_to "Calendar", controller: "calendar", action: "local_calendar" %></li>
+                                <li><%= link_to "Events Check", controller: "calendar", action: "event_check_offline" %></li>
                                 <% if user_full_right(session[:authority]) %>
-                                  <li><%= link_to "Events Check", controller: "calendar", action: "event_check_offline" %></li>
                                   <% if Rails.env.development? %>
                                   <li><%= link_to "Sync", controller: "calendar", action: "event_censor" %></li>
                                   <% else %>
