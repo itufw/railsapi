@@ -60,6 +60,7 @@ class LeadController < ApplicationController
     lead_params[:firstname] = lead_params[:actual_name] if lead_params[:firstname].nil?
     if @customer_lead.update_attributes(lead_params)
       flash[:success] = 'Successfully Created.'
+      CustomerTag.new.insert_lead(@customer_lead)
       # redirect_to action: 'all_leads'
       redirect_to controller: 'calendar', action: 'event_check_offline'
     else
