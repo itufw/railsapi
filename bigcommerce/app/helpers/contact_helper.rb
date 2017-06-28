@@ -18,6 +18,12 @@ module ContactHelper
         contact.phone = params['phone_'+item]
         contact.fax = params['fax_'+item]
         contact.email = params['email_'+item]
+        contact.receive_invoice = params['receive_invoice_'+item]
+        contact.receive_portfolio = params['receive_portfolio_'+item]
+        contact.receive_statement = params['receive_statement_'+item]
+        contact.key_sales = params['key_sales_'+item]
+        contact.key_accountant = params['key_accountant_'+item]
+
         contact.save
       end
     end

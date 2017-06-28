@@ -72,6 +72,7 @@ class ContactController < ApplicationController
 
   def cust_contact_params
     params.permit(:customer_id, :position, :title, :phone, :fax, :email,\
-                  :c_receive_invoice)
+                  :receive_invoice, :receive_statement, :receive_portfolio,\
+                  :key_sales, :key_accountant)
   end
 end

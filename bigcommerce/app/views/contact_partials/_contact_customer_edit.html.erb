@@ -1,7 +1,7 @@
-<div class="col-md-4 append_role_<%= contact_role.customer_id%>">
+<div class="col-md-4 append_role_<%= contact_role.customer_id%> append_customer">
   <%= text_field_tag('customer_id_' + @customer_count.to_s, contact_role.customer_id, readonly: true, size: 5) %>
   &nbsp;&nbsp;&nbsp;
-  <%= text_field_tag('customer_name_' + @customer_count.to_s, contact_role.customer.actual_name, placeholder: 'Customer Name', readonly: true, size: 40) %>
+  <%= text_field_tag('customer_name_' + @customer_count.to_s, contact_role.customer.nil? ? "" : contact_role.customer.actual_name, placeholder: 'Customer Name', readonly: true, size: 40) %>
   <i class="glyphicon glyphicon-remove cust_contact_<%= contact_role.id%>" title="Delete"></i>
   <i class="glyphicon glyphicon-plus cust_contact_<%= contact_role.id%>" title="Active"></i>
   <br/><br/>
@@ -10,5 +10,29 @@
   <%= text_field_tag('phone_' + @customer_count.to_s, contact_role.phone, placeholder: 'Phone', class: 'form-control') %>
   <%= text_field_tag('fax_' + @customer_count.to_s, contact_role.fax, placeholder: 'Fax', class: 'form-control') %>
   <%= text_field_tag('email_' + @customer_count.to_s, contact_role.email, placeholder: 'Email', class: 'form-control') %>
+  <table>
+    <% ['Receive Invoice', "Receive Statement", "Receive Portfolio", "Key Accountant", "Key Sales"].each do |tag|%>
+    <tr>
+      <% attr_tag = tag.downcase.split().join('_') %>
+      <td style = "width: 200px"><%= label(:invoice_receivable, tag)%></td>
+      <td style = "width: 50px"><%= radio_button_tag( attr_tag + '_' + @customer_count.to_s, 1, contact_role[attr_tag].to_i > 0) %> Yes</td>
+      <td style = "width: 50px"><%= radio_button_tag( attr_tag + '_' + @customer_count.to_s, 0, contact_role[attr_tag].to_i == 0) %> No</td>
+    </tr>
+    <% end %>
+  </table>
+
   <%= text_field_tag('status_' + @customer_count.to_s, 'Active', placeholder: 'Status', class: 'form-control', readonly: true) %>
 </div>
+<script type="text/javascript">
+$('.glyphicon-remove').click(function(){
+  $(this).parent().find('input[name*=status]').val('Deleted');
+  $(this).parent().find('.glyphicon-plus').show();
+  $(this).hide();
+});
+
+$('.glyphicon-plus').click(function(){
+  $(this).parent().find('input[name*=status]').val('Active');
+  $(this).parent().find('.glyphicon-remove').show();
+  $(this).hide();
+});
+</script>
