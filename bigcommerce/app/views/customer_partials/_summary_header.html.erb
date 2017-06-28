@@ -14,7 +14,7 @@
         <% @contacts.each do |contact| %>
           <% person = contact.contact%>
           <div class="col-xs-4">
-            <p style="font-size:20px"><%= person.name+": "%></p>
+            <p style="font-size:20px"><%= link_to person.name+": ", controller: 'contact', action: 'summary', contact_id: person.id%></p>
             <p style="font-size:20px">
               <%= contact.title%>
               <br/>
@@ -24,6 +24,11 @@
               <br/>
               <%= mail_to(contact.email) unless contact.email.nil? %>
             </p>
+            <h5>
+              <% ['Receive Invoice', "Receive Statement", "Receive Portfolio", "Key Accountant", "Key Sales"].each do |tag|%>
+                <%= tag + " | " if contact[tag.downcase.split().join('_')].to_i > 0%>
+              <% end %>
+            </h5>
           </div>
       <% end %>
     </div>

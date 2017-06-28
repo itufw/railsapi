@@ -24,7 +24,7 @@
         <p>Email: <%= mail_to(role.email) unless role.email.nil? %></p>
         <h5>
           <% ['Receive Invoice', "Receive Statement", "Receive Portfolio", "Key Accountant", "Key Sales"].each do |tag|%>
-            <%= tag + " | " if role[tag.downcase.split().join('_')] > 0%>
+            <%= tag + " | " if role[tag.downcase.split().join('_')].to_i > 0%>
           <% end %>
         </h5>
       </div>
