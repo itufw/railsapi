@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170626021905) do
+ActiveRecord::Schema.define(version: 20170628004833) do
 
   create_table "SalesForce_account", primary_key: "Id", force: :cascade do |t|
     t.string "Name",                        limit: 52
@@ -325,9 +325,13 @@ ActiveRecord::Schema.define(version: 20170626021905) do
     t.string   "phone",             limit: 255
     t.string   "fax",               limit: 255
     t.string   "email",             limit: 255
-    t.integer  "c_receive_invoice", limit: 4
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
+    t.integer  "receive_statement", limit: 4
+    t.integer  "key_sales",         limit: 4
+    t.integer  "receive_invoice",   limit: 4
+    t.integer  "receive_portfolio", limit: 4
+    t.integer  "key_accountant",    limit: 4
   end
 
   create_table "cust_groups", force: :cascade do |t|

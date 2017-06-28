@@ -37,23 +37,11 @@
     if ($(".append_role_" + data.item.id).length == 0){
       <% contact_role = CustContact.new %>
       <% contact_role.contact_id = @contact.id %>
-      $(".customer_list").append("<%= j render 'contact_partials/contact_customer_append', contact_role: contact_role %>");
+      $(".customer_list").append("<%= j render 'contact_partials/contact_customer_edit', contact_role: contact_role %>");
       $(".customer_list").find('.append_customer').last().addClass('append_role_' + data.item.id);
       $(".append_role_" + data.item.id ).find('input[name*=customer_id]').val(data.item.id);
       $(".append_role_" + data.item.id ).find('input[name*=customer_name]').val(data.item.value);
       <% @customer_count += 1%>
     }
-  });
-
-  $('.glyphicon-remove').click(function(){
-    $(this).parent().find('input[name*=status]').val('Deleted');
-    $(this).parent().find('.glyphicon-plus').show();
-    $(this).hide();
-  });
-
-  $('.glyphicon-plus').click(function(){
-    $(this).parent().find('input[name*=status]').val('Active');
-    $(this).parent().find('.glyphicon-remove').show();
-    $(this).hide();
   });
 </script>
