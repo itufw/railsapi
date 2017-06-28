@@ -64,6 +64,11 @@
     </div>
 
     <div id="products">
+      <%
+        gst = 1 + 0.01 * TaxPercentage.gst_percentage
+        wet = 1 + 0.01 * TaxPercentage.wet_percentage
+        discount = (order.subtotal_inc_tax == 0) ? 0 : order.coupon_discount / order.subtotal_inc_tax
+      %>
             <table class="InvoiceTable">
                     <tr>
                         <th class="ProductQuantity">Qty</th>
@@ -74,7 +79,7 @@
                     </tr>
                     <% invoice.xero_invoice_line_items.each do |item| %>
                       <% unless ((item.item_code.to_i.to_s != item.item_code) || ('1296'.eql? item.item_code)) %>
-                        <% unit_price = ((order.order_products.where("order_id = #{item.invoice_number} and product_id = #{item.item_code}").first.price_inc_tax)/1.1)%>
+                        <% unit_price = (item.unit_amount / (1 - discount)) * wet %>
                       <tr>
                           <td class="ProductQuantity"><%= item.quantity.to_i%></td>
                           <td class="ProductDetails"><%= item.description%></td>
@@ -89,7 +94,7 @@
                       <td></td>
                       <td></td>
                       <td class="ProductCost" align="right">Subtotal(inc. WET ex. GST)</td>
-                      <td class="ProductTotal" align="right" >$<%= '%.2f' % (order.subtotal_inc_tax/1.1) %></td>
+                      <td class="ProductTotal" align="right" >$<%= '%.2f' % (invoice.sub_total/gst) %></td>
                       <td></td>
                     </tr>
                     <% unless order.coupon_discount == 0%>
@@ -97,7 +102,7 @@
                         <td class="ProductQuantity"></td>
                         <td class="ProductDetails"></td>
                         <td class="ProductCost" align="right">Discount Coupon(ex. GST)</td>
-                        <td class="ProductTotal" align="right">-$<%= '%.2f' % (order.coupon_discount/1.1) %></td>
+                        <td class="ProductTotal" align="right">-$<%= '%.2f' % (invoice.sub_total/gst * discount) %></td>
                         <td></td>
                       </tr>
                     <% end %>
@@ -119,7 +124,7 @@
                       <td></td>
                       <td></td>
                       <td class="ProductCost" align="right">GST</td>
-                      <td class="ProductTotal" align="right">$<%= '%.2f' % (invoice.total - (invoice.total/1.1)) %></td>
+                      <td class="ProductTotal" align="right">$<%= '%.2f' % (invoice.total - (invoice.total/gst)) %></td>
                       <td></td>
                     </tr>
                     <tr>
