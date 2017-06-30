@@ -112,7 +112,7 @@
 <% end %>
 
 $('#event_check_search').bind('railsAutocomplete.select', function(event, data){
-  $('select[id=customer_customer]').append($('<option value='+ data.item.id + '|' + data.item.value+'>'+ data.item.value +'</option>'));
+  $('select[id=customer_customer]').append($('<option value='+ data.item.customer_id + '|' + data.item.value+'>'+ data.item.value +'</option>'));
 });
 
 </script>

@@ -30,12 +30,14 @@
                 <% events.select { |x| x.start_date.strftime('%Y-%m-%d %H') == (day.to_datetime + hour.hours).strftime('%Y-%m-%d %H')}.each do |meeting|%>
                   <div>
                     <%begin%>
-                      <p style="color: green;"><%= meeting.start_date.strftime('%-H') + ' ' + Customer.find(meeting.customer_id).actual_name %></p>
+                      <% customer = Customer.find(meeting.customer_id) %>
+                      <p style="color: green;"><%= link_to customer.actual_name, controller: 'customer', action: 'summary', customer_id: customer.id, customer_name: customer.actual_name %></p>
                     <%rescue%>
                       <%begin%>
-                      <p style="color: blue;"><%= meeting.start_date.strftime('%-H') + ' ' + CustomerLead.find(meeting.customer_lead_id).actual_name%></p>
+                      <% lead = CustomerLead.find(meeting.customer_lead_id) %>
+                      <p style="color: blue;"><%= link_to lead.actual_name, controller: 'lead', action: 'summary', lead_id: lead.id %></p>
                       <%rescue%>
-                      <%= meeting.start_date.strftime('%-H') + ' ' + meeting.description[0..5] %><% '...' if meeting.description.length > 5%>
+                      <%= meeting.description[0..5] %><% '...' if meeting.description.length > 5%>
                       <%end%>
                     <%end%>
                   </div>

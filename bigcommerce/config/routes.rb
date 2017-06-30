@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   get '/event_check_offline', to: 'calendar#event_check_offline', as: 'event_check_offline'
   get '/translate_events', to: 'calendar#translate_events'
   get '/event_censor', to:'calendar#event_censor'
+  get '/calendar/local_calendar', to: 'calendar#local_calendar'
 
   get '/fetch_lead', to: 'lead#fetch_lead', as: 'fetch_lead'
 
@@ -37,17 +38,16 @@ Rails.application.routes.draw do
     get :autocomplete_staff_nickname, on: :collection
   end
 
-  resources :calendar do
-    get :autocomplete_customer_tag_name, on: :collection
-  end
-
-
-
   post 'add_task', to: 'task#task_record'
   post 'local_calendar', to: 'calendar#local_calendar'
   post 'add_note', to: 'activity#add_note'
   post 'contact/create_contact', to: 'contact#contact_creation'
   post 'contact/edit_contact', to: 'contact#contact_edition'
+
+  resources :calendar do
+    get :autocomplete_customer_tag_name, on: :collection
+  end
+
   # this needs to be replaced sometime
   match ':controller(/:action(/:id))', via: %i[get post]
 
