@@ -11,7 +11,42 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170628004833) do
+ActiveRecord::Schema.define(version: 20170630063447) do
+
+  create_table "SalesForce_Lead_full", primary_key: "Id", force: :cascade do |t|
+    t.string  "FirstName",                 limit: 38
+    t.string  "LastName",                  limit: 46
+    t.string  "Title",                     limit: 52
+    t.string  "Company",                   limit: 53
+    t.string  "Street",                    limit: 118
+    t.string  "City",                      limit: 32
+    t.string  "State",                     limit: 17
+    t.string  "PostalCode",                limit: 12
+    t.string  "Country",                   limit: 13
+    t.string  "Phone",                     limit: 34
+    t.string  "MobilePhone",               limit: 23
+    t.string  "Fax",                       limit: 10
+    t.string  "Email",                     limit: 43
+    t.string  "Website",                   limit: 240
+    t.string  "OwnerId",                   limit: 18
+    t.integer "HasOptedOutOfEmail",        limit: 4
+    t.integer "IsUnreadByOwner",           limit: 4
+    t.string  "CreatedDate",               limit: 14
+    t.string  "CreatedById",               limit: 18
+    t.string  "LastModifiedDate",          limit: 14
+    t.string  "LastModifiedById",          limit: 18
+    t.string  "SystemModstamp",            limit: 14
+    t.string  "LastActivityDate",          limit: 13
+    t.integer "DoNotCall",                 limit: 4
+    t.integer "HasOptedOutOfFax",          limit: 4
+    t.string  "LastTransferDate",          limit: 14
+    t.string  "Preferred_Contact_Time__c", limit: 109
+    t.string  "Time_Unavailable__c",       limit: 82
+    t.string  "Credit_App_Signed_Date__c", limit: 13
+    t.string  "Credit_App_Type__c",        limit: 11
+    t.string  "Useful_Information__c",     limit: 521
+    t.string  "CustomerType__c",           limit: 9
+  end
 
   create_table "SalesForce_account", primary_key: "Id", force: :cascade do |t|
     t.string "Name",                        limit: 52
@@ -432,6 +467,8 @@ ActiveRecord::Schema.define(version: 20170628004833) do
     t.string   "postcode",                limit: 255
     t.string   "country",                 limit: 255
     t.text     "address",                 limit: 65535
+    t.float    "lat",                     limit: 24
+    t.float    "lng",                     limit: 24
   end
 
   add_index "customers", ["cust_group_id"], name: "index_customers_on_cust_group_id", using: :btree

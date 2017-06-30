@@ -10,6 +10,32 @@ module SalesForceClean
     end
   end
 
+  def update_customer_address
+    customers = Customer.where('street IS NULL AND lat IS NULL')
+    customers.each do |customer|
+      address = customer.addresses.order('created_at DESC').first
+      next if address.nil?
+      customer.street = address.street_1.to_s + ' ' + address.street_2.to_s
+      customer.city = address.city
+      customer.state = address.state
+      customer.postcode = address.postcode
+      customer.country = address.country
+      customer.address = customer.street.to_s + ' ' + customer.city.to_s\
+                         + ' ' + customer.state.to_s + ' '\
+                         + customer.postcode.to_s + ' ' + customer.country.to_s
+      customer.save
+    end
+
+    customers = Customer.where('street IS NOT NULL AND lat IS NULL')
+    customers.each do |customer|
+      address = customer.street.to_s + ' ' + customer.city.to_s + ' '\
+                + customer.state.to_s + ' ' + customer.postcode.to_s + ' '\
+                + customer.country.to_s
+      customer.address = address
+      customer.save
+    end
+  end
+
   def assign_phone_number_from_contact
     cust_contact = CustContact.joins(:customer).select('state, cust_contacts.*')
     cust_contact.each do |relation|
