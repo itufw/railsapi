@@ -4,10 +4,12 @@
     <% meetings.each do |meeting| %>
       <div>
         <%begin%>
-          <p style="color: green;"><%= Customer.find(meeting.customer_id).actual_name %></p>
+          <% customer = Customer.find(meeting.customer_id) %>
+          <p style="color: green;"><%= link_to customer.actual_name, controller: 'customer', action: 'summary', customer_id: customer.id, customer_name: customer.actual_name %></p>
         <%rescue%>
           <%begin%>
-          <p style="color: blue;"><%= CustomerLead.find(meeting.customer_lead_id).actual_name%></p>
+          <% lead = CustomerLead.find(meeting.customer_lead_id) %>
+          <p style="color: blue;"><%= link_to lead.actual_name, controller: 'lead', action: 'summary', lead_id: lead.id %></p>
           <%rescue%>
           <%= meeting.description[0..5] %><% '...' if meeting.description.length > 5%>
           <%end%>
