@@ -27,4 +27,8 @@ class CustomerTag < ActiveRecord::Base
   def self.exist?(role, id)
     where('role = ? AND customer_id = ?', role, id)
   end
+
+  def self.filter_by_role(role)
+    where('role = ?', role)
+  end
 end

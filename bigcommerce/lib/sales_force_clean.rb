@@ -1,7 +1,7 @@
 # clean sales force data
 module SalesForceClean
   def update_lead_address
-    leads = CustomerLead.where('street IS NOT NULL')
+    leads = CustomerLead.where('street IS NOT NULL AND latitude IS NULL')
     leads.each do |lead|
       address = lead.street.to_s + ' ' + lead.city.to_s + ' ' + lead.state.to_s\
         + lead.postalcode.to_s + ' ' + lead.country.to_s
@@ -52,14 +52,18 @@ module SalesForceClean
   end
 
   def import_into_customer_tags
-    customers = Customer.all
-    customers.each do |customer|
+    exist_customer = CustomerTag.filter_by_role('Customer').map(&:customer_id)
+    Customer.where('id NOT IN (?)', exist_customer).each do |customer|
       CustomerTag.new.insert_customer(customer)
     end
-    CustomerLead.all.each do |lead|
+
+    exist_lead = CustomerTag.filter_by_role('Lead').map(&:customer_id)
+    CustomerLead.where('id NOT IN (?)', exist_lead).each do |lead|
       CustomerTag.new.insert_lead(lead)
     end
-    Contact.sales_force.each do |contact|
+
+    exist_contact = CustomerTag.filter_by_role('Contact').map(&:customer_id)
+    Contact.sales_force.where('id NOT IN (?)', exist_contact).each do |contact|
       CustomerTag.new.insert_contact(contact)
     end
   end
