@@ -186,20 +186,20 @@ module XeroInvoiceCalculations
                                                  gst_line_amounts[op_id], wet_unadjusted_order_product_price[op_id])
         end
 
-        XeroCalculation.insert_wet_calculation(invoice_number, wet_unadjusted_total, ship_deduction,\
-                                               subtotal_ex_gst, wet_adjusted, gst_on_wet)
-
-        XeroCalculation.insert_adjustment(invoice_number, adjustment, gst_on_adjustment)
+        # XeroCalculation.insert_wet_calculation(invoice_number, wet_unadjusted_total, ship_deduction,\
+        #                                        subtotal_ex_gst, wet_adjusted, gst_on_wet)
+        #
+        # XeroCalculation.insert_adjustment(invoice_number, adjustment, gst_on_adjustment)
 
         XeroCalculation.insert_shipping_calculation(invoice_number, inc_gst_shipping_price,\
                                                     ex_gst_shipping_price, gst_on_shipping)
 
-        XeroCalculation.insert_gst(invoice_number, gst_sum_line_amounts)
-
-        unless rounding_error_ex_gst.round(2) == 0.0
-            XeroCalculation.insert_rounding(invoice_number,\
-                                            total_ex_gst, gst_sum_line_amounts, order_total, rounding_error_inc_gst, rounding_error_ex_gst)
-        end
+        # XeroCalculation.insert_gst(invoice_number, gst_sum_line_amounts)
+        #
+        # unless rounding_error_ex_gst.round(2) == 0.0
+        #     XeroCalculation.insert_rounding(invoice_number,\
+        #                                     total_ex_gst, gst_sum_line_amounts, order_total, rounding_error_inc_gst, rounding_error_ex_gst)
+        # end
     end
 
     def get_discount_rate(order)
@@ -254,6 +254,7 @@ module XeroInvoiceCalculations
             create_item(item_code)
 
             unit_amount_clean = l.discounted_ex_taxes_unit_price.to_s.to_f.round(4)
+            unit_amount_clean = (unit_amount_clean / l.discount_rate) * (TaxPercentage.wet_percentage * 0.01 + 1) if l.item_code.to_i.to_s == l.item_code
 
             invoice.add_line_item(item_code: item_code, description: l.description,\
                                   quantity: l.qty, unit_amount: unit_amount_clean,\

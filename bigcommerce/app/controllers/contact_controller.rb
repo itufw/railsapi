@@ -30,6 +30,8 @@ class ContactController < ApplicationController
       cust_contact.contact_id = contact.id
       cust_contact.position = params['role'].nil? ? nil : params['role'].first.last
       cust_contact.save
+
+      CustomerTag.new.insert_contact(cust_contact)
     else
       flash[:error] = 'Unsuccessful.'
       redirect_to action: 'create_contact' && return
