@@ -14,6 +14,11 @@ class Customer < ActiveRecord::Base
 	belongs_to :staff
 	belongs_to :xero_contact
 
+	geocoded_by :address
+  after_validation :geocode
+
+  reverse_geocoded_by :lat, :lng
+  after_validation :reverse_geocode
 
 	scoped_search on: [:firstname, :lastname, :company, :actual_name]
 
