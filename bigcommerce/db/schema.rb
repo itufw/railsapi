@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170630063447) do
+ActiveRecord::Schema.define(version: 20170703010958) do
 
   create_table "SalesForce_Lead_full", primary_key: "Id", force: :cascade do |t|
     t.string  "FirstName",                 limit: 38
@@ -1321,6 +1321,20 @@ ActiveRecord::Schema.define(version: 20170630063447) do
     t.datetime "end_time"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "zomato_entities", force: :cascade do |t|
+    t.string   "entity_type",  limit: 255
+    t.integer  "entity_id",    limit: 4
+    t.string   "title",        limit: 255
+    t.float    "latitude",     limit: 24
+    t.float    "longitude",    limit: 24
+    t.integer  "city_id",      limit: 4
+    t.string   "city_name",    limit: 255
+    t.integer  "country_id",   limit: 4
+    t.string   "country_name", limit: 255
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
   end
 
 end
