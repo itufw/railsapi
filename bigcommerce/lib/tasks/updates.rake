@@ -1,6 +1,8 @@
 require 'rake_task_helper.rb'
+load 'zomato_calculation.rb'
 
 include RakeTaskHelper
+include ZomatoCalculation
 
 namespace :updates do
 	desc "Rake task to update data"
@@ -47,6 +49,11 @@ namespace :updates do
 			puts "Update contacts balance #{Time.now} started"
 			XeroContact.new.update_balance_for_all
 			puts "Update contacts balance #{Time.now} ended"
+	end
+
+	task :zomato_update => :environment do
+		puts "Zomato Update At #{Time.now}"
+		search_by_geo
 	end
 
 	task :balanceupdate => :environment do
