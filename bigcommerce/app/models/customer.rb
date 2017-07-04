@@ -14,6 +14,11 @@ class Customer < ActiveRecord::Base
 	belongs_to :staff
 	belongs_to :xero_contact
 
+	geocoded_by :address
+  after_validation :geocode
+
+  reverse_geocoded_by :lat, :lng
+  after_validation :reverse_geocode
 
 	scoped_search on: [:firstname, :lastname, :company, :actual_name]
 
@@ -74,6 +79,7 @@ class Customer < ActiveRecord::Base
 			sql = "INSERT INTO customers(id, firstname, lastname, company, email, phone,\
 			store_credit, registration_ip_address, notes, date_created, date_modified,\
 			created_at, updated_at, cust_type_id, staff_id) VALUES #{cust}"
+
 		else
 
 			sql = "UPDATE customers SET firstname = '#{firstname}', lastname = '#{lastname}', company = '#{company}',\

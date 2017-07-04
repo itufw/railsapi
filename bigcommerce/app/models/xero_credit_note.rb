@@ -43,7 +43,7 @@ class XeroCreditNote < ActiveRecord::Base
 		credit_note = xero.CreditNote.all(modified_since: modified_since_time)
 		credit_note.each do |c|
 			insert_or_update_credit_note(c)
-			XeroCNLineItem.new.download_line_items_from_api(xero, c.credit_note_number)
+			XeroCNLineItem.new.download_line_items_from_api(xero, c)
 		end
 	end
 
@@ -97,6 +97,14 @@ class XeroCreditNote < ActiveRecord::Base
 
 	def self.sum_remaining_credit
 		sum('remaining_credit')
+	end
+
+	def self.credit_above_zero
+		where('remaining_credit > 0 AND status = "AUTHORISED"')
+	end
+
+	def self.period_select(until_date)
+		credit_above_zero.where("xero_credit_notes.date <= '#{until_date}'")
 	end
 
 end

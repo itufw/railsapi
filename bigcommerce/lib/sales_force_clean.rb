@@ -1,12 +1,38 @@
 # clean sales force data
 module SalesForceClean
   def update_lead_address
-    leads = CustomerLead.where('street IS NOT NULL')
+    leads = CustomerLead.where('street IS NOT NULL AND latitude IS NULL')
     leads.each do |lead|
       address = lead.street.to_s + ' ' + lead.city.to_s + ' ' + lead.state.to_s\
         + lead.postalcode.to_s + ' ' + lead.country.to_s
       lead.address = address
       lead.save
+    end
+  end
+
+  def update_customer_address
+    customers = Customer.where('street IS NULL AND lat IS NULL')
+    customers.each do |customer|
+      address = customer.addresses.order('created_at DESC').first
+      next if address.nil?
+      customer.street = address.street_1.to_s + ' ' + address.street_2.to_s
+      customer.city = address.city
+      customer.state = address.state
+      customer.postcode = address.postcode
+      customer.country = address.country
+      customer.address = customer.street.to_s + ' ' + customer.city.to_s\
+                         + ' ' + customer.state.to_s + ' '\
+                         + customer.postcode.to_s + ' ' + customer.country.to_s
+      customer.save
+    end
+
+    customers = Customer.where('street IS NOT NULL AND lat IS NULL')
+    customers.each do |customer|
+      address = customer.street.to_s + ' ' + customer.city.to_s + ' '\
+                + customer.state.to_s + ' ' + customer.postcode.to_s + ' '\
+                + customer.country.to_s
+      customer.address = address
+      customer.save
     end
   end
 
@@ -48,6 +74,23 @@ module SalesForceClean
       number = (contact.area_code.to_s + contact.number.to_s).gsub(/\D/, '')
       sf_c.phone = number
       sf_c.save
+    end
+  end
+
+  def import_into_customer_tags
+    exist_customer = CustomerTag.filter_by_role('Customer').map(&:customer_id)
+    Customer.where('id NOT IN (?)', exist_customer).each do |customer|
+      CustomerTag.new.insert_customer(customer)
+    end
+
+    exist_lead = CustomerTag.filter_by_role('Lead').map(&:customer_id)
+    CustomerLead.where('id NOT IN (?)', exist_lead).each do |lead|
+      CustomerTag.new.insert_lead(lead)
+    end
+
+    exist_contact = CustomerTag.filter_by_role('Contact').map(&:customer_id)
+    Contact.sales_force.where('id NOT IN (?)', exist_contact).each do |contact|
+      CustomerTag.new.insert_contact(contact)
     end
   end
 

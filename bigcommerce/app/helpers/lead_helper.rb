@@ -27,21 +27,12 @@ module LeadHelper
   end
 
   # get information from google places api
-  def grab_from_google(params, customer_lead)
-    customer_name = params['customer_name']
-    staff_id = params['staff_id']
-    return nil if customer_name.nil? || staff_id.nil?
-
+  def grab_from_google(query)
     client = GooglePlaces::Client.new('AIzaSyBvfTZH0XCVEJQTgR9QDYt18XIeV5MIkPI')
-    spot = spot_details(client, customer_lead, customer_name, staff_id)
-    return nil if spot.nil?
+    spots = client.spots_by_query(query)
 
-    customer_lead.staff_id = staff_id
-    # default customer type to wholesale
-    customer_lead.cust_type_id = 2
-    customer_lead.cust_style_id = spot_style(spot.types)
     # detailed spot
-    spot
+    spots
   end
 
   def places_tags
@@ -54,17 +45,19 @@ module LeadHelper
     2
   end
 
-  def spot_details(client, customer_lead, customer_name, staff_id)
-    staff = Staff.find(staff_id)
-    # TODO build the filter column for this
-    # spot = client.spots_by_query(customer_name + "near #{staff.state}", types: places_tags).first
-    spot = client.spots_by_query(customer_name + "near #{staff.state}").first
-    return nil if spot.nil?
-    place = client.spot(spot.place_id)
+  def spot_details(place_id, staff_id)
+    client = GooglePlaces::Client.new('AIzaSyBvfTZH0XCVEJQTgR9QDYt18XIeV5MIkPI')
+    place = client.spot(place_id)
+
+    customer_lead = CustomerLead.new
+    customer_lead.staff_id = staff_id
+    customer_lead.cust_type_id = 2
     customer_lead.phone = place.formatted_phone_number
     customer_lead.actual_name = place.name
     customer_lead.address = place.formatted_address
     customer_lead.website = place.website
-    place
+    customer_lead.cust_style_id = spot_style(place.types)
+
+    [customer_lead, place]
   end
 end

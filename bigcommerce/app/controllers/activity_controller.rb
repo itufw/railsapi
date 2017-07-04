@@ -18,15 +18,28 @@ class ActivityController < ApplicationController
     @customers, @contacts \
       = customer_search(params)
 
-    # activity helper -> get the functions/subjects/methods from json request
-    @function, @subjects = function_search(params)
     # @products = product_search
     @note = Task.new
     if params[:note_id] && Task.where('tasks.id = ?', params[:note_id]).count > 0
       @note.parent_task = params[:note_id]
       @parent = Task.find(@note.parent_task)
       @completed_parent = params[:task_type] || 'no'
+
+      @note.function = @parent.function
+      @note.subject_1 = @parent.subject_1
+      @note.promotion_id = @parent.promotion_id
+      @note.portfolio_id = @parent.portfolio_id
+    else
+      @note.method = params[:selected_method] || 'Meeting'
+      @note.function = default_function_type(session[:authority])
+      @note.subject_1 = 0
+      @note.promotion_id = 0
+      @note.portfolio_id = 0
     end
+
+
+    # activity helper -> get the functions/subjects/methods from json request
+    @function, @subjects = function_search(params, @parent)
 
     # Sample products from table
     # ['tr_1000','tr_2000']
@@ -43,7 +56,6 @@ class ActivityController < ApplicationController
 
     @lead_text = params[:lead_search_text] || nil
 
-    @selected_method = params[:selected_method] || 'Meeting'
     # production version
     if 'Sales Executive' == session[:authority]
       @products = Product.sample_products(session[:user_id], 20)
@@ -79,19 +91,17 @@ class ActivityController < ApplicationController
   # following Dropbox -> pages -> Activity
   def add_activity
     @task = Task.new
-    parent_function = nil
     if params[:note_id]
       parents = Task.where('tasks.id = ?', params[:note_id])
       if parents.count > 0
         parent = parents.first
-        parent_function = parent.function
         @task.parent_task = params[:note_id]
         @wine_note_list = ProductNote.filter_task(params[:note_id])
       end
     end
     @parent = parent
 
-    @function, @subjects = function_search(params, parent_function)
+    @function, @subjects = function_search(params, @parent)
     @staff = Staff.active
 
       # @products = Product.sample_products(session[:user_id], 20)

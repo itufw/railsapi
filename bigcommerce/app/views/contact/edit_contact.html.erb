@@ -1,0 +1,47 @@
+<%= title 'Edit ' + @contact.name%>
+<h3>Edit <%= @contact.name%></h3>
+<br/>
+
+  <%= form_for @contact, url: {action: "edit_contact"}, method: "POST", html: {class: "form-group", style: "padding-left: 50px;"} do |f| %>
+  <div class="row">
+    <%= hidden_field_tag :contact_id , @contact.id %>
+    <%= render 'contact_partials/contact_creation_form', f: f %>
+    <div class="col-md-4 col-md-offset-4">
+      <%= label(:customer,'Customer:')%>
+      <br/>
+      Search:
+        <%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_contact_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 15 %>
+      <br/>
+      <br/>
+    </div>
+  </div>
+  <div class="row customer_list">
+    <% @contact.cust_contacts.each do |contact_role| %>
+      <%= render 'contact_partials/contact_customer_edit', contact_role: contact_role%>
+      <% @customer_count += 1 %>
+    <% end %>
+  </div>
+  <div class="row">
+    <div class="col-md-4 col-md-offset-6 submit_button">
+      <%= f.submit "Edit!", class: 'btn btn-primary' %>
+    </div>
+  <% end %>
+  </div>
+
+<div class="col-md-4 col-md-offset-6">
+  <p style="padding-left: 50px;"><%= link_to "Go Back to Contacts", action: 'all_contacts'%></p>
+</div>
+
+<script type="text/javascript">
+  $('#customer_search').bind('railsAutocomplete.select', function(event, data){
+    if ($(".append_role_" + data.item.id).length == 0){
+      <% contact_role = CustContact.new %>
+      <% contact_role.contact_id = @contact.id %>
+      $(".customer_list").append("<%= j render 'contact_partials/contact_customer_edit', contact_role: contact_role %>");
+      $(".customer_list").find('.append_customer').last().addClass('append_role_' + data.item.id);
+      $(".append_role_" + data.item.id ).find('input[name*=customer_id]').val(data.item.id);
+      $(".append_role_" + data.item.id ).find('input[name*=customer_name]').val(data.item.value);
+      <% @customer_count += 1%>
+    }
+  });
+</script>

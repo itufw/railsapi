@@ -108,3 +108,5 @@ gem 'fuzzy-string-match'
 gem 'simple_calendar'
 # product note rate it
 gem 'rails-rateit', '~> 1.0.22', github:'berikin/rails-rateit'
+
+gem 'httparty'

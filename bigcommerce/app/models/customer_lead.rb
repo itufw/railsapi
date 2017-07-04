@@ -21,6 +21,8 @@ class CustomerLead < ActiveRecord::Base
   self.per_page = 15
 
   def self.update_coordinates
+    CustomerTag.new.insert_lead(self)
+
     coordinate = Geocoder.coordinates(:address)
     self.latitude = coordinate.first
     self.longitude = coordinate.last
@@ -42,6 +44,11 @@ class CustomerLead < ActiveRecord::Base
     where('customer_leads.staff_id = ?', staff_id)
   end
 
+  def self.filter_by_staff(staff_id)
+    return where(:staff_id => staff_id) unless (staff_id.nil? && staff_id.blank?)
+    all
+  end
+
   def self.filter_cust_style(cust_style = nil)
     return all if cust_style.nil?
     where('customer_leads.cust_style_id = ?', cust_style)
@@ -53,6 +60,10 @@ class CustomerLead < ActiveRecord::Base
 
   def self.filter_by_ids(lead_ids)
     where('id IN (?)', lead_ids)
+  end
+
+  def self.filter_by_name(actual_name)
+    where('actual_name LIKE ?', actual_name)
   end
 
   def self.order_by_name(direction)

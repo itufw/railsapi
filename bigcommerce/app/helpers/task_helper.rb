@@ -126,6 +126,7 @@ module TaskHelper
       start_date = params[:start_date] ? params[:start_date].split('-').reverse.join('-') : (Date.today - 1.month).to_s
       end_date = params[:end_date] ? params[:end_date].split('-').reverse.join('-') : Date.today.to_s
 
+      end_date = ((Date.parse end_date) + 1.day).to_s
 
       case task_selected_display
       when "Task"
@@ -190,7 +191,7 @@ module TaskHelper
       function = staff_function(session[:user_id])
       # Sales/ Operations/ Accounting
       default_function = default_function_type(current_user.user_type)
-      params[:selected_function] = params[:selected_function].nil? ? default_function : params[:selected_function]
+      params[:selected_function] = params[:selected_function] || default_function
 
       subjects = TaskSubject.all
       subjects = subjects.select { |x| x.function == params[:selected_function] }

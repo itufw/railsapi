@@ -1,0 +1,36 @@
+
+  <div class="col-md-8 col-md-offset-2">
+    <%= label(:customer,'Customer:')%>
+    <br/>
+    Search:
+      <%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_contact_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 10 %>
+    <br/>
+    <%= text_field_tag('customer_id', @customer_id.to_s, readonly: true, size: 5) %>
+    &nbsp;&nbsp;&nbsp;
+    <%= text_field_tag('customer_name', @customer_name.to_s, placeholder: 'Customer Name', readonly: true, size: 40) %>
+    <br/><br/>
+    <%= render 'partials/contact_role_filter'%>
+    <%= text_field_tag('title', '', placeholder: 'Title', class: 'form-control') %>
+    <%= text_field_tag('phone', '', placeholder: 'Phone', class: 'form-control') %>
+    <%= text_field_tag('fax', '', placeholder: 'Fax', class: 'form-control') %>
+    <%= text_field_tag('email', '', placeholder: 'Email', class: 'form-control') %>
+
+    <table>
+      <% ['Receive Invoice', "Receive Statement", "Receive Portfolio", "Key Accountant", "Key Sales"].each do |tag|%>
+      <tr>
+        <% attr_tag = tag.downcase.split().join('_') %>
+        <td style = "width: 200px"><%= label(:invoice_receivable, tag)%></td>
+        <td style = "width: 50px"><%= radio_button_tag( attr_tag, 1, false) %> Yes</td>
+        <td style = "width: 50px"><%= radio_button_tag( attr_tag, 0, true) %> No</td>
+      </tr>
+      <% end %>
+    </table>
+
+  </div>
+
+  <script type="text/javascript">
+  $('#customer_search').bind('railsAutocomplete.select', function(event, data){
+    $('input[name=customer_id]').val(data.item.id);
+    $('input[name=customer_name]').val(data.item.value);
+  });
+  </script>

@@ -1,0 +1,8 @@
+<%= title 'Zomato Restaurant List'%>
+<h3>Zomato</h3>
+<%= form_tag({controller: "customer", action: 'zomato'}, {:method => "get"}) do %>
+  <div class="form-group" style="margin-left:300px;margin-top:50px;">
+  	<%= render "partials/customer_filter" %>
+  	<%= submit_tag "Filter", class: 'btn btn-primary' %>
+  </div>
+<% end %>

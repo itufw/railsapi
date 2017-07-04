@@ -5,6 +5,9 @@ require 'fuzzystringmatch'
 class CalendarController < ApplicationController
   skip_before_action :verify_authenticity_token
   before_action :confirm_logged_in
+
+  autocomplete :customer_tag, :name, extra_data: [:customer_id], full: true
+
   include CalendarHelper
   include ModelsFilter
 
@@ -45,10 +48,7 @@ class CalendarController < ApplicationController
   end
 
   def local_calendar
-    @calendar_date = params[:calendar_date_selected]
-    @calendar_staff = params[:calendar_staff_selected]
 
-    @current_user = Staff.find(session[:user_id])
     # tempary use, it should be assigned based on the current users' right
     if session[:user_id] == 36
       @staffs = Staff.where('(active = 1 and user_type LIKE "Sales%") OR staffs.id = 36')
@@ -58,18 +58,28 @@ class CalendarController < ApplicationController
       @staffs = Staff.where(id: session[:user_id])
     end
 
-    @events = Task.joins(:task_relations).select('task_relations.*, tasks.*').where('tasks.google_event_id IS NOT NULL AND (task_relations.staff_id IN (?) OR tasks.response_staff IN (?))', @staffs.map(&:id), @staffs.map(&:id))
-
-    @customers = Customer.all
     _, @order_colour_selected, @colour_guide, @max_date =
       colour_selected(params)
-    customer_map, event_map, @start_date, @end_date = \
-      calendar_filter(params, @order_colour_selected, @staffs, @events)
 
-    @hash = hash_map_pins(customer_map)
-    @event_hash = hash_event_pins(event_map)
-    params[:start_date] = params[:start_date] || Date.current.beginning_of_month.to_s
-    @current_month = (Date.parse params[:start_date]).beginning_of_month
+    @selected_staff = params[:calendar_staff_selected]
+    params[:start_date] = params[:start_date] || Date.current.to_s
+    @start_date = Date.parse params[:start_date]
+  end
+
+  def fetch_calendar
+    @calendar_staff = params[:calendar_staff_selected]
+    @start_date = params[:start_date] || Date.today.to_s
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def fetch_calendar_date
+    @calendar_date  = params[:calendar_date_selected] || Date.today.to_s
+    @calendar_staff = params[:calendar_staff_selected]
+    respond_to do |format|
+      format.js
+    end
   end
 
   # online version
@@ -111,11 +121,18 @@ class CalendarController < ApplicationController
     @methods = TaskMethod.all
     @subjects = TaskSubject.sales_subjects
 
+
     if user_full_right(session[:authority])
-      @events = Task.unconfirmed_event.order_by_staff('ASC').paginate(per_page: @per_page, page: params[:page])
+      if params[:selected_staff].nil?
+        @events = Task.unconfirmed_event.order_by_staff('ASC').paginate(per_page: @per_page, page: params[:page])
+      else
+        @events = Task.filter_by_response(params[:selected_staff]).unconfirmed_event.order_by_staff('ASC').paginate(per_page: @per_page, page: params[:page])
+      end
     else
       @events = Task.unconfirmed_event.filter_by_staff(session[:user_id]).order_by_staff('ASC')
     end
+
+    @staffs = Staff.filter_by_ids(Task.unconfirmed_event.map(&:response_staff).uniq)
 
     des = @events.map { |x| x.description.split('\n').first }
     loc = @events.map { |x| x.location.split(/[,\n]/).first unless x.location.nil? }
@@ -123,8 +140,7 @@ class CalendarController < ApplicationController
     @customers = Customer.search_for(pattern).order_by_name('ASC')
     @leads = CustomerLead.search_for(pattern).order_by_name('ASC')
 
-    @customers_all = Customer.all
-    @staffs = Staff.filter_by_ids(@events.map(&:response_staff).uniq)
+
   end
 
   # handle the requests for updating events

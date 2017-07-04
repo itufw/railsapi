@@ -185,6 +185,11 @@ class XeroInvoice < ActiveRecord::Base
         group(DATE_FORMAT('xero_invoices.date', '%Y-%m-01'))
       end
 
+    def self.filter_by_contact_id(contact_id)
+      return where(xero_contact_id: contact_id) unless contact_id.nil? || contact_id.blank?
+      all
+    end
+
     def self.group_by_week
         group('WEEK(xero_invoices.date)')
       end
@@ -205,7 +210,7 @@ class XeroInvoice < ActiveRecord::Base
     end
 
     def self.period_select(until_date)
-        where("(xero_invoices.date < '#{until_date}' or xero_invoices.due_date < '#{until_date}') and xero_invoices.amount_due > 0 ")
+        where("(xero_invoices.date <= '#{until_date}' or xero_invoices.due_date <= '#{until_date}') and xero_invoices.amount_due > 0 ")
       end
 
     def self.limited_period_select_due_date(select_days)

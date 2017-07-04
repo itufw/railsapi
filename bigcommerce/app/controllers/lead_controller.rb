@@ -21,10 +21,28 @@ class LeadController < ApplicationController
   end
 
   def create_leads
-    @customer_lead = CustomerLead.new
-    @google_client = grab_from_google(params, @customer_lead)
+    customer_name = params['customer_name']
+    staff_id = params['staff_id']
+    @staff = Staff.find(staff_id) unless staff_id.nil?
+
+    @search_text = params[:search]
+    if !@search_text.nil?
+      @google_spots = grab_from_google(@search_text)
+    elsif !customer_name.nil? && !staff_id.nil?
+      query = customer_name + "near #{@staff.state}"
+      @google_spots = grab_from_google(query)
+    end
 
     @customer_lead_button = true
+  end
+
+  def fetch_lead
+    @customer_lead, @spot = spot_details(params[:place_id], params[:staff_id] ) unless params[:place_id].nil?
+    @customer_lead_button = true
+
+    respond_to do |format|
+      format.js
+    end
   end
 
   def edit_leads
@@ -33,10 +51,16 @@ class LeadController < ApplicationController
   end
 
   def create_leads_handler
+    if CustomerLead.filter_by_name(lead_params[:actual_name]).count > 0
+      flash[:error] = "Leads already exists"
+      render :back
+      return
+    end
     @customer_lead = CustomerLead.new
     lead_params[:firstname] = lead_params[:actual_name] if lead_params[:firstname].nil?
     if @customer_lead.update_attributes(lead_params)
       flash[:success] = 'Successfully Created.'
+      CustomerTag.new.insert_lead(@customer_lead)
       # redirect_to action: 'all_leads'
       redirect_to controller: 'calendar', action: 'event_check_offline'
     else
@@ -64,6 +88,7 @@ class LeadController < ApplicationController
     @activity = Task.joins(:staff).lead_tasks(@lead.id).expired?.order_by_id('DESC')
     @subjects = TaskSubject.filter_by_ids(@activity.map(&:subject_1).compact)
   end
+
 
   # -----------private --------------------
   private

@@ -105,14 +105,15 @@ module XeroInvoiceCalculations
 
         XeroCalculation.insert_shipping_calculation(invoice_number, inc_gst_shipping_price,\
                                                     ex_gst_shipping_price, gst_on_shipping)
+        # XeroCalculation.insert_gst(invoice_number, gst_sum_line_amounts)
 
-        XeroCalculation.insert_gst(invoice_number, gst_sum_line_amounts)
 
-        unless rounding_error_ex_gst.round(2) == 0.0
-            XeroCalculation.insert_rounding(invoice_number,\
-                                            total_ex_gst, gst_sum_line_amounts, order_total,\
-                                            rounding_error_inc_gst, rounding_error_ex_gst)
-      end
+        insert_rounding_to_calculation(invoice_number, order_total, XeroAccountCode.retail)
+        # unless rounding_error_ex_gst.round(2) == 0.0
+        #     XeroCalculation.insert_rounding(invoice_number,\
+        #                                     total_ex_gst, gst_sum_line_amounts, order_total,\
+        #                                     rounding_error_inc_gst, rounding_error_ex_gst)
+        # end
     end
 
     def wholesale_line_items(discount_rate, discounted_unit_price, discounted_ex_gst_unit_price,\
@@ -186,20 +187,30 @@ module XeroInvoiceCalculations
                                                  gst_line_amounts[op_id], wet_unadjusted_order_product_price[op_id])
         end
 
-        XeroCalculation.insert_wet_calculation(invoice_number, wet_unadjusted_total, ship_deduction,\
-                                               subtotal_ex_gst, wet_adjusted, gst_on_wet)
-
-        XeroCalculation.insert_adjustment(invoice_number, adjustment, gst_on_adjustment)
+        # XeroCalculation.insert_wet_calculation(invoice_number, wet_unadjusted_total, ship_deduction,\
+        #                                        subtotal_ex_gst, wet_adjusted, gst_on_wet)
+        #
+        # XeroCalculation.insert_adjustment(invoice_number, adjustment, gst_on_adjustment)
 
         XeroCalculation.insert_shipping_calculation(invoice_number, inc_gst_shipping_price,\
                                                     ex_gst_shipping_price, gst_on_shipping)
 
-        XeroCalculation.insert_gst(invoice_number, gst_sum_line_amounts)
+        # XeroCalculation.insert_gst(invoice_number, gst_sum_line_amounts)
+        #
+        # unless rounding_error_ex_gst.round(2) == 0.0
+        #     XeroCalculation.insert_rounding(invoice_number,\
+        #                                     total_ex_gst, gst_sum_line_amounts, order_total, rounding_error_inc_gst, rounding_error_ex_gst)
+        # end
 
-        unless rounding_error_ex_gst.round(2) == 0.0
-            XeroCalculation.insert_rounding(invoice_number,\
-                                            total_ex_gst, gst_sum_line_amounts, order_total, rounding_error_inc_gst, rounding_error_ex_gst)
-        end
+        insert_rounding_to_calculation(invoice_number, order_total, XeroAccountCode.wholesale)
+    end
+
+    def insert_rounding_to_calculation(order_number, order_total, xero_account_code)
+      amount = XeroCalculation.where(invoice_number: order_number).map{ |x| (x.discounted_unit_price.to_f * x.qty).round(2)}.sum
+      amount += XeroCalculation.where(invoice_number: order_number, discounted_unit_price: nil).map(&:unit_price_inc_tax).sum
+      if (order_total - amount) != 0
+         XeroCalculation.insert_rounding_new(order_number, order_total - amount, order_total, xero_account_code)
+      end
     end
 
     def get_discount_rate(order)
@@ -249,14 +260,22 @@ module XeroInvoiceCalculations
         line_items = XeroCalculation.get_line_items(invoice_number)
 
         line_items.each do |l|
+            next if ((l.item_code.to_i.to_s != l.item_code) && (l.unit_price_inc_tax == 0))
+
             item_code = l.item_code.to_s
 
             create_item(item_code)
 
-            unit_amount_clean = l.discounted_ex_taxes_unit_price.to_s.to_f.round(4)
-
+            # unit_amount_clean = l.discounted_ex_taxes_unit_price.to_s.to_f.round(4)
+            # unit_amount_clean = (unit_amount_clean / l.discount_rate) * (TaxPercentage.wet_percentage * 0.01 + 1) if l.item_code.to_i.to_s == l.item_code && l.account_code == '2100'
+            # unit_amount_clean = (unit_amount_clean / l.discount_rate) * (TaxPercentage.gst_percentage * 0.01 + 1) if l.item_code.to_i.to_s == l.item_code && l.account_code == '2200'
+            if l.discounted_unit_price.nil?
+              unit_amount = l.unit_price_inc_tax.to_s.to_f.round(4)
+            else
+              unit_amount = l.discounted_unit_price.to_s.to_f.round(4)
+            end
             invoice.add_line_item(item_code: item_code, description: l.description,\
-                                  quantity: l.qty, unit_amount: unit_amount_clean,\
+                                  quantity: l.qty, unit_amount: unit_amount,\
                                   tax_type: l.tax_type.to_s, account_code: l.account_code.to_s)
         end
         invoice.save

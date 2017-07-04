@@ -11,7 +11,42 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170613062007) do
+ActiveRecord::Schema.define(version: 20170704034517) do
+
+  create_table "SalesForce_Lead_full", primary_key: "Id", force: :cascade do |t|
+    t.string  "FirstName",                 limit: 38
+    t.string  "LastName",                  limit: 46
+    t.string  "Title",                     limit: 52
+    t.string  "Company",                   limit: 53
+    t.string  "Street",                    limit: 118
+    t.string  "City",                      limit: 32
+    t.string  "State",                     limit: 17
+    t.string  "PostalCode",                limit: 12
+    t.string  "Country",                   limit: 13
+    t.string  "Phone",                     limit: 34
+    t.string  "MobilePhone",               limit: 23
+    t.string  "Fax",                       limit: 10
+    t.string  "Email",                     limit: 43
+    t.string  "Website",                   limit: 240
+    t.string  "OwnerId",                   limit: 18
+    t.integer "HasOptedOutOfEmail",        limit: 4
+    t.integer "IsUnreadByOwner",           limit: 4
+    t.string  "CreatedDate",               limit: 14
+    t.string  "CreatedById",               limit: 18
+    t.string  "LastModifiedDate",          limit: 14
+    t.string  "LastModifiedById",          limit: 18
+    t.string  "SystemModstamp",            limit: 14
+    t.string  "LastActivityDate",          limit: 13
+    t.integer "DoNotCall",                 limit: 4
+    t.integer "HasOptedOutOfFax",          limit: 4
+    t.string  "LastTransferDate",          limit: 14
+    t.string  "Preferred_Contact_Time__c", limit: 109
+    t.string  "Time_Unavailable__c",       limit: 82
+    t.string  "Credit_App_Signed_Date__c", limit: 13
+    t.string  "Credit_App_Type__c",        limit: 11
+    t.string  "Useful_Information__c",     limit: 521
+    t.string  "CustomerType__c",           limit: 9
+  end
 
   create_table "SalesForce_account", primary_key: "Id", force: :cascade do |t|
     t.string "Name",                        limit: 52
@@ -325,9 +360,13 @@ ActiveRecord::Schema.define(version: 20170613062007) do
     t.string   "phone",             limit: 255
     t.string   "fax",               limit: 255
     t.string   "email",             limit: 255
-    t.integer  "c_receive_invoice", limit: 4
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
+    t.integer  "receive_statement", limit: 4
+    t.integer  "key_sales",         limit: 4
+    t.integer  "receive_invoice",   limit: 4
+    t.integer  "receive_portfolio", limit: 4
+    t.integer  "key_accountant",    limit: 4
   end
 
   create_table "cust_groups", force: :cascade do |t|
@@ -384,6 +423,14 @@ ActiveRecord::Schema.define(version: 20170613062007) do
   add_index "customer_leads", ["cust_type_id"], name: "index_customer_leads_on_cust_type_id", using: :btree
   add_index "customer_leads", ["staff_id"], name: "index_customer_leads_on_staff_id", using: :btree
 
+  create_table "customer_tags", force: :cascade do |t|
+    t.string   "name",        limit: 255
+    t.string   "role",        limit: 255
+    t.integer  "customer_id", limit: 4
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
   create_table "customers", force: :cascade do |t|
     t.text     "firstname",               limit: 255
     t.text     "lastname",                limit: 255
@@ -420,6 +467,8 @@ ActiveRecord::Schema.define(version: 20170613062007) do
     t.string   "postcode",                limit: 255
     t.string   "country",                 limit: 255
     t.text     "address",                 limit: 65535
+    t.float    "lat",                     limit: 24
+    t.float    "lng",                     limit: 24
   end
 
   add_index "customers", ["cust_group_id"], name: "index_customers_on_cust_group_id", using: :btree
@@ -1272,6 +1321,38 @@ ActiveRecord::Schema.define(version: 20170613062007) do
     t.datetime "end_time"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "zomato_entities", force: :cascade do |t|
+    t.string   "entity_type",  limit: 255
+    t.integer  "entity_id",    limit: 4
+    t.string   "title",        limit: 255
+    t.float    "latitude",     limit: 24
+    t.float    "longitude",    limit: 24
+    t.integer  "city_id",      limit: 4
+    t.string   "city_name",    limit: 255
+    t.integer  "country_id",   limit: 4
+    t.string   "country_name", limit: 255
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  create_table "zomato_restaurants", force: :cascade do |t|
+    t.string   "name",                 limit: 255
+    t.string   "url",                  limit: 255
+    t.string   "address",              limit: 255
+    t.string   "locality",             limit: 255
+    t.float    "latitude",             limit: 24
+    t.float    "longitude",            limit: 24
+    t.string   "zipcode",              limit: 255
+    t.integer  "country_id",           limit: 4
+    t.integer  "average_cost_for_two", limit: 4
+    t.string   "cuisines",             limit: 255
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+    t.integer  "customer_id",          limit: 4
+    t.integer  "customer_lead_id",     limit: 4
+    t.integer  "active",               limit: 4
   end
 
 end
