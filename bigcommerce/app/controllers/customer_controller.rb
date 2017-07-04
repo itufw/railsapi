@@ -218,14 +218,19 @@ class CustomerController < ApplicationController
   end
 
   def zomato
-    @zomato = ZomatoRestaurant.all
+    @search_text = params['search']
+    @per_page = params[:per_page] || ZomatoRestaurant.per_page
+
+    order_function, direction = sort_order(params, :order_by_name, 'DESC')
+
+    @zomato = ZomatoRestaurant.search_for(@search_text).send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
   end
 
 
   private
 
   def customer_params
-    params.require(:customer).permit(:firstname, :lastname, :actual_name, :staff_id, :cust_style_id,\
-                                     :cust_group_id)
+    params.require(:customer).permit(:firstname, :lastname, :actual_name,\
+                                     :staff_id, :cust_style_id, :cust_group_id)
   end
 end
