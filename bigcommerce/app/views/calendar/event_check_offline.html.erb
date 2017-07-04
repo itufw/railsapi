@@ -1,7 +1,16 @@
 <%= title "Event From Calendars" %>
 <%= render 'partials/paginate', objects: @events %>
-<div>
-  <table id="event-table">
+
+<div class="row">
+  <div class="col-md-4">
+    Search:
+      <%= autocomplete_field_tag 'name', '', autocomplete_customer_tag_name_calendar_index_path, placeholder: 'Search Customer', id: 'event_check_search', size: 15 %>
+  </div>
+</div>
+
+
+<div class="row">
+  <table id="event-table" border = "1">
   <thead>
     <tr>
       <th>
@@ -11,7 +20,7 @@
             <ul class="dropdown-menu">
               <% @staffs.each do |staff| %>
               <li class="staff-dropdown" id="staff-<%= staff.id%>">
-                <%= staff.nickname %>
+                <%= link_to staff.nickname, controller: 'calendar', action: 'event_check_offline', selected_staff: staff.id %>
               </li>
               <% end %>
             </ul>
@@ -33,7 +42,7 @@
       <%
         response_staff = @staffs.select{|x| x.id == event.response_staff }
       %>
-      <tr class="google-event-line  staff-event-<%= response_staff.first.id.to_s%> ">
+      <tr class="google-event-line  staff-event-<%= response_staff.first.id.to_s%>">
         <td><%= response_staff.first.nickname %></td>
         <td>&nbsp;&nbsp;&nbsp;</td>
         <td>
@@ -50,35 +59,26 @@
         <%
           unless event.description.nil?
             if event.location.nil?
-              loc = event.description.split("\n")
-              loc = loc.first.split(/[ ()\/]/)
-              loc = loc.map {|x| x = x.downcase}
-              customer_list = @customers.select{|x|  x.staff_id == response_staff.first.id && !x.actual_name.nil? && Regexp.union(loc) === x.actual_name.downcase }[0..5]
-
-              lead_list = @leads.select{|x| x.staff_id == response_staff.first.id && Regexp.union(loc) === x.actual_name.downcase }[0..5]
-              lead_list = lead_list.each {|x| x.actual_name = x.actual_name.to_s + ', (Lead)'}
-
-              customer_list = lead_list + customer_list
-              customer_list = customer_list.sort_by! {|x| @jarow.getDistance(loc.join(" "), x.actual_name) }.reverse
-
-              other_customer = @customers_all.select {|x| x.staff_id == response_staff.first.id}
-              other_customer = other_customer.reject{ |x| customer_list.map(&:actual_name).include?x.actual_name || x.actual_name.nil? || (x.actual_name == '')}
-              customer_list += other_customer.sort_by! {|x| @jarow.getDistance(event.description.to_s, x.actual_name.to_s) }.reverse
-            else
-              loc = event.location.split(",").first.split.select{|x| (x.to_i.to_s.casecmp(x)<0) && !(["st","pl","street","St"].include?(x))}
-              loc = loc.map {|x| x = x.downcase}
-              customer_list = @customers.select{|x| x.staff_id == response_staff.first.id && !x.actual_name.nil? && Regexp.union(loc) === x.actual_name.downcase }
+              loc = event.description.split("\n").first.downcase
+              customer_list = @customers.select{|x|  x.staff_id == response_staff.first.id && !x.actual_name.nil? && Regexp.union(loc) === x.actual_name.downcase }
 
               lead_list = @leads.select{|x| x.staff_id == response_staff.first.id && Regexp.union(loc) === x.actual_name.downcase }
               lead_list = lead_list.each {|x| x.actual_name = x.actual_name.to_s + ', (Lead)'}
 
               customer_list = lead_list + customer_list
-              customer_list = customer_list.sort_by! {|x| @jarow.getDistance(loc.join(" "), x.actual_name) }.reverse
+              customer_list = customer_list.sort_by! {|x| @jarow.getDistance(loc, x.actual_name) }.reverse
 
-              other_customer = @customers_all.select {|x| x.staff_id == response_staff.first.id}
-              other_customer = other_customer.reject{ |x| customer_list.map(&:actual_name).include?x.actual_name || x.actual_name.nil? || (x.actual_name == '')}
-              customer_list += other_customer.sort_by! {|x| @jarow.getDistance(event.description.to_s, x.actual_name.to_s) }.reverse
-            end
+            else
+              loc = event.location.split(",").first.split.select{|x| (x.to_i.to_s.casecmp(x)<0) && !(["st","pl","street","St"].include?(x))}
+              loc = loc.map {|x| x = x.downcase}
+              customer_list = @customers.select{|x| x.staff_id == response_staff.first.id && !x.actual_name.nil? && Regexp.union(loc) === x.actual_name.downcase }
+
+              lead_list = @leads.select{|x| (x.staff_id == response_staff.first.id)&& (Regexp.union(loc) === x.actual_name.downcase) }
+              lead_list = lead_list.each {|x| x.actual_name = x.actual_name.to_s + ', (Lead)'}
+
+              customer_list = lead_list + customer_list
+              customer_list = customer_list.sort_by! {|x| @jarow.getDistance(loc.join(" "), x.actual_name) }.reverse
+              end
         %>
           <td>
             <%= collection_select :customer, :customer, customer_list, ->(ob) {"#{ob.id}|#{ob.actual_name}"}, :actual_name, {:include_blank => "Select a Customer"}, :style => "width: 150px" %>
@@ -110,4 +110,9 @@
     $(".staff-event-<%=staff.id%>").toggle();
   });
 <% end %>
+
+$('#event_check_search').bind('railsAutocomplete.select', function(event, data){
+  $('select[id=customer_customer]').append($('<option value='+ data.item.customer_id + '|' + data.item.value.toString() +'>'+ data.item.value +'</option>'));
+});
+
 </script>

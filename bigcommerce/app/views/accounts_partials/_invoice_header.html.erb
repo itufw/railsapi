@@ -30,4 +30,22 @@
     <% end %>
   </div>
   <% end %>
+
+  <div class= "row">
+      <% customer.cust_contacts.each do |contact| %>
+        <% person = contact.contact%>
+        <div class="col-xs-4">
+          <p style="font-size:20px"><%= person.name+": "%></p>
+          <p style="font-size:20px">
+            <%= contact.title%>
+            <br/>
+            <%= label_tag :position, contact.position%>
+            <br/>
+              <a href="tel:<%=contact.phone%>"><%= num_to_phone(contact.phone) %></a>
+            <br/>
+            <%= mail_to(contact.email) unless contact.email.nil? %>
+          </p>
+        </div>
+    <% end %>
+  </div>
 </div>

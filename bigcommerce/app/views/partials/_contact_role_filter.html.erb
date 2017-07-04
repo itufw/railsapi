@@ -1,0 +1,3 @@
+   <div class="col-xs-2">
+   <%= collection_select(:role, :role, ContactRole.all, :role, :role, {:include_blank => 'All Position', selected: @contact_role }, {:class => 'form-control'}) %>
+   </div>

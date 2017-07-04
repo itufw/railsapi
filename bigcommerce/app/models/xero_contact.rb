@@ -161,7 +161,9 @@ class XeroContact < ActiveRecord::Base
       end
 
     def self.period_select(until_date)
-        where('xero_contacts.xero_contact_id IN (?)', XeroInvoice.select(:xero_contact_id).period_select(until_date).uniq)
+      where('xero_contacts.xero_contact_id IN (?) ', (XeroInvoice.period_select(until_date).map(&:xero_contact_id)).uniq )
+
+        # where('xero_contacts.xero_contact_id IN (?) ', (XeroInvoice.select(:xero_contact_id).period_select(until_date).uniq + XeroOverpayment.select(:xero_contact_id).period_select(until_date).uniq + XeroCreditNote.select(:xero_contact_id).period_select(until_date).uniq).uniq )
       end
     def self.limited_period_select(select_days, date_column)
       (date_column.eql? "invoice_date") ? where('xero_contacts.xero_contact_id IN (?)', XeroInvoice.select(:xero_contact_id).limited_period_select_date(select_days).uniq) : where('xero_contacts.xero_contact_id IN (?)', XeroInvoice.select(:xero_contact_id).limited_period_select_due_date(select_days).uniq)
@@ -211,7 +213,7 @@ class XeroContact < ActiveRecord::Base
     def self.order_by_invoice(direction, start_date, end_date, date_column)
       date_column = (date_column.eql? "invoice_date") ? 'date' : 'due_date'
       joins("RIGHT JOIN xero_invoices ON xero_contacts.xero_contact_id = xero_invoices.xero_contact_id").\
-      where("xero_invoices.#{date_column} > '#{start_date}' and xero_invoices.#{date_column} <= '#{end_date}'").\
+      where("xero_invoices.#{date_column} >= '#{start_date}' and xero_invoices.#{date_column} <= '#{end_date}'").\
       group('xero_invoices.xero_contact_id').\
       order(" SUM(xero_invoices.amount_due) " + direction)
     end

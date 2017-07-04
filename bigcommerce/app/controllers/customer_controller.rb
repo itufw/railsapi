@@ -50,13 +50,17 @@ class CustomerController < ApplicationController
 
   # Orders and Overall Stats for Customer
   def summary
+    if !params[:method].nil? && params[:method] == 'delete_contact' && !params[:contact_id].nil? && params[:contact_id]!=""
+      CustContact.where(customer_id: params[:customer_id], contact_id: params[:contact_id]).destroy_all
+    end
+
     get_id_and_name(params)
     # overall_stats has structure {time_period_name => [sum, average, supply]}
     @overall_stats = overall_stats_(params)
     display_orders(params, Order.customer_filter([@customer_id]))
 
     # task section
-    @activity = Task.joins(:staff).customer_tasks(@customer_id).order_by_id('DESC')
+    @activity = Task.joins(:staff).customer_tasks(@customer_id).order_by_start_date('DESC')
     @subjects = TaskSubject.filter_by_ids(@activity.map(&:subject_1).compact)
     # -------------------
     # multiple contact people
@@ -212,6 +216,11 @@ class CustomerController < ApplicationController
     end
     ####################################
   end
+
+  def zomato
+    @zomato = ZomatoRestaurant.all
+  end
+
 
   private
 

@@ -1,0 +1,33 @@
+<%= title @contact.name %>
+<h3><%= @contact.name%></h3>
+<center><%= link_to 'Edit', controller: 'contact', action: 'edit_contact', contact_id: @contact.id %></center>
+<br/><br/>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-4 col-md-offset-4">
+      <p>Personal Number: <a href="tel:<%=@contact.personal_number%>"><%= num_to_phone(@contact.personal_number) unless @contact.personal_number.nil? || @contact.personal_number == "" %></a></p>
+      <p>Preferred Contact Number: <%= @contact.preferred_contact_number%></p>
+      <p>Time Unavailable: <%= @contact.time_unavailable%></p>
+    </div>
+  </div>
+  <br/><br/>
+  <div class= "row">
+    <% @contact.cust_contacts.each do |role|%>
+      <div class="col-xs-4">
+        <% customer = role.customer %>
+        <h5>Customer: <%= link_to customer.actual_name, controller: 'customer', action: 'summary', customer_id: customer.id, customer_name: customer.actual_name%></h5>
+        <h5>Sales Rep.: <%= customer.staff.nickname %></h5>
+        <p>Position: <%= role.position %></p>
+        <p>Title: <%= role.title%></p>
+        <p>Ph: <a href="tel:<%=role.phone%>"><%= num_to_phone(role.phone) unless role.phone.nil? || role.phone == "" %></a></p>
+        <p>Email: <%= mail_to(role.email) unless role.email.nil? %></p>
+        <h5>
+          <% ['Receive Invoice', "Receive Statement", "Receive Portfolio", "Key Accountant", "Key Sales"].each do |tag|%>
+            <%= tag + " | " if role[tag.downcase.split().join('_')].to_i > 0%>
+          <% end %>
+        </h5>
+      </div>
+    <% end %>
+  </div>
+</div>

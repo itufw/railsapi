@@ -1,10 +1,17 @@
 require 'xero_connection.rb'
+require 'clean_data.rb'
 
 class Contact < ActiveRecord::Base
+  include CleanData
+
   belongs_to :xero_contact
   belongs_to :customer
   belongs_to :customer_lead
   has_many :cust_contacts
+
+  scoped_search on: %i[name number personal_number]
+
+  self.per_page = 30
 
   # DO NOT USE
   def download_data_from_api(modified_since_time)
@@ -61,6 +68,10 @@ class Contact < ActiveRecord::Base
 
   def self.xero_contact
     where('contacts.xero_contact_id IS NOT NULL')
+  end
+
+  def self.order_by_name(direction)
+    order('name ' + direction)
   end
 
   def display_position

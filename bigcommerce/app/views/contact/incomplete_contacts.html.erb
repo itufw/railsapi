@@ -1,0 +1,17 @@
+<%= title "Incomplete Contacts" %>
+<h3>Incomplete Contacts</h3>
+<center><%= link_to "Create New Contact", action: 'create_contact' %></center>
+<center><%= link_to "View Completed Contacts", action: 'all_contacts'  %></center>
+
+<%= form_tag({:controller => "contact", :action => 'incomplete_contact'}, {:method => "get"}) do %>
+
+<div class="form-group" style="margin-left:300px;margin-top:50px;">
+  <div class="col-xs-4">
+     <%= text_field_tag('search', @search_text, placeholder: 'Enter Contact Name', class: 'form-control') %>
+  </div>
+  <%= submit_tag "Filter", class: 'btn btn-primary' %>
+</div>
+<%= render 'partials/paginate', objects: @contacts %>
+<%= render "contact_partials/incomplete_contact_list", contacts: @contacts %>
+
+<% end %>

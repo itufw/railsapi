@@ -10,34 +10,32 @@ module AccountsHelper
 
       # select customers with the balance above zero
       contacts = XeroContact.joins(:customer).select("xero_contacts.*, customers.staff_id").\
-                  search_filter(search_text).outstanding_is_greater_zero.is_customer.\
-                  paginate(per_page: per_page, page: params[:page]).uniq
-
+                  search_filter(search_text).outstanding_is_greater_zero.is_customer.uniq
 
       contacts = contacts.where("customers.staff_id IN (?)", selected_staff) unless selected_staff.nil? || selected_staff.blank?
 
+      # contacts = (params[:selected_months].blank?) ? contacts.period_select(end_date.to_s) : contacts.limited_period_select(params[:selected_months], date_column)
+      contacts = (params[:selected_months].blank?) ? contacts : contacts.limited_period_select(params[:selected_months], date_column)
 
       # sorting via sort_order -> find the function called order_by_name
       order_function, direction = sort_order(params, 'order_by_name', 'ASC')
 
-        if params[:selected_months].blank?
-            contacts = contacts.period_select(end_date)
-        else
-            contacts = contacts.limited_period_select(params[:selected_months], date_column)
-        end
+      if order_function.start_with?('order_by_invoice')
+          # .split('|')
+          order_function, sort_date_start, sort_date_end = order_function.split('|')
+          contacts = XeroContact.select('*').from(contacts.send(order_function, direction, sort_date_start, sort_date_end, date_column))
+      else
+          contacts = contacts.send(order_function, direction)
+      end
 
-        if order_function.start_with?('order_by_invoice')
-            # .split('|')
-            order_function, sort_date_start, sort_date_end = order_function.split('|')
-            contacts = XeroContact.select('*').from(contacts.send(order_function, direction, sort_date_start, sort_date_end, date_column))
-        else
-            contacts = contacts.send(order_function, direction)
-        end
-        [contacts, search_text, selected_staff]
+      contacts = contacts.paginate(per_page: per_page, page: params[:page])
+      [contacts, search_text, selected_staff]
     end
 
     def credit_note_and_overpayment(xero_contact_id, xero_invoices_ids)
         op = XeroOverpayment.joins(:xero_op_allocations).get_remaining_credit(xero_contact_id).where('xero_overpayments.remaining_credit > 0 OR xero_op_allocations.invoice_number IN (?)', xero_invoices_ids)
+        op += XeroOverpayment.get_remaining_credit(xero_contact_id).where('xero_overpayments.remaining_credit > 0')
+        op = op.uniq
         cn = XeroCreditNote.joins(:xero_cn_allocations).get_remaining_credit(xero_contact_id).where('xero_credit_notes.remaining_credit > 0 OR xero_cn_allocations.invoice_number IN (?)', xero_invoices_ids)
         cn_s = XeroCreditNote.get_remaining_credit(xero_contact_id).where('xero_credit_notes.remaining_credit > 0')
         cn += cn_s
@@ -199,8 +197,9 @@ module AccountsHelper
         email_content.email_type = params[:commit]
         unless @checked_send_email_to_self
             luke_email = Staff.find(9).email
-            email_content.cc = luke_email +";"+Staff.find(Customer.find(customer_id).staff_id).email.to_s
-            email_content.bcc = 'emailtosalesforce@y-5cvcy6yhzo3z4984r5f5htqn7.9yyfmeag.9.le.salesforce.com'
+            staff = Staff.find(Customer.find(customer_id).staff_id)
+            email_content.cc = luke_email +";"+staff.email.to_s
+            email_content.cc += '; candice@untappedwines.com' if staff.id == 6
         end
         # set default_email_content, this function is located in helpers-> accounts_helper
         email_content.content, email_content.content_second, @email_title = default_email_content(params[:commit], cn_op)

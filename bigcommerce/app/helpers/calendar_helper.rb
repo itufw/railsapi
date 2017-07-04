@@ -169,12 +169,67 @@ module CalendarHelper
     [customer_map, event_map, start_date, end_date]
   end
 
+  def get_events_details(staff_id, start_date = nil, end_date = nil)
+    start_date = Date.today - 1.month if start_date.nil?
+    end_date = Date.today if end_date.nil?
+
+    events = Task.joins(:task_relations).select('task_relations.*, tasks.*').where('tasks.start_date >= ? AND end_date <= ? AND tasks.google_event_id IS NOT NULL AND (task_relations.staff_id = ? OR tasks.response_staff = ? )', start_date.to_s, end_date.to_s, staff_id, staff_id)
+    events
+  end
+
+  def get_customers_pins(staff_id, start_date = nil)
+    customers = Customer.filter_by_staff(staff_id).joins(:addresses).select("addresses.lat AS latitude, addresses.lng AS longitude, customers.*").where("addresses.lat IS NOT NULL").group("customers.id")
+    customers = customers.joins(:orders).select("MAX(orders.date_created) as last_order_date, customers.id").where("orders.status_id IN (2, 3, 7, 8, 9, 10, 11, 12, 13)").order("orders.date_created DESC").group("customers.id")
+
+    start_date = Date.today if start_date.nil?
+    colour_range = {
+      'lightgreen' => [0, 15], 'green' => [15, 30], 'gold' => [30, 45],
+      'coral' => [45, 60], 'red' => [60, 75], 'maroon' => [75, 3000]
+    }
+
+    customer_map = {}
+    customers.each do |customer|
+      days_gap = (start_date - customer.last_order_date.to_date).to_i
+      days_gap = 0 if days_gap < 0
+      colour_range.keys.each do |colour|
+        if days_gap.between?(colour_range["#{colour}"].min, colour_range["#{colour}"].max)
+          infowindow = "Last Order in : " + days_gap.to_s + "  days"
+          customer_map[customer.id] = add_map_pin(colour, customer, infowindow)
+          break
+        end # end if
+      end # end colour guide for loop
+    end # end customers for loop
+
+    customer_pins = hash_map_pins(customer_map)
+    customer_pins
+  end
+
+  def get_events_pins(events)
+    customers = Customer.filter_by_ids(events.map(&:customer_id).uniq.compact)
+    customers = customers.joins(:addresses).select("addresses.lat AS latitude, addresses.lng AS longitude, customers.*") unless customers.nil?
+    leads = CustomerLead.filter_by_ids(events.map(&:customer_lead_id).uniq.compact)
+
+    event_map = {}
+    events.each do |event|
+      customer = (customers.nil?) ? nil : customers.select { |x| x.id == event.customer_id }.first
+      if !customer.nil?
+        event_map[event.google_event_id] = add_event_pin(customer, event)
+      else
+        lead = leads.select { |x| x.id == event.customer_lead_id}.first
+        event_map[event.google_event_id] = add_event_pin(lead, event, false) unless lead.nil?
+      end
+    end
+    event_hash = hash_event_pins(event_map)
+
+    event_hash
+  end
+
   # turn events to map_pins
   def hash_event_pins(event)
     hash = Gmaps4rails.build_markers(event.keys()) do |event_id, marker|
       marker.lat event[event_id]["lat"]
       marker.lng event[event_id]["lng"]
-      marker.picture({ url: view_context.image_path(event[event_id]["url"]),
+      marker.picture({ url: ActionView::Base.new.image_path(event[event_id]["url"]),
                         width: 30,
                         height: 30 })
       if event[event_id]['customer_id'].nil?
@@ -266,7 +321,7 @@ module CalendarHelper
       marker.lat customer_map[customer_id]["lat"]
       marker.lng customer_map[customer_id]["lng"]
       marker.picture({
-                        :url    => view_context.image_path(customer_map[customer_id]["url"]),
+                        :url    => ActionView::Base.new.image_path(customer_map[customer_id]["url"]),
                         :width  => 30,
                         :height => 30
                        })
@@ -308,11 +363,25 @@ module CalendarHelper
   end
 
   # scrap events from google calendar
-  def update_google_events(new_events, tasks, staff_calendars, unconfirm)
-    new_events.select { |x| (!tasks.include?x.id) || (unconfirm.include?x.id) }.each do |event|
-      if unconfirm.include? event.id
-        task = Task.filter_by_google_event_id(event.id).first
-        task.auto_update_from_calendar_event(event) unless task.nil?
+  def update_google_events(new_events, staff_calendars, unconfirm)
+    new_events.each do |event|
+      task = Task.filter_by_google_event_id(event.id).first
+
+      if !task.nil?
+        task.start_date = if event.start.date_time.nil?
+                            event.start.date.to_s
+                          else
+                            event.start.date_time.to_s(:db)
+                          end
+          task.end_date = if event.end.date_time.nil?
+                            event.end.date.to_s
+                          else
+                            event.end.date_time.to_s(:db)
+                          end
+          task.description = event.summary
+          task.location = event.location
+          task.summary = event.description
+          task.save
       else
         # filter the staff
         staff_address = staff_calendars.select { |x| [event.organizer.email, event.creator.email].include? x.calendar_address}.first
@@ -324,14 +393,13 @@ module CalendarHelper
 
   def scrap_from_calendars(service)
     new_events = []
-    tasks = Task.where('google_event_id IS NOT NULL').map(&:google_event_id)
     unconfirmed_task = Task.unconfirmed_event.map(&:google_event_id)
 
     staff_calendars = StaffCalendarAddress.all
     service.list_calendar_lists.items.select { |x| staff_calendars.map(&:calendar_address).include?x.id }.each do |calendar|
       new_events += service.list_events(calendar.id).items
     end
-    update_google_events(new_events, tasks, staff_calendars, unconfirmed_task)
+    update_google_events(new_events, staff_calendars, unconfirmed_task)
   end
 
   # -----------------push events to google calendar ---------------------
@@ -416,7 +484,7 @@ module CalendarHelper
                                                 attendees: attendee_list
                                                 })
     begin
-      gcal_event = service.insert_event(response_staff_email, event, send_notifications: true)
+      gcal_event = service.insert_event('primary', event, send_notifications: true)
       return gcal_event
     rescue Google::Apis::AuthorizationError
       client.update!(

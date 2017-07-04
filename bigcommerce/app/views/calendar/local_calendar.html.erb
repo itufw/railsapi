@@ -4,23 +4,18 @@
 <script src="//cdn.rawgit.com/mahnunchik/markerclustererplus/master/dist/markerclusterer.min.js"></script>
 
 
-<div id="patient-name">
-
-</div>
-
 <div class="container">
   <div class="row">
     <div class='col-md-6'>
       <input type="checkbox" value="event" id="event_checkbox"/>
       <lable for="event_checkbox">Event</lable>
-
       <input type="checkbox" value="customer" id="customer_checkbox"/>
       <lable for="customer_checkbox">Customer</lable>
       <br/><br/>
       <div id="customer_location" style='width: 500px; height: 500px;'></div>
       <button type="button" class="btn btn-default" id="filter_on">Filter</button>
       <div id = "calendar_map_filter">
-        <%= render 'calendar_partials/calendar_map_filter'%>
+        <%=  render 'calendar_partials/calendar_map_filter' %>
       </div>
     </div>
 
@@ -28,27 +23,16 @@
     <div class='col-md-6'>
       <div id="selector" class="btn-group">
         <% @staffs.each do |staff|%>
-          <button type="button" class="btn btn-default calendar-staff-selector" id="calendar-button-<%= staff.id %>" staff-id="<%= staff.id%>"><%= staff.nickname %></button>
+          <label type="button" class="btn btn-default staff-select"><%= link_to staff.nickname, fetch_calendar_path(calendar_staff_selected: staff.id, start_date: @start_date), remote: true, staff_id: staff.id.to_s %></label>
         <% end %>
       </div>
+      <br/>
+      <div class="btn group" role="group" data-toggle="buttons" aria-label="calendar_radio">
+        <label type="button" class="btn btn-default calendar_radio" date='monthly'><%= radio_button_tag(:calendar_radio, "monthly") %> Month</label>
+        <label type="button" class="btn btn-default calendar_radio" date='weekly'><%= radio_button_tag(:calendar_radio, "weekly") %> Week</label>
+      </div>
 
-      <% @staffs.each do |staff|%>
-        <div class="calendar-staff" id="calendar-staff-<%= staff.id%>" >
-          <%= month_calendar events: @events do |date, meetings| %>
-            <%if (date >= @current_month.beginning_of_month) && (date <= @current_month.end_of_month)%>
-              <a class="calendar-date" date="<%=date%>" staff-id="<%= staff.id%>"><%= date.strftime('%e %b') %></a>
-            <% else %>
-              <%= date.strftime('%e %b') %>
-            <% end %>
-              <% meetings.each do |meeting| %>
-              <% next unless [meeting.staff_id, meeting.response_staff].include?staff.id%>
-                <div>
-                  <%= meeting.description%>
-                </div>
-              <% end %>
-          <% end %>
-        </div>
-      <% end %>
+      <div id="calendar_table"></div>
     </div>
 
   </div>
@@ -67,39 +51,29 @@ handler.buildMap({
 var event_markers = null;
 var customer_markers = null;
 
-<%@staffs.each do |staff|%>
-  $("#calendar-staff-<%= staff.id%>").hide();
-  $("#calendar-button-<%= staff.id %>").click(function(){
+var calendar_table = $('#calendar_table');
+var calendar_radio = $('div[aria-label=calendar_radio]');
+var event_checkbox = $('#event_checkbox');
+var customer_checkbox = $('#customer_checkbox');
 
-    <%@staffs.each do |staff|%>
-      $("#calendar-staff-<%= staff.id%>").hide();
-    <% end %>
-
-    $("#calendar-staff-<%= staff.id%>").toggle();
-    handler.removeMarkers(event_markers);
-    handler.removeMarkers(customer_markers);
-    event_markers, customer_markers = null;
-    if ($('#event_checkbox').is(':checked'))
-      event_markers = handler.addMarkers(<%=raw @event_hash.select{|x| ([x[:creator], x[:participant]].include?staff.id) && (@current_month.beginning_of_month == x[:date].beginning_of_month)}.to_json %>);
-    if ($('#customer_checkbox').is(':checked'))
-      customer_markers = handler.addMarkers(<%=raw @hash.select{|x| x[:staff_id]==staff.id }.to_json%>);
-
-    if (event_markers != null && event_markers.length != 0){
-      handler.bounds.extendWith(event_markers);
-      handler.fitMapToBounds();
-    }else if (customer_markers != null) {
-      handler.bounds.extendWith(customer_markers);
-      handler.fitMapToBounds();
-    };
-
-  });
-<% end %>
+$('#event_checkbox').attr('checked',true);
 
   // hide filter
-  $("#calendar_map_filter").hide();
-  $("#filter_on").click(function(){
-    $("#calendar_map_filter").toggle();
-  });
+$("#calendar_map_filter").hide();
+$("#filter_on").click(function(){
+  $("#calendar_map_filter").toggle();
+});
+</script>
 
-  $('#event_checkbox').attr('checked',true);
+<script type="text/javascript">
+<% events = get_events_details(session[:user_id], @start_date.beginning_of_month, @start_date.end_of_month) %>
+
+// calendar update
+  calendar_table.html("<%=j render 'calendar_partials/monthly_calendar', staff_id: @calendar_staff, events: events%>");
+  if (event_checkbox.is(':checked'))
+    event_markers = handler.addMarkers(<%=raw get_events_pins(events).to_json %>);
+
+  if (event_markers != null && event_markers.length != 0){
+    handler.bounds.extendWith(event_markers);
+    handler.fitMapToBounds();}
 </script>
