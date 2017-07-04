@@ -249,7 +249,7 @@ module XeroInvoiceCalculations
         line_items = XeroCalculation.get_line_items(invoice_number)
 
         line_items.each do |l|
-            next if ((l.item_code.to_i.to_s != l.item_code) && (l.discounted_unit_price == 0))
+            next if ((l.item_code.to_i.to_s != l.item_code) && (l.unit_price_inc_tax == 0))
 
             item_code = l.item_code.to_s
 
