@@ -50,6 +50,10 @@ class CustomerController < ApplicationController
 
   # Orders and Overall Stats for Customer
   def summary
+    if !params[:method].nil? && params[:method] == 'delete_contact' && !params[:contact_id].nil? && params[:contact_id]!=""
+      CustContact.where(customer_id: params[:customer_id], contact_id: params[:contact_id]).destroy_all
+    end
+
     get_id_and_name(params)
     # overall_stats has structure {time_period_name => [sum, average, supply]}
     @overall_stats = overall_stats_(params)
@@ -212,6 +216,11 @@ class CustomerController < ApplicationController
     end
     ####################################
   end
+
+  def zomato
+    @zomato = ZomatoRestaurant.all
+  end
+
 
   private
 

@@ -38,7 +38,7 @@ every 1.day, :at => Time.zone.parse('11:30 am').utc do
 	rake "updates:timeperiods"
 end
 
-every 1.day, :at => Time.zone.parse('11:00 am').utc do
+every 1.day, :at => Time.zone.parse('8:30 pm').utc do
 	rake "updates:zomato_update"
 end
 
