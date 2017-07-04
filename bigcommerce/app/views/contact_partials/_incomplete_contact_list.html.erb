@@ -1,0 +1,13 @@
+<table class = "table table-striped table-bordered table-hover table-responsive">
+	<tr>
+		<th>Contact</th>
+		<th>Phone</th>
+	</tr>
+
+	<% contacts.each do |c| %>
+			<tr>
+				<td><%= link_to c.name, controller: 'contact', action: 'summary', contact_id: c.id%></td>
+				<td><%= c.personal_number %></td>
+			</tr>
+	<% end %>
+</table>
