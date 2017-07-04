@@ -44,13 +44,14 @@ Rails.application.routes.draw do
   post 'contact/create_contact', to: 'contact#contact_creation'
   post 'contact/edit_contact', to: 'contact#contact_edition'
 
-  resources :calendar do
-    get :autocomplete_customer_tag_name, on: :collection
-  end
 
   # this needs to be replaced sometime
   match ':controller(/:action(/:id))', via: %i[get post]
 
+  resources :calendar do
+    get :autocomplete_customer_tag_name, on: :collection
+  end
+  
   resources :contact do
     get :autocomplete_customer_actual_name, on: :collection
   end
