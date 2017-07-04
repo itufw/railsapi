@@ -18,6 +18,13 @@ class ContactController < ApplicationController
     @contacts = CustContact.filter_by_staff(staff_id).filter_by_role(@contact_role).search_for(@search_text).order_by_contacts('ASC').paginate(per_page: @per_page, page: params[:page])
   end
 
+  def incomplete_contacts
+    @search_text = params['search']
+    @per_page = params[:per_page] || Contact.per_page
+
+    @contacts = Contact.where('id NOT IN (?) AND customer_id IN (Null, 0)', CustContact.select('contact_id').uniq).search_for(@search_text).paginate(per_page: @per_page, page: params[:page])
+  end
+
   def create_contact
     @customer_id = params[:customer_id]
     @customer_name = params[:customer_name]

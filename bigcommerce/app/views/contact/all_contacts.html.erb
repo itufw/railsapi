@@ -1,6 +1,8 @@
 <%= title "Contacts" %>
 <h3>Contacts</h3>
 <center><%= link_to "Create New Contact", action: 'create_contact' %></center>
+<center><%= link_to "View Incomplete Contacts", action: 'incomplete_contacts'  %></center>
+
 <%= form_tag({:controller => "contact", :action => 'all_contacts'}, {:method => "get"}) do %>
 
 <div class="form-group" style="margin-left:300px;margin-top:50px;">
