@@ -249,16 +249,18 @@ module XeroInvoiceCalculations
         line_items = XeroCalculation.get_line_items(invoice_number)
 
         line_items.each do |l|
+            next if ((l.item_code.to_i.to_s != l.item_code) && (l.discounted_unit_price == 0))
+
             item_code = l.item_code.to_s
 
             create_item(item_code)
 
-            unit_amount_clean = l.discounted_ex_taxes_unit_price.to_s.to_f.round(4)
-            unit_amount_clean = (unit_amount_clean / l.discount_rate) * (TaxPercentage.wet_percentage * 0.01 + 1) if l.item_code.to_i.to_s == l.item_code && l.account_code == '2100'
-            unit_amount_clean = (unit_amount_clean / l.discount_rate) * (TaxPercentage.gst_percentage * 0.01 + 1) if l.item_code.to_i.to_s == l.item_code && l.account_code == '2200'
-
+            # unit_amount_clean = l.discounted_ex_taxes_unit_price.to_s.to_f.round(4)
+            # unit_amount_clean = (unit_amount_clean / l.discount_rate) * (TaxPercentage.wet_percentage * 0.01 + 1) if l.item_code.to_i.to_s == l.item_code && l.account_code == '2100'
+            # unit_amount_clean = (unit_amount_clean / l.discount_rate) * (TaxPercentage.gst_percentage * 0.01 + 1) if l.item_code.to_i.to_s == l.item_code && l.account_code == '2200'
+            unit_amount = l.discounted_unit_price.to_s.to_f.round(4)
             invoice.add_line_item(item_code: item_code, description: l.description,\
-                                  quantity: l.qty, unit_amount: unit_amount_clean,\
+                                  quantity: l.qty, unit_amount: unit_amount,\
                                   tax_type: l.tax_type.to_s, account_code: l.account_code.to_s)
         end
         invoice.save
