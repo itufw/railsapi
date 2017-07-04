@@ -42,6 +42,13 @@ class XeroCalculation < ActiveRecord::Base
 			tax_type: wholesale_account.tax_type)
 	end
 
+	def self.insert_rounding_new(invoice_number, rouding, order_total, xero_account_code)
+		create(invoice_number: invoice_number, item_code: "ROUNDING",\
+		  description: "ROUNDING", qty: 1, unit_price_inc_tax: rouding,\
+			order_total: order_total, account_code: xero_account_code.account_code,\
+			tax_type: xero_account_code.tax_type)
+	end
+
 	def self.insert_gst(invoice_number, gst)
 		gst_account = XeroAccountCode.gst
 		create(invoice_number: invoice_number, item_code: "GST", description: "GST",\
@@ -78,7 +85,7 @@ class XeroCalculation < ActiveRecord::Base
 		retail_account = XeroAccountCode.retail
 
 		clean_product_name = ActiveSupport::Inflector.transliterate(product_name).to_s.gsub(/[^a-z ]/i, '')
-		
+
 		create(invoice_number: invoice_number, item_code: product_id.to_s,\
 			description: clean_product_name, qty: qty, unit_price_inc_tax: op_unit_price,\
 			discount_rate: discount_rate, discounted_unit_price: discounted_unit_price,\
