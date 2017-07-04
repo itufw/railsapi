@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170703025541) do
+ActiveRecord::Schema.define(version: 20170704034517) do
 
   create_table "SalesForce_Lead_full", primary_key: "Id", force: :cascade do |t|
     t.string  "FirstName",                 limit: 38
@@ -663,14 +663,6 @@ ActiveRecord::Schema.define(version: 20170703025541) do
     t.text     "pipe",       limit: 65535
     t.datetime "created_at",               null: false
     t.datetime "updated_at",               null: false
-  end
-
-  create_table "postcodes_geo", force: :cascade do |t|
-    t.integer "postcode",  limit: 4
-    t.string  "suburb",    limit: 100
-    t.string  "state",     limit: 4
-    t.decimal "latitude",              precision: 6, scale: 3
-    t.decimal "longitude",             precision: 6, scale: 3
   end
 
   create_table "producer_countries", force: :cascade do |t|
@@ -1358,6 +1350,9 @@ ActiveRecord::Schema.define(version: 20170703025541) do
     t.string   "cuisines",             limit: 255
     t.datetime "created_at",                       null: false
     t.datetime "updated_at",                       null: false
+    t.integer  "customer_id",          limit: 4
+    t.integer  "customer_lead_id",     limit: 4
+    t.integer  "active",               limit: 4
   end
 
 end

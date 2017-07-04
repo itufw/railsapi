@@ -6,6 +6,7 @@
 <div class="row">
   <% @contact = Contact.new if @contact.nil? %>
   <%= form_for @contact, url: {action: "create_contact"}, method: "POST", html: {class: "form-group", style: "padding-left: 50px;"} do |f| %>
+    <%= hidden_field_tag :customer_id, @customer_id%>
     <%= render 'contact_partials/contact_creation_form', f: f %>
     <%= render 'contact_partials/contact_customer_form'%>
     <div class="col-md-4 col-md-offset-6 submit_button">
