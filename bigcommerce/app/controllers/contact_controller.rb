@@ -19,6 +19,9 @@ class ContactController < ApplicationController
   end
 
   def create_contact
+    @customer_id = params[:customer_id]
+    @customer_name = params[:customer_name]
+
     @contact = Contact.new
   end
 
@@ -31,12 +34,16 @@ class ContactController < ApplicationController
       cust_contact.position = params['role'].nil? ? nil : params['role'].first.last
       cust_contact.save
 
-      CustomerTag.new.insert_contact(cust_contact)
+      CustomerTag.create(name: contact.name.to_s + ', (Contact)', role: 'Contact', customer_id: contact.id)
     else
       flash[:error] = 'Unsuccessful.'
       redirect_to action: 'create_contact' && return
     end
-    redirect_to action: 'all_contacts'
+    if params[:customer_id].nil? || params[:customer_id].blank? || params[:customer_id] == ""
+      redirect_to action: 'all_contacts' && return
+    else
+      redirect_to controller: 'customer', action: 'summary', customer_id: params[:customer_id], customer_name: Customer.find(params[:customer_id]).actual_name
+    end
   end
 
   def edit_contact

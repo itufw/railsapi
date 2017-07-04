@@ -19,7 +19,7 @@ module ZomatoCalculation
   def filter_viewed_spots
     customers_viewed = []
     ZomatoRestaurant.all.each do |restaurant|
-      customers_viewed += Customer.near([restaurant.latitude, restaurant.longitude], 0.8).map(&:id)
+      customers_viewed += Customer.near([restaurant.latitude, restaurant.longitude], 0.3).map(&:id)
     end
     customers_viewed.uniq
   end
@@ -74,7 +74,7 @@ module ZomatoCalculation
           zipcode: restaurant['location']['zipcode'],\
           country_id: restaurant['location']['country_id'],\
           average_cost_for_two: restaurant['average_cost_for_two'],\
-          cuisines: restaurant['cuisines'] }
+          cuisines: restaurant['cuisines'], active: 1 }
       ZomatoRestaurant.new().update_attributes(restaurant_attr)
     end # end resposne.each
   end
