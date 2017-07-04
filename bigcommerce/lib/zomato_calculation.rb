@@ -54,8 +54,7 @@ module ZomatoCalculation
         restaurant_update_attribuets(response['restaurants'])
       end # end while
 
-      customers_viewed += Customer.near([customer.lat, customer.lng], 0.5).map(&:id) if max_number < 100
-      customers_viewed += Customer.near([customer.lat, customer.lng], 0.2).map(&:id) if max_number >= 100
+      customers_viewed += max_number < 100 ? Customer.near([customer.lat, customer.lng], 0.5).map(&:id) : Customer.near([customer.lat, customer.lng], 0.2).map(&:id)
       customers = customers.select{ |x| !customers_viewed.include?x.id }
     end
   end # end def
@@ -66,6 +65,11 @@ module ZomatoCalculation
       next if restaurant.nil?
       next if ZomatoRestaurant.filter_by_id(restaurant['id']).count > 0
 
+      customer = Customer.where('Round(lat, 4) = ? AND Round(lng, 3) = ? AND actual_name LIKE ?', restaurant['location']['latitude'].to_f.round(4), restaurant['location']['longitude'].to_f.round(3), restaurant['name']).first
+      customer_id = (customer.nil?) ? nil : customer.id
+      lead = CustomerLead.where('Round(latitude, 4) = ? AND Round(longitude, 3) = ? AND actual_name LIKE ?', restaurant['location']['latitude'].to_f.round(4), restaurant['location']['longitude'].to_f.round(3), restaurant['name']).first
+      lead_id = (lead.nil?) ? nil : lead.id
+
       restaurant_attr = {id: restaurant['id'], name: restaurant['name'],\
           url: restaurant['url'], address: restaurant['location']['address'],\
           locality: restaurant['location']['locality'],\
@@ -74,9 +78,21 @@ module ZomatoCalculation
           zipcode: restaurant['location']['zipcode'],\
           country_id: restaurant['location']['country_id'],\
           average_cost_for_two: restaurant['average_cost_for_two'],\
-          cuisines: restaurant['cuisines'], active: 1 }
+          cuisines: restaurant['cuisines'], active: 1,\
+          customer_id: customer_id, customer_lead_id: lead_id
+         }
       ZomatoRestaurant.new().update_attributes(restaurant_attr)
     end # end resposne.each
+  end
+
+  def update_customer_or_lead_for_zomato
+    ZomatoRestaurant.where('customer_id IS NULL AND customer_lead_id IS NULL').each do |restaurant|
+      customer = Customer.where('Round(lat, 4) = ? AND Round(lng, 3) = ? AND actual_name LIKE ?', restaurant.latitude.to_f.round(4), restaurant.longitude.to_f.round(3), restaurant.name).first
+      restaurant.customer_id = (customer.nil?) ? nil : customer.id
+      lead = CustomerLead.where('Round(latitude, 4) = ? AND Round(longitude, 3) = ? AND actual_name LIKE ?', restaurant.latitude.to_f.round(4), restaurant.longitude.to_f.round(3), restaurant.name).first
+      restaurant.customer_lead_id = (lead.nil?) ? nil : lead.id
+      restaurant.save if !restaurant.customer_id.nil? || !restaurant.customer_lead_id.nil?
+    end
   end
 
   private
