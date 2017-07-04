@@ -49,7 +49,6 @@ module ZomatoCalculation
         query += '&start=' + start.to_s
         response = HTTParty.get(query, headers: {"user-key" => Rails.application.secrets.zomato_key })
         break if response['restaurants'].nil? || response['restaurants'].blank? || (response['results_shown'] == 0)
-
         max_number = response['results_found']
         start = response['results_start'].to_i + 20
         restaurant_update_attribuets(response['restaurants'])
@@ -83,6 +82,6 @@ module ZomatoCalculation
   private
 
   def get_cuisines
-     [1,151,3,131,193,133,158,287,144,35,153,541,268,38,45,274,134,181,154,55,162,87,471,89,141,179,150,95,264]
+     [1,151,131,193,133,158,287,144,35,153,541,268,38,45,274,134,181,154,55,162,87,471,89,141,179,150,95,264]
   end
 end
