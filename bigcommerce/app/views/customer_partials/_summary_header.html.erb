@@ -14,7 +14,10 @@
         <% @contacts.each do |contact| %>
           <% person = contact.contact%>
           <div class="col-xs-4">
-            <p style="font-size:20px"><%= link_to person.name+": ", controller: 'contact', action: 'summary', contact_id: person.id%></p>
+            <p style="font-size:20px">
+              <%= link_to person.name+": ", controller: 'contact', action: 'summary', contact_id: person.id%>
+              <%= link_to '<i class="glyphicon glyphicon-remove" title="Delete"></i>'.html_safe, {controller: 'customer', action: 'summary', customer_id: @customer.id, customer_name: @customer.actual_name, method: 'delete_contact', contact_id: person.id }, data: {confirm: "Do you want to delete #{person.name} for #{customer.actual_name}?"}%>
+            </p>
             <p style="font-size:20px">
               <%= contact.title%>
               <br/>
