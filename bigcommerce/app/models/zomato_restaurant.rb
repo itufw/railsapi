@@ -3,6 +3,9 @@ class ZomatoRestaurant < ActiveRecord::Base
   belongs_to :customer
   belongs_to :customer_lead
 
+  geocoded_by :address
+  reverse_geocoded_by :latitude, :longitude
+
   scoped_search on: [:name, :address, :locality, :average_cost_for_two, :cuisines]
 
   self.per_page = 15

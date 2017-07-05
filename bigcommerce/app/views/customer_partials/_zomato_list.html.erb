@@ -1,4 +1,4 @@
-<%= render "partials/form_paginate", objects: zomatos %>
+<%= render "partials/form_paginate", objects: zomatos unless zomatos.kind_of? Array  %>
 
 
 <table class = "table table-striped table-bordered table-hover table-responsive">
@@ -18,12 +18,12 @@
 		<td class="num"><%= z.average_cost_for_two %></td>
 		<td><%= z.cuisines %></td>
     <td><%= z.address %></td>
-    <td></td>
+		<%= render 'customer_partials/zomato_icons', restaurant: z%>
 	</tr>
 	<% end %>
 
 </table>
 
 <span style="float:right;">
-<%= paginate(zomatos) %>
+<%= paginate(zomatos) unless zomatos.kind_of? Array  %>
 </span>

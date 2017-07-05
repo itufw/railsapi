@@ -1,0 +1,12 @@
+<%= title "Customers Near #{@zomato.name}"%>
+<h3>Customers Near <%=@zomato.name%></h3>
+
+<h5>Customers</h5>
+<%= render "partials/customer", customers: @customers %>
+<br/>
+<h5>Leads</h5>
+<%= render "lead_partials/leads", leads: @leads %>
+<br/>
+<h5>Zomato List</h5>
+<%= render 'customer_partials/zomato_list', zomatos: @restaurants%>
+<br/>

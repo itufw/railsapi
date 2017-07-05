@@ -226,6 +226,16 @@ class CustomerController < ApplicationController
     @zomato = ZomatoRestaurant.search_for(@search_text).send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
   end
 
+  def near_by
+
+    radius = params[:radius] || 1
+    @per_page = params[:per_page] || Customer.per_page
+
+    @zomato = ZomatoRestaurant.find(params[:zomato_id])
+    @restaurants = ZomatoRestaurant.near([params[:latitude], params[:longitude]], radius.to_i).select{|x| x}
+    @customers = Customer.near([params[:latitude], params[:longitude]], radius.to_i).select{|x| x}
+    @leads = CustomerLead.near([params[:latitude], params[:longitude]], radius.to_i).select{|x| x}
+  end
 
   private
 
