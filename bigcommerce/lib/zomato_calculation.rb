@@ -18,8 +18,10 @@ module ZomatoCalculation
 
   def filter_viewed_spots
     customers_viewed = []
-    ZomatoRestaurant.all.each do |restaurant|
-      customers_viewed += Customer.near([restaurant.latitude, restaurant.longitude], 0.3).map(&:id)
+    restaurants = ZomatoRestaurant.all
+    while !restaurants.blank?
+      customers_viewed += Customer.near([restaurants.first.latitude, restaurants.first.longitude], 2).map(&:id)
+      restaurants -= ZomatoRestaurant.near([restaurants.first.latitude, restaurants.first.longitude], 2)
     end
     customers_viewed.uniq
   end
@@ -34,32 +36,28 @@ module ZomatoCalculation
     # delete following block after data integrated
     customers_viewed = filter_viewed_spots
     customers = customers.select{ |x| !customers_viewed.include?x.id }
-
+    # ------------------------------------------------------------------
 
     while !customers.blank?
-      customer = customers.first
+      customer = customers.last
       query += 'lat=' + customer.lat.to_s
       query += '&lon=' + customer.lng.to_s
       query += '&radius=' + '500'
+      query += '&cuisines=' + get_cuisines.map(&:to_s).join('%2C%20')
 
-      start = 0
-      max_number = 300
-      while start < max_number
-        query += '&cuisines=' + get_cuisines.map(&:to_s).join('%2C%20')
-        query += '&start=' + start.to_s
-        response = HTTParty.get(query, headers: {"user-key" => Rails.application.secrets.zomato_key })
-        break if response['restaurants'].nil? || response['restaurants'].blank? || (response['results_shown'] == 0)
-        max_number = response['results_found']
-        start = response['results_start'].to_i + 20
-        restaurant_update_attribuets(response['restaurants'])
-      end # end while
+      response = HTTParty.get(query, headers: {"user-key" => Rails.application.secrets.zomato_key })
 
-      customers_viewed += max_number < 100 ? Customer.near([customer.lat, customer.lng], 0.5).map(&:id) : Customer.near([customer.lat, customer.lng], 0.2).map(&:id)
+      return if resposne['results_found'].nil?
+      restaurant_update_attribuets(response['restaurants'])
+
+      customers_viewed += (response['results_found'].to_i < 100) ? Customer.near([customer.lat, customer.lng], 5).map(&:id) : Customer.near([customer.lat, customer.lng], 0.5).map(&:id)
       customers = customers.select{ |x| !customers_viewed.include?x.id }
+
     end
   end # end def
 
   def restaurant_update_attribuets(restaurants)
+    return if restaurants.nil? || restaurants.blank?
     restaurants.each do |restaurantL3|
       restaurant = restaurantL3['restaurant']
       next if restaurant.nil?

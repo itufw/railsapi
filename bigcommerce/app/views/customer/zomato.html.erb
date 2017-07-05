@@ -5,5 +5,6 @@
   	<%= render "partials/zomato_filter" %>
   	<%= submit_tag "Filter", class: 'btn btn-primary' %>
   </div>
+  <%= render 'customer_partials/zomato_list', zomatos: @zomato%>
+
 <% end %>
-<%= render 'customer_partials/zomato_list', zomatos: @zomato%>
