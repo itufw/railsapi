@@ -1,0 +1,100 @@
+<table class = "table table-striped table-bordered table-hover table-responsive customer-list-table">
+  <!-- Customers -->
+  <tr>
+    <th colspan="4">Customers</th>
+  </tr>
+	<tr>
+		<th>Sales Rep</th>
+		<th colspan="2">Name</th>
+		<th colspan="2">Address </th>
+		<th>Phone</th>
+	</tr>
+	<% customers.each do |c| %>
+	<tr>
+		<%= render "partials/staff_update_form", customer: c, staff: c.staff, can_update_staff: allow_to_update(session[:user_id]) %>
+		<% cust_name = customer_name(c) %>
+		<td colspan="2"><%= link_to cust_name, controller: 'customer', action: 'summary', customer_id: c.id, customer_name: cust_name %></td>
+		<td colspan="2"><%= c.address %></td>
+		<td><%= c.phone  %></td>
+	</tr>
+	<% end %>
+  <!-- Leads -->
+  <tr>
+    <th colspan="4">Leads</th>
+  </tr>
+  <tr>
+    <th>Sales Rep</th>
+    <th colspan="2">Name</th>
+		<th colspan="2">Address </th>
+    <th>Phone</th>
+  </tr>
+  <% leads.each do |l|%>
+  <tr>
+    <tr>
+      <%= render 'lead_partials/lead_staff_update', lead_id: l.id, staff_id: l.staff_id, can_update_staff: allow_to_update(session[:user_id])%>
+      <td colspan="2"><%= link_to l.actual_name, controller: 'lead', action: 'summary', lead_id: l.id%></td>
+      <td colspan="2"><%= lead_address(l)%></td>
+      <td><%= l.phone %></td>
+    </tr>
+  </tr>
+  <% end %>
+  <!-- Zomato Restaurants -->
+  <tr>
+    <th colspan="4">Other Restaurants</th>
+  </tr>
+  <tr>
+    <th>Sales Rep</th>
+    <th>Name</th>
+    <th>Address</th>
+    <th>Locality <%= render "partials/sort_arrows", order: 'order_by_locality' %></th>
+    <th>Average Cost <%= render "partials/sort_arrows", order: 'order_by_cost' %></th>
+    <th>Cuisine <%= render "partials/sort_arrows", order: 'order_by_cuisine' %></th>
+  </tr>
+  <% restaurants.each do |z| %>
+  <tr>
+    <td>---</td>
+    <td><a href="<%= z.url%>"><%=z.name%></a></td>
+    <td><%= z.address %></td>
+    <td><%= z.locality %></td>
+    <td class="num"><%= z.average_cost_for_two %></td>
+    <td><%= z.cuisines %></td>
+  </tr>
+  <% end %>
+</table>
+
+<script type="text/javascript">
+
+  function exportTableToCSV($table, filename) {
+      var $rows = $table.find('tr:has(td),tr:has(th)'),
+          // Temporary delimiter characters unlikely to be typed by keyboard
+          // This is to avoid accidentally splitting the actual contents
+          tmpColDelim = String.fromCharCode(11), // vertical tab character
+          tmpRowDelim = String.fromCharCode(0), // null character
+          // actual delimiter characters for CSV format
+          colDelim = '","',
+          rowDelim = '"\r\n"',
+          // Grab text from table into CSV formatted string
+          csv = '"' + $rows.map(function (i, row) {
+              var $row = $(row), $cols = $row.find('td,th');
+
+              return $cols.map(function (j, col) {
+                  var $col = $(col), text = $col.text();
+
+                  return text.replace(/"/g, '""'); // escape double quotes
+
+              }).get().join(tmpColDelim);
+
+          }).get().join(tmpRowDelim)
+              .split(tmpRowDelim).join(rowDelim)
+              .split(tmpColDelim).join(colDelim) + '"',
+
+          // Data URI
+          csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csv);
+          console.log(csv);
+          $(this).attr({ 'download': filename, 'href': csvData, 'target': '_blank' });
+  }
+
+  $(".export_csv_button").on('click', function (event) {
+    exportTableToCSV.apply(this, [$('.customer-list-table'), 'customer-list.csv']);
+  });
+</script>

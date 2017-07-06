@@ -227,14 +227,28 @@ class CustomerController < ApplicationController
   end
 
   def near_by
+    @search_text = params['search']
 
-    radius = params[:radius] || 1
-    @per_page = params[:per_page] || Customer.per_page
+    radius = params[:radius] || 0.5
 
-    @zomato = ZomatoRestaurant.find(params[:zomato_id])
-    @restaurants = ZomatoRestaurant.near([params[:latitude], params[:longitude]], radius.to_i).select{|x| x}
-    @customers = Customer.near([params[:latitude], params[:longitude]], radius.to_i).select{|x| x}
-    @leads = CustomerLead.near([params[:latitude], params[:longitude]], radius.to_i).select{|x| x}
+    customer = Customer.where('lat IS NOT NULL').search_for(@search_text).first
+    customer = ZomatoRestaurant.search_for(@search_text).first if customer.nil?
+    customer = CustomerLead.where('latitude IS NOT NULL').search_for(@search_text).first if customer.nil?
+    latitude = (customer.is_a? Customer) ? customer.lat : customer.latitude
+    longitude = (customer.is_a? Customer) ? customer.lng : customer.longitude
+    
+    @customers, @leads, @resaurants = near_by_customers(latitude, longitude, radius)
+  end
+
+  def map_geocode
+    latLng = params[:geocode].split(/[(,) ]/)
+    distance = params[:distance] || 1
+    latitude = latLng.second.to_f.round(4)
+    longitude = latLng.last.to_f.round(3)
+    @customers, @leads, @restaurants = near_by_customers(latitude, longitude, distance)
+    respond_to do |format|
+      format.js
+    end
   end
 
   private
