@@ -34,7 +34,7 @@ every 1.day, :at => Time.zone.parse('1:00 pm').utc do
 	rake "updates:balanceupdate"
 end
 
-every 1.day, :at => Time.zone.parse('8:30 am').utc do
+every 1.day, :at => Time.zone.parse('8:30 pm').utc do
 	rake "updates:timeperiods"
 end
 

@@ -47,7 +47,7 @@ module ZomatoCalculation
 
       response = HTTParty.get(query, headers: {"user-key" => Rails.application.secrets.zomato_key })
 
-      return if resposne['results_found'].nil?
+      return if response['results_found'].nil?
       restaurant_update_attribuets(response['restaurants'])
 
       customers_viewed += (response['results_found'].to_i < 100) ? Customer.near([customer.lat, customer.lng], 5).map(&:id) : Customer.near([customer.lat, customer.lng], 0.5).map(&:id)
@@ -80,7 +80,7 @@ module ZomatoCalculation
           customer_id: customer_id, customer_lead_id: lead_id
          }
       ZomatoRestaurant.new().update_attributes(restaurant_attr)
-    end # end resposne.each
+    end # end response.each
   end
 
   def update_customer_or_lead_for_zomato
