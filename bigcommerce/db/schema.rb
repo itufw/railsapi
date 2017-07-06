@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170704034517) do
+ActiveRecord::Schema.define(version: 20170706024743) do
 
   create_table "SalesForce_Lead_full", primary_key: "Id", force: :cascade do |t|
     t.string  "FirstName",                 limit: 38
@@ -1245,20 +1245,20 @@ ActiveRecord::Schema.define(version: 20170704034517) do
   add_index "xero_op_allocations", ["xero_overpayment_id"], name: "index_xero_op_allocations_on_xero_overpayment_id", using: :btree
 
   create_table "xero_overpayments", primary_key: "xero_overpayment_id", force: :cascade do |t|
-    t.string   "xero_contact_id",   limit: 36,                 null: false
+    t.string   "xero_contact_id",   limit: 36,                           null: false
     t.string   "contact_name",      limit: 255
-    t.decimal  "sub_total",                     precision: 10
-    t.decimal  "total_tax",                     precision: 10
-    t.decimal  "total",                         precision: 10
-    t.decimal  "remaining_credit",              precision: 10
+    t.decimal  "sub_total",                     precision: 10, scale: 2
+    t.decimal  "total_tax",                     precision: 10, scale: 2
+    t.decimal  "total",                         precision: 10, scale: 2
+    t.decimal  "remaining_credit",              precision: 10, scale: 2
     t.datetime "date"
     t.datetime "updated_date"
     t.string   "status",            limit: 255
     t.string   "line_amount_types", limit: 255
     t.string   "currency_code",     limit: 255
     t.boolean  "has_attachments"
-    t.datetime "created_at",                                   null: false
-    t.datetime "updated_at",                                   null: false
+    t.datetime "created_at",                                             null: false
+    t.datetime "updated_at",                                             null: false
     t.string   "note",              limit: 255
   end
 
@@ -1321,6 +1321,13 @@ ActiveRecord::Schema.define(version: 20170704034517) do
     t.datetime "end_time"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "zomato_cuisines", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.integer  "active",     limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
   end
 
   create_table "zomato_entities", force: :cascade do |t|

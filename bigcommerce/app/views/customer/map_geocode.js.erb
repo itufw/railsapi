@@ -1,0 +1,13 @@
+
+handler.removeMarkers(customer_markers);
+handler.removeMarkers(lead_markers);
+handler.removeMarkers(restaurant_markers);
+
+<% customer_markers, lead_markers, restaurant_markers =  marks_by_distance(@customers, @leads, @restaurants) %>
+
+customer_markers = handler.addMarkers(<%=raw customer_markers.to_json%>);
+lead_markers = handler.addMarkers(<%= raw lead_markers.to_json%>);
+restaurant_markers = handler.addMarkers(<%= raw restaurant_markers.to_json%>);
+
+
+customer_table.html("<%=j render 'customer_partials/all_customers_list', customers: @customers, leads: @leads, restaurants: @restaurants%>");

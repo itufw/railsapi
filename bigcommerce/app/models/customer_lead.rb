@@ -66,6 +66,10 @@ class CustomerLead < ActiveRecord::Base
     where('actual_name LIKE ?', actual_name)
   end
 
+  def self.active_lead
+    where(id: TaskRelation.select(:customer_lead_id).map(&:customer_lead_id))
+  end
+
   def self.order_by_name(direction)
     order('actual_name ' + direction)
   end

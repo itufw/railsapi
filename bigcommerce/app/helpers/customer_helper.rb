@@ -33,4 +33,59 @@ module CustomerHelper
     orders = orders.include_all.send(order_function, direction).paginate(per_page: per_page, page: params[:page])
     [orders, per_page]
   end
+
+  def marks_by_distance(customers, leads, zomato_restaurants)
+    # "<a href=\"http://188.166.243.138/customer/summary?customer_id=#{customer_id}&customer_name=#{customer_map[customer_id]["name"]}\">#{customer_map[customer_id]["name"]}</a>
+    #                         <br/><br/>
+    #                         <p>#{customer_map[customer_id]["infowindow"]}<p>"
+    customer_hash = Gmaps4rails.build_markers(customers) do |customer, marker|
+      marker.lat customer.lat
+      marker.lng customer.lng
+      marker.picture({
+                        :url    => ActionView::Base.new.image_path('map_icons/bottle_shop_green.png'),
+                        :width  => 30,
+                        :height => 30
+                       })
+      marker.infowindow link_to "Customer:" + customer.actual_name, controller: 'customer', action: 'summary', customer_id: customer.id, customer_name: customer.actual_name
+      marker.json ({
+        :customer_id => customer.id,
+        })
+    end
+
+    lead_hash = Gmaps4rails.build_markers(leads) do |lead, marker|
+      marker.lat lead.latitude
+      marker.lng lead.longitude
+      marker.picture({
+                        :url    => ActionView::Base.new.image_path('map_icons/people_red.png'),
+                        :width  => 30,
+                        :height => 30
+                       })
+      marker.infowindow link_to "lead:" + lead.actual_name, controller: 'lead', action: 'summary', lead_id: lead.id
+      marker.json ({
+        :lead_id => lead.id,
+        })
+    end
+
+    restaurant_hash = Gmaps4rails.build_markers(zomato_restaurants) do |restaurant, marker|
+      marker.lat restaurant.latitude
+      marker.lng restaurant.longitude
+      marker.picture({
+                        :url    => ActionView::Base.new.image_path('map_icons/restaurant_maroon.png'),
+                        :width  => 30,
+                        :height => 30
+                       })
+      marker.infowindow "<a href=\"#{restaurant.url}\">#{restaurant.name}</a>
+                                  <br/><br/>
+                                  <p>Zomato<p>"
+    end
+    [customer_hash, lead_hash, restaurant_hash]
+  end
+
+  def near_by_customers(latitude, longitude, radius)
+    restaurants = ZomatoRestaurant.near([latitude, longitude], radius.to_f, units: :km).select{|x| x}
+    customers = Customer.near([latitude, longitude], radius.to_f, units: :km).select{|x| x}
+    leads = CustomerLead.active_lead.near([latitude, longitude], radius.to_f, units: :km).select{|x| x}
+
+    [customers, leads, restaurants]
+  end
 end

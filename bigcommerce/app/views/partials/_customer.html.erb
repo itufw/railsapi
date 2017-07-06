@@ -1,4 +1,4 @@
-<%= render "partials/form_paginate", objects: customers unless customers.kind_of? Array %>
+<%= render "partials/form_paginate", objects: customers %>
 
 
 <table class = "table table-striped table-bordered table-hover table-responsive">
@@ -28,5 +28,5 @@
 </table>
 
 <span style="float:right;">
-<%= paginate(customers) unless customers.kind_of? Array %>
+<%= paginate(customers) %>
 </span>

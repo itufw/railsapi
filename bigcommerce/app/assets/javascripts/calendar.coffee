@@ -10,3 +10,12 @@ $(document).ready ->
       data:{
         calendar_staff_selected: $(this).find('a').attr('staff_id')
       };
+  $('.map-geocode').on "change", ->
+    $.ajax
+      url: "/customer/map_geocode"
+      type: "GET"
+      dataType: "script"
+      data:{
+        geocode: $('.map-geocode').val(),
+        distance: $('.map-distance').val()
+      };
