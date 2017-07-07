@@ -6,7 +6,7 @@
 <div class="row">
   <%= render 'activity_partials/customer_search', activity: @parent%>
   <%= render 'activity_partials/note_table', f: f, activity: @parent%>
-  <%= render 'activity_partials/wine_note', activity: @parent, products: @products %>
+  <%= render 'activity_partials/wine_note', activity: @parent %>
   <div class="col-md-8 complete_form">
   <%= button_tag(type: 'submit', class: 'btn btn-primary') do %>
     <div> Save </div>

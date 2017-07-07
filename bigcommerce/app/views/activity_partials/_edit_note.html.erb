@@ -1,7 +1,7 @@
 <div class="row">
   <%= render 'activity_partials/customer_search', activity: activity%>
   <%= render 'activity_partials/note_table', f: f, activity: activity%>
-  <%= render 'activity_partials/wine_note', activity: activity, products: @products%>
+  <%= render 'activity_partials/wine_note', activity: activity%>
   <div class="col-md-8 complete_form">
   <%= button_tag(type: 'submit', class: 'btn btn-primary') do %>
     <div> Edit </div>

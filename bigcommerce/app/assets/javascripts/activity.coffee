@@ -19,16 +19,7 @@ $(document).ready ->
       data:{
         customer_search_text: $("#customer_search").val()
       };
-
-  $('.activity-leads').on "click", ->
-    $.ajax
-      url: "/activity/add_note"
-      type: "GET"
-      dataType: "script"
-      data:{
-        lead_search_text: $("#lead_search").val()
-      };
-
+      
   $('.activity-staffs').on "click", ->
     $.ajax
       url: "/activity/add_activity"
@@ -36,15 +27,6 @@ $(document).ready ->
       dataType: "script"
       data:{
         staff_search_text: $("#staff_search").val()
-      };
-
-  $('.wine-list-product').on "click", ->
-    $.ajax
-      url: "/activity/add_note"
-      type: "GET"
-      dataType: "script"
-      data:{
-        product_selected: $(this).attr('id')
       };
 
   $(".save-as-sample").on "click", ->
