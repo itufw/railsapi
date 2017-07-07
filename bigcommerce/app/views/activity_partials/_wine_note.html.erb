@@ -29,6 +29,7 @@
       <th>Notes</th>
       <th>Buy</th>
       <th>Rating</th>
+      <th>Tasted</th>
     </tr>
     <% unless activity.nil?
         begin
@@ -46,6 +47,7 @@
             <%= number_field_tag(:rating, nil, {min: 1, max:5, step:1, id: 'rate_'+p_note.product_id.to_s}) %>
             <%=rateit(type:"span", backingfld: '#rate_'+p_note.product_id.to_s, max:5, min:1, step:1, resetable:'false')%>
         </td>
+        <td><%= check_box_tag 'tasted[]', p_note.product_id.to_s, (p_note.tasted == 1 ? true : false)%></td>
         <td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>
       </tr>
     <%
@@ -75,8 +77,9 @@
             '<td><input type="text" name="discount '+ data.item.id +'" id="discount_'+ data.item.id +'" value="0" placeholder="Discount" size="3"> %</td>',
             '<td><input type="text" name="price '+ data.item.id +'" id="price_'+ data.item.id +'" value="'+ data.item.price +'" placeholder="Price" size="5"></td>',
             '<td><input type="text" name="note '+ data.item.id +'" id="note_'+ data.item.id +'" value=""></td>',
-            '<td><input type="checkbox" name="buy_wine[]" id="buy_wine_" value="'+ data.item.id +'"></td>',
+            '<td><input type="checkbox" name="buy_wine[]" id="buy_wine_'+ data.item.id +'" value="'+ data.item.id +'"></td>',
             '<td><input type="number" name="rate '+ data.item.id +'" id="rate_'+ data.item.id +'" value="1" min="1" max="5" step="1"><span data-rateit-backingfld="#rate_'+ data.item.id +'" data-rateit-max="5" data-rateit-min="1" data-rateit-step="1" data-rateit-resetable="false" class="rateit"></span></td>',
+            '<td><input type="checkbox" name="tasted[]" id="tasted_'+ data.item.id +'" value="'+ data.item.id +'"></td>',
             '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
         '</tr>'
         ].join(''));

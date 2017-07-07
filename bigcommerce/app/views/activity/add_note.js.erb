@@ -18,6 +18,7 @@ $('.wine-list-product').click(function(){
             '<%= number_field_tag("rate "+product.id.to_s, 1, {min: 1, max:5, step:1, id: "rate_"+product.id.to_s}) %>',
             '<%= rateit(type:"span", backingfld: "#rate_"+product.id.to_s, max:5, min:1, step:1, resetable:"false")%>',
           '</td>',
+          '<td><%= check_box_tag 'tasted[]', product.id.to_s, true%></td>',
           '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
       '</tr>'
       ].join(''));
