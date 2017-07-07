@@ -6,7 +6,7 @@
   <%= render 'activity_partials/customer_search', activity: @parent%>
   <%= render 'activity_partials/task_table', f: f, activity: @parent%>
   <% if @task.parent_task.nil?%>
-    <%= render 'activity_partials/wine_note', activity: @parent, products: @products%>
+    <%= render 'activity_partials/wine_note', activity: @parent %>
   <% else %>
     <%= render 'activity_partials/wine_note_saved'%>
   <% end %>

@@ -7,7 +7,7 @@ class ActivityController < ApplicationController
   autocomplete :product, :name, full: true
   autocomplete :customer, :actual_name, full: true
   autocomplete :customer_lead, :actual_name, full: true
-  autocomplete :contact, :name, display_value: :display_position, scopes: :sales_force
+  autocomplete :contact, :name, display_value: :display_position
   autocomplete :staff, :nickname
 
   include ActivityHelper
@@ -18,7 +18,6 @@ class ActivityController < ApplicationController
     @customers, @contacts \
       = customer_search(params)
 
-    # @products = product_search
     @note = Task.new
     if params[:note_id] && Task.where('tasks.id = ?', params[:note_id]).count > 0
       @note.parent_task = params[:note_id]
@@ -45,8 +44,6 @@ class ActivityController < ApplicationController
     # ['tr_1000','tr_2000']
     @sample_products = params[:sample_products] || nil
 
-    # TEST VERSION
-    # @products = Product.sample_products(35, 20)
 
     @search_text = params[:product_search_text] || nil
 
@@ -55,14 +52,6 @@ class ActivityController < ApplicationController
     @customer_text = params[:customer_search_text] || nil
 
     @lead_text = params[:lead_search_text] || nil
-
-    # production version
-    if 'Sales Executive' == session[:authority]
-      @products = Product.sample_products(session[:user_id], 20)
-    else
-      @products = Product.sample_products(35, 20)
-    end
-
   end
 
   def save_note
@@ -104,13 +93,6 @@ class ActivityController < ApplicationController
     @function, @subjects = function_search(params, @parent)
     @staff = Staff.active
 
-      # @products = Product.sample_products(session[:user_id], 20)
-      if %w['Sales Executive'].include? session[:authority]
-        @products = Product.sample_products(session[:user_id], 20)
-      else
-        @products = Product.sample_products(35, 20)
-      end
-
     @staff_text = params[:staff_search_text]
   end
 
@@ -130,21 +112,25 @@ class ActivityController < ApplicationController
     end
     @function, @subjects = function_search(params)
     @staff = Staff.active
-    if 'Sales Executive' == session[:authority]
-      @products = Product.sample_products(session[:user_id], 20)
-    else
-      @products = Product.sample_products(35, 20)
-    end
   end
 
   def update
     activity = note_update(note_params, session[:staff_id], params[:activity_id])
-    customer_id = relation_save(params, activity)
+    customer_id, destination = relation_save(params, activity)
 
     task_product_note(params, activity, session[:user_id])
-    redirect_to controller: 'customer', action: 'summary', customer_id: customer_id, customer_name: Customer.find(customer_id).actual_name
+    if destination == 'customer'
+      redirect_to controller: 'customer', action: 'summary', customer_id: customer_id, customer_name: Customer.find(customer_id).actual_name
+      return
+    end
+
+    redirect_to controller: 'lead', action: 'summary', lead_id: customer_id
   end
 
+  def autocomplete_product_name
+    products = Product.search_for(params[:term]).order(:name).all
+    render :json => products.map { |product| {:id => product.id, :label => product.name, :value => product.name, :price => (product.calculated_price * (1.29)).round(2)} }
+  end
 
   # -----------private --------------------
   private

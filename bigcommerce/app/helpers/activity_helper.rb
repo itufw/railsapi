@@ -97,8 +97,12 @@ module ActivityHelper
     task.gcal_status = ('yes' == params['event_column']) ? 'pending' : 'na'
     customers = params.keys.select { |x| x.start_with?('customer ') }.map(&:split).map(&:last)
     customer_id = customers.first
+    assign_to = 'customer' unless customer_id.nil?
     staffs = params.keys.select { |x| x.start_with?('staff ') }.map(&:split).map(&:last)
     leads = params.keys.select { |x| x.start_with?('lead ') }.map(&:split).map(&:last)
+    assign_to = 'lead' if customer_id.nil?
+    customer_id = leads.first if customer_id.nil?
+
     [customers, staffs, leads].max_by(&:length).each do |f|
       tr = TaskRelation.new
       tr.task_id = task_id
@@ -108,7 +112,7 @@ module ActivityHelper
       tr.save
     end
     task.save
-    customer_id
+    [customer_id,assign_to]
   end
 
   def product_note_version_update(activity_id)
@@ -145,6 +149,16 @@ module ActivityHelper
       task.pro_note_include = params['selected_wine_note'].join(',')
       task.save
     end
+  end
+
+  def find_sample_products(staff_id)
+    customer_id = Staff.find(staff_id).pick_up_id || 2086
+    products = []
+    Order.where(customer_id: customer_id).order('id DESC').limit(10).each do |order|
+      products += order.products
+      return products if products.count >= 20
+    end
+    products
   end
 
   # -------------------------

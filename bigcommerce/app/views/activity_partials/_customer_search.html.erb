@@ -33,7 +33,6 @@
         <th>Lead</th>
         <td>
             <%= autocomplete_field_tag 'lead_name', '', autocomplete_customer_lead_actual_name_activity_index_path, placeholder: 'Search Lead', id: 'lead_search',size: 15 %>
-            <i class="glyphicon glyphicon-plus activity-leads" title="Include Lead"></i>
         </td>
       </tr>
       <% unless relations.nil?
@@ -64,6 +63,22 @@
   <br/>
 </div>
 <script>
+  $('#lead_search').bind('railsAutocomplete.select', function(event, data){
+    if($('#tr_lead_'+ data.item.id ).length == 0){
+      console.log(data.item);
+
+      $('#lead_table').append([
+        '<tr id="tr_lead_'+ data.item.id +'">',
+          '<td colspan="2"><input type="text" name="lead '+ data.item.id +'" id="lead_'+ data.item.id +'" value="'+ data.item.label +'" readonly="readonly"><i class="glyphicon glyphicon-remove remove_lead" title="remove"></i></td>',
+        '</tr>'
+      ].join(''));
+      $('.remove_lead').click(function(){
+        $(this).parent().parent().remove();
+      });
+    }
+  });
+
+
   $('.remove_customer').click(function(){
     $(this).parent().parent().remove();
   });

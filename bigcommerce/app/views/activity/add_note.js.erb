@@ -1,54 +1,6 @@
-$('.add_row_product').click(function(){
-  <%unless @search_text.nil?
-    products = Product.where('products.name = ?', @search_text)
-    append_product = products.first
-  end
-  unless append_product.nil?
-    wet = TaxPercentage.wet_percentage * 0.01
-  %>
-  if ($('#product_search').val() != ""){
-        if($('#tr_<%=append_product.id%>').length == 0){
-          $('#product_table').append([
-            '<tr id="tr_<%=append_product.id%>">',
-                '<td><%= append_product.id%></td>',
-                '<td><%= text_field_tag 'product_name '+append_product.id.to_s, append_product.name, readonly:true %></td>',
-                '<td class="num"><%= text_field_tag 'price_luc '+append_product.id.to_s, "%.2f" %(append_product.calculated_price * (1 + wet)), readonly: true%></td>',
-                '<td><%= text_field_tag 'discount '+append_product.id.to_s,  0, placeholder: 'Discount', size: 3 %> %</td>',
-                '<td><%= text_field_tag 'price '+append_product.id.to_s,"%.2f" %(append_product.calculated_price * (1 + wet)), placeholder: 'Price', size: 5%></td>',
-                '<td><%= text_field_tag 'note '+append_product.id.to_s, ''%></td>',
-                '<td><%= check_box_tag 'buy_wine[]', append_product.id.to_s%> </td>',
-                '<td>',
-                    '<%= number_field_tag(:rating, nil, {min: 1, max:5, step:1, id: 'rate_'+append_product.id.to_s}) %>',
-                    '<%=rateit(type:"span", backingfld: '#rate_'+append_product.id.to_s, max:5, min:1, step:1, resetable:'false')%>',
-                '</td>',
-                '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
-            '</tr>'
-            ].join(''));
-
-            $('#price_<%= append_product.id %>').on('input',function(){
-              var d = $('#price_<%= append_product.id %>').val();
-              var c = '<%= append_product.calculated_price * (1 + wet)%>';
-              $('#discount_<%= append_product.id %>').val((100 - (d/c*100)).toFixed(0));
-            });
-
-            $('#discount_<%= append_product.id %>').on('input',function(){
-              var d = $('#discount_<%= append_product.id %>').val();
-              var c = '<%= append_product.calculated_price * (1 + wet)%>';
-              $('#price_<%= append_product.id %>').val(((1-d*0.01)*c).toFixed(2));
-            });
-
-            $('.remove_row').click(function(){
-              $(this).parent().parent().remove();
-            });
-          }
-  }
-  <%end%>
-});
-
-
 $('.wine-list-product').click(function(){
   <%
-      product = @products.select { |x| x.id == @product_selected.to_i }.first
+      product = Product.find(@product_selected.to_i) unless @product_selected.nil?
       unless product.nil?
         wet = TaxPercentage.wet_percentage * 0.01
   %>
@@ -126,27 +78,6 @@ $('.activity-customers').click(function(){
             var att = $(this).parent().parent().attr('id').split('_');
             var customer_id = att[att.length -1 ]
             $('.tr_invoice_'+customer_id).remove();
-            $(this).parent().parent().remove();
-          });
-        }
-  }
-  <%end%>
-});
-
-
-$('.activity-leads').click(function(){
-  <%
-    lead = @lead_text==nil ? nil : CustomerLead.where('actual_name = ?', @lead_text).first
-    unless lead.nil?
-  %>
-  if ($('#lead_search').val() != ""){
-        if($('#tr_lead_<%=lead.id%>').length == 0){
-          $('#lead_table').append([
-            '<tr id="tr_lead_<%=lead.id%>">',
-                '<td colspan="2"><%= text_field_tag 'lead '+lead.id.to_s, lead.actual_name, readonly: true %><i class="glyphicon glyphicon-remove remove_lead" title="remove"></i></td>',
-            '</tr>'
-            ].join(''));
-          $('.remove_lead').click(function(){
             $(this).parent().parent().remove();
           });
         }
