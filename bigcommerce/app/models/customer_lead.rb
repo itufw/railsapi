@@ -4,6 +4,7 @@ require 'clean_data.rb'
 class CustomerLead < ActiveRecord::Base
   include CleanData
   has_many :contacts
+  has_many :task_relations
   has_many :tasks, through: :task_relations
   belongs_to :cust_type
   belongs_to :cust_group
@@ -80,6 +81,16 @@ class CustomerLead < ActiveRecord::Base
 
   def self.order_by_staff(direction)
     includes(:staff).order('staffs.nickname ' + direction)
+  end
+
+  def self.not_customer
+    where(customer_id: [nil, 0])
+  end
+
+  def turn_customer(customer_id, date = Time.now())
+    self.customer_id = customer_id
+    self.turn_customer_date = date
+    self.save
   end
 
 end

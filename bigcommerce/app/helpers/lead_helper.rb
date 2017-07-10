@@ -11,7 +11,7 @@ module LeadHelper
     order_function = params[:order_col] || 'order_by_name'
     direction = params[:direction] == '1' ? 'DESC' : 'ASC'
 
-    leads = CustomerLead.search_for(search_text).filter_staff(staff_id).filter_cust_style(cust_style_id).send(order_function, direction).paginate( per_page: per_page, page: params[:page])
+    leads = CustomerLead.not_customer.search_for(search_text).filter_staff(staff_id).filter_cust_style(cust_style_id).send(order_function, direction).paginate( per_page: per_page, page: params[:page])
 
     [leads, search_text]
   end
@@ -59,5 +59,26 @@ module LeadHelper
     customer_lead.cust_style_id = spot_style(place.types)
 
     [customer_lead, place]
+  end
+
+  def lead_link_customer(lead, customer_id, datetime = Time.now())
+    customer = Customer.find(customer_id)
+    customer.address = lead.address if customer.address.nil?
+    customer.save
+
+    lead.task_relations.each do |relation|
+      if relation.customer_id.to_i == 0
+        relation.customer_id = customer_id
+        relation.save
+      else
+        TaskRelation.create(task_id: relation.task_id, customer_id: customer_id, completed_date: relation.completed_date)
+      end
+    end
+
+    CustomerTag.where(role: 'Lead', customer_id: lead.id).destroy_all
+    CustomerTag.create(name: customer.actual_name, role: 'Customer', customer_id: customer_id) unless CustomerTag.exist?('Customer', customer_id).count > 0
+
+    lead.turn_customer(customer_id, datetime)
+    customer
   end
 end

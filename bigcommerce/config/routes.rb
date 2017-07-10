@@ -51,7 +51,7 @@ Rails.application.routes.draw do
   resources :calendar do
     get :autocomplete_customer_tag_name, on: :collection
   end
-  
+
   resources :contact do
     get :autocomplete_customer_actual_name, on: :collection
   end
