@@ -2,26 +2,38 @@
 
 <%= form_for @task, :url => {:controller => "activity", :action => "save_task"}, :id => "task_append_form"  do |f| %>
 
+
+
 <div class="row">
-  <%= render 'activity_partials/customer_search', activity: @parent%>
-  <%= render 'activity_partials/task_table', f: f, activity: @parent%>
-  <% if @task.parent_task.nil?%>
-    <%= render 'activity_partials/wine_note', activity: @parent %>
-  <% else %>
-    <%= render 'activity_partials/wine_note_saved'%>
-  <% end %>
-  <div class="col-md-8 complete_form">
-    <%= button_tag(type: 'submit', class: 'btn btn-primary') do %>
-      <div> Save </div>
+  <div class="col-md-4">
+    <div class="row" style="margin-top: -50px;">
+      <%= render 'activity_partials/customer_search', activity: @parent%>
+    </div>
+    <%= render 'activity_partials/task_table', f: f, activity: @parent%>
+  </div>
+  <div class="col-md-8" style="margin-top: 50px;">
+    <% if @task.parent_task.nil?%>
+      <%= render 'activity_partials/wine_note', activity: @parent %>
+    <% else %>
+      <%= render 'activity_partials/wine_note_saved'%>
     <% end %>
   </div>
-  <div class="col-md-8 incomplete_form">
+</div>
+
+<div class="row">
+  <div class="col-md-4 col-md-offset-4 complete_form">
+  <%= button_tag(type: 'submit', class: 'btn btn-primary') do %>
+    <div> Save </div>
+  <% end %>
+  </div>
+  <div class="col-md-4 col-md-offset-4 incomplete_form">
     <p style="color: red" class="activity_reminder">Please Select Subject / Customer / Staff</p>
-    <button type="button" class="btn btn-secondary disabled" disabled>
+    <button name="button" class="btn btn-secondary disabled" disabled>
       <div>Save</div>
     </button>
   </div>
 </div>
+
 <% end %>
 <script>
 var TaskCompleteForm = function(){

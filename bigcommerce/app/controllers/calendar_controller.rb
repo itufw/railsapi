@@ -6,7 +6,7 @@ class CalendarController < ApplicationController
   skip_before_action :verify_authenticity_token
   before_action :confirm_logged_in
 
-  autocomplete :customer_tag, :name, extra_data: [:customer_id], full: true
+  autocomplete :customer_tag, :name, extra_data: [:customer_id, :role], full: true
 
   include CalendarHelper
   include ModelsFilter
@@ -201,4 +201,5 @@ class CalendarController < ApplicationController
     @per_page = params[:per_page] || Customer.per_page
     @customers = Customer.filter_by_ids(customer_map.keys).include_all.send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
   end
+
 end

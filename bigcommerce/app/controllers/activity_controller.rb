@@ -6,9 +6,9 @@ class ActivityController < ApplicationController
 
   autocomplete :product, :name, full: true
   autocomplete :customer, :actual_name, full: true
-  autocomplete :customer_lead, :actual_name, full: true
+  autocomplete :customer_lead, :actual_name, full: true, scopes: :not_customer
   autocomplete :contact, :name, display_value: :display_position
-  autocomplete :staff, :nickname
+  autocomplete :staff, :nickname, extra_data: [:nickname]
 
   include ActivityHelper
 
@@ -43,7 +43,6 @@ class ActivityController < ApplicationController
     # Sample products from table
     # ['tr_1000','tr_2000']
     @sample_products = params[:sample_products] || nil
-
 
     @search_text = params[:product_search_text] || nil
 
@@ -92,8 +91,6 @@ class ActivityController < ApplicationController
 
     @function, @subjects = function_search(params, @parent)
     @staff = Staff.active
-
-    @staff_text = params[:staff_search_text]
   end
 
   def save_task

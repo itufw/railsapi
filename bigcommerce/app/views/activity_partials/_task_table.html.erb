@@ -1,61 +1,65 @@
-<div class="col-md-8">
-  <div class="col-md-4">
-    Task:
-    <br/>
-    <%= f.text_area :description, :rows=>10, :cols=>35	%>
-  </div>
-  <div class="col-md-8">
-    <%
-      if activity.nil?
-        selected_function = default_function_type(session[:authority])
-        selected_subject = 0
-        selected_method = 'meeting'
-        selected_promotion = 0
-        selected_portfolio = 0
-      else
-        selected_function = activity.function
-        selected_subject = activity.subject_1
-        selected_method = activity.method
-        selected_promotion = activity.promotion_id
-        selected_portfolio = activity.portfolio_id
-      end
-    %>
-
+<div class="row">
+  <%
+    if activity.nil?
+      selected_function = default_function_type(session[:authority])
+      selected_subject = 0
+      selected_method = 'meeting'
+      selected_promotion = 0
+      selected_portfolio = 0
+    else
+      selected_function = activity.function
+      selected_subject = activity.subject_1
+      selected_method = activity.method
+      selected_promotion = activity.promotion_id
+      selected_portfolio = activity.portfolio_id
+    end
+  %>
+  <div class="col-md-3">
     <%= label(:subject_1, "Subject:")%>
     <%= f.collection_select :subject_1, @subjects, :id, :subject, {:prompt => "Select a Subject", :selected => selected_subject}, {class: "subject_selection", style: 'width: 80px'} %>
+  </div>
+  <div class="col-md-3">
     <%= label(:function, "Function:")%>
     <%= f.collection_select :function, @function, :function, :function, {:include_blank => "Select a Function", :selected => selected_function}, {class:"function_selection", style: 'width: 80px'} %>
-    <br/>
+  </div>
+  <div class="col-md-3">
     <%= label(:priority, "Priority:")%>
     <%= f.number_field :priority, {min: 1, max:6, step:1, id: 'task_priority'}%>
     <%= rateit(type:"span", backingfld: '#task_priority', max:6, min:1, step:1, resetable:'false')%>
-
+  </div>
+  <div class="col-md-3">
     <%= label(:method, "Method:")%>
     <%= f.collection_select :method, TaskMethod.all, :method, :method, {:include_blank => "Select a Method", :selected => selected_method}, style: 'width: 80px' %>
-    <br/>
-    <table id="staff_table">
-      <tr>
-        <td>
-          <%= autocomplete_field_tag 'staffs', '', autocomplete_staff_nickname_activity_index_path, placeholder: 'Search Staff', id: 'staff_search' %>
-          <i class="glyphicon glyphicon-plus activity-staffs" title="Include Staff"></i>
-        </td>
-      </tr>
-      <%
-      begin
-        Staff.filter_by_ids(activity.task_relations.map(&:staff_id).append(session[:user_id]).uniq.compact).each do |staff|
-      %>
-        <tr id="tr_staff_<%=staff.id%>">
-          <td><%= text_field_tag 'staff '+staff.id.to_s, staff.nickname, readonly: true %></td>
-          <td><i class="glyphicon glyphicon-remove remove_staff" title="remove"></i></td>
-        </tr>
-      <%
-        end
-      rescue
-      end
-      %>
-    </table>
+  </div>
+</div>
 
-    <!-- Date picker -->
+<div class="row" style="margin-top: -40px;">
+  <table class="col-xs-offset-1" id="staff_table">
+    <tr>
+      <td>
+        <%= autocomplete_field_tag 'staffs', '', autocomplete_staff_nickname_activity_index_path, placeholder: 'Search Staff', id: 'staff_search' %>
+      </td>
+    </tr>
+    <%
+    begin
+      Staff.filter_by_ids(activity.task_relations.map(&:staff_id).append(session[:user_id]).uniq.compact).each do |staff|
+    %>
+      <tr id="tr_staff_<%=staff.id%>">
+        <td><%= text_field_tag 'staff '+staff.id.to_s, staff.nickname, readonly: true %></td>
+        <td><i class="glyphicon glyphicon-remove remove_staff" title="remove"></i></td>
+      </tr>
+    <%
+      end
+    rescue
+    end
+    %>
+  </table>
+</div>
+<!-- Date picker -->
+
+<div class="row">
+  <div class="col-xs-offset-1">
+
     <div id="calendar_timepicker">
       <%= label(:end_date, "end")%>
       <div class='input-group date' id='due_timepicker', style='width: 200px'>
@@ -107,6 +111,17 @@
         </span>
     </div>
   </div>
+</div>
+
+<div class="row">
+  <div class="col-md-7 col-md-offset-1">
+    Task:
+    <br/>
+    <%= f.text_area :description, :rows=>10, :cols=>50	%>
+  </div>
+</div>
+
+<div class="row">
   <%= label(:creator, "Creator:")%>
   <%= session[:username] %>
   <%= label(:create_date, "Create Date") %>
@@ -114,6 +129,20 @@
 </div>
 
 <script>
+  $('#staff_search').bind('railsAutocomplete.select', function (event, data) {
+    if($('#tr_staff_'+data.item.id).length == 0){
+      $('#staff_table').append([
+        '<tr id="tr_staff_'+ data.item.id +'">',
+            '<td colspan="2"><input type="text" name="staff '+data.item.id + '" id="staff_' +data.item.id +'" value="'+ data.item.nickname +'" readonly="readonly"><i class="glyphicon glyphicon-remove remove_staff" title="remove"></i></td>',
+        '</tr>'
+        ].join(''));
+      $('.remove_staff').click(function(){
+        $(this).parent().parent().remove();
+      });
+    }
+  });
+
+
 $('.remove_staff').click(function(){
   $(this).parent().parent().remove();
 });
@@ -121,12 +150,12 @@ $('.remove_staff').click(function(){
 
 $(function () {
   $('#start_timepicker').datetimepicker({
-    format: 'YYYY-MM-DD',
+    format: 'YYYY-MM-DD hh:mm a',
     defaultDate: new Date(),
     sideBySide: true
   });
   $('#due_timepicker').datetimepicker({
-    format: 'YYYY-MM-DD',
+    format: 'YYYY-MM-DD hh:mm a',
     defaultDate: new Date(),
     sideBySide: true
   });
@@ -144,13 +173,9 @@ $(function () {
 $(document).ready(function(){
     $('input[type=radio][name=event_column]').on('change',function(){
       if(this.value == 'yes'){
-        $('#due_timepicker').datetimepicker('format', 'YYYY-MM-DD hh:mm a');
-        $('#start_timepicker').datetimepicker('format', 'YYYY-MM-DD hh:mm a');
         $('#due_timepicker').data("DateTimePicker").date($('#start_timepicker').data("DateTimePicker").date().add("hours", '1'));
         $('#task_timepicker').hide();
       }else{
-        $('#due_timepicker').datetimepicker('format', 'YYYY-MM-DD');
-        $('#start_timepicker').datetimepicker('format', 'YYYY-MM-DD');
         $('#task_timepicker').show();
       }
     });
