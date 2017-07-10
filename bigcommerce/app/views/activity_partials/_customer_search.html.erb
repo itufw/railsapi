@@ -65,8 +65,6 @@
 <script>
   $('#lead_search').bind('railsAutocomplete.select', function(event, data){
     if($('#tr_lead_'+ data.item.id ).length == 0){
-      console.log(data.item);
-
       $('#lead_table').append([
         '<tr id="tr_lead_'+ data.item.id +'">',
           '<td colspan="2"><input type="text" name="lead '+ data.item.id +'" id="lead_'+ data.item.id +'" value="'+ data.item.label +'" readonly="readonly"><i class="glyphicon glyphicon-remove remove_lead" title="remove"></i></td>',
