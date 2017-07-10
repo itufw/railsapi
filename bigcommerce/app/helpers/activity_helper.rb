@@ -123,11 +123,11 @@ module ActivityHelper
     product_note_version_update(task_id)
     product_list = params.keys.select { |x| x.start_with?('note ') }.map(&:split).map(&:last)
     product_list.each do |product_id|
-      pn_save(product_id, staff_id, task_id, params['buy_wine'])
+      pn_save(product_id, staff_id, task_id, params['buy_wine'], params['tasted'])
     end
   end
 
-  def pn_save(product_id, staff_id, task_id, buy_list)
+  def pn_save(product_id, staff_id, task_id, buy_list, tasted_list)
     pn = ProductNote.new
     pn.task_id = task_id
     pn.created_by = staff_id
@@ -138,6 +138,7 @@ module ActivityHelper
     pn.product_name = params['product_name ' + product_id]
     pn.price_luc = params['price_luc ' + product_id]
     pn.intention = (buy_list.include? product_id) ? 1 : 0 unless buy_list.nil?
+    pn.tasted = (tasted_list.include? product_id) ? 1 : 0 unless tasted_list.nil?
     pn.version = 0
     pn.save
   end
