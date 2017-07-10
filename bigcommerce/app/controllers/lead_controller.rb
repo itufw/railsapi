@@ -96,6 +96,15 @@ class LeadController < ApplicationController
     @subjects = TaskSubject.filter_by_ids(@activity.map(&:subject_1).compact)
   end
 
+  def link_leads
+    @leads = CustomerLead.select('customer_leads.id AS lead_id, customer_leads.actual_name AS lead_name, customers.id AS customer_id, customers.actual_name AS customer_name').joins("Left JOIN customers ON customer_leads.actual_name LIKE customers.actual_name").not_customer.where('customer_leads.actual_name IS NOT NULL AND customers.actual_name IS NOT NULL')
+  end
+
+  def turn_customer
+    lead_link_customer(CustomerLead.find(params[:lead_id]), params[:customer_id])
+    redirect_to action: 'link_leads'
+  end
+
 
   # -----------private --------------------
   private

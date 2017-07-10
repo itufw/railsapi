@@ -62,6 +62,10 @@ module LeadHelper
   end
 
   def lead_link_customer(lead, customer_id, datetime = Time.now())
+    unless lead.is_a?CustomerLead
+      lead = CustomerLead.find(lead)
+    end
+
     customer = Customer.find(customer_id)
     customer.address = lead.address if customer.address.nil?
     customer.save
