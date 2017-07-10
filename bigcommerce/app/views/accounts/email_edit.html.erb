@@ -26,7 +26,7 @@
               <%= email_content.text_field :bcc, :maxlength=>"100"	%>
               <br/>
               <%= label(:file_attachment, "Attach PoD:")%>
-              <%= email_content.file_field :attachment, {accept: 'pdf', multiple: true} %>
+              <%= email_content.file_field :attachment, :multiple => true %>
 
               <%= email_content.bootsy_area :content, editor_options: { link: false, html: false, image: false, lists: false, html: true, color: false}, :rows=>5, :cols=>60 %>
 
