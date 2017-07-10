@@ -1,48 +1,60 @@
-<div class="col-md-8">
+<div class="row">
+  <%
+    if activity.nil?
+      selected_function = default_function_type(session[:authority])
+      selected_subject = 0
+      selected_method = 'meeting'
+      selected_promotion = 0
+      selected_portfolio = 0
+    else
+      selected_function = activity.function
+      selected_subject = activity.subject_1
+      selected_method = activity.method
+      selected_promotion = activity.promotion_id
+      selected_portfolio = activity.portfolio_id
+    end
+  %>
   <div class="col-md-4">
+    <%= label(:subject_1, "Subject:")%>
+    <%= f.collection_select :subject_1, @subjects, :id, :subject, {:prompt => "Select a Subject"}, {class: "subject_selection", style: 'width: 80px'} %>
+  </div>
+  <div class="col-md-4">
+    <%= label(:function, "Function:")%>
+    <%= f.collection_select :function, @function, :function, :function, {:include_blank => "Select a Function"}, {class:"function_selection", style: 'width: 80px'} %>
+  </div>
+  <div class="col-md-4">
+    <%= label(:method, "Method:")%>
+    <%= f.collection_select :method, TaskMethod.all, :method, :method, {:include_blank => "Select a Method"}, style: 'width: 80px' %>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-4">
+    <%= label(:promotion, "Promotion:")%>
+    <%= f.collection_select :promotion_id, Promotion.all, :id, :name, {:include_blank => "Select a Campaign"}, style: 'width: 80px' %>
+  </div>
+  <div class="col-md-4">
+    <%= label(:portfolio, "Portfolio:")%>
+    <%= f.collection_select :portfolio_id, Portfolio.all, :id, :name, {:include_blank => "Select a Portfolio"}, style: 'width: 80px' %>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-8">
+    <%= label(:end_date, "Date")%>
+    <div class='input-group date' id='due_timepicker', style='width: 200px'>
+      <%= f.text_field :start_date, placeholder: 'Timepicker', class: 'form-control' %>
+      <span class="input-group-addon">
+        <span class="glyphicon glyphicon-calendar"></span>
+      </span>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-7 col-md-offset-1">
     Note:
     <br/>
-    <%= f.text_area :description, :rows=>10, :cols=>30	%>
+    <%= f.text_area :description, :rows=>10, :cols=>50	%>
   </div>
-  <div class="col-md-8">
-    <%
-      if activity.nil?
-        selected_function = default_function_type(session[:authority])
-        selected_subject = 0
-        selected_method = 'meeting'
-        selected_promotion = 0
-        selected_portfolio = 0
-      else
-        selected_function = activity.function
-        selected_subject = activity.subject_1
-        selected_method = activity.method
-        selected_promotion = activity.promotion_id
-        selected_portfolio = activity.portfolio_id
-      end
-    %>
-    <br/><br/><br/>
-      <%= label(:subject_1, "Subject:")%>
-      <%= f.collection_select :subject_1, @subjects, :id, :subject, {:prompt => "Select a Subject"}, {class: "subject_selection", style: 'width: 80px'} %>
-      <%= label(:function, "Function:")%>
-      <%= f.collection_select :function, @function, :function, :function, {:include_blank => "Select a Function"}, {class:"function_selection", style: 'width: 80px'} %>
-      <br/>
-      <%= label(:method, "Method:")%>
-      <%= f.collection_select :method, TaskMethod.all, :method, :method, {:include_blank => "Select a Method"}, style: 'width: 80px' %>
-      <br/>
-      <%= label(:promotion, "Promotion:")%>
-      <%= f.collection_select :promotion_id, Promotion.all, :id, :name, {:include_blank => "Select a Campaign"}, style: 'width: 80px' %>
-      <%= label(:portfolio, "Portfolio:")%>
-      <%= f.collection_select :portfolio_id, Portfolio.all, :id, :name, {:include_blank => "Select a Portfolio"}, style: 'width: 80px' %>
-      <br/>
-      <%= label(:end_date, "Date")%>
-      <div class='input-group date' id='due_timepicker', style='width: 200px'>
-        <%= f.text_field :start_date, placeholder: 'Timepicker', class: 'form-control' %>
-        <span class="input-group-addon">
-          <span class="glyphicon glyphicon-calendar"></span>
-        </span>
-      </div>
-  </div>
-
 </div>
 
 <script>

@@ -14,6 +14,8 @@ class Customer < ActiveRecord::Base
 	belongs_to :staff
 	belongs_to :xero_contact
 
+	has_many :xero_invoices, through: :xero_contact
+
 	geocoded_by :address
   after_validation :geocode
 
