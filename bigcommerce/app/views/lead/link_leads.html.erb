@@ -1,0 +1,21 @@
+<%= title 'Link Leads to Customers'%>
+<h3>Leads / Customers</h3>
+<center><%= link_to "All lead", action: 'all_leads' %></center>
+
+<table class = "table table-striped table-bordered table-hover table-responsive">
+    <tr>
+      <th>Lead Name</th>
+      <th>Customer Name</th>
+    </tr>
+    <% @leads.each do |lead| %>
+    <tr>
+      <td><%= link_to lead.lead_name, controller: 'lead', action: 'summary', lead_id: lead.lead_id%></td>
+      <td><%= link_to lead.customer_name, controller: 'customer', action:'summary', customer_id: lead.customer_id, customer_name: lead.customer_name%></td>
+      <td><%= link_to '<i class="glyphicon glyphicon-ok" title="Match" style="color: blue;"></i>'.html_safe, controller: 'leads', action: 'turn_customer', lead_id: lead.lead_id, customer_id: lead.customer_id%></td>
+    </tr>
+    <% end %>
+</table>
+
+<script type="text/javascript">
+  // lead_link_customer(CustomerLead.find(lead.lead_id), lead.customer_id)
+</script>
