@@ -271,4 +271,16 @@ class Product < ActiveRecord::Base
   def self.autocomplete(term)
     where('LOWER(name) LIKE ?', term.downcase)
   end
+
+  def self.filter_by_product_id(id)
+    where(id: id)
+  end
+
+  def self.filter_by_product_no_ws_id(id)
+    where(product_no_ws_id: id)
+  end
+
+  def self.filter_by_product_no_vintage_id(id)
+    where(product_no_vintage_id: id)
+  end
 end

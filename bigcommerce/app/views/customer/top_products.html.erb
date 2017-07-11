@@ -3,10 +3,10 @@
 
 <div class="form-group container-fluid">
 	<%= form_tag({:action => "top_products"}, {:method => "get"}) do %>
-	<%= render "partials/product_filter" %>
-	<%= hidden_field_tag :customer_id, @customer_id %>
-   	<%= hidden_field_tag :customer_name, @customer_name %>
-<% end %>
+		<%= render "partials/product_filter" %>
+		<%= hidden_field_tag :customer_id, @customer_id %>
+	  <%= hidden_field_tag :customer_name, @customer_name %>
+	<% end %>
 </div>
 
 <table class = "table table-striped table-bordered table-hover table-responsive">
