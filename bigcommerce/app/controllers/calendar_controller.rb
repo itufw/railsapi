@@ -121,26 +121,15 @@ class CalendarController < ApplicationController
     @methods = TaskMethod.all
     @subjects = TaskSubject.sales_subjects
 
-
-    if user_full_right(session[:authority])
-      if params[:selected_staff].nil?
-        @events = Task.unconfirmed_event.order_by_staff('ASC').paginate(per_page: @per_page, page: params[:page])
-      else
-        @events = Task.filter_by_response(params[:selected_staff]).unconfirmed_event.order_by_staff('ASC').paginate(per_page: @per_page, page: params[:page])
-      end
+    if !params[:selected_staff].nil?
+      @events = Task.filter_by_response(params[:selected_staff]).unconfirmed_event.order_by_staff('ASC').paginate(per_page: @per_page, page: params[:page])
+    elsif user_full_right(session[:authority])
+      @events = Task.unconfirmed_event.order_by_staff('ASC').paginate(per_page: @per_page, page: params[:page])
     else
       @events = Task.unconfirmed_event.filter_by_staff(session[:user_id]).order_by_staff('ASC')
     end
 
     @staffs = Staff.filter_by_ids(Task.unconfirmed_event.map(&:response_staff).uniq)
-
-    des = @events.map { |x| x.description.split('\n').first }
-    loc = @events.map { |x| x.location.split(/[,\n]/).first unless x.location.nil? }
-    pattern = '"' + (des + loc).uniq.compact.map(&:downcase).join('" OR "') + '"'
-    @customers = Customer.search_for(pattern).order_by_name('ASC')
-    @leads = CustomerLead.not_customer.search_for(pattern).order_by_name('ASC')
-
-
   end
 
   # handle the requests for updating events
@@ -203,3 +192,31 @@ class CalendarController < ApplicationController
   end
 
 end
+
+
+# unless event.description.nil?
+#   if event.location.nil?
+#     loc = event.description.split("\n").first.downcase
+#
+#     customer_list = Customer.filter_by_staff(response_staff.first.id).search_for(loc)
+#     lead_list = CustomerLead.filter_by_staff(response_staff.first.id).not_customer.search_for(loc)
+#
+#     customer_list = @customers.select{|x|  x.staff_id == response_staff.first.id && !x.actual_name.nil? && Regexp.union(loc) === x.actual_name.downcase }
+#
+#     lead_list = @leads.select{|x| x.staff_id == response_staff.first.id && Regexp.union(loc) === x.actual_name.downcase }
+#     lead_list = lead_list.each {|x| x.actual_name = x.actual_name.to_s + ', (Lead)'}
+#
+#     customer_list = lead_list + customer_list
+#     customer_list = customer_list.sort_by! {|x| @jarow.getDistance(loc, x.actual_name) }.reverse
+#
+#   else
+#     loc = event.location.split(",").first.split.select{|x| (x.to_i.to_s.casecmp(x)<0) && !(["st","pl","street","St"].include?(x))}
+#     loc = loc.map {|x| x = x.downcase}
+#     customer_list = @customers.select{|x| x.staff_id == response_staff.first.id && !x.actual_name.nil? && Regexp.union(loc) === x.actual_name.downcase }
+#
+#     lead_list = @leads.select{|x| (x.staff_id == response_staff.first.id)&& (Regexp.union(loc) === x.actual_name.downcase) }
+#     lead_list = lead_list.each {|x| x.actual_name = x.actual_name.to_s + ', (Lead)'}
+#
+#     customer_list = lead_list + customer_list
+#     customer_list = customer_list.sort_by! {|x| @jarow.getDistance(loc.join(" "), x.actual_name) }.reverse
+#     end
