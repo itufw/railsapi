@@ -79,9 +79,10 @@
               customer_list = lead_list + customer_list
               customer_list = customer_list.sort_by! {|x| @jarow.getDistance(loc.join(" "), x.actual_name) }.reverse
               end
+            selected_collection = (customer_list.blank?) ? nil : "#{customer_list.first.id}|#{customer_list.first.actual_name}"
         %>
           <td>
-            <%= collection_select :customer, :customer, customer_list, ->(ob) {"#{ob.id}|#{ob.actual_name}"}, :actual_name, {:include_blank => "Select a Customer"}, :style => "width: 150px" %>
+            <%= collection_select :customer, :customer, customer_list, ->(ob) {"#{ob.id}|#{ob.actual_name}"}, :actual_name, {include_blank: "Select a Customer", selected: selected_collection }, :style => "width: 150px" %>
           </td>
         <%else%>
           <td></td>

@@ -1,16 +1,18 @@
 <div class="row">
-  <table class="table table-striped table-bordered table-hover table-responsive" style="margin-top: 0px;" id="wine_note_list">
-    <tr style="width: 90%; padding: 5px" class="info">
-      <th></th>
-      <th>Wine</th>
-      <th>Notes</th>
-    </tr>
-    <% @wine_note_list.each do |wn|%>
-      <tr>
-        <td><%= check_box_tag 'selected_wine_note[]', wn.id%></td>
-        <td><%= wn.product_name %></td>
-        <td><%= wn.note%></td>
+  <div class="col-md-10 col-md-offset-1">
+    <table class="table table-striped table-bordered table-hover table-responsive" style="margin-top: 0px;" id="wine_note_list">
+      <tr style="width: 90%; padding: 5px" class="info">
+        <th></th>
+        <th>Wine</th>
+        <th>Notes</th>
       </tr>
-    <% end %>
-  </table>
+      <% @wine_note_list.each do |wn|%>
+        <tr>
+          <td><%= check_box_tag 'selected_wine_note[]', wn.id%></td>
+          <td><%= wn.product_name %></td>
+          <td><%= wn.note%></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
 </div>

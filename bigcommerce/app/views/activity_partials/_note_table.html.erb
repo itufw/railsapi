@@ -14,46 +14,42 @@
       selected_portfolio = activity.portfolio_id
     end
   %>
-  <div class="col-md-4">
+  <div class="col-xs-2 col-md-offset-1">
     <%= label(:subject_1, "Subject:")%>
     <%= f.collection_select :subject_1, @subjects, :id, :subject, {:prompt => "Select a Subject"}, {class: "subject_selection", style: 'width: 80px'} %>
   </div>
-  <div class="col-md-4">
+  <div class="col-xs-2">
     <%= label(:function, "Function:")%>
     <%= f.collection_select :function, @function, :function, :function, {:include_blank => "Select a Function"}, {class:"function_selection", style: 'width: 80px'} %>
   </div>
-  <div class="col-md-4">
+  <div class="col-xs-2">
     <%= label(:method, "Method:")%>
     <%= f.collection_select :method, TaskMethod.all, :method, :method, {:include_blank => "Select a Method"}, style: 'width: 80px' %>
   </div>
-</div>
-<div class="row">
-  <div class="col-md-4">
+  <div class="col-xs-2">
     <%= label(:promotion, "Promotion:")%>
     <%= f.collection_select :promotion_id, Promotion.all, :id, :name, {:include_blank => "Select a Campaign"}, style: 'width: 80px' %>
   </div>
-  <div class="col-md-4">
+  <div class="col-xs-2">
     <%= label(:portfolio, "Portfolio:")%>
     <%= f.collection_select :portfolio_id, Portfolio.all, :id, :name, {:include_blank => "Select a Portfolio"}, style: 'width: 80px' %>
   </div>
 </div>
+
 <div class="row">
-  <div class="col-md-8">
+  <div class="col-md-6 col-md-offset-1">
+    <%= label(:note, "Note:")%>
+    <br/>
+    <%= f.text_area :description, :rows=>10, :cols=>100	%>
+  </div>
+  <div class="col-md-3">
     <%= label(:end_date, "Date")%>
-    <div class='input-group date' id='due_timepicker', style='width: 200px'>
+    <div class='input-group date' id='due_timepicker'>
       <%= f.text_field :start_date, placeholder: 'Timepicker', class: 'form-control' %>
       <span class="input-group-addon">
         <span class="glyphicon glyphicon-calendar"></span>
       </span>
     </div>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-md-7 col-md-offset-1">
-    Note:
-    <br/>
-    <%= f.text_area :description, :rows=>10, :cols=>50	%>
   </div>
 </div>
 

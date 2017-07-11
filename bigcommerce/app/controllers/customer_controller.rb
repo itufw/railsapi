@@ -185,7 +185,7 @@ class CustomerController < ApplicationController
     # Get top products
     # To get top products, get all the orders for a customer, then get products of those orders
     # based on the above param filters, filter products out
-    where_query = 'OrderProduct.valid_orders.order_customer_filter(%s).product_filter(%s)' % [[@customer_id], Product.all.pluck('id')]
+    where_query = 'OrderProduct.valid_orders.order_customer_filter(%s).product_filter(%s)' % [[@customer_id], products.pluck('id')]
 
     # default sorting with name
     order_col = params[:order_col] || 'Last Quarter'
@@ -215,6 +215,7 @@ class CustomerController < ApplicationController
       end
     end
     ####################################
+    @products = Product.send('filter_by_' + @transform_column, @product_ids)
   end
 
   def zomato
@@ -236,7 +237,7 @@ class CustomerController < ApplicationController
     customer = CustomerLead.where('latitude IS NOT NULL').search_for(@search_text).first if customer.nil?
     latitude = (customer.is_a? Customer) ? customer.lat : customer.latitude
     longitude = (customer.is_a? Customer) ? customer.lng : customer.longitude
-    
+
     @customers, @leads, @resaurants = near_by_customers(latitude, longitude, radius)
   end
 

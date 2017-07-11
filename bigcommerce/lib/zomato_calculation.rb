@@ -29,7 +29,7 @@ module ZomatoCalculation
   def search_by_geo
     # MultiGeocoder.geocode(location)
     count_ping = 0
-    query = 'https://developers.zomato.com/api/v2.1/search?'
+    query = 'https://developers.zomato.com/api/v2.1/search'
     customers_viewed = []
     customers = Customer.where('lng IS NOT NULL')
 
@@ -41,19 +41,17 @@ module ZomatoCalculation
     while !customers.blank?
       customer = customers.delete_at(customers.length - 1)
 
-      next if Customer.near([customer.lat, customer.lng], 2, units: :km).map(&:id).count < 2
+      next if Customer.near([customer.lat, customer.lng], 0.5, units: :km).map(&:id).count < 2
 
-      query += 'lat=' + customer.lat.to_s
-      query += '&lon=' + customer.lng.to_s
-      query += '&radius=' + '500'
-      query += '&cuisines=' + get_cuisines.map(&:to_s).join('%2C%20')
-
-      response = HTTParty.get(query, headers: {"user-key" => Rails.application.secrets.zomato_key }, verity: false)
+      response = HTTParty.get(query, query: {lat: customer.lat, lon: customer.lng, radius: 500, cuisines: get_cuisines.map(&:to_s)}, headers: {"user-key" => Rails.application.secrets.zomato_key })
       count_ping += 1
+
+      puts 'Counting ' + count_ping.to_s
+
       restaurant_update_attribuets(response['restaurants'])
       return if count_ping > 200
 
-      customers_viewed += (response['results_found'].to_i < 100) ? Customer.near([customer.lat, customer.lng], 5, units: :km).map(&:id) : Customer.near([customer.lat, customer.lng], 0.5, units: :km).map(&:id)
+      customers_viewed += (response['results_found'].to_i < 100) ? Customer.near([customer.lat, customer.lng], 2, units: :km).map(&:id) : Customer.near([customer.lat, customer.lng], 0.5, units: :km).map(&:id)
       customers = customers.select{ |x| !customers_viewed.include?x.id }
     end
   end # end def
