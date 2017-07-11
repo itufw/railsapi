@@ -6,12 +6,16 @@
       selected_method = 'meeting'
       selected_promotion = 0
       selected_portfolio = 0
+      staff_list = [session[:user_id]]
+      staff_list = staff_list.append(Customer.find(@customer_id.to_i).staff_id) unless @customer_id.nil?
+      staff_list = staff_list.append(CustomerLead.find(@lead_id.to_i).staff_id) unless @lead_id.nil?
     else
       selected_function = activity.function
       selected_subject = activity.subject_1
       selected_method = activity.method
       selected_promotion = activity.promotion_id
       selected_portfolio = activity.portfolio_id
+      staff_list = activity.task_relations.map(&:staff_id).append(session[:user_id]).uniq.compact
     end
   %>
   <div class="col-xs-2 col-md-offset-1">
@@ -48,7 +52,7 @@
       </tr>
       <%
       begin
-        Staff.filter_by_ids(activity.task_relations.map(&:staff_id).append(session[:user_id]).uniq.compact).each do |staff|
+        Staff.filter_by_ids(staff_list).each do |staff|
       %>
       <tr id="tr_staff_<%=staff.id%>">
         <td><%= text_field_tag 'staff '+staff.id.to_s, staff.nickname, readonly: true %></td>

@@ -36,7 +36,6 @@ class ActivityController < ApplicationController
       @note.portfolio_id = 0
     end
 
-
     # activity helper -> get the functions/subjects/methods from json request
     @function, @subjects = function_search(params, @parent)
 
@@ -48,9 +47,9 @@ class ActivityController < ApplicationController
 
     @product_selected = params[:product_selected] || nil
 
-    @customer_text = params[:customer_search_text] || nil
+    @customer_id = params[:customer_id]
 
-    @lead_text = params[:lead_search_text] || nil
+    @lead_id = params[:lead_id]
   end
 
   def save_note
@@ -66,13 +65,17 @@ class ActivityController < ApplicationController
     end
 
     product_note_save(params, session[:user_id], note.id)
-    relation_save(params, note)
+    customer_id, role = relation_save(params, note)
     flash[:success] = 'Note Saved!'
     if 'new_task' == params[:button]
       redirect_to action: 'add_activity', note_id: note.id
       return
     end
-    redirect_to :back
+    if role=="customer"
+      redirect_to controller: 'customer', action: 'summary', customer_id: customer_id, customer_name: Customer.find(customer_id).actual_name
+    else
+      redirect_to controller: 'lead', action: 'summary', lead_id: customer_id
+    end
   end
 
   # insert task
@@ -91,14 +94,28 @@ class ActivityController < ApplicationController
 
     @function, @subjects = function_search(params, @parent)
     @staff = Staff.active
+
+    @customer_id = params[:customer_id]
+
+    @lead_id = params[:lead_id]
   end
 
   def save_task
     task = note_save(note_params, session[:user_id])
-    customer_id = relation_save(params, task)
+    customer_id, role = relation_save(params, task)
     task_product_note(params, task, session[:user_id])
     flash[:success] = 'Task Saved!'
-    redirect_to controller: 'customer', action: 'summary', customer_id: customer_id, customer_name: Customer.find(customer_id).actual_name
+    if role=="customer"
+      redirect_to controller: 'customer', action: 'summary', customer_id: customer_id, customer_name: Customer.find(customer_id).actual_name
+    else
+      redirect_to controller: 'lead', action: 'summary', lead_id: customer_id
+    end
+  end
+
+  # TODO!
+  def selected_customer
+    customer = Customer.find(params[:customer_id])
+    @invoices = customer.xero_invoices
   end
 
   def activity_edit
