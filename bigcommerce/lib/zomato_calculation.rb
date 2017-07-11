@@ -48,7 +48,7 @@ module ZomatoCalculation
       query += '&radius=' + '500'
       query += '&cuisines=' + get_cuisines.map(&:to_s).join('%2C%20')
 
-      response = HTTParty.get(query, headers: {"user-key" => Rails.application.secrets.zomato_key })
+      response = HTTParty.get(query, headers: {"user-key" => Rails.application.secrets.zomato_key }, verity: false)
       count_ping += 1
       restaurant_update_attribuets(response['restaurants'])
       return if count_ping > 200
