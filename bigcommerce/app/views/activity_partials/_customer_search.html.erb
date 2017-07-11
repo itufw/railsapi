@@ -1,4 +1,8 @@
 <%relations = (activity.nil?) ? nil : activity.task_relations%>
+<% customer_list = [@customer_id.to_i]  %>
+<% customer_list = customer_list + relations.uniq.compact.map(&:customer_id) unless relations.nil?%>
+<% lead_list = [@lead_id.to_i] %>
+<% lead_list = lead_list + relations.uniq.compact.map(&:customer_lead_id) unless relations.nil? %>
 <div class="col-md-offset-1">
   <table id="customer_table">
     <tr>
@@ -7,25 +11,24 @@
         <%= autocomplete_field_tag 'customer_name', '', autocomplete_customer_tag_name_calendar_index_path, placeholder: 'Search Customer', id: 'customer_search',size: 15 %>
       </td>
     </tr>
-    <% unless relations.nil?
-          customers = Customer.filter_by_ids(relations.uniq.compact.map(&:customer_id))
-          customers.each do|customer| %>
+      <% customers = Customer.filter_by_ids(customer_list)
+      customers.each do|customer| %>
     <tr id="tr_customer_<%=customer.id%>">
       <td colspan="2"><%= text_field_tag 'customer '+customer.id.to_s, customer.actual_name, readonly: true %>
         <i class="glyphicon glyphicon-remove remove" title="remove"></i>
       </td>
     </tr>
     <%end
-          leads = CustomerLead.filter_by_ids(relations.uniq.compact.map(&:customer_lead_id))
-          leads.each do|lead| %>
+        leads = CustomerLead.filter_by_ids(lead_list)
+    leads.each do|lead| %>
     <tr id="tr_lead_<%=lead.id%>">
       <td colspan="2"><%= text_field_tag 'lead '+lead.id.to_s, lead.actual_name, readonly: true %>
         <i class="glyphicon glyphicon-remove remove" title="remove"></i>
       </td>
     </tr>
     <% end %>
-    <% end %>
   </table>
+  <div class="selected_customer" style="display: none;"></div>
 </div>
 
 <script>
@@ -43,6 +46,10 @@
         }
         $(this).parent().parent().remove();
       });
+      if (data.item.role == "Customer"){
+        $('.selected_customer').attr('customer_id', data.item.customer_id);
+        $('.selected_customer').change();
+      }
     }
   });
 
