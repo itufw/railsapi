@@ -48,7 +48,6 @@ class CalendarController < ApplicationController
   end
 
   def local_calendar
-
     # tempary use, it should be assigned based on the current users' right
     if session[:user_id] == 36
       @staffs = Staff.where('(active = 1 and user_type LIKE "Sales%") OR staffs.id = 36')
@@ -126,7 +125,7 @@ class CalendarController < ApplicationController
     elsif user_full_right(session[:authority])
       @events = Task.unconfirmed_event.order_by_staff('ASC').paginate(per_page: @per_page, page: params[:page])
     else
-      @events = Task.unconfirmed_event.filter_by_staff(session[:user_id]).order_by_staff('ASC')
+      @events = Task.unconfirmed_event.filter_by_staff(session[:user_id]).order_by_staff('ASC').paginate(per_page: @per_page, page: params[:page])
     end
 
     @staffs = Staff.filter_by_ids(Task.unconfirmed_event.map(&:response_staff).uniq)
