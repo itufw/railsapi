@@ -191,6 +191,10 @@ class CalendarController < ApplicationController
     @customers = Customer.filter_by_ids(customer_map.keys).include_all.send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
   end
 
+  def event_dashboard
+    
+  end
+
 end
 
 
