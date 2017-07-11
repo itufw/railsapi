@@ -1,0 +1,35 @@
+<% @cust_contacts.each do |contact_role|%>
+  <% contact = contact_role.contact%>
+  if ($('#tr_contact_<%= contact.id %>').length == 0) {
+    contact_table.append([
+      '<tr id="tr_contact_<%= contact.id %>" class="tr_customer_<%= contact_role.customer_id %>">',
+        '<td colspan="2"><input type="text" name="contact <%= contact.id %>" id="contact_<%= contact.id %>" value="<%= contact.name%>" readonly="readonly"><i class="glyphicon glyphicon-remove remove" title="remove"></i></td>',
+        '<td><%= contact_role.customer.actual_name + " : " + contact_role.position %></td>',
+      '</tr>'
+    ].join(''));
+    $('.remove').click(function () {
+      $(this).parent().parent().remove();
+    });
+  }
+<% end %>
+
+  <% @invoices.each do |invoice|%>
+  if ($('#tr_invoice_<%= invoice.invoice_number %>').length == 0) {
+    <% customer = invoice.xero_contact.customer %>
+    invoice_table.append([
+      '<tr class="tr_invoice_<%=invoice.invoice_number%> tr_customer_<%= customer.id%>">',
+          '<td><%= customer.actual_name %></td>',
+          '<td><%= invoice.invoice_number%></td>',
+          '<td><%= invoice.date.to_date.strftime("%d/%-m/%y")%></td>',
+          '<td class="num"><%= invoice.sub_total%></td>',
+          '<td class="num"><%= invoice.amount_due%></td>',
+          '<td><%= invoice.due_date.to_date.strftime("%d/%-m/%y")%></td>',
+          '<td><%= Date.today.mjd - invoice.due_date.to_date.mjd%> Days</td>',
+          '<td><i class="glyphicon glyphicon-remove remove" title="remove"></i></td>',
+      '</tr>'
+    ].join(''));
+      $('.remove').click(function(){
+        $(this).parent().parent().remove();
+      });
+  }
+  <% end %>

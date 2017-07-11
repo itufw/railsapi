@@ -5,12 +5,11 @@ class CustContact < ActiveRecord::Base
   self.per_page = 30
 
   def self.filter_by_customer(id)
-    where('cust_contacts.customer_id = ?', id)
+    where(customer_id: id)
   end
 
   def self.filter_by_contacts(ids)
-    return all if ids.nil? || ids.empty?
-    where('cust_contacts.contact_id IN (?)', ids)
+    where(contact_id: ids)
   end
 
   def self.filter_by_staff(id)
