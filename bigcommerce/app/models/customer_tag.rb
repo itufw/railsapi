@@ -31,4 +31,8 @@ class CustomerTag < ActiveRecord::Base
   def self.filter_by_role(role)
     where('role = ?', role)
   end
+
+  def self.no_contacts
+    where('role != "Contact"')
+  end
 end
