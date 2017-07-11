@@ -3,7 +3,7 @@
 <% customer_list = customer_list + relations.uniq.compact.map(&:customer_id) unless relations.nil?%>
 <% lead_list = [@lead_id.to_i] %>
 <% lead_list = lead_list + relations.uniq.compact.map(&:customer_lead_id) unless relations.nil? %>
-<div class="col-md-offset-1">
+<div class="col-md-offset-1 col-md-4">
   <table id="customer_table">
     <tr>
       <th>Customer</th>
@@ -22,7 +22,7 @@
         leads = CustomerLead.filter_by_ids(lead_list)
     leads.each do|lead| %>
     <tr id="tr_lead_<%=lead.id%>">
-      <td colspan="2"><%= text_field_tag 'lead '+lead.id.to_s, lead.actual_name, readonly: true %>
+      <td colspan="2"><%= text_field_tag 'lead '+lead.id.to_s, lead.actual_name + ', (Lead)', readonly: true %>
         <i class="glyphicon glyphicon-remove remove" title="remove"></i>
       </td>
     </tr>
@@ -31,9 +31,31 @@
   <div class="selected_customer" style="display: none;"></div>
 </div>
 
+<div class="col-md-4">
+  <table id="contact_table">
+    <tr>
+      <th>Contact</th>
+      <td>
+        <%= autocomplete_field_tag 'contact_name', '', autocomplete_contact_name_activity_index_path, placeholder: 'Search contact', id: 'contact_search',size: 15 %>
+      </td>
+    </tr>
+    <% unless relations.nil? %>
+      <% CustContact.filter_by_contacts(relations.pluck('contact_id')).each do |contact_role|%>
+        <% contact = contact_role.contact %>
+        <tr id="tr_contact_<%= contact.id %>" class="tr_customer_<%= contact_role.customer_id %>">
+          <td colspan="2"><input type="text" name="contact <%= contact.id %>" id="contact_<%= contact.id %>" value="<%= contact.name%>" readonly="readonly"><i class="glyphicon glyphicon-remove remove" title="remove"></i></td>
+          <td><%= contact_role.customer.actual_name + "|" + contact_role.position %></td>
+        </tr>
+      <% end %>
+    <% end %>
+  </table>
+</div>
+
 <script>
+
+var contact_table = $('#contact_table');
+
   $('#customer_search').bind('railsAutocomplete.select', function (event, data) {
-    console.log(data.item);
     if ($('#tr_' + data.item.role.toLowerCase() + '_' + data.item.customer_id).length == 0) {
       $('#customer_table').append([
         '<tr id="tr_' + data.item.role.toLowerCase() + '_' + data.item.customer_id + '">',
@@ -42,7 +64,7 @@
       ].join(''));
       $('.remove').click(function () {
         if (data.item.role == "Customer") {
-          $('.tr_invoice_' + data.item.customer_id).remove();
+          $('.tr_customer_' + data.item.customer_id).remove();
         }
         $(this).parent().parent().remove();
       });
@@ -50,6 +72,21 @@
         $('.selected_customer').attr('customer_id', data.item.customer_id);
         $('.selected_customer').change();
       }
+    }
+  });
+
+  $('#contact_search').bind('railsAutocomplete.select', function (event, data) {
+    console.log(data.item);
+    if ($('#tr_contact_' + data.item.id).length == 0) {
+      contact_table.append([
+        '<tr id="tr_contact_' + data.item.id + '">',
+          '<td colspan="2"><input type="text" name="contact '+ data.item.id +'" id="contact_'+ data.item.id +'" value="'+ data.item.label.split("|")[0] +'" readonly="readonly"><i class="glyphicon glyphicon-remove remove" title="remove"></i></td>',
+          '<td>'+ data.item.label.split("|")[1] +'</td>',
+        '</tr>'
+      ].join(''));
+      $('.remove').click(function () {
+        $(this).parent().parent().remove();
+      });
     }
   });
 

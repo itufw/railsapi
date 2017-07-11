@@ -7,7 +7,7 @@ class ActivityController < ApplicationController
   autocomplete :product, :name, full: true
   autocomplete :customer, :actual_name, full: true
   autocomplete :customer_lead, :actual_name, full: true, scopes: :not_customer
-  autocomplete :contact, :name, display_value: :display_position
+  autocomplete :contact, :name, display_value: :display_position, scopes: :has_role
   autocomplete :staff, :nickname, extra_data: [:nickname]
 
   include ActivityHelper
@@ -112,10 +112,13 @@ class ActivityController < ApplicationController
     end
   end
 
-  # TODO!
   def selected_customer
     customer = Customer.find(params[:customer_id])
-    @invoices = customer.xero_invoices
+    @invoices = customer.xero_invoices.has_amount_due
+    @cust_contacts = customer.cust_contacts
+    respond_to do |format|
+      format.js
+    end
   end
 
   def activity_edit

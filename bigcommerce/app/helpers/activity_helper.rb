@@ -103,12 +103,15 @@ module ActivityHelper
     assign_to = 'lead' if customer_id.nil?
     customer_id = leads.first if customer_id.nil?
 
-    [customers, staffs, leads].max_by(&:length).each do |f|
+    contacts = params.keys.select {|x| x.start_with?('contact ')}.map(&:split).map(&:last)
+
+    [customers, staffs, leads, contacts].max_by(&:length).each do |f|
       tr = TaskRelation.new
       tr.task_id = task_id
       tr.customer_id = customers.delete_at(0)
       tr.staff_id = staffs.delete_at(0)
       tr.customer_lead_id = leads.delete_at(0)
+      tr.contact_id = contacts.delete_at(0)
       tr.save
     end
     task.save
