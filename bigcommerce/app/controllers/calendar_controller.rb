@@ -6,7 +6,7 @@ class CalendarController < ApplicationController
   skip_before_action :verify_authenticity_token
   before_action :confirm_logged_in
 
-  autocomplete :customer_tag, :name, extra_data: [:customer_id, :role], full: true
+  autocomplete :customer_tag, :name, extra_data: [:customer_id, :role], full: true, scopes: :no_contacts
 
   include CalendarHelper
   include ModelsFilter
