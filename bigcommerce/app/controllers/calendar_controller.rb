@@ -192,7 +192,7 @@ class CalendarController < ApplicationController
   end
 
   def event_dashboard
-    
+
   end
 
 end
