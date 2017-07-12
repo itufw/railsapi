@@ -417,7 +417,7 @@ module CalendarHelper
 
     staff_calendars = StaffCalendarAddress.all
     service.list_calendar_lists.items.select { |x| staff_calendars.map(&:calendar_address).include?x.id }.each do |calendar|
-      items = service.list_events(calendar.id).items
+      items = service.list_events(calendar.id).items.select{ |x| (x.start.date_time.to_s > (Date.today - 1.month).to_s) || (x.start.date.to_s > (Date.today - 1.month).to_s) }
       calendar_events_pair[calendar.id] = items.map(&:id)
       new_events += items
     end
