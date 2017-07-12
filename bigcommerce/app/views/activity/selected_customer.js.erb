@@ -3,13 +3,11 @@
   if ($('#tr_contact_<%= contact.id %>').length == 0) {
     contact_table.append([
       '<tr id="tr_contact_<%= contact.id %>" class="tr_customer_<%= contact_role.customer_id %>">',
-        '<td colspan="2"><input type="text" name="contact <%= contact.id %>" id="contact_<%= contact.id %>" value="<%= contact.name%>" readonly="readonly"><i class="glyphicon glyphicon-remove remove" title="remove"></i></td>',
+        '<td><%= check_box_tag 'selected_contact[]', contact.id.to_s%> </td>',
+        '<td><input type="text" name="contact <%= contact.id %>" id="contact_<%= contact.id %>" value="<%= contact.name%>" readonly="readonly"></td>',
         '<td><%= contact_role.customer.actual_name + " : " + contact_role.position %></td>',
       '</tr>'
     ].join(''));
-    $('.remove').click(function () {
-      $(this).parent().parent().remove();
-    });
   }
 <% end %>
 
