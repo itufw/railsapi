@@ -59,7 +59,8 @@
           <td>&nbsp;&nbsp;&nbsp;</td>
           <%
           unless event.description.nil?
-            pattern = (event.location.nil?) ? event.description.split("\n").first : event.location
+            pattern = (event.location.nil?) ? event.description.split("\n").first.downcase : event.location.downcase
+            pattern.slice! ' tasting'
 
             customer_list = Customer.filter_by_staff(response_staff.first.id).search_for(pattern)
             lead_list = CustomerLead.filter_by_staff(response_staff.first.id).not_customer.search_for(pattern)
