@@ -49,9 +49,6 @@ namespace :updates do
 			puts "Update contacts balance #{Time.now} started"
 			XeroContact.new.update_balance_for_all
 			puts "Update contacts balance #{Time.now} ended"
-
-			puts "Zomato Update At #{Time.now}"
-			search_by_geo
 	end
 
 	task :zomato_update => :environment do
