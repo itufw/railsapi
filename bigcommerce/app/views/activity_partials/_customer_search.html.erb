@@ -76,17 +76,14 @@ var contact_table = $('#contact_table');
   });
 
   $('#contact_search').bind('railsAutocomplete.select', function (event, data) {
-    console.log(data.item);
     if ($('#tr_contact_' + data.item.id).length == 0) {
       contact_table.append([
         '<tr id="tr_contact_' + data.item.id + '">',
-          '<td colspan="2"><input type="text" name="contact '+ data.item.id +'" id="contact_'+ data.item.id +'" value="'+ data.item.label.split("|")[0] +'" readonly="readonly"><i class="glyphicon glyphicon-remove remove" title="remove"></i></td>',
+          '<td><input type="checkbox" name="selected_contact[]" value= '+ data.item.id +'></td>',
+          '<td><input type="text" name="contact '+ data.item.id +'" id="contact_'+ data.item.id +'" value="'+ data.item.label.split("|")[0] +'" readonly="readonly"></td>',
           '<td>'+ data.item.label.split("|")[1] +'</td>',
         '</tr>'
       ].join(''));
-      $('.remove').click(function () {
-        $(this).parent().parent().remove();
-      });
     }
   });
 
