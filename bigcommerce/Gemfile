@@ -94,6 +94,8 @@ gem 'underscore-rails'
 gem 'gmaps4rails'
 # google places for rails
 gem 'google_places'
+# google credentials
+gem 'googleauth'
 # convert street address to latitude and longitude
 gem 'geokit-rails'
 gem 'geocoder'
