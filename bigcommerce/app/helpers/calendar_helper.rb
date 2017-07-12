@@ -338,7 +338,7 @@ module CalendarHelper
 
 
   def collection_valid_check(params)
-    ["customer","method","subject"].each do |column|
+    ["method","subject"].each do |column|
       if params[column]
         if ((params[column][column].nil?) || ("".eql? params[column][column]))
           return false
@@ -363,7 +363,7 @@ module CalendarHelper
   end
 
   # scrap events from google calendar
-  def update_google_events(new_events, staff_calendars, unconfirm)
+  def update_google_events(new_events, staff_calendars, unconfirm, service, calendar_events_pair)
     new_events.each do |event|
       task = Task.filter_by_google_event_id(event.id).first
 
@@ -382,6 +382,9 @@ module CalendarHelper
           task.location = event.location
           task.summary = event.description
           task.save
+        # push address back to events
+        update_event_location(task.task_relations.first, event, service, calendar_events_pair) if event.location.nil?
+
       else
         # filter the staff
         staff_address = staff_calendars.select { |x| [event.organizer.email, event.creator.email].include? x.calendar_address}.first
@@ -391,15 +394,35 @@ module CalendarHelper
     end
   end
 
+  def update_event_location(relation, event, service, calendar_events_pair)
+    return if relation.nil?
+    address = nil
+    address = relation.customer.address unless relation.customer.nil?
+    address = relation.customer_lead.address unless !address.nil? || relation.customer_lead.nil?
+    return if address.nil?
+    calendar_id = calendar_events_pair.select {|key, value| value.include?event.id }.keys().first.to_s
+    return if calendar_id == ""
+
+    begin
+      event.location = address
+      service.update_event(calendar_id, event.id, event)
+    rescue
+    end
+  end
+
   def scrap_from_calendars(service)
     new_events = []
+    # record the events and the calendar id
+    calendar_events_pair = {}
     unconfirmed_task = Task.unconfirmed_event.map(&:google_event_id)
 
     staff_calendars = StaffCalendarAddress.all
     service.list_calendar_lists.items.select { |x| staff_calendars.map(&:calendar_address).include?x.id }.each do |calendar|
-      new_events += service.list_events(calendar.id).items
+      items = service.list_events(calendar.id).items
+      calendar_events_pair[calendar.id] = items.map(&:id)
+      new_events += items
     end
-    update_google_events(new_events, staff_calendars, unconfirmed_task)
+    update_google_events(new_events, staff_calendars, unconfirmed_task, service, calendar_events_pair)
   end
 
   # -----------------push events to google calendar ---------------------
@@ -419,12 +442,13 @@ module CalendarHelper
     tasks = Task.pending_event
     tasks.each do |t|
       t_relations = t.task_relations
-      customer_id = t_relations.map(&:customer_id).compact
-      customer_id = (customer_id.blank?) ? 0 : customer_id.first
+      customer = nil
+      customer = Customer.find(t_relations.map(&:customer_id).compact.first) if t_relations.map(&:customer_id).compact.first.to_i != 0
+      customer = CustomerLead.find(t_relations.map(&:customer_lead_id).compact.first.to_i) if customer.nil? && t_relations.map(&:customer_lead_id).compact.first.to_i != 0
       staff_ids = t_relations.map(&:staff_id).compact
       staff_ids.delete(0)
       next if staff_ids.blank?
-      t.google_event_id = push_event(customer_id, t.description, staff_ids, t.response_staff, t.start_date, t.end_date, t.subject_1, t.method, service, client).id
+      t.google_event_id = push_event(customer, t.description, staff_ids, t.response_staff, t.start_date, t.end_date, t.subject_1, t.method, service, client).id
       t.gcal_status = "pushed"
       t.save
     end
@@ -446,7 +470,7 @@ module CalendarHelper
   # TODO
   # TODO
   # TODO
-  def push_event(customer_id, description, staff_ids, response_staff, start_time, end_time, subject, method, service, client)
+  def push_event(customer, description, staff_ids, response_staff, start_time, end_time, subject, method, service, client)
 
     staffs = Staff.filter_by_ids(staff_ids.append(response_staff))
     staff_calendar_addresses = StaffCalendarAddress.filter_by_ids(staff_ids)
@@ -462,10 +486,9 @@ module CalendarHelper
       attendee_list.append(attend)
     end
 
-    customer = Customer.where("customers.id = #{customer_id}")
-    customer = (customer.blank?) ? 'No Customer' : customer.first.actual_name
+    customer_name = (customer.nil?) ? 'No Customer' : customer.actual_name
+    address = customer.address unless customer.nil?
 
-    address = combine_adress(Address.where("customer_id = #{customer_id}")) if customer_id != 0
     task_subject = TaskSubject.find(subject).subject
 
     event = Google::Apis::CalendarV3::Event.new({
@@ -478,8 +501,8 @@ module CalendarHelper
                                                   time_zone: 'Australia/Melbourne',
                                                 },
                                                 # colorID: "2",
-                                                summary: customer,
-                                                description: task_subject + ": "+ customer + "\n" +description + "\n Created By:" + response_staff.nickname,
+                                                summary: customer_name,
+                                                description: task_subject + ": "+ customer_name + "\n" +description + "\n Created By:" + response_staff.nickname,
                                                 location: address,
                                                 attendees: attendee_list
                                                 })

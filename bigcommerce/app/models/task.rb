@@ -87,7 +87,7 @@ class Task < ActiveRecord::Base
     task.gcal_status = :pulled
     task.save
 
-    TaskRelation.new.link_relation(task.id, customer_id) unless customer_id.nil?
+    TaskRelation.new.link_relation(task.id, customer_id) unless customer_id.nil? || customer_id == ""
     true
   end
 
