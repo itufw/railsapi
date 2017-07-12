@@ -5,6 +5,8 @@ module SalesControllerHelper
   def sum_orders(start_date, end_date, group_by_date_function, sum_function, staff_id)
     if (:new_customer).eql? sum_function
       return Customer.create_date_filter(start_date, end_date.next_day).send(group_by_date_function).filter_by_staff(staff_id).count_id
+    elsif (:contact_note).eql? sum_function
+      return Task.valid_task.start_date_filter(start_date, end_date.next_day).send(group_by_date_function).filter_by_responses(staff_id).count_id
     elsif (:avg_bottle_price).eql? sum_function
       orders = Order.date_filter(start_date, end_date.next_day).valid_order.staff_filter(staff_id).send(group_by_date_function)
       bottles = orders.send("sum_qty")
@@ -36,12 +38,12 @@ module SalesControllerHelper
     sum_params_h = {"Order Totals" => :sum_total, "Bottles" => :sum_qty,\
      "Number of Orders" => :count_orders, "Avg. Order Total" => :avg_order_total,\
       "Avg. Bottles" => :avg_order_qty, "Avg. Bottle Price exGST" => :avg_bottle_price,\
-      "New Customer" => :new_customer }
+      "New Customer" => :new_customer, "Contact Note" => :contact_note }
 
     if selected.nil?
-      return sum_params_h["Order Totals"], "Order Totals", sum_params_h.keys
+      return sum_params_h["Order Totals"], "Order Totals", sum_params_h.keys[0..-2]
     else
-      return sum_params_h[selected], selected, sum_params_h.keys
+      return sum_params_h[selected], selected, sum_params_h.keys[0..-2]
     end
   end
 

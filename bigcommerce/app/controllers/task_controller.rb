@@ -28,7 +28,6 @@ class TaskController < ApplicationController
   end
 
   def staff_task
-
     @start_date = params[:start_date] ? params[:start_date].split('-').reverse.join('-') : (Date.today - 1.month).to_s
     @end_date = params[:end_date] ? params[:end_date].split('-').reverse.join('-') : Date.today.to_s
     @date_column = params[:date_column] || 'start_date'
