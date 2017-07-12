@@ -1,4 +1,4 @@
-<div class="monthly-calendar" id="calendar-staff-<%= staff_id%>" >
+<div class="monthly-calendar calendar-table" id="calendar-staff-<%= staff_id%>" staff="<%= staff_id%>" start-date="<%= @start_date.to_s%>">
   <%= month_calendar events: events do |date, meetings| %>
     <%= link_to date.strftime('%e %b'), fetch_calendar_date_path(calendar_date_selected: date, calendar_staff_selected: staff_id), :remote => true %>
     <% meetings.each do |meeting| %>

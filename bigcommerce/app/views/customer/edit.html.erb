@@ -19,6 +19,10 @@
   <%= f.text_field :actual_name, class: 'form-control quarter-size' %>
   <br/><br/>
 
+  <%= f.label :address, class: 'margin-from-top label-new' %>
+  <%= f.text_field :address, class: 'form-control quarter-size' %>
+  <br/><br/>
+
   <%= f.label :staff, class: 'margin-from-top label-new' %>
   <%= f.collection_select :staff_id, Staff.active_sales_staff, :id, :nickname, {selected: @customer.staff_id}, {class: "form-control quarter-size"} %>
   <br/><br/>

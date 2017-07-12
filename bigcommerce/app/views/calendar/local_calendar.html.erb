@@ -40,21 +40,28 @@
 
 <!-- staff calendar selector -->
 <script>
+
+var event_markers = null;
+var customer_markers = null;
+<% events = get_events_details(session[:user_id], @start_date.beginning_of_month, @start_date.end_of_month) %>
+
 var handler = Gmaps.build('Google');
 handler.buildMap({
     internal: {
         id: 'customer_location'
     }
 }, function () {
+  event_markers = handler.addMarkers(<%=raw get_events_pins(events).to_json %>);
+  handler.bounds.extendWith(event_markers);
+  handler.fitMapToBounds();
 });
 
-var event_markers = null;
-var customer_markers = null;
 
 var calendar_table = $('#calendar_table');
 var calendar_radio = $('div[aria-label=calendar_radio]');
 var event_checkbox = $('#event_checkbox');
 var customer_checkbox = $('#customer_checkbox');
+calendar_table.html("<%=j render 'calendar_partials/monthly_calendar', staff_id: session[:user_id], events: events%>");
 
 $('#event_checkbox').attr('checked',true);
 
@@ -63,17 +70,5 @@ $("#calendar_map_filter").hide();
 $("#filter_on").click(function(){
   $("#calendar_map_filter").toggle();
 });
-</script>
 
-<script type="text/javascript">
-<% events = get_events_details(session[:user_id], @start_date.beginning_of_month, @start_date.end_of_month) %>
-
-// calendar update
-  calendar_table.html("<%=j render 'calendar_partials/monthly_calendar', staff_id: @calendar_staff, events: events%>");
-  if (event_checkbox.is(':checked'))
-    event_markers = handler.addMarkers(<%=raw get_events_pins(events).to_json %>);
-
-  if (event_markers != null && event_markers.length != 0){
-    handler.bounds.extendWith(event_markers);
-    handler.fitMapToBounds();}
 </script>
