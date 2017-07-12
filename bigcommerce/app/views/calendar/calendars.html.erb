@@ -52,6 +52,10 @@
 </div>
 
 <script>
+  var event_markers = null;
+  var customer_markers = null;
+
+
   var handler = Gmaps.build('Google');
   handler.buildMap({
       internal: {
@@ -59,9 +63,6 @@
       }
   }, function () {
   });
-  var event_markers = null;
-  var customer_markers = null;
-
   <%@calendar_list.each do |calendar|
       calendar_staff = @staffs.select{ |x| x.email == calendar.id }.first
   %>

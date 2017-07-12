@@ -256,6 +256,7 @@ class CustomerController < ApplicationController
 
   def customer_params
     params.require(:customer).permit(:firstname, :lastname, :actual_name,\
-                                     :staff_id, :cust_style_id, :cust_group_id)
+                                     :staff_id, :cust_style_id, :cust_group_id,\
+                                     :address)
   end
 end

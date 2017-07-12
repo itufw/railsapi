@@ -178,7 +178,7 @@ module CalendarHelper
   end
 
   def get_customers_pins(staff_id, start_date = nil)
-    customers = Customer.filter_by_staff(staff_id).joins(:addresses).select("addresses.lat AS latitude, addresses.lng AS longitude, customers.*").where("addresses.lat IS NOT NULL").group("customers.id")
+    customers = Customer.filter_by_staff(staff_id).select("lat AS latitude, lng AS longitude, customers.*").where("lat IS NOT NULL")
     customers = customers.joins(:orders).select("MAX(orders.date_created) as last_order_date, customers.id").where("orders.status_id IN (2, 3, 7, 8, 9, 10, 11, 12, 13)").order("orders.date_created DESC").group("customers.id")
 
     start_date = Date.today if start_date.nil?
@@ -205,8 +205,7 @@ module CalendarHelper
   end
 
   def get_events_pins(events)
-    customers = Customer.filter_by_ids(events.map(&:customer_id).uniq.compact)
-    customers = customers.joins(:addresses).select("addresses.lat AS latitude, addresses.lng AS longitude, customers.*") unless customers.nil?
+    customers = Customer.select("lat AS latitude, lng AS longitude, customers.*").filter_by_ids(events.map(&:customer_id).uniq.compact)
     leads = CustomerLead.filter_by_ids(events.map(&:customer_lead_id).uniq.compact)
 
     event_map = {}
@@ -260,7 +259,7 @@ module CalendarHelper
     selected_staff, colour_range = map_filter(params, colour_guide, colour_range, false)
     start_date, end_date = time_picker(params, 0)
 
-    customers = Customer.joins(:addresses).select("addresses.lat AS latitude, addresses.lng AS longitude, customers.*").where("addresses.lat IS NOT NULL AND customers.staff_id IN (?)", staffs.map{|x| x.id}).group("customers.id")
+    customers = Customer.select("lat AS latitude, lng AS longitude, customers.*").where("lat IS NOT NULL AND customers.staff_id IN (?)", staffs.map{|x| x.id})
     # the Status check needs to be updated
     customers = customers.joins(:orders).select("MAX(orders.date_created) as last_order_date, customers.id").where("orders.status_id IN (2, 3, 7, 8, 9, 10, 11, 12, 13)").order("orders.date_created DESC").group("customers.id")
     customers = customers.select{|x| selected_cust_style.include? x.cust_style_id.to_s } unless selected_cust_style.blank?
@@ -291,7 +290,7 @@ module CalendarHelper
     # default to one month ago until today
     start_date, end_date = time_picker(params, 3)
 
-    customers = Customer.joins(:addresses).select("addresses.lat AS latitude, addresses.lng AS longitude, customers.*").where("addresses.lat IS NOT NULL AND customers.staff_id IN (?)", staffs.map{|x| x.id}).group("customers.id")
+    customers = Customer.select("lat AS latitude, lng AS longitude, customers.*").where("lat IS NOT NULL AND customers.staff_id IN (?)", staffs.map{|x| x.id})
 
     # calculate the customers who have sales record in given period
     customers_sales = Customer.joins(:orders).select("customers.id, sum(orders.total_inc_tax) as sales").where("orders.status_id IN (2, 3, 7, 8, 9, 10, 11, 12, 13)").where("orders.date_created < '#{end_date}' AND orders.date_created > '#{start_date}'").group("customers.id")
