@@ -12,7 +12,7 @@ class CalendarController < ApplicationController
   include ModelsFilter
 
   def redirect
-    uri = Rails.env.development? ? 'http://localhost:3000/callback' : 'http://188.166.243.138.xip.io/callback'
+    uri = Rails.env.development? ? 'http://localhost:3000/callback' : 'http://cms.untappedwines.com.au/callback'
     client = Signet::OAuth2::Client.new(
       client_id: Rails.application.secrets.google_client_id,
       client_secret: Rails.application.secrets.google_client_secret,
@@ -28,7 +28,7 @@ class CalendarController < ApplicationController
   end
 
   def callback
-    uri = Rails.env.development? ? 'http://localhost:3000/callback' : 'http://188.166.243.138.xip.io/callback'
+    uri = Rails.env.development? ? 'http://localhost:3000/callback' : 'http://cms.untappedwines.com.au/callback'
 
     client = Signet::OAuth2::Client.new(
       client_id: Rails.application.secrets.google_client_id,
