@@ -306,6 +306,7 @@ DEPENDENCIES
   gmaps4rails
   google-api-client
   google_places
+  googleauth
   httparty
   jbuilder (~> 2.0)
   jquery-rails

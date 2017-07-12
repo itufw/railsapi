@@ -41,9 +41,9 @@ module SalesControllerHelper
       "New Customer" => :new_customer, "Contact Note" => :contact_note }
 
     if selected.nil?
-      return sum_params_h["Order Totals"], "Order Totals", sum_params_h.keys[0..-2]
+      return sum_params_h["Order Totals"], "Order Totals", sum_params_h.keys
     else
-      return sum_params_h[selected], selected, sum_params_h.keys[0..-2]
+      return sum_params_h[selected], selected, sum_params_h.keys
     end
   end
 
