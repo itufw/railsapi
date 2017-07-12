@@ -3,10 +3,22 @@
 <%#= sums_dates_h are a hash like {[start_date, end_date] => sum} %>
 
 <% dates.each do |d| %>
-	<td class="num"><%= link_to ( exists_in_h_int(sums_dates_h, d) == 0 ? "" :\
-	 exists_in_h_int(sums_dates_h, d).integer? ? exists_in_h_int(sums_dates_h, d) : display_num(exists_in_h_int(sums_dates_h, d))),\
-	 controller: 'order', action: 'all', start_date: dates_map[d][0], end_date: dates_map[d][1], staff_nickname: staff_nickname, sales_selected_staff_id: staff_id %></td>
+	<% if exists_in_h_int(sums_dates_h, d) == 0 %>
+	  <td class="num"></td>
+	<% elsif exists_in_h_int(sums_dates_h, d).integer? && params[:sum_param] == 'Contact Note' %>
+		<td class="num"><%= link_to exists_in_h_int(sums_dates_h, d), controller: 'task', action: 'staff_task', date_column: 'start_date', staff: {'assigned': '', 'creator': staff_id}, start_date: d.strftime('%d-%m-%Y'), end_date: d.strftime('%d-%m-%Y') %></td>
+	<% elsif exists_in_h_int(sums_dates_h, d).integer?%>
+		<td class="num"><%= link_to exists_in_h_int(sums_dates_h, d), controller: 'order', action: 'all', start_date: dates_map[d][0], end_date: dates_map[d][1], staff_nickname: staff_nickname, sales_selected_staff_id: staff_id %></td>
+	<% else %>
+		<td class="num"><%= link_to display_num(exists_in_h_int(sums_dates_h, d)), controller: 'order', action: 'all', start_date: dates_map[d][0], end_date: dates_map[d][1], staff_nickname: staff_nickname, sales_selected_staff_id: staff_id %></td>
+	<% end %>
 <% end %>
 
 <% total = @avg_sum ? sums_dates_h.values.sum/sums_dates_h.values.size.to_f : sums_dates_h.values.sum %>
-<td class="num"><%= link_to display_num(total), controller: 'order', action: 'all', start_date: total_cell_start_date(dates_map), end_date: total_cell_end_date(dates_map), staff_nickname: staff_nickname, staff_id: staff_id %></td>
+<% if total.zero? %>
+	<td></td>
+<% elsif params[:sum_param] == 'Contact Note' %>
+	<td class="num"><%= link_to total, controller: 'task', action: 'staff_task', date_column: 'start_date', staff: {'assigned': '', 'creator': staff_id}, start_date: dates.first.strftime('%d-%m-%Y'), end_date: dates.last.strftime('%d-%m-%Y') %></td>
+<% else %>
+	<td class="num"><%= link_to display_num(total), controller: 'order', action: 'all', start_date: total_cell_start_date(dates_map), end_date: total_cell_end_date(dates_map), staff_nickname: staff_nickname, staff_id: staff_id %></td>
+<% end %>

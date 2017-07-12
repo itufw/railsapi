@@ -26,6 +26,7 @@ class SalesController < ApplicationController
     @dates_last_two_week = last_week(@dates_last_week[0])
 
     sum_function, @param_val, @sum_params = order_sum_param(params[:sum_param])
+    @sum_params.append('Contact Note') if user_full_right(session[:user_authority])
 
     # returns a hashmap like { date => order_totals }
     @sum_this_week = sum_orders(@dates_this_week[0], @dates_this_week[-1], :group_by_date_created, sum_function, nil)
@@ -33,7 +34,6 @@ class SalesController < ApplicationController
     @sum_last_two_week = sum_orders(@dates_last_two_week[0], @dates_last_two_week[-1], :group_by_date_created, sum_function, nil)
 
     # Order.date_filter(@dates_this_week[0], @dates_this_week[-1].next_day).valid_order.staff_filter(nil).send(:group_by_date_created).send(sum_function)
-    # p= c
 
     @dates_paired_this_week = make_daily_dates_map(@dates_this_week)
     @dates_paired_last_week = make_daily_dates_map(@dates_last_week)

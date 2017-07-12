@@ -269,7 +269,8 @@ class Task < ActiveRecord::Base
   end
 
   def self.filter_by_responses(staff_ids)
-    where('tasks.response_staff IN (?)', staff_ids)
+    return where(response_staff: staff_ids) unless staff_ids.nil? || staff_ids.blank?
+    where(response_staff: Staff.active_sales_staff.pluck('id'))
   end
 
   def self.filter_by_responses_relations(staff_ids, tasks_ids)
@@ -317,5 +318,59 @@ class Task < ActiveRecord::Base
 
   def end_time
     end_date
+  end
+
+  def self.count_id
+    count("id")
+  end
+
+  #######################################################
+  # Dashboard Filter
+  def self.valid_task
+    where('gcal_status != 4 AND (is_task = 0 OR google_event_id IS NOT NULL)')
+  end
+
+  def self.start_date_filter(start_date, end_date)
+    where('start_date >= ? AND start_date < ?', start_date, end_date)
+  end
+
+  def self.group_by_date_created
+    group('DATE(tasks.start_date)')
+  end
+
+  def self.group_by_week_created
+    group('WEEK(tasks.start_date)')
+  end
+
+  def self.group_by_month_created
+    group(['MONTH(tasks.start_date)', 'YEAR(tasks.start_date)'])
+  end
+
+  def self.group_by_quarter_created
+    group(['QUARTER(tasks.start_date)', 'YEAR(tasks.start_date)'])
+  end
+
+  def self.group_by_year_created
+    group('YEAR(tasks.start_date)')
+  end
+
+  def self.group_by_date_created_and_staff_id
+    group(['tasks.response_staff', 'DATE(tasks.start_date)'])
+  end
+
+  def self.group_by_week_created_and_staff_id
+    group(['tasks.response_staff', 'WEEK(tasks.start_date)'])
+  end
+
+  def self.group_by_month_created_and_staff_id
+    group(['tasks.response_staff', 'MONTH(tasks.start_date)', 'YEAR(tasks.start_date)'])
+  end
+
+  def self.group_by_quarter_created_and_staff_id
+    group(['tasks.response_staff', 'QUARTER(tasks.start_date)', 'YEAR(tasks.start_date)'])
+  end
+
+  def self.group_by_year_created_and_staff_id
+    group(['tasks.response_staff', 'YEAR(tasks.start_date)'])
   end
 end
