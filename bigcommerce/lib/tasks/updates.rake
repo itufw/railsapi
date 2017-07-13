@@ -1,8 +1,10 @@
 require 'rake_task_helper.rb'
 load 'zomato_calculation.rb'
+require 'google_calendar_sync.rb'
 
 include RakeTaskHelper
 include ZomatoCalculation
+include GoogleCalendarSync
 
 namespace :updates do
 	desc "Rake task to update data"
@@ -54,6 +56,11 @@ namespace :updates do
 	task :zomato_update => :environment do
 		puts "Zomato Update At #{Time.now}"
 		search_by_geo
+	end
+
+	task :event_update => :environment do
+		puts "Event Update At #{Time.now}"
+		calendar_event_update
 	end
 
 	task :balanceupdate => :environment do
