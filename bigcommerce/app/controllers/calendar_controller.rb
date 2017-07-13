@@ -18,10 +18,10 @@ class CalendarController < ApplicationController
     #
     # scope = 'https://www.googleapis.com/auth/calendar'
     # uri = Rails.env.development? ? 'http://localhost:3000/callback' : 'http://cms.untappedwines.com.au/callback'
-    #
-    # client_id = Google::Auth::ClientId.from_file('/path/to/client_secrets.json')
+    # 
+    # client_id = Google::Auth::ClientId.new(Rails.application.secrets.google_client_id, Rails.application.secrets.google_client_secret)
     # token_store = Google::Auth::Stores::FileTokenStore.new(
-    #   :file => '/path/to/tokens.yaml')
+    #   :file => 'config/tokens.yaml')
     # authorizer = Google::Auth::UserAuthorizer.new(client_id, scope, token_store)
     #
     # credentials = authorizer.get_credentials(user_id)
