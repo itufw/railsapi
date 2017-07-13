@@ -417,6 +417,7 @@ module CalendarHelper
 
     staff_calendars = StaffCalendarAddress.all
     service.list_calendar_lists.items.select { |x| staff_calendars.map(&:calendar_address).include?x.id }.each do |calendar|
+      # only sync the tasks for last month
       items = service.list_events(calendar.id).items.select{ |x| (x.start.date_time.to_s > (Date.today - 1.month).to_s) || (x.start.date.to_s > (Date.today - 1.month).to_s) }
       calendar_events_pair[calendar.id] = items.map(&:id)
       new_events += items
@@ -465,10 +466,7 @@ module CalendarHelper
     location
   end
 
-  # TODO
-  # TODO
-  # TODO
-  # TODO
+  # Push events back to calendars
   def push_event(customer, description, staff_ids, response_staff, start_time, end_time, subject, method, service, client)
 
     staffs = Staff.filter_by_ids(staff_ids.append(response_staff))

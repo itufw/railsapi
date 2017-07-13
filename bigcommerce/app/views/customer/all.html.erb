@@ -2,6 +2,8 @@
 <h3>Customers</h3>
 
 <center><%= link_to "View Incomplete Customers", action: 'incomplete_customers' %></center>
+<center><%= link_to "View My Customers", action: 'all', staff: {id: session[:user_id]} unless current_user_sales?(session[:authority]) %></center>
+
 <%= form_tag({:controller => "customer", :action => customer_filter_path}, {:method => "get"}) do %>
 
 <div class="form-group" style="margin-left:300px;margin-top:50px;">
