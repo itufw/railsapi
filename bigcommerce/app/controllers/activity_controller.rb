@@ -53,7 +53,6 @@ class ActivityController < ApplicationController
   end
 
   def save_note
-     p = c
     note = note_save(note_params, session[:user_id])
 
     # complted: task_control_icon -> add_note -> save_note
