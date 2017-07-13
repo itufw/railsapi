@@ -1,8 +1,6 @@
 require 'calendar_helper.rb'
 require 'models_filter.rb'
 require 'fuzzystringmatch'
-require 'googleauth'
-require 'googleauth/stores/file_token_store'
 
 class CalendarController < ApplicationController
   skip_before_action :verify_authenticity_token
@@ -12,28 +10,6 @@ class CalendarController < ApplicationController
 
   include CalendarHelper
   include ModelsFilter
-
-  def cron_google_calendar
-    # OOB_URI = 'urn:ietf:wg:oauth:2.0:oob'
-    #
-    # scope = 'https://www.googleapis.com/auth/calendar'
-    # uri = Rails.env.development? ? 'http://localhost:3000/callback' : 'http://cms.untappedwines.com.au/callback'
-    # 
-    # client_id = Google::Auth::ClientId.new(Rails.application.secrets.google_client_id, Rails.application.secrets.google_client_secret)
-    # token_store = Google::Auth::Stores::FileTokenStore.new(
-    #   :file => 'config/tokens.yaml')
-    # authorizer = Google::Auth::UserAuthorizer.new(client_id, scope, token_store)
-    #
-    # credentials = authorizer.get_credentials(user_id)
-    # if credentials.nil?
-    #   url = authorizer.get_authorization_url(base_url: OOB_URI )
-    #   puts "Open #{url} in your browser and enter the resulting code:"
-    #   code = gets
-    #   credentials = authorizer.get_and_store_credentials_from_code(
-    #     user_id: user_id, code: code, base_url: OOB_URI)
-    # end
-    # OK to use credentials
-  end
 
   def redirect
     uri = Rails.env.development? ? 'http://localhost:3000/callback' : 'http://cms.untappedwines.com.au/callback'
@@ -116,6 +92,7 @@ class CalendarController < ApplicationController
                                         },
                                         token_credential_uri: 'https://accounts.google.com/o/oauth2/token')
     client.update!(session[:authorization])
+    
     service = Google::Apis::CalendarV3::CalendarService.new
     service.authorization = client
 

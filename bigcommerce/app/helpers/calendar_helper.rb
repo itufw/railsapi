@@ -416,9 +416,10 @@ module CalendarHelper
     unconfirmed_task = Task.unconfirmed_event.map(&:google_event_id)
 
     staff_calendars = StaffCalendarAddress.all
+
     service.list_calendar_lists.items.select { |x| staff_calendars.map(&:calendar_address).include?x.id }.each do |calendar|
       # only sync the tasks for last month
-      items = service.list_events(calendar.id).items.select{ |x| (x.start.date_time.to_s > (Date.today - 1.month).to_s) || (x.start.date.to_s > (Date.today - 1.month).to_s) }
+      items = service.list_events(calendar.id).items.select{|x| x.updated.to_s > (Date.today - 1.month).to_s }.select{ |x| (x.start.date_time.to_s > (Date.today - 1.month).to_s) || (x.start.date.to_s > (Date.today - 1.month).to_s) }
       calendar_events_pair[calendar.id] = items.map(&:id)
       new_events += items
     end
@@ -439,6 +440,10 @@ module CalendarHelper
     service = Google::Apis::CalendarV3::CalendarService.new
     service.authorization = client
 
+    push_pending_events_to_google_offline(service)
+  end
+
+  def push_pending_events_to_google_offline(service)
     tasks = Task.pending_event
     tasks.each do |t|
       t_relations = t.task_relations
@@ -448,7 +453,7 @@ module CalendarHelper
       staff_ids = t_relations.map(&:staff_id).compact
       staff_ids.delete(0)
       next if staff_ids.blank?
-      t.google_event_id = push_event(customer, t.description, staff_ids, t.response_staff, t.start_date, t.end_date, t.subject_1, t.method, service, client).id
+      t.google_event_id = push_event(customer, t.description, staff_ids, t.response_staff, t.start_date, t.end_date, t.subject_1, t.method, service, service.authorization).id
       t.gcal_status = "pushed"
       t.save
     end
