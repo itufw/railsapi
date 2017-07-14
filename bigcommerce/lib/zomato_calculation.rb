@@ -41,7 +41,7 @@ module ZomatoCalculation
     while !customers.blank?
       customer = customers.delete_at(customers.length - 1)
 
-      next if Customer.near([customer.lat, customer.lng], 0.5, units: :km).map(&:id).count < 2
+      next if Customer.near([customer.lat, customer.lng], 0.2, units: :km).map(&:id).count < 2
 
       response = HTTParty.get(query, query: {lat: customer.lat, lon: customer.lng, radius: 500, cuisines: get_cuisines.map(&:to_s)}, headers: {"user-key" => Rails.application.secrets.zomato_key })
       count_ping += 1
@@ -49,9 +49,9 @@ module ZomatoCalculation
       puts 'Counting ' + count_ping.to_s
 
       restaurant_update_attribuets(response['restaurants'])
-      return if count_ping > 200
+      return if count_ping > 500
 
-      customers_viewed += (response['results_found'].to_i < 100) ? Customer.near([customer.lat, customer.lng], 1, units: :km).map(&:id) : Customer.near([customer.lat, customer.lng], 0.5, units: :km).map(&:id)
+      customers_viewed += (response['results_found'].to_i < 100) ? Customer.near([customer.lat, customer.lng], 0.5, units: :km).map(&:id) : Customer.near([customer.lat, customer.lng], 0.2, units: :km).map(&:id)
       customers = customers.select{ |x| !customers_viewed.include?x.id }
     end
   end # end def
