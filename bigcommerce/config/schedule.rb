@@ -30,7 +30,7 @@ every 5.minutes do
 	rake "updates:models"
 end
 
-every 2.hours do
+every 1.hours do
 	rake "updates:event_update"
 end
 
