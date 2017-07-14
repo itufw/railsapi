@@ -228,6 +228,29 @@ class Task < ActiveRecord::Base
     where('tasks.is_task = 0')
   end
 
+  def complete_task(staff_id)
+    time = Time.now.to_s(:db)
+    self.completed_date = time
+    self.completed_staff = staff_id
+    self.expired = 1
+    self.task_relations.each do |relation|
+      relation.completed_date = time
+      relation.completed_staff = staff_id
+      relation.save
+    end
+    self.save
+  end
+
+  def expire_task
+    self.expired = 1
+    self.save
+  end
+
+  def reactive_task
+    self.expired = 0
+    self.save
+  end
+
   def self.order_by_id(direction)
     order('tasks.id ' + direction)
   end

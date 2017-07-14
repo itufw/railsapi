@@ -80,17 +80,21 @@ class TaskController < ApplicationController
   end
 
   def task_update
-    case params[:task_type]
-    when 'expired'
-      expire_task(params[:task_id])
-    when 'reactive'
-      reactive_task(params[:task_id])
-    when 'higher_priority'
-      higher_priority_task(params[:task_id])
-    when 'lower_priority'
-      lower_priority_task(params[:task_id])
-    when 'completed'
-      complete_task(params[:task_id], session[:user_id])
+    begin
+      case params[:task_type]
+      when 'expired'
+        Task.find(params[:task_id]).expire_task
+      when 'reactive'
+        Task.find(params[:task_id]).reactive_task
+      when 'higher_priority'
+        higher_priority_task(params[:task_id])
+      when 'lower_priority'
+        lower_priority_task(params[:task_id])
+      when 'completed'
+        Task.find(params[:task_id]).complete_task(session[:user_id])
+      end
+    rescue
+      flash[:error] = "Error"
     end
     redirect_to :back
   end

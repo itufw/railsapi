@@ -2,7 +2,7 @@
 
 <%= form_for @note, :url => {:controller => "activity", :action => "save_note"}, :id => "note_append_form"  do |f| %>
 <%= hidden_field_tag :completed_parent , @completed_parent %>
-
+<%= hidden_field_tag :parent_task, @parent.id unless @parent.nil? %>
 <div class="row" style="margin-top: -50px;">
   <%= render 'activity_partials/customer_search', activity: @parent%>
 </div>

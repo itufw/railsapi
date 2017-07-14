@@ -22,8 +22,10 @@ class ActivityController < ApplicationController
     if params[:note_id] && Task.where('tasks.id = ?', params[:note_id]).count > 0
       @note.parent_task = params[:note_id]
       @parent = Task.find(@note.parent_task)
-      @completed_parent = params[:task_type] || 'no'
-
+      if params[:task_type]
+        @completed_parent = params[:task_type]
+        @note.description = "Complete: \n" + @parent.description
+      end
       @note.function = @parent.function
       @note.subject_1 = @parent.subject_1
       @note.promotion_id = @parent.promotion_id
@@ -43,26 +45,13 @@ class ActivityController < ApplicationController
     # ['tr_1000','tr_2000']
     @sample_products = params[:sample_products] || nil
 
-    @search_text = params[:product_search_text] || nil
-
     @product_selected = params[:product_selected] || nil
-
-    @customer_id = params[:customer_id]
-
-    @lead_id = params[:lead_id]
   end
 
   def save_note
-    note = note_save(note_params, session[:user_id])
-
+    note = note_save(note_params, session[:user_id], params[:parent_task])
     # complted: task_control_icon -> add_note -> save_note
-    if note.parent_task && params[:completed_parent] == 'completed'
-      parent = Task.find(note.parent_task)
-      parent.expired = 1
-      parent.completed_date = Date.today.to_s(:db)
-      parent.completed_staff = session[:user_id]
-      parent.save
-    end
+    Task.find(note.parent_task).complete_task(session[:user_id]) if note.parent_task && params[:completed_parent] == 'completed'
 
     product_note_save(params, session[:user_id], note.id)
     customer_id, role = relation_save(params, note)
@@ -122,13 +111,14 @@ class ActivityController < ApplicationController
   end
 
   def activity_edit
-    @activity = Task.find(params[:note_id])
-    if @activity.nil?
+    begin
+      @activity = Task.find(params[:note_id])
+      @function, @subjects = function_search(params)
+      @staff = Staff.active
+    rescue
       flash[:error] = 'Error'
       redirect_to :back
     end
-    @function, @subjects = function_search(params)
-    @staff = Staff.active
   end
 
   def update
@@ -136,12 +126,15 @@ class ActivityController < ApplicationController
     customer_id, destination = relation_save(params, activity)
 
     task_product_note(params, activity, session[:user_id])
-    if destination == 'customer'
+
+    if params['button'] == 'complete'
+      redirect_to controller: 'activity', action: 'add_note', note_id: activity.id, task_type: 'completed'
+    elsif destination == 'customer'
       redirect_to controller: 'customer', action: 'summary', customer_id: customer_id, customer_name: Customer.find(customer_id).actual_name
       return
+    else
+      redirect_to controller: 'lead', action: 'summary', lead_id: customer_id
     end
-
-    redirect_to controller: 'lead', action: 'summary', lead_id: customer_id
   end
 
   def autocomplete_product_name
