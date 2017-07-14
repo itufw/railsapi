@@ -2,6 +2,24 @@ require 'google/apis/calendar_v3'
 require 'googleauth'
 
 module GoogleCalendarSync
+
+  def import_into_customer_tags
+    exist_customer = CustomerTag.filter_by_role('Customer').map(&:customer_id)
+    Customer.where('id NOT IN (?)', exist_customer).each do |customer|
+      CustomerTag.new.insert_customer(customer)
+    end
+
+    exist_lead = CustomerTag.filter_by_role('Lead').map(&:customer_id)
+    CustomerLead.where('id NOT IN (?)', exist_lead).each do |lead|
+      CustomerTag.new.insert_lead(lead)
+    end
+
+    exist_contact = CustomerTag.filter_by_role('Contact').map(&:customer_id)
+    Contact.sales_force.where('id NOT IN (?)', exist_contact).each do |contact|
+      CustomerTag.new.insert_contact(contact)
+    end
+  end
+  
   def connect_google_calendar
     ENV['GOOGLE_APPLICATION_CREDENTIALS'] = 'config/key.json'
 
