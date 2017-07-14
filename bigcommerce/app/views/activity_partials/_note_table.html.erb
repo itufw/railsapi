@@ -60,9 +60,6 @@ $(function () {
       defaultDate: new Date(),
       sideBySide: true
     });
-    <% unless activity.nil?%>
-      $('#due_timepicker').data("DateTimePicker").date("<%= activity.start_date.to_date.to_s %>");
-    <% end %>
 });
 
 

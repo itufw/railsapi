@@ -1,5 +1,6 @@
 <thead>
     <tr>
+      <% relations = TaskRelation.filter_by_task_ids(@tasks.map(&:id)) %>
         <th id="priority_th">
           <li class="dropdown">
             <a class="" data-toggle="dropdown" href="#">Priority</a>
@@ -15,36 +16,6 @@
               </ul>
           </li>
         </th>
-        <th id="function_th">
-          <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Func/Sub</a>
-              <ul class="dropdown-menu">
-                <% TaskSubject.where('id IN (?)', @tasks.map(&:subject_1).uniq.compact).each do |subject| %>
-                <li>
-                  <a id="filter_subject_<%= subject.id%>"><%= subject.subject %></a>
-                  &nbsp;&nbsp;
-                </li>
-                <% end %>
-              </ul>
-          </li>
-        </th>
-        <th id="method_th">
-          <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Method</a>
-              <ul class="dropdown-menu">
-                <% @tasks.map(&:method).uniq.each do |method| %>
-                <li>
-                  <a id="filter_method_<%= method%>"><%= method %></a>
-                  &nbsp;&nbsp;
-                </li>
-                <% end %>
-              </ul>
-          </li>
-        </th>
-        <th>Description</th>
-
-        <% relations = TaskRelation.filter_by_task_ids(@tasks.map(&:id)) %>
-
         <th id="customer_th">
           <li class="dropdown">
             <a class="" data-toggle="dropdown" href="#">Customer</a>
@@ -64,7 +35,34 @@
               </ul>
           </li>
         </th>
-        <th id="staff_th">
+
+        <th id="function_th" class="hidden-columns">
+          <li class="dropdown">
+            <a class="" data-toggle="dropdown" href="#">Func/Sub</a>
+              <ul class="dropdown-menu">
+                <% TaskSubject.where('id IN (?)', @tasks.map(&:subject_1).uniq.compact).each do |subject| %>
+                <li>
+                  <a id="filter_subject_<%= subject.id%>"><%= subject.subject %></a>
+                  &nbsp;&nbsp;
+                </li>
+                <% end %>
+              </ul>
+          </li>
+        </th>
+        <th id="method_th" class="hidden-columns">
+          <li class="dropdown">
+            <a class="" data-toggle="dropdown" href="#">Method</a>
+              <ul class="dropdown-menu">
+                <% @tasks.map(&:method).uniq.each do |method| %>
+                <li>
+                  <a id="filter_method_<%= method%>"><%= method %></a>
+                  &nbsp;&nbsp;
+                </li>
+                <% end %>
+              </ul>
+          </li>
+        </th>
+        <th id="staff_th" class="hidden-columns">
           <li class="dropdown">
             <a class="" data-toggle="dropdown" href="#">Assigned</a>
               <ul class="dropdown-menu">
@@ -77,9 +75,12 @@
               </ul>
           </li>
         </th>
+
+        <th>Description</th>
+
         <th id="created_by_th">
           <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Created By</a>
+            <a class="" data-toggle="dropdown" href="#">Creator</a>
               <ul class="dropdown-menu">
                 <% Staff.filter_by_ids(@tasks.map(&:response_staff).uniq).each do |staff| %>
                 <li>
@@ -92,6 +93,7 @@
         </th>
         <th><%= date_column_name %></th>
         <th><a class="show_all">Show All</a></th>
+        <th><i class="glyphicon glyphicon-off expand-table" title="Expand!"></i></th>
     </tr>
 </thead>
 
