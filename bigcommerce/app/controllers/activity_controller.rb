@@ -6,9 +6,9 @@ class ActivityController < ApplicationController
 
   autocomplete :product, :name, full: true
   autocomplete :customer, :actual_name, full: true
-  autocomplete :customer_lead, :actual_name, full: true
-  autocomplete :contact, :name, display_value: :display_position, scopes: :sales_force
-  autocomplete :staff, :nickname
+  autocomplete :customer_lead, :actual_name, full: true, scopes: :not_customer
+  autocomplete :contact, :name, display_value: :display_position, scopes: :has_role
+  autocomplete :staff, :nickname, extra_data: [:nickname]
 
   include ActivityHelper
 
@@ -18,13 +18,14 @@ class ActivityController < ApplicationController
     @customers, @contacts \
       = customer_search(params)
 
-    # @products = product_search
     @note = Task.new
     if params[:note_id] && Task.where('tasks.id = ?', params[:note_id]).count > 0
       @note.parent_task = params[:note_id]
       @parent = Task.find(@note.parent_task)
-      @completed_parent = params[:task_type] || 'no'
-
+      if params[:task_type]
+        @completed_parent = params[:task_type]
+        @note.description = "Complete: \n" + @parent.description
+      end
       @note.function = @parent.function
       @note.subject_1 = @parent.subject_1
       @note.promotion_id = @parent.promotion_id
@@ -37,7 +38,6 @@ class ActivityController < ApplicationController
       @note.portfolio_id = 0
     end
 
-
     # activity helper -> get the functions/subjects/methods from json request
     @function, @subjects = function_search(params, @parent)
 
@@ -45,46 +45,26 @@ class ActivityController < ApplicationController
     # ['tr_1000','tr_2000']
     @sample_products = params[:sample_products] || nil
 
-    # TEST VERSION
-    # @products = Product.sample_products(35, 20)
-
-    @search_text = params[:product_search_text] || nil
-
     @product_selected = params[:product_selected] || nil
-
-    @customer_text = params[:customer_search_text] || nil
-
-    @lead_text = params[:lead_search_text] || nil
-
-    # production version
-    if 'Sales Executive' == session[:authority]
-      @products = Product.sample_products(session[:user_id], 20)
-    else
-      @products = Product.sample_products(35, 20)
-    end
-
   end
 
   def save_note
-    note = note_save(note_params, session[:user_id])
-
+    note = note_save(note_params, session[:user_id], params[:parent_task])
     # complted: task_control_icon -> add_note -> save_note
-    if note.parent_task && params[:completed_parent] == 'completed'
-      parent = Task.find(note.parent_task)
-      parent.expired = 1
-      parent.completed_date = Date.today.to_s(:db)
-      parent.completed_staff = session[:user_id]
-      parent.save
-    end
+    Task.find(note.parent_task).complete_task(session[:user_id]) if note.parent_task && params[:completed_parent] == 'completed'
 
     product_note_save(params, session[:user_id], note.id)
-    relation_save(params, note)
+    customer_id, role = relation_save(params, note)
     flash[:success] = 'Note Saved!'
     if 'new_task' == params[:button]
       redirect_to action: 'add_activity', note_id: note.id
       return
     end
-    redirect_to :back
+    if role=="customer"
+      redirect_to controller: 'customer', action: 'summary', customer_id: customer_id, customer_name: Customer.find(customer_id).actual_name
+    else
+      redirect_to controller: 'lead', action: 'summary', lead_id: customer_id
+    end
   end
 
   # insert task
@@ -104,47 +84,63 @@ class ActivityController < ApplicationController
     @function, @subjects = function_search(params, @parent)
     @staff = Staff.active
 
-      # @products = Product.sample_products(session[:user_id], 20)
-      if %w['Sales Executive'].include? session[:authority]
-        @products = Product.sample_products(session[:user_id], 20)
-      else
-        @products = Product.sample_products(35, 20)
-      end
+    @customer_id = params[:customer_id]
 
-    @staff_text = params[:staff_search_text]
+    @lead_id = params[:lead_id]
   end
 
   def save_task
     task = note_save(note_params, session[:user_id])
-    customer_id = relation_save(params, task)
+    customer_id, role = relation_save(params, task)
     task_product_note(params, task, session[:user_id])
     flash[:success] = 'Task Saved!'
-    redirect_to controller: 'customer', action: 'summary', customer_id: customer_id, customer_name: Customer.find(customer_id).actual_name
+    if role=="customer"
+      redirect_to controller: 'customer', action: 'summary', customer_id: customer_id, customer_name: Customer.find(customer_id).actual_name
+    else
+      redirect_to controller: 'lead', action: 'summary', lead_id: customer_id
+    end
+  end
+
+  def selected_customer
+    customer = Customer.find(params[:customer_id])
+    @invoices = customer.xero_invoices.has_amount_due
+    @cust_contacts = customer.cust_contacts
+    respond_to do |format|
+      format.js
+    end
   end
 
   def activity_edit
-    @activity = Task.find(params[:note_id])
-    if @activity.nil?
+    begin
+      @activity = Task.find(params[:note_id])
+      @function, @subjects = function_search(params)
+      @staff = Staff.active
+    rescue
       flash[:error] = 'Error'
       redirect_to :back
-    end
-    @function, @subjects = function_search(params)
-    @staff = Staff.active
-    if 'Sales Executive' == session[:authority]
-      @products = Product.sample_products(session[:user_id], 20)
-    else
-      @products = Product.sample_products(35, 20)
     end
   end
 
   def update
     activity = note_update(note_params, session[:staff_id], params[:activity_id])
-    customer_id = relation_save(params, activity)
+    customer_id, destination = relation_save(params, activity)
 
     task_product_note(params, activity, session[:user_id])
-    redirect_to controller: 'customer', action: 'summary', customer_id: customer_id, customer_name: Customer.find(customer_id).actual_name
+
+    if params['button'] == 'complete'
+      redirect_to controller: 'activity', action: 'add_note', note_id: activity.id, task_type: 'completed'
+    elsif destination == 'customer'
+      redirect_to controller: 'customer', action: 'summary', customer_id: customer_id, customer_name: Customer.find(customer_id).actual_name
+      return
+    else
+      redirect_to controller: 'lead', action: 'summary', lead_id: customer_id
+    end
   end
 
+  def autocomplete_product_name
+    products = Product.search_for(params[:term]).order('name_no_vintage ASC, vintage DESC').all
+    render :json => products.map { |product| {:id => product.id, :label => product.name, :value => product.name, :price => (product.calculated_price * (1.29)).round(2)} }
+  end
 
   # -----------private --------------------
   private

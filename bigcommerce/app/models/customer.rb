@@ -14,13 +14,15 @@ class Customer < ActiveRecord::Base
 	belongs_to :staff
 	belongs_to :xero_contact
 
+	has_many :xero_invoices, through: :xero_contact
+
 	geocoded_by :address
   after_validation :geocode
 
   reverse_geocoded_by :lat, :lng
   after_validation :reverse_geocode
 
-	scoped_search on: [:firstname, :lastname, :company, :actual_name]
+	scoped_search on: [:firstname, :lastname, :company, :actual_name, :address]
 
 	self.per_page = 15
 
@@ -192,6 +194,10 @@ class Customer < ActiveRecord::Base
 
 	def self.order_by_overdue(direction)
 		includes(:xero_contact).order('xero_contacts.accounts_receivable_overdue ' + direction)
+	end
+
+	def self.active_customers
+		where(staff_id: Staff.active_sales_staff)
 	end
 
 	def self.insert_xero_contact_id(customer_id, xero_contact_id)

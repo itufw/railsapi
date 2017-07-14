@@ -1,8 +1,9 @@
 <%= title "#{@customer.xero_contact.name}" %>
 <h3><%= @customer.xero_contact.name%></h3>
+<center><%= link_to "Add New Contact", controller: 'contact', action: 'create_contact', customer_id: @customer.id, customer_name: @customer.actual_name %></center>
 
 <div style="margin-top: 50px;">
-    <%= render "accounts_partials/invoice_header", customer: @customer %>
+    <%= render "customer_partials/summary_header", customer: @customer %>
 </div>
 
 <div style="margin-top: 50px;">

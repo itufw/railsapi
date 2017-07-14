@@ -1,73 +1,93 @@
-<%
-  relations = (activity.nil?) ? nil : activity.task_relations
-%>
-<div class="col-md-8">
-  <div class="col-md-4">
-    <table id="customer_table">
-      <thead>
-        <tr>
-          <th>Customer</th>
-          <td>
-              <%= autocomplete_field_tag 'customer_name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search',size: 15 %>
-              <i class="glyphicon glyphicon-plus activity-customers" title="Include Customer"></i>
-          </td>
-        </tr>
-      </thead>
-      <% unless relations.nil?
-          begin
-            customers = Customer.filter_by_ids(relations.uniq.compact.map(&:customer_id))
-            customers.each do|customer| %>
-              <tr id="tr_customer_<%=customer.id%>">
-                <td colspan="2"><%= text_field_tag 'customer '+customer.id.to_s, customer.actual_name, readonly: true %><i class="glyphicon glyphicon-remove remove_customer" title="remove"></i></td>
-              </tr>
-        <% end
-          rescue
-          end
-        %>
-      <% end %>
-    </table>
-  </div>
-  <div class="col-md-4">
-    <table id="lead_table">
-      <tr>
-        <th>Lead</th>
-        <td>
-            <%= autocomplete_field_tag 'lead_name', '', autocomplete_customer_lead_actual_name_activity_index_path, placeholder: 'Search Lead', id: 'lead_search',size: 15 %>
-            <i class="glyphicon glyphicon-plus activity-leads" title="Include Lead"></i>
-        </td>
-      </tr>
-      <% unless relations.nil?
-          begin
-            leads = CustomerLead.filter_by_ids(relations.uniq.compact.map(&:customer_lead_id))
-            leads.each do|lead| %>
-              <tr id="tr_lead_<%=lead.id%>">
-                <td colspan="2"><%= text_field_tag 'lead '+lead.id.to_s, lead.actual_name, readonly: true %><i class="glyphicon glyphicon-remove remove_lead" title="remove"></i></td>
-              </tr>
-        <% end
-          rescue
-          end
-        %>
-      <% end %>
-    </table>
-  </div>
-  <div class="col-md-4">
-    <table id="contact_table">
-      <tr>
-        <th>Contact</th>
-        <td>
-            <%= autocomplete_field_tag 'contact_name', '', autocomplete_contact_name_activity_index_path, placeholder: 'Search Contact', id: 'contact_search',size: 15 %>
-            <i class="glyphicon glyphicon-plus activity-contacts" title="Include Contact"></i>
-        </td>
-      </tr>
-    </table>
-  </div>
-  <br/>
+<%relations = (activity.nil?) ? nil : activity.task_relations%>
+<% customer_list = [@customer_id.to_i]  %>
+<% customer_list = customer_list + relations.uniq.compact.map(&:customer_id) unless relations.nil?%>
+<% lead_list = [@lead_id.to_i] %>
+<% lead_list = lead_list + relations.uniq.compact.map(&:customer_lead_id) unless relations.nil? %>
+<div class="col-md-offset-1 col-md-4">
+  <table id="customer_table">
+    <tr>
+      <th>Customer</th>
+      <td>
+        <%= autocomplete_field_tag 'customer_name', '', autocomplete_customer_tag_name_calendar_index_path, placeholder: 'Search Customer', id: 'customer_search',size: 15 %>
+      </td>
+    </tr>
+      <% customers = Customer.filter_by_ids(customer_list)
+      customers.each do|customer| %>
+    <tr id="tr_customer_<%=customer.id%>">
+      <td colspan="2"><%= text_field_tag 'customer '+customer.id.to_s, customer.actual_name, readonly: true %>
+        <i class="glyphicon glyphicon-remove remove" title="remove"></i>
+      </td>
+    </tr>
+    <%end
+        leads = CustomerLead.filter_by_ids(lead_list)
+    leads.each do|lead| %>
+    <tr id="tr_lead_<%=lead.id%>">
+      <td colspan="2"><%= text_field_tag 'lead '+lead.id.to_s, lead.actual_name + ', (Lead)', readonly: true %>
+        <i class="glyphicon glyphicon-remove remove" title="remove"></i>
+      </td>
+    </tr>
+    <% end %>
+  </table>
+  <div class="selected_customer" style="display: none;"></div>
 </div>
+
+<div class="col-md-4">
+  <table id="contact_table">
+    <tr>
+      <th>Contact</th>
+      <td>
+        <%= autocomplete_field_tag 'contact_name', '', autocomplete_contact_name_activity_index_path, placeholder: 'Search contact', id: 'contact_search',size: 15 %>
+      </td>
+    </tr>
+    <% unless relations.nil? %>
+      <% CustContact.filter_by_contacts(relations.pluck('contact_id')).each do |contact_role|%>
+        <% contact = contact_role.contact %>
+        <tr id="tr_contact_<%= contact.id %>" class="tr_customer_<%= contact_role.customer_id %>">
+          <td colspan="2"><input type="text" name="contact <%= contact.id %>" id="contact_<%= contact.id %>" value="<%= contact.name%>" readonly="readonly"><i class="glyphicon glyphicon-remove remove" title="remove"></i></td>
+          <td><%= contact_role.customer.actual_name + "|" + contact_role.position %></td>
+        </tr>
+      <% end %>
+    <% end %>
+  </table>
+</div>
+
 <script>
-  $('.remove_customer').click(function(){
-    $(this).parent().parent().remove();
+
+var contact_table = $('#contact_table');
+
+  $('#customer_search').bind('railsAutocomplete.select', function (event, data) {
+    if ($('#tr_' + data.item.role.toLowerCase() + '_' + data.item.customer_id).length == 0) {
+      $('#customer_table').append([
+        '<tr id="tr_' + data.item.role.toLowerCase() + '_' + data.item.customer_id + '">',
+        '<td colspan="2"><input type="text" name="' + data.item.role.toLowerCase() + ' ' + data.item.customer_id + '" id="' + data.item.role.toLowerCase() + '_' + data.item.customer_id + '" value="' + data.item.label + '" readonly="readonly"><i class="glyphicon glyphicon-remove remove" title="remove"></i></td>',
+        '</tr>'
+      ].join(''));
+      $('.remove').click(function () {
+        if (data.item.role == "Customer") {
+          $('.tr_customer_' + data.item.customer_id).remove();
+        }
+        $(this).parent().parent().remove();
+      });
+      if (data.item.role == "Customer"){
+        $('.selected_customer').attr('customer_id', data.item.customer_id);
+        $('.selected_customer').change();
+      }
+    }
   });
-  $('.remove_lead').click(function(){
+
+  $('#contact_search').bind('railsAutocomplete.select', function (event, data) {
+    if ($('#tr_contact_' + data.item.id).length == 0) {
+      contact_table.append([
+        '<tr id="tr_contact_' + data.item.id + '">',
+          '<td><input type="checkbox" name="selected_contact[]" value= '+ data.item.id +'></td>',
+          '<td><input type="text" name="contact '+ data.item.id +'" id="contact_'+ data.item.id +'" value="'+ data.item.label.split("|")[0] +'" readonly="readonly"></td>',
+          '<td>'+ data.item.label.split("|")[1] +'</td>',
+        '</tr>'
+      ].join(''));
+    }
+  });
+
+  $('.remove').click(function () {
     $(this).parent().parent().remove();
   });
 </script>

@@ -38,10 +38,11 @@ class TaskRelation < ActiveRecord::Base
 
     unless customer_id.nil?
       id, actual_name = customer_id.split('|')
+      actual_name, role = actual_name.split(', ')
       customer = Customer.where("id = #{id}").first
       if !customer.nil? && (customer.actual_name.include?actual_name)
         task_relation.customer_id = id
-      elsif !CustomerLead.where('id = ?', id).first.nil? && (CustomerLead.where('id = ?', id).first.actual_name.include?actual_name)
+      elsif !CustomerLead.where('id = ?', id).first.nil? && (role == '(Lead)')
         task_relation.customer_lead_id = id
       else
         task_relation.contact_id = id

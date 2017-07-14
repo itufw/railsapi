@@ -26,10 +26,12 @@ class ReminderMailer < ActionMailer::Base
 
     # attachment file
     # basically Pod
-    unless attachment_tmp.nil?
-      attachment_tmp_path = File.absolute_path(attachment_tmp.tempfile)
-      attachment_tmp_name = attachment_tmp.original_filename
-      attachments[attachment_tmp_name] = File.read(attachment_tmp_path)
+    unless attachment_tmp.nil? || attachment_tmp.blank?
+      attachment_tmp.each do |attachment_tmp_file|
+        attachment_tmp_path = File.absolute_path(attachment_tmp_file.tempfile)
+        attachment_tmp_name = attachment_tmp_file.original_filename
+        attachments[attachment_tmp_name] = File.read(attachment_tmp_path)
+      end
     end
 
     @email_content = email_content

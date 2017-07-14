@@ -1,6 +1,8 @@
 <%= title "Leads" %>
 <h3>Leads</h3>
 <center><%= link_to "Create New Lead", action: 'create_leads' %></center>
+<center><%= link_to "Link Lead to Customers", action: 'link_leads' %></center>
+
 <%= form_tag({:controller => "lead", :action => 'all_leads'}, {:method => "get"}) do %>
 
 <div class="form-group" style="margin-left:300px;margin-top:50px;">

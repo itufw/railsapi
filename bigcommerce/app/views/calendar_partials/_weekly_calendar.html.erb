@@ -1,4 +1,4 @@
-<div class="weekly-calendar" id="calendar-staff-<%= staff_id%>" >
+<div class="weekly-calendar calendar-table" id="calendar-staff-<%= staff_id%>" staff="<%= staff_id%>" start-date="<%= @start_date.to_s%>">
   <% date = Date.parse @start_date %>
   <table class="table table-striped">
       <thead>

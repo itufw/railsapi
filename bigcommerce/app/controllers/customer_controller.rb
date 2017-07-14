@@ -185,7 +185,7 @@ class CustomerController < ApplicationController
     # Get top products
     # To get top products, get all the orders for a customer, then get products of those orders
     # based on the above param filters, filter products out
-    where_query = 'OrderProduct.valid_orders.order_customer_filter(%s).product_filter(%s)' % [[@customer_id], Product.all.pluck('id')]
+    where_query = 'OrderProduct.valid_orders.order_customer_filter(%s).product_filter(%s)' % [[@customer_id], products.pluck('id')]
 
     # default sorting with name
     order_col = params[:order_col] || 'Last Quarter'
@@ -215,17 +215,48 @@ class CustomerController < ApplicationController
       end
     end
     ####################################
+    @products = Product.send('filter_by_' + @transform_column, @product_ids)
   end
 
   def zomato
-    @zomato = ZomatoRestaurant.all
+    @search_text = params['search']
+    @per_page = params[:per_page] || ZomatoRestaurant.per_page
+
+    order_function, direction = sort_order(params, :order_by_name, 'DESC')
+
+    @zomato = ZomatoRestaurant.search_for(@search_text).send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
   end
 
+  def near_by
+    @search_text = params['search']
+
+    radius = params[:radius] || 0.5
+
+    customer = Customer.where('lat IS NOT NULL').search_for(@search_text).first
+    customer = ZomatoRestaurant.search_for(@search_text).first if customer.nil?
+    customer = CustomerLead.where('latitude IS NOT NULL').search_for(@search_text).first if customer.nil?
+    latitude = (customer.is_a? Customer) ? customer.lat : customer.latitude
+    longitude = (customer.is_a? Customer) ? customer.lng : customer.longitude
+
+    @customers, @leads, @resaurants = near_by_customers(latitude, longitude, radius)
+  end
+
+  def map_geocode
+    latLng = params[:geocode].split(/[(,) ]/)
+    distance = params[:distance] || 1
+    latitude = latLng.second.to_f.round(4)
+    longitude = latLng.last.to_f.round(3)
+    @customers, @leads, @restaurants = near_by_customers(latitude, longitude, distance)
+    respond_to do |format|
+      format.js
+    end
+  end
 
   private
 
   def customer_params
-    params.require(:customer).permit(:firstname, :lastname, :actual_name, :staff_id, :cust_style_id,\
-                                     :cust_group_id)
+    params.require(:customer).permit(:firstname, :lastname, :actual_name,\
+                                     :staff_id, :cust_style_id, :cust_group_id,\
+                                     :address)
   end
 end

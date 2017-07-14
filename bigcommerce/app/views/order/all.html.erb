@@ -1,5 +1,6 @@
 <%= title "Orders" %>
 <h3><%= orders_page_title(@staff_nickname, @start_date, @end_date) %></h3>
+<center><%= link_to "View My Orders", action: 'all', staff: {id: session[:user_id]} unless current_user_sales?(session[:authority]) %></center>
 
 <%= form_tag({:controller => "order", :action => "all"}, {:method => "get"}) do %>
 

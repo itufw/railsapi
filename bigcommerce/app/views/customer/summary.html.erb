@@ -1,6 +1,7 @@
 <%= title @customer_name %>
 <h3><%= @customer_name %></h3>
 
+<center><a href="http://maps.apple.com/?q=<%=@customer.actual_name%>&sll=<%=@customer.lat%>,<%=@customer.lng%>&z=10"><%= @customer.address unless @customer.address.nil?%></a></center>
 <center><%= link_to "Edit", action: 'edit', customer_id: @customer_id, customer_name: @customer_name %></center>
 <center><%= link_to "Add New Contact", controller: 'contact', action: 'create_contact', customer_id: @customer_id, customer_name: @customer_name %></center>
 

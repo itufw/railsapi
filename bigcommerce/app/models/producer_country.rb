@@ -6,5 +6,10 @@ class ProducerCountry < ActiveRecord::Base
   def self.filter_by_id(producer_country_id)
     find(producer_country_id)
   end
-  
+
+  def self.producer_country_filter(producer_country_ids)
+    return where(id: producer_country_ids) if producer_country_ids
+    all
+  end
+
 end

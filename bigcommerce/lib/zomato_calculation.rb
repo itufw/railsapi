@@ -18,53 +18,56 @@ module ZomatoCalculation
 
   def filter_viewed_spots
     customers_viewed = []
-    ZomatoRestaurant.all.each do |restaurant|
-      customers_viewed += Customer.near([restaurant.latitude, restaurant.longitude], 0.3).map(&:id)
+    restaurants = ZomatoRestaurant.all
+    while !restaurants.blank?
+      customers_viewed += Customer.near([restaurants.first.latitude, restaurants.first.longitude], 0.1, units: :km).map(&:id)
+      restaurants -= ZomatoRestaurant.near([restaurants.first.latitude, restaurants.first.longitude], 0.1, units: :km)
     end
     customers_viewed.uniq
   end
 
   def search_by_geo
     # MultiGeocoder.geocode(location)
-
-    query = 'https://developers.zomato.com/api/v2.1/search?'
+    count_ping = 0
+    query = 'https://developers.zomato.com/api/v2.1/search'
     customers_viewed = []
     customers = Customer.where('lng IS NOT NULL')
 
     # delete following block after data integrated
-    customers_viewed = filter_viewed_spots
-    customers = customers.select{ |x| !customers_viewed.include?x.id }
-
+    # customers_viewed = filter_viewed_spots
+    # customers = customers.select{ |x| !customers_viewed.include?x.id }
+    # ------------------------------------------------------------------
 
     while !customers.blank?
-      customer = customers.first
-      query += 'lat=' + customer.lat.to_s
-      query += '&lon=' + customer.lng.to_s
-      query += '&radius=' + '500'
+      customer = customers.delete_at(customers.length - 1)
 
-      start = 0
-      max_number = 300
-      while start < max_number
-        query += '&cuisines=' + get_cuisines.map(&:to_s).join('%2C%20')
-        query += '&start=' + start.to_s
-        response = HTTParty.get(query, headers: {"user-key" => Rails.application.secrets.zomato_key })
-        break if response['restaurants'].nil? || response['restaurants'].blank? || (response['results_shown'] == 0)
-        max_number = response['results_found']
-        start = response['results_start'].to_i + 20
-        restaurant_update_attribuets(response['restaurants'])
-      end # end while
+      next if Customer.near([customer.lat, customer.lng], 0.2, units: :km).map(&:id).count < 2
 
-      customers_viewed += Customer.near([customer.lat, customer.lng], 0.5).map(&:id) if max_number < 100
-      customers_viewed += Customer.near([customer.lat, customer.lng], 0.2).map(&:id) if max_number >= 100
+      response = HTTParty.get(query, query: {lat: customer.lat, lon: customer.lng, radius: 500, cuisines: get_cuisines.map(&:to_s)}, headers: {"user-key" => Rails.application.secrets.zomato_key })
+      count_ping += 1
+
+      puts 'Counting ' + count_ping.to_s
+
+      restaurant_update_attribuets(response['restaurants'])
+      return if count_ping > 500
+
+      customers_viewed += (response['results_found'].to_i < 100) ? Customer.near([customer.lat, customer.lng], 0.5, units: :km).map(&:id) : Customer.near([customer.lat, customer.lng], 0.2, units: :km).map(&:id)
       customers = customers.select{ |x| !customers_viewed.include?x.id }
     end
   end # end def
 
   def restaurant_update_attribuets(restaurants)
+    return if restaurants.nil? || restaurants.blank?
     restaurants.each do |restaurantL3|
       restaurant = restaurantL3['restaurant']
       next if restaurant.nil?
+      next if (ZomatoCuisine.inactive_cuisines.map(&:name) + restaurant['cuisines'].split).sort.uniq == ZomatoCuisine.inactive_cuisines.map(&:name).sort.uniq
       next if ZomatoRestaurant.filter_by_id(restaurant['id']).count > 0
+
+      customer = Customer.where('Round(lat, 4) = ? AND Round(lng, 3) = ? AND actual_name LIKE ?', restaurant['location']['latitude'].to_f.round(4), restaurant['location']['longitude'].to_f.round(3), restaurant['name']).first
+      customer_id = (customer.nil?) ? nil : customer.id
+      lead = CustomerLead.where('Round(latitude, 4) = ? AND Round(longitude, 3) = ? AND actual_name LIKE ?', restaurant['location']['latitude'].to_f.round(4), restaurant['location']['longitude'].to_f.round(3), restaurant['name']).first
+      lead_id = (lead.nil?) ? nil : lead.id
 
       restaurant_attr = {id: restaurant['id'], name: restaurant['name'],\
           url: restaurant['url'], address: restaurant['location']['address'],\
@@ -74,14 +77,27 @@ module ZomatoCalculation
           zipcode: restaurant['location']['zipcode'],\
           country_id: restaurant['location']['country_id'],\
           average_cost_for_two: restaurant['average_cost_for_two'],\
-          cuisines: restaurant['cuisines'], active: 1 }
+          cuisines: restaurant['cuisines'], active: 1,\
+          customer_id: customer_id, customer_lead_id: lead_id
+         }
       ZomatoRestaurant.new().update_attributes(restaurant_attr)
-    end # end resposne.each
+    end # end response.each
+  end
+
+  def update_customer_or_lead_for_zomato
+    ZomatoRestaurant.where('customer_id IS NULL AND customer_lead_id IS NULL').each do |restaurant|
+      customer = Customer.where('Round(lat, 4) = ? AND Round(lng, 3) = ? AND actual_name LIKE ?', restaurant.latitude.to_f.round(4), restaurant.longitude.to_f.round(3), restaurant.name).first
+      restaurant.customer_id = (customer.nil?) ? nil : customer.id
+      lead = CustomerLead.where('Round(latitude, 4) = ? AND Round(longitude, 3) = ? AND actual_name LIKE ?', restaurant.latitude.to_f.round(4), restaurant.longitude.to_f.round(3), restaurant.name).first
+      restaurant.customer_lead_id = (lead.nil?) ? nil : lead.id
+      restaurant.save if !restaurant.customer_id.nil? || !restaurant.customer_lead_id.nil?
+    end
   end
 
   private
 
   def get_cuisines
-     [1,151,131,193,133,158,287,144,35,153,541,268,38,45,274,134,181,154,55,162,87,471,89,141,179,150,95,264]
+    ZomatoCuisine.active_cuisines.map(&:id)
+    #  [1,151,131,193,133,158,287,144,35,153,541,268,38,45,274,134,181,154,55,162,87,471,89,141,179,150,95,264]
   end
 end
