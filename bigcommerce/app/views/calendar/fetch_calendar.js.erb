@@ -23,12 +23,3 @@
   if (customer_checkbox.is(':checked')){
     customer_markers = handler.addMarkers(<%=raw get_customers_pins(@calendar_staff, start_date).to_json%>);
   }
-
-
-  if (event_markers != null && event_markers.length != 0){
-    handler.bounds.extendWith(event_markers);
-    handler.fitMapToBounds();
-  }else if (customer_markers != null) {
-    handler.bounds.extendWith(customer_markers);
-    handler.fitMapToBounds();
-  };

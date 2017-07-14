@@ -30,13 +30,6 @@ Rails.application.routes.draw do
   get '/activity/add_activity', to: 'activity#add_activity'
   get '/activity/daily_products', to: 'activity#daily_products'
 
-  resources :activity do
-    get :autocomplete_product_name, on: :collection
-    get :autocomplete_customer_actual_name, on: :collection
-    get :autocomplete_contact_name, on: :collection
-    get :autocomplete_customer_lead_actual_name, on: :collection
-    get :autocomplete_staff_nickname, on: :collection
-  end
 
   post 'add_task', to: 'task#task_record'
   post 'local_calendar', to: 'calendar#local_calendar'
@@ -51,10 +44,19 @@ Rails.application.routes.draw do
   resources :calendar do
     get :autocomplete_customer_tag_name, on: :collection
   end
-  
+
   resources :contact do
     get :autocomplete_customer_actual_name, on: :collection
   end
+
+  resources :activity do
+    get :autocomplete_product_name, on: :collection
+    get :autocomplete_customer_actual_name, on: :collection
+    get :autocomplete_contact_name, on: :collection
+    get :autocomplete_customer_lead_actual_name, on: :collection
+    get :autocomplete_staff_nickname, on: :collection
+  end
+
   # The priority is based upon order of creation: first created ->
   # highest priority.
   # See how all your routes lay out with "rake routes".

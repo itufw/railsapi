@@ -6,13 +6,13 @@ class CalendarController < ApplicationController
   skip_before_action :verify_authenticity_token
   before_action :confirm_logged_in
 
-  autocomplete :customer_tag, :name, extra_data: [:customer_id], full: true
+  autocomplete :customer_tag, :name, extra_data: [:customer_id, :role], full: true, scopes: :no_contacts
 
   include CalendarHelper
   include ModelsFilter
 
   def redirect
-    uri = Rails.env.development? ? 'http://localhost:3000/callback' : 'http://188.166.243.138.xip.io/callback'
+    uri = Rails.env.development? ? 'http://localhost:3000/callback' : 'http://cms.untappedwines.com.au/callback'
     client = Signet::OAuth2::Client.new(
       client_id: Rails.application.secrets.google_client_id,
       client_secret: Rails.application.secrets.google_client_secret,
@@ -28,7 +28,7 @@ class CalendarController < ApplicationController
   end
 
   def callback
-    uri = Rails.env.development? ? 'http://localhost:3000/callback' : 'http://188.166.243.138.xip.io/callback'
+    uri = Rails.env.development? ? 'http://localhost:3000/callback' : 'http://cms.untappedwines.com.au/callback'
 
     client = Signet::OAuth2::Client.new(
       client_id: Rails.application.secrets.google_client_id,
@@ -48,7 +48,6 @@ class CalendarController < ApplicationController
   end
 
   def local_calendar
-
     # tempary use, it should be assigned based on the current users' right
     if session[:user_id] == 36
       @staffs = Staff.where('(active = 1 and user_type LIKE "Sales%") OR staffs.id = 36')
@@ -93,6 +92,7 @@ class CalendarController < ApplicationController
                                         },
                                         token_credential_uri: 'https://accounts.google.com/o/oauth2/token')
     client.update!(session[:authorization])
+    
     service = Google::Apis::CalendarV3::CalendarService.new
     service.authorization = client
 
@@ -121,26 +121,15 @@ class CalendarController < ApplicationController
     @methods = TaskMethod.all
     @subjects = TaskSubject.sales_subjects
 
-
-    if user_full_right(session[:authority])
-      if params[:selected_staff].nil?
-        @events = Task.unconfirmed_event.order_by_staff('ASC').paginate(per_page: @per_page, page: params[:page])
-      else
-        @events = Task.filter_by_response(params[:selected_staff]).unconfirmed_event.order_by_staff('ASC').paginate(per_page: @per_page, page: params[:page])
-      end
+    if !params[:selected_staff].nil?
+      @events = Task.filter_by_response(params[:selected_staff]).unconfirmed_event.order_by_staff('ASC').paginate(per_page: @per_page, page: params[:page])
+    elsif user_full_right(session[:authority])
+      @events = Task.unconfirmed_event.order_by_staff('ASC').paginate(per_page: @per_page, page: params[:page])
     else
-      @events = Task.unconfirmed_event.filter_by_staff(session[:user_id]).order_by_staff('ASC')
+      @events = Task.unconfirmed_event.filter_by_staff(session[:user_id]).order_by_staff('ASC').paginate(per_page: @per_page, page: params[:page])
     end
 
     @staffs = Staff.filter_by_ids(Task.unconfirmed_event.map(&:response_staff).uniq)
-
-    des = @events.map { |x| x.description.split('\n').first }
-    loc = @events.map { |x| x.location.split(/[,\n]/).first unless x.location.nil? }
-    pattern = '"' + (des + loc).uniq.compact.map(&:downcase).join('" OR "') + '"'
-    @customers = Customer.search_for(pattern).order_by_name('ASC')
-    @leads = CustomerLead.search_for(pattern).order_by_name('ASC')
-
-
   end
 
   # handle the requests for updating events
@@ -201,4 +190,37 @@ class CalendarController < ApplicationController
     @per_page = params[:per_page] || Customer.per_page
     @customers = Customer.filter_by_ids(customer_map.keys).include_all.send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
   end
+
+  def event_dashboard
+
+  end
+
 end
+
+
+# unless event.description.nil?
+#   if event.location.nil?
+#     loc = event.description.split("\n").first.downcase
+#
+#     customer_list = Customer.filter_by_staff(response_staff.first.id).search_for(loc)
+#     lead_list = CustomerLead.filter_by_staff(response_staff.first.id).not_customer.search_for(loc)
+#
+#     customer_list = @customers.select{|x|  x.staff_id == response_staff.first.id && !x.actual_name.nil? && Regexp.union(loc) === x.actual_name.downcase }
+#
+#     lead_list = @leads.select{|x| x.staff_id == response_staff.first.id && Regexp.union(loc) === x.actual_name.downcase }
+#     lead_list = lead_list.each {|x| x.actual_name = x.actual_name.to_s + ', (Lead)'}
+#
+#     customer_list = lead_list + customer_list
+#     customer_list = customer_list.sort_by! {|x| @jarow.getDistance(loc, x.actual_name) }.reverse
+#
+#   else
+#     loc = event.location.split(",").first.split.select{|x| (x.to_i.to_s.casecmp(x)<0) && !(["st","pl","street","St"].include?(x))}
+#     loc = loc.map {|x| x = x.downcase}
+#     customer_list = @customers.select{|x| x.staff_id == response_staff.first.id && !x.actual_name.nil? && Regexp.union(loc) === x.actual_name.downcase }
+#
+#     lead_list = @leads.select{|x| (x.staff_id == response_staff.first.id)&& (Regexp.union(loc) === x.actual_name.downcase) }
+#     lead_list = lead_list.each {|x| x.actual_name = x.actual_name.to_s + ', (Lead)'}
+#
+#     customer_list = lead_list + customer_list
+#     customer_list = customer_list.sort_by! {|x| @jarow.getDistance(loc.join(" "), x.actual_name) }.reverse
+#     end

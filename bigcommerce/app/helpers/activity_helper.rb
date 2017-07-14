@@ -97,18 +97,25 @@ module ActivityHelper
     task.gcal_status = ('yes' == params['event_column']) ? 'pending' : 'na'
     customers = params.keys.select { |x| x.start_with?('customer ') }.map(&:split).map(&:last)
     customer_id = customers.first
+    assign_to = 'customer' unless customer_id.nil?
     staffs = params.keys.select { |x| x.start_with?('staff ') }.map(&:split).map(&:last)
     leads = params.keys.select { |x| x.start_with?('lead ') }.map(&:split).map(&:last)
-    [customers, staffs, leads].max_by(&:length).each do |f|
+    assign_to = 'lead' if customer_id.nil?
+    customer_id = leads.first if customer_id.nil?
+
+    contacts = params[:selected_contact] || []
+
+    [customers, staffs, leads, contacts].max_by(&:length).each do |f|
       tr = TaskRelation.new
       tr.task_id = task_id
       tr.customer_id = customers.delete_at(0)
       tr.staff_id = staffs.delete_at(0)
       tr.customer_lead_id = leads.delete_at(0)
+      tr.contact_id = contacts.delete_at(0)
       tr.save
     end
     task.save
-    customer_id
+    [customer_id,assign_to]
   end
 
   def product_note_version_update(activity_id)
@@ -119,11 +126,11 @@ module ActivityHelper
     product_note_version_update(task_id)
     product_list = params.keys.select { |x| x.start_with?('note ') }.map(&:split).map(&:last)
     product_list.each do |product_id|
-      pn_save(product_id, staff_id, task_id, params['buy_wine'])
+      pn_save(product_id, staff_id, task_id, params['buy_wine'], params['tasted'])
     end
   end
 
-  def pn_save(product_id, staff_id, task_id, buy_list)
+  def pn_save(product_id, staff_id, task_id, buy_list, tasted_list)
     pn = ProductNote.new
     pn.task_id = task_id
     pn.created_by = staff_id
@@ -134,6 +141,7 @@ module ActivityHelper
     pn.product_name = params['product_name ' + product_id]
     pn.price_luc = params['price_luc ' + product_id]
     pn.intention = (buy_list.include? product_id) ? 1 : 0 unless buy_list.nil?
+    pn.tasted = (tasted_list.include? product_id) ? 1 : 0 unless tasted_list.nil?
     pn.version = 0
     pn.save
   end
@@ -145,6 +153,16 @@ module ActivityHelper
       task.pro_note_include = params['selected_wine_note'].join(',')
       task.save
     end
+  end
+
+  def find_sample_products(staff_id)
+    customer_id = Staff.find(staff_id).pick_up_id || 2086
+    products = []
+    Order.where(customer_id: customer_id).order('id DESC').limit(10).each do |order|
+      products += order.products
+      return products if products.count >= 20
+    end
+    products
   end
 
   # -------------------------

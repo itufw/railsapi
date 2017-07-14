@@ -1,5 +1,10 @@
 <%= title "Edit #{@lead_name}"%>
 <h3>Edit <%= @lead_name %></h3>
+
+<div class="customer_leads_field link_customer">
+  <center>Link to a Customer</center>
+</div>
+
 <br/>
 
 <%= form_for @customer_lead, url: {action: "edit_leads_handler"}, method: "POST", html: {class: "form-group", style: "padding-left: 50px;"} do |f| %>
@@ -53,6 +58,16 @@
 
   <%= f.label :group, class: 'margin-from-top label-new' %>
   <%= f.collection_select :cust_group_id, CustGroup.all, :id, :name, {selected: @customer_lead.cust_group_id, :include_blank => 'Not Assigned'}, {class: "form-control quarter-size"} %><br/><br/>
+
+</div>
+
+<div class="customer_leads_field turn_customer">
+  <%= f.label :customer_id, class: 'margin-from-top label-new' %>
+  <%= autocomplete_field_tag 'customer_name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search',size: 15 %>
+  <br/>
+  <%= f.text_field :customer_id, readonly: true, size: 5 %>
+  &nbsp;&nbsp;&nbsp;
+  <%= text_field_tag('customer_name_column', '', placeholder: 'Customer Name', readonly: true, size: 40) %>
 </div>
 
 
@@ -62,11 +77,28 @@
 <p style="padding-left: 50px;"><%= link_to "Go Back to Customer Profile", action: 'summary', customer_id: @customer_id, customer_name: @customer_name %></p>
 
 <script>
+
+  $('#customer_search').bind('railsAutocomplete.select', function(event, data){
+    $('#customer_lead_customer_id').val(data.item.id);
+    $('#customer_name_column').val(data.item.label);
+  });
+
   <% if @customer_lead.region.nil? || @customer_lead.region == ''%>
     $(".customer_leads_field").show();
+    $(".turn_customer").hide();
     $(".region_leads_field").hide();
   <% else %>
     $(".region_leads_field").show();
     $(".customer_leads_field").hide();
+  <% end %>
+
+  $('.link_customer').click(function(){
+    $(".turn_customer").toggle();
+    $(".customer_leads_field:not(.turn_customer, .link_customer)").toggle();
+  });
+
+  <% if !@link_to_customer.nil? %>
+    $(".turn_customer").toggle();
+    $(".customer_leads_field:not(.turn_customer, .link_customer)").toggle();
   <% end %>
 </script>

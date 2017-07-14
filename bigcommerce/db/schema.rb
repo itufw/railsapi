@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170704034517) do
+ActiveRecord::Schema.define(version: 20170714005714) do
 
   create_table "SalesForce_Lead_full", primary_key: "Id", force: :cascade do |t|
     t.string  "FirstName",                 limit: 38
@@ -417,6 +417,8 @@ ActiveRecord::Schema.define(version: 20170704034517) do
     t.string   "country",                limit: 255
     t.string   "perferred_contact_time", limit: 255
     t.text     "useful_information",     limit: 65535
+    t.integer  "customer_id",            limit: 4
+    t.datetime "turn_customer_date"
   end
 
   add_index "customer_leads", ["cust_group_id"], name: "index_customer_leads_on_cust_group_id", using: :btree
@@ -475,6 +477,13 @@ ActiveRecord::Schema.define(version: 20170704034517) do
   add_index "customers", ["cust_store_id"], name: "index_customers_on_cust_store_id", using: :btree
   add_index "customers", ["cust_type_id"], name: "index_customers_on_cust_type_id", using: :btree
   add_index "customers", ["staff_id"], name: "index_customers_on_staff_id", using: :btree
+
+  create_table "google_revisions", force: :cascade do |t|
+    t.datetime "start_time"
+    t.datetime "end_time"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "order_actions", force: :cascade do |t|
     t.integer  "order_id",   limit: 4,  null: false
@@ -738,6 +747,7 @@ ActiveRecord::Schema.define(version: 20170704034517) do
     t.datetime "updated_at",                                         null: false
     t.string   "product_name", limit: 255
     t.integer  "version",      limit: 4
+    t.integer  "tasted",       limit: 4
   end
 
   create_table "product_package_types", force: :cascade do |t|
@@ -1245,20 +1255,20 @@ ActiveRecord::Schema.define(version: 20170704034517) do
   add_index "xero_op_allocations", ["xero_overpayment_id"], name: "index_xero_op_allocations_on_xero_overpayment_id", using: :btree
 
   create_table "xero_overpayments", primary_key: "xero_overpayment_id", force: :cascade do |t|
-    t.string   "xero_contact_id",   limit: 36,                 null: false
+    t.string   "xero_contact_id",   limit: 36,                           null: false
     t.string   "contact_name",      limit: 255
-    t.decimal  "sub_total",                     precision: 10
-    t.decimal  "total_tax",                     precision: 10
-    t.decimal  "total",                         precision: 10
-    t.decimal  "remaining_credit",              precision: 10
+    t.decimal  "sub_total",                     precision: 10, scale: 2
+    t.decimal  "total_tax",                     precision: 10, scale: 2
+    t.decimal  "total",                         precision: 10, scale: 2
+    t.decimal  "remaining_credit",              precision: 10, scale: 2
     t.datetime "date"
     t.datetime "updated_date"
     t.string   "status",            limit: 255
     t.string   "line_amount_types", limit: 255
     t.string   "currency_code",     limit: 255
     t.boolean  "has_attachments"
-    t.datetime "created_at",                                   null: false
-    t.datetime "updated_at",                                   null: false
+    t.datetime "created_at",                                             null: false
+    t.datetime "updated_at",                                             null: false
     t.string   "note",              limit: 255
   end
 
@@ -1321,6 +1331,13 @@ ActiveRecord::Schema.define(version: 20170704034517) do
     t.datetime "end_time"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "zomato_cuisines", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.integer  "active",     limit: 4
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "zomato_entities", force: :cascade do |t|

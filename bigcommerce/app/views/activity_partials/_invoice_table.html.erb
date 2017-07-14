@@ -1,4 +1,4 @@
-<div class="col-md-8">
+<div class="col-md-8 col-md-offset-1">
   <%= label(:invoice, "Invoices:")%>
   <div>
     <table class="table table-striped table-bordered table-hover table-responsive" style="margin-top: -10px;" id="invoice_table">
@@ -14,3 +14,6 @@
     </table>
   </div>
 </div>
+<script type="text/javascript">
+  var invoice_table = $('#invoice_table');
+</script>

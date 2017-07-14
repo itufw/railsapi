@@ -80,4 +80,8 @@ class Contact < ActiveRecord::Base
     position = relation.map(&:position)
     self.name.to_s + names.zip(position).map { |x, y| '|' + x.to_s + ':' + y.to_s }.join(' ')
   end
+
+  def self.has_role
+    where(id: CustContact.pluck('contact_id'))
+  end
 end

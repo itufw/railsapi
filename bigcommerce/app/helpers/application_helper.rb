@@ -135,7 +135,8 @@ module ApplicationHelper
 
   # format the phone number for accounting header
   def num_to_phone(num)
-    return '--' if num.nil? || num.length < 10
+    return '--' if num.nil? || num.length < 9
+    return "0#{num[0..2]} #{num[3..5]} #{num[6..8]}" if num.length == 9
     return "#{num[0..3]} #{num[4..6]} #{num[7..9]}" if num[1] == '4'
     "#{num[0..1]} #{num[2..5]} #{num[6..9]}"
   end

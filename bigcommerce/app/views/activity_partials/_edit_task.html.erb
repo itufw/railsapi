@@ -1,23 +1,34 @@
-<div class="row">
+
+<div class="row" style="margin-top: -50px;">
   <%= render 'activity_partials/customer_search', activity: activity%>
-  <%= render 'activity_partials/task_table', f: f, activity: activity%>
-  <% if activity.parent_task.nil?%>
-    <%= render 'activity_partials/wine_note', activity: activity, products: @products%>
-  <% else %>
-    <%= render 'activity_partials/wine_note_saved'%>
-  <% end %>
-  <div class="col-md-8 complete_form">
+</div>
+<%= render 'activity_partials/task_table', f: f, activity: activity%>
+
+<% if activity.parent_task.nil?%>
+  <%= render 'activity_partials/wine_note', activity: activity %>
+<% else %>
+  <%= render 'activity_partials/wine_note_saved'%>
+<% end %>
+
+<div class="row">
+  <div class="col-md-4 col-md-offset-4 complete_form">
     <%= button_tag(type: 'submit', class: 'btn btn-primary') do %>
       <div> Edit </div>
     <% end %>
   </div>
-  <div class="col-md-8 incomplete_form">
+  <div class="col-md-4 col-md-offset-4 incomplete_form">
     <p style="color: red" class="activity_reminder">Please Select Subject / Customer / Staff</p>
     <button type="button" class="btn btn-secondary disabled" disabled>
       <div>Save</div>
     </button>
   </div>
+  <div class="col-md-4">
+    <%= button_tag(type: 'submit', value: 'complete', class: 'btn btn-primary') do %>
+      <div> Complete Task </div>
+    <% end %>
+  </div>
 </div>
+
 <script>
 var TaskCompleteForm = function(){
   if (($('input[id*=staff ]').length > 1) && (($('input[id*=customer ]').length > 1) || ($('tr[id*=tr_lead ]').length > 0)) && ($('#task_subject_1 option:selected').val()!="")){
