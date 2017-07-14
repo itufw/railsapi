@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170710021835) do
+ActiveRecord::Schema.define(version: 20170714005714) do
 
   create_table "SalesForce_Lead_full", primary_key: "Id", force: :cascade do |t|
     t.string  "FirstName",                 limit: 38
@@ -477,6 +477,13 @@ ActiveRecord::Schema.define(version: 20170710021835) do
   add_index "customers", ["cust_store_id"], name: "index_customers_on_cust_store_id", using: :btree
   add_index "customers", ["cust_type_id"], name: "index_customers_on_cust_type_id", using: :btree
   add_index "customers", ["staff_id"], name: "index_customers_on_staff_id", using: :btree
+
+  create_table "google_revisions", force: :cascade do |t|
+    t.datetime "start_time"
+    t.datetime "end_time"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "order_actions", force: :cascade do |t|
     t.integer  "order_id",   limit: 4,  null: false

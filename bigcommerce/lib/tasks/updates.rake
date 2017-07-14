@@ -59,8 +59,10 @@ namespace :updates do
 	end
 
 	task :event_update => :environment do
-		puts "Event Update At #{Time.now}"
+		puts "Event Update Start At #{Time.now}"
+		import_into_customer_tags
 		calendar_event_update
+		puts "Event Update End AT #{Time.now}"
 	end
 
 	task :balanceupdate => :environment do
