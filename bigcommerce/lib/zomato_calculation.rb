@@ -31,7 +31,7 @@ module ZomatoCalculation
     count_ping = 0
     query = 'https://developers.zomato.com/api/v2.1/search'
     customers_viewed = []
-    customers = Customer.where('lng IS NOT NULL')
+    customers = Customer.where('lng IS NOT NULL').select{ |x| x}
 
     # delete following block after data integrated
     # customers_viewed = filter_viewed_spots
@@ -46,7 +46,7 @@ module ZomatoCalculation
       response = HTTParty.get(query, query: {lat: customer.lat, lon: customer.lng, radius: 500, cuisines: get_cuisines.map(&:to_s)}, headers: {"user-key" => Rails.application.secrets.zomato_key })
       count_ping += 1
 
-      puts 'Counting ' + count_ping.to_s
+      puts 'Counting ' + count_ping.to_s if count_ping % 10 == 0
 
       restaurant_update_attribuets(response['restaurants'])
       return if count_ping > 500
