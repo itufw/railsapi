@@ -5,12 +5,12 @@ module GoogleCalendarSync
 
   def import_into_customer_tags
     exist_customer = CustomerTag.filter_by_role('Customer').map(&:customer_id)
-    Customer.where('id NOT IN (?)', exist_customer).each do |customer|
+    Customer.where('id NOT IN (?)', exist_customer).where('actual_name IS NOT NULL').each do |customer|
       CustomerTag.new.insert_customer(customer)
     end
 
     exist_lead = CustomerTag.filter_by_role('Lead').map(&:customer_id)
-    CustomerLead.where('id NOT IN (?)', exist_lead).each do |lead|
+    CustomerLead.where('id NOT IN (?)', exist_lead).where('customer_id IS NULL').each do |lead|
       CustomerTag.new.insert_lead(lead)
     end
 
@@ -19,7 +19,7 @@ module GoogleCalendarSync
       CustomerTag.new.insert_contact(contact)
     end
   end
-  
+
   def connect_google_calendar
     ENV['GOOGLE_APPLICATION_CREDENTIALS'] = 'config/key.json'
 
