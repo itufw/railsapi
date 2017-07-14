@@ -20,8 +20,8 @@ module ZomatoCalculation
     customers_viewed = []
     restaurants = ZomatoRestaurant.all
     while !restaurants.blank?
-      customers_viewed += Customer.near([restaurants.first.latitude, restaurants.first.longitude], 0.5, units: :km).map(&:id)
-      restaurants -= ZomatoRestaurant.near([restaurants.first.latitude, restaurants.first.longitude], 0.5, units: :km)
+      customers_viewed += Customer.near([restaurants.first.latitude, restaurants.first.longitude], 0.1, units: :km).map(&:id)
+      restaurants -= ZomatoRestaurant.near([restaurants.first.latitude, restaurants.first.longitude], 0.1, units: :km)
     end
     customers_viewed.uniq
   end
@@ -34,8 +34,8 @@ module ZomatoCalculation
     customers = Customer.where('lng IS NOT NULL')
 
     # delete following block after data integrated
-    customers_viewed = filter_viewed_spots
-    customers = customers.select{ |x| !customers_viewed.include?x.id }
+    # customers_viewed = filter_viewed_spots
+    # customers = customers.select{ |x| !customers_viewed.include?x.id }
     # ------------------------------------------------------------------
 
     while !customers.blank?
