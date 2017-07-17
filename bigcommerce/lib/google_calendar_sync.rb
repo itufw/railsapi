@@ -4,8 +4,12 @@ require 'googleauth'
 module GoogleCalendarSync
 
   def import_into_customer_tags
+    active_sales_staff = Staff.active_sales_staff.map(&:id)
+    active_sales_staff.delete(24)
+    active_sales_staff.delete(34)
+
     exist_customer = CustomerTag.filter_by_role('Customer').map(&:customer_id)
-    Customer.where('id NOT IN (?)', exist_customer).where('actual_name IS NOT NULL').each do |customer|
+    Customer.where('id NOT IN (?)', exist_customer).staff_search_filter(staff_id = active_sales_staff).where('actual_name IS NOT NULL').each do |customer|
       CustomerTag.new.insert_customer(customer)
     end
 

@@ -6,7 +6,7 @@ class CalendarController < ApplicationController
   skip_before_action :verify_authenticity_token
   before_action :confirm_logged_in
 
-  autocomplete :customer_tag, :name, extra_data: [:customer_id, :role], full: true, scopes: :no_contacts
+  autocomplete :customer_tag, :name, extra_data: [:customer_id, :role, :staff_nickname, :state, :address, :name], full: true, scopes: :no_contacts, display_value: :details
 
   include CalendarHelper
   include ModelsFilter
@@ -92,7 +92,7 @@ class CalendarController < ApplicationController
                                         },
                                         token_credential_uri: 'https://accounts.google.com/o/oauth2/token')
     client.update!(session[:authorization])
-    
+
     service = Google::Apis::CalendarV3::CalendarService.new
     service.authorization = client
 

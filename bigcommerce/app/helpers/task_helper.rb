@@ -114,17 +114,13 @@ module TaskHelper
       function
     end
 
-    def staff_task_display(params, task_selected_display)
+    def staff_task_display(params, task_selected_display, date_column, start_date, end_date, per_page)
 
       selected_staff = (params[:staff] && params[:staff][:assigned] && params[:staff][:assigned]!='') ? [params[:staff][:assigned]] : [0]
 
       selected_creator = (params[:staff] && params[:staff][:creator]) ? [params[:staff][:creator]] : [session[:user_id]]
       selected_creator = Staff.active.map(&:id) if selected_creator == ['']
       order = 'DESC'
-
-      date_column = params[:date_column] || 'start_date'
-      start_date = params[:start_date] ? params[:start_date].split('-').reverse.join('-') : (Date.today - 1.month).to_s
-      end_date = params[:end_date] ? params[:end_date].split('-').reverse.join('-') : Date.today.to_s
 
       end_date = ((Date.parse end_date) + 1.day).to_s
 
@@ -145,6 +141,8 @@ module TaskHelper
       else
         tasks = tasks.filter_by_responses(selected_creator).send('filter_by_' + date_column, start_date, end_date).send('order_by_' + date_column, order)
       end
+
+      tasks = tasks.paginate(per_page: per_page, page: params[:page])
 
       [tasks, collection_default_staff(selected_creator), collection_default_staff(selected_staff)]
     end
@@ -215,7 +213,7 @@ module TaskHelper
       mix_customer = []
       mix_customer += customer unless customer.nil?
       mix_customer += lead unless lead.nil?
-      staff = (staff.blank?) ? '-' : Staff.filter_by_ids(staff)
+      staff = ((staff + mix_customer.map(&:staff_id)).blank?) ? '-' : Staff.filter_by_ids(staff + mix_customer.map(&:staff_id))
       [mix_customer, staff]
     end
 end
