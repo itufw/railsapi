@@ -44,6 +44,7 @@ module ZomatoCalculation
       start = 0
       results_found = 100
       while (results_found > 40) && ((start * 20) < results_found) && start < 80
+        break if ZomatoRestaurant.near([customer.lat, customer.lng], 0.1, units: :km).map(&:id).count > 20
         response = HTTParty.get(query, query: {lat: customer.lat, lon: customer.lng, radius: 200, cuisines: get_cuisines.map(&:to_s), start: start}, headers: {"user-key" => Rails.application.secrets.zomato_key })
         start += 20
         count_ping += 1
