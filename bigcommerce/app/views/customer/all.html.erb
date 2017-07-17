@@ -13,3 +13,13 @@
 <% end %>
 
 <%= render "partials/customer", customers: @customers %>
+
+<% unless @leads.nil? || @leads.blank? %>
+	<h3>Lead</h3>
+	<%= render "lead_partials/leads", leads: @leads  %>
+<% end %>
+
+<% unless @zomato.nil? || @zomato.blank? %>
+	<h3>Zomato</h3>
+	<%= render 'customer_partials/zomato_list', zomatos: @zomato%>
+<% end %>

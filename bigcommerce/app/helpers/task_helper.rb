@@ -191,8 +191,7 @@ module TaskHelper
       default_function = default_function_type(current_user.user_type)
       params[:selected_function] = params[:selected_function] || default_function
 
-      subjects = TaskSubject.all
-      subjects = subjects.select { |x| x.function == params[:selected_function] }
+      subjects = TaskSubject.get_subjects_on_function(params[:selected_function])
       methods = TaskMethod.all
       [function, subjects, methods, default_function]
     end

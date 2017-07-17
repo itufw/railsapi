@@ -4,6 +4,7 @@ require 'models_filter.rb'
 require 'dates_helper.rb'
 require 'customer_helper.rb'
 require 'accounts_helper.rb'
+require 'lead_helper.rb'
 
 class CustomerController < ApplicationController
   before_action :confirm_logged_in
@@ -14,6 +15,7 @@ class CustomerController < ApplicationController
   include DatesHelper
   include CustomerHelper
   include AccountsHelper
+  include LeadHelper
 
   # NEW CUSTOMER PAGE
   def contact
@@ -29,6 +31,12 @@ class CustomerController < ApplicationController
     @staffs = Staff.active_sales_staff.order_by_order
     customers = filter(params, 'display_report')
     display_(params, customers)
+
+    # include Lead
+    unless @search_text.nil? || @search_text == ''
+      @leads, @search_text = lead_filter(params, @per_page)
+      @zomato = ZomatoRestaurant.search_for(@search_text).paginate(per_page: @per_page, page: params[:page])
+    end
   end
 
   def new_customers
