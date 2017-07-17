@@ -139,6 +139,10 @@ class CustomerController < ApplicationController
     @customer = Customer.filter_by_id(params[:customer][:id])
     if @customer.update_attributes(customer_params)
       flash[:success] = 'Successfully Changed.'
+
+      customer_tag = CustomerTag.exist?('Customer', @customer.id).first
+      (customer_tag.nil?) ? CustomerTag.new.insert_customer(@customer) : customer_tag.update_record('Customer', @customer.id, @customer.actual_name)
+
       redirect_to action: 'summary',\
                   customer_id: params[:customer][:id],\
                   customer_name: Customer.customer_name(@customer.actual_name, @customer.firstname, @customer.lastname)

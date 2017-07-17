@@ -59,13 +59,20 @@
           <td>&nbsp;&nbsp;&nbsp;</td>
           <%
           unless event.description.nil?
-            pattern = (event.location.nil?) ? event.description.split("\n").first.downcase : event.location.downcase
+            pattern = event.description.split("\n").first.downcase
             pattern.slice! ' tasting'
+            pattern = pattern.split('-').first
 
             customer_list = Customer.filter_by_staff(response_staff.first.id).search_for(pattern)
             lead_list = CustomerLead.filter_by_staff(response_staff.first.id).not_customer.search_for(pattern)
-            lead_list = lead_list.each {|x| x.actual_name = x.actual_name.to_s + ', (Lead)'}
 
+            unless event.location.nil?
+              pattern = event.location.downcase
+              customer_list += Customer.filter_by_staff(response_staff.first.id).search_for(pattern)
+              lead_list += CustomerLead.filter_by_staff(response_staff.first.id).not_customer.search_for(pattern)
+            end
+
+            lead_list = lead_list.each {|x| x.actual_name = x.actual_name.to_s + ', (Lead)'}
             customer_list = (lead_list + customer_list).sort_by!  {|x| @jarow.getDistance(pattern, x.actual_name) }.reverse
             selected_collection = (customer_list.blank?) ? nil : "#{customer_list.first.id}|#{customer_list.first.actual_name}"
           %>
