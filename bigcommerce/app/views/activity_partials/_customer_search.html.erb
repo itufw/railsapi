@@ -1,4 +1,4 @@
-<%relations = (activity.nil?) ? nil : activity.task_relations%>
+<% relations = (activity.nil?) ? nil : activity.task_relations%>
 <% customer_list = [@customer_id.to_i]  %>
 <% customer_list = customer_list + relations.uniq.compact.map(&:customer_id) unless relations.nil?%>
 <% lead_list = [@lead_id.to_i] %>

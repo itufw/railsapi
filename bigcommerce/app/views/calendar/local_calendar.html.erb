@@ -11,6 +11,8 @@
       <lable for="event_checkbox">Event</lable>
       <input type="checkbox" value="customer" id="customer_checkbox"/>
       <lable for="customer_checkbox">Customer</lable>
+      <input type="checkbox" value="customer" id="lead_checkbox"/>
+      <lable for="lead_checkbox">Lead</lable>
       <br/><br/>
       <div id="customer_location" style='width: 500px; height: 500px;'></div>
       <button type="button" class="btn btn-default" id="filter_on">Filter</button>
@@ -43,6 +45,7 @@
 
 var event_markers = null;
 var customer_markers = null;
+var lead_markers = null;
 <% events = get_events_details(session[:user_id], @start_date.beginning_of_month, @start_date.end_of_month) %>
 
 var handler = Gmaps.build('Google');
@@ -61,6 +64,7 @@ var calendar_table = $('#calendar_table');
 var calendar_radio = $('div[aria-label=calendar_radio]');
 var event_checkbox = $('#event_checkbox');
 var customer_checkbox = $('#customer_checkbox');
+var lead_checkbox = $('#lead_checkbox');
 calendar_table.html("<%=j render 'calendar_partials/monthly_calendar', staff_id: session[:user_id], events: events%>");
 
 $('#event_checkbox').attr('checked',true);

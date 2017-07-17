@@ -56,7 +56,7 @@ module CustomerHelper
       marker.lat lead.latitude
       marker.lng lead.longitude
       marker.picture({
-                        :url    => ActionView::Base.new.image_path('map_icons/people_red.png'),
+                        :url    => ActionView::Base.new.image_path('map_icons/lead_black.png'),
                         :width  => 30,
                         :height => 30
                        })
@@ -70,21 +70,23 @@ module CustomerHelper
       marker.lat restaurant.latitude
       marker.lng restaurant.longitude
       marker.picture({
-                        :url    => ActionView::Base.new.image_path('map_icons/restaurant_maroon.png'),
+                        :url    => ActionView::Base.new.image_path('map_icons/zomato_white.png'),
                         :width  => 30,
                         :height => 30
                        })
       marker.infowindow "<a href=\"#{restaurant.url}\">#{restaurant.name}</a>
-                                  <br/><br/>
-                                  <p>Zomato<p>"
+                                  <br/>
+                                  <p>Average Cost: #{restaurant.average_cost_for_two}</p>
+                                  <br/>
+                                  <p>Zomato</p>"
     end
     [customer_hash, lead_hash, restaurant_hash]
   end
 
-  def near_by_customers(latitude, longitude, radius)
+  def near_by_customers(latitude, longitude, radius, staff_id = nil)
     restaurants = ZomatoRestaurant.near([latitude, longitude], radius.to_f, units: :km).select{|x| x}
-    customers = Customer.near([latitude, longitude], radius.to_f, units: :km).select{|x| x}
-    leads = CustomerLead.active_lead.near([latitude, longitude], radius.to_f, units: :km).select{|x| x}
+    customers = Customer.staff_search_filter(staff_id = staff_id).near([latitude, longitude], radius.to_f, units: :km).select{|x| x}
+    leads = CustomerLead.filter_by_staff(staff_id).active_lead.near([latitude, longitude], radius.to_f, units: :km).select{|x| x}
 
     [customers, leads, restaurants]
   end

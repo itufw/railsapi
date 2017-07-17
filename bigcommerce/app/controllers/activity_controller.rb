@@ -46,6 +46,9 @@ class ActivityController < ApplicationController
     @sample_products = params[:sample_products] || nil
 
     @product_selected = params[:product_selected] || nil
+
+    @customer_id = params[:customer_id]
+    @lead_id = params[:lead_id]
   end
 
   def save_note

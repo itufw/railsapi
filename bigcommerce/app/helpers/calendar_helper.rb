@@ -1,4 +1,6 @@
+require 'customer_helper.rb'
 module CalendarHelper
+  include CustomerHelper
 
   def user_full_right(_authority)
     return true if %w[Admin Management Accounts].include? session[:authority]
@@ -8,6 +10,16 @@ module CalendarHelper
   def sales_last_order(params)
     return 'Last_Order' if ((params["filter_selector"].nil?) || ("".eql?params["filter_selector"]) ||  ("Last_Order".eql?params["filter_selector"]))
     'Sales'
+  end
+
+  def get_lead_pins(staff_id, center_point = nil)
+    return [nil, nil] if staff_id.nil?
+    leads = CustomerLead.filter_by_staff(staff_id).active_lead
+    return [nil, nil] if leads.blank?
+    # center_point = Geocoder::Calculations.geographic_center(leads) if center_point.nil?
+    # restaurants = ZomatoRestaurant.near(center_point, 50, units: :km).select{|x| x}
+    _, lead_hash, _ = marks_by_distance([], leads, [])
+    lead_hash
   end
 
   def map_filter(params, colour_guide, colour_range_origin, sale_or_day)
@@ -205,8 +217,8 @@ module CalendarHelper
   end
 
   def get_events_pins(events)
-    customers = Customer.select("lat AS latitude, lng AS longitude, customers.*").filter_by_ids(events.map(&:customer_id).uniq.compact)
-    leads = CustomerLead.filter_by_ids(events.map(&:customer_lead_id).uniq.compact)
+    customers = Customer.select("lat AS latitude, lng AS longitude, customers.*").where('lat IS NOT NULL').filter_by_ids(events.map(&:customer_id).uniq.compact)
+    leads = CustomerLead.filter_by_ids(events.map(&:customer_lead_id).uniq.compact).where('latitude IS NOT NULL')
 
     event_map = {}
     events.each do |event|
