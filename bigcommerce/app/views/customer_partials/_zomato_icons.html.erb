@@ -1,5 +1,5 @@
 <td>
-<%= link_to '<i class="glyphicon glyphicon-search" title="Find Nearby Customers"></i>'.html_safe, controller: "customer", action: "near_by", zomato_id: restaurant.id, latitude: restaurant.latitude, longitude: restaurant.longitude%>
+<%= link_to '<i class="glyphicon glyphicon-search" title="Find Nearby Customers"></i>'.html_safe, controller: "customer", action: "near_by", zomato_id: restaurant.id, latitude: restaurant.latitude, longitude: restaurant.longitude, search: restaurant.name%>
 
 
 </td>
