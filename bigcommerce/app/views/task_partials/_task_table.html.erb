@@ -7,20 +7,23 @@
             <%
               customers, staffs = task_customer_staff(task.task_relations)
               customers_filter = ('-'.eql?customers) ? ' ' : customers.map(&:id).map{|x| 'customer_'+x.to_s}.join(' ')
-              staffs_filter = ('-'.eql?staffs) ? ' ' :staffs.map(&:id).map{ |x| 'staff_'+x.to_s}.join(' ')
+              staffs_filter = ('-'.eql?staffs) ? ' ' : staffs.map(&:id).map{ |x| 'staff_'+x.to_s}.join(' ')
               priority_filter = (task.is_task.nil? || task.is_task.zero?) ? ' ' : 'priority_'+task.priority.to_s
             %>
 
             <tr class="activity_record <%=priority_filter%> creator_<%=task.response_staff%> method_<%=task.method%> subject_<%=task.subject_1%> <%= customers_filter %> <%= staffs_filter %>">
               <% if task.is_task==1 %>
-                <td class="<%=task_priority_display(task.priority).downcase%>"><%= render "task_partials/priority_update_cell", task_id: task.id, priority: task.priority %></td>
+                <td class="<%=task_priority_display(task.priority).downcase%>" style="width: 15px;"><%= render "task_partials/priority_update_cell", task_id: task.id, priority: task.priority %></td>
               <% else %>
                 <td></td>
               <% end %>
+
+              <% if '-'.eql? customers%>
+                <td>-</td>
+                <td>-</td>
+              <% else %>
+              <td><%= Staff.filter_by_ids(customers.map(&:staff_id)).map(&:nickname).join('<br>').html_safe %></td>
               <td>
-                <% if '-'.eql? customers%>
-                  <%= '-' %>
-                <% else %>
                   <% customers.each do |customer| %>
                     <% if customer.is_a?(Customer) %>
                       <p style="color: green"><%= link_to customer.actual_name, controller: 'customer', action: 'summary', customer_id: customer.id, customer_name: customer.actual_name %></p>
@@ -29,18 +32,6 @@
                     <% end %>
                   <% end %>
                 <% end %>
-              </td>
-
-              <td class="hidden-columns"><%=task.function.byteslice(0,3) + "/" + TaskSubject.find(task.subject_1).subject%></td>
-              <td class="hidden-columns"><%=task.method%></td>
-              <td class="hidden-columns">
-                  <% if '-'.eql? staffs%>
-                    <%= '-' %>
-                  <% else %>
-                    <% staffs.each do |staff| %>
-                      <%= staff.nickname %>
-                    <% end %>
-                  <% end %>
               </td>
 
                 <td><%= link_to task.description, controller: "activity", action: "activity_edit", note_id: task.id%></td>
@@ -69,6 +60,19 @@
                 <% is_task = (1==task.is_task)? "task" : "note"%>
                 <% is_task = 'event' unless task.google_event_id.nil?%>
                 <td class=<%=is_task%> ><%=is_task.upcase%></td>
+
+                <td class="hidden-columns"><%=task.function.byteslice(0,3) + "/" + TaskSubject.find(task.subject_1).subject%></td>
+                <td class="hidden-columns"><%=task.method%></td>
+                <td class="hidden-columns">
+                    <% if '-'.eql? staffs%>
+                      <%= '-' %>
+                    <% else %>
+                      <% staffs.each do |staff| %>
+                        <%= staff.nickname %>
+                      <% end %>
+                    <% end %>
+                </td>
+
                 <td>
                   <%=render "task_partials/control_icon", task: task%>
                 </td>

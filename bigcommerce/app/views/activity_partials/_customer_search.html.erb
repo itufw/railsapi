@@ -59,7 +59,7 @@ var contact_table = $('#contact_table');
     if ($('#tr_' + data.item.role.toLowerCase() + '_' + data.item.customer_id).length == 0) {
       $('#customer_table').append([
         '<tr id="tr_' + data.item.role.toLowerCase() + '_' + data.item.customer_id + '">',
-        '<td colspan="2"><input type="text" name="' + data.item.role.toLowerCase() + ' ' + data.item.customer_id + '" id="' + data.item.role.toLowerCase() + '_' + data.item.customer_id + '" value="' + data.item.label + '" readonly="readonly"><i class="glyphicon glyphicon-remove remove" title="remove"></i></td>',
+        '<td colspan="2"><input type="text" name="' + data.item.role.toLowerCase() + ' ' + data.item.customer_id + '" id="' + data.item.role.toLowerCase() + '_' + data.item.customer_id + '" value="' + data.item.name + '" readonly="readonly"><i class="glyphicon glyphicon-remove remove" title="remove"></i></td>',
         '</tr>'
       ].join(''));
       $('.remove').click(function () {

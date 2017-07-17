@@ -5,6 +5,9 @@ class CustomerTag < ActiveRecord::Base
     self.name = customer.actual_name
     self.role = 'Customer'
     self.customer_id = customer.id
+    self.staff_nickname = customer.staff.nickname
+    self.address = customer.address
+    self.state = customer.state
     save
   end
 
@@ -13,6 +16,9 @@ class CustomerTag < ActiveRecord::Base
     self.name = lead.actual_name.to_s + ', (Lead)'
     self.role = 'Lead'
     self.customer_id = lead.id
+    self.staff_nickname = lead.staff.nickname
+    self.address = lead.address
+    self.state = lead.state
     save
   end
 
@@ -40,6 +46,34 @@ class CustomerTag < ActiveRecord::Base
     self.role = role
     self.customer_id = customer_id
     self.name = name
+    self.save
+    update_details
+  end
+
+  def update_details
+    case self.role
+    when 'Customer'
+      customer = Customer.find(self.customer_id)
+    when 'Lead'
+      customer = CustomerLead.find(self.customer_id)
+    else
+      return
+    end
+    self.staff_nickname = customer.staff.nickname
+    self.address = customer.address
+    self.state = customer.state
+    self.save
+  end
+
+  def details
+    query = self.name
+    query += ' | ' + self.staff_nickname.to_s unless self.staff_nickname.nil? || self.staff_nickname == ''
+    query += ' | ' + self.state.to_s unless self.state.nil? || self.state == ''
+    query
+  end
+
+  def staff_change(staff_nickname)
+    self.staff_nickname = staff_nickname
     self.save
   end
 end

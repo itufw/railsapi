@@ -16,16 +16,30 @@
               </ul>
           </li>
         </th>
+        <%
+          customers = Customer.filter_by_ids(relations.map(&:customer_id).compact)
+          lead = CustomerLead.filter_by_ids(relations.map(&:customer_lead_id).compact)
+          mix_customer = []
+          mix_customer += customers unless customers.nil?
+          mix_customer += lead unless lead.nil?
+        %>
+        <th id="sales_rep">
+          <li class="dropdown">
+            <a class="" data-toggle="dropdown" href="#">Sales</a>
+              <ul class="dropdown-menu">
+                <% Staff.filter_by_ids(mix_customer.map(&:staff_id)).each do |staff|%>
+                <li>
+                  <a id="filter_staff_<%= staff.id%>"><%= staff.nickname %></a>
+                  &nbsp;&nbsp;
+                </li>
+                <% end %>
+              </ul>
+          </li>
+        </th>
         <th id="customer_th">
           <li class="dropdown">
             <a class="" data-toggle="dropdown" href="#">Customer</a>
               <ul class="dropdown-menu">
-                <% customers = Customer.filter_by_ids(relations.map(&:customer_id).compact) %>
-                <% lead = CustomerLead.filter_by_ids(relations.map(&:customer_lead_id).compact)
-                  mix_customer = []
-                  mix_customer += customers unless customers.nil?
-                  mix_customer += lead unless lead.nil?
-                %>
                 <% mix_customer.each do |customer|%>
                 <li>
                   <a id="filter_customer_<%= customer.id%>"><%= customer.actual_name %></a>
@@ -35,6 +49,24 @@
               </ul>
           </li>
         </th>
+
+        <th>Description</th>
+
+        <th id="created_by_th">
+          <li class="dropdown">
+            <a class="" data-toggle="dropdown" href="#">Creator</a>
+              <ul class="dropdown-menu">
+                <% Staff.filter_by_ids(@tasks.map(&:response_staff).uniq).each do |staff| %>
+                <li>
+                  <a id="filter_creator_<%= staff.id%>"><%= staff.nickname %></a>
+                  &nbsp;&nbsp;
+                </li>
+                <% end %>
+              </ul>
+          </li>
+        </th>
+        <th><%= date_column_name %></th>
+        <th><a class="show_all">Show All</a></th>
 
         <th id="function_th" class="hidden-columns">
           <li class="dropdown">
@@ -76,23 +108,6 @@
           </li>
         </th>
 
-        <th>Description</th>
-
-        <th id="created_by_th">
-          <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Creator</a>
-              <ul class="dropdown-menu">
-                <% Staff.filter_by_ids(@tasks.map(&:response_staff).uniq).each do |staff| %>
-                <li>
-                  <a id="filter_creator_<%= staff.id%>"><%= staff.nickname %></a>
-                  &nbsp;&nbsp;
-                </li>
-                <% end %>
-              </ul>
-          </li>
-        </th>
-        <th><%= date_column_name %></th>
-        <th><a class="show_all">Show All</a></th>
         <th><i class="glyphicon glyphicon-off expand-table" title="Expand!"></i></th>
     </tr>
 </thead>
