@@ -35,4 +35,11 @@ class CustomerTag < ActiveRecord::Base
   def self.no_contacts
     where('role != "Contact"')
   end
+
+  def update_record(role, customer_id, name)
+    self.role = role
+    self.customer_id = customer_id
+    self.name = name
+    self.save
+  end
 end
