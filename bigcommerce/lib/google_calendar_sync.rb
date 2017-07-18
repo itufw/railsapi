@@ -22,6 +22,20 @@ module GoogleCalendarSync
     Contact.sales_force.where('id NOT IN (?)', exist_contact).each do |contact|
       CustomerTag.new.insert_contact(contact)
     end
+
+    customer_state_update
+  end
+
+  def customer_state_update
+    states = ['VIC', 'TAS', 'QLD', 'WA', 'SA', 'NT', 'NSW', 'ACT']
+    Customer.where('lat IS NOT NULL AND country = \'Australia\' AND state NOT IN ?', states).each do |customer|
+      begin
+        customer.state = customer.address.split(',')[-2].split()[-2]
+        customer.save
+      rescue
+        next
+      end
+    end
   end
 
   def connect_google_calendar
@@ -97,7 +111,7 @@ module GoogleCalendarSync
         task.summary = event.description
         task.save
         # push address back to events
-        update_event_location(task.task_relations.first, event, service, calendar_events_pair) if event.location.nil?
+        update_event_location(task, event, service, calendar_events_pair) if (task.updated_at > event.updated) || event.location.nil?
 
       else
         # filter the staff
@@ -108,12 +122,22 @@ module GoogleCalendarSync
     end
   end
 
-  def update_event_location(relation, event, service, calendar_events_pair)
-    return if relation.nil?
-    address = nil
-    address = relation.customer.address unless relation.customer.nil?
-    address = relation.customer_lead.address unless !address.nil? || relation.customer_lead.nil?
-    return if address.nil?
+  def update_event_location(task, event, service, calendar_events_pair)
+    relation = task.task_relations.first
+
+    if task.updated_at > event.updated
+      event.summary = task.description
+    elsif relation.nil?
+      return
+    end
+
+    unless relation.nil? || !event.location.nil?
+      address = nil
+      address = relation.customer.address unless relation.customer.nil?
+      address = relation.customer_lead.address unless !address.nil? || relation.customer_lead.nil?
+    end
+
+    return if address.nil? && !(task.updated_at > event.updated)
     calendar_id = calendar_events_pair.select { |_key, value| value.include?event.id }.keys.first.to_s
     return if calendar_id == ''
 

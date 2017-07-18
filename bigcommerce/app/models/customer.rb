@@ -17,10 +17,10 @@ class Customer < ActiveRecord::Base
 	has_many :xero_invoices, through: :xero_contact
 
 	geocoded_by :address
-  after_validation :geocode
+  after_validation :geocode, if: ->(obj){ obj.address.present? and obj.address_changed?}
 
   reverse_geocoded_by :lat, :lng
-  after_validation :reverse_geocode
+  after_validation :reverse_geocode, if: ->(obj){ obj.address.present? and obj.address_changed?}
 
 	scoped_search on: [:firstname, :lastname, :company, :actual_name, :address]
 
