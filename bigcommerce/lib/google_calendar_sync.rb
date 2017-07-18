@@ -52,9 +52,9 @@ module GoogleCalendarSync
   end
 
   def calendar_event_update
-    # service = connect_google_calendar
-    # push_pending_events_to_google_offline(service)
-    # scrap_from_calendars(service)
+    service = connect_google_calendar
+    push_pending_events_to_google_offline(service)
+    scrap_from_calendars(service)
   end
 
   def push_pending_events_to_google_offline(service)
@@ -95,7 +95,16 @@ module GoogleCalendarSync
     new_events.each do |event|
       task = Task.filter_by_google_event_id(event.id).first
 
-      if !task.nil?
+      # insert new task
+      if task.nil?
+        # filter the staff
+        staff_address = staff_calendars.select { |x| [event.organizer.email, event.creator.email].include? x.calendar_address }.first
+        next if staff_address.blank?
+        Task.new.auto_insert_from_calendar_event(event, staff_address.staff_id)
+      end
+
+      # if events are updated, update the data
+      if event.updated > task.updated_at
         task.start_date = if event.start.date_time.nil?
                             event.start.date.to_s
                           else
@@ -110,37 +119,43 @@ module GoogleCalendarSync
         task.location = event.location
         task.summary = event.description
         task.save
-        # push address back to events
-        update_event_location(task, event, service, calendar_events_pair) if  (task.description != event.summary && task.gcal_status = 2 && task.updated_at > event.updated) || event.location.nil?
-
       else
-        # filter the staff
-        staff_address = staff_calendars.select { |x| [event.organizer.email, event.creator.email].include? x.calendar_address }.first
-        next if staff_address.blank?
-        Task.new.auto_insert_from_calendar_event(event, staff_address.staff_id)
+        if event.location.nil? && !task.task_relations.first.nil?
+          # push address back to events
+          update_event_location(task.task_relations.first, event, service, calendar_events_pair)
+        end
+        if task.description != event.summary
+          update_event_summary(task, event, service, calendar_events_pair)
+        end
       end
     end
   end
 
-  def update_event_location(task, event, service, calendar_events_pair)
-    relation = task.task_relations.first
-
-    if (task.description != event.summary && task.gcal_status = 2 && task.updated_at > event.updated)
-      event.summary = task.description
-    elsif relation.nil?
-      return
-    end
-
-    unless relation.nil? || !event.location.nil?
-      address = nil
-      address = relation.customer.address unless relation.customer.nil?
-      address = relation.customer_lead.address unless !address.nil? || relation.customer_lead.nil?
-    end
-
-    return if address.nil? && !(task.updated_at > event.updated)
+  # Testing this one
+  def update_event_summary(task, event, service, calendar_events_pair)
+    event.description = task.description + event.description
     calendar_id = calendar_events_pair.select { |_key, value| value.include?event.id }.keys.first.to_s
     return if calendar_id == ''
 
+    # TODO
+    # DELETE THIS AFTER TESTING
+    puts 'Calendar Event: ' + event.id.to_s + ' summary: ' + event.summary + ' description: ' + task.description
+    return if calendar_id != 'it@untappedwines.com'
+
+    begin
+      service.update_event(calendar_id, event.id, event)
+    rescue
+    end
+  end
+
+  def update_event_location(relation, event, service, calendar_events_pair)
+    address = nil
+    address = relation.customer.address unless relation.customer.nil?
+    address = relation.customer_lead.address unless !address.nil? || relation.customer_lead.nil?
+
+    return if address.nil?
+    calendar_id = calendar_events_pair.select { |_key, value| value.include?event.id }.keys.first.to_s
+    return if calendar_id == ''
     begin
       event.location = address
       service.update_event(calendar_id, event.id, event)
