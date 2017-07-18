@@ -13,7 +13,7 @@
 
             <tr class="activity_record <%=priority_filter%> creator_<%=task.response_staff%> method_<%=task.method%> subject_<%=task.subject_1%> <%= customers_filter %> <%= staffs_filter %>">
               <% if task.is_task==1 %>
-                <td class="<%=task_priority_display(task.priority).downcase%>" style="width: 15px;"><%= render "task_partials/priority_update_cell", task_id: task.id, priority: task.priority %></td>
+                <td class="<%=task_priority_display(task.priority).downcase%>" style="width: 20px;"><%= render "task_partials/priority_update_cell", task_id: task.id, priority: task.priority %></td>
               <% else %>
                 <td></td>
               <% end %>
@@ -60,8 +60,11 @@
                 <% is_task = (1==task.is_task)? "task" : "note"%>
                 <% is_task = 'event' unless task.google_event_id.nil?%>
                 <td class=<%=is_task%> ><%=is_task.upcase%></td>
-
-                <td class="hidden-columns"><%=task.function.byteslice(0,3) + "/" + TaskSubject.find(task.subject_1).subject%></td>
+                <% begin %>
+                  <td class="hidden-columns"><%=task.function.byteslice(0,3) + "/" + TaskSubject.find(task.subject_1).subject%></td>
+                <% rescue %>
+                  <td></td>
+                <% end %>
                 <td class="hidden-columns"><%=task.method%></td>
                 <td class="hidden-columns">
                     <% if '-'.eql? staffs%>
