@@ -52,9 +52,9 @@ module GoogleCalendarSync
   end
 
   def calendar_event_update
-    service = connect_google_calendar
-    push_pending_events_to_google_offline(service)
-    scrap_from_calendars(service)
+    # service = connect_google_calendar
+    # push_pending_events_to_google_offline(service)
+    # scrap_from_calendars(service)
   end
 
   def push_pending_events_to_google_offline(service)
@@ -111,7 +111,7 @@ module GoogleCalendarSync
         task.summary = event.description
         task.save
         # push address back to events
-        update_event_location(task, event, service, calendar_events_pair) if (task.updated_at > event.updated) || event.location.nil?
+        update_event_location(task, event, service, calendar_events_pair) if  (task.description != event.summary && task.gcal_status = 2 && task.updated_at > event.updated) || event.location.nil?
 
       else
         # filter the staff
@@ -125,7 +125,7 @@ module GoogleCalendarSync
   def update_event_location(task, event, service, calendar_events_pair)
     relation = task.task_relations.first
 
-    if task.updated_at > event.updated
+    if (task.description != event.summary && task.gcal_status = 2 && task.updated_at > event.updated)
       event.summary = task.description
     elsif relation.nil?
       return
