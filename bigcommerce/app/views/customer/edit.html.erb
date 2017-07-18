@@ -17,9 +17,9 @@
   <% unless @google_spots.nil?%>
     <% @google_spots.each do |spot|%>
     <div class="col-xs-2">
-      <p id="<%= spot.place_id%>"><%= spot.name %></p>
+      <p class="google-place" place-id = "<%= spot.place_id%>"><%= spot.name %></p>
       <br/>
-      <%= spot.formatted_address %>
+      <p class="google-place-address <%= spot.place_id%>"><%= spot.formatted_address %></p>
     </div>
     <% end %>
   <% end %>
@@ -61,3 +61,10 @@
 <% end %>
 
 <p style="padding-left: 50px;"><%= link_to "Go Back to Customer Profile", action: 'summary', customer_id: @customer_id, customer_name: @customer_name %></p>
+
+<!-- Google Places -->
+<script type="text/javascript">
+  $('.google-place').click(function(){
+    $('input#customer_address').val($('p.google-place-address.'+ $(this).attr('place-id')).text());
+  });
+</script>
