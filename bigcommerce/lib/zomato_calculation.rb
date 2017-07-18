@@ -48,6 +48,9 @@ module ZomatoCalculation
         response = HTTParty.get(query, query: {lat: customer.lat, lon: customer.lng, radius: 200, cuisines: get_cuisines.map(&:to_s), start: start}, headers: {"user-key" => Rails.application.secrets.zomato_key })
         start += 20
         count_ping += 1
+        # if hit the daily limit, return the function
+        return if response['results_found'].nil?
+
         results_found = response['results_found'].to_i
         restaurant_update_attribuets(response['restaurants'])
         puts 'Counting ' + count_ping.to_s if count_ping % 10 == 0

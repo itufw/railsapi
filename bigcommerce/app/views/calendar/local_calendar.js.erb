@@ -12,8 +12,8 @@ $('#customer_checkbox').click(function(){
 $('#lead_checkbox').click(function(){
   if ($(this).is(':checked')){
     handler.removeMarkers(lead_markers);
-    <% pins = get_lead_pins(@calendar_staff) %>
-    lead_markers = handler.addMarkers(<%=raw pins.to_json unless pins.nil?%>);
+    lead_markers = null;
+    lead_markers = handler.addMarkers(<%=raw get_lead_pins(@selected_staff).to_json %>);
   }else{
     handler.removeMarkers(lead_markers);
     lead_markers = null;
