@@ -139,6 +139,10 @@ class Customer < ActiveRecord::Base
 		return all
 	end
 
+	def self.staff_filter(staff_ids)
+		where(staff_id: staff_ids)
+	end
+
 	def self.cust_style_filter(cust_style_id)
 		return where(cust_style_id: cust_style_id) unless cust_style_id.nil?
 		return all

@@ -50,9 +50,9 @@ class CalendarController < ApplicationController
   def local_calendar
     # tempary use, it should be assigned based on the current users' right
     if session[:user_id] == 36
-      @staffs = Staff.where('(active = 1 and user_type LIKE "Sales%") OR staffs.id = 36')
+      @staffs = Staff.calendar_list(session[:user_id]).order_by_order
     elsif user_full_right(session[:authority])
-      @staffs = Staff.active_sales_staff
+      @staffs = Staff.calendar_list.order_by_order
     else
       @staffs = Staff.where(id: session[:user_id])
     end

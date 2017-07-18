@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170717023200) do
+ActiveRecord::Schema.define(version: 20170718023501) do
 
   create_table "SalesForce_Lead_full", primary_key: "Id", force: :cascade do |t|
     t.string  "FirstName",                 limit: 38
@@ -926,6 +926,8 @@ ActiveRecord::Schema.define(version: 20170717023200) do
     t.string   "access_token",     limit: 255
     t.string   "refresh_token",    limit: 255
     t.integer  "pick_up_id",       limit: 4
+    t.integer  "sales_list_right", limit: 4
+    t.integer  "calendar_right",   limit: 4
   end
 
   add_index "staffs", ["active"], name: "index_staffs_on_active", using: :btree

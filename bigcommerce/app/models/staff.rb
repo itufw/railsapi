@@ -28,6 +28,15 @@ class Staff < ActiveRecord::Base
         where('(active = 1 and user_type LIKE "Sales%") OR (id = ?)', staff_id)
     end
 
+    def self.sales_list
+      where(active: 1, sales_list_right: 1)
+    end
+
+    def self.calendar_list(staff_id = nil)
+      where(active: 1, calendar_right: 1) if staff_id.nil?
+      where('active = 1 AND (calendar_right = 1 OR id = ?)', staff_id)
+    end
+
     def self.active
         where('active = 1').order('user_type DESC, staff_order ASC')
     end
@@ -68,6 +77,10 @@ class Staff < ActiveRecord::Base
 
     def self.can_update(staff_id)
         find(staff_id).can_update
+    end
+
+    def self.filter_by_state(state)
+      where(state: state)
     end
 
     def self.order_by_order

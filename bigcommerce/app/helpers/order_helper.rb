@@ -29,7 +29,7 @@ module OrderHelper
   def order_display_(params, orders)
     order_function, direction = sort_order(params, :order_by_id, 'DESC')
     per_page = params[:per_page] || Order.per_page
-    orders = orders.include_all.send(order_function, direction).paginate(per_page: per_page, page: params[:page])
+    orders = orders.where('orders.customer_id != 0').include_all.send(order_function, direction).paginate(per_page: per_page, page: params[:page])
     [per_page, orders]
   end
 end

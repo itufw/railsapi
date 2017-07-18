@@ -20,6 +20,7 @@ class AccessController < ApplicationController
       session[:user_id] = authorized_user.id
       session[:username] = authorized_user.nickname
       session[:authority] = authorized_user.user_type
+      session[:state] = authorized_user.state
       flash[:success] = "You are now logged in."
       redirect_to controller: 'sales', action: 'sales_dashboard'
     else
