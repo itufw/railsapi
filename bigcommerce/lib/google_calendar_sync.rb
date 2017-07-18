@@ -9,7 +9,7 @@ module GoogleCalendarSync
     active_sales_staff.delete(34)
 
     exist_customer = CustomerTag.filter_by_role('Customer').map(&:customer_id)
-    Customer.where('id NOT IN (?)', exist_customer).staff_search_filter(staff_id = active_sales_staff).where('actual_name IS NOT NULL').each do |customer|
+    Customer.where('id NOT IN (?)', exist_customer).staff_filter(active_sales_staff).where('actual_name IS NOT NULL').each do |customer|
       CustomerTag.new.insert_customer(customer)
     end
 
@@ -122,5 +122,49 @@ module GoogleCalendarSync
       service.update_event(calendar_id, event.id, event)
     rescue
     end
+  end
+
+  def push_event(customer, description, staff_ids, response_staff, start_time, end_time, subject, method, service, client)
+
+    staffs = Staff.filter_by_ids(staff_ids.append(response_staff))
+    staff_calendar_addresses = StaffCalendarAddress.filter_by_ids(staff_ids)
+    response_staff = staffs.select { |x| x.id.to_s == response_staff.to_s }.first
+    response_staff_email = response_staff.email
+
+    attendee_list = []
+    staffs.each do |staff|
+      attend = {
+        displayName: staff.nickname,
+        email: staff_calendar_addresses.select{|x|x.staff_id == staff.id}.first.calendar_address
+      }
+      attendee_list.append(attend)
+    end
+
+    customer_name = (customer.nil?) ? 'No Customer' : customer.actual_name
+    address = customer.address unless customer.nil?
+
+    task_subject = TaskSubject.find(subject).subject
+
+    event = Google::Apis::CalendarV3::Event.new({
+                                                start: {
+                                                  date_time: start_time.strftime('%Y-%m-%dT%H:%M:%S'),
+                                                  time_zone: 'Australia/Melbourne',
+                                                },
+                                                end:{
+                                                  date_time: end_time.strftime('%Y-%m-%dT%H:%M:%S'),
+                                                  time_zone: 'Australia/Melbourne',
+                                                },
+                                                # colorID: "2",
+                                                summary: customer_name,
+                                                description: task_subject + ": "+ customer_name + "\n" +description + "\n Created By:" + response_staff.nickname,
+                                                location: address,
+                                                attendees: attendee_list
+                                                })
+    begin
+      gcal_event = service.insert_event('primary', event, send_notifications: true)
+    rescue
+    end
+
+    return gcal_event
   end
 end
