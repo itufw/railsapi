@@ -13,12 +13,25 @@ module CalendarHelper
   end
 
   def get_lead_pins(staff_id, center_point = nil)
-    return [nil, nil] if staff_id.nil?
-    leads = CustomerLead.filter_by_staff(staff_id).active_lead
-    return [nil, nil] if leads.blank?
+    return nil if staff_id.nil?
+    leads = CustomerLead.filter_by_staff(staff_id).where('latitude IS NOT NULL').active_lead
     # center_point = Geocoder::Calculations.geographic_center(leads) if center_point.nil?
     # restaurants = ZomatoRestaurant.near(center_point, 50, units: :km).select{|x| x}
-    _, lead_hash, _ = marks_by_distance([], leads, [])
+
+    lead_hash = Gmaps4rails.build_markers(leads) do |lead, marker|
+      marker.lat lead.latitude
+      marker.lng lead.longitude
+      marker.picture({
+                        :url    => ActionView::Base.new.image_path('map_icons/lead_black.png'),
+                        :width  => 30,
+                        :height => 30
+                       })
+      marker.infowindow link_to "lead:" + lead.actual_name, controller: 'lead', action: 'summary', lead_id: lead.id
+      marker.json ({
+        :lead_id => lead.id,
+        })
+    end
+    # _, lead_hash, _ = marks_by_distance([], leads, [])
     lead_hash
   end
 
