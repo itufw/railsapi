@@ -1,5 +1,5 @@
 <%= title @product_name  + " - " + @status_name %>
-<h3><%= @product_name %></h3>
+<h3><%= link_to @product_name, controller: 'product', action: 'summary', pending_stock: @status_qty , product_id: @product_id, product_name: @product_name, total_stock: @status_qty.to_i + @qty.to_i, transform_column: 'product_id' %></h3>
 <h3><%= @status_name %></h3>
 
 <table class = "table table-bordered table-hover table-responsive" style="width:50%;" align="center">

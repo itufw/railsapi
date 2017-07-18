@@ -141,6 +141,13 @@ class CustomerController < ApplicationController
     # once you update using post request,
     # then want to update again, we need to use params[:customer][:id]
     @customer = Customer.include_all.filter_by_id(@customer_id || params[:customer][:id])
+
+    # google search function:
+    @search_text = params[:search]
+    unless @search_text.nil? || @search_text == ''
+      client = GooglePlaces::Client.new('AIzaSyBvfTZH0XCVEJQTgR9QDYt18XIeV5MIkPI')
+      @google_spots = client.spots_by_query(@search_text)
+    end
   end
 
   def update
