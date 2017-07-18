@@ -2,6 +2,29 @@
 <h3>Edit <%= @customer_name %></h3>
 <br/>
 
+<div class="row">
+  <div class="col-md-4 col-md-offset-4">
+    <%= form_tag({:controller => "customer", :action => "edit"}, {:method => "get"}) do %>
+    <%= text_field_tag('search', @search_text, placeholder: 'Search from Google', class: 'form-control') %>
+    <%= hidden_field_tag :customer_id, @customer.id %>
+    <%= hidden_field_tag :customer_name, @customer.firstname.to_s + ' ' + @customer.lastname.to_s %>
+    <%= submit_tag "Search!", class: 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+<div class="row place_lists">
+  <% unless @google_spots.nil?%>
+    <% @google_spots.each do |spot|%>
+    <div class="col-xs-2">
+      <p id="<%= spot.place_id%>"><%= spot.name %></p>
+      <br/>
+      <%= spot.formatted_address %>
+    </div>
+    <% end %>
+  <% end %>
+</div>
+
 <%= form_for @customer, url: {action: "update"}, method: "POST", html: {class: "form-group", style: "padding-left: 50px;"} do |f| %>
 
   <%= f.hidden_field :id %>
