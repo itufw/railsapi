@@ -58,8 +58,9 @@
 
           <td>&nbsp;&nbsp;&nbsp;</td>
           <%
-          unless event.description.nil?
-            pattern = event.description.split("\n").first.downcase
+          unless event.description.nil? && event.summary.nil?
+            pattern = event.description.split("\n").first.downcase unless event.description.nil?
+            pattern = event.summary.downcase unless event.summary.nil?
             pattern.slice! ' tasting'
             pattern = pattern.split('-').first
 
@@ -91,7 +92,7 @@
             <%= button_tag(type: 'submit', name: 'submit', class: "btn btn-default", value: 'reject') do%>
               <span class="glyphicon glyphicon-remove"></span>
             <% end %>
-            <%= link_to '<i class="glyphicon glyphicon-pencil" title="Create Lead"></i>'.html_safe, controller: "lead", action: "create_leads", customer_name: event.description.split("\n").first.to_s + event.location.to_s, staff_id: response_staff.first.id%>
+            <%= link_to '<i class="glyphicon glyphicon-pencil" title="Create Lead"></i>'.html_safe, controller: "lead", action: "create_leads", customer_name: event.summary.to_s.split("\n").first.to_s + event.location.to_s, staff_id: response_staff.first.id%>
           </td>
         </tr>
         <% end %>
