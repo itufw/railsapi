@@ -102,20 +102,20 @@ var update_subtotal = function(){
     total += parseFloat($(this).find('.product-total').val());
     discount += (parseFloat($(this).find('.product-luc').val()) - parseFloat($(this).find('.product-price').val()) *  parseInt($(this).find('.product-qty').val()));
   });
-  $('#cms_order_subtotal_inc_tax').val(total);
-  $('#cms_order_subtotal_tax').val(total/1.29 * 0.29);
-  $('#cms_order_total_tax').val(total*0.1);
-  $('#cms_order_discount_amount').val(discount);
-  $('#cms_order_total_inc_tax').val(total*1.1);
+  $('#cms_order_subtotal_inc_tax').val(total.toFixed(4));
+  $('#cms_order_subtotal_tax').val((total/1.29 * 0.29).toFixed(4));
+  $('#cms_order_total_tax').val((total*0.1).toFixed(4));
+  $('#cms_order_discount_amount').val(discount.toFixed(4));
+  $('#cms_order_total_inc_tax').val((total*1.1).toFixed(4));
   return total
 }
 
 $('#cms_order_discount_rate').on('input',function(){
   var discount = 1 - (parseFloat($('#cms_order_discount_rate').val()) / 100);
-  $('#cms_order_discount_amount').val((1 - discount) * parseFloat($('#cms_order_subtotal_inc_tax').val()));
+  $('#cms_order_discount_amount').val(((1 - discount) * parseFloat($('#cms_order_subtotal_inc_tax').val())).toFixed(4));
   var total = discount * parseFloat($('#cms_order_subtotal_inc_tax').val());
-  $('#cms_order_total_tax').val(total*0.1);
-  $('#cms_order_total_inc_tax').val(total*1.1);
+  $('#cms_order_total_tax').val((total*0.1).toFixed(4));
+  $('#cms_order_total_inc_tax').val((total*1.1).toFixed(4));
 });
 
 // Customer Search
@@ -146,7 +146,7 @@ $('#cms_order_discount_rate').on('input',function(){
             '<td><input class="product-qty" type="text" name="qty '+ data.item.id +'" id="qty_'+ data.item.id +'" value="0" placeholder="QTY" size="3"></td>',
             '<td><input class="product-discount" type="text" name="discount '+ data.item.id +'" id="discount_'+ data.item.id +'" value="0" placeholder="Discount" size="3"> %</td>',
             '<td><input class="product-price" type="text" name="price '+ data.item.id +'" id="price_'+ data.item.id +'" value="'+ data.item.price +'" placeholder="Price" size="5"></td>',
-            '<td class="num"><input class="product-total" type="text" name="total '+ data.item.id +'" id="total_'+ data.item.id +'" value="'+ parseFloat(parseFloat($('input#qty_'+data.item.id).val()) * parseFloat($('input#price_'+data.item.id).val())) +'" readonly="readonly"></td>',
+            '<td class="num"><input class="product-total" type="text" name="total '+ data.item.id +'" id="total_'+ data.item.id +'" value="'+ parseFloat(parseFloat($('input#qty_'+data.item.id).val()) * parseFloat($('input#price_'+data.item.id).val())).toFixed(4) +'" readonly="readonly"></td>',
             '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
         '</tr>'
         ].join(''));
@@ -155,7 +155,7 @@ $('#cms_order_discount_rate').on('input',function(){
           var d = $('#price_'+ data.item.id).val();
           var c = data.item.price;
           $('#discount_'+ data.item.id).val((100 - (d/c*100)).toFixed(0));
-          $('#total_' + data.item.id).val(parseFloat($('input#qty_'+data.item.id).val()) * parseFloat($('input#price_'+data.item.id).val()));
+          $('#total_' + data.item.id).val((parseFloat($('input#qty_'+data.item.id).val()) * parseFloat($('input#price_'+data.item.id).val())).toFixed(4));
           update_subtotal();
         });
 
@@ -163,12 +163,12 @@ $('#cms_order_discount_rate').on('input',function(){
           var d = $('#discount_'+ data.item.id).val();
           var c = data.item.price;
           $('#price_'+ data.item.id).val(((1-d*0.01)*c).toFixed(2));
-          $('#total_' + data.item.id).val(parseFloat($('input#qty_'+data.item.id).val()) * parseFloat($('input#price_'+data.item.id).val()));
+          $('#total_' + data.item.id).val((parseFloat($('input#qty_'+data.item.id).val()) * parseFloat($('input#price_'+data.item.id).val())).toFixed(4));
           update_subtotal();
         });
 
         $('#qty_'+ data.item.id).on('input', function(){
-          $('#total_' + data.item.id).val(parseFloat($('input#qty_'+data.item.id).val()) * parseFloat($('input#price_'+data.item.id).val()));
+          $('#total_' + data.item.id).val((parseFloat($('input#qty_'+data.item.id).val()) * parseFloat($('input#price_'+data.item.id).val())).toFixed(4));
           update_subtotal();
         });
 
