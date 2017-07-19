@@ -28,9 +28,10 @@ module GoogleCalendarSync
 
   def customer_state_update
     states = ['VIC', 'TAS', 'QLD', 'WA', 'SA', 'NT', 'NSW', 'ACT']
-    Customer.where('lat IS NOT NULL AND country = \'Australia\' AND state NOT IN ?', states).each do |customer|
+    Customer.where('lat IS NOT NULL AND country = \'Australia\' AND state NOT IN (?)', states).each do |customer|
       begin
-        customer.state = customer.address.split(',')[-2].split()[-2]
+        state = customer.address.split(',')[-2].split()[-2]
+        customer.state = state if states.include? state
         customer.save
       rescue
         next
