@@ -111,13 +111,11 @@ var update_subtotal = function(){
 }
 
 $('#cms_order_discount_rate').on('input',function(){
-  var discount = 1 - (parseFloat($('#cms_order_discount_rate').val()) / 100) ;
-  $('.product-item').each(function(){
-    $(this).find('.product-discount').val($('#cms_order_discount_rate').val());
-    $(this).find('.product-price').val(parseFloat($(this).find('.product-luc').val()) * discount);
-    $(this).find('.product-total').val(parseFloat($(this).find('.product-price').val()) * parseInt($(this).find('.product-qty').val()));
-    update_subtotal();
-  });
+  var discount = 1 - (parseFloat($('#cms_order_discount_rate').val()) / 100);
+  $('#cms_order_discount_amount').val((1 - discount) * parseFloat($('#cms_order_subtotal_inc_tax').val()));
+  var total = discount * parseFloat($('#cms_order_subtotal_inc_tax').val());
+  $('#cms_order_total_tax').val(total*0.1);
+  $('#cms_order_total_inc_tax').val(total*1.1);
 });
 
 // Customer Search
