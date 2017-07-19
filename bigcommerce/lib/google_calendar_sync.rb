@@ -78,7 +78,6 @@ module GoogleCalendarSync
     new_events = []
     # record the events and the calendar id
     calendar_events_pair = {}
-    unconfirmed_task = Task.unconfirmed_event.map(&:google_event_id)
 
     staff_calendars = StaffCalendarAddress.all
 
@@ -88,11 +87,11 @@ module GoogleCalendarSync
       calendar_events_pair[calendar.id] = items.map(&:id)
       new_events += items
     end
-    update_google_events(new_events, staff_calendars, unconfirmed_task, service, calendar_events_pair)
+    update_google_events(new_events, staff_calendars, service, calendar_events_pair)
   end
 
   # scrap events from google calendar
-  def update_google_events(new_events, staff_calendars, _unconfirm, service, calendar_events_pair)
+  def update_google_events(new_events, staff_calendars, service, calendar_events_pair)
     new_events.each do |event|
       task = Task.filter_by_google_event_id(event.id).first
 
@@ -102,10 +101,8 @@ module GoogleCalendarSync
         staff_address = staff_calendars.select { |x| [event.organizer.email, event.creator.email].include? x.calendar_address }.first
         next if staff_address.blank?
         Task.new.auto_insert_from_calendar_event(event, staff_address.staff_id)
-      end
-
-      # if events are updated, update the data
-      if event.updated > task.updated_at
+        # if events are updated, update the data
+      elsif event.updated > task.updated_at
         task.start_date = if event.start.date_time.nil?
                             event.start.date.to_s
                           else
