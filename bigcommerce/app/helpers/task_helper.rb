@@ -30,7 +30,7 @@ module TaskHelper
                 end
             end
             customer_id = (!params['customer'].nil? && params['customer']['id'] != '') ? params['customer']['id'] : 0
-            staff_id = (!params['customer'].nil? && params['staff']['id'] != '') ? params['staff']['id'] : 0
+            staff_id = (!params['staff'].nil? && params['staff']['id'] != '') ? params['staff']['id'] : 0
 
 
             Task.new.insert_or_update(t)
