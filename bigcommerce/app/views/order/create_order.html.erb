@@ -34,53 +34,48 @@
       <th>Price (Luc)</th>
       <th>QTY</th>
       <th>Discount</th>
-      <th>Price</th>
+      <th>Discounted Price</th>
       <th>Total</th>
     </tr>
   </thead>
   <tbody class="product-list">
   </tbody>
   <tr>
-    <td colspan="6" style="background-color:rgb(255,255,255); border: 0px;"></td>
+    <td colspan="6" rowspan="6" style="background-color:rgb(255,255,255); border: 0px;">
+      <div class="well panel-default panel" style="margin-top:20px;margin-left:100px;width:30%;float:left;">
+        <h4 class="panel-heading">Customer Notes</h4>
+        <div class="panel-body"><%= f.text_area :customer_notes%></div>
+      </div>
+
+      <div class="well panel-default panel" style="margin-top:20px;margin-left:200px;width:30%;float:left;">
+        <h4 class="panel-heading">Staff Notes</h4>
+        <div class="panel-body"><%= f.text_area :staff_notes%></div>
+      </div>
+    </td>
     <td class="ProductCost" align="right">Subtotal (Inc. WET, Ex. GST)</td>
     <td class="ProductTotal" align="right"><%= f.text_field :subtotal_inc_tax, readonly: true%></td>
   </tr>
   <tr>
-    <td colspan="6" style="background-color:rgb(255,255,255); border: 0px;"></td>
     <td class="ProductCost" align="right">Discount Rate</td>
     <td class="ProductTotal" align="right"><%= f.text_field :discount_rate %></td>
   </tr>
   <tr>
-    <td colspan="6" style="background-color:rgb(255,255,255); border: 0px;"></td>
     <td class="ProductCost" align="right">Discount</td>
     <td class="ProductTotal" align="right"><%= f.text_field :discount_amount, readonly: true%></td>
   </tr>
   <tr>
-    <td colspan="6" style="background-color:rgb(255,255,255); border: 0px;"></td>
     <td class="ProductCost" align="right">WET</td>
     <td class="ProductTotal" align="right"><%= f.text_field :subtotal_tax, readonly: true%></td>
   </tr>
   <tr>
-    <td colspan="6" style="background-color:rgb(255,255,255); border: 0px;"></td>
     <td class="ProductCost" align="right">GST</td>
     <td class="ProductTotal" align="right"><%= f.text_field :total_tax, readonly: true%></td>
   </tr>
   <tr>
-    <td colspan="6" style="background-color:rgb(255,255,255); border: 0px;"></td>
     <td class="ProductCost" align="right">Grand Total</td>
     <td class="ProductTotal" align="right"><%= f.text_field :total_inc_tax, readonly: true%></td>
   </tr>
 </table>
-
-<div class="well panel-default panel" style="margin-top:20px;margin-left:100px;width:30%;float:left;">
-  <h4 class="panel-heading">Customer Notes</h4>
-  <div class="panel-body"><%= f.text_area :customer_notes%></div>
-</div>
-
-<div class="well panel-default panel" style="margin-top:20px;margin-left:200px;width:30%;float:left;">
-  <h4 class="panel-heading">Staff Notes</h4>
-  <div class="panel-body"><%= f.text_area :staff_notes%></div>
-</div>
 <div class="row">
   <div class="col-md-4 col-md-offset-4">
     <%= button_tag(type: 'submit', class: 'btn btn-primary') do %>
@@ -100,7 +95,7 @@ var update_subtotal = function(){
   var discount = 0;
   $('.product-item').each(function(){
     total += parseFloat($(this).find('.product-total').val());
-    discount += (parseFloat($(this).find('.product-luc').val()) - parseFloat($(this).find('.product-price').val()) *  parseInt($(this).find('.product-qty').val()));
+    discount += (parseFloat($(this).find('.product-luc').val()) - parseFloat($(this).find('.product-price').val())) *  parseInt($(this).find('.product-qty').val());
   });
   $('#cms_order_subtotal_inc_tax').val(total.toFixed(4));
   $('#cms_order_subtotal_tax').val((total/1.29 * 0.29).toFixed(4));
