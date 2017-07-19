@@ -70,8 +70,9 @@ class TaskController < ApplicationController
           params[:accounts_page] && !(''.eql? params[:customer][:id]) ? (redirect_to(controller: 'accounts', action: 'contact_invoices', customer_id: params[:customer][:id]) && return) : (redirect_to(action: 'staff_task') && return)
         else
           selected_invoices = params[:selected_orders].nil? ? [] : params[:selected_orders].split
+          account_customer = (!params[:customer].nil? && params[:customer][:id] != '') ? params[:customer][:id] : 0
           redirect_to(controller: 'task', action: 'add_task',\
-                      parent_task: parent_task_id, account_customer: params[:customer][:id],\
+                      parent_task: parent_task_id, account_customer: account_customer,\
                       selected_invoices: selected_invoices, selected_function: params[:task][:function]) && return
         end
       else
