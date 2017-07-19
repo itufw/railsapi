@@ -29,7 +29,7 @@ class Product < ActiveRecord::Base
   belongs_to :product_no_vintage
   belongs_to :product_no_ws
 
-  scoped_search on: %i[name portfolio_region]
+  scoped_search on: %i[id name portfolio_region]
 
   self.per_page = 30
 
