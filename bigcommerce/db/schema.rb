@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170719022000) do
+ActiveRecord::Schema.define(version: 20170719023330) do
 
   create_table "SalesForce_Lead_full", primary_key: "Id", force: :cascade do |t|
     t.string  "FirstName",                 limit: 38
@@ -321,6 +321,24 @@ ActiveRecord::Schema.define(version: 20170719022000) do
   end
 
   add_index "categories", ["parent_id"], name: "index_categories_on_parent_id", using: :btree
+
+  create_table "cms_order_products", force: :cascade do |t|
+    t.integer  "cms_order_id",      limit: 4,                         null: false
+    t.integer  "product_id",        limit: 4,                         null: false
+    t.integer  "order_shipping_id", limit: 4,                         null: false
+    t.integer  "qty",               limit: 3,                         null: false
+    t.integer  "qty_shipped",       limit: 3,                         null: false
+    t.decimal  "base_price",                  precision: 6, scale: 2, null: false
+    t.decimal  "price_ex_tax",                precision: 6, scale: 2, null: false
+    t.decimal  "price_inc_tax",               precision: 6, scale: 2, null: false
+    t.decimal  "price_tax",                   precision: 6, scale: 2, null: false
+    t.datetime "created_at",                                          null: false
+    t.datetime "updated_at",                                          null: false
+  end
+
+  add_index "cms_order_products", ["cms_order_id"], name: "index_cms_order_products_on_cms_order_id", using: :btree
+  add_index "cms_order_products", ["order_shipping_id"], name: "index_cms_order_products_on_order_shipping_id", using: :btree
+  add_index "cms_order_products", ["product_id"], name: "index_cms_order_products_on_product_id", using: :btree
 
   create_table "cms_orders", force: :cascade do |t|
     t.integer  "customer_id",                limit: 4,                             null: false

@@ -142,7 +142,7 @@ class ActivityController < ApplicationController
 
   def autocomplete_product_name
     products = Product.search_for(params[:term]).order('name_no_vintage ASC, vintage DESC').all
-    render :json => products.map { |product| {:id => product.id, :label => product.name, :value => product.name, :price => (product.calculated_price * (1.29)).round(2)} }
+    render :json => products.map { |product| {:id => product.id, :label => product.name, :value => product.name, :price => (product.calculated_price * (1.29)).round(4), :inventory => product.inventory}}
   end
 
   # -----------private --------------------
