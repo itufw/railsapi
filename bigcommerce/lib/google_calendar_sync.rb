@@ -116,16 +116,16 @@ module GoogleCalendarSync
                         else
                           event.end.date_time.to_s(:db)
                         end
-        task.description = event.summary
+        task.summary = event.summary
         task.location = event.location
-        task.summary = event.description
+        task.description = event.description
         task.save
       else
         if event.location.nil? && !task.task_relations.first.nil?
           # push address back to events
           update_event_location(task.task_relations.first, event, service, calendar_events_pair)
         end
-        if task.description != event.summary
+        if task.description != event.summary && task.description != event.description
           update_event_summary(task, event, service, calendar_events_pair)
         end
       end
@@ -134,14 +134,9 @@ module GoogleCalendarSync
 
   # Testing this one
   def update_event_summary(task, event, service, calendar_events_pair)
-    event.description = task.description + event.description
+    event.description = task.description
     calendar_id = calendar_events_pair.select { |_key, value| value.include?event.id }.keys.first.to_s
     return if calendar_id == ''
-
-    # TODO
-    # DELETE THIS AFTER TESTING
-    puts 'Calendar Event: ' + event.id.to_s + ' summary: ' + event.summary + ' description: ' + task.description
-    return if calendar_id != 'it@untappedwines.com'
 
     begin
       service.update_event(calendar_id, event.id, event)
