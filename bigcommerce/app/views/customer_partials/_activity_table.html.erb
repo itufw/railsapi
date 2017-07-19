@@ -24,7 +24,7 @@
           <%= task.method%>
         </div>
       </td>
-      <td class="col-md-8"><%= link_to task.description[0..200],controller: "activity", action: "activity_edit", note_id: task.id%><%= '...' if task.description.length > 200%></td>
+      <td class="col-md-8"><%= link_to task.description.to_s[0..200],controller: "activity", action: "activity_edit", note_id: task.id%><%= '...' if task.description.to_s.length > 200%></td>
       <td class="col-md-2"><%= task.is_task==1 ? task.end_date.strftime("%d/%m") : '                '%></td>
     </tr>
     <% end %>
