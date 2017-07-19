@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170718023501) do
+ActiveRecord::Schema.define(version: 20170719020542) do
 
   create_table "SalesForce_Lead_full", primary_key: "Id", force: :cascade do |t|
     t.string  "FirstName",                 limit: 38
@@ -424,6 +424,13 @@ ActiveRecord::Schema.define(version: 20170718023501) do
   add_index "customer_leads", ["cust_group_id"], name: "index_customer_leads_on_cust_group_id", using: :btree
   add_index "customer_leads", ["cust_type_id"], name: "index_customer_leads_on_cust_type_id", using: :btree
   add_index "customer_leads", ["staff_id"], name: "index_customer_leads_on_staff_id", using: :btree
+
+  create_table "customer_states", force: :cascade do |t|
+    t.string   "state",      limit: 255
+    t.string   "state_full", limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "customer_tags", force: :cascade do |t|
     t.string   "name",           limit: 255
