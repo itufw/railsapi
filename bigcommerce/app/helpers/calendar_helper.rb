@@ -261,9 +261,7 @@ module CalendarHelper
                                 <br/><br/>
                                 <p>#{event[event_id]['infowindow']}<p>"
       else
-        marker.infowindow "<a href=\"http://188.166.243.138/customer/summary?customer_id=#{event[event_id]['customer_id']}&customer_name=#{event[event_id]['name']}\">#{event[event_id]['name']}</a>
-                                <br/><br/>
-                                <p>#{event[event_id]['infowindow']}<p>"
+        marker.infowindow link_to event[event_id]['name'].to_s + "\n" + event[event_id]['infowindow'].to_s, controller: 'customer', action: 'summary', customer_id: event[event_id]['customer_id'], customer_name: event[event_id]['name']
       end
       marker.json({
         date: event[event_id]['date'],
@@ -349,9 +347,7 @@ module CalendarHelper
                         :width  => 30,
                         :height => 30
                        })
-      marker.infowindow "<a href=\"http://188.166.243.138/customer/summary?customer_id=#{customer_id}&customer_name=#{customer_map[customer_id]["name"]}\">#{customer_map[customer_id]["name"]}</a>
-                              <br/><br/>
-                              <p>#{customer_map[customer_id]["infowindow"]}<p>"
+      marker.infowindow link_to customer_map[customer_id]["name"].to_s + "\n" + customer_map[customer_id]["infowindow"].to_s, controller: 'customer', action: 'summary', customer_id: customer_id, customer_name: customer_map[customer_id]["name"]
       marker.json ({
         :customer_id => customer_id,
         :staff_id => customer_map[customer_id]['staff_id']

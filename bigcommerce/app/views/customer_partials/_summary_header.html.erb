@@ -1,6 +1,6 @@
 <div class="container-center">
   <div class= "row">
-    <div class="col-xs-4">
+    <div class="col-xs-6">
       <% staff = customer.staff %>
       <h5>Sales Rep.: <%= staff.nickname %></h5>
       <p>Ph: <a href="tel:<%=staff.contact_number%>"><%= num_to_phone(staff.contact_number) unless staff.contact_number.nil? %></a></p>
@@ -9,7 +9,7 @@
       <p>Email for Accounts: <%= mail_to(customer.email_for_accounts) unless customer.email_for_accounts.nil? %></p>
     </div>
     <% XeroContactPerson.all_contact_people(customer.xero_contact_id).each do |person| %>
-      <div class="col-xs-4">
+      <div class="col-xs-6">
         <h5><%= person.first_name+"  "+person.last_name %></h5>
         <p>Email: <%= mail_to(person.email_address) unless person.email_address.nil? %></p>
       </div>

@@ -35,7 +35,7 @@ class CustomerController < ApplicationController
     # include Lead
     unless @search_text.nil? || @search_text == ''
       @leads, @search_text = lead_filter(params, @per_page)
-      @zomato = ZomatoRestaurant.search_for(@search_text).paginate(per_page: @per_page, page: params[:page])
+      @zomato = ZomatoRestaurant.unassigned.search_for(@search_text).paginate(per_page: @per_page, page: params[:page])
     end
   end
 
@@ -244,7 +244,7 @@ class CustomerController < ApplicationController
 
     order_function, direction = sort_order(params, :order_by_name, 'DESC')
 
-    @zomato = ZomatoRestaurant.search_for(@search_text).send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
+    @zomato = ZomatoRestaurant.unassigned.search_for(@search_text).send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
   end
 
   def near_by
@@ -253,7 +253,7 @@ class CustomerController < ApplicationController
     radius = params[:radius] || 0.5
 
     customer = Customer.where('lat IS NOT NULL').search_for(@search_text).first
-    customer = ZomatoRestaurant.search_for(@search_text).first if customer.nil?
+    customer = ZomatoRestaurant.unassigned.search_for(@search_text).first if customer.nil?
     customer = CustomerLead.where('latitude IS NOT NULL').search_for(@search_text).first if customer.nil?
     latitude = (customer.is_a? Customer) ? customer.lat : customer.latitude
     longitude = (customer.is_a? Customer) ? customer.lng : customer.longitude
