@@ -30,4 +30,8 @@ class ZomatoRestaurant < ActiveRecord::Base
   def self.order_by_locality(direction)
     order('locality ' + direction)
   end
+
+  def self.unassigned
+    where(customer_id: nil, customer_lead_id: nil)
+  end
 end

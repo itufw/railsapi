@@ -1,0 +1,10 @@
+<div class="lead_pictures">
+  <%= render 'lead_partials/lead_pictures', spot: spot, size: size%>
+</div>
+
+<!-- map -->
+<script src="//maps.google.com/maps/api/js?key=AIzaSyB1HFWQ1DigWTnXGn_ZaUOk-v8hgGF3moI"></script>
+<script src="//cdn.rawgit.com/mahnunchik/markerclustererplus/master/dist/markerclusterer.min.js"></script>
+<div style='width: <%= size%>px;'>
+  <div id="map" style='width: <%= size%>px; height: <%= size%>px;'></div>
+</div>

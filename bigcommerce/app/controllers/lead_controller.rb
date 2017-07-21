@@ -36,6 +36,7 @@ class LeadController < ApplicationController
     end
 
     @customer_lead_button = true
+    p = c
   end
 
   def fetch_lead
@@ -114,6 +115,7 @@ class LeadController < ApplicationController
     params.require(:customer_lead).permit(:firstname, :lastname, :actual_name,\
                                           :staff_id, :cust_style_id, \
                                           :cust_group_id, :cust_type_id, \
-                                          :address, :region, :website)
+                                          :address, :region, :website,\
+                                          :featured_image, :google_place_id)
   end
 end
