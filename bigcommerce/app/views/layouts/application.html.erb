@@ -29,7 +29,6 @@
                         </li>
 
                         <li><%= link_to "Orders", controller: "order", action: "all" %></li>
-                        <li><%= link_to "Orders-Temp", controller: 'order', action: 'cms_order_all'%></li>
                         <li class="dropdown">
                           <a class="" data-toggle="dropdown" href="#">Customers
                             <span class="caret"></span>
@@ -100,6 +99,8 @@
                             <li>Activity down there<li>
                             <li><%= link_to "Add Note", controller: 'activity', action: 'add_note'%></li>
                             <li><%= link_to "Add Task", controller: 'activity', action: 'add_activity'%></li>
+                            <li>Generate Order</li>
+                            <li><%= link_to "Orders-Temp", controller: 'order', action: 'cms_order_all'%></li>
                           </ul>
                         </li>
                         <% end %>
