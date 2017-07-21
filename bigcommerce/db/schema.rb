@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170719023330) do
+ActiveRecord::Schema.define(version: 20170721014020) do
 
   create_table "SalesForce_Lead_full", primary_key: "Id", force: :cascade do |t|
     t.string  "FirstName",                 limit: 38
@@ -325,13 +325,13 @@ ActiveRecord::Schema.define(version: 20170719023330) do
   create_table "cms_order_products", force: :cascade do |t|
     t.integer  "cms_order_id",      limit: 4,                         null: false
     t.integer  "product_id",        limit: 4,                         null: false
-    t.integer  "order_shipping_id", limit: 4,                         null: false
+    t.integer  "order_shipping_id", limit: 4
     t.integer  "qty",               limit: 3,                         null: false
-    t.integer  "qty_shipped",       limit: 3,                         null: false
-    t.decimal  "base_price",                  precision: 6, scale: 2, null: false
-    t.decimal  "price_ex_tax",                precision: 6, scale: 2, null: false
-    t.decimal  "price_inc_tax",               precision: 6, scale: 2, null: false
-    t.decimal  "price_tax",                   precision: 6, scale: 2, null: false
+    t.integer  "qty_shipped",       limit: 3
+    t.decimal  "base_price",                  precision: 9, scale: 4, null: false
+    t.decimal  "price_ex_tax",                precision: 9, scale: 4, null: false
+    t.decimal  "price_inc_tax",               precision: 9, scale: 4
+    t.decimal  "price_tax",                   precision: 9, scale: 4
     t.datetime "created_at",                                          null: false
     t.datetime "updated_at",                                          null: false
   end
@@ -344,19 +344,19 @@ ActiveRecord::Schema.define(version: 20170719023330) do
     t.integer  "customer_id",                limit: 4,                             null: false
     t.integer  "status_id",                  limit: 4
     t.integer  "staff_id",                   limit: 4
-    t.decimal  "total_inc_tax",                            precision: 8, scale: 2
+    t.decimal  "total_inc_tax",                            precision: 9, scale: 4
     t.decimal  "refunded_amount",                          precision: 8, scale: 2
-    t.integer  "qty",                        limit: 3,                             null: false
+    t.integer  "qty",                        limit: 3
     t.integer  "items_shipped",              limit: 3
     t.text     "staff_notes",                limit: 65535
     t.text     "customer_notes",             limit: 65535
-    t.decimal  "discount_rate",                            precision: 6, scale: 2
-    t.decimal  "discount_amount",                          precision: 6, scale: 2
-    t.decimal  "subtotal_ex_tax",                          precision: 6, scale: 2
-    t.decimal  "subtotal_inc_tax",                         precision: 6, scale: 2
-    t.decimal  "subtotal_tax",                             precision: 6, scale: 2
-    t.decimal  "total_ex_tax",                             precision: 6, scale: 2
-    t.decimal  "total_tax",                                precision: 6, scale: 2
+    t.decimal  "discount_rate",                            precision: 9, scale: 4
+    t.decimal  "discount_amount",                          precision: 9, scale: 4
+    t.decimal  "subtotal_ex_tax",                          precision: 9, scale: 4
+    t.decimal  "subtotal_inc_tax",                         precision: 9, scale: 4
+    t.decimal  "subtotal_tax",                             precision: 9, scale: 4
+    t.decimal  "total_ex_tax",                             precision: 9, scale: 4
+    t.decimal  "total_tax",                                precision: 9, scale: 4
     t.decimal  "base_shipping_cost",                       precision: 6, scale: 2
     t.decimal  "shipping_cost_ex_tax",                     precision: 6, scale: 2
     t.decimal  "shipping_cost_inc_tax",                    precision: 6, scale: 2
@@ -1445,6 +1445,10 @@ ActiveRecord::Schema.define(version: 20170719023330) do
     t.integer  "customer_id",          limit: 4
     t.integer  "customer_lead_id",     limit: 4
     t.integer  "active",               limit: 4
+    t.string   "thumb",                limit: 255
+    t.string   "featured_image",       limit: 255
+    t.float    "aggregate_rating",     limit: 24
+    t.string   "rating_text",          limit: 255
   end
 
 end
