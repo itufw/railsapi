@@ -36,7 +36,6 @@ class LeadController < ApplicationController
     end
 
     @customer_lead_button = true
-    p = c
   end
 
   def fetch_lead

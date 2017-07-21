@@ -80,8 +80,8 @@
 					}
 				}
 			]);
-			<% customers = Customer.near([spot.lat, spot.lng], 0.5, units: :km).where('id != ?', @customer.id).select{|x| x} %>
-			<% leads = CustomerLead.near([spot.lat, spot.lng], 0.5, units: :km) %>
+			<% customers = Customer.near([spot.lat, spot.lng], 1, units: :km).where('id != ?', @customer.id).select{|x| x} %>
+			<% leads = CustomerLead.near([spot.lat, spot.lng], 1, units: :km) %>
 			<% customer_markers, lead_markers, restaurant_markers =  marks_by_distance(customers, leads, []) %>
 			customer_markers = handler.addMarkers(<%=raw customer_markers.to_json%>);
       lead_markers = handler.addMarkers(<%= raw lead_markers.to_json%>);
