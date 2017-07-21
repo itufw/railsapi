@@ -34,4 +34,9 @@ class ZomatoRestaurant < ActiveRecord::Base
   def self.unassigned
     where(customer_id: nil, customer_lead_id: nil)
   end
+
+  def self.cuisine_search(cuisine)
+    return where("cuisines Like '%#{cuisine.strip}%'") unless cuisine.nil?
+    all
+  end
 end
