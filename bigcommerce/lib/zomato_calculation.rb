@@ -47,6 +47,7 @@ module ZomatoCalculation
         start += 20
         count_ping += 1
         puts 'Counting ' + count_ping.to_s if count_ping % 100 == 0
+        return if count_ping > 900
       end
 
       customers_viewed += Customer.near([customer.lat, customer.lng], 0.05, units: :km).map(&:id)

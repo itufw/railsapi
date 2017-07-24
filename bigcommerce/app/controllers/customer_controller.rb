@@ -252,7 +252,7 @@ class CustomerController < ApplicationController
     radius = params[:radius] || 0.5
 
     customer = Customer.where('lat IS NOT NULL').search_for(@search_text).first
-    customer = ZomatoRestaurant.unassigned.search_for(@search_text).first if customer.nil?
+    customer = ZomatoRestaurant.unassigned.cuisine_search(params[:cuisine]).search_for(@search_text).first if customer.nil?
     customer = CustomerLead.where('latitude IS NOT NULL').search_for(@search_text).first if customer.nil?
     latitude = (customer.is_a? Customer) ? customer.lat : customer.latitude
     longitude = (customer.is_a? Customer) ? customer.lng : customer.longitude
