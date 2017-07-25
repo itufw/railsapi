@@ -5,4 +5,9 @@ class FastwayConsignment < ActiveRecord::Base
   def self.exists?(consignment_ids)
     where(ConsignmentID: consignment_ids)
   end
+
+  def traces
+    FastwayTrace.trace_label(self.items.map(&:LabelNumber))
+  end
+
 end

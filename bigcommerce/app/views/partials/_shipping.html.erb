@@ -2,7 +2,7 @@
 <% traces = FastwayTrace.tract_order(order_id).order('Date ASC') %>
 
 <% signature = traces.select{|x| x.StatusDescription == 'Signature Obtained'}.first%>
-<% unless signature.nil?%>
+<% unless signature.nil? %>
   <table class="table table-striped table-bordered table-hover table-responsive fastway">
     <thead>
       <th>Signature</th>
@@ -20,7 +20,7 @@
           <br/>
             <%= signature.address4.to_s + "\n" + signature.address5.to_s + "\n" + signature.address6.to_s%>
         </td>
-        <td><%= signature.comment%></td>
+        <td><%= signature.comment%><br/><%= link_to '<i class="glyphicon glyphicon-download" title="Download Pod" style="color: blue;"></i>'.html_safe, controller: 'order', action: 'generate_pod', order_id: order_id%></td>
       </tr>
     </tbody>
   </table>
