@@ -43,6 +43,24 @@
 	<tr>
 		<td colspan="4">
 		<% traces = FastwayTrace.tract_order(order.id).order('Date ASC') %>
+
+		<!-- print the signature area if it is delivered -->
+		<% signature = traces.select{|x| x.StatusDescription == 'Signature Obtained'}.first%>
+		<% unless signature.nil?%>
+			<%= label(:signature, 'Signature')%>
+			<%= image_tag "#{signature.Signature}"%>
+			<br/>
+			<%= label(:company, 'Company')%> <%= signature.company%>
+			<br/>
+			<%= label(:receiver, 'Receiver')%> <%= signature.contactName%>
+			<br/>
+			<%= label(:address, 'Address')%> <%= signature.address1.to_s + ' ' + signature.address2 + ' ' + signature.address3%>
+			<br/>
+			<%= signature.address4.to_s + ' ' + signature.address5.to_s + ' ' + signature.address6.to_s + ' '%>
+			<br/>
+			<%= label(:comment, 'Comment')%> <%= signature.comment%>
+		<% end %>
+		<br/>
 		<% traces.map(&:LabelNumber).uniq.each do |label|%>
 			<%= label(:label, label)%>
 			<br/>
