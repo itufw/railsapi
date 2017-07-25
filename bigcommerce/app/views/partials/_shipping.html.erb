@@ -1,0 +1,21 @@
+<!-- Trace Table -->
+<% traces = FastwayTrace.tract_order(order_id).order('Date ASC') %>
+<% traces.map(&:LabelNumber).uniq.each do |label|%>
+  <%= label(:label, label)%>
+  <table class="table table-striped table-bordered table-hover table-responsive fastway">
+    <thead>
+      <th>Date</th>
+      <th>Franchise</th>
+      <th>Status</th>
+      <th>Comment</th>
+    </thead>
+    <%traces.select{|x| x.LabelNumber == label}.each do |scan|%>
+      <tr>
+        <td><%= scan.Date%></td>
+        <td><%= scan.Franchise%></td>
+        <td><%= scan.StatusDescription%></td>
+        <td><%= scan.comment%></td>
+      </tr>
+    <% end %>
+  </table>
+<% end %>

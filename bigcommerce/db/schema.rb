@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170721032501) do
+ActiveRecord::Schema.define(version: 20170724053111) do
 
   create_table "SalesForce_Lead_full", primary_key: "Id", force: :cascade do |t|
     t.string  "FirstName",                 limit: 38
@@ -554,6 +554,94 @@ ActiveRecord::Schema.define(version: 20170721032501) do
   add_index "customers", ["cust_store_id"], name: "index_customers_on_cust_store_id", using: :btree
   add_index "customers", ["cust_type_id"], name: "index_customers_on_cust_type_id", using: :btree
   add_index "customers", ["staff_id"], name: "index_customers_on_staff_id", using: :btree
+
+  create_table "fastway_consignment_items", primary_key: "ItemID", force: :cascade do |t|
+    t.string   "Reference",        limit: 255
+    t.integer  "Packaging",        limit: 4
+    t.integer  "Weight",           limit: 4
+    t.integer  "WeightCubic",      limit: 4
+    t.datetime "CreateDate"
+    t.datetime "PrintDate"
+    t.integer  "ExcessLabelCount", limit: 4
+    t.string   "LabelColour",      limit: 255
+    t.string   "LabelNumber",      limit: 255
+    t.integer  "ConsignmentID",    limit: 4
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  add_index "fastway_consignment_items", ["ItemID"], name: "index_fastway_consignment_items_on_ItemID", using: :btree
+
+  create_table "fastway_consignments", primary_key: "ConsignmentID", force: :cascade do |t|
+    t.integer  "AccountNumber",           limit: 4
+    t.string   "CompanyName",             limit: 255
+    t.string   "Address1",                limit: 255
+    t.string   "Address2",                limit: 255
+    t.string   "City",                    limit: 255
+    t.string   "PostCode",                limit: 255
+    t.string   "SpecialInstruction1",     limit: 255
+    t.string   "SpecialInstruction2",     limit: 255
+    t.string   "SpecialInstruction3",     limit: 255
+    t.string   "ContactEmail",            limit: 255
+    t.string   "ContactPhone",            limit: 255
+    t.string   "ContactMobile",           limit: 255
+    t.string   "ContactName",             limit: 255
+    t.string   "DestinationFranchise",    limit: 255
+    t.string   "ThirdPartyConsignmentID", limit: 255
+    t.string   "SenderFirstName",         limit: 255
+    t.string   "SenderLastName",          limit: 255
+    t.string   "SenderContactNumber",     limit: 255
+    t.datetime "CreateDate"
+    t.integer  "NotificationEmailSent",   limit: 4
+    t.integer  "ManifestID",              limit: 4
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
+  end
+
+  add_index "fastway_consignments", ["ConsignmentID"], name: "index_fastway_consignments_on_ConsignmentID", using: :btree
+
+  create_table "fastway_manifests", primary_key: "ManifestID", force: :cascade do |t|
+    t.string   "Description",            limit: 255
+    t.integer  "AutoImport",             limit: 4
+    t.datetime "AutoImportCompleteDate"
+    t.integer  "MultiBusinessID",        limit: 4
+    t.datetime "CreateDate"
+    t.datetime "CloseDate"
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "fastway_manifests", ["ManifestID"], name: "index_fastway_manifests_on_ManifestID", using: :btree
+
+  create_table "fastway_traces", force: :cascade do |t|
+    t.string   "LabelNumber",        limit: 255
+    t.string   "Type",               limit: 255
+    t.string   "Courier",            limit: 255
+    t.string   "Description",        limit: 255
+    t.datetime "Date"
+    t.datetime "UploadDate"
+    t.string   "Name",               limit: 255
+    t.string   "Status",             limit: 255
+    t.string   "Franchise",          limit: 255
+    t.string   "StatusDescription",  limit: 255
+    t.string   "contactName",        limit: 255
+    t.string   "company",            limit: 255
+    t.string   "address1",           limit: 255
+    t.string   "address2",           limit: 255
+    t.string   "address3",           limit: 255
+    t.string   "address4",           limit: 255
+    t.string   "address5",           limit: 255
+    t.string   "address6",           limit: 255
+    t.string   "address7",           limit: 255
+    t.string   "address8",           limit: 255
+    t.string   "comment",            limit: 255
+    t.string   "Signature",          limit: 255
+    t.string   "DistributedTo",      limit: 255
+    t.string   "ParcelConnectAgent", limit: 255
+    t.string   "Reference",          limit: 255
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+  end
 
   create_table "google_revisions", force: :cascade do |t|
     t.datetime "start_time"
