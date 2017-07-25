@@ -38,15 +38,15 @@ class AdminController < ApplicationController
     def update; end
 
     def update_products
-        Product.new.update_from_api(Revision.update_time_iso)
+        Product.new.update_from_api(Revision.bigcommerce.update_time_iso)
     end
 
     def update_customers
-        Customer.new.update_from_api(Revision.update_time_iso)
+        Customer.new.update_from_api(Revision.bigcommerce.update_time_iso)
     end
 
     def update_orders
-        Order.new.update_from_api(Revision.update_time_iso)
+        Order.new.update_from_api(Revision.bigcommerce.update_time_iso)
     end
 
     def import_from_csv
@@ -80,20 +80,20 @@ class AdminController < ApplicationController
 
     def xero_sync
         start_time = Time.now.utc
-        XeroRevision.update_end_time(start_time)
+        Revision.xero.update_end_time(start_time)
         xero = XeroController.new
         xero.update_xero_contacts
         xero.update_xero_invoices
 
         system 'rake xero_invoice_sync:sync'
         flash[:success] = 'Sync is Done!'
-        XeroRevision.end_update(start_time, Time.now)
+        Revision.xero.end_update(start_time, Time.now)
         redirect_to controller: 'admin', action: 'index'
     end
 
 
     def xero_sync_temp
-        XeroRevision.update_end_time(Time.now.utc)
+        Revision.xero.update_end_time(Time.now.utc)
 
         system 'rake xero_invoice_sync:sync'
         flash[:success] = 'Sync is Done! (Temporary!)'
