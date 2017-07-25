@@ -17,4 +17,8 @@ class FastwayTrace < ActiveRecord::Base
   def self.tract_order(order_id)
     where("Reference LIKE '%#{order_id}%'")
   end
+
+  def self.lastest
+    order('updated_at DESC').limit(1)
+  end
 end

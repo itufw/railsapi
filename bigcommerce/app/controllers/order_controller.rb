@@ -50,6 +50,13 @@ class OrderController < ApplicationController
       @tasks = Task.active_tasks.order_tasks(@order_id).order_by_id('DESC')
 	end
 
+  def fetch_order_detail
+    @order_id = params[:order_id]
+    respond_to do |format|
+      format.js
+    end
+  end
+
   def create_order
     @order = CmsOrder.new
   end

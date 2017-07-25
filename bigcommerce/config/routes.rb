@@ -21,6 +21,8 @@ Rails.application.routes.draw do
   get '/event_censor', to:'calendar#event_censor'
   get '/calendar/local_calendar', to: 'calendar#local_calendar'
 
+  get '/fetch_order_detail', to: 'order#fetch_order_detail', as: 'fetch_order_detail'
+
   get '/fetch_lead', to: 'lead#fetch_lead', as: 'fetch_lead'
 
   get '/rails/mailers' => 'rails/mailers#index'
