@@ -57,6 +57,20 @@ class OrderController < ApplicationController
     end
   end
 
+  def generate_pod
+    order = Order.find(params[:order_id])
+    item = FastwayConsignmentItem.filter_order(params[:order_id]).first
+    return if item.nil?
+
+    pdf = WickedPdf.new.pdf_from_string(
+      render_to_string(
+          :template => 'pdf/proof_of_delivery.pdf',
+          :locals => {order: order, item: item }
+          )
+      )
+      send_data pdf, filename: "pod-#{order.id}.pdf", type: :pdf
+  end
+
   def create_order
     @order = CmsOrder.new
   end

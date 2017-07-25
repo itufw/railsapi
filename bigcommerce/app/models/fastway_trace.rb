@@ -1,5 +1,5 @@
 class FastwayTrace < ActiveRecord::Base
-  belongs_to :item, class_name: 'fastway_consignment_item', foreign_key: 'LabelNumber'
+  belongs_to :item, class_name: 'fastway_consignment_item', foreign_key: 'LabelNumber', primary_key: 'LabelNumber'
   delegate :consignment, to: :item
 
   def self.exists?(label_number, description, status_description)
@@ -12,6 +12,10 @@ class FastwayTrace < ActiveRecord::Base
 
   def self.uncompleted
     where('LabelNumber NOT IN (?)', completed.map(&:LabelNumber))
+  end
+
+  def self.trace_label(label_number)
+    where(LabelNumber: label_number)
   end
 
   def self.tract_order(order_id)
