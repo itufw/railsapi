@@ -66,6 +66,6 @@ every 1.day, :at => Time.zone.parse('6:00 am').utc do
 	rake 'updates:manifest_update'
 end
 
-every '30 10-17,0 * * *' do
+every '30 9-19,0 * * *' do
 	rake 'updates:package_trace'
 end

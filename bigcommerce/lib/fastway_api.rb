@@ -1,7 +1,7 @@
 load 'fastway.rb'
 
 module FastwayApi
-  def tract_events
+  def trace_events
     fastway = Fastway.new()
     delivered_label = FastwayTrace.completed.map(&:LabelNumber)
     undelivered_label = FastwayConsignmentItem.pending_label(delivered_label).map(&:LabelNumber)
@@ -10,7 +10,7 @@ module FastwayApi
       # maximum for 15, otherwise url error
       selected_labels = undelivered_label[0..15]
 
-      response = fastway.track(undelivered_label)
+      response = fastway.track(selected_labels)
       return response if response['result'].nil?
 
       response['result'].each do |label|
