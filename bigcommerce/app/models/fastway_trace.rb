@@ -23,6 +23,6 @@ class FastwayTrace < ActiveRecord::Base
   end
 
   def self.lastest
-    order('updated_at DESC').limit(1)
+    order('Date DESC').limit(1)
   end
 end

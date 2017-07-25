@@ -78,9 +78,9 @@ namespace :updates do
 	end
 
 	task :package_trace => :environment do
-		puts "Package Update Start At #{Time.now}"
-		tract_events
-		puts "Package Update End At #{Time.now}"
+		puts "Shipping Update Start At #{Time.now}"
+		trace_events
+		puts "Shipping Update End At #{Time.now}"
 	end
 
 	task :balanceupdate => :environment do
