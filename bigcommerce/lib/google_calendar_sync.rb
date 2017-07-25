@@ -52,10 +52,10 @@ module GoogleCalendarSync
     service
   end
 
-  def calendar_event_update
+  def calendar_event_update(last_update_date = (Time.now - 1.month))
     service = connect_google_calendar
     push_pending_events_to_google_offline(service)
-    scrap_from_calendars(service)
+    scrap_from_calendars(service, last_update_date)
   end
 
   def push_pending_events_to_google_offline(service)
@@ -74,7 +74,7 @@ module GoogleCalendarSync
     end
   end
 
-  def scrap_from_calendars(service)
+  def scrap_from_calendars(service, last_update_date)
     new_events = []
     # record the events and the calendar id
     calendar_events_pair = {}
@@ -83,7 +83,7 @@ module GoogleCalendarSync
 
     service.list_calendar_lists.items.select { |x| staff_calendars.map(&:calendar_address).include?x.id }.each do |calendar|
       # only sync the tasks for last month
-      items = service.list_events(calendar.id).items.select { |x| x.updated.to_s > (Date.today - 1.month).to_s }.select { |x| (x.start.date_time.to_s > (Date.today - 1.month).to_s) || (x.start.date.to_s > (Date.today - 1.month).to_s) }
+      items = service.list_events(calendar.id).items.select { |x| x.updated.to_s > last_update_date.to_s }
       calendar_events_pair[calendar.id] = items.map(&:id)
       new_events += items
     end

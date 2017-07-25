@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170724053111) do
+ActiveRecord::Schema.define(version: 20170725024254) do
 
   create_table "SalesForce_Lead_full", primary_key: "Id", force: :cascade do |t|
     t.string  "FirstName",                 limit: 38
@@ -1026,9 +1026,10 @@ ActiveRecord::Schema.define(version: 20170724053111) do
   create_table "revisions", force: :cascade do |t|
     t.datetime "start_time"
     t.datetime "end_time"
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
     t.integer  "attempt_count", limit: 4
+    t.string   "description",   limit: 255
   end
 
   create_table "staff_calendar_addresses", force: :cascade do |t|
