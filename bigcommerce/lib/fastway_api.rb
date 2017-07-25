@@ -15,6 +15,7 @@ module FastwayApi
 
       response['result'].each do |label|
         label_number = {'LabelNumber' => label['LabelNumber'], 'Reference' => label['Reference']}
+        next if label['Scans'].nil?
         label['Scans'].each do |scan|
           next if FastwayTrace.exists?(label['LabelNumber'], scan['Description'], scan['StatusDescription']).count > 0
           attributes = scan.select{ |key, value| key!='CompanyInfo'}.merge(scan['CompanyInfo']).merge(label_number)
