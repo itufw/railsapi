@@ -12,6 +12,7 @@
 				<%= render "partials/sort_arrows", order: 'order_by_customer' %></th>
 			<th>Status
 				<%= render "partials/sort_arrows", order: 'order_by_status' %></th>
+			<th>Shipping Status</th>
 			<th class=<%= display_class %>>Selected Prod Qty</th>
 			<th>Qty
 				<%= render "partials/sort_arrows", order: 'order_by_qty' %></th>
@@ -32,6 +33,8 @@
 		<td><%= link_to cust_name, controller: 'customer', action: 'summary', customer_id: order.customer_id, customer_name: cust_name %></td>
 
 		<td><%= order_status(order.status) %></td>
+		<% shipping_description = shipping_status(order.id) %>
+		<td class=<%= shipping_description.split().join('-') %>><%= shipping_description %></td>
 		<td class=<%= display_class + " num " %>><%= product_qty(product_ids, order.id) %></th>
 		<td class="num"><%= order.qty %></td>
 		<td class="num"><%= display_num(order.total_inc_tax) %></td>
@@ -40,48 +43,12 @@
 		<% invoice_status = invoice_status(order.xero_invoice) %>
 		<td class=<%= invoice_status[0].downcase %>><%= invoice_status[0] %></td>
 	</tr>
-	<tr>
+	<tr data-href="<%= fetch_order_detail_path(order_id: order.id) %>">
 		<td colspan="4">
-		<% traces = FastwayTrace.tract_order(order.id).order('Date ASC') %>
-
-		<!-- print the signature area if it is delivered -->
-		<% signature = traces.select{|x| x.StatusDescription == 'Signature Obtained'}.first%>
-		<% unless signature.nil?%>
-			<%= label(:signature, 'Signature')%>
-			<%= image_tag "#{signature.Signature}"%>
-			<br/>
-			<%= label(:company, 'Company')%> <%= signature.company%>
-			<br/>
-			<%= label(:receiver, 'Receiver')%> <%= signature.contactName%>
-			<br/>
-			<%= label(:address, 'Address')%> <%= signature.address1.to_s + ' ' + signature.address2 + ' ' + signature.address3%>
-			<br/>
-			<%= signature.address4.to_s + ' ' + signature.address5.to_s + ' ' + signature.address6.to_s + ' '%>
-			<br/>
-			<%= label(:comment, 'Comment')%> <%= signature.comment%>
-		<% end %>
-		<br/>
-		<% traces.map(&:LabelNumber).uniq.each do |label|%>
-			<%= label(:label, label)%>
-			<br/>
-			<%traces.select{|x| x.LabelNumber == label}.each do |scan|%>
-				<%= scan.Date%>|<%= scan.Franchise%>|<%= scan.StatusDescription%>|<%= scan.comment%>
-				<br/>
-			<% end %>
-			<br/>
-		<% end %>
+			<div class="shippment"></div>
 		</td>
-		<td colspan="4">
-		<% order.order_products.each do |op| %>
-			<%next if op.product.nil?%>
-			<%= link_to op.product.name, controller: 'customer', action: 'summary_with_product', product_id: op.product.id, product_name: op.product.name, customer_id: order.customer_id, customer_name: cust_name %>
-			<br/>
-			&nbsp;&nbsp;&nbsp;
-			Qty:<%= op.qty %>
-			&nbsp;&nbsp;&nbsp;
-			<%= display_num(op.price_inc_tax) %>
-			<br/><br/>
-		<% end %>
+		<td colspan="5">
+			<div class="product-list"></div>
 		</td>
 	</tr>
 	<% end %>
@@ -96,9 +63,21 @@ $("#orders-view-table tr:odd").addClass("odd");
 $("#orders-view-table tr:not(.odd)").hide();
 $("#orders-view-table tr:first-child").show();
 
+var shippment = null;
+var product_list = null;
+
 $("#orders-view-table tr.odd").click(function () {
     var trToToggle = $(this).next("tr");
     $("#orders-view-table tbody tr:not(.odd)").not(trToToggle).hide();
+		shippment = trToToggle.find('div.shippment');
+		product_list = trToToggle.find('div.product-list');
+
+		var link = trToToggle.data('href');
+		$.ajax({
+				type: 'GET',
+				url: link
+		});
+
     $(trToToggle).toggle();
     $(this).find(".arrow").toggleClass("up");
 });

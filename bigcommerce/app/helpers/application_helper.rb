@@ -41,6 +41,13 @@ module ApplicationHelper
     status.name
   end
 
+  # Return the latest shipping status
+  def shipping_status(order_id)
+    record = FastwayTrace.tract_order(order_id).lastest.first
+    return '' if record.nil?
+    record.Description
+  end
+
   def all_staffs
     Staff.active_sales_staff.order_by_order
   end

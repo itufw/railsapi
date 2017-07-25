@@ -61,13 +61,12 @@ namespace :updates do
 	end
 
 	task :event_update => :environment do
-		last_update_date = Revision.google.end_time
 		start_time = Time.now
 		Revision.google.start_update
 
 		puts "Event Update Start At #{start_time}"
 		import_into_customer_tags
-		calendar_event_update(last_update_date)
+		calendar_event_update(Revision.google.start_time)
 		puts "Event Update End AT #{Time.now}"
 		Revision.google.end_update(start_time, Time.now)
 	end
