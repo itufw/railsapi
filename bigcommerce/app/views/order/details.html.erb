@@ -15,12 +15,15 @@
   <div class="panel-body"><%= @order.first.staff_notes %></div>
 </div>
 
-<% unless @tasks.nil? || @tasks.blank?%>
 <div class="container">
-    <div class="row">
-        <div style="margin-top: -10px;">
-            <%= render "task_partials/task_table", display_all: "Yes"%>
-        </div>
-    </div>
+  <div class="row">
+    <%= render 'partials/shipping', order_id: @order_id%>
+  </div>
+  <% unless @tasks.nil? || @tasks.blank?%>
+      <div class="row">
+          <div style="margin-top: -10px;">
+              <%= render "task_partials/task_table", display_all: "Yes"%>
+          </div>
+      </div>
+  <% end %>
 </div>
-<% end %>

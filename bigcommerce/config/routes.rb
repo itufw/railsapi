@@ -30,7 +30,6 @@ Rails.application.routes.draw do
   get '/activity/add_activity', to: 'activity#add_activity'
   get '/activity/daily_products', to: 'activity#daily_products'
 
-
   post 'add_task', to: 'task#task_record'
   post 'local_calendar', to: 'calendar#local_calendar'
   post 'add_note', to: 'activity#add_note'

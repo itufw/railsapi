@@ -41,15 +41,22 @@
 		<td class=<%= invoice_status[0].downcase %>><%= invoice_status[0] %></td>
 	</tr>
 	<tr>
-		<td colspan="8">
-		<%
-			order_products = order.order_products
-			cust_id = order.customer_id
-			cust_name = customer_name(order.customer)
-		%>
-		<% order_products.each do |op| %>
+		<td colspan="4">
+		<% traces = FastwayTrace.tract_order(order.id).order('Date ASC') %>
+		<% traces.map(&:LabelNumber).uniq.each do |label|%>
+			<%= label(:label, label)%>
+			<br/>
+			<%traces.select{|x| x.LabelNumber == label}.each do |scan|%>
+				<%= scan.Date%>|<%= scan.Franchise%>|<%= scan.StatusDescription%>|<%= scan.comment%>
+				<br/>
+			<% end %>
+			<br/>
+		<% end %>
+		</td>
+		<td colspan="4">
+		<% order.order_products.each do |op| %>
 			<%next if op.product.nil?%>
-			<%= link_to op.product.name, controller: 'customer', action: 'summary_with_product', product_id: op.product.id, product_name: op.product.name, customer_id: cust_id, customer_name: cust_name %>
+			<%= link_to op.product.name, controller: 'customer', action: 'summary_with_product', product_id: op.product.id, product_name: op.product.name, customer_id: order.customer_id, customer_name: cust_name %>
 			<br/>
 			&nbsp;&nbsp;&nbsp;
 			Qty:<%= op.qty %>
@@ -62,7 +69,7 @@
 	<% end %>
 </table>
 
-<span class="orders-view default" style="float:right;">
+<span class="orders-view default" stye="float:right;">
 	<%= paginate(orders) %>
 </span>
 
