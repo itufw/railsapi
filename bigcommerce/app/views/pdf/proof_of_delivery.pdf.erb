@@ -16,12 +16,12 @@
       <%= wicked_pdf_image_tag "Fastway_logo.png", style: "float: right;margin-top:-20px;margin-right:5px;" %>
     </div>
   </div>
-  <div class="row">
+  <div class="row" style="margin-top: -15px;">
     <h3>Proof of Delivery</h3>
+    <h3><%= order.customer.actual_name %></h3><br/>
   </div>
   <div class="row">
     <div class="col-xs-6">
-      <h3><%= order.customer.actual_name %></h3><br/>
       <%= label(:invoice, 'Invoice: ')%> <%= item.Reference %><br/>
       <%= label(:package, 'Package(s) Sent: ')%> <%= items.sum('Packaging') %><br/>
       <%= label(:bottles, 'Bottles in Order: ')%> <%= order.qty %><br/>
@@ -44,48 +44,48 @@
     <div class="col-xs-6" style="font-size: 10px;">
       <%= label(:invoice, 'Invoice: ')%> <%= item.Reference %><br/>
       <%= label(:label, 'Fast Label Sent To: ')%> <%= consignment.Address1 + " " + consignment.Address2 + " " + consignment.City %><br/>
-      <%= label(:printtimestamp, 'Label Printed: ')%> <%= Time.now().to_s%><br/>
+      <%= label(:printtimestamp, 'Label Printed: ')%> <%= Time.now().to_s(:db)%><br/>
     </div>
-    <div class="col-xs-5 col-xs-offset-1" style="font-size: 10px;">
+    <div class="col-xs-6" style="font-size: 10px;">
       <p align="right">Label was distributed to: <%= label(:melbourne, 'Melbounre')%></p>
-      <table>
+      <table align="right">
         <tr align="right" style="font-size: 10px;">
-          <td><%= label(:to, 'To:')%></td>
+          <td style="font-size: 10px;"><%= label(:to, 'To:')%></td>
           <td rowspan="7">&nbsp;&nbsp;&nbsp;</td>
-          <td><%= consignment.CompanyName%></td>
+          <td style="font-size: 10px;"><%= consignment.CompanyName%></td>
         </tr>
         <tr align="right" style="font-size: 10px;">
-          <td><%= label(:Address1, 'Address1:')%></td>
-          <td><%= consignment.Address1%></td>
+          <td style="font-size: 10px;"><%= label(:Address1, 'Address1:')%></td>
+          <td style="font-size: 10px;"><%= consignment.Address1%></td>
         </tr>
         <% unless consignment.Address2 == ''%>
           <tr align="right" style="font-size: 10px;">
-            <td><%= label(:Address2, 'Address2:')%></td>
-            <td><%= consignment.Address2%></td>
+            <td style="font-size: 10px;"><%= label(:Address2, 'Address2:')%></td>
+            <td style="font-size: 10px;"><%= consignment.Address2%></td>
           </tr>
         <% end %>
         <tr align="right" style="font-size: 10px;">
-          <td><%= label(:city, 'Town:')%></td>
-          <td><%= consignment.City%></td>
+          <td style="font-size: 10px;"><%= label(:city, 'Town:')%></td>
+          <td style="font-size: 10px;"><%= consignment.City%></td>
         </tr>
         <tr align="right" style="font-size: 10px;">
-          <td><%= label(:postcode, 'Postcode:')%></td>
-          <td><%= consignment.PostCode%></td>
+          <td style="font-size: 10px;"><%= label(:postcode, 'Postcode:')%></td>
+          <td style="font-size: 10px;"><%= consignment.PostCode%></td>
         </tr>
         <% unless consignment.SpecialInstruction1 == ''%>
           <tr align="right" style="font-size: 10px;">
-            <td rowspan="3"><%= label(:s1, 'SpecialInstruction:')%></td>
-            <td><%= consignment.SpecialInstruction1%></td>
+            <td rowspan="3" style="font-size: 10px;"><%= label(:s1, 'SpecialInstruction:')%></td>
+            <td style="font-size: 10px;"><%= consignment.SpecialInstruction1%></td>
           </tr>
         <% end %>
         <% unless consignment.SpecialInstruction2 == ''%>
           <tr align="right" style="font-size: 10px;">
-            <td><%= consignment.SpecialInstruction2%></td>
+            <td style="font-size: 10px;"><%= consignment.SpecialInstruction2%></td>
           </tr>
         <% end %>
         <% unless consignment.SpecialInstruction3 == ''%>
           <tr align="right" style="font-size: 10px;">
-            <td><%= consignment.SpecialInstruction3%></td>
+            <td style="font-size: 10px;"><%= consignment.SpecialInstruction3%></td>
           </tr>
         <% end %>
       </table>
@@ -93,7 +93,7 @@
   </div>
   <br/>
   <div class="row">
-    <p style="font-size: 12px;">For any queries please contact Untapped Fine Wines: 0396769663 or customerservice@untappedwines.com</p>
+    <p style="font-size: 10px;">For any queries please contact Untapped Fine Wines: 0396769663 or customerservice@untappedwines.com</p>
   </div>
   <br/>
   <div class="row">
@@ -106,7 +106,7 @@
       </thead>
       <%item.traces.order('UploadDate ASC').each do |scan|%>
         <tr style="font-size: 10px;">
-          <td><%= scan.Date%></td>
+          <td><%= scan.Date.to_s(:db)%></td>
           <td><%= scan.Franchise%></td>
           <td><%= scan.StatusDescription%></td>
           <td><%= scan.comment%></td>
