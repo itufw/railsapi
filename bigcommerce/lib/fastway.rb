@@ -8,16 +8,21 @@ class Fastway
 
   def track(trace_number)
     @query[:query]['CountryCode'] = 1
-    if trace_number.is_a?Array
-      @query[:query]['LabelNoList'] = trace_number.join(';')
+    begin
+      if trace_number.is_a?Array
+        @query[:query]['LabelNoList'] = trace_number.join(';')
 
-      if trace_number.count >= 10
-        self.class.post('/tracktrace/massdetail', @query)
+        if trace_number.count >= 10
+          self.class.post('/tracktrace/massdetail', @query)
+        else
+          self.class.get('/tracktrace/massdetail', @query)
+        end
       else
-        self.class.get('/tracktrace/massdetail', @query)
+        self.class.get('/tracktrace/detail/'+ trace_number, @query)
       end
-    else
-      self.class.get('/tracktrace/detail/'+ trace_number, @query)
+    rescue
+      puts 'Time out in tracing'
+      retry
     end
   end
 
