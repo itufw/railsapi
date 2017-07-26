@@ -21,7 +21,8 @@
   </div>
   <div class="row">
     <div class="col-xs-6">
-      <%= label(:package, 'Customer: ')%> <%= order.customer.actual_name %><br/>
+      <h3><%= order.customer.actual_name %></h3><br/>
+      <%= label(:invoice, 'Invoice: ')%> <%= item.Reference %><br/>
       <%= label(:package, 'Package(s) Sent: ')%> <%= items.sum('Packaging') %><br/>
       <%= label(:bottles, 'Bottles in Order: ')%> <%= order.qty %><br/>
     </div>
@@ -30,13 +31,11 @@
         <div class="col-xs-4" style=" align: right;">
           <%= label(:labels, 'Label(s) Sent: ')%>
         </div>
-        <div class="col-xs-8">
-          <% items.each do |package|%>
-            <div class="col-xs-4" style="font-size: 10px; align: right;">
-              <%= package.LabelNumber %>
-            </div>
-          <% end %>
-        </div>
+        <% items.each do |package|%>
+          <div class="col-xs-4" style="font-size: 10px; align: right;">
+            <%= package.LabelNumber %>
+          </div>
+        <% end %>
       </div>
     </div>
   </div>
@@ -52,6 +51,7 @@
       <table>
         <tr align="right" style="font-size: 10px;">
           <td><%= label(:to, 'To:')%></td>
+          <td rowspan="7">&nbsp;&nbsp;&nbsp;</td>
           <td><%= consignment.CompanyName%></td>
         </tr>
         <tr align="right" style="font-size: 10px;">
@@ -74,19 +74,17 @@
         </tr>
         <% unless consignment.SpecialInstruction1 == ''%>
           <tr align="right" style="font-size: 10px;">
-            <td><%= label(:s1, 'SpecialInstruction:')%></td>
+            <td rowspan="3"><%= label(:s1, 'SpecialInstruction:')%></td>
             <td><%= consignment.SpecialInstruction1%></td>
           </tr>
         <% end %>
         <% unless consignment.SpecialInstruction2 == ''%>
           <tr align="right" style="font-size: 10px;">
-            <td></td>
             <td><%= consignment.SpecialInstruction2%></td>
           </tr>
         <% end %>
         <% unless consignment.SpecialInstruction3 == ''%>
           <tr align="right" style="font-size: 10px;">
-            <td></td>
             <td><%= consignment.SpecialInstruction3%></td>
           </tr>
         <% end %>
