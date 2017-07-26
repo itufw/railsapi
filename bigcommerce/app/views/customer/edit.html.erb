@@ -47,7 +47,7 @@
   <br/><br/>
 
   <%= f.label :staff, class: 'margin-from-top label-new' %>
-  <%= f.collection_select :staff_id, Staff.active_sales_staff, :id, :nickname, {selected: @customer.staff_id}, {class: "form-control quarter-size"} %>
+  <%= f.collection_select :staff_id, Staff.sales_list.order_by_order, :id, :nickname, {selected: @customer.staff_id}, {class: "form-control quarter-size"} %>
   <br/><br/>
 
   <%= f.label :channel, class: 'margin-from-top label-new' %>
