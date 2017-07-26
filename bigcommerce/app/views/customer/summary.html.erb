@@ -36,30 +36,31 @@
 	</div>
 </div>
 
+<div class="col-md-10 col-md-offset-1">
+	<%= form_tag({:action => "summary" }, {:method => "get"}) do %>
 
-<%= form_tag({:action => "summary" }, {:method => "get"}) do %>
 
-
-	<div class="customer_activity">
-		<%= render 'customer_partials/activity'%>
-	</div>
-
-	<div class="sales_stats" style="margin-top: 50px;">
-		<%= render "partials/overall_stats", sum_param: "$", supply_display_class: "none" %>
-		<%= hidden_field_tag :customer_id, @customer_id %>
-	  <%= hidden_field_tag :customer_name, @customer_name %>
-	</div>
-<!-- End Form -->
-<% end %>
-
-	<% unless @amount_due.nil?%>
-		<div class="account_stats" style="margin-top: 50px;">
-			<%= render 'accounts_partials/account_stats', customer: @customer, amount_due: @amount_due%>
+		<div class="customer_activity">
+			<%= render 'customer_partials/activity'%>
 		</div>
+
+		<div class="sales_stats" style="margin-top: 50px;">
+			<%= render "partials/overall_stats", sum_param: "$", supply_display_class: "none" %>
+			<%= hidden_field_tag :customer_id, @customer_id %>
+		  <%= hidden_field_tag :customer_name, @customer_name %>
+		</div>
+		<!-- End Form -->
 	<% end %>
 
-	<%= render "partials/order", orders: @orders, display_class: "none", product_ids: nil %>
+		<% unless @amount_due.nil?%>
+			<div class="account_stats" style="margin-top: 50px;">
+				<%= render 'accounts_partials/account_stats', customer: @customer, amount_due: @amount_due%>
+			</div>
+		<% end %>
 
+		<%= render "partials/order", orders: @orders, display_class: "none", product_ids: nil %>
+
+</div>
 <!-- Map -->
 <script type="text/javascript">
 	var handler = Gmaps.build('Google');
