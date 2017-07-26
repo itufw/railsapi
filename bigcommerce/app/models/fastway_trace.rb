@@ -18,6 +18,10 @@ class FastwayTrace < ActiveRecord::Base
     where(LabelNumber: label_number)
   end
 
+  def self.pod_available(invoice_number)
+    where("Description IN (?) AND Reference LIKE '%#{invoice_number}%'", ['Signature Obtained', 'Left As Instructed', 'Left with neighbour', 'Delivery Completed', 'Authority to Leave'])
+  end
+
   def self.tract_order(order_id)
     where("Reference LIKE '%#{order_id}%'")
   end
