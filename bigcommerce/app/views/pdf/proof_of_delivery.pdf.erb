@@ -25,18 +25,18 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-xs-6"  style="font-size: 12px;">
+    <div class="col-xs-6"  style="font-size: 9px;">
       <%= label(:invoice, 'Invoice:')%> <%= item.Reference %><br/>
       <%= label(:package, 'Package(s) Sent:')%> <%= items.sum('Packaging') %><br/>
       <%= label(:bottles, 'Bottles in Order:')%> <%= order.qty %><br/>
     </div>
-    <div class="col-xs-6"  style="font-size: 12px;">
+    <div class="col-xs-6"  style="font-size: 9px;">
       <div class="row">
-        <div class="col-xs-4" style=" align: right;">
+        <div class="col-xs-4" style="align: right;">
           <%= label(:labels, 'Label(s) Sent: ')%>
         </div>
         <% items.each do |package|%>
-          <div class="col-xs-4" style="font-size: 10px; align: right;">
+          <div class="col-xs-4" style="font-size: 9px; align: right;">
             <%= package.LabelNumber %>
           </div>
         <% end %>
@@ -45,72 +45,71 @@
   </div>
   <br/>
   <div class="row">
-    <div class="col-xs-6" style="font-size: 10px;">
-      <%= label(:invoice, 'Invoice: ')%> <%= item.Reference %><br/>
-      <%= label(:label, 'Fast Label Sent To: ')%> <%= consignment.Address1 + " " + consignment.Address2 + " " + consignment.City %><br/>
-      <%= label(:printtimestamp, 'Label Printed: ')%> <%= Time.now().to_s(:db)%><br/>
+    <div class="col-xs-5" style="font-size: 9px;">
+      <%= label(:invoice, 'Invoice:')%> <%= item.Reference %><br/>
+      <label>Label Printed:<%= Time.now().to_s(:db)%></label><br/>
     </div>
-    <div class="col-xs-6" style="font-size: 10px;">
+    <div class="col-xs-7" style="font-size: 9px;">
       <p align="right">Label was distributed to: <%= label(:melbourne, 'Melbounre')%></p>
       <table align="right">
-        <tr align="right" style="font-size: 10px;">
-          <td style="font-size: 10px;"><%= label(:to, 'To:')%></td>
-          <td style="font-size: 10px;"><%= consignment.CompanyName%></td>
+        <tr align="right" style="font-size: 9px;">
+          <td style="font-size: 9px;"><%= label(:to, 'To:')%></td>
+          <td style="font-size: 9px;"><%= consignment.CompanyName%></td>
         </tr>
-        <tr align="right" style="font-size: 10px;">
-          <td style="font-size: 10px;"><%= label(:Address1, 'Address1:')%></td>
-          <td style="font-size: 10px;"><%= consignment.Address1%></td>
+        <tr align="right" style="font-size: 9px;">
+          <td style="font-size: 9px;"><%= label(:Address1, 'Address1:')%></td>
+          <td style="font-size: 9px;"><%= consignment.Address1%></td>
         </tr>
         <% unless consignment.Address2 == ''%>
-          <tr align="right" style="font-size: 10px;">
-            <td style="font-size: 10px;"><%= label(:Address2, 'Address2:')%></td>
-            <td style="font-size: 10px;"><%= consignment.Address2%></td>
+          <tr align="right" style="font-size: 9px;">
+            <td style="font-size: 9px;"><%= label(:Address2, 'Address2:')%></td>
+            <td style="font-size: 9px;"><%= consignment.Address2%></td>
           </tr>
         <% end %>
-        <tr align="right" style="font-size: 10px;">
-          <td style="font-size: 10px;"><%= label(:city, 'Town:')%></td>
-          <td style="font-size: 10px;"><%= consignment.City%></td>
+        <tr align="right" style="font-size: 9px;">
+          <td style="font-size: 9px;"><%= label(:city, 'Town:')%></td>
+          <td style="font-size: 9px;"><%= consignment.City%></td>
         </tr>
-        <tr align="right" style="font-size: 10px;">
-          <td style="font-size: 10px;"><%= label(:postcode, 'Postcode:')%></td>
-          <td style="font-size: 10px;"><%= consignment.PostCode%></td>
+        <tr align="right" style="font-size: 9px;">
+          <td style="font-size: 9px;"><%= label(:postcode, 'Postcode:')%></td>
+          <td style="font-size: 9px;"><%= consignment.PostCode%></td>
         </tr>
         <% unless consignment.SpecialInstruction1 == ''%>
-          <tr align="right" style="font-size: 10px;">
-            <td rowspan="3" style="font-size: 10px;"><%= label(:s1, 'Special Instruction:')%></td>
-            <td style="font-size: 10px;"><%= consignment.SpecialInstruction1%></td>
+          <tr align="right" style="font-size: 9px;">
+            <td rowspan="3" style="font-size: 9px;"><label>Special Instruction:</label></td>
+            <td style="font-size: 9px;"><%= consignment.SpecialInstruction1%></td>
           </tr>
         <% end %>
         <% unless consignment.SpecialInstruction2 == ''%>
-          <tr align="right" style="font-size: 10px;">
-            <td style="font-size: 10px;"><%= consignment.SpecialInstruction2%></td>
+          <tr align="right" style="font-size: 9px;">
+            <td style="font-size: 9px;"><%= consignment.SpecialInstruction2%></td>
           </tr>
         <% end %>
         <% unless consignment.SpecialInstruction3 == ''%>
-          <tr align="right" style="font-size: 10px;">
-            <td style="font-size: 10px;"><%= consignment.SpecialInstruction3%></td>
+          <tr align="right" style="font-size: 9px;">
+            <td style="font-size: 9px;"><%= consignment.SpecialInstruction3%></td>
           </tr>
         <% end %>
       </table>
     </div>
   </div>
   <div class="row">
-    <p style="font-size: 10px;">For any queries please contact Untapped Fine Wines: 0396769663 or customerservice@untappedwines.com</p>
+    <p style="font-size: 9px;">For any queries please contact Untapped Fine Wines: 0396769663 or customerservice@untappedwines.com</p>
   </div>
   <div class="row">
     <table class="table table-striped table-bordered table-hover table-responsive">
-      <thead style="font-size: 10px;">
-        <th style="font-size: 10px;">Date</th>
-        <th style="font-size: 10px;">Franchise</th>
-        <th style="font-size: 10px;">Status</th>
-        <th style="font-size: 10px;">Comment</th>
+      <thead style="font-size: 9px;">
+        <th style="font-size: 9px;">Date</th>
+        <th style="font-size: 9px;">Franchise</th>
+        <th style="font-size: 9px;">Status</th>
+        <th style="font-size: 9px;">Comment</th>
       </thead>
       <%item.traces.order('UploadDate ASC').each do |scan|%>
-        <tr style="font-size: 10px;">
-          <td style="font-size: 10px;"><%= scan.Date.to_s(:db)%></td>
-          <td style="font-size: 10px;"><%= scan.Franchise%></td>
-          <td style="font-size: 10px;"><%= scan.StatusDescription%></td>
-          <td style="font-size: 10px;"><%= scan.comment%></td>
+        <tr style="font-size: 9px;">
+          <td style="font-size: 9px;"><%= scan.Date.to_s(:db)%></td>
+          <td style="font-size: 9px;"><%= scan.Franchise%></td>
+          <td style="font-size: 9px;"><%= scan.StatusDescription%></td>
+          <td style="font-size: 9px;"><%= scan.comment%></td>
         </tr>
       <% end %>
     </table>
@@ -119,23 +118,23 @@
   <% unless signature.nil?%>
     <div class="row">
       <table class="table table-striped table-bordered table-hover table-responsive">
-        <thead style="font-size: 10px;">
-          <th style="font-size: 10px;">Signature</th>
-          <th style="font-size: 10px;">Company</th>
-          <th style="font-size: 10px;">Receiver</th>
-          <th style="font-size: 10px;">Address</th>
-          <th style="font-size: 10px;">Comment</th>
+        <thead style="font-size: 9px;">
+          <th style="font-size: 9px;">Signature</th>
+          <th style="font-size: 9px;">Company</th>
+          <th style="font-size: 9px;">Receiver</th>
+          <th style="font-size: 9px;">Address</th>
+          <th style="font-size: 9px;">Comment</th>
         </thead>
         <tbody>
-          <tr style="font-size: 10px;">
-            <td style="font-size: 10px;"><%= image_tag "#{signature.Signature}"%></td>
-            <td style="font-size: 10px;"><%= signature.company%></td>
-            <td style="font-size: 10px;"><%= signature.contactName%></td>
-            <td style="font-size: 10px;"><%= signature.address1.to_s + "\n" + signature.address2 + "\n" + signature.address3%>
+          <tr style="font-size: 9px;">
+            <td style="font-size: 9px;"><%= image_tag "#{signature.Signature}"%></td>
+            <td style="font-size: 9px;"><%= signature.company%></td>
+            <td style="font-size: 9px;"><%= signature.contactName%></td>
+            <td style="font-size: 9px;"><%= signature.address1.to_s + "\n" + signature.address2 + "\n" + signature.address3%>
               <br/>
                 <%= signature.address4.to_s + "\n" + signature.address5.to_s + "\n" + signature.address6.to_s%>
             </td>
-            <td style="font-size: 10px;"><%= signature.comment%></td>
+            <td style="font-size: 9px;"><%= signature.comment%></td>
           </tr>
         </tbody>
       </table>
