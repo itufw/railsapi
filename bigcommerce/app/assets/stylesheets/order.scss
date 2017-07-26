@@ -2,7 +2,7 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 .Onboard {
-  color: green;
+  color: blue;
 }
 
 .Pickup {
@@ -13,10 +13,30 @@
   color: green;
 }
 
+.Delivery-Completed {
+  color: green;
+}
+
+.Left-As-Instructed {
+  color: orange;
+}
+
+.Left-with-neighbour {
+  color: orange;
+}
+
+.Authority-to-Leave {
+  color: orange;
+}
+
 .Unable-to-Deliver {
   color: red;
 }
 
 .Undeliverable {
+  color: red;
+}
+
+.Damaged {
   color: red;
 }

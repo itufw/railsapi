@@ -7,7 +7,7 @@ class FastwayTrace < ActiveRecord::Base
   end
 
   def self.completed
-    where(Type: 'D', Description: 'Signature Obtained')
+    where(Type: 'D', Description: ['Signature Obtained', 'Left As Instructed', 'Left with neighbour', 'Delivery Completed', 'Authority to Leave'])
   end
 
   def self.uncompleted
