@@ -27,8 +27,8 @@
   <div class="row">
     <div class="col-xs-6"  style="font-size: 9px;">
       <%= label(:invoice, 'Invoice:')%> <%= item.Reference %><br/>
-      <%= label(:package, 'Package(s) Sent:')%> <%= items.sum('Packaging') %><br/>
-      <%= label(:bottles, 'Bottles in Order:')%> <%= order.qty %><br/>
+      <label>Package(s) Sent:</label><%= items.sum('Packaging') %><br/>
+      <label>Bottles in Order:</label><%= order.qty %><br/>
     </div>
     <div class="col-xs-6"  style="font-size: 9px;">
       <div class="row">
@@ -45,11 +45,11 @@
   </div>
   <br/>
   <div class="row">
-    <div class="col-xs-5" style="font-size: 9px;">
+    <div class="col-xs-4" style="font-size: 9px;">
       <%= label(:invoice, 'Invoice:')%> <%= item.Reference %><br/>
-      <label>Label Printed:<%= Time.now().to_s(:db)%></label><br/>
+      <label>Label Printed:</label> <%= Time.now().to_s(:db)%><br/>
     </div>
-    <div class="col-xs-7" style="font-size: 9px;">
+    <div class="col-xs-8" style="font-size: 9px;">
       <p align="right">Label was distributed to: <%= label(:melbourne, 'Melbounre')%></p>
       <table align="right">
         <tr align="right" style="font-size: 9px;">
