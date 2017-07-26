@@ -30,6 +30,13 @@
 
               <%= email_content.bootsy_area :content, editor_options: { link: false, html: false, image: false, lists: false, html: true, color: false}, :rows=>5, :cols=>60 %>
 
+              <% available = []%>
+              <% unavailable = [] %>
+              <% @over_due_invoices.map(&:invoice_number).each do |invoice| %>
+                <% (FastwayTrace.pod_available(invoice).count>0) ? available.append(invoice) : unavailable.append(invoice)%>
+              <% end %>
+              <p style="color: green;">POD Available: <%= available.join(', ') %></p>
+              <p style="color: red;">POD Unavailable: <%= unavailable.join(', ') %></p>
             <%=render "reminder_mailer_partials/reminder_table", over_due_invoices: @over_due_invoices, xero_contact: @xero_contact%>
 
             <%= email_content.bootsy_area :content_second, editor_options: { link: false, html: false, image: false, lists: false, html: true, color: false}, :rows=>10, :cols=>60 %>
