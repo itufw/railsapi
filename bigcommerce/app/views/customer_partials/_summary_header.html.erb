@@ -1,10 +1,10 @@
-<% if customer.cust_type_id == 1%>
+<% if (customer.cust_type_id == 1) || (customer.is_a? CustomerLead) %>
   <div class="container-center">
     <div class="row">
       <div class="col-xs-10">
         <h5>Contact:</h5>
         <p><%= customer.actual_name%></p>
-        <p>Number: <%= customer.phone%></p>
+        <p>Number: <%= num_to_phone(customer.phone)%></p>
         <p>Email: <%= mail_to(customer.email) unless customer.email.nil? %></p>
       </div>
     </div>
