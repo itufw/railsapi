@@ -42,27 +42,19 @@ every 1.day, :at => Time.zone.parse('8:30 pm').utc do
 	rake "updates:timeperiods"
 end
 
-every 1.day, :at => Time.zone.parse('6:30 am').utc do
+every 1.day, :at => '10:00 pm' do
 	rake "updates:zomato_update"
 end
 
-every 1.day, :at => Time.zone.parse('10:30 am').utc do
+every 1.day, :at => '11:30 am' do
   rake "xero_invoice_sync:sync"
 end
 
-every 1.day, :at => Time.zone.parse('10:00 pm').utc do
+every 1.day, :at => '6:00 pm' do
   rake "xero_invoice_sync:sync"
 end
 
-every 1.day, :at => Time.zone.parse('5:45 pm').utc do
-  rake "xero_invoice_sync:sync"
-end
-
-every 1.day, :at => Time.zone.parse('9:15 am').utc do
-  rake "xero_invoice_sync:sync"
-end
-
-every 1.day, :at => Time.zone.parse('6:00 am').utc do
+every 1.day, :at => '4:00 pm' do
 	rake 'updates:manifest_update'
 end
 
