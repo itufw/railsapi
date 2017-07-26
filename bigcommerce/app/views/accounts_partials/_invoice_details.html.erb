@@ -70,7 +70,7 @@
 						<th>Amount Paid</th>
 						<th>Amount Credited</th>
 						<th>Amount Due</th>
-						<th>Pod Available</th>
+						<th>POD Available</th>
 					</tr>
 					<% customer.xero_contact.xero_invoices.has_amount_due.order_by_due_date.each do |i| %>
 					<tr>
@@ -88,7 +88,7 @@
 						<td><%= i.amount_credited %></td>
 						<td><%= i.amount_due %></td>
 						<% pod_avaiablity = !FastwayTrace.pod_available(i.invoice_number).blank? %>
-						<td style="color: <%= pod_avaiablity ? 'green' : 'red'%>;"><%= pod_avaiablity ? 'Pod Available' : 'Unavailable' %></td>
+						<td style="color: <%= pod_avaiablity ? 'green' : 'red'%>;"><%= pod_avaiablity ? 'POD Available' : 'Unavailable' %></td>
 					</tr>
 					<% end%>
 					<!--  customer.xero_contact.xero_invoices.has_amount_due.each do |i|-->
