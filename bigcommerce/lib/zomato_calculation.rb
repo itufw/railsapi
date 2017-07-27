@@ -11,6 +11,46 @@ module ZomatoCalculation
     customers_viewed.uniq
   end
 
+  def search_by_jump
+    query = 'https://developers.zomato.com/api/v2.1/search'
+
+    # Selected Cuisines and useless Cuisines
+    selected_cuisines = get_cuisines.map(&:to_s)
+    inactive_cuisines = ZomatoCuisine.inactive_cuisines.map(&:name).sort.uniq
+
+    customers = ZomatoRestaurant.all
+
+    while !customers.blank?
+      customer = customers.delete_at(customers.length - 1)
+
+      # filter out near by restaurants
+      near_by = ZomatoRestaurant.near([customer.latitude, customer.longitude], 0.5, units: :km).map(&:id)
+      customers = customers.reject {|x| near_by.include?x.id}
+
+      next if near_by.count > 40
+
+      start = 0
+      results_found = 100
+      while (results_found > 40) && ((start * 20) < results_found) && start < 80
+        response = HTTParty.get(query, query: {lat: customer.latitude, lon: customer.longitude, radius: 200, cuisines: selected_cuisines, start: start}, headers: {"user-key" => Rails.application.secrets.zomato_key })
+
+        # if hit the daily limit, return the function
+        return if response['results_found'].nil?
+
+        restaurant_update_attribuets(response['restaurants'], inactive_cuisines)
+
+        # search for next customer or search for next page
+        results_found = response['results_found'].to_i
+        start += 20
+        count_ping += 1
+        puts 'Counting ' + count_ping.to_s if count_ping % 100 == 0
+        return if count_ping > 900
+      end
+      
+    end
+
+  end
+
   def search_by_geo
     # MultiGeocoder.geocode(location)
     count_ping = 0
@@ -21,21 +61,21 @@ module ZomatoCalculation
     inactive_cuisines = ZomatoCuisine.inactive_cuisines.map(&:name).sort.uniq
 
     customers_viewed = []
-    customers = Customer.where('lng IS NOT NULL').select{ |x| x}
+    customers = Customer.where('lng IS NOT NULL AND cust_type_id != 1').select{ |x| x}
 
     # delete following block after data integrated
-    customers_viewed = filter_viewed_spots
-    customers = customers.select{ |x| !customers_viewed.include?x.id }
+    # customers_viewed = filter_viewed_spots
+    # customers = customers.select{ |x| !customers_viewed.include?x.id }
     # ------------------------------------------------------------------
 
     while !customers.blank?
       customer = customers.delete_at(customers.length - 1)
 
+      existed_customer = ZomatoRestaurant.near([customer.lat, customer.lng], 0.5, units: :km).map(&:id)
       start = 0
       results_found = 100
-      while (results_found > 40) && ((start * 20) < results_found) && start < 80
-        break if ZomatoRestaurant.near([customer.lat, customer.lng], 0.05, units: :km).map(&:id).count > 20
-        response = HTTParty.get(query, query: {lat: customer.lat, lon: customer.lng, radius: 50, cuisines: selected_cuisines, start: start}, headers: {"user-key" => Rails.application.secrets.zomato_key })
+      while (results_found > 40) && ((start * 20) < results_found) && start < 80 && existed_customer.count < 40
+        response = HTTParty.get(query, query: {lat: customer.lat, lon: customer.lng, radius: 200, cuisines: selected_cuisines, start: start}, headers: {"user-key" => Rails.application.secrets.zomato_key })
 
         # if hit the daily limit, return the function
         return if response['results_found'].nil?
@@ -50,7 +90,7 @@ module ZomatoCalculation
         return if count_ping > 900
       end
 
-      customers_viewed += Customer.near([customer.lat, customer.lng], 0.05, units: :km).map(&:id)
+      customers_viewed += Customer.near([customer.lat, customer.lng], 0.5, units: :km).map(&:id)
       customers = customers.select{ |x| !customers_viewed.include?x.id }
     end
   end # end def
