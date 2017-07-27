@@ -13,6 +13,10 @@
 	<p style="color: black"><%= display_num(outstanding_customer(xero_contact))%></p>
 </div>
 <%end%>
+
+<!-- container / white page -->
+<div style="margin-left: 30px; margin-right:30px;">
+
 <!-- Headers -->
 <div class="row" style="margin-top: 10px;">
 	<div class="col-md-6">
@@ -36,9 +40,7 @@
 	</div>
 </div>
 
-<div class="col-md-10 col-md-offset-1">
 	<%= form_tag({:action => "summary" }, {:method => "get"}) do %>
-
 
 		<div class="customer_activity">
 			<%= render 'customer_partials/activity'%>
@@ -59,7 +61,6 @@
 		<% end %>
 
 		<%= render "partials/order", orders: @orders, display_class: "none", product_ids: nil %>
-
 </div>
 <!-- Map -->
 <script type="text/javascript">

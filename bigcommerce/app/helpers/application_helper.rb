@@ -43,9 +43,13 @@ module ApplicationHelper
 
   # Return the latest shipping status
   def shipping_status(order_id)
-    record = FastwayTrace.tract_order(order_id).lastest.first
-    return '' if record.nil?
-    record.Description
+    # FastwayTrace.where(id: FastwayTrace.track_order('22642').group('LabelNumber').maximum('id').values())
+    records = FastwayTrace.where(id: FastwayTrace.track_order(order_id).group('LabelNumber').maximum('id').values())
+    return '' if records.blank?
+
+    record_status = records.map(&:Description).uniq
+    return 'Manual Check Require' if record_status.count > 1
+    record_status.first
   end
 
   def all_staffs
