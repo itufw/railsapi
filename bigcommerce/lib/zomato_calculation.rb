@@ -11,7 +11,7 @@ module ZomatoCalculation
     customers_viewed.uniq
   end
 
-  def search_by_jump
+  def search_by_zomato
     query = 'https://developers.zomato.com/api/v2.1/search'
 
     # Selected Cuisines and useless Cuisines
@@ -21,7 +21,7 @@ module ZomatoCalculation
     customers = ZomatoRestaurant.all
 
     while !customers.blank?
-      customer = customers.delete_at(customers.length - 1)
+      customer = customers.last
 
       # filter out near by restaurants
       near_by = ZomatoRestaurant.near([customer.latitude, customer.longitude], 0.5, units: :km).map(&:id)
@@ -46,7 +46,7 @@ module ZomatoCalculation
         puts 'Counting ' + count_ping.to_s if count_ping % 100 == 0
         return if count_ping > 900
       end
-      
+
     end
 
   end
