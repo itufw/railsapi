@@ -23,9 +23,8 @@
 		<%= render "customer_partials/summary_header", customer: @customer %>
 	</div>
 	<div class="col-md-6">
-		<% spot = @customer %>
 		<% spot = GooglePlaces::Client.new('AIzaSyBvfTZH0XCVEJQTgR9QDYt18XIeV5MIkPI').spots_by_query(@customer.actual_name.to_s + ' ' + @customer.city.to_s).first if @customer.cust_type_id != 1 %>
-		<% if spot.is_a?Customer %>
+		<% if spot.nil? %>
 			<div class="col-md-6"></div>
 		<% else %>
 			<div class="col-md-6">
@@ -70,11 +69,11 @@
 					id: 'map'
 			}
 	}, function () {
-		<% unless spot.lat.nil?%>
+		<% unless @customer.lat.nil?%>
 			markers = handler.addMarkers([
 				{
-					"lat": '<%= spot.lat %>',
-					"lng": '<%= spot.lng %>',
+					"lat": '<%= @customer.lat %>',
+					"lng": '<%= @customer.lng %>',
 					"picture": {
 						"url": '<%= image_path('map_icons/townhouse.png')%>',
 						"width":  30,
@@ -82,8 +81,8 @@
 					}
 				}
 			]);
-			<% customers = Customer.near([spot.lat, spot.lng], 1, units: :km).where('id != ?', @customer.id).select{|x| x} %>
-			<% leads = CustomerLead.near([spot.lat, spot.lng], 1, units: :km) %>
+			<% customers = Customer.near([@customer.lat, @customer.lng], 1, units: :km).where('id != ?', @customer.id).select{|x| x} %>
+			<% leads = CustomerLead.near([@customer.lat, @customer.lng], 1, units: :km) %>
 			<% customer_markers, lead_markers, restaurant_markers =  marks_by_distance(customers, leads, []) %>
 			customer_markers = handler.addMarkers(<%=raw customer_markers.to_json%>);
       lead_markers = handler.addMarkers(<%= raw lead_markers.to_json%>);
