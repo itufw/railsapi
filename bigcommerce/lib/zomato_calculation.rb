@@ -12,6 +12,7 @@ module ZomatoCalculation
   end
 
   def search_by_zomato
+    count_ping = 0
     query = 'https://developers.zomato.com/api/v2.1/search'
 
     # Selected Cuisines and useless Cuisines
