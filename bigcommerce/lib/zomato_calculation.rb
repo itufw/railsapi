@@ -25,7 +25,7 @@ module ZomatoCalculation
       customer = customers.last
 
       # filter out near by restaurants
-      near_by = ZomatoRestaurant.near([customer.latitude, customer.longitude], 0.5, units: :km).map(&:id)
+      near_by = ZomatoRestaurant.near([customer.latitude, customer.longitude], 0.2, units: :km).map(&:id)
       customers = customers.reject {|x| near_by.include?x.id}
 
       next if near_by.count > 40

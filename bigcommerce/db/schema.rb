@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170725024254) do
+ActiveRecord::Schema.define(version: 20170727044354) do
 
   create_table "SalesForce_Lead_full", primary_key: "Id", force: :cascade do |t|
     t.string  "FirstName",                 limit: 38
@@ -637,17 +637,10 @@ ActiveRecord::Schema.define(version: 20170725024254) do
     t.string   "comment",            limit: 255
     t.string   "Signature",          limit: 255
     t.string   "DistributedTo",      limit: 255
-    t.string   "ParcelConnectAgent", limit: 255
+    t.text     "ParcelConnectAgent", limit: 65535
     t.string   "Reference",          limit: 255
-    t.datetime "created_at",                     null: false
-    t.datetime "updated_at",                     null: false
-  end
-
-  create_table "google_revisions", force: :cascade do |t|
-    t.datetime "start_time"
-    t.datetime "end_time"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
   end
 
   create_table "order_actions", force: :cascade do |t|
@@ -822,6 +815,9 @@ ActiveRecord::Schema.define(version: 20170725024254) do
     t.datetime "updated_at",                                                        null: false
     t.string   "xero_invoice_id",            limit: 36
     t.string   "xero_invoice_number",        limit: 255
+    t.string   "source",                     limit: 255
+    t.integer  "source_id",                  limit: 4
+    t.integer  "shipping_status_id",         limit: 4
   end
 
   add_index "orders", ["billing_address_id"], name: "index_orders_on_billing_address_id", using: :btree

@@ -57,7 +57,8 @@ namespace :updates do
 
 	task :zomato_update => :environment do
 		puts "Zomato Update At #{Time.now}"
-		search_by_geo
+		search_by_zomato
+		puts "Zomato Update End #{Time.now}"
 	end
 
 	task :event_update => :environment do
