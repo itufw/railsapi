@@ -69,7 +69,7 @@ module ZomatoCalculation
     # ------------------------------------------------------------------
 
     while !customers.blank?
-      customer = customers.delete_at(customers.length - 1)
+      customer = customers.last
 
       existed_customer = ZomatoRestaurant.near([customer.lat, customer.lng], 0.5, units: :km).map(&:id)
       start = 0
@@ -103,6 +103,7 @@ module ZomatoCalculation
       next if (inactive_cuisines + restaurant['cuisines'].split).sort.uniq == inactive_cuisines
 
       existed_restaurant = ZomatoRestaurant.filter_by_id(restaurant['id']).first
+
       if !existed_restaurant.nil? && existed_restaurant.aggregate_rating.nil?
         restaurant_attr = {thumb: restaurant['thumb'],\
           featured_image: restaurant['featured_image'],\
@@ -110,7 +111,7 @@ module ZomatoCalculation
           rating_text: restaurant['user_rating']['rating_text']
         }
         existed_restaurant.update_attributes(restaurant_attr)
-      elsif !existed_restaurant.aggregate_rating.nil?
+      elsif !existed_restaurant.nil?
         next
       end
 
