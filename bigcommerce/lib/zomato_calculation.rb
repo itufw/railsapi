@@ -111,6 +111,7 @@ module ZomatoCalculation
           rating_text: restaurant['user_rating']['rating_text']
         }
         existed_restaurant.update_attributes(restaurant_attr)
+        next
       elsif !existed_restaurant.nil?
         next
       end
