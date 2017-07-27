@@ -1,5 +1,5 @@
 <!-- Trace Table -->
-<% traces = FastwayTrace.tract_order(order_id).order('Date ASC') %>
+<% traces = FastwayTrace.track_order(order_id).order('Date ASC') %>
 
 <% signature = traces.select{|x| x.StatusDescription == 'Signature Obtained'}.first%>
 <% unless signature.nil? %>
