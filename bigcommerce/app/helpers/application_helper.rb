@@ -48,7 +48,7 @@ module ApplicationHelper
     return '' if records.blank?
 
     record_status = records.map(&:Description).uniq
-    return 'Manual Check Require' if record_status.count > 1
+    return 'Manual Check Required' if record_status.count > 1
     record_status.first
   end
 
