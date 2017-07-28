@@ -23,7 +23,7 @@
   <tbody>
     <% @orders.each do |order|%>
       <tr>
-        <td><%= order.id%></td>
+        <td><%= link_to order.id, action: 'order_update', order_id: order.id%></td>
         <td><%= date_format_orders(order.created_at) %></td>
         <td><%= Customer.find(order.customer_id).actual_name %></td>
         <td><%= order.qty %></td>
