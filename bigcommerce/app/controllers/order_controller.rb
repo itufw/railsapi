@@ -111,6 +111,24 @@ class OrderController < ApplicationController
       send_data pdf, filename: "#{order.id}.pdf", type: :pdf
   end
 
+  def order_update
+    @order = CmsOrder.find(params[:order_id])
+  end
+
+  def update_order
+    p = c
+
+    order = CmsOrder.find(params[:cms_order][:id])
+    order.update_attributes(cms_order_params)
+
+    product_history = CmsOrderProduct.order_products(order.id)
+
+    products = params[:cms_order][:products]
+    products.keys().each do |product|
+
+    end
+  end
+
   private
   def cms_order_params
     # total_tax -> GST
@@ -119,6 +137,4 @@ class OrderController < ApplicationController
                                      :subtotal_tax, :total_tax, :total_inc_tax,\
                                      :customer_notes, :staff_notes)
   end
-
-
 end

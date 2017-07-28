@@ -38,7 +38,6 @@ Rails.application.routes.draw do
   post 'contact/create_contact', to: 'contact#contact_creation'
   post 'contact/edit_contact', to: 'contact#contact_edition'
 
-
   # this needs to be replaced sometime
   match ':controller(/:action(/:id))', via: %i[get post]
 

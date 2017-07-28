@@ -1,0 +1,194 @@
+<%= title 'Order#' + @order.id.to_s %>
+<h3>Order#<%= @order.id %></h3>
+<%= form_for @order, url: {controller: "order", action: "update_order"}, method: :POST  do |f| %>
+<%= f.text_field :customer_id %>
+<%= f.hidden_field :id %>
+<div class="row">
+  <div class="col-md-4">
+    <table id="customer_table">
+      <tr>
+        <th>Customer</th>
+        <td>
+          <%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 15 %>
+        </td>
+      </tr>
+      <tr id="customer_<%= @order.customer_id%>">
+        <td colspan="2"><input type="text" name="customer" id="<%= @order.customer_id %>" value="<%= Customer.find(@order.customer_id).actual_name%>" readonly="readonly"></td>
+      </tr>
+    </table>
+  </div>
+  <div class="col-md-4">
+    <table id="product_table">
+      <tr>
+        <th>Product</th>
+        <td>
+          <%= autocomplete_field_tag 'product', '', autocomplete_product_name_activity_index_path, placeholder: 'Search Product', id_element: '#product_id', id: 'product_search'%>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<table class = "table table-striped table-bordered table-hover table-responsive product-table">
+  <thead>
+    <tr>
+      <th>Product ID</th>
+      <th>Product</th>
+      <th style="width: 3px;">Inventory</th>
+      <th>Price (Luc)</th>
+      <th style="width: 3px;">QTY</th>
+      <th>Discount</th>
+      <th>Discounted Price</th>
+      <th style="width: 7px;">Total</th>
+    </tr>
+  </thead>
+  <tbody class="product-list">
+    <% f.object.cms_order_products.each do |product| %>
+    <tr>
+      <td><%= product.product_id %></td>
+      <td><%= Product.find(product.product_id).name %></td>
+      <td><%= Product.find(product.product_id).inventory %></td>
+      <%= f.fields_for "products[#{product.product_id}]", product do |product_form|%>
+        <td><%= product_form.text_field :base_price, size: "5", readonly: true, class: 'product-luc' %></td>
+        <td><%= product_form.text_field :qty, size: "3", class: 'product-qty' %></td>
+        <td><%= product_form.text_field :discount, size: "2", class: 'product-discount' %>%</td>
+        <td><%= product_form.text_field :price_ex_tax, size: "5", class: 'product-price' %></td>
+        <td class="product-total"><%= product.qty * product.price_ex_tax %></td>
+      <% end %>
+    </tr>
+    <% end %>
+  </tbody>
+  <tr>
+    <td colspan="6" rowspan="6" style="background-color:rgb(255,255,255); border: 0px;">
+      <div class="well panel-default panel" style="margin-top:20px;margin-left:100px;width:30%;float:left;">
+        <h4 class="panel-heading">Customer Notes</h4>
+        <div class="panel-body"><%= f.text_area :customer_notes%></div>
+      </div>
+
+      <div class="well panel-default panel" style="margin-top:20px;margin-left:200px;width:30%;float:left;">
+        <h4 class="panel-heading">Staff Notes</h4>
+        <div class="panel-body"><%= f.text_area :staff_notes%></div>
+      </div>
+    </td>
+    <td class="ProductCost" align="right">Subtotal (Inc. WET, Ex. GST)</td>
+    <td class="ProductTotal" align="right"><%= f.text_field :subtotal_inc_tax, readonly: true%></td>
+  </tr>
+  <tr>
+    <td class="ProductCost" align="right">Discount Rate</td>
+    <td class="ProductTotal" align="right"><%= f.text_field :discount_rate %></td>
+  </tr>
+  <tr>
+    <td class="ProductCost" align="right">Discount</td>
+    <td class="ProductTotal" align="right"><%= f.text_field :discount_amount, readonly: true%></td>
+  </tr>
+  <tr>
+    <td class="ProductCost" align="right">WET</td>
+    <td class="ProductTotal" align="right"><%= f.text_field :subtotal_tax, readonly: true%></td>
+  </tr>
+  <tr>
+    <td class="ProductCost" align="right">GST</td>
+    <td class="ProductTotal" align="right"><%= f.text_field :total_tax, readonly: true%></td>
+  </tr>
+  <tr>
+    <td class="ProductCost" align="right">Grand Total</td>
+    <td class="ProductTotal" align="right"><%= f.text_field :total_inc_tax, readonly: true%></td>
+  </tr>
+</table>
+<div class="row">
+  <div class="col-md-4 col-md-offset-4">
+    <%= button_tag(type: 'submit', class: 'btn btn-primary') do %>
+      <div> Save </div>
+    <% end %>
+  </div>
+</div>
+
+<% end %>
+
+
+<script type="text/javascript">
+$('#cms_order_customer_id').hide();
+
+// Customer Search
+  $('#customer_search').bind('railsAutocomplete.select', function(event, data){
+    if ($('#customer_table tr').length < 2) {
+      $('#customer_table').append([
+        '<tr id="customer_' + data.item.id + '">',
+        '<td colspan="2"><input type="text" name="customer" id="' + data.item.id + '" value="' + data.item.value + '" readonly="readonly"><i class="glyphicon glyphicon-remove remove" title="remove"></i></td>',
+        '</tr>'
+      ].join(''));
+      $('#cms_order_customer_id').val(data.item.id);
+      $('.remove').click(function () {
+        $(this).parent().parent().remove();
+        $('#cms_order_customer_id').val('');
+      });
+    }
+  });
+
+// Product Search
+$('#product_search').bind('railsAutocomplete.select', function(event, data){
+  if($('#tr_' + data.item.id).length == 0){
+    $('.product-table tbody.product-list').append([
+      '<tr>',
+          '<td>'+ data.item.id +'</td>',
+          '<td>'+ data.item.label +'</td>',
+          '<td>'+ data.item.inventory +'</td>',
+          '<td><input size="5" readonly="readonly" class="product-luc" type="text" value="'+ data.item.price +'" name="cms_order[products['+ data.item.id +']][base_price]" id="cms_order_products_'+ data.item.id +'__base_price"></td>',
+          '<td><input size="3" class="product-qty" type="text" value="0" name="cms_order[products['+ data.item.id +']][qty]" id="cms_order_products_'+ data.item.id +'__qty"></td>',
+          '<td><input size="2" class="product-discount" type="text" value="0" name="cms_order[products['+ data.item.id +']][discount]" id="cms_order_products_'+ data.item.id +'__discount"  placeholder="Discount"> %</td>',
+          '<td><input size="5" class="product-price" type="text" value="'+ data.item.price +'" name="cms_order[products['+ data.item.id +']][price_ex_tax]" id="cms_order_products_'+ data.item.id +'__price_ex_tax"></td>',
+          '<td class="product-total">0</td>',
+          '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
+      '</tr>'
+      ].join(''));
+    }
+});
+
+
+var update_subtotal = function(){
+  var total = 0;
+  var discount = 0;
+  $('.product-list tr').each(function(){
+    total += parseFloat($(this).find('.product-total').html());
+    discount += (parseFloat($(this).find('.product-luc').val()) - parseFloat($(this).find('.product-price').val())) *  parseInt($(this).find('.product-qty').val());
+  });
+  $('#cms_order_subtotal_inc_tax').val(total.toFixed(4));
+  $('#cms_order_subtotal_tax').val((total/1.29 * 0.29).toFixed(4));
+
+  discount += (total * $('#cms_order_discount_rate').val() * 0.01)
+  total -= discount
+
+  $('#cms_order_total_tax').val((total*0.1).toFixed(4));
+  $('#cms_order_discount_amount').val(discount.toFixed(4));
+  $('#cms_order_total_inc_tax').val((total*1.1).toFixed(4));
+  return total;
+}
+
+var product_change = function(column){
+  qty = column.parent().parent().find('.product-qty').val();
+  luc = column.parent().parent().find('.product-luc').val();
+  price = luc;
+  discount = 0;
+
+  if(column.attr('class') == 'product-discount'){
+    price = luc * (1 - column.val() * 0.01 );
+    column.parent().parent().find('.product-price').val(price.toFixed(4));
+  }else if (column.attr('class') == 'product-price') {
+    discount = (1 - (column.val() / luc)) * 100 ;
+    column.parent().parent().find('.product-discount').val(discount.toFixed(2));
+  }
+  column.parent().parent().find('.product-total').html((price * qty).toFixed(4));
+  update_subtotal();
+};
+
+$(document).on('input', '.product-qty, .product-discount, .product-price', function(){
+  console.log($(this));
+  product_change($(this));
+});
+$(document).on('input', '#cms_order_discount_rate', function(){
+  update_subtotal();
+});
+$(document).on('click', '.remove_row', function(){
+  $(this).parent().parent().remove();
+});
+
+</script>

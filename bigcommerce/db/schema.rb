@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170727044354) do
+ActiveRecord::Schema.define(version: 20170727052127) do
 
   create_table "SalesForce_Lead_full", primary_key: "Id", force: :cascade do |t|
     t.string  "FirstName",                 limit: 38
@@ -323,17 +323,26 @@ ActiveRecord::Schema.define(version: 20170727044354) do
   add_index "categories", ["parent_id"], name: "index_categories_on_parent_id", using: :btree
 
   create_table "cms_order_products", force: :cascade do |t|
-    t.integer  "cms_order_id",      limit: 4,                         null: false
-    t.integer  "product_id",        limit: 4,                         null: false
+    t.integer  "cms_order_id",      limit: 4,                             null: false
+    t.integer  "product_id",        limit: 4,                             null: false
     t.integer  "order_shipping_id", limit: 4
-    t.integer  "qty",               limit: 3,                         null: false
+    t.integer  "qty",               limit: 3,                             null: false
     t.integer  "qty_shipped",       limit: 3
-    t.decimal  "base_price",                  precision: 9, scale: 4, null: false
-    t.decimal  "price_ex_tax",                precision: 9, scale: 4, null: false
-    t.decimal  "price_inc_tax",               precision: 9, scale: 4
-    t.decimal  "price_tax",                   precision: 9, scale: 4
-    t.datetime "created_at",                                          null: false
-    t.datetime "updated_at",                                          null: false
+    t.decimal  "base_price",                      precision: 9, scale: 4, null: false
+    t.decimal  "price_ex_tax",                    precision: 9, scale: 4, null: false
+    t.decimal  "price_inc_tax",                   precision: 9, scale: 4
+    t.decimal  "price_tax",                       precision: 9, scale: 4
+    t.datetime "created_at",                                              null: false
+    t.datetime "updated_at",                                              null: false
+    t.float    "discount",          limit: 24
+    t.integer  "stock_previous",    limit: 4
+    t.integer  "stock_current",     limit: 4
+    t.integer  "stock_incremental", limit: 4
+    t.integer  "display",           limit: 4
+    t.integer  "damaged",           limit: 4
+    t.text     "note",              limit: 65535
+    t.integer  "created_by",        limit: 4
+    t.integer  "modified_by",       limit: 4
   end
 
   add_index "cms_order_products", ["cms_order_id"], name: "index_cms_order_products_on_cms_order_id", using: :btree
