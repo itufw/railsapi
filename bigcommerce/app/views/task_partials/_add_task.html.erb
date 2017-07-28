@@ -1,5 +1,6 @@
+  <% @parent_task = (@parent_task.is_a?Task) ? @parent_task.id : @parent_task %>
   <%= form_for @task, :url => {:controller => "task", :action => "add_task"}, :id => "task_append_form"  do |f| %>
-  <%= hidden_field_tag :parent_task, @parent_task %>
+  <%= hidden_field_tag :parent_task, @parent_task.to_s %>
   <%= hidden_field_tag :selected_orders, @selected_orders unless @selected_orders.blank?%>
   <%= hidden_field_tag :accounts_page, @customer_locked %>
 
@@ -12,7 +13,7 @@
       <div class="col-md-8 col-md-offset-4" id="task_function">
           <%= "Include Order: "+ @selected_orders.to_s unless @selected_orders.blank?%>
           <br/>
-          <%= "Following Task: "+ @parent_task unless @parent_task.nil? || ("".eql? @parent_task.to_s) || @parent_task.to_i == 0%>
+          <%= "Following Task: "+ @parent_task.to_s unless @parent_task.nil? || ("".eql? @parent_task.to_s) || @parent_task.to_i == 0%>
           <br/>
           <%= label(:function, "Function:")%>
           <%= f.collection_select :function, @function, :function, :function, {:include_blank => "Select a Function", :selected => @default_function}, {:class=>"function_selection"} %>

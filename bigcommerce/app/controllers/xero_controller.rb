@@ -18,17 +18,17 @@ class XeroController < ApplicationController
 	end
 
 	def update_xero_invoices
-		XeroInvoice.new.download_data_from_api(Revision.update_time)
-		XeroOverpayment.new.download_data_from_api(Revision.update_time)
-		XeroCreditNote.new.download_data_from_api(Revision.update_time)
+		XeroInvoice.new.download_data_from_api(Revision.bigcommerce.update_time)
+		XeroOverpayment.new.download_data_from_api(Revision.bigcommerce.update_time)
+		XeroCreditNote.new.download_data_from_api(Revision.bigcommerce.update_time)
 	end
 
 	def update_xero_contacts
-		XeroContact.new.download_data_from_api(Revision.update_time)
+		XeroContact.new.download_data_from_api(Revision.bigcommerce.update_time)
 	end
 
 	def update_xero_over
-		XeroContact.new.download_data_from_api(Revision.update_time)
+		XeroContact.new.download_data_from_api(Revision.bigcommerce.update_time)
 	end
 
 	def export_invoices_to_xero

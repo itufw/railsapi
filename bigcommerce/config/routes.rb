@@ -21,6 +21,8 @@ Rails.application.routes.draw do
   get '/event_censor', to:'calendar#event_censor'
   get '/calendar/local_calendar', to: 'calendar#local_calendar'
 
+  get '/fetch_order_detail', to: 'order#fetch_order_detail', as: 'fetch_order_detail'
+
   get '/fetch_lead', to: 'lead#fetch_lead', as: 'fetch_lead'
 
   get '/rails/mailers' => 'rails/mailers#index'
@@ -30,13 +32,11 @@ Rails.application.routes.draw do
   get '/activity/add_activity', to: 'activity#add_activity'
   get '/activity/daily_products', to: 'activity#daily_products'
 
-
   post 'add_task', to: 'task#task_record'
   post 'local_calendar', to: 'calendar#local_calendar'
   post 'add_note', to: 'activity#add_note'
   post 'contact/create_contact', to: 'contact#contact_creation'
   post 'contact/edit_contact', to: 'contact#contact_edition'
-
 
   # this needs to be replaced sometime
   match ':controller(/:action(/:id))', via: %i[get post]

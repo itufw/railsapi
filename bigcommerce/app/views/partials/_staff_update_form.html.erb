@@ -1,5 +1,5 @@
 <td class="col-xs-2">
-	<% active_staff = Staff.active_sales_staff %>
+	<% active_staff = Staff.sales_list.order_by_order %>
 	<% @staff_id = staff.id %>
 	<% if can_update_staff and !staff.nil? and active_staff.include?staff%>
 		<%= form_tag :controller => "customer", :action => "update_staff" do %>

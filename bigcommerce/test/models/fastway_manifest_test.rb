@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class GoogleRevisionTest < ActiveSupport::TestCase
+class FastwayManifestTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

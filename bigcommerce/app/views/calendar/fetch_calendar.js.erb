@@ -2,7 +2,8 @@
 
   handler.removeMarkers(event_markers);
   handler.removeMarkers(customer_markers);
-  event_markers, customer_markers = null;
+  handler.removeMarkers(lead_markers);
+  event_markers, customer_markers, lead_markers = null;
 
   <% events = get_events_details(@calendar_staff, start_date.beginning_of_month, start_date.end_of_month) %>
 
@@ -12,14 +13,22 @@
     // map pins update
     if (event_checkbox.is(':checked'))
       event_markers = handler.addMarkers(<%=raw get_events_pins(events.select{ |x| x.start_date >= start_date.beginning_of_week && x.end_date<= start_date.end_of_week}).to_json %>);
+      handler.bounds.extendWith(event_markers);
+      handler.fitMapToBounds();
   }
   else {
     calendar_table.html("<%=j render 'calendar_partials/monthly_calendar', staff_id: @calendar_staff, events: events%>");
     if (event_checkbox.is(':checked'))
       event_markers = handler.addMarkers(<%=raw get_events_pins(events).to_json %>);
+      handler.bounds.extendWith(event_markers);
+      handler.fitMapToBounds();
   }
-
 
   if (customer_checkbox.is(':checked')){
     customer_markers = handler.addMarkers(<%=raw get_customers_pins(@calendar_staff, start_date).to_json%>);
+  }
+
+  if (lead_checkbox.is(':checked')){
+    <% pins = get_lead_pins(@calendar_staff) %>
+    lead_markers = handler.addMarkers(<%=raw pins.to_json unless pins.nil?%>);
   }

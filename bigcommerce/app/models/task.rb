@@ -11,7 +11,7 @@ class Task < ActiveRecord::Base
 
   enum gcal_status: %i[na pushed pulled unconfirmed rejected pending]
 
-  self.per_page = 5
+  self.per_page = 15
 
   def insert_or_update(t)
     time = Time.now.to_s(:db)
@@ -263,8 +263,8 @@ class Task < ActiveRecord::Base
     order('tasks.start_date ' + direction)
   end
 
-  def self.order_by_due_date(direction)
-    order('tasks.due_date ' + direction)
+  def self.order_by_end_date(direction)
+    order('tasks.end_date ' + direction)
   end
 
   def self.order_by_create_date(direction)

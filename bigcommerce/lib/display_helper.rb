@@ -3,7 +3,7 @@ module DisplayHelper
   def display_reports_for_sales_dashboard(staff_id)
   	# display all staffs
   	if reports_access_open(staff_id) == 1
-  	  staffs = Staff.active_sales_staff.order_by_order.nickname.to_h
+  	  staffs = Staff.sales_list.order_by_order.nickname.to_h
   	  return nil, staffs
   	# display only the one
   	else

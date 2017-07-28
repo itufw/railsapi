@@ -28,15 +28,17 @@ class TaskController < ApplicationController
   end
 
   def staff_task
-    @start_date = params[:start_date] ? params[:start_date].split('-').reverse.join('-') : (Date.today - 1.month).to_s
-    @end_date = params[:end_date] ? params[:end_date].split('-').reverse.join('-') : Date.today.to_s
+    @start_date = params[:start_date] ? params[:start_date].split('-').reverse.join('-') : (Date.today.beginning_of_week - 1.week).to_s
+    @end_date = params[:end_date] ? params[:end_date].split('-').reverse.join('-') : Date.today.end_of_week.to_s
     @date_column = params[:date_column] || 'start_date'
+    @per_page = params[:per_page] || Task.per_page
+
     @subjects = TaskSubject.all
 
 
     @selected_display = params[:display_options] || 'All'
     @tasks, @selected_creator, @selected_assigned = \
-      staff_task_display(params, @selected_display)
+      staff_task_display(params, @selected_display, @date_column, @start_date, @end_date, @per_page)
   end
 
   def task_details
@@ -68,8 +70,9 @@ class TaskController < ApplicationController
           params[:accounts_page] && !(''.eql? params[:customer][:id]) ? (redirect_to(controller: 'accounts', action: 'contact_invoices', customer_id: params[:customer][:id]) && return) : (redirect_to(action: 'staff_task') && return)
         else
           selected_invoices = params[:selected_orders].nil? ? [] : params[:selected_orders].split
+          account_customer = (!params[:customer].nil? && params[:customer][:id] != '') ? params[:customer][:id] : 0
           redirect_to(controller: 'task', action: 'add_task',\
-                      parent_task: parent_task_id, account_customer: params[:customer][:id],\
+                      parent_task: parent_task_id, account_customer: account_customer,\
                       selected_invoices: selected_invoices, selected_function: params[:task][:function]) && return
         end
       else

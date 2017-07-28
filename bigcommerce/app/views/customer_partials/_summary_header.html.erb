@@ -1,53 +1,66 @@
-<div class="container-center">
-  <div class= "row">
-    <div class="col-xs-4">
-      <% staff = customer.staff %>
-      <h5>Sales Rep.: <%= staff.nickname %></h5>
-      <p>Ph: <a href="tel:<%=staff.contact_number%>"><%= num_to_phone(staff.contact_number) unless staff.contact_number.nil? %></a></p>
-      <p>Email: <%= mail_to(staff.email) unless staff.email.nil? %></p>
-      <p>Email for Sales: <%= mail_to(customer.email_for_sales) unless customer.email_for_sales.nil? %></p>
-      <p>Email for Accounts: <%= mail_to(customer.email_for_accounts) unless customer.email_for_accounts.nil? %></p>
-    </div>
-    <% XeroContactPerson.all_contact_people(customer.xero_contact_id).each do |person| %>
-      <div class="col-xs-4">
-        <h5><%= person.first_name+"  "+person.last_name %></h5>
-        <p>Email: <%= mail_to(person.email_address) unless person.email_address.nil? %></p>
+<% if (customer.cust_type_id == 1) || (customer.is_a? CustomerLead) %>
+  <div class="container-center">
+    <div class="row">
+      <div class="col-xs-10">
+        <h5>Contact:</h5>
+        <p><%= customer.actual_name%></p>
+        <p>Number: <%= num_to_phone(customer.phone)%></p>
+        <p>Email: <%= mail_to(customer.email) unless customer.email.nil? %></p>
       </div>
-    <% end %>
-  </div>
-  <h5>  Contacts:</h5>
-    <div class= "row">
-        <% customer.cust_contacts.each do |contact| %>
-          <% person = contact.contact%>
-          <div class="col-xs-4">
-            <p style="font-size:20px">
-              <%= link_to person.name+": ", controller: 'contact', action: 'summary', contact_id: person.id%>
-              <%= link_to '<i class="glyphicon glyphicon-remove" title="Delete"></i>'.html_safe, {controller: 'customer', action: 'summary', customer_id: @customer.id, customer_name: @customer.actual_name, method: 'delete_contact', contact_id: person.id }, data: {confirm: "Do you want to delete contact #{person.name} for #{customer.actual_name}?"}%>
-            </p>
-            <p style="font-size:20px">
-              <%= contact.title%>
-              <br/>
-              <%= label_tag :position, contact.position%>
-              <br/>
-                <a href="tel:<%=contact.phone%>"><%= num_to_phone(contact.phone) %></a>
-              <br/>
-              <%= mail_to(contact.email) unless contact.email.nil? %>
-            </p>
-            <h5>
-              <% ['Receive Invoice', "Receive Statement", "Receive Portfolio", "Key Accountant", "Key Sales"].each do |tag|%>
-                <%= tag + " | " if contact[tag.downcase.split().join('_')].to_i > 0%>
-              <% end %>
-            </h5>
-          </div>
-      <% end %>
     </div>
-    <% contact_phone = Contact.filter_by_xero_contact_id(customer.xero_contact_id) %>
+  </div>
+<% else %>
+  <div class="container-center">
     <div class= "row">
-      <% contact_phone.each do |contact| %>
-        <div class="col-xs-4">
-          <h5 style="font-size:20px"><%= contact.name+": "%></h5>
-          <p style="font-size:20px">Ph: <%= contact.area_code unless contact.area_code.nil? %> <%= contact.number unless contact.number.nil? %></p>
+      <div class="col-xs-6">
+        <% staff = customer.staff %>
+        <h5>Sales Rep.: <%= staff.nickname %></h5>
+        <p>Ph: <a href="tel:<%=staff.contact_number%>"><%= num_to_phone(staff.contact_number) unless staff.contact_number.nil? %></a></p>
+        <p>Email: <%= mail_to(staff.email) unless staff.email.nil? %></p>
+        <p>Email for Sales: <%= mail_to(customer.email_for_sales) unless customer.email_for_sales.nil? %></p>
+        <p>Email for Accounts: <%= mail_to(customer.email_for_accounts) unless customer.email_for_accounts.nil? %></p>
+      </div>
+      <% XeroContactPerson.all_contact_people(customer.xero_contact_id).each do |person| %>
+        <div class="col-xs-6">
+          <h5><%= person.first_name+"  "+person.last_name %></h5>
+          <p>Email: <%= mail_to(person.email_address) unless person.email_address.nil? %></p>
         </div>
       <% end %>
     </div>
-</div>
+    <h5>  Contacts:</h5>
+      <div class= "row">
+          <% customer.cust_contacts.each do |contact| %>
+            <% person = contact.contact%>
+            <div class="col-xs-4">
+              <p>
+                <%= link_to person.name+": ", controller: 'contact', action: 'summary', contact_id: person.id%>
+                <%= link_to '<i class="glyphicon glyphicon-remove" title="Delete"></i>'.html_safe, {controller: 'customer', action: 'summary', customer_id: @customer.id, customer_name: @customer.actual_name, method: 'delete_contact', contact_id: person.id }, data: {confirm: "Do you want to delete contact #{person.name} for #{customer.actual_name}?"}%>
+              </p>
+              <p>
+                <%= contact.title%>
+                <br/>
+                <%= label_tag :position, contact.position%>
+                <br/>
+                  <a href="tel:<%=contact.phone%>"><%= num_to_phone(contact.phone) %></a>
+                <br/>
+                <%= mail_to(contact.email) unless contact.email.nil? %>
+              </p>
+              <h5>
+                <% ['Receive Invoice', "Receive Statement", "Receive Portfolio", "Key Accountant", "Key Sales"].each do |tag|%>
+                  <%= tag + " | " if contact[tag.downcase.split().join('_')].to_i > 0%>
+                <% end %>
+              </h5>
+            </div>
+        <% end %>
+      </div>
+      <% contact_phone = Contact.filter_by_xero_contact_id(customer.xero_contact_id) %>
+      <div class= "row">
+        <% contact_phone.each do |contact| %>
+          <div class="col-xs-4">
+            <h5><%= contact.name+": "%></h5>
+            <p>Ph: <%= contact.area_code unless contact.area_code.nil? %> <%= contact.number unless contact.number.nil? %></p>
+          </div>
+        <% end %>
+      </div>
+  </div>
+<% end %>

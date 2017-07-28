@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170714005714) do
+ActiveRecord::Schema.define(version: 20170727052127) do
 
   create_table "SalesForce_Lead_full", primary_key: "Id", force: :cascade do |t|
     t.string  "FirstName",                 limit: 38
@@ -322,6 +322,78 @@ ActiveRecord::Schema.define(version: 20170714005714) do
 
   add_index "categories", ["parent_id"], name: "index_categories_on_parent_id", using: :btree
 
+  create_table "cms_order_products", force: :cascade do |t|
+    t.integer  "cms_order_id",      limit: 4,                             null: false
+    t.integer  "product_id",        limit: 4,                             null: false
+    t.integer  "order_shipping_id", limit: 4
+    t.integer  "qty",               limit: 3,                             null: false
+    t.integer  "qty_shipped",       limit: 3
+    t.decimal  "base_price",                      precision: 9, scale: 4, null: false
+    t.decimal  "price_ex_tax",                    precision: 9, scale: 4, null: false
+    t.decimal  "price_inc_tax",                   precision: 9, scale: 4
+    t.decimal  "price_tax",                       precision: 9, scale: 4
+    t.datetime "created_at",                                              null: false
+    t.datetime "updated_at",                                              null: false
+    t.float    "discount",          limit: 24
+    t.integer  "stock_previous",    limit: 4
+    t.integer  "stock_current",     limit: 4
+    t.integer  "stock_incremental", limit: 4
+    t.integer  "display",           limit: 4
+    t.integer  "damaged",           limit: 4
+    t.text     "note",              limit: 65535
+    t.integer  "created_by",        limit: 4
+    t.integer  "modified_by",       limit: 4
+  end
+
+  add_index "cms_order_products", ["cms_order_id"], name: "index_cms_order_products_on_cms_order_id", using: :btree
+  add_index "cms_order_products", ["order_shipping_id"], name: "index_cms_order_products_on_order_shipping_id", using: :btree
+  add_index "cms_order_products", ["product_id"], name: "index_cms_order_products_on_product_id", using: :btree
+
+  create_table "cms_orders", force: :cascade do |t|
+    t.integer  "customer_id",                limit: 4,                             null: false
+    t.integer  "status_id",                  limit: 4
+    t.integer  "staff_id",                   limit: 4
+    t.decimal  "total_inc_tax",                            precision: 9, scale: 4
+    t.decimal  "refunded_amount",                          precision: 8, scale: 2
+    t.integer  "qty",                        limit: 3
+    t.integer  "items_shipped",              limit: 3
+    t.text     "staff_notes",                limit: 65535
+    t.text     "customer_notes",             limit: 65535
+    t.decimal  "discount_rate",                            precision: 9, scale: 4
+    t.decimal  "discount_amount",                          precision: 9, scale: 4
+    t.decimal  "subtotal_ex_tax",                          precision: 9, scale: 4
+    t.decimal  "subtotal_inc_tax",                         precision: 9, scale: 4
+    t.decimal  "subtotal_tax",                             precision: 9, scale: 4
+    t.decimal  "total_ex_tax",                             precision: 9, scale: 4
+    t.decimal  "total_tax",                                precision: 9, scale: 4
+    t.decimal  "base_shipping_cost",                       precision: 6, scale: 2
+    t.decimal  "shipping_cost_ex_tax",                     precision: 6, scale: 2
+    t.decimal  "shipping_cost_inc_tax",                    precision: 6, scale: 2
+    t.decimal  "shipping_cost_tax",                        precision: 6, scale: 2
+    t.decimal  "base_handling_cost",                       precision: 6, scale: 2
+    t.decimal  "handling_cost_ex_tax",                     precision: 6, scale: 2
+    t.decimal  "handling_cost_inc_tax",                    precision: 6, scale: 2
+    t.decimal  "handling_cost_tax",                        precision: 6, scale: 2
+    t.decimal  "base_wrapping_cost",                       precision: 6, scale: 2
+    t.decimal  "wrapping_cost_ex_tax",                     precision: 6, scale: 2
+    t.decimal  "wrapping_cost_inc_tax",                    precision: 6, scale: 2
+    t.decimal  "wrapping_cost_tax",                        precision: 6, scale: 2
+    t.decimal  "store_credit",                             precision: 6, scale: 2
+    t.decimal  "gift_certificate_amount",                  precision: 6, scale: 2
+    t.integer  "shipping_cost_tax_class_id", limit: 4
+    t.integer  "handling_cost_tax_class_id", limit: 4
+    t.integer  "wrapping_cost_tax_class_id", limit: 4
+    t.integer  "active",                     limit: 1
+    t.datetime "date_shipped"
+    t.string   "xero_invoice_id",            limit: 255
+    t.datetime "created_at",                                                       null: false
+    t.datetime "updated_at",                                                       null: false
+  end
+
+  add_index "cms_orders", ["customer_id"], name: "index_cms_orders_on_customer_id", using: :btree
+  add_index "cms_orders", ["staff_id"], name: "index_cms_orders_on_staff_id", using: :btree
+  add_index "cms_orders", ["status_id"], name: "index_cms_orders_on_status_id", using: :btree
+
   create_table "contact_roles", force: :cascade do |t|
     t.string   "role",              limit: 255
     t.string   "staff_role",        limit: 255
@@ -419,18 +491,30 @@ ActiveRecord::Schema.define(version: 20170714005714) do
     t.text     "useful_information",     limit: 65535
     t.integer  "customer_id",            limit: 4
     t.datetime "turn_customer_date"
+    t.text     "featured_image",         limit: 65535
+    t.string   "google_place_id",        limit: 255
   end
 
   add_index "customer_leads", ["cust_group_id"], name: "index_customer_leads_on_cust_group_id", using: :btree
   add_index "customer_leads", ["cust_type_id"], name: "index_customer_leads_on_cust_type_id", using: :btree
   add_index "customer_leads", ["staff_id"], name: "index_customer_leads_on_staff_id", using: :btree
 
+  create_table "customer_states", force: :cascade do |t|
+    t.string   "state",      limit: 255
+    t.string   "state_full", limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "customer_tags", force: :cascade do |t|
-    t.string   "name",        limit: 255
-    t.string   "role",        limit: 255
-    t.integer  "customer_id", limit: 4
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.string   "name",           limit: 255
+    t.string   "role",           limit: 255
+    t.integer  "customer_id",    limit: 4
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+    t.string   "address",        limit: 255
+    t.string   "state",          limit: 255
+    t.string   "staff_nickname", limit: 255
   end
 
   create_table "customers", force: :cascade do |t|
@@ -471,6 +555,8 @@ ActiveRecord::Schema.define(version: 20170714005714) do
     t.text     "address",                 limit: 65535
     t.float    "lat",                     limit: 24
     t.float    "lng",                     limit: 24
+    t.text     "featured_image",          limit: 65535
+    t.string   "google_place_id",         limit: 255
   end
 
   add_index "customers", ["cust_group_id"], name: "index_customers_on_cust_group_id", using: :btree
@@ -478,11 +564,92 @@ ActiveRecord::Schema.define(version: 20170714005714) do
   add_index "customers", ["cust_type_id"], name: "index_customers_on_cust_type_id", using: :btree
   add_index "customers", ["staff_id"], name: "index_customers_on_staff_id", using: :btree
 
-  create_table "google_revisions", force: :cascade do |t|
-    t.datetime "start_time"
-    t.datetime "end_time"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+  create_table "fastway_consignment_items", primary_key: "ItemID", force: :cascade do |t|
+    t.string   "Reference",        limit: 255
+    t.integer  "Packaging",        limit: 4
+    t.integer  "Weight",           limit: 4
+    t.integer  "WeightCubic",      limit: 4
+    t.datetime "CreateDate"
+    t.datetime "PrintDate"
+    t.integer  "ExcessLabelCount", limit: 4
+    t.string   "LabelColour",      limit: 255
+    t.string   "LabelNumber",      limit: 255
+    t.integer  "ConsignmentID",    limit: 4
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  add_index "fastway_consignment_items", ["ItemID"], name: "index_fastway_consignment_items_on_ItemID", using: :btree
+
+  create_table "fastway_consignments", primary_key: "ConsignmentID", force: :cascade do |t|
+    t.integer  "AccountNumber",           limit: 4
+    t.string   "CompanyName",             limit: 255
+    t.string   "Address1",                limit: 255
+    t.string   "Address2",                limit: 255
+    t.string   "City",                    limit: 255
+    t.string   "PostCode",                limit: 255
+    t.string   "SpecialInstruction1",     limit: 255
+    t.string   "SpecialInstruction2",     limit: 255
+    t.string   "SpecialInstruction3",     limit: 255
+    t.string   "ContactEmail",            limit: 255
+    t.string   "ContactPhone",            limit: 255
+    t.string   "ContactMobile",           limit: 255
+    t.string   "ContactName",             limit: 255
+    t.string   "DestinationFranchise",    limit: 255
+    t.string   "ThirdPartyConsignmentID", limit: 255
+    t.string   "SenderFirstName",         limit: 255
+    t.string   "SenderLastName",          limit: 255
+    t.string   "SenderContactNumber",     limit: 255
+    t.datetime "CreateDate"
+    t.integer  "NotificationEmailSent",   limit: 4
+    t.integer  "ManifestID",              limit: 4
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
+  end
+
+  add_index "fastway_consignments", ["ConsignmentID"], name: "index_fastway_consignments_on_ConsignmentID", using: :btree
+
+  create_table "fastway_manifests", primary_key: "ManifestID", force: :cascade do |t|
+    t.string   "Description",            limit: 255
+    t.integer  "AutoImport",             limit: 4
+    t.datetime "AutoImportCompleteDate"
+    t.integer  "MultiBusinessID",        limit: 4
+    t.datetime "CreateDate"
+    t.datetime "CloseDate"
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "fastway_manifests", ["ManifestID"], name: "index_fastway_manifests_on_ManifestID", using: :btree
+
+  create_table "fastway_traces", force: :cascade do |t|
+    t.string   "LabelNumber",        limit: 255
+    t.string   "Type",               limit: 255
+    t.string   "Courier",            limit: 255
+    t.string   "Description",        limit: 255
+    t.datetime "Date"
+    t.datetime "UploadDate"
+    t.string   "Name",               limit: 255
+    t.string   "Status",             limit: 255
+    t.string   "Franchise",          limit: 255
+    t.string   "StatusDescription",  limit: 255
+    t.string   "contactName",        limit: 255
+    t.string   "company",            limit: 255
+    t.string   "address1",           limit: 255
+    t.string   "address2",           limit: 255
+    t.string   "address3",           limit: 255
+    t.string   "address4",           limit: 255
+    t.string   "address5",           limit: 255
+    t.string   "address6",           limit: 255
+    t.string   "address7",           limit: 255
+    t.string   "address8",           limit: 255
+    t.string   "comment",            limit: 255
+    t.string   "Signature",          limit: 255
+    t.string   "DistributedTo",      limit: 255
+    t.text     "ParcelConnectAgent", limit: 65535
+    t.string   "Reference",          limit: 255
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
   end
 
   create_table "order_actions", force: :cascade do |t|
@@ -657,6 +824,9 @@ ActiveRecord::Schema.define(version: 20170714005714) do
     t.datetime "updated_at",                                                        null: false
     t.string   "xero_invoice_id",            limit: 36
     t.string   "xero_invoice_number",        limit: 255
+    t.string   "source",                     limit: 255
+    t.integer  "source_id",                  limit: 4
+    t.integer  "shipping_status_id",         limit: 4
   end
 
   add_index "orders", ["billing_address_id"], name: "index_orders_on_billing_address_id", using: :btree
@@ -861,9 +1031,10 @@ ActiveRecord::Schema.define(version: 20170714005714) do
   create_table "revisions", force: :cascade do |t|
     t.datetime "start_time"
     t.datetime "end_time"
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
     t.integer  "attempt_count", limit: 4
+    t.string   "description",   limit: 255
   end
 
   create_table "staff_calendar_addresses", force: :cascade do |t|
@@ -923,6 +1094,8 @@ ActiveRecord::Schema.define(version: 20170714005714) do
     t.string   "access_token",     limit: 255
     t.string   "refresh_token",    limit: 255
     t.integer  "pick_up_id",       limit: 4
+    t.integer  "sales_list_right", limit: 4
+    t.integer  "calendar_right",   limit: 4
   end
 
   add_index "staffs", ["active"], name: "index_staffs_on_active", using: :btree
@@ -1370,6 +1543,10 @@ ActiveRecord::Schema.define(version: 20170714005714) do
     t.integer  "customer_id",          limit: 4
     t.integer  "customer_lead_id",     limit: 4
     t.integer  "active",               limit: 4
+    t.string   "thumb",                limit: 255
+    t.string   "featured_image",       limit: 255
+    t.float    "aggregate_rating",     limit: 24
+    t.string   "rating_text",          limit: 255
   end
 
 end

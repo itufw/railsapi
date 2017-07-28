@@ -134,6 +134,17 @@ class ReminderMailer < ActionMailer::Base
                          :order => order})
         )
       end
+
+      pod = FastwayTrace.pod_available(invoice.invoice_number).first
+      unless pod.nil?
+        item = FastwayConsignmentItem.filter_order(invoice.invoice_number).first
+        attachments["invoice\##{invoice.invoice_number}-pod.pdf"] = WickedPdf.new.pdf_from_string(
+          render_to_string(
+              :template => 'pdf/proof_of_delivery.pdf',
+              :locals => {order: Order.find(invoice.invoice_number), item: item }
+              )
+          )
+      end
     end
   end
 

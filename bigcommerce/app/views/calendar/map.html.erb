@@ -29,7 +29,7 @@
             id: 'customer_location'
         }
     }, function () {
-        var markers = handler.addMarkers(<%=raw @hash.to_json %>);
+        var markers = handler.addMarkers(<%=raw hash_map_pins(@customer_map).to_json %>);
         handler.bounds.extendWith(markers);
         handler.fitMapToBounds();
     });

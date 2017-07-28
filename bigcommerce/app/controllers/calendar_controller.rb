@@ -6,7 +6,7 @@ class CalendarController < ApplicationController
   skip_before_action :verify_authenticity_token
   before_action :confirm_logged_in
 
-  autocomplete :customer_tag, :name, extra_data: [:customer_id, :role], full: true, scopes: :no_contacts
+  autocomplete :customer_tag, :name, extra_data: [:customer_id, :role, :staff_nickname, :state, :address, :name], full: true, scopes: :no_contacts, display_value: :details
 
   include CalendarHelper
   include ModelsFilter
@@ -50,9 +50,9 @@ class CalendarController < ApplicationController
   def local_calendar
     # tempary use, it should be assigned based on the current users' right
     if session[:user_id] == 36
-      @staffs = Staff.where('(active = 1 and user_type LIKE "Sales%") OR staffs.id = 36')
+      @staffs = Staff.calendar_list(session[:user_id]).order_by_order
     elsif user_full_right(session[:authority])
-      @staffs = Staff.active_sales_staff
+      @staffs = Staff.calendar_list.order_by_order
     else
       @staffs = Staff.where(id: session[:user_id])
     end
@@ -92,7 +92,7 @@ class CalendarController < ApplicationController
                                         },
                                         token_credential_uri: 'https://accounts.google.com/o/oauth2/token')
     client.update!(session[:authorization])
-    
+
     service = Google::Apis::CalendarV3::CalendarService.new
     service.authorization = client
 
@@ -178,49 +178,16 @@ class CalendarController < ApplicationController
       # in Helper
       # filter customers with attributes
       @active_sales = true
-      customer_map, @start_date, @end_date = customer_filter_map(params, @colour_selected, @colour_range_sales, @customer_style_selected, @staff)
+      @customer_map, @start_date, @end_date = customer_filter_map(params, @colour_selected, @colour_range_sales, @customer_style_selected, @staff)
     when 'Last_Order'
       @active_sales = false
-      customer_map, @start_date, @end_date = customer_last_order_filter(params, @order_colour_selected, @customer_style_selected, @staff)
+      @customer_map, @start_date, @end_date = customer_last_order_filter(params, @order_colour_selected, @customer_style_selected, @staff)
     end
-    @hash = hash_map_pins(customer_map)
 
     # customer table
     order_function, direction = sort_order(params, 'order_by_name', 'ASC')
     @per_page = params[:per_page] || Customer.per_page
-    @customers = Customer.filter_by_ids(customer_map.keys).include_all.send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
-  end
-
-  def event_dashboard
-
+    @customers = Customer.filter_by_ids(@customer_map.keys).include_all.send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
   end
 
 end
-
-
-# unless event.description.nil?
-#   if event.location.nil?
-#     loc = event.description.split("\n").first.downcase
-#
-#     customer_list = Customer.filter_by_staff(response_staff.first.id).search_for(loc)
-#     lead_list = CustomerLead.filter_by_staff(response_staff.first.id).not_customer.search_for(loc)
-#
-#     customer_list = @customers.select{|x|  x.staff_id == response_staff.first.id && !x.actual_name.nil? && Regexp.union(loc) === x.actual_name.downcase }
-#
-#     lead_list = @leads.select{|x| x.staff_id == response_staff.first.id && Regexp.union(loc) === x.actual_name.downcase }
-#     lead_list = lead_list.each {|x| x.actual_name = x.actual_name.to_s + ', (Lead)'}
-#
-#     customer_list = lead_list + customer_list
-#     customer_list = customer_list.sort_by! {|x| @jarow.getDistance(loc, x.actual_name) }.reverse
-#
-#   else
-#     loc = event.location.split(",").first.split.select{|x| (x.to_i.to_s.casecmp(x)<0) && !(["st","pl","street","St"].include?(x))}
-#     loc = loc.map {|x| x = x.downcase}
-#     customer_list = @customers.select{|x| x.staff_id == response_staff.first.id && !x.actual_name.nil? && Regexp.union(loc) === x.actual_name.downcase }
-#
-#     lead_list = @leads.select{|x| (x.staff_id == response_staff.first.id)&& (Regexp.union(loc) === x.actual_name.downcase) }
-#     lead_list = lead_list.each {|x| x.actual_name = x.actual_name.to_s + ', (Lead)'}
-#
-#     customer_list = lead_list + customer_list
-#     customer_list = customer_list.sort_by! {|x| @jarow.getDistance(loc.join(" "), x.actual_name) }.reverse
-#     end

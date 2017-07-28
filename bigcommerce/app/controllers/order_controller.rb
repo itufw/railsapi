@@ -50,4 +50,91 @@ class OrderController < ApplicationController
       @tasks = Task.active_tasks.order_tasks(@order_id).order_by_id('DESC')
 	end
 
+  def fetch_order_detail
+    @order_id = params[:order_id]
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def generate_pod
+    order = Order.find(params[:order_id])
+    item = FastwayConsignmentItem.filter_order(params[:order_id]).first
+    return if item.nil?
+
+    pdf = WickedPdf.new.pdf_from_string(
+      render_to_string(
+          :template => 'pdf/proof_of_delivery.pdf',
+          :locals => {order: order, item: item }
+          )
+      )
+      send_data pdf, filename: "pod-#{order.id}.pdf", type: :pdf
+  end
+
+  def create_order
+    @order = CmsOrder.new
+  end
+
+  def cms_order_all
+    @orders = CmsOrder.all
+  end
+
+  def save_order
+    order = CmsOrder.new
+    if order.update_attributes(cms_order_params)
+      qty = 0
+      product_list = params.keys.select { |x| x.start_with?('product_name ') }.map(&:split).map(&:last)
+      product_list.each do |product_id|
+        order_product = CmsOrderProduct.new(cms_order_id: order.id, product_id: product_id, qty: params['qty '+product_id], base_price: params['price_luc '+product_id], price_ex_tax: params['price '+ product_id])
+        order_product.save
+
+        qty += params['qty '+product_id].to_i
+      end
+      order.staff_id = Customer.find(order.customer_id).staff_id
+      order.qty = qty
+      order.save
+      redirect_to action: 'cms_order_all'
+    else
+      redirect_to :back
+    end
+  end
+
+  def generate_invoice
+    order = CmsOrder.find(params[:order_id])
+    customer = Customer.find(order.customer_id)
+    pdf = WickedPdf.new.pdf_from_string(
+      render_to_string(
+          :template => 'pdf/cms_order_invoice.pdf',
+          :locals => {order: order, customer: customer}
+          )
+      )
+      send_data pdf, filename: "#{order.id}.pdf", type: :pdf
+  end
+
+  def order_update
+    @order = CmsOrder.find(params[:order_id])
+  end
+
+  def update_order
+    p = c
+
+    order = CmsOrder.find(params[:cms_order][:id])
+    order.update_attributes(cms_order_params)
+
+    product_history = CmsOrderProduct.order_products(order.id)
+
+    products = params[:cms_order][:products]
+    products.keys().each do |product|
+
+    end
+  end
+
+  private
+  def cms_order_params
+    # total_tax -> GST
+    # subtotal_tax -> WET
+    params.require(:cms_order).permit(:customer_id, :subtotal_inc_tax, :discount_rate, :discount_amount,\
+                                     :subtotal_tax, :total_tax, :total_inc_tax,\
+                                     :customer_notes, :staff_notes)
+  end
 end

@@ -7,6 +7,9 @@
 # Ignore bundler config.
 # /.bundle
 
+# Ignore Google Server Key
+/config/key.json
+
 # Ignore all logfiles and tempfiles.
 /log/*
 !/log/.keep
