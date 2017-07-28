@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170727052127) do
+ActiveRecord::Schema.define(version: 20170728072009) do
 
   create_table "SalesForce_Lead_full", primary_key: "Id", force: :cascade do |t|
     t.string  "FirstName",                 limit: 38
@@ -1507,10 +1507,11 @@ ActiveRecord::Schema.define(version: 20170727052127) do
   end
 
   create_table "zomato_cuisines", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.integer  "active",     limit: 4
+    t.string   "name",           limit: 255
+    t.integer  "active",         limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "priority_group", limit: 4
   end
 
   create_table "zomato_entities", force: :cascade do |t|
