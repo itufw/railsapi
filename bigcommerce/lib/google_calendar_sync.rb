@@ -4,8 +4,12 @@ require 'googleauth'
 module GoogleCalendarSync
 
   def import_into_customer_tags
+    active_sales_staff = Staff.active_sales_staff.map(&:id)
+    active_sales_staff.delete(24)
+    active_sales_staff.delete(34)
+
     exist_customer = CustomerTag.filter_by_role('Customer').map(&:customer_id)
-    Customer.where('id NOT IN (?)', exist_customer).where('actual_name IS NOT NULL').each do |customer|
+    Customer.where('id NOT IN (?)', exist_customer).staff_filter(active_sales_staff).where('actual_name IS NOT NULL').each do |customer|
       CustomerTag.new.insert_customer(customer)
     end
 
@@ -17,6 +21,21 @@ module GoogleCalendarSync
     exist_contact = CustomerTag.filter_by_role('Contact').map(&:customer_id)
     Contact.sales_force.where('id NOT IN (?)', exist_contact).each do |contact|
       CustomerTag.new.insert_contact(contact)
+    end
+
+    customer_state_update
+  end
+
+  def customer_state_update
+    states = ['VIC', 'TAS', 'QLD', 'WA', 'SA', 'NT', 'NSW', 'ACT']
+    Customer.where('lat IS NOT NULL AND country = \'Australia\' AND state NOT IN (?)', states).each do |customer|
+      begin
+        state = customer.address.split(',')[-2].split()[-2]
+        customer.state = state if states.include? state
+        customer.save
+      rescue
+        next
+      end
     end
   end
 
@@ -33,10 +52,10 @@ module GoogleCalendarSync
     service
   end
 
-  def calendar_event_update
+  def calendar_event_update(last_update_date = (Time.now - 1.month))
     service = connect_google_calendar
     push_pending_events_to_google_offline(service)
-    scrap_from_calendars(service)
+    scrap_from_calendars(service, last_update_date)
   end
 
   def push_pending_events_to_google_offline(service)
@@ -55,29 +74,35 @@ module GoogleCalendarSync
     end
   end
 
-  def scrap_from_calendars(service)
+  def scrap_from_calendars(service, last_update_date)
     new_events = []
     # record the events and the calendar id
     calendar_events_pair = {}
-    unconfirmed_task = Task.unconfirmed_event.map(&:google_event_id)
 
     staff_calendars = StaffCalendarAddress.all
 
     service.list_calendar_lists.items.select { |x| staff_calendars.map(&:calendar_address).include?x.id }.each do |calendar|
       # only sync the tasks for last month
-      items = service.list_events(calendar.id).items.select { |x| x.updated.to_s > (Date.today - 1.month).to_s }.select { |x| (x.start.date_time.to_s > (Date.today - 1.month).to_s) || (x.start.date.to_s > (Date.today - 1.month).to_s) }
+      items = service.list_events(calendar.id).items.select { |x| x.updated.to_s > last_update_date.to_s }
       calendar_events_pair[calendar.id] = items.map(&:id)
       new_events += items
     end
-    update_google_events(new_events, staff_calendars, unconfirmed_task, service, calendar_events_pair)
+    update_google_events(new_events, staff_calendars, service, calendar_events_pair)
   end
 
   # scrap events from google calendar
-  def update_google_events(new_events, staff_calendars, _unconfirm, service, calendar_events_pair)
+  def update_google_events(new_events, staff_calendars, service, calendar_events_pair)
     new_events.each do |event|
       task = Task.filter_by_google_event_id(event.id).first
 
-      if !task.nil?
+      # insert new task
+      if task.nil?
+        # filter the staff
+        staff_address = staff_calendars.select { |x| [event.organizer.email, event.creator.email].include? x.calendar_address }.first
+        next if staff_address.blank?
+        Task.new.auto_insert_from_calendar_event(event, staff_address.staff_id)
+        # if events are updated, update the data
+      elsif event.updated > task.updated_at
         task.start_date = if event.start.date_time.nil?
                             event.start.date.to_s
                           else
@@ -88,35 +113,90 @@ module GoogleCalendarSync
                         else
                           event.end.date_time.to_s(:db)
                         end
-        task.description = event.summary
+        task.summary = event.summary
         task.location = event.location
-        task.summary = event.description
+        task.description = event.description
         task.save
-        # push address back to events
-        update_event_location(task.task_relations.first, event, service, calendar_events_pair) if event.location.nil?
-
       else
-        # filter the staff
-        staff_address = staff_calendars.select { |x| [event.organizer.email, event.creator.email].include? x.calendar_address }.first
-        next if staff_address.blank?
-        Task.new.auto_insert_from_calendar_event(event, staff_address.staff_id)
+        if event.location.nil? && !task.task_relations.first.nil?
+          # push address back to events
+          update_event_location(task.task_relations.first, event, service, calendar_events_pair)
+        end
+        if task.description != event.summary && task.description != event.description
+          update_event_summary(task, event, service, calendar_events_pair)
+        end
       end
     end
   end
 
-  def update_event_location(relation, event, service, calendar_events_pair)
-    return if relation.nil?
-    address = nil
-    address = relation.customer.address unless relation.customer.nil?
-    address = relation.customer_lead.address unless !address.nil? || relation.customer_lead.nil?
-    return if address.nil?
+  # Testing this one
+  def update_event_summary(task, event, service, calendar_events_pair)
+    event.description = task.description
     calendar_id = calendar_events_pair.select { |_key, value| value.include?event.id }.keys.first.to_s
     return if calendar_id == ''
 
+    begin
+      service.update_event(calendar_id, event.id, event)
+    rescue
+    end
+  end
+
+  def update_event_location(relation, event, service, calendar_events_pair)
+    address = nil
+    address = relation.customer.address unless relation.customer.nil?
+    address = relation.customer_lead.address unless !address.nil? || relation.customer_lead.nil?
+
+    return if address.nil?
+    calendar_id = calendar_events_pair.select { |_key, value| value.include?event.id }.keys.first.to_s
+    return if calendar_id == ''
     begin
       event.location = address
       service.update_event(calendar_id, event.id, event)
     rescue
     end
+  end
+
+  def push_event(customer, description, staff_ids, response_staff, start_time, end_time, subject, method, service, client)
+
+    staffs = Staff.filter_by_ids(staff_ids.append(response_staff))
+    staff_calendar_addresses = StaffCalendarAddress.filter_by_ids(staff_ids)
+    response_staff = staffs.select { |x| x.id.to_s == response_staff.to_s }.first
+    response_staff_email = response_staff.email
+
+    attendee_list = []
+    staffs.each do |staff|
+      attend = {
+        displayName: staff.nickname,
+        email: staff_calendar_addresses.select{|x|x.staff_id == staff.id}.first.calendar_address
+      }
+      attendee_list.append(attend)
+    end
+
+    customer_name = (customer.nil?) ? 'No Customer' : customer.actual_name
+    address = customer.address unless customer.nil?
+
+    task_subject = TaskSubject.find(subject).subject
+
+    event = Google::Apis::CalendarV3::Event.new({
+                                                start: {
+                                                  date_time: start_time.strftime('%Y-%m-%dT%H:%M:%S'),
+                                                  time_zone: 'Australia/Melbourne',
+                                                },
+                                                end:{
+                                                  date_time: end_time.strftime('%Y-%m-%dT%H:%M:%S'),
+                                                  time_zone: 'Australia/Melbourne',
+                                                },
+                                                # colorID: "2",
+                                                summary: customer_name,
+                                                description: task_subject + ": "+ customer_name + "\n" +description + "\n Created By:" + response_staff.nickname,
+                                                location: address,
+                                                attendees: attendee_list
+                                                })
+    begin
+      gcal_event = service.insert_event('primary', event, send_notifications: true)
+    rescue
+    end
+
+    return gcal_event
   end
 end

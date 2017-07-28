@@ -1,10 +1,12 @@
 require 'rake_task_helper.rb'
 load 'zomato_calculation.rb'
+load 'fastway_api.rb'
 require 'google_calendar_sync.rb'
 
 include RakeTaskHelper
 include ZomatoCalculation
 include GoogleCalendarSync
+include FastwayApi
 
 namespace :updates do
 	desc "Rake task to update data"
@@ -12,7 +14,7 @@ namespace :updates do
 
 		if can_start_update
 
-			Revision.start_update
+			Revision.bigcommerce.start_update
 			start_time = Time.now
 
 			puts "Models update #{start_time} started"
@@ -36,7 +38,7 @@ namespace :updates do
 			xero.update_xero_invoices
 			puts "Updated Xero Invoices"
 
-			Revision.end_update(start_time, Time.now)
+			Revision.bigcommerce.end_update(start_time, Time.now)
 
 			puts "Models update #{Time.now} ended"
 
@@ -55,14 +57,31 @@ namespace :updates do
 
 	task :zomato_update => :environment do
 		puts "Zomato Update At #{Time.now}"
-		search_by_geo
+		search_by_zomato
+		puts "Zomato Update End #{Time.now}"
 	end
 
 	task :event_update => :environment do
-		puts "Event Update Start At #{Time.now}"
+		start_time = Time.now
+		Revision.google.start_update
+
+		puts "Event Update Start At #{start_time}"
 		import_into_customer_tags
-		calendar_event_update
+		calendar_event_update(Revision.google.start_time)
 		puts "Event Update End AT #{Time.now}"
+		Revision.google.end_update(start_time, Time.now)
+	end
+
+	task :manifest_update => :environment do
+		puts "Manifest Update Start At #{Time.now}"
+		update_closed_manifest
+		puts "Manifest Update End AT #{Time.now}"
+	end
+
+	task :package_trace => :environment do
+		puts "Shipping Update Start At #{Time.now}"
+		trace_events
+		puts "Shipping Update End At #{Time.now}"
 	end
 
 	task :balanceupdate => :environment do

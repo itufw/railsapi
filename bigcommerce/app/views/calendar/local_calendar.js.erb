@@ -9,6 +9,17 @@ $('#customer_checkbox').click(function(){
   }
 });
 
+$('#lead_checkbox').click(function(){
+  if ($(this).is(':checked')){
+    handler.removeMarkers(lead_markers);
+    lead_markers = null;
+    lead_markers = handler.addMarkers(<%=raw get_lead_pins(@selected_staff).to_json %>);
+  }else{
+    handler.removeMarkers(lead_markers);
+    lead_markers = null;
+  }
+});
+
 $('#event_checkbox').click(function(){
   if ($(this).is(':checked')){
     handler.removeMarkers(event_markers);

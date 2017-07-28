@@ -123,7 +123,7 @@ class Order < ActiveRecord::Base
       '#{o.gift_certificate_amount}','#{o.ip_address}', '#{staff_notes}',\
       '#{customer_notes}', '#{o.discount_amount}', '#{o.coupon_discount}',\
       '#{active}', '#{o.order_source}', '#{time}', '#{time}',\
-      '#{payment_method}', '#{staff_id}')"
+      '#{payment_method}', '#{staff_id}', 'bigcommerce', '#{o.id}')"
 
       sql = "INSERT INTO orders (id, customer_id, date_created, date_modified, date_shipped,\
 			status_id, subtotal_ex_tax, subtotal_inc_tax, subtotal_tax, base_shipping_cost,\
@@ -132,7 +132,7 @@ class Order < ActiveRecord::Base
 			base_wrapping_cost, wrapping_cost_ex_tax, wrapping_cost_inc_tax, wrapping_cost_tax, wrapping_cost_tax_class_id,\
 			total_ex_tax, total_inc_tax, total_tax, qty, items_shipped, refunded_amount, store_credit,\
 			gift_certificate_amount, ip_address, staff_notes, customer_notes, discount_amount,\
-			coupon_discount, active, order_source, created_at, updated_at, payment_method, staff_id)\
+			coupon_discount, active, order_source, created_at, updated_at, payment_method, staff_id, source, source_id)\
 			VALUES #{order}"
 
       # insert the billing adress where the id is order_id

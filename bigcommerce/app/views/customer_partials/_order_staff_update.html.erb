@@ -3,7 +3,7 @@
 
 		<%= form_tag :controller => "customer", :action => "update_order_staff" do %>
 
-		<%= select_tag(:staff_id, options_from_collection_for_select(Staff.active_sales_staff_plus(staff_id), :id, :nickname, staff_id), html_options = {:class => 'form-control', :onchange => "this.form.submit()"}) %>
+		<%= select_tag(:staff_id, options_from_collection_for_select(Staff.sales_list.order_by_order, :id, :nickname, staff_id), html_options = {:class => 'form-control', :onchange => "this.form.submit()"}) %>
 
 		<%= hidden_field_tag :order_id, order_id %>
     <%= hidden_field_tag :customer_id, customer.id %>

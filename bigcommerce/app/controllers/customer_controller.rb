@@ -4,6 +4,7 @@ require 'models_filter.rb'
 require 'dates_helper.rb'
 require 'customer_helper.rb'
 require 'accounts_helper.rb'
+require 'lead_helper.rb'
 
 class CustomerController < ApplicationController
   before_action :confirm_logged_in
@@ -14,6 +15,7 @@ class CustomerController < ApplicationController
   include DatesHelper
   include CustomerHelper
   include AccountsHelper
+  include LeadHelper
 
   # NEW CUSTOMER PAGE
   def contact
@@ -29,6 +31,12 @@ class CustomerController < ApplicationController
     @staffs = Staff.active_sales_staff.order_by_order
     customers = filter(params, 'display_report')
     display_(params, customers)
+
+    # include Lead
+    unless @search_text.nil? || @search_text == ''
+      @leads, @search_text = lead_filter(params, @per_page)
+      @zomato = ZomatoRestaurant.unassigned.search_for(@search_text).paginate(per_page: @per_page, page: params[:page])
+    end
   end
 
   def new_customers
@@ -133,12 +141,23 @@ class CustomerController < ApplicationController
     # once you update using post request,
     # then want to update again, we need to use params[:customer][:id]
     @customer = Customer.include_all.filter_by_id(@customer_id || params[:customer][:id])
+
+    # google search function:
+    @search_text = params[:search]
+    unless @search_text.nil? || @search_text == ''
+      client = GooglePlaces::Client.new('AIzaSyBvfTZH0XCVEJQTgR9QDYt18XIeV5MIkPI')
+      @google_spots = client.spots_by_query(@search_text)
+    end
   end
 
   def update
     @customer = Customer.filter_by_id(params[:customer][:id])
     if @customer.update_attributes(customer_params)
       flash[:success] = 'Successfully Changed.'
+
+      customer_tag = CustomerTag.exist?('Customer', @customer.id).first
+      (customer_tag.nil?) ? CustomerTag.new.insert_customer(@customer) : customer_tag.update_record('Customer', @customer.id, @customer.actual_name)
+
       redirect_to action: 'summary',\
                   customer_id: params[:customer][:id],\
                   customer_name: Customer.customer_name(@customer.actual_name, @customer.firstname, @customer.lastname)
@@ -153,6 +172,7 @@ class CustomerController < ApplicationController
     staff_id = params[:staff_id]
 
     Customer.staff_change(staff_id, customer_id)
+    CustomerTag.exist?('Customer', customer_id).first.staff_change(Staff.find(staff_id).nickname)
     # render html: "#{customer_id}, #{staff_id}".html_safe
     flash[:success] = 'Staff Successfully Changed.'
     redirect_to request.referrer
@@ -223,8 +243,7 @@ class CustomerController < ApplicationController
     @per_page = params[:per_page] || ZomatoRestaurant.per_page
 
     order_function, direction = sort_order(params, :order_by_name, 'DESC')
-
-    @zomato = ZomatoRestaurant.search_for(@search_text).send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
+    @zomato = ZomatoRestaurant.unassigned.cuisine_search(params[:cuisine]).search_for(@search_text).send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
   end
 
   def near_by
@@ -233,7 +252,7 @@ class CustomerController < ApplicationController
     radius = params[:radius] || 0.5
 
     customer = Customer.where('lat IS NOT NULL').search_for(@search_text).first
-    customer = ZomatoRestaurant.search_for(@search_text).first if customer.nil?
+    customer = ZomatoRestaurant.unassigned.cuisine_search(params[:cuisine]).search_for(@search_text).first if customer.nil?
     customer = CustomerLead.where('latitude IS NOT NULL').search_for(@search_text).first if customer.nil?
     latitude = (customer.is_a? Customer) ? customer.lat : customer.latitude
     longitude = (customer.is_a? Customer) ? customer.lng : customer.longitude

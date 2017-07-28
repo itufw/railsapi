@@ -1,4 +1,6 @@
+require 'customer_helper.rb'
 module CalendarHelper
+  include CustomerHelper
 
   def user_full_right(_authority)
     return true if %w[Admin Management Accounts].include? session[:authority]
@@ -8,6 +10,29 @@ module CalendarHelper
   def sales_last_order(params)
     return 'Last_Order' if ((params["filter_selector"].nil?) || ("".eql?params["filter_selector"]) ||  ("Last_Order".eql?params["filter_selector"]))
     'Sales'
+  end
+
+  def get_lead_pins(staff_id, center_point = nil)
+    return nil if staff_id.nil?
+    leads = CustomerLead.filter_by_staff(staff_id).where('latitude IS NOT NULL').active_lead
+    # center_point = Geocoder::Calculations.geographic_center(leads) if center_point.nil?
+    # restaurants = ZomatoRestaurant.near(center_point, 50, units: :km).select{|x| x}
+
+    lead_hash = Gmaps4rails.build_markers(leads) do |lead, marker|
+      marker.lat lead.latitude
+      marker.lng lead.longitude
+      marker.picture({
+                        :url    => ActionView::Base.new.image_path('map_icons/lead_black.png'),
+                        :width  => 30,
+                        :height => 30
+                       })
+      marker.infowindow link_to "lead:" + lead.actual_name, controller: 'lead', action: 'summary', lead_id: lead.id
+      marker.json ({
+        :lead_id => lead.id,
+        })
+    end
+    # _, lead_hash, _ = marks_by_distance([], leads, [])
+    lead_hash
   end
 
   def map_filter(params, colour_guide, colour_range_origin, sale_or_day)
@@ -205,8 +230,8 @@ module CalendarHelper
   end
 
   def get_events_pins(events)
-    customers = Customer.select("lat AS latitude, lng AS longitude, customers.*").filter_by_ids(events.map(&:customer_id).uniq.compact)
-    leads = CustomerLead.filter_by_ids(events.map(&:customer_lead_id).uniq.compact)
+    customers = Customer.select("lat AS latitude, lng AS longitude, customers.*").where('lat IS NOT NULL').filter_by_ids(events.map(&:customer_id).uniq.compact)
+    leads = CustomerLead.filter_by_ids(events.map(&:customer_lead_id).uniq.compact).where('latitude IS NOT NULL')
 
     event_map = {}
     events.each do |event|
@@ -236,9 +261,7 @@ module CalendarHelper
                                 <br/><br/>
                                 <p>#{event[event_id]['infowindow']}<p>"
       else
-        marker.infowindow "<a href=\"http://188.166.243.138/customer/summary?customer_id=#{event[event_id]['customer_id']}&customer_name=#{event[event_id]['name']}\">#{event[event_id]['name']}</a>
-                                <br/><br/>
-                                <p>#{event[event_id]['infowindow']}<p>"
+        marker.infowindow link_to event[event_id]['name'].to_s + "\n" + event[event_id]['infowindow'].to_s, controller: 'customer', action: 'summary', customer_id: event[event_id]['customer_id'], customer_name: event[event_id]['name']
       end
       marker.json({
         date: event[event_id]['date'],
@@ -324,9 +347,7 @@ module CalendarHelper
                         :width  => 30,
                         :height => 30
                        })
-      marker.infowindow "<a href=\"http://188.166.243.138/customer/summary?customer_id=#{customer_id}&customer_name=#{customer_map[customer_id]["name"]}\">#{customer_map[customer_id]["name"]}</a>
-                              <br/><br/>
-                              <p>#{customer_map[customer_id]["infowindow"]}<p>"
+      marker.infowindow link_to customer_map[customer_id]["name"].to_s + "\n" + customer_map[customer_id]["infowindow"].to_s, controller: 'customer', action: 'summary', customer_id: customer_id, customer_name: customer_map[customer_id]["name"]
       marker.json ({
         :customer_id => customer_id,
         :staff_id => customer_map[customer_id]['staff_id']

@@ -25,6 +25,7 @@
     <% end %>
   <% end %>
 </div>
+
 <br/><br/>
   <div class="row">
     <div class="col-md-8 lead_form">
@@ -33,16 +34,7 @@
     </div>
 
     <div class="col-md-4 customer_leads_field">
-      <div class="lead_pictures">
-        <%= render 'lead_partials/lead_pictures', spot: spot%>
-      </div>
-
-      <!-- map -->
-      <script src="//maps.google.com/maps/api/js?key=AIzaSyB1HFWQ1DigWTnXGn_ZaUOk-v8hgGF3moI"></script>
-      <script src="//cdn.rawgit.com/mahnunchik/markerclustererplus/master/dist/markerclusterer.min.js"></script>
-      <div style='width: 400px;'>
-        <div id="map" style='width: 400px; height: 400px;'></div>
-      </div>
+      <%= render 'partials/google_img_map', spot: spot, size: 400%>
     </div>
 
   </div>

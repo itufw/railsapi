@@ -12,7 +12,7 @@ class CustomerLead < ActiveRecord::Base
   belongs_to :staff
 
   geocoded_by :address
-  after_validation :geocode
+  after_validation :geocode, if: ->(obj){ obj.address.present? and obj.address_changed?}
 
   reverse_geocoded_by :latitude, :longitude
   after_validation :reverse_geocode
@@ -46,7 +46,7 @@ class CustomerLead < ActiveRecord::Base
   end
 
   def self.filter_by_staff(staff_id)
-    return where(:staff_id => staff_id) unless (staff_id.nil? && staff_id.blank?)
+    return where(staff_id: staff_id) unless (staff_id.nil? && staff_id.blank?)
     all
   end
 

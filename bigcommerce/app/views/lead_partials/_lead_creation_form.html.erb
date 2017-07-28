@@ -1,6 +1,9 @@
     <% customer_lead = CustomerLead.new if customer_lead.nil? %>
     <%= form_for customer_lead, url: {action: "create_leads_handler"}, method: "POST", html: {class: "form-group", style: "padding-left: 50px;"} do |f| %>
-
+    <% url = (spot.nil?) ? '' : "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + spot.photos.first.photo_reference + "&key=AIzaSyBvfTZH0XCVEJQTgR9QDYt18XIeV5MIkPI"%>
+    <% place_id = (spot.nil?) ? '' : spot.id %>
+    <%= f.hidden_field :featured_image, value: url%>
+    <%= f.hidden_field :google_place_id, value: place_id%>
     <div id="selector" class="btn-group">
       <button type="button" class="btn btn-default <%= 'active' if @customer_lead_button %>" value="customer">Customer Lead</button>
       <button type="button" class="btn btn-default <%= 'active' unless @customer_lead_button %>" value="region">Region Lead</button>

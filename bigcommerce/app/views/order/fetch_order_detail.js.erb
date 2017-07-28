@@ -1,0 +1,3 @@
+shippment.html('<%=j render 'partials/shipping', order_id: @order_id %>');
+<% order = Order.find(@order_id)%>
+product_list.html('<%=j render "partials/order_product", order_products: order.order_products, cust_id: order.customer_id, cust_name: customer_name(order.customer) %>')
