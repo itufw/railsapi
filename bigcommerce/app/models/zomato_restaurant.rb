@@ -36,7 +36,13 @@ class ZomatoRestaurant < ActiveRecord::Base
   end
 
   def self.cuisine_search(cuisine)
-    return where("cuisines Like '%#{cuisine.strip}%'") unless cuisine.nil?
+    return where("cuisines Like '%#{cuisine.strip}%'") if cuisine.is_a? String
+    if ((cuisine.is_a?Array) && (!cuisine.blank?))
+      query = cuisine.join("%' OR cuisines LIKE '%")
+      query += "%'"
+      query = "cuisines LIKE '%" + query
+      return where(query)
+    end
     all
   end
 end

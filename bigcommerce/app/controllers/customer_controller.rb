@@ -239,11 +239,14 @@ class CustomerController < ApplicationController
   end
 
   def zomato
+    @selected_cuisine = params[:selected_cuisine] || []
+    @selected_cuisine.map(&:strip)
+
     @search_text = params['search']
     @per_page = params[:per_page] || ZomatoRestaurant.per_page
 
     order_function, direction = sort_order(params, :order_by_name, 'DESC')
-    @zomato = ZomatoRestaurant.unassigned.cuisine_search(params[:cuisine]).search_for(@search_text).send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
+    @zomato = ZomatoRestaurant.unassigned.cuisine_search(@selected_cuisine).search_for(@search_text).send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
   end
 
   def near_by

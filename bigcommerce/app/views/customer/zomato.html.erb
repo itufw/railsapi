@@ -2,9 +2,26 @@
 <h3>Zomato</h3>
 <%= form_tag({controller: "customer", action: 'zomato'}, {:method => "get"}) do %>
   <div class="form-group" style="margin-left:300px;margin-top:50px;">
-  	<%= render "partials/zomato_filter" %>
-  	<%= submit_tag "Filter", class: 'btn btn-primary' %>
+    <div class="row">
+      <%= render "partials/zomato_filter" %>
+      <div class="col-xs-2">
+        <%= label(:cuisine_selection, 'Select Cuisine', class: 'btn btn-primary')%>
+      </div>
+      <%= submit_tag "Filter", class: 'btn btn-primary' %>
+    </div>
+    <div class="row cuisine-list" style="display: none;">
+      <% ZomatoCuisine.active_cuisines.each do |cuisine| %>
+        <div class="col-xs-2">
+          <%= check_box_tag 'selected_cuisine[]', cuisine.name, (@selected_cuisine.include? cuisine.name) %><%= cuisine.name%>
+        </div>
+      <% end %>
+    </div>
   </div>
   <%= render 'customer_partials/zomato_list', zomatos: @zomato%>
 
 <% end %>
+<script type="text/javascript">
+  $('label[for*=cuisine_selection]').click(function(){
+    $('.cuisine-list').toggle();
+  });
+</script>
