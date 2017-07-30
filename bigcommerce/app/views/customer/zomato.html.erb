@@ -16,7 +16,7 @@
       <div class="row">
         <% cuisines.select{ |x| x.priority_group == priority}.each do |cuisine| %>
             <div class="col-xs-2">
-              <%= check_box_tag 'selected_cuisine[]', cuisine.name, (@selected_cuisine.include? cuisine.name), class: "priority-" + priority.to_s %><%= cuisine.name%>
+              <%= check_box_tag 'selected_cuisine[]', cuisine.name, (@selected_cuisine.include? cuisine.name), class: "priority priority-" + priority.to_s %><%= cuisine.name%>
             </div>
         <% end %>
         <label class="btn btn-primary" for="select_all">Select All</label>
@@ -34,9 +34,10 @@
   });
 
   $('label[for*=select_all]').click(function(){
-    checkboxes = $(this).parent().find('[class*=priority-]');
+    checkboxes = $(this).parent().find('.priority');
     flag = !checkboxes[0].checked;
-    for(var checkbox in checkboxes)
-        checkbox.checked = flag;
+    for(var i = 0; i < checkboxes.length; i ++){
+      checkboxes[i].checked = flag;
+    }
   });
 </script>
