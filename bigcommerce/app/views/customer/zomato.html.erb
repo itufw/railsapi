@@ -26,6 +26,7 @@
               <%= check_box_tag 'selected_cuisine[]', cuisine.name, (@selected_cuisine.include? cuisine.name), class: "priority-" + priority.to_s %><%= cuisine.name%>
             </div>
         <% end %>
+        <label class="btn btn-primary" for="select_all">Select All</label>
       </div>
       <br/>
       <% end %>
@@ -37,5 +38,13 @@
 <script type="text/javascript">
   $('label[for*=cuisine_selection]').click(function(){
     $('.cuisine-list').toggle();
+  });
+
+  $('label[for*=select_all]').click(function(){
+    checkboxes = $(this).parent().find('[class*=priority-]');
+    flag = !checkboxes[0].checked;
+    for(var checkbox in checkboxes)
+        checkbox.checked = flag;
+    }
   });
 </script>
