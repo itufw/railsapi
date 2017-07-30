@@ -1,12 +1,5 @@
 <%= title 'Zomato Restaurant List'%>
 <h3>Zomato</h3>
-<script type="text/javascript">
-  // function select_all(priority) {
-  //   checkboxes = $('.priority-' + priority);
-  //   for(var checkbox in checkboxes)
-  //     checkbox.checked = this.checked;
-  // }
-</script>
 
 <%= form_tag({controller: "customer", action: 'zomato'}, {:method => "get"}) do %>
   <div class="form-group" style="margin-left:300px;margin-top:50px;">
@@ -45,6 +38,5 @@
     flag = !checkboxes[0].checked;
     for(var checkbox in checkboxes)
         checkbox.checked = flag;
-    }
   });
 </script>
