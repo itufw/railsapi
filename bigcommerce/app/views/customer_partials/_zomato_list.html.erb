@@ -27,7 +27,7 @@
 		<% else %>
 			<td>
 				<% lead = z.customer_lead %>
-				<% top_task = Task.select("tasks.id, tasks.subject_1, tasks.end_date").lead_tasks(lead.id).where('response_staff != 26').active_tasks.order(:end_date).first %>
+				<% top_task = Task.select("tasks.id, tasks.start_date, tasks.subject_1, tasks.end_date").lead_tasks(lead.id).where('response_staff != 26').active_tasks.order(:end_date).first %>
 				<p class="lead"><%= link_to lead.actual_name, controller: 'lead', action: 'summary', lead_id: lead.id, lead_name: lead.actual_name %></p>
 				<p><%= TaskSubject.find(top_task.subject_1).subject.to_s + '  ' + top_task.start_date.strftime('%d/%m') unless top_task.nil? || top_task.blank? %></p>
 			</td>
