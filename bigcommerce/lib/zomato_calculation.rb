@@ -25,8 +25,6 @@ module ZomatoCalculation
       match.save
       count_lead += 1
     end
-    puts count
-    puts count_lead
   end
 
   def filter_viewed_spots
