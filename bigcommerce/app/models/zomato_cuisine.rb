@@ -5,4 +5,7 @@ class ZomatoCuisine < ActiveRecord::Base
   def self.inactive_cuisines
     where(active: 0)
   end
+  def self.filter_priority(priority)
+    where(priority_group: priority)
+  end
 end
