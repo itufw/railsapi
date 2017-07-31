@@ -19,10 +19,10 @@
 			<td></td>
 		<% elsif !z.customer_id.nil?%>
 			<% customer = z.customer %>
-			<% top_task = Task.select("tasks.id, tasks.subject_1, tasks.end_date").customer_tasks(customer.id).where('response_staff != 26').active_tasks.order(:end_date).first %>
+			<% top_task = Task.select("tasks.id, tasks.start_date, tasks.subject_1, tasks.end_date").customer_tasks(customer.id).where('response_staff != 26').active_tasks.order(:end_date).first %>
 			<td>
 				<p class="customer"><%= link_to customer.actual_name, controller: 'customer', action: 'summary', customer_id: customer.id, customer_name: customer.actual_name %></p>
-				<p><%= TaskSubject.find(top_task.subject_1).subject unless top_task.nil? || top_task.blank? %></p>
+				<p><%= TaskSubject.find(top_task.subject_1).subject + '  ' + top_task.start_date.strftime('%d/%m') unless top_task.nil? || top_task.blank? %></p>
 			</td>
 		<% else %>
 			<td>
