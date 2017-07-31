@@ -11,7 +11,7 @@ module ZomatoCalculation
     count = 0
     count_lead = 0
     customers.each do |customer|
-      match = ZomatoRestaurant.where("name LIKE \"%#{customer.firstname}%\" AND ABS(latitude - #{customer.lat}) < 0.0002 AND ABS(longitude - #{customer.lng}) < 0.0002").first
+      match = ZomatoRestaurant.where("(name LIKE \"%#{customer.firstname}%\" OR name Like \"%#{customer.lastname}%\") AND ABS(latitude - #{customer.lat}) < 0.0002 AND ABS(longitude - #{customer.lng}) < 0.0002").first
       next if match.nil?
       match.customer_id = customer.id
       match.save
@@ -19,12 +19,14 @@ module ZomatoCalculation
     end
 
     leads.each do |lead|
-      match = ZomatoRestaurant.where("name LIKE \"%#{lead.firstname}%\" AND ABS(latitude - #{lead.latitude}) < 0.0002 AND ABS(longitude - #{lead.longitude}) < 0.0002").first
+      match = ZomatoRestaurant.where("(name LIKE \"%#{lead.firstname}%\" OR name LIKE \"%#{lead.lastname}%\") AND ABS(latitude - #{lead.latitude}) < 0.0002 AND ABS(longitude - #{lead.longitude}) < 0.0002").first
       next if match.nil?
       match.customer_lead_id = lead.id
       match.save
       count_lead += 1
     end
+    puts count
+    puts count_lead
   end
 
   def filter_viewed_spots
