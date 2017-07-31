@@ -17,7 +17,7 @@
 		<td><a href="<%= z.url%>"><%=z.name%></a></td>
 		<% if z.customer_id.nil? && z.customer_lead_id.nil?%>
 			<td></td>
-		<% elsif z.customer_lead_id.nil?%>
+		<% elsif !z.customer_id.nil?%>
 			<% customer = z.customer %>
 			<% top_task = Task.select("tasks.id, tasks.subject_1, tasks.end_date").customer_tasks(customer.id).where('response_staff != 26').active_tasks.order(:end_date).first %>
 			<td>
