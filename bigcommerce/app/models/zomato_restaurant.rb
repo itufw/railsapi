@@ -35,6 +35,10 @@ class ZomatoRestaurant < ActiveRecord::Base
     where(customer_id: nil, customer_lead_id: nil)
   end
 
+  def self.assigned
+    where('customer_id IS NOT NULL OR customer_lead_id IS NOT NULL')
+  end
+
   def self.cuisine_search(cuisine)
     return where("cuisines Like '%#{cuisine.strip}%'") if cuisine.is_a? String
     if ((cuisine.is_a?Array) && (!cuisine.blank?))
