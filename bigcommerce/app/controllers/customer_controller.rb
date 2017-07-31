@@ -35,7 +35,7 @@ class CustomerController < ApplicationController
     # include Lead
     unless @search_text.nil? || @search_text == ''
       @leads, @search_text = lead_filter(params, @per_page)
-      @zomato = ZomatoRestaurant.unassigned.search_for(@search_text).paginate(per_page: @per_page, page: params[:page])
+      @zomato = ZomatoRestaurant.search_for(@search_text).paginate(per_page: @per_page, page: params[:page])
     end
   end
 
