@@ -20,6 +20,7 @@
 	</thead>
 	<% orders.each do |order| %>
 	<tr class='odd'>
+		<% next if order.staff.nil? %>
 		<%= render "partials/staff_update_form", customer: order.customer, staff: order.staff, can_update_staff: allow_to_update(session[:user_id]) %>
 
 		<td><%= date_format_orders(order.date_created) %></td>

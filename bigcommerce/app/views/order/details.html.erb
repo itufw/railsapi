@@ -1,9 +1,40 @@
 <%= title "Order # " + @order_id %>
 <h3>Order #<%= @order_id %></h3>
+<center>
+  <%= link_to '<i class="glyphicon glyphicon-edit" title="Edit!"></i>'.html_safe, action: 'order_update', order_id: @order_id %>
+  <%= link_to '<i class="glyphicon glyphicon-print" title="Print Invoice!"></i>'.html_safe, action: 'generate_invoice', order_id: @order_id%>
+  <%= link_to '<i class="glyphicon glyphicon-hand-right" title="History!"></i>'.html_safe, action: 'order_history', order_id: @order_id%>
+</center>
 
 <%= render "partials/order", orders: @order, display_class: "none", product_ids: nil %>
 
 <%= render "partials/order_product", order_products: @order.first.order_products, cust_id: @order.first.customer_id, cust_name: customer_name(@order.first.customer) %>
+
+<div class="status-change">
+    <%= form_for @order.first, :url => {:controller => "status", :action => "status_update"}, :method => 'get' do |f| %>
+    <%= f.hidden_field :id %>
+    <%= hidden_field_tag 'selected_orders[]', @selected_orders unless @selected_orders.nil? || @selected_orders.blank?%>
+    <div class="row" style="margin: auto;">
+      <div class="col-xs-2">
+        <%= label(:status, 'Status: ')%>
+        <%= f.collection_select :status_id, Status.can_update, :id, :name, {}, {class: "status-selection", style: 'width: 80px'} %>
+      </div>
+      <div class="col-xs-2">
+        <%= label(:courier, 'Courier Status: ')%>
+        <%= f.collection_select :courier_status_id, CourierStatus.all, :id, :name, {}, {class: "courier-selection", style: 'width: 80px'} %>
+      </div>
+      <div class="col-xs-2">
+        <%= label(:account, 'Account Status: ')%>
+        <%= f.collection_select :account_status, ['Approved', 'Partially Paid', 'Unpaid', 'Paid', 'Hold-Account'], :to_s, :to_s, {}, {class: "account-selection", style: 'width: 80px'} %>
+      </div>
+    </div>
+    <div class="row" style="margin: auto;">
+        <%= submit_tag 'Update Status', class: 'btn btn-primary', comfirmation: 'Do you want to update the status of this order?'%>
+        <%= submit_tag 'Update and Next', class: 'btn btn-primary', comfirmation: 'Do you want to update the status of this order and move to the next?' unless @selected_orders.nil? || @selected_orders.blank?%>
+        <%= submit_tag 'Next', class: 'btn btn-primary' unless @selected_orders.nil? || @selected_orders.blank?%>
+    </div>
+    <% end %>
+</div>
 
 <div class="well panel-default panel" style="margin-top:20px;margin-left:100px;width:30%;float:left;">
   <h4 class="panel-heading">Customer Notes</h4>
@@ -14,6 +45,7 @@
   <h4 class="panel-heading">Staff Notes</h4>
   <div class="panel-body"><%= @order.first.staff_notes %></div>
 </div>
+
 
 <div class="container">
   <div class="row">

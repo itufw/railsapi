@@ -5,7 +5,7 @@ class ActivityController < ApplicationController
   before_action :confirm_logged_in
 
   autocomplete :product, :name, full: true
-  autocomplete :customer, :actual_name, full: true
+  autocomplete :customer, :actual_name, full: true, extra_data: [:address]
   autocomplete :customer_lead, :actual_name, full: true, scopes: :not_customer
   autocomplete :contact, :name, display_value: :display_position, scopes: :has_role
   autocomplete :staff, :nickname, extra_data: [:nickname]

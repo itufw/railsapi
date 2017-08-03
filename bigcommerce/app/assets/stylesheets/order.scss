@@ -44,3 +44,18 @@
 .Manual-Check-Required {
   color: red;
 }
+
+.status-inactive {
+  display: none;
+  cursor: not-allowed;
+}
+
+.status-active {
+  display: inline;
+}
+
+textarea {
+  -webkit-box-sizing: border-box; /* <=iOS4, <= Android  2.3 */
+   -moz-box-sizing: border-box; /* FF1+ */
+        box-sizing: border-box; /* Chrome, IE8, Opera, Safari 5.1*/
+}
