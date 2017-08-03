@@ -1,10 +1,8 @@
-<span class="orders-view default">
-	<%= render "partials/form_paginate", objects: orders %>
-</span>
 <% can_update_staff = allow_to_update(session[:user_id]) %>
 <table class="table table-striped table-bordered table-hover table-responsive orders-view default" id="orders-view-table">
 	<thead>
 		<tr>
+			<th class="multi-select"><input type="checkbox" name="selected_all" class="selected_all_checkbox"></th>
 			<th>Order Id
 				<%= render "partials/sort_arrows", order: 'order_by_id' %></th>
 			<th>Date</th>
@@ -26,12 +24,15 @@
 
 	<% orders.each do |order| %>
 	<tr>
+		<td class="multi-select"><%= check_box_tag 'selected_orders[]', order.id, false, class: "orders_checkbox" %></td>
 		<td><%= link_to order.id, controller: 'order', action: 'details', order_id: order.id %></td>
 		<td><%= date_format_orders(order.date_created) %></td>
 
 		<% cust_name = customer_name(order.customer) %>
 		<td><%= link_to cust_name, controller: 'customer', action: 'summary', customer_id: order.customer_id, customer_name: cust_name %></td>
-		<td><%= order_status(order.status)%></td>
+
+		<td class="<%= order.status.name.split.join('-')%>"><%= order.status.name %></td>
+
 		<% shipping_description = shipping_status(order.id) %>
 		<td class=<%= shipping_description.split().join('-') %>><%= shipping_description %></td>
 		<td class=<%= display_class + " num " %>><%= product_qty(product_ids, order.id) %></th>
@@ -42,42 +43,15 @@
 		<% invoice_status = invoice_status(order.xero_invoice) %>
 		<td class=<%= invoice_status[0].downcase %>><%= invoice_status[0] %></td>
 	</tr>
-	<tr data-href="<%= fetch_order_detail_path(order_id: order.id) %>">
-		<td colspan="4">
-			<div class="shippment"></div>
-		</td>
-		<td colspan="5">
-			<div class="product-list"></div>
-		</td>
-	</tr>
 	<% end %>
 </table>
 
-<span class="orders-view default" stye="float:right;">
-	<%= paginate(orders) %>
-</span>
-
-<script>
-$("#orders-view-table tr:odd").addClass("odd");
-$("#orders-view-table tr:not(.odd)").hide();
-$("#orders-view-table tr:first-child").show();
-
-var shippment = null;
-var product_list = null;
-
-$("#orders-view-table tr.odd").click(function () {
-    var trToToggle = $(this).next("tr");
-    $("#orders-view-table tbody tr:not(.odd)").not(trToToggle).hide();
-		shippment = trToToggle.find('div.shippment');
-		product_list = trToToggle.find('div.product-list');
-
-		var link = trToToggle.data('href');
-		$.ajax({
-				type: 'GET',
-				url: link
-		});
-
-    $(trToToggle).toggle();
-    $(this).find(".arrow").toggleClass("up");
-});
+<script type="text/javascript">
+	$('.selected_all_checkbox').change(function(){
+		var flag = this.checked;
+		var checkboxes = $('.orders_checkbox');
+		for(var i = 0; i < checkboxes.length; i++){
+			checkboxes[i].checked = flag;
+		}
+	});
 </script>

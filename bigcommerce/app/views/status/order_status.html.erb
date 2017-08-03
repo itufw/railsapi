@@ -1,0 +1,50 @@
+<%= title @status_name %>
+<h3 id="orders-view-heading"><%= @status_name %> Orders</h3>
+<%= render "partials/status_dropdown", path_name: 'order_status' %>
+<br/>
+<%= form_tag({:controller => "status", :action => "order_status"}, {:method => "get"}) do %>
+<div class="form-group" style="margin-top:100px;">
+
+    <div class="col-xs-3 col-xs-offset-3">
+        <%= text_field_tag('search', @search_text, placeholder: 'Search for Customer Name', class: 'form-control') %>
+    </div>
+    <%= render "partials/staff_filter" %>
+
+    <%= hidden_field_tag :status_id, @status_id %>
+    <%= hidden_field_tag :status_name, @status_name %>
+
+    <%= submit_tag "Filter", class: 'btn btn-primary' %>
+</div><br/>
+<span>
+  <%= paginate(@orders) %>
+</span>
+<% end %>
+<%= form_tag({:controller => "status", :action => "status_check"}, {:method => "get"}) do %>
+  <div class="row" style="margin: auto;">
+    <div class="col-xs-1 col-centered Created status-inactive">
+      <%= submit_tag "Approval", class: 'btn btn-primary' %>
+    </div>
+    <div class="col-xs-1 col-centered Approved status-inactive">
+      <%= submit_tag "Picking", class: 'btn btn-primary'%>
+    </div>
+    <div class="col-xs-1 col-centered Approved Picking status-inactive">
+      <%= submit_tag "Ready", class: 'btn btn-primary'%>
+    </div>
+    <div class="col-xs-1 col-centered Approved Picking Ready status-inactive">
+      <%= submit_tag "Shipping", class: 'btn btn-primary'%>
+    </div>
+    <div class="col-xs-1 col-centered Shipped status-inactive">
+      <%= submit_tag "Delivered", class: 'btn btn-primary'%>
+    </div>
+    <div class="col-xs-1 col-centered">
+      <%= submit_tag "Hold", class: 'btn btn-primary'%>
+    </div>
+  </div>
+
+  <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
+
+  <script type="text/javascript">
+    $('.status-inactive.' + '<%= @status_name%>').removeClass('status-inactive').addClass('status-active');
+  </script>
+
+<% end %>
