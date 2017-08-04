@@ -80,7 +80,7 @@ class AdminController < ApplicationController
 
     def xero_sync
         start_time = Time.now.utc
-        Revision.xero.update_end_time(start_time)
+        Revision.xero.update_end_time
         xero = XeroController.new
         xero.update_xero_contacts
         xero.update_xero_invoices
