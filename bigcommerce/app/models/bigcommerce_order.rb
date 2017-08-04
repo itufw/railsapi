@@ -18,7 +18,7 @@ class BigcommerceOrder < ActiveRecord::Base
 
       orders.each do |o|
         insert_or_update(o, 1)
-        order_product.insert(o.id)
+        order_product.insert(o.id, nil)
       end
 
       page_number += 1
@@ -49,19 +49,20 @@ class BigcommerceOrder < ActiveRecord::Base
           # OrderProductHistory.new.insert(last_insert_id, o.id)
 
           # Update Order Table
-          insert_or_update(o, 0)
+          # order from new order table
+          order, order_history = insert_or_update(o, 0)
 
           # doing a delete - insert instead of a select - update
           # because select - update doesnt work when product gets deleted
 
           # Update Order Product table
           order_product.delete(o.id)
-          order_product.insert(o.id)
+          order_product.insert(o.id, order_history)
 
         else
           # insert a new one
-          insert_or_update(o, 1)
-          order_product.insert(o.id)
+          order, _ = insert_or_update(o, 1)
+          order_product.insert(o.id, nil)
         end
         Address.new.insert_or_update(o.billing_address, o.customer_id, o.id)
       end
@@ -120,6 +121,8 @@ class BigcommerceOrder < ActiveRecord::Base
       # insert the billing adress where the id is order_id
       Address.new.insert_or_update(o.billing_address, o.customer_id, o.id)
 
+      order = Order.new.import_from_bigcommerce(o)
+      order_history = nil
     else
       sql = "UPDATE bigcommerce_orders SET customer_id = '#{o.customer_id}', date_created = '#{date_created}',\
 					date_modified = '#{date_modified}', date_shipped = '#{date_shipped}', status_id = '#{o.status_id}',\
@@ -136,7 +139,10 @@ class BigcommerceOrder < ActiveRecord::Base
       # if o.status_id == 10
       #   OrderAction.new.order_paid(o.id)
       # end
+      order = Order.where("source = 'bigcommerce' AND source_id = ?", o.id).first
+      order, order_history = order.update_from_bigcommerce(o)
     end
     ActiveRecord::Base.connection.execute(sql)
+    [order, order_history]
   end
 end

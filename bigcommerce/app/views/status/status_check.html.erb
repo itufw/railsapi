@@ -20,6 +20,7 @@
 <% else %>
   <%= form_tag({:controller => "order", :action => "details"}, {:method => "get"}) do %>
     <%= hidden_field_tag :status_name, @status_name%>
+    <%= hidden_field_tag :status_id, @status_id%>
     <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
     <%= submit_tag 'Check', class: 'btn btn-primary'%>
   <% end %>

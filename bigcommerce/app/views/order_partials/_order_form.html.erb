@@ -128,7 +128,7 @@
   $('#product_search').bind('railsAutocomplete.select', function(event, data){
     if($('#tr_' + data.item.id).length == 0){
       $('.product-table tbody.product-list').append([
-        '<tr>',
+        '<tr id="tr_'+ data.item.id +'">',
             '<td>'+ data.item.id +'</td>',
             '<td>'+ data.item.label +'</td>',
             '<td>'+ data.item.inventory +'</td>',
@@ -209,7 +209,7 @@
       $('button.disabled').show();
     };
   }
-  
+
   $(document).on('input', valid_check);
   $(document).on('click', valid_check);
 </script>

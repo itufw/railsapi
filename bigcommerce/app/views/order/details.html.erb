@@ -13,11 +13,12 @@
 <div class="status-change">
     <%= form_for @order.first, :url => {:controller => "status", :action => "status_update"}, :method => 'get' do |f| %>
     <%= f.hidden_field :id %>
+    <%= hidden_field_tag :status_id, @selected_status_id %>
     <%= hidden_field_tag 'selected_orders[]', @selected_orders unless @selected_orders.nil? || @selected_orders.blank?%>
     <div class="row" style="margin: auto;">
       <div class="col-xs-2">
         <%= label(:status, 'Status: ')%>
-        <%= f.collection_select :status_id, Status.can_update, :id, :name, {}, {class: "status-selection", style: 'width: 80px'} %>
+        <%= f.collection_select :status_id, Status.can_update, :id, :name, {selected: @selected_status_id || @order.first.status_id}, {class: "status-selection", style: 'width: 80px'} %>
       </div>
       <div class="col-xs-2">
         <%= label(:courier, 'Courier Status: ')%>
