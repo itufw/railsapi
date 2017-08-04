@@ -51,6 +51,7 @@ class OrderController < ApplicationController
     else
       @order_id = params[:selected_orders].delete_at(0)
       @selected_orders = params[:selected_orders]
+      @selected_status_id = params[:status_id]
     end
 
       @per_page = params[:per_page] || Order.per_page

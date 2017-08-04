@@ -44,6 +44,7 @@ class StatusController < ApplicationController
       return
     end
     @status_name = params[:commit]
+    @status_id = Status.where("alt_name LIKE '#{@status_name}'").first.id
     @orders = Order.order_filter_by_ids(selected_orders)
   end
 
@@ -73,12 +74,18 @@ class StatusController < ApplicationController
       orders.update_all(status_id: 9)
       redirect_to controller: 'status', action: 'order_status', status_id: 9, status_name: 'Ready' and return
     elsif !params[:order].nil?
-      order = Order.find(params[:order][:id])
       status = Status.find(params[:order][:status_id])
+      order = Order.find(params[:order][:id])
       # Approved, Partially Paid, Unpaid, Paid, Hold-Accounts
       account_status = params[:order][:account_status]
       if account_status == "Hold-Account" && status.in_transit == 1
         flash[:error] = "Account Hold for Order#" + order.id.to_s
+      elsif status.name == "Shipped"
+        redirect_to controller: 'status', action: 'ship_orders', order_id: order.id and return
+      elsif status.name == "Damaged"
+        redirect_to controller: 'status', action: 'damage_orders', order_id: order.id and return
+      elsif status.name == "Return Requested"
+        redirect_to controller: 'status', action: 'return_orders', order_id: order.id and return
       else
         order.assign_attributes(params[:order].permit(:status_id, :account_status, :courier_status_id))
         order.save
@@ -90,7 +97,7 @@ class StatusController < ApplicationController
     if selected_orders.blank?
       redirect_to controller: 'order', action: 'all' and return
     else
-      redirect_to controller: 'order', action: 'details', order_id: selected_orders.first, selected_orders: selected_orders
+      redirect_to controller: 'order', action: 'details', order_id: selected_orders.first, selected_orders: selected_orders, status_id: params[:status_id]
       return
     end
   end

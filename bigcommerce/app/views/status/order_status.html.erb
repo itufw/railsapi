@@ -20,26 +20,28 @@
 </span>
 <% end %>
 <%= form_tag({:controller => "status", :action => "status_check"}, {:method => "get"}) do %>
-  <div class="row" style="margin: auto;">
-    <div class="col-xs-1 col-centered Created status-inactive">
+<div class="container">
+  <div class="row">
+    <div class="col-xs-1 Created status-inactive">
       <%= submit_tag "Approval", class: 'btn btn-primary' %>
     </div>
-    <div class="col-xs-1 col-centered Approved status-inactive">
+    <div class="col-xs-1 Approved status-inactive">
       <%= submit_tag "Picking", class: 'btn btn-primary'%>
     </div>
-    <div class="col-xs-1 col-centered Approved Picking status-inactive">
+    <div class="col-xs-1 Approved Picking status-inactive">
       <%= submit_tag "Ready", class: 'btn btn-primary'%>
     </div>
-    <div class="col-xs-1 col-centered Approved Picking Ready status-inactive">
+    <div class="col-xs-1 Approved Picking Ready status-inactive">
       <%= submit_tag "Shipping", class: 'btn btn-primary'%>
     </div>
-    <div class="col-xs-1 col-centered Shipped status-inactive">
+    <div class="col-xs-1 Shipped status-inactive">
       <%= submit_tag "Delivered", class: 'btn btn-primary'%>
     </div>
-    <div class="col-xs-1 col-centered">
+    <div class="col-xs-1">
       <%= submit_tag "Hold", class: 'btn btn-primary'%>
     </div>
   </div>
+</div>
 
   <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
 

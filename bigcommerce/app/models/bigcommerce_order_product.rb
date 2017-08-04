@@ -1,5 +1,5 @@
 class BigcommerceOrderProduct < ActiveRecord::Base
-  def insert(order_id)
+  def insert(order_id, order_history)
 
     order_product_api = Bigcommerce::OrderProduct
     order_products = order_product_api.all(order_id)
@@ -7,6 +7,11 @@ class BigcommerceOrderProduct < ActiveRecord::Base
     if order_products.blank?
       return
     end
+
+    # New Order Table
+    order = Order.where("source = 'bigcommerce' AND source_id = ?", order_id).first
+    # Delete Products that no long exist in new order
+    OrderProduct.where('order_id = ? AND product_id NOT IN (?)', order.id, order_products.map(&:product_id)).map(&:delete_product) unless order_history.nil?
 
     order_products.each do |op|
       time = Time.now.to_s(:db)
@@ -19,6 +24,17 @@ class BigcommerceOrderProduct < ActiveRecord::Base
       created_at, updated_at) VALUES #{inserts_products}"
 
       ActiveRecord::Base.connection.execute(sql_products)
+
+      if order_history.nil?
+        OrderProduct.new.import_from_bigcommerce(order, op, order_history)
+      else
+        order_product = OrderProduct.where('order_id = ? AND product_id = ?', order.id, op.product_id)
+        if order_product.count > 0
+          order_product.first.import_from_bigcommerce(order, op, order_history)
+        else
+          OrderProduct.new.import_from_bigcommerce(order, op, nil)
+        end
+      end
 
     end
   end

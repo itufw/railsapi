@@ -4,6 +4,55 @@ class OrderProduct < ActiveRecord::Base
 
 	belongs_to :order_shipping
 
+	after_validation :stock_change, on: [:create, :update] if: ->(obj){ obj.stock_incremental.present? and obj.stock_incremental_changed?}
+
+	def import_from_bigcommerce(order, op, order_history)
+		unless order_history.nil? || self.id.nil?
+			product_attribuets = self.attributes
+			product_attribuets['order_history_id'] = order_history.id
+			product_history = OrderProductHistory.new(product_attribuets.reject{|key, value| ['id'].include?key})
+		  product_history.save
+		end
+
+		self.order_id = order.id
+		self.product_id = op.id
+		self.price_luc = op.base_price * 1.29
+		self.qty = op.quantity
+		self.discount = 0
+		self.price_discounted = self.price_luc
+		self.qty_shipped = op.quantity_shipped
+		self.base_price = op.base_price
+		self.order_discount = order.discount_rate
+		self.price_handling = 1.82
+		self.price_inc_tax = op.price_inc_tax
+		self.price_wet = op.base_price * 0.29
+		self.gst = op.price_inc_tax / 11
+		self.stock_previous = self.stock_current
+		self.stock_current = op.quantity
+		self.stock_incremental = self.stock_current - self.stock_previous.to_i
+		self.display = (self.current == 0) ? 0 : 1
+		self.damaged = 0
+		self.created_by = 34 if self.created_by.nil?
+		self.updated_by = 34
+		self.save
+		self
+	end
+
+	def delete_product
+		product_attribuets = self.attributes
+		product_attribuets['order_history_id'] = order_history.id
+		product_history = OrderProductHistory.new(product_attribuets.reject{|key, value| ['id'].include?key})
+		product_history.save
+
+		self.previous = self.stock_current
+		self.stock_current = 0
+		self.stock_incremental = 0 - self.previous
+		self.display = 0
+		self.updated_by = 34
+		self.save
+		self
+	end
+
 	# Inc Tax
 	def self.order_sum(order_products)
 		order_total = 0.0
@@ -139,5 +188,13 @@ class OrderProduct < ActiveRecord::Base
 
 	def self.min_price_inc_tax(min_price)
 		where("price_inc_tax > #{min_price}")
+	end
+
+	private
+	# inventory trigger
+	def stock_change
+		product = self.product
+		product.inventory = product.inventory + self.stock_incremental
+		product.save
 	end
 end
