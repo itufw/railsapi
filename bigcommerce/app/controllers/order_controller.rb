@@ -117,66 +117,44 @@ class OrderController < ApplicationController
 
 
     order = Order.find(params[:order][:id])
-    # Write Order into Order History
-    attributes = order.attributes
-    attributes['order_id'] = attributes['id']
-    order_history = OrderHistory.new(attributes.reject{|key, value| ['id'].include?key})
-    order_history.save
     products = order.order_products
 
-    product_histories = []
-    products.each do |product|
-      product_attribuets = product.attributes
-      product_attribuets['order_history_id'] = order_history.id
-      product_history = OrderProductHistory.new(product_attribuets.reject{|key, value| ['id'].include?key})
-      product_histories.append(product_history)
-    end
-
     order.assign_attributes(order_params)
-
-    order.staff_id = Customer.find(order.customer_id).staff_id
-    order.qty = products_params.values().map {|x| x['qty'].to_i }.sum
-    order.handling_cost = order.qty * handling_fee
-    order.last_updated_by = session[:user_id]
+    order_attributes = {'staff_id': Customer.find(order.customer_id).staff_id,\
+      'qty': products_params.values().map {|x| x['qty'].to_i }.sum,\
+      'handling_cost': products_params.values().map {|x| x['qty'].to_i }.sum * handling_fee,\
+      'last_updated_by': session[:user_id]}
+    order.assign_attributes(order_attributes)
 
     products_container = []
     products_params.each do |product_id, product_params|
       if products.map(&:product_id).include? product_id.to_i
+        # update
         product = products.where(product_id: product_id).first
         product.assign_attributes(product_params.permit(:price_luc, :qty, :discount, :price_discounted))
-
-        product.display = (product.qty == 0) ? 0 : 1
-        product.stock_previous = product.stock_current
-        product.stock_current = product.qty
-        product.stock_incremental = product.qty - product.stock_previous
+        product_attributes = {'display': (product.qty == 0) ? 0 : 1, 'stock_previous': product.stock_current,\
+          'stock_current': product.qty, 'stock_incremental': product.qty - product.stock_current,\
+          'order_discount': order.discount_rate, 'price_handling': handling_fee,\
+          'price_inc_tax': product.price_discounted * (1 + gst),\
+          'price_wet': (product.price_discounted / (1 + wet) - handling_fee) * wet,\
+          'price_gst': product.price_discounted * gst, 'updated_by': session[:user_id]}
       else
+        # insert
         product = OrderProduct.new(product_params.permit(:price_luc, :qty, :discount, :price_discounted))
-        product.product_id = product_id
-        product.order_id = order.id
-
-        product.qty_shipped = 0
-        product.base_price = product.price_luc / (1 + wet)
-
-        product.stock_previous = 0
-        product.stock_current = product.qty
-        product.stock_incremental = product.qty
-
-        product.display = 1
-        product.damaged = 0
-        product.created_by = session[:user_id]
+        product_attributes = {'product_id': prduct_id, 'order_id': order.id, 'qty_shipped': 0,\
+          'base_price': product.price_luc / (1 + wet), 'stock_previous': 0, 'stock_current': product.qty,\
+          'stock_incremental': product.qty, 'display': 1, 'damaged': 0, 'created_by': session[:user_id],\
+          'order_discount': order.discount_rate, 'price_handling': handling_fee,\
+          'price_inc_tax': product.price_discounted * (1 + gst),\
+          'price_wet': (product.price_discounted / (1 + wet) - handling_fee) * wet,\
+          'price_gst': product.price_discounted * gst, 'updated_by': session[:user_id]}
       end
-      product.order_discount = order.discount_rate
-      product.price_handling = handling_fee
-      product.price_inc_tax = product.price_discounted * (1 + gst)
-      product.price_wet = (product.price_discounted / (1 + wet) - handling_fee) * wet
-      product.price_gst = product.price_discounted * gst
-      product.updated_by = session[:user_id]
+      product.assign_attributes(product_attributes)
       products_container.append(product)
     end
 
-    products_container.map(&:save)
-    product_histories.map(&:save)
     order.save
+    products_container.map(&:save)
 
     flash[:success] = 'Edited'
     redirect_to action: 'details', order_id: order.id

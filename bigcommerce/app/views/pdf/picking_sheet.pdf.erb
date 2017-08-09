@@ -4,13 +4,24 @@
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 
 <div class="container">
-  <% orders.each do |order| %>
-    <div class="row">
-      <div class="col-xs-6">
-        <p><%= order.customer.actual_name %></p>
-        <p><%= order.address %></p>
-      </div>
-    </div>
-    <%= render "partials/order_product", order_products: order.order_products, cust_id: order.customer_id, cust_name: customer_name(order.customer) %>
-  <% end %>
+    <table class = "table table-striped table-bordered table-hover table-responsive">
+      <tr>
+    		<th>Product Name</th>
+    		<th>Quantity</th>
+    		<th>List Price Ex Tax</th>
+    		<th>Price Inc Tax</th>
+    		<th>Total</th>
+    	</tr>
+      <tr>
+        <% order_products.each do |product| %>
+        <tr>
+          <td><%= product.product.name %></td>
+          <td class="num"><%= product.qty %></td>
+          <td class="num"><%= product.product.calculated_price %></td>
+          <td class="num"><%= display_num(product.price_inc_tax) %></td>
+          <td class="num"><%= product.price_inc_tax * product.qty %></td>
+        </tr>
+        <% end %>
+      </tr>
+    </table>
 </div>

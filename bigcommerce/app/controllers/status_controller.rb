@@ -57,14 +57,9 @@ class StatusController < ApplicationController
     elsif "Print Picking Sheet" == params[:commit] && !selected_orders.blank?
       # Print Picking Sheet
       # Due to Rails redirect conflicts
-      orders = Order.where(id: selected_orders)
-      picking_sheet = WickedPdf.new.pdf_from_string(
-        render_to_string(
-            :template => 'pdf/picking_sheet.pdf',
-            :locals => {orders: orders }
-            )
-        )
-      send_data picking_sheet, filename: "picking_sheet_#{session[:username]}_#{Date.today.to_s}.pdf", type: :pdf and return
+      pdf = print_shipping_sheet(selected_orders)
+      send_data pdf.to_pdf, filename: "picking_sheet_#{session[:username]}_#{Date.today.to_s}.pdf" and return
+      
     elsif 'Picked' == params[:commit]
       orders = Order.where(id: selected_orders)
       orders.update_all(status_id: 8)
@@ -103,6 +98,17 @@ class StatusController < ApplicationController
   end
 
   def ship_orders
+    order_ids = params[:selected_orders] || []
+    order_ids.append(params[:order_id]) unless params[:order_id].nil?
+    @orders = Order.order_filter_by_ids(order_ids)
+  end
+
+  def damage_orders
+    p = c
+    # TODO
+  end
+
+  def return_orders
     p = c
     # TODO
   end

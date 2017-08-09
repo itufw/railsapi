@@ -19,6 +19,10 @@ class Order < ActiveRecord::Base
   belongs_to :order_history
   belongs_to :xero_invoice
 
+  before_validation :record_history, on: [:update, :delete], unless: ->(obj){ obj.xero_invoice_number_changed? or obj.xero_invoice_id_changed?}
+  after_validation :cancel_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id == 5}
+
+
   self.per_page = 30
 
   def import_from_bigcommerce(order)
@@ -39,11 +43,6 @@ class Order < ActiveRecord::Base
   end
 
   def update_from_bigcommerce(order)
-    attributes = self.attributes
-    attributes['order_id'] = attributes['id']
-    order_history = OrderHistory.new(attributes.reject{|key, value| ['id'].include?key})
-    order_history.save
-
     customer = Customer.find(order.customer_id)
     params = {'customer_id': order.customer_id, 'status_id': 11, 'staff_id': customer.staff_id,\
        'total_inc_tax': order.total_inc_tax, 'qty': order.items_total, 'items_shipped': order.items_shipped,\
@@ -57,7 +56,7 @@ class Order < ActiveRecord::Base
        'courier_status_id': 1, 'address': customer.address}
     self.assign_attributes(params)
     self.save
-    [self, order_history]
+    self
   end
 
   ############## FILTER FUNCTIONS ############
@@ -333,5 +332,33 @@ class Order < ActiveRecord::Base
   # WHERE DO I USE THIS?
   def self.filter_by_product(product_ids)
     includes(:products).where('products.id IN (?)', [product_ids]).references(:products)
+  end
+
+  private
+
+  def cancel_order
+    order_products = self.order_products
+    order_products.map(&:delete_product)
+  end
+
+  def record_history
+    order_attributes =  "('#{self.id_was}', '#{self.customer_id_was}', '#{self.status_id_was}',\
+    '#{self.courier_status_id_was}', '#{self.account_status_was}', '#{self.street_was}', '#{self.city_was}',\
+    '#{self.state_was}', '#{self.postcode_was}', '#{self.country_was}', '#{self.address_was}',\
+    '#{self.staff_id_was}', '#{self.total_inc_tax_was}', '#{self.qty_was}', '#{self.items_shipped_was}',\
+    '#{self.subtotal_was}', '#{self.discount_rate_was}', '#{self.discount_amount_was}',\
+    '#{self.handling_cost_was}', '#{self.shipping_cost_was}', '#{self.wrapping_cost_was}',\
+    '#{self.wet_was}', '#{self.gst_was}', '#{self.staff_notes_was}', '#{self.customer_notes_was}',\
+    '#{self.active_was}', '#{self.xero_invoice_id_was}', '#{self.xero_invoice_number_was}',\
+    '#{self.source_was}', '#{self.source_id_was}', '#{self.date_created_was.to_s(:db)}',\
+    '#{self.created_by_was}', '#{self.last_updated_by_was}', '#{self.created_at_was.to_s(:db)}', '#{self.updated_at_was.to_s(:db)}')"
+    sql = "INSERT INTO order_histories(order_id, customer_id, status_id, courier_status_id,\
+    account_status, street, city, state, postcode, country, address, staff_id,\
+    total_inc_tax, qty, items_shipped, subtotal, discount_rate, discount_amount,\
+    handling_cost, shipping_cost, wrapping_cost, wet, gst, staff_notes, customer_notes,\
+    active, xero_invoice_id, xero_invoice_number, source, source_id, date_created,\
+    created_by, last_updated_by, created_at, updated_at) VALUES #{order_attributes}"
+
+    ActiveRecord::Base.connection.execute(sql)
   end
 end
