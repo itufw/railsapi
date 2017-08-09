@@ -4,52 +4,25 @@ class OrderProduct < ActiveRecord::Base
 
 	belongs_to :order_shipping
 
-	after_validation :stock_change, on: [:create, :update] if: ->(obj){ obj.stock_incremental.present? and obj.stock_incremental_changed?}
+	before_validation :record_history, on: [:update, :delete]
+	after_validation :stock_change, on: [:create, :update], if: ->(obj){ obj.stock_incremental.present? and obj.stock_incremental_changed?}
 
-	def import_from_bigcommerce(order, op, order_history)
-		unless order_history.nil? || self.id.nil?
-			product_attribuets = self.attributes
-			product_attribuets['order_history_id'] = order_history.id
-			product_history = OrderProductHistory.new(product_attribuets.reject{|key, value| ['id'].include?key})
-		  product_history.save
-		end
-
-		self.order_id = order.id
-		self.product_id = op.id
-		self.price_luc = op.base_price * 1.29
-		self.qty = op.quantity
-		self.discount = 0
-		self.price_discounted = self.price_luc
-		self.qty_shipped = op.quantity_shipped
-		self.base_price = op.base_price
-		self.order_discount = order.discount_rate
-		self.price_handling = 1.82
-		self.price_inc_tax = op.price_inc_tax
-		self.price_wet = op.base_price * 0.29
-		self.gst = op.price_inc_tax / 11
-		self.stock_previous = self.stock_current
-		self.stock_current = op.quantity
-		self.stock_incremental = self.stock_current - self.stock_previous.to_i
-		self.display = (self.current == 0) ? 0 : 1
-		self.damaged = 0
-		self.created_by = 34 if self.created_by.nil?
-		self.updated_by = 34
+	def import_from_bigcommerce(order, op)
+		attributes = {'order_id': order.id, 'product_id': op.id, 'price_luc': op.base_price * 1.29,\
+			'qty': op.quantity, 'discount': 0, 'price_discounted': op.base_price * 1.29,\
+			'order_discount': order.discount_rate, 'price_handling': 1.82, 'price_inc_tax': op.price_inc_tax,\
+		  'price_wet': op.base_price * 0.29, 'gst': op.price_inc_tax / 11, 'stock_previous': self.stock_current,\
+		  'stock_current': op.quantity, 'stock_incremental': op.quantity - self.stock_current.to_i,\
+		  'display':(op.quantity == 0) ? 0 : 1, 'damaged': 0, 'created_by': 34, 'updated_by': 34}
+		self.assign_attributes(attributes)
 		self.save
 		self
 	end
 
 	def delete_product
-		product_attribuets = self.attributes
-		product_attribuets['order_history_id'] = order_history.id
-		product_history = OrderProductHistory.new(product_attribuets.reject{|key, value| ['id'].include?key})
-		product_history.save
-
-		self.previous = self.stock_current
-		self.stock_current = 0
-		self.stock_incremental = 0 - self.previous
-		self.display = 0
-		self.updated_by = 34
-		self.save
+		attributes = {'stock_previous': self.stock_current, 'stock_current': 0, 'stock_incremental': 0 - self.stock_current,\
+			'display': 0, 'updated_by': 34}
+		self.update_attributes(attributes)
 		self
 	end
 
@@ -193,8 +166,35 @@ class OrderProduct < ActiveRecord::Base
 	private
 	# inventory trigger
 	def stock_change
-		product = self.product
-		product.inventory = product.inventory + self.stock_incremental
-		product.save
+		sql = "UPDATE products SET inventory = inventory - '#{self.stock_incremental}' WHERE id = '#{self.product_id}'"
+		ActiveRecord::Base.connection.execute(sql)
+
+		if self.qty > 0
+			self.display = 1
+		else
+			self.display = 0
+		end
+		self.save
+	end
+
+	def record_history
+		order_history = OrderHistory.where(order_id: self.order_id).order('id DESC').first
+		return if order_history.nil?
+		order_history_id = order_history.id
+
+		product_attributes =  "('#{self.order_id_was}', '#{order_history.id}', '#{self.product_id_was}',\
+		'#{self.order_shipping_id_was.to_i}', '#{self.qty_was}', '#{self.qty_shipped_was}', '#{self.price_luc_was}',\
+		'#{self.base_price_was}', '#{self.discount_was}', '#{self.order_discount_was}', '#{self.price_handling_was}',\
+		'#{self.price_inc_tax_was}', '#{self.price_wet_was}', '#{self.price_gst_was}', '#{self.price_discounted_was}',\
+		'#{self.stock_previous_was}', '#{self.stock_current_was}', '#{self.stock_incremental_was}',\
+		'#{self.display_was}', '#{self.damaged_was}', '#{self.note_was}', '#{self.created_by_was}',\
+		'#{self.updated_by_was}', '#{self.created_at_was.to_s(:db)}', '#{self.updated_at_was.to_s(:db)}')"
+
+		sql = "INSERT INTO order_product_histories(order_id, order_history_id, product_id,\
+		order_shipping_id, qty, qty_shipped, price_luc, base_price, discount, order_discount,\
+		price_handling, price_inc_tax, price_wet, price_gst, price_discounted, stock_previous,\
+		stock_current, stock_incremental, display, damaged, note, created_by, updated_by,\
+		created_at, updated_at) VALUES #{product_attributes}"
+		ActiveRecord::Base.connection.execute(sql)
 	end
 end

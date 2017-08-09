@@ -98,6 +98,8 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.12.2)
+    combine_pdf (1.0.6)
+      ruby-rc4 (>= 0.1.5)
     concurrent-ruby (1.0.5)
     debug_inspector (0.0.2)
     declarative (0.0.9)
@@ -228,6 +230,7 @@ GEM
       rubyzip
       spreadsheet (> 0.6.4)
     ruby-ole (1.2.12)
+    ruby-rc4 (0.1.5)
     rubyzip (1.2.0)
     sass (3.4.23)
     sass-rails (5.0.6)
@@ -299,6 +302,7 @@ DEPENDENCIES
   bootsy
   byebug
   coffee-rails (~> 4.1.0)
+  combine_pdf
   filterrific
   fuzzy-string-match
   geocoder

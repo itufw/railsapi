@@ -50,18 +50,18 @@ class BigcommerceOrder < ActiveRecord::Base
 
           # Update Order Table
           # order from new order table
-          order, order_history = insert_or_update(o, 0)
+          order = insert_or_update(o, 0)
 
           # doing a delete - insert instead of a select - update
           # because select - update doesnt work when product gets deleted
 
           # Update Order Product table
           order_product.delete(o.id)
-          order_product.insert(o.id, order_history)
+          order_product.insert(o.id)
 
         else
           # insert a new one
-          order, _ = insert_or_update(o, 1)
+          order = insert_or_update(o, 1)
           order_product.insert(o.id, nil)
         end
         Address.new.insert_or_update(o.billing_address, o.customer_id, o.id)
@@ -122,7 +122,6 @@ class BigcommerceOrder < ActiveRecord::Base
       Address.new.insert_or_update(o.billing_address, o.customer_id, o.id)
 
       order = Order.new.import_from_bigcommerce(o)
-      order_history = nil
     else
       sql = "UPDATE bigcommerce_orders SET customer_id = '#{o.customer_id}', date_created = '#{date_created}',\
 					date_modified = '#{date_modified}', date_shipped = '#{date_shipped}', status_id = '#{o.status_id}',\
@@ -140,9 +139,9 @@ class BigcommerceOrder < ActiveRecord::Base
       #   OrderAction.new.order_paid(o.id)
       # end
       order = Order.where("source = 'bigcommerce' AND source_id = ?", o.id).first
-      order, order_history = order.update_from_bigcommerce(o)
+      order = order.update_from_bigcommerce(o)
     end
     ActiveRecord::Base.connection.execute(sql)
-    [order, order_history]
+    order
   end
 end

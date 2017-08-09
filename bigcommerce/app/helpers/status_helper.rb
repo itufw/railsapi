@@ -64,4 +64,29 @@ module StatusHelper
       end
       last_order_date
     end
+
+    def print_shipping_sheet(selected_orders)
+      orders = Order.where(id: selected_orders)
+      pdf = CombinePDF.new
+
+      orders.each do |order|
+        customer = Customer.find(order.customer_id)
+        order_invoice = WickedPdf.new.pdf_from_string(
+          render_to_string(
+              :template => 'pdf/order_invoice.pdf',
+              :locals => {order: order, customer: customer}
+              )
+          )
+        pdf << CombinePDF.parse(order_invoice)
+      end
+      picking_sheet = WickedPdf.new.pdf_from_string(
+        render_to_string(
+            template: 'pdf/picking_sheet.pdf',
+            locals: {order_products: OrderProduct.where(order_id: selected_orders) }
+            )
+        )
+
+      pdf << CombinePDF.parse(picking_sheet)
+      pdf
+    end
 end

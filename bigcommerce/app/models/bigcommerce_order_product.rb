@@ -1,5 +1,6 @@
 class BigcommerceOrderProduct < ActiveRecord::Base
-  def insert(order_id, order_history)
+  def insert(order_id)
+    order_history = OrderHistory.where(order_id: order_id).order('id DESC').first
 
     order_product_api = Bigcommerce::OrderProduct
     order_products = order_product_api.all(order_id)
@@ -26,13 +27,13 @@ class BigcommerceOrderProduct < ActiveRecord::Base
       ActiveRecord::Base.connection.execute(sql_products)
 
       if order_history.nil?
-        OrderProduct.new.import_from_bigcommerce(order, op, order_history)
+        OrderProduct.new.import_from_bigcommerce(order, op)
       else
         order_product = OrderProduct.where('order_id = ? AND product_id = ?', order.id, op.product_id)
         if order_product.count > 0
-          order_product.first.import_from_bigcommerce(order, op, order_history)
+          order_product.first.import_from_bigcommerce(order, op)
         else
-          OrderProduct.new.import_from_bigcommerce(order, op, nil)
+          OrderProduct.new.import_from_bigcommerce(order, op)
         end
       end
 
