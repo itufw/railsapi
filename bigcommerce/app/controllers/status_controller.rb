@@ -23,12 +23,12 @@ class StatusController < ApplicationController
   end
 
   def order_status
-    customer_ids = (params[:search].nil?) ? [] : Customer.search_for(params[:search]).pluck("id")
+    @customer_ids = (params[:search].nil?) ? [] : Customer.search_for(params[:search]).pluck("id")
     @per_page = params[:per_page] || Order.per_page
-    order_function, direction = sort_order(params, :order_by_id, 'DESC')
+    @order_function, @direction = sort_order(params, :order_by_id, 'DESC')
 
-    @orders = Order.include_all.where('status_id != 10').customer_filter(customer_ids)\
-      .send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
+    @orders = Order.where('status_id != 10').customer_filter(@customer_ids)\
+      .send(@order_function, @direction).paginate(per_page: @per_page, page: params[:page])
   end
 
   def status_check
@@ -81,7 +81,9 @@ class StatusController < ApplicationController
     elsif "Delivered" == params[:commit]
       Order.find(params[:order_id]).update(status_id: 12)
     elsif "Problem" == params[:commit]
-      Order.find(params[:order_id]).update_attributes(params[:order])
+      Order.find(params[:order_id]).update_attributes(params[:order].permit(:status_id))
+    elsif "Complete" == params[:commit]
+      Order.find(params[:order_id]).update(status_id: 10)
     elsif !params[:order].nil?
       status = Status.find(params[:order][:status_id])
       order = Order.find(params[:order][:id])
@@ -89,25 +91,16 @@ class StatusController < ApplicationController
       account_status = params[:order][:account_status]
       if account_status == "Hold-Account" && status.in_transit == 1
         flash[:error] = "Account Hold for Order#" + order.id.to_s
-      elsif status.name == "Shipped"
-        redirect_to controller: 'status', action: 'ship_orders', order_id: order.id and return
-      elsif status.name == "Damaged"
-        redirect_to controller: 'status', action: 'damage_orders', order_id: order.id and return
-      elsif status.name == "Return Requested"
-        redirect_to controller: 'status', action: 'return_orders', order_id: order.id and return
       else
         order.assign_attributes(params[:order].permit(:status_id, :account_status, :courier_status_id))
         order.save
       end
-    else
-      # Group Updated
     end
 
     if selected_orders.blank?
       redirect_to controller: 'order', action: 'all' and return
     else
-      redirect_to controller: 'order', action: 'order_confirmation', order_id: selected_orders.first, selected_orders: selected_orders, status_id: params[:status_id]
-      return
+      redirect_to controller: 'order', action: 'order_confirmation', order_id: selected_orders.first, selected_orders: selected_orders, status_id: params[:status_id] and return
     end
   end
 

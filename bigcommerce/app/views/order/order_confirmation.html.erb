@@ -125,7 +125,8 @@
           <div class="col-md-6"><%= f.collection_select :status_id, Status.problems, :id, :name, {include_blank: 'All Status'}, {class: 'form-control'}%></div>
           <div class="col-md-6"><%= submit_tag 'Problem', class: 'btn btn-primary'%></div>
           <div class="col-md-6"><%= submit_tag 'Delivered', class: 'btn btn-primary'%></div>
-          <div class="col-md-6"><%= submit_tag 'Skip', class: 'btn btn-primary'%></div>
+          <div class="col-md-6"><%= submit_tag 'Complete', class: 'btn btn-primary'%></div>
+          <div class="col-md-6 col-md-offset-6"><%= submit_tag 'Skip', class: 'btn btn-primary'%></div>
         </div>
       </div>
     <!-- Super User Overwrite -->

@@ -1,5 +1,5 @@
 <span>
-  <%= paginate(orders) %>
+  <%= paginate(orders) unless orders.is_a? Array %>
 </span>
 <% can_update_staff = allow_to_update(session[:user_id]) %>
 <table class="table table-striped table-bordered table-hover table-responsive orders-view default" id="orders-view-table">
