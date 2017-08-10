@@ -4,8 +4,9 @@ class OrderProduct < ActiveRecord::Base
 
 	belongs_to :order_shipping
 
-	before_validation :record_history, on: [:update, :delete]
+	after_validation :record_history, on: [:update, :delete]
 	after_validation :stock_change, on: [:create, :update], if: ->(obj){ obj.stock_incremental.present? and obj.stock_incremental_changed?}
+	after_validation :product_display_check, on:[:create, :update], if: ->(obj){ obj.stock_current_changed?}
 
 	def import_from_bigcommerce(order, op)
 		attributes = {'order_id': order.id, 'product_id': op.id, 'price_luc': op.base_price * 1.29,\
@@ -168,13 +169,16 @@ class OrderProduct < ActiveRecord::Base
 	def stock_change
 		sql = "UPDATE products SET inventory = inventory - '#{self.stock_incremental}' WHERE id = '#{self.product_id}'"
 		ActiveRecord::Base.connection.execute(sql)
+	end
 
-		if self.qty > 0
-			self.display = 1
-		else
-			self.display = 0
+	def product_display_check
+		if self.qty > 0 && self.display == 0
+			sql = "Update order_products SET display = 1 WHERE id = #{self.id}"
+			ActiveRecord::Base.connection.execute(sql)
+		elsif self.qty <= 0 && self.display == 1
+			sql = "Update order_products SET display = 0 WHERE id = #{self.id}"
+			ActiveRecord::Base.connection.execute(sql)
 		end
-		self.save
 	end
 
 	def record_history

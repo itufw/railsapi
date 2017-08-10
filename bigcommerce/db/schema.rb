@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170802001819) do
+ActiveRecord::Schema.define(version: 20170810003900) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -565,7 +565,7 @@ ActiveRecord::Schema.define(version: 20170802001819) do
     t.integer  "order_id",          limit: 4,                             null: false
     t.integer  "order_history_id",  limit: 4,                             null: false
     t.integer  "product_id",        limit: 4,                             null: false
-    t.integer  "order_shipping_id", limit: 4,                             null: false
+    t.integer  "order_shipping_id", limit: 4
     t.integer  "qty",               limit: 3,                             null: false
     t.integer  "qty_shipped",       limit: 3,                             null: false
     t.decimal  "price_luc",                       precision: 9, scale: 4, null: false
@@ -576,7 +576,7 @@ ActiveRecord::Schema.define(version: 20170802001819) do
     t.decimal  "price_inc_tax",                   precision: 9, scale: 4, null: false
     t.decimal  "price_wet",                       precision: 9, scale: 4, null: false
     t.decimal  "price_gst",                       precision: 9, scale: 4, null: false
-    t.decimal  "price_discounted",                precision: 9, scale: 4, null: false
+    t.decimal  "price_discounted",                precision: 9, scale: 4
     t.integer  "stock_previous",    limit: 4
     t.integer  "stock_current",     limit: 4
     t.integer  "stock_incremental", limit: 4
@@ -685,6 +685,7 @@ ActiveRecord::Schema.define(version: 20170802001819) do
     t.string   "postcode",            limit: 255
     t.string   "country",             limit: 255
     t.string   "address",             limit: 255
+    t.string   "track_number",        limit: 255
   end
 
   add_index "orders", ["customer_id"], name: "index_orders_on_customer_id", using: :btree

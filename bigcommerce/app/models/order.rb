@@ -19,7 +19,7 @@ class Order < ActiveRecord::Base
   belongs_to :order_history
   belongs_to :xero_invoice
 
-  before_validation :record_history, on: [:update, :delete], unless: ->(obj){ obj.xero_invoice_number_changed? or obj.xero_invoice_id_changed?}
+  after_validation :record_history, on: [:update, :delete], unless: ->(obj){ obj.xero_invoice_number_changed? or obj.xero_invoice_id_changed?}
   after_validation :cancel_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id == 5}
 
 

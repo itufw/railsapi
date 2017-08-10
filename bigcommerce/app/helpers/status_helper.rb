@@ -78,11 +78,19 @@ module StatusHelper
               )
           )
         pdf << CombinePDF.parse(order_invoice)
+
+        packing_slip = WickedPdf.new.pdf_from_string(
+          render_to_string(
+              :template => 'pdf/packing_slip.pdf',
+              :locals => {order: order, customer: customer}
+              )
+          )
+        pdf << CombinePDF.parse(packing_slip)
       end
       picking_sheet = WickedPdf.new.pdf_from_string(
         render_to_string(
             template: 'pdf/picking_sheet.pdf',
-            locals: {order_products: OrderProduct.where(order_id: selected_orders) }
+            locals: {order_products: OrderProduct.where(order_id: selected_orders, display: 1) }
             )
         )
 

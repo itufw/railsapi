@@ -1,52 +1,56 @@
-<%= title @status_name %>
-<h3 id="orders-view-heading"><%= @status_name %> Orders</h3>
-<%= render "partials/status_dropdown", path_name: 'order_status' %>
-<br/>
-<%= form_tag({:controller => "status", :action => "order_status"}, {:method => "get"}) do %>
-<div class="form-group" style="margin-top:100px;">
+<%= title 'Order Status' %>
+<h3 id="orders-view-heading">Manage Orders</h3>
 
-    <div class="col-xs-3 col-xs-offset-3">
-        <%= text_field_tag('search', @search_text, placeholder: 'Search for Customer Name', class: 'form-control') %>
-    </div>
-    <%= render "partials/staff_filter" %>
-
-    <%= hidden_field_tag :status_id, @status_id %>
-    <%= hidden_field_tag :status_name, @status_name %>
-
-    <%= submit_tag "Filter", class: 'btn btn-primary' %>
-</div><br/>
-<span>
-  <%= paginate(@orders) %>
-</span>
-<% end %>
 <%= form_tag({:controller => "status", :action => "status_check"}, {:method => "get"}) do %>
-<div class="container">
+<div class="form-group" style="margin-top:100px;">
   <div class="row">
-    <div class="col-xs-1 Created status-inactive">
-      <%= submit_tag "Approval", class: 'btn btn-primary' %>
+    <div class="col-md-4 col-md-offset-8">
+      <div class="col-xs-4"><%= label(:status, 'Approve')%></div>
+      <div class="col-xs-4"><%= label(:status, 'Picking')%></div>
+      <div class="col-xs-4"><%= label(:status, 'Courier')%></div>
+      <div class="col-xs-4"><%= label(:status, "Problem")%><%= '(' + @orders.select {|x| x.status.send_reminder == 1}.count.to_s + ')'%></div>
+      <div class="col-xs-4"><%= label(:status, 'Shipped')%></div>
+      <div class="col-xs-4"><%= label(:status, 'Delivered')%></div>
     </div>
-    <div class="col-xs-1 Approved status-inactive">
-      <%= submit_tag "Picking", class: 'btn btn-primary'%>
+  </div>
+  <div class="row">
+    <div class="col-md-4">
+        <%= text_field_tag('search', @search_text, placeholder: 'Search for Customer Name', class: 'form-control', size: 50) %>
+        <%= submit_tag "Filter", class: 'btn btn-primary' %>
     </div>
-    <div class="col-xs-1 Approved Picking status-inactive">
-      <%= submit_tag "Ready", class: 'btn btn-primary'%>
-    </div>
-    <div class="col-xs-1 Approved Picking Ready status-inactive">
-      <%= submit_tag "Shipping", class: 'btn btn-primary'%>
-    </div>
-    <div class="col-xs-1 Shipped status-inactive">
-      <%= submit_tag "Delivered", class: 'btn btn-primary'%>
-    </div>
-    <div class="col-xs-1">
-      <%= submit_tag "Hold", class: 'btn btn-primary'%>
+    <div class="col-md-4 col-md-offset-4">
+      <div class="col-xs-4 col-xs-offset-8" id="filter_button"></div>
     </div>
   </div>
 </div>
+<br/>
 
-  <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
+  <div class="order_table">
+    <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
+  </div>
 
   <script type="text/javascript">
-    $('.status-inactive.' + '<%= @status_name%>').removeClass('status-inactive').addClass('status-active');
+    $('label').click(function(){
+      if( $(this).attr('for') == 'status_Approve'){
+        $('#filter_button').html('<input type="submit" name="commit" value="Approval" class="btn btn-primary">');
+        $('.order_table').html("<%=j render 'partials/order_status', orders: @orders.select{|x| x.status_id == 11}, display_class: 'none', product_ids: nil %>");
+      }else if ($(this).attr('for') == 'status_Picking') {
+        $('#filter_button').html('<input type="submit" name="commit" value="Picking" class="btn btn-primary">');
+        $('.order_table').html("<%=j render 'partials/order_status', orders: @orders.select{|x| x.status_id == 3}, display_class: 'none', product_ids: nil %>");
+      }else if ($(this).attr('for') == 'status_Courier'){
+        $('#filter_button').html('<input type="submit" name="commit" value="Courier" class="btn btn-primary">');
+        $('.order_table').html("<%=j render 'partials/order_status', orders: @orders.select{|x| [3, 8].include? x.status_id }, display_class: 'none', product_ids: nil %>");
+      }else if ($(this).attr('for') == 'status_Problem') {
+        $('#filter_button').html('<input type="submit" name="commit" value="Problem" class="btn btn-primary">');
+        $('.order_table').html("<%=j render 'partials/order_status', orders: @orders.select{|x| x.status.send_reminder == 1 }, display_class: 'none', product_ids: nil %>");
+      }else if ($(this).attr('for') == 'status_Shipped') {
+        $('#filter_button').html('<input type="submit" name="commit" value="Shipping" class="btn btn-primary">');
+        $('.order_table').html("<%=j render 'partials/order_status', orders: @orders.select{|x| [3, 8, 9].include? x.status_id }, display_class: 'none', product_ids: nil %>");
+      }else if ($(this).attr('for') == 'status_Delivered') {
+        $('#filter_button').html('<input type="submit" name="commit" value="Delivered" class="btn btn-primary">');
+        $('.order_table').html("<%=j render 'partials/order_status', orders: @orders.select{|x| [2, 12].include? x.status_id }, display_class: 'none', product_ids: nil %>");
+      }
+    });
   </script>
 
 <% end %>

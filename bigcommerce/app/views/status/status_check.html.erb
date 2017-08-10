@@ -1,7 +1,13 @@
 <%= title @status_name + " Checklist" %>
 <h3><%= @status_name + " Checklist" %></h3>
-
-<% if ["Picking", "Ready"].include? @status_name%>
+<% if ['Approval'].include? @status_name %>
+  <%= form_tag({:controller => "order", :action => "order_confirmation"}, {:method => "get"}) do %>
+    <%= hidden_field_tag :status_name, @status_name%>
+    <%= hidden_field_tag :status_id, @status_id%>
+    <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
+    <%= submit_tag 'Check', class: 'btn btn-primary'%>
+  <% end %>
+<% elsif ["Picking", "Ready"].include? @status_name%>
   <%= form_tag({:controller => "status", :action => "status_update"}, {:method => "get"}) do %>
     <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
     <% if @status_name == "Picking" %>
@@ -11,14 +17,28 @@
       <%= submit_tag 'Ready', class: 'btn btn-primary'%>
     <% end %>
   <% end %>
-<% elsif ['Shipping'].include? @status_name%>
-  <%= form_tag({:controller => "status", :action => "ship_orders"}, {:method => "get"}) do %>
+<% elsif ['Courier'].include? @status_name%>
+  <%= form_tag({:controller => "order", :action => "order_confirmation"}, {:method => "get"}) do %>
+    <%= hidden_field_tag :status_name, @status_name%>
+    <%= hidden_field_tag :status_id, @status_id%>
     <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
-    <%= submit_tag 'Ship!', class: 'btn btn-primary'%>
+    <%= submit_tag 'Courier Selection', class: 'btn btn-primary'%>
+  <% end %>
+<% elsif ['Shipping'].include? @status_name%>
+  <%= form_tag({:controller => "status", :action => "status_update"}, {:method => "get"}) do %>
+    <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
+    <%= submit_tag 'Shipped', class: 'btn btn-primary'%>
     <button type="button" name="return" class="btn btn-primary"><%= link_to 'Back', controller: 'status', action: 'order_status', status_id: 9, status_name: 'Ready'%></button>
   <% end %>
+<% elsif ['Delivered'].include? @status_name %>
+  <%= form_tag({:controller => "order", :action => "order_confirmation"}, {:method => "get"}) do %>
+    <%= hidden_field_tag :status_name, @status_name%>
+    <%= hidden_field_tag :status_id, @status_id%>
+    <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
+    <%= submit_tag 'Delivered', class: 'btn btn-primary'%>
+  <% end %>
 <% else %>
-  <%= form_tag({:controller => "order", :action => "details"}, {:method => "get"}) do %>
+  <%= form_tag({:controller => "order", :action => "order_confirmation"}, {:method => "get"}) do %>
     <%= hidden_field_tag :status_name, @status_name%>
     <%= hidden_field_tag :status_id, @status_id%>
     <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>

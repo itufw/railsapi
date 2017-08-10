@@ -23,36 +23,41 @@ class OrderController < ApplicationController
      	@per_page, @orders = order_display_(params, orders)
     end
 
-	def for_product
-		@product_id = params[:product_id]
-		@product_name = params[:product_name]
-		@transform_column = params[:transform_column]
+  	def for_product
+  		@product_id = params[:product_id]
+  		@product_name = params[:product_name]
+  		@transform_column = params[:transform_column]
 
-		# orders filtered by param
-		@staff, @status, orders_filtered, @search_text, @order_id  = order_controller_filter(params, "product_rights")
+  		# orders filtered by param
+  		@staff, @status, orders_filtered, @search_text, @order_id  = order_controller_filter(params, "product_rights")
 
-		# get product_ids depending on the transform_column
-		# if transform_column is product_no_vintage_id then we have a set of products
-		# who have the same no_vintage_id
-		@product_ids = get_products_after_transformation(@transform_column, @product_id).pluck("id") || [@product_id]
-		# orders filtered by product
-		orders = orders_filtered.order_product_filter(@product_ids)
-		@per_page, @orders = order_display_(params, orders)
-	end
+  		# get product_ids depending on the transform_column
+  		# if transform_column is product_no_vintage_id then we have a set of products
+  		# who have the same no_vintage_id
+  		@product_ids = get_products_after_transformation(@transform_column, @product_id).pluck("id") || [@product_id]
+  		# orders filtered by product
+  		orders = orders_filtered.order_product_filter(@product_ids)
+  		@per_page, @orders = order_display_(params, orders)
+  	end
+
+    # Current used as Status Update
+    def order_confirmation
+      if params[:selected_orders].nil?
+        @order = Order.find(params[:order_id])
+      elsif params[:selected_orders].blank?
+        redirect_to controller: 'order', action: 'all'
+        return
+      else
+        @order =  Order.find(params[:selected_orders].delete_at(0))
+        @selected_orders = params[:selected_orders]
+        @selected_status_id = params[:status_id]
+      end
+    end
 
 	# Displays all details about an order
 	# How do I get to this ? Click on a Order ID anywhere on the site
 	def details
-    if params[:selected_orders].nil?
-      @order_id = params[:order_id]
-    elsif params[:selected_orders].blank?
-      redirect_to controller: 'order', action: 'all'
-      return
-    else
-      @order_id = params[:selected_orders].delete_at(0)
-      @selected_orders = params[:selected_orders]
-      @selected_status_id = params[:status_id]
-    end
+    @order_id = params[:order_id]
 
       @per_page = params[:per_page] || Order.per_page
     	@order = Order.include_all.order_filter_(@order_id).paginate( per_page: @per_page, page: params[:page])
@@ -94,6 +99,7 @@ class OrderController < ApplicationController
   def save_order
     # Order Helper -> Move to Lib later
     order_creation(order_params, products_params)
+    redirect_to controller: 'activity', action: 'add_note', customer_id: params[:customer_id] and return if params["button"] == "new_note"
     redirect_to action: 'all'
   end
 
@@ -157,6 +163,7 @@ class OrderController < ApplicationController
     products_container.map(&:save)
 
     flash[:success] = 'Edited'
+    redirect_to controller: 'activity', action: 'add_note', customer_id: params[:customer_id] and return if params["button"] == "new_note"
     redirect_to action: 'details', order_id: order.id
   end
 

@@ -12,4 +12,8 @@ class Status < ActiveRecord::Base
 	def self.sort
 		order('statuses.order')
 	end
+
+	def self.problems
+		where(send_reminder: 1).order('statuses.order')
+	end
 end

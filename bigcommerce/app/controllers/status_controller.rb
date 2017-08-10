@@ -23,17 +23,12 @@ class StatusController < ApplicationController
   end
 
   def order_status
-    @status_id, @status_name = get_id_and_name(params)
-    staff_id, @staff = staff_filter(params)
-    search_text = params[:search]
-    customer_ids = (search_text.nil?) ? [] : Customer.search_for(search_text).pluck("id")
+    customer_ids = (params[:search].nil?) ? [] : Customer.search_for(params[:search]).pluck("id")
     @per_page = params[:per_page] || Order.per_page
     order_function, direction = sort_order(params, :order_by_id, 'DESC')
 
-    @orders = Order.include_all.status_filter(@status_id).staff_filter(staff_id)\
-                .customer_filter(customer_ids).send(order_function, direction)\
-                .paginate(per_page: @per_page, page: params[:page])
-
+    @orders = Order.include_all.where('status_id != 10').customer_filter(customer_ids)\
+      .send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
   end
 
   def status_check
@@ -52,22 +47,41 @@ class StatusController < ApplicationController
     selected_orders = params[:selected_orders] || []
     selected_orders = selected_orders.first.split unless selected_orders.blank? || selected_orders.count > 1
 
-    if "Next" == params[:commit]
-      # Next one
-    elsif "Print Picking Sheet" == params[:commit] && !selected_orders.blank?
+    # Print Shipping List
+    if "Print Picking Sheet" == params[:commit] && !selected_orders.blank?
       # Print Picking Sheet
       # Due to Rails redirect conflicts
       pdf = print_shipping_sheet(selected_orders)
       send_data pdf.to_pdf, filename: "picking_sheet_#{session[:username]}_#{Date.today.to_s}.pdf" and return
-      
-    elsif 'Picked' == params[:commit]
-      orders = Order.where(id: selected_orders)
-      orders.update_all(status_id: 8)
-      redirect_to controller: 'status', action: 'order_status', status_id: 8, status_name: 'Picking' and return
-    elsif 'Ready' == params[:commit]
-      orders = Order.where(id: selected_orders)
-      orders.update_all(status_id: 9)
-      redirect_to controller: 'status', action: 'order_status', status_id: 9, status_name: 'Ready' and return
+    end
+
+    # Group Update
+    if ['Picked', 'Ready', 'Shipped'].include? params[:commit]
+      status_id = 8 if params[:commit] == 'Picked'
+      status_id = 9 if params[:commit] == 'Ready'
+      status_id = 2 if params[:commit] == 'Shipped'
+      Order.where(id: selected_orders).update_all(status_id: status_id)
+      redirect_to controller: 'status', action: 'order_status' and return
+    end
+
+    # Individual Update
+    # Skip current record
+    if "Skip" == params[:commit]
+    elsif "Approve" == params[:commit]
+      Order.find(params[:order_id]).update(status_id: 3)
+    elsif "Hold-Stock" == params[:commit]
+      Order.find(params[:order_id]).update(status_id: 20)
+    elsif "Hold-Price" == params[:commit]
+      Order.find(params[:order_id]).update(status_id: 7)
+    elsif "Hold-Other" == params[:commit]
+      Order.find(params[:order_id]).update(status_id: 13)
+    elsif "Create Label" == params[:commit]
+      # TODO
+      # Create Fastway Label & Create tracking information for orders
+    elsif "Delivered" == params[:commit]
+      Order.find(params[:order_id]).update(status_id: 12)
+    elsif "Problem" == params[:commit]
+      Order.find(params[:order_id]).update_attributes(params[:order])
     elsif !params[:order].nil?
       status = Status.find(params[:order][:status_id])
       order = Order.find(params[:order][:id])
@@ -92,25 +106,9 @@ class StatusController < ApplicationController
     if selected_orders.blank?
       redirect_to controller: 'order', action: 'all' and return
     else
-      redirect_to controller: 'order', action: 'details', order_id: selected_orders.first, selected_orders: selected_orders, status_id: params[:status_id]
+      redirect_to controller: 'order', action: 'order_confirmation', order_id: selected_orders.first, selected_orders: selected_orders, status_id: params[:status_id]
       return
     end
-  end
-
-  def ship_orders
-    order_ids = params[:selected_orders] || []
-    order_ids.append(params[:order_id]) unless params[:order_id].nil?
-    @orders = Order.order_filter_by_ids(order_ids)
-  end
-
-  def damage_orders
-    p = c
-    # TODO
-  end
-
-  def return_orders
-    p = c
-    # TODO
   end
 
   def summary_with_product
@@ -132,6 +130,15 @@ class StatusController < ApplicationController
     @selected_period, @period_types = define_period_types(params)
     @result = overall_stats('Order.order_product_filter(%s).status_filter(%s)' % \
        [@product_id, @status_id], :sum_order_product_qty, @selected_period, nil)
+  end
+
+  def fetch_last_products
+    order_ids = Order.where(customer_id: params[:customer_id]).map(&:id)
+    product_ids = OrderProduct.where("order_id IN (?) AND created_at > ?", order_ids, (Date.today - 3.month).to_s(:db)).map(&:product_id)
+    @products = Product.where(id: product_ids)
+    respond_to do |format|
+      format.js
+    end
   end
 end
 
