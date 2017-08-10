@@ -1,0 +1,7 @@
+<% @products.each do |product| %>
+  last_products.append([
+          '<tr class="last-order-product" product-id="<%= product.id%>" name="<%= product.name%>" inventory="<%= product.inventory%>" price="<%= product.calculated_price * 1.29%>">',
+              '<td><%= product.name%></td>',
+          '</tr>'
+          ].join(''));
+<% end %>

@@ -22,6 +22,7 @@ Rails.application.routes.draw do
   get '/calendar/local_calendar', to: 'calendar#local_calendar'
 
   get '/fetch_order_detail', to: 'order#fetch_order_detail', as: 'fetch_order_detail'
+  get '/fetch_last_products', to: 'status#fetch_last_products', as: 'fetch_last_products'
 
   get '/fetch_lead', to: 'lead#fetch_lead', as: 'fetch_lead'
 
