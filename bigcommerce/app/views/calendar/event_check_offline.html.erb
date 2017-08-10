@@ -59,18 +59,30 @@
           <td>&nbsp;&nbsp;&nbsp;</td>
           <%
           unless event.description.nil? && event.summary.nil?
-            pattern = event.description.split("\n").first.downcase unless event.description.nil?
             pattern = event.summary.downcase unless event.summary.nil?
+            pattern = event.description.split("\n").first.downcase unless event.description.nil?
             pattern.slice! ' tasting'
             pattern = pattern.split('-').first
 
-            customer_list = Customer.filter_by_staff(response_staff.first.id).search_for(pattern)
-            lead_list = CustomerLead.filter_by_staff(response_staff.first.id).not_customer.search_for(pattern)
+            begin
+              customer_list = Customer.filter_by_staff(response_staff.first.id).search_for(pattern)
+            rescue
+              customer_list = []
+            end
 
-            unless event.location.nil?
-              pattern = event.location.downcase
-              customer_list += Customer.filter_by_staff(response_staff.first.id).search_for(pattern)
-              lead_list += CustomerLead.filter_by_staff(response_staff.first.id).not_customer.search_for(pattern)
+            begin
+              lead_list = CustomerLead.filter_by_staff(response_staff.first.id).not_customer.search_for(pattern)
+            rescue
+              lead_list = []
+            end
+
+            begin
+              unless event.location.nil?
+                pattern = event.location.downcase
+                customer_list += Customer.filter_by_staff(response_staff.first.id).search_for(pattern)
+                lead_list += CustomerLead.filter_by_staff(response_staff.first.id).not_customer.search_for(pattern)
+              end
+            rescue
             end
 
             lead_list = lead_list.each {|x| x.actual_name = x.actual_name.to_s + ', (Lead)'}

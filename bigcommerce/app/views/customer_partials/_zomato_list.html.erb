@@ -4,6 +4,7 @@
 <table class = "table table-striped table-bordered table-hover table-responsive">
 	<tr>
 		<th>Name <%= render "partials/sort_arrows", order: 'order_by_name' %></th>
+		<th>Customer</th>
 		<th>Locality <%= render "partials/sort_arrows", order: 'order_by_locality' %></th>
 		<th>Average Cost <%= render "partials/sort_arrows", order: 'order_by_cost' %></th>
 		<th>Cuisine <%= render "partials/sort_arrows", order: 'order_by_cuisine' %></th>
@@ -14,6 +15,23 @@
 	<% zomatos.each do |z| %>
 	<tr>
 		<td><a href="<%= z.url%>"><%=z.name%></a></td>
+		<% if z.customer_id.nil? && z.customer_lead_id.nil?%>
+			<td></td>
+		<% elsif !z.customer_id.nil?%>
+			<% customer = z.customer %>
+			<% top_task = Task.select("tasks.id, tasks.start_date, tasks.subject_1, tasks.end_date").customer_tasks(customer.id).where('response_staff != 26').active_tasks.order(:end_date).first %>
+			<td>
+				<p class="customer"><%= link_to customer.actual_name, controller: 'customer', action: 'summary', customer_id: customer.id, customer_name: customer.actual_name %></p>
+				<p><%= TaskSubject.find(top_task.subject_1).subject + '  ' + top_task.start_date.strftime('%d/%m') unless top_task.nil? || top_task.blank? %></p>
+			</td>
+		<% else %>
+			<td>
+				<% lead = z.customer_lead %>
+				<% top_task = Task.select("tasks.id, tasks.start_date, tasks.subject_1, tasks.end_date").lead_tasks(lead.id).where('response_staff != 26').active_tasks.order(:end_date).first %>
+				<p class="lead"><%= link_to lead.actual_name, controller: 'lead', action: 'summary', lead_id: lead.id, lead_name: lead.actual_name %></p>
+				<p><%= TaskSubject.find(top_task.subject_1).subject.to_s + '  ' + top_task.start_date.strftime('%d/%m') unless top_task.nil? || top_task.blank? %></p>
+			</td>
+		<% end %>
 		<td><%= z.locality %></td>
 		<td class="num"><%= z.average_cost_for_two %></td>
 		<td><%= z.cuisines %></td>
