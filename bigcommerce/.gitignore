@@ -9,6 +9,9 @@
 
 # Ignore Google Server Key
 /config/key.json
+/config/privatekey.pem
+/config/tokens.yaml
+
 
 # Ignore all logfiles and tempfiles.
 /log/*

@@ -59,7 +59,7 @@
     <tr id="tr_<%= product.product_id%>">
       <td><%= product.product_id %></td>
       <td><%= Product.find(product.product_id).name %></td>
-      <td><%= Product.find(product.product_id).inventory %></td>
+      <td class="product-inventory"><%= Product.find(product.product_id).inventory %></td>
       <%= f.fields_for "products[#{product.product_id}]", product do |product_form|%>
         <td><%= product_form.text_field :price_luc, size: "5", readonly: true, class: 'product-luc' %></td>
         <td><%= product_form.text_field :qty, size: "3", class: 'product-qty' %></td>
@@ -160,7 +160,7 @@
         '<tr id="tr_'+ data.item.id +'">',
             '<td>'+ data.item.id +'</td>',
             '<td>'+ data.item.label +'</td>',
-            '<td>'+ data.item.inventory +'</td>',
+            '<td class="product-inventory">'+ data.item.inventory +'</td>',
             '<td><input size="5" readonly="readonly" class="product-luc" type="text" value="'+ data.item.price +'" name="order[products['+ data.item.id +']][price_luc]" id="order_products_'+ data.item.id +'__price_luc"></td>',
             '<td><input size="3" class="product-qty" type="text" value="0" name="order[products['+ data.item.id +']][qty]" id="order_products_'+ data.item.id +'__qty"></td>',
             '<td><input size="2" class="product-discount" type="text" value="0" name="order[products['+ data.item.id +']][discount]" id="order_products_'+ data.item.id +'__discount"  placeholder="Discount"> %</td>',
@@ -227,7 +227,7 @@
       '<tr id="tr_'+ $(this).attr('product-id') +'">',
           '<td>'+ $(this).attr('product-id') +'</td>',
           '<td>'+ $(this).attr('name') +'</td>',
-          '<td>'+ $(this).attr('inventory') +'</td>',
+          '<td class="product-inventory">'+ $(this).attr('inventory') +'</td>',
           '<td><input size="5" readonly="readonly" class="product-luc" type="text" value="'+ $(this).attr('price') +'" name="order[products['+ $(this).attr('product-id') +']][price_luc]" id="order_products_'+ $(this).attr('product-id') +'__price_luc"></td>',
           '<td><input size="3" class="product-qty" type="text" value="0" name="order[products['+ $(this).attr('product-id') +']][qty]" id="order_products_'+ $(this).attr('product-id') +'__qty"></td>',
           '<td><input size="2" class="product-discount" type="text" value="0" name="order[products['+ $(this).attr('product-id') +']][discount]" id="order_products_'+ $(this).attr('product-id') +'__discount"  placeholder="Discount"> %</td>',
@@ -249,7 +249,14 @@
     var customer_flag = $('tr input[name=customer]').size() > 0;
     var product_flag = $('tbody.product-list tr').size() > 0;
     var shipping_address_flag = ($('input#order_address').val() != "");
-    if (customer_flag && product_flag && shipping_address_flag){
+    var inventory_flag = true;
+    var table_flag = $('table input:text').filter(function() { return (this.value == "" || this.value=="NaN"); }).size() == 0;
+    $('.product-qty').each(function(){
+      if (parseInt($(this).val()) > parseInt($(this).parent().parent().find('.product-inventory').html())){
+        inventory_flag = false;
+      }
+    });
+    if (customer_flag && product_flag && shipping_address_flag && inventory_flag && table_flag){
       $('button.active').show();
       $('button.disabled').hide();
     }else{

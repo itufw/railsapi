@@ -1,3 +1,5 @@
+require 'bigcommerce_connection.rb'
+
 class OrderProduct < ActiveRecord::Base
 	belongs_to :order
 	belongs_to :product, class_name: Product
@@ -169,6 +171,7 @@ class OrderProduct < ActiveRecord::Base
 	def stock_change
 		sql = "UPDATE products SET inventory = inventory - '#{self.stock_incremental}' WHERE id = '#{self.product_id}'"
 		ActiveRecord::Base.connection.execute(sql)
+		Bigcommerce::Product.update(self.product_id, inventory_level: self.product.inventory) if (self.stock_incremental != 0 && self.product_id == 2233)
 	end
 
 	def product_display_check

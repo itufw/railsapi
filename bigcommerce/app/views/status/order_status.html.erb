@@ -8,7 +8,7 @@
       <div class="col-xs-4"><%= label(:status, 'Approve')%></div>
       <div class="col-xs-4"><%= label(:status, 'Picking')%></div>
       <div class="col-xs-4"><%= label(:status, 'Courier')%></div>
-      <div class="col-xs-4"><%= label(:status, "Problem")%><%= '(' + @orders.select {|x| x.status.send_reminder == 1}.count.to_s + ')'%></div>
+      <div class="col-xs-4"><%= label(:status, "Problem")%><%= '(' + Order.joins(:status).where('statuses.send_reminder = 1').count.to_s + ')'%></div>
       <div class="col-xs-4"><%= label(:status, 'Shipped')%></div>
       <div class="col-xs-4"><%= label(:status, 'Delivered')%></div>
     </div>
@@ -28,27 +28,27 @@
   <div class="order_table">
     <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
   </div>
-
   <script type="text/javascript">
+    <% orders = Order.where('status_id != 10').customer_filter(@customer_ids).send(@order_function, @direction)%>
     $('label').click(function(){
       if( $(this).attr('for') == 'status_Approve'){
         $('#filter_button').html('<input type="submit" name="commit" value="Approval" class="btn btn-primary">');
-        $('.order_table').html("<%=j render 'partials/order_status', orders: @orders.select{|x| x.status_id == 11}, display_class: 'none', product_ids: nil %>");
+        $('.order_table').html("<%=j render 'partials/order_status', orders: orders.select{|x| x.status_id == 11}, display_class: 'none', product_ids: nil %>");
       }else if ($(this).attr('for') == 'status_Picking') {
         $('#filter_button').html('<input type="submit" name="commit" value="Picking" class="btn btn-primary">');
-        $('.order_table').html("<%=j render 'partials/order_status', orders: @orders.select{|x| x.status_id == 3}, display_class: 'none', product_ids: nil %>");
+        $('.order_table').html("<%=j render 'partials/order_status', orders: orders.select{|x| x.status_id == 3}, display_class: 'none', product_ids: nil %>");
       }else if ($(this).attr('for') == 'status_Courier'){
         $('#filter_button').html('<input type="submit" name="commit" value="Courier" class="btn btn-primary">');
-        $('.order_table').html("<%=j render 'partials/order_status', orders: @orders.select{|x| [3, 8].include? x.status_id }, display_class: 'none', product_ids: nil %>");
+        $('.order_table').html("<%=j render 'partials/order_status', orders: orders.select{|x| [3, 8].include? x.status_id }, display_class: 'none', product_ids: nil %>");
       }else if ($(this).attr('for') == 'status_Problem') {
         $('#filter_button').html('<input type="submit" name="commit" value="Problem" class="btn btn-primary">');
-        $('.order_table').html("<%=j render 'partials/order_status', orders: @orders.select{|x| x.status.send_reminder == 1 }, display_class: 'none', product_ids: nil %>");
+        $('.order_table').html("<%=j render 'partials/order_status', orders: orders.select{|x| x.status.send_reminder == 1 }, display_class: 'none', product_ids: nil %>");
       }else if ($(this).attr('for') == 'status_Shipped') {
         $('#filter_button').html('<input type="submit" name="commit" value="Shipping" class="btn btn-primary">');
-        $('.order_table').html("<%=j render 'partials/order_status', orders: @orders.select{|x| [3, 8, 9].include? x.status_id }, display_class: 'none', product_ids: nil %>");
+        $('.order_table').html("<%=j render 'partials/order_status', orders: orders.select{|x| [3, 8, 9].include? x.status_id }, display_class: 'none', product_ids: nil %>");
       }else if ($(this).attr('for') == 'status_Delivered') {
         $('#filter_button').html('<input type="submit" name="commit" value="Delivered" class="btn btn-primary">');
-        $('.order_table').html("<%=j render 'partials/order_status', orders: @orders.select{|x| [2, 12].include? x.status_id }, display_class: 'none', product_ids: nil %>");
+        $('.order_table').html("<%=j render 'partials/order_status', orders: orders.select{|x| [2, 12].include? x.status_id }, display_class: 'none', product_ids: nil %>");
       }
     });
   </script>
