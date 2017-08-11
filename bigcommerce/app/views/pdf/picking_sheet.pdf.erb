@@ -8,18 +8,16 @@
       <tr>
     		<th>Product Name</th>
     		<th>Quantity</th>
-    		<th>List Price Ex Tax</th>
-    		<th>Price Inc Tax</th>
-    		<th>Total</th>
+    		<th>Dozen</th>
+    		<th>Remainder</th>
     	</tr>
       <tr>
         <% order_products.each do |product| %>
         <tr>
           <td><%= product.product.name %></td>
           <td class="num"><%= product.qty %></td>
-          <td class="num"><%= product.product.calculated_price %></td>
-          <td class="num"><%= display_num(product.price_inc_tax) %></td>
-          <td class="num"><%= product.price_inc_tax * product.qty %></td>
+          <td class="num"><%= product.qty/12 %></td>
+          <td class="num"><%= product.qty%12 %></td>
         </tr>
         <% end %>
       </tr>

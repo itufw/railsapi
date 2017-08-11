@@ -23,15 +23,41 @@ class StatusController < ApplicationController
   end
 
   def order_status
-    @customer_ids = (params[:search].nil?) ? [] : Customer.search_for(params[:search]).pluck("id")
-    @per_page = params[:per_page] || Order.per_page
-    @order_function, @direction = sort_order(params, :order_by_id, 'DESC')
+    # <script type="text/javascript">
+    #   <% orders = Order.where('status_id != 10').customer_filter(@customer_ids).send(@order_function, @direction)%>
+    #   $('label').click(function(){
+    #     if( $(this).attr('for') == 'status_Approve'){
+    #       $('#filter_button').html('<input type="submit" name="commit" value="Approval" class="btn btn-primary">');
+    #       $('.order_table').html("<%=j render 'partials/order_status', orders: orders.select{|x| x.status_id == 11}, display_class: 'none', product_ids: nil %>");
+    #     }else if ($(this).attr('for') == 'status_Picking') {
+    #       $('#filter_button').html('<input type="submit" name="commit" value="Picking" class="btn btn-primary">');
+    #       $('.order_table').html("<%=j render 'partials/order_status', orders: orders.select{|x| x.status_id == 3}, display_class: 'none', product_ids: nil %>");
+    #     }else if ($(this).attr('for') == 'status_Courier'){
+    #       $('#filter_button').html('<input type="submit" name="commit" value="Courier" class="btn btn-primary">');
+    #       $('.order_table').html("<%=j render 'partials/order_status', orders: orders.select{|x| [3, 8].include? x.status_id }, display_class: 'none', product_ids: nil %>");
+    #     }else if ($(this).attr('for') == 'status_Problem') {
+    #       $('#filter_button').html('<input type="submit" name="commit" value="Problem" class="btn btn-primary">');
+    #       $('.order_table').html("<%=j render 'partials/order_status', orders: orders.select{|x| x.status.send_reminder == 1 }, display_class: 'none', product_ids: nil %>");
+    #     }else if ($(this).attr('for') == 'status_Shipped') {
+    #       $('#filter_button').html('<input type="submit" name="commit" value="Shipping" class="btn btn-primary">');
+    #       $('.order_table').html("<%=j render 'partials/order_status', orders: orders.select{|x| [3, 8, 9].include? x.status_id }, display_class: 'none', product_ids: nil %>");
+    #     }else if ($(this).attr('for') == 'status_Delivered') {
+    #       $('#filter_button').html('<input type="submit" name="commit" value="Delivered" class="btn btn-primary">');
+    #       $('.order_table').html("<%=j render 'partials/order_status', orders: orders.select{|x| [2, 12].include? x.status_id }, display_class: 'none', product_ids: nil %>");
+    #     }
+    #   });
+    # </script>
 
-    @orders = Order.where('status_id != 10').customer_filter(@customer_ids)\
-      .send(@order_function, @direction).paginate(per_page: @per_page, page: params[:page])
+    customer_ids = (params[:search].nil?) ? [] : Customer.search_for(params[:search]).pluck("id")
+    per_page = params[:per_page] || Order.per_page
+    order_function, direction = sort_order(params, :order_by_id, 'DESC')
+
+    @orders = Order.where('status_id != 10').customer_filter(customer_ids)\
+      .send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
   end
 
   def status_check
+    p = c
     selected_orders = params[:selected_orders]
     if selected_orders.nil? || selected_orders.blank?
       flash[:error] = "Please Select Orders!"
@@ -48,7 +74,7 @@ class StatusController < ApplicationController
     selected_orders = selected_orders.first.split unless selected_orders.blank? || selected_orders.count > 1
 
     # Print Shipping List
-    if "Print Picking Sheet" == params[:commit] && !selected_orders.blank?
+    if "Paperwork" == params[:commit] && !selected_orders.blank?
       # Print Picking Sheet
       # Due to Rails redirect conflicts
       pdf = print_shipping_sheet(selected_orders)

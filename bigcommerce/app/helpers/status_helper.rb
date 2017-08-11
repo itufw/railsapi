@@ -68,7 +68,7 @@ module StatusHelper
     def print_shipping_sheet(selected_orders)
       orders = Order.where(id: selected_orders)
       pdf = CombinePDF.new
-
+      picking_slips = CombinePDF.new
       orders.each do |order|
         customer = Customer.find(order.customer_id)
         order_invoice = WickedPdf.new.pdf_from_string(
@@ -85,7 +85,7 @@ module StatusHelper
               :locals => {order: order, customer: customer}
               )
           )
-        pdf << CombinePDF.parse(packing_slip)
+        picking_slips << CombinePDF.parse(packing_slip)
       end
       picking_sheet = WickedPdf.new.pdf_from_string(
         render_to_string(
@@ -94,6 +94,7 @@ module StatusHelper
             )
         )
 
+      pdf << picking_slips
       pdf << CombinePDF.parse(picking_sheet)
       pdf
     end

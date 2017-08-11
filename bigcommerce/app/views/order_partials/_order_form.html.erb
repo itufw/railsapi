@@ -1,29 +1,47 @@
 <%= f.text_field :customer_id %>
 <div class="row">
-  <div class="col-md-4">
-    <table id="customer_table">
-      <tr>
-        <th>Customer</th>
-        <td>
-          <%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 15 %>
-        </td>
-      </tr>
-      <% unless @order.customer_id.nil? || @order.customer_id == ""%>
-        <tr id="customer_<%= @order.customer_id%>">
-          <td colspan="2"><input type="text" name="customer" id="<%= @order.customer_id %>" value="<%= Customer.find(@order.customer_id).actual_name%>" readonly="readonly"></td>
-        </tr>
-      <% end %>
-    </table>
-  </div>
-  <div class="col-md-4">
-    <table id="product_table">
-      <tr>
-        <th>Product</th>
-        <td>
-          <%= autocomplete_field_tag 'product', '', autocomplete_product_name_activity_index_path, placeholder: 'Search Product', id_element: '#product_id', id: 'product_search'%>
-        </td>
-      </tr>
-    </table>
+  <div class="col-md-8">
+    <div class="row">
+      <div class="col-md-6">
+        <table id="customer_table">
+          <tr>
+            <th>Customer</th>
+            <td>
+              <%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 15 %>
+            </td>
+          </tr>
+          <% unless @order.customer_id.nil? || @order.customer_id == ""%>
+            <tr id="customer_<%= @order.customer_id%>">
+              <td colspan="2"><input type="text" name="customer" id="<%= @order.customer_id %>" value="<%= Customer.find(@order.customer_id).actual_name%>" readonly="readonly"></td>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+      <div class="col-md-6">
+        <table id="product_table">
+          <tr>
+            <th>Product</th>
+            <td>
+              <%= autocomplete_field_tag 'product', '', autocomplete_product_name_activity_index_path, placeholder: 'Search Product', id_element: '#product_id', id: 'product_search'%>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4">
+        <table>
+          <tr>
+            <td class="ProductCost" align="right">Billing Address</td>
+            <td colspan="2"><%= f.text_field :billing_address, placeholder: 'Billing Address', size: 80%></td>
+          </tr>
+          <tr>
+            <td class="ProductCost" align="right">Shipping Address</td>
+            <td colspan="2"><%= f.text_field :address, placeholder: 'Shipping Address', size: 80%></td>
+          </tr>
+        </table>
+      </div>
+    </div>
   </div>
   <div class="col-md-4">
     <table id="last_products">
@@ -47,7 +65,7 @@
       <th>Product ID</th>
       <th>Product</th>
       <th style="width: 3px;">Inventory</th>
-      <th>Price (Luc)</th>
+      <th>Price (LUC)</th>
       <th style="width: 3px;">QTY</th>
       <th>Discount</th>
       <th>Discounted Price</th>
@@ -71,24 +89,20 @@
     <% end %>
   </tbody>
   <tr>
-    <td class="ProductCost" align="right">Shipping Address</td>
-    <td colspan="5"><%= f.text_field :address, placeholder: 'Address', size: 100%></td>
+    <td colspan="2" rowspan="7" align="center">
+      <%= f.text_area :customer_notes, style: "border: none; width: 100%; height: 190px; ", placeholder: 'Customer Notes'%>
+    </td>
+    <td colspan="4" rowspan="7" align="center">
+      <%= f.text_area :staff_notes, style: "border: none; width: 100%; height: 190px; ", placeholder: 'Staff Notes'%>
+    </td>
     <td class="ProductCost" align="right">Subtotal (Inc. WET, Ex. GST)</td>
     <td class="ProductTotal" align="right"><%= f.text_field :subtotal, readonly: true%></td>
   </tr>
   <tr>
-    <td colspan="3">Customer Notes</td>
-    <td colspan="3">Staff Notes</td>
     <td class="ProductCost" align="right">Discount Rate</td>
     <td class="ProductTotal" align="right"><%= f.text_field :discount_rate %></td>
   </tr>
   <tr>
-    <td colspan="3" rowspan="5" align="center">
-      <%= f.text_area :customer_notes, style: "border: none; width: 100%; height: 190px; ", placeholder: 'Customer Notes'%>
-    </td>
-    <td colspan="3" rowspan="5" align="center">
-      <%= f.text_area :staff_notes, style: "border: none; width: 100%; height: 190px; ", placeholder: 'Staff Notes'%>
-    </td>
     <td class="ProductCost" align="right">Discount</td>
     <td class="ProductTotal" align="right"><%= f.text_field :discount_amount, readonly: true%></td>
   </tr>
@@ -109,6 +123,7 @@
     <td class="ProductTotal" align="right"><%= f.text_field :total_inc_tax, readonly: true%></td>
   </tr>
 </table>
+<%= f.hidden_field :modified_wet %>
 <div class="row">
   <div class="col-md-4 col-md-offset-8">
     <%= button_tag(type: 'submit', class: 'btn btn-primary save active', value: 'new_note') do %>
@@ -138,6 +153,7 @@
         ].join(''));
         $('#order_customer_id').val(data.item.id);
         $('#order_address').val(data.item.address);
+        $('#order_billing_address').val(data.item.address);
 
         var link = "/fetch_last_products?customer_id=" + data.item.id
         $.ajax({
@@ -178,12 +194,16 @@
   var update_subtotal = function(){
     var total = 0;
     var discount = 0;
+    var wet = 0;
     $('.product-list tr').each(function(){
       total += parseFloat($(this).find('.product-total').html());
       discount += (parseFloat($(this).find('.product-luc').val()) - parseFloat($(this).find('.product-price').val())) *  parseInt($(this).find('.product-qty').val());
+      wet += ((parseFloat($(this).find('.product-price').val()) - 1.82) * parseInt($(this).find('.product-qty').val() * 0.29));
     });
     $('#order_subtotal').val(total.toFixed(4));
-    $('#order_wet').val((total/1.29 * 0.29).toFixed(4));
+    $('#order_wet').val((total / 1.29 * 0.29).toFixed(4));
+    // Modified Wet
+    $('#order_modified_wet').val(wet);
 
     order_discount = parseFloat($('#order_discount_rate').val()) * 0.01
     discount += (total * order_discount)
@@ -248,7 +268,7 @@
   var valid_check = function(){
     var customer_flag = $('tr input[name=customer]').size() > 0;
     var product_flag = $('tbody.product-list tr').size() > 0;
-    var shipping_address_flag = ($('input#order_address').val() != "");
+    var shipping_address_flag = (($('input#order_address').val() != "") && ($('input#order_billing_address').val() != ""));
     var inventory_flag = true;
     var table_flag = $('table input:text').filter(function() { return (this.value == "" || this.value=="NaN"); }).size() == 0;
     $('.product-qty').each(function(){
