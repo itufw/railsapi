@@ -10,7 +10,7 @@ class Order < ActiveRecord::Base
   has_many :order_shippings
   has_many :addresses, through: :order_shippings
   has_many :order_actions
-  belongs_to :billing_address, class_name: :Address, foreign_key: :billing_address_id
+  belongs_to :bigcommerce_address, class_name: :Address, foreign_key: :billing_address_id
   has_many :order_products
   has_many :products, through: :order_products
   has_many :order_histories
@@ -128,6 +128,11 @@ class Order < ActiveRecord::Base
   # Returns orders with a given status id
   def self.status_filter(status_id)
     return where('status_id = ?', status_id) unless status_id.nil?
+    all
+  end
+
+  def self.statuses_filter(status_id)
+    return where(status_id: status_id) unless status_id.nil? || status_id.blank?
     all
   end
 
