@@ -3,7 +3,7 @@
 <% if ['Approval'].include? @status_name %>
   <%= form_tag({:controller => "order", :action => "order_confirmation"}, {:method => "get"}) do %>
     <%= hidden_field_tag :status_name, @status_name%>
-    <%= hidden_field_tag :status_id, @status_id%>
+    <%= hidden_field_tag :status_id, 3%>
     <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
     <%= submit_tag 'Check', class: 'btn btn-primary'%>
   <% end %>
@@ -20,9 +20,9 @@
 <% elsif ['Courier'].include? @status_name%>
   <%= form_tag({:controller => "order", :action => "order_confirmation"}, {:method => "get"}) do %>
     <%= hidden_field_tag :status_name, @status_name%>
-    <%= hidden_field_tag :status_id, @status_id%>
+    <%= hidden_field_tag :status_id, 9%>
     <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
-    <%= submit_tag 'Courier Selection', class: 'btn btn-primary'%>
+    <%= submit_tag 'Select Courier', class: 'btn btn-primary'%>
   <% end %>
 <% elsif ['Shipping'].include? @status_name%>
   <%= form_tag({:controller => "status", :action => "status_update"}, {:method => "get"}) do %>
@@ -33,14 +33,14 @@
 <% elsif ['Delivered'].include? @status_name %>
   <%= form_tag({:controller => "order", :action => "order_confirmation"}, {:method => "get"}) do %>
     <%= hidden_field_tag :status_name, @status_name%>
-    <%= hidden_field_tag :status_id, @status_id%>
+    <%= hidden_field_tag :status_id, 12 %>
     <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
     <%= submit_tag 'Delivered', class: 'btn btn-primary'%>
   <% end %>
 <% else %>
   <%= form_tag({:controller => "order", :action => "order_confirmation"}, {:method => "get"}) do %>
     <%= hidden_field_tag :status_name, @status_name%>
-    <%= hidden_field_tag :status_id, @status_id%>
+    <%= hidden_field_tag :status_id, 3 %>
     <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
     <%= submit_tag 'Check', class: 'btn btn-primary'%>
   <% end %>

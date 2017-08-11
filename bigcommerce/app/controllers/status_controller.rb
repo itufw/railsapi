@@ -22,32 +22,8 @@ class StatusController < ApplicationController
       orders(params, product_filtered_ids, staff_id, @status_id)
   end
 
+  # DON'T Use
   def order_status
-    # <script type="text/javascript">
-    #   <% orders = Order.where('status_id != 10').customer_filter(@customer_ids).send(@order_function, @direction)%>
-    #   $('label').click(function(){
-    #     if( $(this).attr('for') == 'status_Approve'){
-    #       $('#filter_button').html('<input type="submit" name="commit" value="Approval" class="btn btn-primary">');
-    #       $('.order_table').html("<%=j render 'partials/order_status', orders: orders.select{|x| x.status_id == 11}, display_class: 'none', product_ids: nil %>");
-    #     }else if ($(this).attr('for') == 'status_Picking') {
-    #       $('#filter_button').html('<input type="submit" name="commit" value="Picking" class="btn btn-primary">');
-    #       $('.order_table').html("<%=j render 'partials/order_status', orders: orders.select{|x| x.status_id == 3}, display_class: 'none', product_ids: nil %>");
-    #     }else if ($(this).attr('for') == 'status_Courier'){
-    #       $('#filter_button').html('<input type="submit" name="commit" value="Courier" class="btn btn-primary">');
-    #       $('.order_table').html("<%=j render 'partials/order_status', orders: orders.select{|x| [3, 8].include? x.status_id }, display_class: 'none', product_ids: nil %>");
-    #     }else if ($(this).attr('for') == 'status_Problem') {
-    #       $('#filter_button').html('<input type="submit" name="commit" value="Problem" class="btn btn-primary">');
-    #       $('.order_table').html("<%=j render 'partials/order_status', orders: orders.select{|x| x.status.send_reminder == 1 }, display_class: 'none', product_ids: nil %>");
-    #     }else if ($(this).attr('for') == 'status_Shipped') {
-    #       $('#filter_button').html('<input type="submit" name="commit" value="Shipping" class="btn btn-primary">');
-    #       $('.order_table').html("<%=j render 'partials/order_status', orders: orders.select{|x| [3, 8, 9].include? x.status_id }, display_class: 'none', product_ids: nil %>");
-    #     }else if ($(this).attr('for') == 'status_Delivered') {
-    #       $('#filter_button').html('<input type="submit" name="commit" value="Delivered" class="btn btn-primary">');
-    #       $('.order_table').html("<%=j render 'partials/order_status', orders: orders.select{|x| [2, 12].include? x.status_id }, display_class: 'none', product_ids: nil %>");
-    #     }
-    #   });
-    # </script>
-
     customer_ids = (params[:search].nil?) ? [] : Customer.search_for(params[:search]).pluck("id")
     per_page = params[:per_page] || Order.per_page
     order_function, direction = sort_order(params, :order_by_id, 'DESC')
@@ -57,16 +33,11 @@ class StatusController < ApplicationController
   end
 
   def status_check
-    p = c
-    selected_orders = params[:selected_orders]
-    if selected_orders.nil? || selected_orders.blank?
-      flash[:error] = "Please Select Orders!"
-      redirect_to :back
-      return
-    end
-    @status_name = params[:commit]
-    @status_id = Status.where("alt_name LIKE '#{@status_name}'").first.id
-    @orders = Order.order_filter_by_ids(selected_orders)
+    @status_name = params[:status_name]
+    status_ids = Status.where("alt_name LIKE '%#{@status_name}%'").map(&:id)
+
+    per_page = params[:per_page] || Order.per_page
+    @orders = Order.statuses_filter(status_ids).paginate(per_page: @per_page, page: params[:page])
   end
 
   def status_update
@@ -94,22 +65,30 @@ class StatusController < ApplicationController
     # Skip current record
     if "Skip" == params[:commit]
     elsif "Approve" == params[:commit]
-      Order.find(params[:order_id]).update(status_id: 3)
+      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 3}))
     elsif "Hold-Stock" == params[:commit]
-      Order.find(params[:order_id]).update(status_id: 20)
+      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 20}))
     elsif "Hold-Price" == params[:commit]
-      Order.find(params[:order_id]).update(status_id: 7)
+      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 7}))
     elsif "Hold-Other" == params[:commit]
-      Order.find(params[:order_id]).update(status_id: 13)
+      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 13}))
     elsif "Create Label" == params[:commit]
       # TODO
       # Create Fastway Label & Create tracking information for orders
+      # IF order_params[:courier_status_id] == 3 -> Create FASTWAY Label
+      # Else: just record the label number
+      p = c
+      if order_params[:courier_status_id] == '3'
+        # create label with fastway
+      else
+        Order.find(params[:order_id]).update_attributes(order_params)
+      end
     elsif "Delivered" == params[:commit]
-      Order.find(params[:order_id]).update(status_id: 12)
+      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 12}))
     elsif "Problem" == params[:commit]
-      Order.find(params[:order_id]).update_attributes(params[:order].permit(:status_id))
+      Order.find(params[:order_id]).update_attributes(order_params)
     elsif "Complete" == params[:commit]
-      Order.find(params[:order_id]).update(status_id: 10)
+      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 10}))
     elsif !params[:order].nil?
       status = Status.find(params[:order][:status_id])
       order = Order.find(params[:order][:id])
@@ -152,7 +131,9 @@ class StatusController < ApplicationController
   end
 
   def fetch_last_products
-    order_ids = Order.where(customer_id: params[:customer_id]).map(&:id)
+    orders = Order.where(customer_id: params[:customer_id]).order('updated_at DESC')
+    @last_order = orders.first
+    order_ids = orders.map(&:id)
     product_ids = OrderProduct.where("order_id IN (?) AND created_at > ?", order_ids, (Date.today - 3.month).to_s(:db)).map(&:product_id)
     @products = Product.where(id: product_ids)
     respond_to do |format|
@@ -163,5 +144,7 @@ end
 
 private
   def order_params
-    params.require(:order).permit(:id, :status_id, :courier_status_id, :account_status)
+    params.require(:order).permit(:id, :status_id, :courier_status_id,\
+      :account_status, :address, :billing_address, :customer_notes,\
+      :staff_notes, :delivery_instruction)
   end

@@ -650,44 +650,45 @@ ActiveRecord::Schema.define(version: 20170810064048) do
   add_index "order_shippings", ["order_id"], name: "index_order_shippings_on_order_id", using: :btree
 
   create_table "orders", force: :cascade do |t|
-    t.integer  "customer_id",         limit: 4,                              null: false
-    t.integer  "status_id",           limit: 4
-    t.integer  "staff_id",            limit: 4
-    t.decimal  "total_inc_tax",                     precision: 10, scale: 4
-    t.integer  "qty",                 limit: 3,                              null: false
-    t.integer  "items_shipped",       limit: 3
-    t.decimal  "subtotal",                          precision: 10, scale: 4
-    t.decimal  "discount_rate",                     precision: 10, scale: 4
-    t.decimal  "discount_amount",                   precision: 10, scale: 4
-    t.decimal  "handling_cost",                     precision: 10, scale: 4
-    t.decimal  "shipping_cost",                     precision: 10, scale: 4
-    t.decimal  "wrapping_cost",                     precision: 10, scale: 4
-    t.decimal  "wet",                               precision: 10, scale: 4
-    t.decimal  "gst",                               precision: 10, scale: 4
-    t.text     "staff_notes",         limit: 65535
-    t.text     "customer_notes",      limit: 65535
-    t.integer  "active",              limit: 1
-    t.string   "xero_invoice_id",     limit: 255
-    t.string   "xero_invoice_number", limit: 255
-    t.string   "source",              limit: 255
-    t.string   "source_id",           limit: 255
+    t.integer  "customer_id",          limit: 4,                              null: false
+    t.integer  "status_id",            limit: 4
+    t.integer  "staff_id",             limit: 4
+    t.decimal  "total_inc_tax",                      precision: 10, scale: 4
+    t.integer  "qty",                  limit: 3,                              null: false
+    t.integer  "items_shipped",        limit: 3
+    t.decimal  "subtotal",                           precision: 10, scale: 4
+    t.decimal  "discount_rate",                      precision: 10, scale: 4
+    t.decimal  "discount_amount",                    precision: 10, scale: 4
+    t.decimal  "handling_cost",                      precision: 10, scale: 4
+    t.decimal  "shipping_cost",                      precision: 10, scale: 4
+    t.decimal  "wrapping_cost",                      precision: 10, scale: 4
+    t.decimal  "wet",                                precision: 10, scale: 4
+    t.decimal  "gst",                                precision: 10, scale: 4
+    t.text     "staff_notes",          limit: 65535
+    t.text     "customer_notes",       limit: 65535
+    t.integer  "active",               limit: 1
+    t.string   "xero_invoice_id",      limit: 255
+    t.string   "xero_invoice_number",  limit: 255
+    t.string   "source",               limit: 255
+    t.string   "source_id",            limit: 255
     t.datetime "date_created"
     t.datetime "date_shipped"
-    t.integer  "created_by",          limit: 4
-    t.integer  "last_updated_by",     limit: 4
-    t.datetime "created_at",                                                 null: false
-    t.datetime "updated_at",                                                 null: false
-    t.integer  "courier_status_id",   limit: 4
-    t.string   "account_status",      limit: 255
-    t.text     "street",              limit: 65535
-    t.string   "city",                limit: 255
-    t.string   "state",               limit: 255
-    t.string   "postcode",            limit: 255
-    t.string   "country",             limit: 255
-    t.string   "address",             limit: 255
-    t.string   "track_number",        limit: 255
-    t.float    "modified_wet",        limit: 24
-    t.string   "billing_address",     limit: 255
+    t.integer  "created_by",           limit: 4
+    t.integer  "last_updated_by",      limit: 4
+    t.datetime "created_at",                                                  null: false
+    t.datetime "updated_at",                                                  null: false
+    t.integer  "courier_status_id",    limit: 4
+    t.string   "account_status",       limit: 255
+    t.text     "street",               limit: 65535
+    t.string   "city",                 limit: 255
+    t.string   "state",                limit: 255
+    t.string   "postcode",             limit: 255
+    t.string   "country",              limit: 255
+    t.string   "address",              limit: 255
+    t.string   "track_number",         limit: 255
+    t.float    "modified_wet",         limit: 24
+    t.string   "billing_address",      limit: 255
+    t.text     "delivery_instruction", limit: 65535
   end
 
   add_index "orders", ["customer_id"], name: "index_orders_on_customer_id", using: :btree

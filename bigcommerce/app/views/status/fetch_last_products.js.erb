@@ -5,3 +5,6 @@
           '</tr>'
           ].join(''));
 <% end %>
+dilivery_instruction.val('<%= @last_order.delivery_instruction %>');
+shipping_address.val('<%= @last_order.address%>');
+billing_address.val('<%= @last_order.billing_address %>');
