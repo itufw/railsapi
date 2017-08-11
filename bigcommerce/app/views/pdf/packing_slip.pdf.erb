@@ -6,7 +6,7 @@
   <div id="heading">
     <div id="Logo">
       <b>Packing Slip</b>
-      <h1 style="margin-bottom: 0px;padding-right: 5px;">Untapped Fine Wines</h1><br/>
+      <h1 style="margin-bottom: 0px;padding-right: 2px;">Untapped Fine Wines</h1><br/>
     </div>
     <table id="invoiceDets">
       <tr>
@@ -34,7 +34,7 @@
     <%= customer.country%><br/>
   </div>
 
-  <div id="products">
+  <div id="products" style="margin-top: -50px;">
     <%
         gst = 1 + 0.01 * TaxPercentage.gst_percentage
         wet = 1 + 0.01 * TaxPercentage.wet_percentage
