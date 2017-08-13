@@ -31,7 +31,7 @@ class BigcommerceOrder < ActiveRecord::Base
     order_count = order_api.count(min_date_modified: update_time).count
     limit = 50
     order_pages = (order_count / limit) + 1
-    order_product = OrderProduct.new
+    order_product = BigcommerceOrderProduct.new
 
     page_number = 1
 
@@ -62,7 +62,7 @@ class BigcommerceOrder < ActiveRecord::Base
         else
           # insert a new one
           order = insert_or_update(o, 1)
-          order_product.insert(o.id, nil)
+          order_product.insert(o.id)
         end
         Address.new.insert_or_update(o.billing_address, o.customer_id, o.id)
       end
@@ -106,16 +106,16 @@ class BigcommerceOrder < ActiveRecord::Base
       '#{o.gift_certificate_amount}','#{o.ip_address}', '#{staff_notes}',\
       '#{customer_notes}', '#{o.discount_amount}', '#{o.coupon_discount}',\
       '#{active}', '#{o.order_source}', '#{time}', '#{time}',\
-      '#{payment_method}', '#{staff_id}', 'bigcommerce', '#{o.id}')"
+      '#{payment_method}', '#{staff_id}')"
 
-      sql = "INSERT INTO bigcomerce_orders (id, customer_id, date_created, date_modified, date_shipped,\
+      sql = "INSERT INTO bigcommerce_orders (id, customer_id, date_created, date_modified, date_shipped,\
 			status_id, subtotal_ex_tax, subtotal_inc_tax, subtotal_tax, base_shipping_cost,\
 			shipping_cost_ex_tax, shipping_cost_inc_tax, shipping_cost_tax, shipping_cost_tax_class_id,\
 			base_handling_cost, handling_cost_ex_tax, handling_cost_inc_tax, handling_cost_tax, handling_cost_tax_class_id,\
 			base_wrapping_cost, wrapping_cost_ex_tax, wrapping_cost_inc_tax, wrapping_cost_tax, wrapping_cost_tax_class_id,\
 			total_ex_tax, total_inc_tax, total_tax, qty, items_shipped, refunded_amount, store_credit,\
 			gift_certificate_amount, ip_address, staff_notes, customer_notes, discount_amount,\
-			coupon_discount, active, order_source, created_at, updated_at, payment_method, staff_id, source, source_id)\
+			coupon_discount, active, order_source, created_at, updated_at, payment_method, staff_id)\
 			VALUES #{order}"
 
       # insert the billing adress where the id is order_id
@@ -132,7 +132,7 @@ class BigcommerceOrder < ActiveRecord::Base
 					total_ex_tax = '#{o.total_ex_tax}', total_inc_tax = '#{o.total_inc_tax}', total_tax = '#{o.total_tax}', qty = '#{o.items_total}', items_shipped = '#{o.items_shipped}',\
 					refunded_amount = '#{o.refunded_amount}', store_credit = '#{o.store_credit_amount}', gift_certificate_amount = '#{o.gift_certificate_amount}',\
 					ip_address = '#{o.ip_address}', staff_notes = '#{staff_notes}', customer_notes = '#{customer_notes}', discount_amount = '#{o.discount_amount}',\
-					coupon_discount = '#{o.coupon_discount}', active = '#{active}', order_source = '#{o.order_source}', updated_at = '#{time}', payment_method = '#{payment_method}' WHERE id = '#{o.id}'"
+					coupon_discount = '#{o.coupon_discount}', active = '#{active}', updated_at = '#{time}', payment_method = '#{payment_method}' WHERE id = '#{o.id}'"
 
       # update order action table
       # if o.status_id == 10

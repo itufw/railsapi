@@ -109,6 +109,28 @@
         </div>
       <!-- Shipping & Assign Tracking Number -->
     <% elsif @selected_status_id == '9' %>
+      <div class="fastway_labels" style="display: none;">
+        <div class="row">
+          <div class="col-md-4">Total Bottles</div>
+          <div class="col-md-4"><%= @order.qty %></div>
+          <div class="col-md-4">
+            <%= label(:dozen, '12 Pack') %>
+            <%= text_field_tag('dozen', (@order.qty.to_f/12).to_i, placeholder: '12 pack', class: 'form-control') %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4">Dozen</div>
+          <div class="col-md-4"><%= (@order.qty.to_f/12).round(1) %></div>
+          <div class="col-md-4">
+            <%= label(:half_dozen, '6 Pack') %>
+            <%= text_field_tag('half-dozen', (((@order.qty % 12).to_f/6) + 0.9).to_i, placeholder: '6 pack', class: 'form-control') %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4">Fastway Labels</div>
+          <div class="col-md-4"><%= (@order.qty.to_f/12 + 0.9).to_i %></div>
+        </div>
+      </div>
       <div class="row">
           <div class="col-md-6"><%= f.collection_select :courier_status_id, CourierStatus.all, :id, :name, {include_blank: 'All Status'}, {:class => 'form-control'}%></div>
           <div class="col-md-6"><%= submit_tag 'Create Label', class: 'btn btn-success'%></div>
@@ -120,8 +142,10 @@
           $('input#order_track_number').hide();
           if (this.value == 3){
             $('input#order_track_number').hide();
+            $('.fastway_labels').show();
           }else{
             $('input#order_track_number').show();
+            $('.fastway_labels').hide();
           }
         });
       </script>
