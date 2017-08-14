@@ -108,7 +108,8 @@ class Product < ActiveRecord::Base
 			upc = '#{p.upc}', bin_picking_num = '#{p.bin_picking_number}', search_keywords = '#{search_keywords}', meta_keywords = '#{meta_keywords}',\
 			description = '#{description}', meta_description = '#{meta_description}', page_title = '#{page_title}', retail_price = '#{p.retail_price}',\
 			sale_price = '#{p.sale_price}', calculated_price = '#{p.calculated_price}', inventory_warning_level = '#{p.inventory_warning_level}',\
-			inventory_tracking = '#{p.inventory_tracking}', keyword_filter = '#{p.keyword_filter}', sort_order = '#{p.sort_order}',\
+      inventory = '#{p.inventory_level}',\
+      inventory_tracking = '#{p.inventory_tracking}', keyword_filter = '#{p.keyword_filter}', sort_order = '#{p.sort_order}',\
 			related_products = '#{p.related_products}', rating_total = '#{p.rating_total}', rating_count = '#{p.rating_count}', updated_at = '#{time}'\
 			WHERE id = '#{p.id}'"
 

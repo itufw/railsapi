@@ -8,10 +8,8 @@ class BigcommerceOrderProduct < ActiveRecord::Base
       return
     end
 
-    # New Order Table
-    order = BigcommerceOrder.find(order_id)
-    # Delete Products that no long exist in new order
-    BigcommerceOrderProduct.where('order_id = ? AND product_id NOT IN (?)', order.id, order_products.map(&:product_id)).map(&:delete_product)
+    order = Order.where('source = ? AND source_id = ?', 'bigcommerce', order_id).first
+    new_op = order.order_products
 
     order_products.each do |op|
       time = Time.now.to_s(:db)
@@ -25,11 +23,17 @@ class BigcommerceOrderProduct < ActiveRecord::Base
 
       ActiveRecord::Base.connection.execute(sql_products)
 
+      op_main = new_op.select {|x| x.product_id == op.product_id}.first
+      op_main.import_from_bigcommerce(order, op) unless op_main.nil?
+      OrderProduct.new.import_from_bigcommerce(order, op) if op_main.nil?
     end
   end
 
   def delete(order_id)
     delete_order_product = "DELETE FROM bigcommerce_order_products WHERE order_id = '#{order_id}'"
       ActiveRecord::Base.connection.execute(delete_order_product)
+
+    order = Order.where('source = ? AND source_id = ?', 'bigcommerce', order_id).first
+    order.order_products.map(&:delete_product)
   end
 end
