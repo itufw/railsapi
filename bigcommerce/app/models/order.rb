@@ -19,6 +19,26 @@ class Order < ActiveRecord::Base
   belongs_to :order_history
   belongs_to :xero_invoice
 
+  geocoded_by :address  do |obj,results|
+    if geo = results.first
+      geo.data['address_components'].each do |address_detail|
+        if address_detail['types'].include? 'street_number'
+          obj.street = address_detail['long_name'].to_s + ' ' + obj.street.to_s
+        elsif address_detail['types'].include? 'route'
+          obj.street = obj.street.to_s + address_detail['long_name'].to_s
+        elsif address_detail['types'].include? 'locality'
+          obj.city = address_detail['long_name']
+        elsif address_detail['types'].include? 'administrative_area_level_1'
+          obj.state = address_detail['long_name']
+        elsif address_detail['types'].include? 'postal_code'
+          obj.postcode = address_detail['long_name']
+        elsif address_detail['types'].include? 'country'
+          obj.country = address_detail['long_name']
+        end
+      end
+    end
+  end
+  after_validation :geocode, if: ->(obj){ obj.address_changed? }
   after_validation :record_history, on: [:update, :delete], unless: ->(obj){ obj.xero_invoice_number_changed? or obj.xero_invoice_id_changed?}
   after_validation :cancel_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id == 5}
 
@@ -27,7 +47,8 @@ class Order < ActiveRecord::Base
 
   def import_from_bigcommerce(order)
     customer = Customer.find(order.customer_id)
-    params = {'customer_id': order.customer_id, 'status_id': 11, 'staff_id': customer.staff_id,\
+    status_id = Status.where('bigcommerce_id = ?', order.status_id).order('statuses.order').first.id
+    params = {'customer_id': order.customer_id, 'status_id': status_id, 'staff_id': customer.staff_id,\
        'total_inc_tax': order.total_inc_tax, 'qty': order.items_total, 'items_shipped': order.items_shipped,\
        'subtotal': order.subtotal_inc_tax.to_f/1.29, 'discount_rate': 0, 'discount_amount': order.discount_amount + order.coupon_discount,\
        'handling_cost': order.items_total.to_f * 1.82, 'shipping_cost': order.shipping_cost_ex_tax,\
@@ -43,7 +64,8 @@ class Order < ActiveRecord::Base
 
   def update_from_bigcommerce(order)
     customer = Customer.find(order.customer_id)
-    params = {'customer_id': order.customer_id, 'status_id': 11, 'staff_id': customer.staff_id,\
+    status_id = Status.where('bigcommerce_id = ?', order.status_id).order('statuses.order').first.id
+    params = {'customer_id': order.customer_id, 'status_id': status_id, 'staff_id': customer.staff_id,\
        'total_inc_tax': order.total_inc_tax, 'qty': order.items_total, 'items_shipped': order.items_shipped,\
        'subtotal': order.subtotal_inc_tax.to_f/1.29, 'discount_rate': 0, 'discount_amount': order.discount_amount + order.coupon_discount,\
        'handling_cost': order.items_total.to_f * 1.82, 'shipping_cost': order.shipping_cost_ex_tax,\

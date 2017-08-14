@@ -177,7 +177,7 @@ class OrderController < ApplicationController
     # subtotal_tax -> WET
     params.require(:order).permit(:customer_id, :subtotal, :discount_rate, :discount_amount,\
                                   :shipping_cost, :total_inc_tax, :wet, :gst, \
-                                  :customer_notes, :staff_notes, :shipping_address, :modified_wet,\
+                                  :customer_notes, :staff_notes, :address, :modified_wet,\
                                   :billing_address, :delivery_instruction)
   end
 
