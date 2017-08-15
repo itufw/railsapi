@@ -156,5 +156,6 @@ private
   def order_params
     params.require(:order).permit(:id, :status_id, :courier_status_id,\
       :account_status, :address, :billing_address, :customer_notes,\
-      :staff_notes, :delivery_instruction)
+      :staff_notes, :delivery_instruction, :SpecialInstruction1, :SpecialInstruction2,\
+      :SpecialInstruction3)
   end
