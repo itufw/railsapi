@@ -81,7 +81,7 @@ class StatusController < ApplicationController
       if order_params[:courier_status_id] == '3'
         order = Order.find(params[:order_id])
         order.update_attributes(order_params.reject{|key, value| key == 'courier_status_id' })
-        result = Fastway.new.add_consignment(order, dozen, half_dozen)
+        result = Fastway.new.add_consignment(order, params['dozen'].to_i, params['half-dozen'].to_i)
         begin
           order.update_attributes(order_params.merge({'track_number': result['result']['LabelNumbers'].join(';')}))
         rescue
