@@ -16,7 +16,7 @@
                     <b>Invoice No</b>
                 </td>
                 <td>
-                    <b>000<%= order.id %></b>
+                    <b><%= order.id %></b>
                 </td>
             </tr>
             <tr>
@@ -64,8 +64,8 @@
       <%
         gst = 1 + 0.01 * TaxPercentage.gst_percentage
         wet = 1 + 0.01 * TaxPercentage.wet_percentage
-        products = order.cms_order_products
-        discount_amount = products.map {|x| x.base_price - x.price_ex_tax }.sum
+        products = order.order_products
+        discount_amount = products.map {|x| x.price_discounted - x.price_luc }.sum
       %>
             <table class="InvoiceTable">
                     <tr>
@@ -79,33 +79,34 @@
                         <th class="ProductTotal" align="right" id="amt" style="width:15px;">Total</th>
                         <th></th>
                     </tr>
-                    <% products.each do |item| %>
+                    <% products.select{ |x| x.display == 1}.each do |item| %>
                       <tr>
                           <td class="ProductQuantity"><%= item.qty.to_i%></td>
                           <td class="ProductDetails"><%= Product.find(item.product_id).name %></td>
-                          <td class="ProductCost" id="price" align="right">$<%= '%.2f' % item.base_price %></td>
+                          <td class="ProductCost" id="price" align="right">$<%= '%.2f' % item.price_luc %></td>
                           <% unless discount_amount == 0%>
-                            <td class="ProductCost" align="right"><%= '%.0f' % ((1 - item.price_ex_tax / item.base_price) * 100) %>%</td>
-                            <td class="ProductCost" align="right">$<%= '%.2f' % item.price_ex_tax %></td>
+                            <td class="ProductCost" align="right"><%= '%.0f' % item.discount %>%</td>
+                            <td class="ProductCost" align="right">$<%= '%.2f' % item.price_discounted %></td>
                           <% end %>
-                          <td class="ProductTotal" align="right" id="amt" style="width:15px;">$<%= '%.2f' % (item.qty * item.price_ex_tax) %></td>
+                          <td class="ProductTotal" align="right" id="amt" style="width:15px;">$<%= '%.2f' % (item.qty * item.price_discounted) %></td>
                           <td></td>
                       </tr>
                     <% end %>
                     <tr style="border-bottom:1px solid black"><td colspan="100%"></td></tr>
                     <tr>
-                      <td rowspan="7"></td>
-                      <% unless discount_amount == 0%>
-                        <td colspan="2" rowspan="7"></td>
+                      <% if discount_amount == 0%>
+                        <td rowspan="7"></td>
+                      <% else %>
+                        <td colspan="3" rowspan="7"></td>
                       <% end %>
                       <td colspan="2" class="ProductCost" align="right">Subtotal(inc. WET ex. GST)</td>
-                      <td class="ProductTotal" align="right" >$<%= '%.2f' % (order.subtotal_inc_tax) %></td>
+                      <td class="ProductTotal" align="right" >$<%= '%.2f' % (order.subtotal) %></td>
                       <td></td>
                     </tr>
                     <% unless order.discount_amount.to_f == 0%>
                       <tr>
                         <td colspan="2" class="ProductCost" align="right">Discount Rate</td>
-                        <td class="ProductTotal" align="right"><%= '%.2f' % (order.discount_rate) %>%</td>
+                        <td class="ProductTotal" align="right"><%= '%.0f' % (order.discount_rate) %>%</td>
                         <td></td>
                       </tr>
                       <tr>
@@ -116,17 +117,17 @@
                     <% end %>
                     <tr>
                       <td colspan="2" class="ProductCost" align="right">Shipping(ex. GST)</td>
-                      <td class="ProductTotal" align="right">$<%= '%.2f' % (order.base_shipping_cost.to_f) %></td>
+                      <td class="ProductTotal" align="right">$<%= '%.2f' % (order.shipping_cost) %></td>
                       <td></td>
                     </tr>
                     <tr>
                       <td colspan="2" class="ProductCost" align="right">WET</td>
-                      <td class="ProductTotal" align="right">$<%= '%.2f' % (order.subtotal_tax.to_f) %></td>
+                      <td class="ProductTotal" align="right">$<%= '%.2f' % (order.wet) %></td>
                       <td></td>
                     </tr>
                     <tr>
                       <td colspan="2" class="ProductCost" align="right">GST</td>
-                      <td class="ProductTotal" align="right">$<%= '%.2f' % (order.total_tax) %></td>
+                      <td class="ProductTotal" align="right">$<%= '%.2f' % (order.gst) %></td>
                       <td></td>
                     </tr>
                     <tr>

@@ -17,14 +17,4 @@ class OrderHistory < ActiveRecord::Base
 	has_many :order_product_histories
 	has_many :products, through: :order_product_histories
 
-	def insert(order_id)
-
-		insert = "INSERT INTO order_histories SELECT NULL, orders.* FROM orders WHERE id = '#{order_id}'"
-
-		last_insert_id = ActiveRecord::Base.connection.insert(insert)
-
-		return last_insert_id
-	
-
-	end
 end

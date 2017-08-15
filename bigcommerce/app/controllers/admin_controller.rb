@@ -46,7 +46,7 @@ class AdminController < ApplicationController
     end
 
     def update_orders
-        Order.new.update_from_api(Revision.bigcommerce.update_time_iso)
+        BigcommerceOrder.new.update_from_api(Revision.bigcommerce.update_time_iso)
     end
 
     def import_from_csv

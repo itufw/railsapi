@@ -28,7 +28,17 @@
                             </ul>
                         </li>
 
-                        <li><%= link_to "Orders", controller: "order", action: "all" %></li>
+                        <li class="dropdown">
+                          <a class="" data-toggle="dropdown" href="#">Orders
+                            <span class="caret"></span>
+                          </a>
+                          <ul class="dropdown-menu">
+                            <li><%= link_to "Orders", controller: "order", action: "all" %></li>
+                            <li><%= link_to "New Order", controller: "order", action: "create_order" %></li>
+                            <li><%= link_to "Pending Orders", controller: "status", action: "pending", status_id: 1, status_name: "Pending" %></li>
+                          </ul>
+                        </li>
+
                         <li class="dropdown">
                           <a class="" data-toggle="dropdown" href="#">Customers
                             <span class="caret"></span>
@@ -52,7 +62,6 @@
                             </ul>
                         </li>
 
-                        <li><%= link_to "Pending Orders", controller: "status", action: "pending", status_id: 1, status_name: "Pending" %></li>
                         <% if user_full_right(session[:authority]) %>
                         <li class="dropdown">
                             <a class="" data-toggle="dropdown" href="#">Accounting

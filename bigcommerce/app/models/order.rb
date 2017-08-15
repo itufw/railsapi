@@ -1,4 +1,3 @@
-require 'bigcommerce_connection.rb'
 require 'clean_data.rb'
 
 class Order < ActiveRecord::Base
@@ -11,151 +10,75 @@ class Order < ActiveRecord::Base
   has_many :order_shippings
   has_many :addresses, through: :order_shippings
   has_many :order_actions
-  belongs_to :billing_address, class_name: :Address, foreign_key: :billing_address_id
+  belongs_to :bigcommerce_address, class_name: :Address, foreign_key: :billing_address_id
   has_many :order_products
   has_many :products, through: :order_products
+  has_many :order_histories
   # has_many :products, through: :order_products
 
   belongs_to :order_history
   belongs_to :xero_invoice
 
+  geocoded_by :address  do |obj,results|
+    if geo = results.first
+      obj.street = ''
+      geo.data['address_components'].each do |address_detail|
+        if address_detail['types'].include? 'street_number'
+          obj.street = address_detail['long_name'].to_s + ' ' + obj.street.to_s
+        elsif address_detail['types'].include? 'route'
+          obj.street = obj.street.to_s + address_detail['long_name'].to_s
+        elsif address_detail['types'].include? 'locality'
+          obj.city = address_detail['long_name']
+        elsif address_detail['types'].include? 'administrative_area_level_1'
+          obj.state = address_detail['long_name']
+        elsif address_detail['types'].include? 'postal_code'
+          obj.postcode = address_detail['long_name']
+        elsif address_detail['types'].include? 'country'
+          obj.country = address_detail['long_name']
+        end
+      end
+    end
+  end
+  after_validation :geocode, on: [:create, :update], if: ->(obj){ obj.address_changed? }
+  after_validation :record_history, on: [:update, :delete], unless: ->(obj){ obj.xero_invoice_number_changed? or obj.xero_invoice_id_changed?}
+  after_validation :cancel_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id == 5}
+  after_validation :recovery_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id_was == 5}
+
+
   self.per_page = 30
 
-  def scrape
-    order_api = Bigcommerce::Order
-    order_count = order_api.count.count
-    limit = 50
-    order_pages = (order_count / limit) + 1
-
-    page_number = 1
-
-    order_product = OrderProduct.new
-
-    order_pages.times do
-      orders = order_api.all(page: page_number)
-
-      orders.each do |o|
-        insert_or_update(o, 1)
-        order_product.insert(o.id)
-      end
-
-      page_number += 1
-    end
+  def import_from_bigcommerce(order)
+    customer = Customer.find(order.customer_id)
+    status_id = Status.where('bigcommerce_id = ?', order.status_id).order('statuses.order').first.id
+    params = {'customer_id': order.customer_id, 'status_id': status_id, 'staff_id': customer.staff_id,\
+       'total_inc_tax': order.total_inc_tax, 'qty': order.items_total, 'items_shipped': order.items_shipped,\
+       'subtotal': order.subtotal_inc_tax.to_f/1.29, 'discount_rate': 0, 'discount_amount': order.discount_amount + order.coupon_discount,\
+       'handling_cost': order.items_total.to_f * 1.82, 'shipping_cost': order.shipping_cost_ex_tax,\
+       'wrapping_cost': order.wrapping_cost_ex_tax, 'wet': (order.subtotal_ex_tax.to_f - order.discount_amount.to_f - order.coupon_discount.to_f) * 0.29,\
+       'gst': order.total_inc_tax.to_f / 11, 'staff_notes': remove_apostrophe(order.staff_notes),\
+       'customer_notes': remove_apostrophe(order.customer_message), 'active': convert_bool(order.is_deleted),\
+       'source': 'bigcommerce', 'source_id': order.id, 'date_created': map_date(order.date_created),\
+       'date_shipped': map_date(order.date_shipped), 'created_by': 34, 'last_updated_by': 34,\
+       'courier_status_id': 1, 'address': customer.address}
+    self.update_attributes(params)
+    self
   end
 
-  def update_from_api(update_time)
-    order_api = Bigcommerce::Order
-
-    order_count = order_api.count(min_date_modified: update_time).count
-    limit = 50
-    order_pages = (order_count / limit) + 1
-    order_product = OrderProduct.new
-
-    page_number = 1
-
-    order_pages.times do
-      orders = order_api.all(min_date_modified: update_time, page: page_number)
-
-      return if orders.blank?
-
-      orders.each do |o|
-        if !Order.where(id: o.id).blank?
-          # move row to history, update this one
-
-          # Insert into Order History tables
-          # last_insert_id = OrderHistory.new.insert(o.id)
-          # OrderProductHistory.new.insert(last_insert_id, o.id)
-
-          # Update Order Table
-          insert_or_update(o, 0)
-
-          # doing a delete - insert instead of a select - update
-          # because select - update doesnt work when product gets deleted
-
-          # Update Order Product table
-          order_product.delete(o.id)
-          order_product.insert(o.id)
-
-        else
-          # insert a new one
-          insert_or_update(o, 1)
-          order_product.insert(o.id)
-        end
-        Address.new.insert_or_update(o.billing_address, o.customer_id, o.id)
-      end
-
-      page_number += 1
-    end
-  end
-
-  def insert_or_update(o, insert)
-    order = sql = ''
-    time = Time.now.to_s(:db)
-
-    date_created = map_date(o.date_created)
-    date_modified = map_date(o.date_modified)
-    date_shipped = map_date(o.date_shipped)
-
-    staff_notes = remove_apostrophe(o.staff_notes)
-
-    customer_notes = remove_apostrophe(o.customer_message)
-
-    active = convert_bool(o.is_deleted)
-
-    payment_method = remove_apostrophe(o.payment_method)
-
-    if insert == 1
-      staff_id = Customer.find(o.customer_id).staff_id
-
-      order = "('#{o.id}', '#{o.customer_id}', '#{date_created}',\
-      '#{date_modified}', '#{date_shipped}', '#{o.status_id}',\
-      '#{o.subtotal_ex_tax}', '#{o.subtotal_inc_tax}', '#{o.subtotal_tax}',\
-      '#{o.base_shipping_cost}', '#{o.shipping_cost_ex_tax}',\
-      '#{o.shipping_cost_inc_tax}', '#{o.shipping_cost_tax}',\
-      '#{o.shipping_cost_tax_class_id}', '#{o.base_handling_cost}',\
-			'#{o.handling_cost_ex_tax}', '#{o.handling_cost_inc_tax}',\
-      '#{o.handling_cost_tax}', '#{o.handling_cost_tax_class_id}',\
-      '#{o.base_wrapping_cost}', '#{o.wrapping_cost_ex_tax}',\
-  		'#{o.wrapping_cost_inc_tax}', '#{o.wrapping_cost_tax}',\
-      '#{o.wrapping_cost_tax_class_id}', '#{o.total_ex_tax}',\
-      '#{o.total_inc_tax}', '#{o.total_tax}', '#{o.items_total}',\
-      '#{o.items_shipped}', '#{o.refunded_amount}', '#{o.store_credit_amount}',\
-      '#{o.gift_certificate_amount}','#{o.ip_address}', '#{staff_notes}',\
-      '#{customer_notes}', '#{o.discount_amount}', '#{o.coupon_discount}',\
-      '#{active}', '#{o.order_source}', '#{time}', '#{time}',\
-      '#{payment_method}', '#{staff_id}', 'bigcommerce', '#{o.id}')"
-
-      sql = "INSERT INTO orders (id, customer_id, date_created, date_modified, date_shipped,\
-			status_id, subtotal_ex_tax, subtotal_inc_tax, subtotal_tax, base_shipping_cost,\
-			shipping_cost_ex_tax, shipping_cost_inc_tax, shipping_cost_tax, shipping_cost_tax_class_id,\
-			base_handling_cost, handling_cost_ex_tax, handling_cost_inc_tax, handling_cost_tax, handling_cost_tax_class_id,\
-			base_wrapping_cost, wrapping_cost_ex_tax, wrapping_cost_inc_tax, wrapping_cost_tax, wrapping_cost_tax_class_id,\
-			total_ex_tax, total_inc_tax, total_tax, qty, items_shipped, refunded_amount, store_credit,\
-			gift_certificate_amount, ip_address, staff_notes, customer_notes, discount_amount,\
-			coupon_discount, active, order_source, created_at, updated_at, payment_method, staff_id, source, source_id)\
-			VALUES #{order}"
-
-      # insert the billing adress where the id is order_id
-      Address.new.insert_or_update(o.billing_address, o.customer_id, o.id)
-
-    else
-      sql = "UPDATE orders SET customer_id = '#{o.customer_id}', date_created = '#{date_created}',\
-					date_modified = '#{date_modified}', date_shipped = '#{date_shipped}', status_id = '#{o.status_id}',\
-					subtotal_ex_tax = '#{o.subtotal_ex_tax}', subtotal_inc_tax = '#{o.subtotal_inc_tax}', subtotal_tax = '#{o.subtotal_tax}', base_shipping_cost = '#{o.base_shipping_cost}',\
-					shipping_cost_ex_tax = '#{o.shipping_cost_ex_tax}', shipping_cost_inc_tax = '#{o.shipping_cost_inc_tax}', shipping_cost_tax = '#{o.shipping_cost_tax}',\
-					shipping_cost_tax_class_id = '#{o.shipping_cost_tax_class_id}', base_handling_cost = '#{o.base_handling_cost}', handling_cost_ex_tax = '#{o.handling_cost_ex_tax}',\
-					handling_cost_inc_tax = '#{o.handling_cost_inc_tax}', handling_cost_tax = '#{o.handling_cost_tax}', handling_cost_tax_class_id = '#{o.handling_cost_tax_class_id}',\
-					total_ex_tax = '#{o.total_ex_tax}', total_inc_tax = '#{o.total_inc_tax}', total_tax = '#{o.total_tax}', qty = '#{o.items_total}', items_shipped = '#{o.items_shipped}',\
-					refunded_amount = '#{o.refunded_amount}', store_credit = '#{o.store_credit_amount}', gift_certificate_amount = '#{o.gift_certificate_amount}',\
-					ip_address = '#{o.ip_address}', staff_notes = '#{staff_notes}', customer_notes = '#{customer_notes}', discount_amount = '#{o.discount_amount}',\
-					coupon_discount = '#{o.coupon_discount}', active = '#{active}', order_source = '#{o.order_source}', updated_at = '#{time}', payment_method = '#{payment_method}' WHERE id = '#{o.id}'"
-
-      # update order action table
-      # if o.status_id == 10
-      #   OrderAction.new.order_paid(o.id)
-      # end
-    end
-    ActiveRecord::Base.connection.execute(sql)
+  def update_from_bigcommerce(order)
+    customer = Customer.find(order.customer_id)
+    status_id = Status.where('bigcommerce_id = ?', order.status_id).order('statuses.order').first.id
+    params = {'customer_id': order.customer_id, 'status_id': status_id, 'staff_id': customer.staff_id,\
+       'total_inc_tax': order.total_inc_tax, 'qty': order.items_total, 'items_shipped': order.items_shipped,\
+       'subtotal': order.subtotal_inc_tax.to_f/1.29, 'discount_rate': 0, 'discount_amount': order.discount_amount + order.coupon_discount,\
+       'handling_cost': order.items_total.to_f * 1.82, 'shipping_cost': order.shipping_cost_ex_tax,\
+       'wrapping_cost': order.wrapping_cost_ex_tax, 'wet': (order.subtotal_ex_tax.to_f - order.discount_amount.to_f - order.coupon_discount.to_f) * 0.29,\
+       'gst': order.total_inc_tax.to_f / 11, 'staff_notes': remove_apostrophe(order.staff_notes),\
+       'customer_notes': remove_apostrophe(order.customer_message), 'active': convert_bool(order.is_deleted),\
+       'source': 'bigcommerce', 'source_id': order.id, 'date_created': map_date(order.date_created),\
+       'date_shipped': map_date(order.date_shipped), 'created_by': 34, 'last_updated_by': 34,\
+       'courier_status_id': 1, 'address': customer.address}
+    self.update_attributes(params)
+    self
   end
 
   ############## FILTER FUNCTIONS ############
@@ -192,7 +115,8 @@ class Order < ActiveRecord::Base
   end
 
   def self.staff_filter(staff_id)
-    return includes(:customer).where('customers.staff_id = ?', staff_id).references(:customers) unless staff_id.nil?
+    return where(staff_id: staff_id) unless staff_id.nil?
+    # return includes(:customer).where('customers.staff_id = ?', staff_id).references(:customers) unless staff_id.nil?
     all
   end
 
@@ -226,6 +150,11 @@ class Order < ActiveRecord::Base
   # Returns orders with a given status id
   def self.status_filter(status_id)
     return where('status_id = ?', status_id) unless status_id.nil?
+    all
+  end
+
+  def self.statuses_filter(status_id)
+    return where(status_id: status_id) unless status_id.nil? || status_id.blank?
     all
   end
 
@@ -430,5 +359,36 @@ class Order < ActiveRecord::Base
   # WHERE DO I USE THIS?
   def self.filter_by_product(product_ids)
     includes(:products).where('products.id IN (?)', [product_ids]).references(:products)
+  end
+
+  private
+
+  def cancel_order
+    self.order_products.map(&:delete_product)
+  end
+
+  def recovery_order
+    self.order_products.map(&:recovery_product)
+  end
+
+  def record_history
+    order_attributes =  "('#{self.id_was}', '#{self.customer_id_was}', '#{self.status_id_was}',\
+    '#{self.courier_status_id_was}', '#{self.account_status_was}', '#{self.street_was}', '#{self.city_was}',\
+    '#{self.state_was}', '#{self.postcode_was}', '#{self.country_was}', '#{self.address_was}',\
+    '#{self.staff_id_was}', '#{self.total_inc_tax_was}', '#{self.qty_was}', '#{self.items_shipped_was}',\
+    '#{self.subtotal_was}', '#{self.discount_rate_was}', '#{self.discount_amount_was}',\
+    '#{self.handling_cost_was}', '#{self.shipping_cost_was}', '#{self.wrapping_cost_was}',\
+    '#{self.wet_was}', '#{self.gst_was}',\
+    '#{self.active_was}', '#{self.xero_invoice_id_was}', '#{self.xero_invoice_number_was}',\
+    '#{self.source_was}', '#{self.source_id_was}', '#{self.date_created_was.to_s(:db)}',\
+    '#{self.created_by_was}', '#{self.last_updated_by_was}', '#{self.created_at_was.to_s(:db)}', '#{self.updated_at_was.to_s(:db)}')"
+    sql = "INSERT INTO order_histories(order_id, customer_id, status_id, courier_status_id,\
+    account_status, street, city, state, postcode, country, address, staff_id,\
+    total_inc_tax, qty, items_shipped, subtotal, discount_rate, discount_amount,\
+    handling_cost, shipping_cost, wrapping_cost, wet, gst,\
+    active, xero_invoice_id, xero_invoice_number, source, source_id, date_created,\
+    created_by, last_updated_by, created_at, updated_at) VALUES #{order_attributes}"
+
+    ActiveRecord::Base.connection.execute(sql)
   end
 end
