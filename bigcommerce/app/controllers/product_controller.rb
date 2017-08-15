@@ -131,6 +131,7 @@ class ProductController < ApplicationController
 
   def get_id_activerecord_h(customers)
     id_activerecord_h = {}
+    return id_activerecord_h if customers.blank?
     customers.map { |c| id_activerecord_h[c.id] = c }
     id_activerecord_h
   end

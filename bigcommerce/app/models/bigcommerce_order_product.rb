@@ -9,7 +9,7 @@ class BigcommerceOrderProduct < ActiveRecord::Base
     end
 
     order = Order.where('source = ? AND source_id = ?', 'bigcommerce', order_id).first
-    new_op = order.order_products
+    new_op = order.order_products unless order.nil?
 
     order_products.each do |op|
       time = Time.now.to_s(:db)
@@ -23,9 +23,11 @@ class BigcommerceOrderProduct < ActiveRecord::Base
 
       ActiveRecord::Base.connection.execute(sql_products)
 
-      op_main = new_op.select {|x| x.product_id == op.product_id}.first
-      op_main.import_from_bigcommerce(order, op) unless op_main.nil?
-      OrderProduct.new.import_from_bigcommerce(order, op) if op_main.nil?
+      unless order.nil?
+        op_main = new_op.select {|x| x.product_id == op.product_id}.first
+        op_main.import_from_bigcommerce(order, op) unless op_main.nil?
+        OrderProduct.new.import_from_bigcommerce(order, op) if op_main.nil?
+      end
     end
   end
 
@@ -34,6 +36,6 @@ class BigcommerceOrderProduct < ActiveRecord::Base
       ActiveRecord::Base.connection.execute(delete_order_product)
 
     order = Order.where('source = ? AND source_id = ?', 'bigcommerce', order_id).first
-    order.order_products.map(&:delete_product)
+    order.order_products.map(&:delete_product) unless order.nil?
   end
 end

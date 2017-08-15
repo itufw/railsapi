@@ -89,10 +89,10 @@
     <% end %>
   </tbody>
   <tr>
-    <td colspan="2" rowspan="7" align="center">
+    <td colspan="2" rowspan="4" align="center">
       <%= f.text_area :customer_notes, style: "border: none; width: 100%; height: 130px; ", placeholder: 'Customer Notes'%>
     </td>
-    <td colspan="4" rowspan="7" align="center">
+    <td colspan="4" rowspan="4" align="center">
       <%= f.text_area :staff_notes, style: "border: none; width: 100%; height: 130px; ", placeholder: 'Staff Notes'%>
     </td>
     <td class="ProductCost" align="right">Subtotal (Inc. WET, Ex. GST)</td>
@@ -111,6 +111,9 @@
     <td class="ProductTotal" align="right"><%= f.text_field :shipping_cost%></td>
   </tr>
   <tr>
+    <td colspan="6" rowspan="3" align="center">
+      <%= f.text_area :delivery_instruction, style: "border: none; width: 100%; height: 100px; ", placeholder: 'Delivery Instruction'%>
+    </td>
     <td class="ProductCost" align="right">WET</td>
     <td class="ProductTotal" align="right"><%= f.text_field :wet, readonly: true%></td>
   </tr>
@@ -132,10 +135,10 @@
       <div> Save & New Note </div>
     <% end %>
     <button name="button" class="btn btn-primary disabled" disabled>Save & New Note</button>
-    <%= button_tag(type: 'submit', class: 'btn btn-primary save active') do %>
-      <div> Save </div>
+    <%= button_tag(type: 'submit', class: 'btn btn-success save active') do %>
+      <div> Create </div>
     <% end %>
-    <button name="button" class="btn btn-primary disabled" disabled>Save</button>
+    <button name="button" class="btn btn-success disabled" disabled>Create</button>
   </div>
 </div>
 

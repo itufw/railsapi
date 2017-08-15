@@ -38,9 +38,10 @@ class Order < ActiveRecord::Base
       end
     end
   end
-  after_validation :geocode, if: ->(obj){ obj.address_changed? }
+  after_validation :geocode, on: [:create, :update], if: ->(obj){ obj.address_changed? }
   after_validation :record_history, on: [:update, :delete], unless: ->(obj){ obj.xero_invoice_number_changed? or obj.xero_invoice_id_changed?}
   after_validation :cancel_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id == 5}
+  after_validation :recovery_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id_was == 5}
 
 
   self.per_page = 30
@@ -362,8 +363,11 @@ class Order < ActiveRecord::Base
   private
 
   def cancel_order
-    order_products = self.order_products
-    order_products.map(&:delete_product)
+    self.order_products.map(&:delete_product)
+  end
+
+  def recovery_order
+    self.order_products.map(&:recovery_product)
   end
 
   def record_history

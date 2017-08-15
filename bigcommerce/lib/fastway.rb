@@ -98,7 +98,6 @@ class Fastway
     # Items[1].Packaging
 
     customer = order.customer
-    specialInstruction = order.delivery_instruction.split(/\n/)
     packaging = packaging_selection(order)
     item_number = 0
 
@@ -107,9 +106,9 @@ class Fastway
     @query[:query][:Suburb] = order.city
     @query[:query][:Postcode] = order.postcode
 
-    @query[:query][:SpecialInstruction1] = specialInstruction.first unless specialInstruction.first.nil?
-    @query[:query][:SpecialInstruction2] = specialInstruction.second unless specialInstruction.count < 2 || specialInstruction.second.nil?
-    @query[:query][:SpecialInstruction3] = specialInstruction.third unless specialInstruction.count < 3 || specialInstruction.third.nil?
+    @query[:query][:SpecialInstruction1] = order.SpeicalInstruction1 unless order.SpeicalInstruction1.nil?
+    @query[:query][:SpecialInstruction2] = order.SpeicalInstruction2 unless order.SpeicalInstruction2.nil?
+    @query[:query][:SpecialInstruction3] = order.SpecialInstruction3 unless order.SpeicalInstruction3.nil?
 
     if dozen > 0
       @query[:query]["items[#{item_number}].Reference"] = order.id
@@ -127,9 +126,13 @@ class Fastway
       @query[:query]["items[#{half_dozen}].Packaging"] = packaging
     end
 
-    puts @query
     # send request
     self.class.get('/fastlabel/addconsignment', @query)
+  end
+
+  def remove_consignment(consignment_id)
+    @query[:query][:ConsignmentID] = consignment_id
+    self.class.get('/fastlabel/removeconsignment', @query)
   end
 
   def packaging_selection(order)
