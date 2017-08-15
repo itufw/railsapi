@@ -21,9 +21,10 @@
         <table id="product_table">
           <tr>
             <th>Product</th>
-            <td>
+            <td class="product_autocomplete">
               <%= autocomplete_field_tag 'product', '', autocomplete_product_name_activity_index_path, placeholder: 'Search Product', id_element: '#product_id', id: 'product_search'%>
             </td>
+            <!-- No WS products -->
           </tr>
         </table>
       </div>
@@ -173,7 +174,6 @@
         });
       }
     });
-
   // Product Search
   $('#product_search').bind('railsAutocomplete.select', function(event, data){
     if($('#tr_' + data.item.id).length == 0){

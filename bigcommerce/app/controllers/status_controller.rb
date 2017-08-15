@@ -84,6 +84,8 @@ class StatusController < ApplicationController
         result = Fastway.new.add_consignment(order, params['dozen'].to_i, params['half-dozen'].to_i)
         begin
           order.update_attributes(order_params.merge({'track_number': result['result']['LabelNumbers'].join(';')}))
+          flash[:success] = "Label Printed"
+          order.update_attributes({courier_status_id: 4, status_id: 2, date_shipped: Date.today.to_s(:db)})
         rescue
           flash[:error] = 'Fail to connect Fastway, Check the Shipping Address'
           flash[:error] = result['error'] unless result.nil? || result[:error].nil?
@@ -92,7 +94,7 @@ class StatusController < ApplicationController
         end
         # create label with fastway
       else
-        Order.find(params[:order_id]).update_attributes(order_params)
+        Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 2, date_shipped: Date.today.to_s(:db)}))
       end
     elsif "Delivered" == params[:commit]
       Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 12}))
