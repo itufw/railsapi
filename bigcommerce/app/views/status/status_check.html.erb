@@ -1,0 +1,53 @@
+<%= title @status_name + " Checklist" %>
+<h3><%= @status_name + " Checklist" %></h3>
+<% if ['Approval'].include? @status_name %>
+  <%= form_tag({:controller => "order", :action => "order_confirmation"}, {:method => "get"}) do %>
+    <%= hidden_field_tag :status_name, @status_name%>
+    <%= hidden_field_tag :status_id, 3%>
+    <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
+    <%= submit_tag 'Check', class: 'btn btn-primary'%>
+  <% end %>
+<% elsif ["Picking", "Ready"].include? @status_name%>
+  <%= form_tag({:controller => "status", :action => "status_update"}, {:method => "get"}) do %>
+    <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
+    <% if @status_name == "Picking" %>
+      <%= submit_tag 'Picked', class: 'btn btn-primary'%>
+      <%= submit_tag 'Paperwork', class: 'btn btn-primary'%>
+    <% else %>
+      <%= submit_tag 'Ready', class: 'btn btn-primary'%>
+    <% end %>
+  <% end %>
+<% elsif ['Courier'].include? @status_name%>
+  <%= form_tag({:controller => "order", :action => "order_confirmation"}, {:method => "get"}) do %>
+    <%= hidden_field_tag :status_name, @status_name%>
+    <%= hidden_field_tag :status_id, 9%>
+    <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
+    <%= submit_tag 'Select Courier', class: 'btn btn-primary'%>
+  <% end %>
+<% elsif ['Shipping'].include? @status_name%>
+  <%= form_tag({:controller => "status", :action => "status_update"}, {:method => "get"}) do %>
+    <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
+    <%= submit_tag 'Shipped', class: 'btn btn-primary'%>
+    <button type="button" name="return" class="btn btn-primary"><%= link_to 'Back', controller: 'status', action: 'order_status', status_id: 9, status_name: 'Ready'%></button>
+  <% end %>
+<% elsif ['Delivered'].include? @status_name %>
+  <%= form_tag({:controller => "order", :action => "order_confirmation"}, {:method => "get"}) do %>
+    <%= hidden_field_tag :status_name, @status_name%>
+    <%= hidden_field_tag :status_id, 12 %>
+    <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
+    <%= submit_tag 'Delivered', class: 'btn btn-primary'%>
+  <% end %>
+<% else %>
+  <%= form_tag({:controller => "order", :action => "order_confirmation"}, {:method => "get"}) do %>
+    <%= hidden_field_tag :status_name, @status_name%>
+    <%= hidden_field_tag :status_id, 3 %>
+    <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
+    <%= submit_tag 'Check', class: 'btn btn-primary'%>
+  <% end %>
+<% end %>
+<script type="text/javascript">
+  var checkboxes = $('.orders_checkbox');
+  for(var i = 0; i < checkboxes.length; i++){
+    checkboxes[i].checked = true;
+  }
+</script>

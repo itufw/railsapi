@@ -1,0 +1,25 @@
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<%= wicked_pdf_stylesheet_link_tag('bootstrap') %>
+<link rel="stylesheet" href="https://www.untappedwines.com.au/template/Styles/printinvoice.css" type="text/css">
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<h3>Packing List Summary</h3>
+<div class="container">
+    <table class = "table table-striped table-bordered table-hover table-responsive">
+      <tr>
+    		<th>Product Name</th>
+    		<th>Quantity</th>
+    		<th>Dozen</th>
+    		<th>Remainder</th>
+    	</tr>
+      <tr>
+        <% order_products.each do |product| %>
+        <tr>
+          <td><%= product.product.name %></td>
+          <td class="num"><%= product.qty %></td>
+          <td class="num"><%= product.qty/12 %></td>
+          <td class="num"><%= product.qty%12 %></td>
+        </tr>
+        <% end %>
+      </tr>
+    </table>
+</div>

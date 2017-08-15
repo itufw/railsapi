@@ -3,8 +3,8 @@ module StatusHelper
         status_id = params[:status_id]
         status_name = params[:status_name]
         if status_id.nil?
-            status_id = 1
-            status_name = 'Pending'
+            status_id = 11
+            status_name = 'Created'
         end
         [status_id, status_name]
     end
@@ -63,5 +63,39 @@ module StatusHelper
         last_order_date[order.id] = product_orders.customer_filter([order.customer_id]).order_by_date_created('DESC').map{|x| x[:date_created]}[1]
       end
       last_order_date
+    end
+
+    def print_shipping_sheet(selected_orders)
+      orders = Order.where(id: selected_orders)
+      pdf = CombinePDF.new
+      picking_slips = CombinePDF.new
+      orders.each do |order|
+        customer = Customer.find(order.customer_id)
+        order_invoice = WickedPdf.new.pdf_from_string(
+          render_to_string(
+              :template => 'pdf/order_invoice.pdf',
+              :locals => {order: order, customer: customer}
+              )
+          )
+        pdf << CombinePDF.parse(order_invoice)
+
+        packing_slip = WickedPdf.new.pdf_from_string(
+          render_to_string(
+              :template => 'pdf/packing_slip.pdf',
+              :locals => {order: order, customer: customer}
+              )
+          )
+        picking_slips << CombinePDF.parse(packing_slip)
+      end
+      picking_sheet = WickedPdf.new.pdf_from_string(
+        render_to_string(
+            template: 'pdf/picking_sheet.pdf',
+            locals: {order_products: OrderProduct.where(order_id: selected_orders, display: 1) }
+            )
+        )
+
+      pdf << picking_slips
+      pdf << CombinePDF.parse(picking_sheet)
+      pdf
     end
 end

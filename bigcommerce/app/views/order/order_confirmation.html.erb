@@ -1,0 +1,200 @@
+<%= title "Order # " + @order.id.to_s %>
+<h3>Order #<%= @order.id %></h3>
+
+<%= form_for @order, :url => {:controller => "status", :action => "status_update"}, :method => 'get' do |f| %>
+  <%= f.hidden_field :id %>
+
+  <div class="col-md-4" style="margin-top: -40px;">
+    <table id="customer_table">
+      <tbody>
+        <tr>
+          <th>Customer</th>
+          <td><%= @order.customer.actual_name%></td>
+        </tr>
+        <tr>
+          <td class="ProductCost" align="right">Shipping Address</td>
+          <td colspan="3"><%= f.text_field :address, placeholder: 'Shipping Address', size: 80 %></td>
+        </tr>
+        <tr>
+          <td class="ProductCost" align="right">Billing Address</td>
+          <td colspan="3"><%= f.text_field :billing_address, placeholder: 'Billing Address', size: 80 %></td>
+        </tr>
+    </table>
+  </div>
+
+  <table class="table table-striped table-bordered table-hover table-responsive product-table">
+    <thead>
+      <tr>
+        <th>Product ID</th>
+        <th>Product</th>
+        <th style="width: 3px;">Inventory</th>
+        <th>Price (Luc)</th>
+        <th style="width: 3px;">QTY</th>
+        <th>Discount</th>
+        <th>Discounted Price</th>
+        <th style="width: 7px;">Total</th>
+      </tr>
+    </thead>
+    <tbody class="product-list">
+      <% @order.order_products.each do |product| %>
+        <% list_product = Product.find(product.product_id)%>
+        <tr id="tr_<%= product.product_id%>">
+          <td><%= product.product_id %></td>
+          <td><%= list_product.name %></td>
+          <td class="num"><%= list_product.inventory %></td>
+          <td class="num"><%= product.price_luc %></td>
+          <td class="num"><%= product.qty %></td>
+          <td class="num"><%= product.discount %></td>
+          <td class="num"><%= product.price_discounted %></td>
+          <td class="product-total"><%= (product.qty * product.price_discounted).round(4) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+    <tbody>
+    <tr>
+      <td colspan="2">Customer Note</td>
+      <td colspan="4">Staff Note</td>
+      <td class="ProductCost" align="right">Subtotal (Inc. WET, Ex. GST)</td>
+      <td class="ProductTotal" align="right"><%= @order.subtotal%></td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="3" align="center">
+        <%= f.text_area :customer_notes, style: "border: none; width: 100%; height: 90px; ", placeholder: 'Customer Notes'%>
+      </td>
+      <td colspan="4" rowspan="3" align="center">
+        <%= f.text_area :staff_notes, style: "border: none; width: 100%; height: 90px; ", placeholder: 'Staff Notes'%>
+      </td>
+      <td class="ProductCost" align="right">Discount Rate</td>
+      <td class="ProductTotal" align="right"><%= @order.discount_rate%></td>
+    </tr>
+    <tr>
+      <td class="ProductCost" align="right">Discount</td>
+      <td class="ProductTotal num" align="right"><input readonly="readonly" type="text" value="<%= @order.discount_amount%>" name="order[discount_amount]" id="order_discount_amount"></td>
+    </tr>
+    <tr>
+      <td class="ProductCost" align="right">Shipping</td>
+      <td class="ProductTotal num" align="right"><input readonly="readonly" type="text" value="<%= @order.shipping_cost%>" name="order[shipping_cost]" id="order_shipping_cost"></td>
+    </tr>
+    <tr>
+      <td colspan="6" rowspan="3" align="center">
+        <%= f.text_area :delivery_instruction, style: "border: none; width: 100%; height: 90px; ", placeholder: 'Delivery Instruction' %>
+      </td>
+      <td class="ProductCost" align="right">WET</td>
+      <td class="ProductTotal num" align="right"><input readonly="readonly" type="text" value="<%= @order.wet%>" name="order[wet]" id="order_wet"></td>
+    </tr>
+    <tr>
+      <td class="ProductCost" align="right">GST</td>
+      <td class="ProductTotal num" align="right"><input readonly="readonly" type="text" value="<%= @order.gst%>" name="order[gst]" id="order_gst"></td>
+    </tr>
+    <tr>
+      <td class="ProductCost" align="right">Grand Total</td>
+      <td class="ProductTotal num" align="right"><input readonly="readonly" type="text" value="<%= @order.total_inc_tax%>" name="order[total_inc_tax]" id="order_total_inc_tax"></td>
+    </tr>
+  </tbody>
+</table>
+<div class="status-change col-md-offset-8">
+      <%= hidden_field_tag :order_id, @order.id%>
+      <%= hidden_field_tag :status_id, @selected_status_id %>
+      <%= hidden_field_tag 'selected_orders[]', @selected_orders unless @selected_orders.nil? || @selected_orders.blank?%>
+    <!-- Approval -->
+    <% if @selected_status_id == '3' %>
+        <div class="row">
+          <div class="col-md-4"><%= submit_tag 'Hold-Stock', class: 'btn btn-primary'%></div>
+          <div class="col-md-4"><%= submit_tag 'Hold-Price', class: 'btn btn-primary'%></div>
+          <div class="col-md-4"><%= submit_tag 'Hold-Other', class: 'btn btn-primary'%></div>
+        </div>
+        <br/>
+        <div class="row">
+          <div class="col-md-4"><%= submit_tag 'Approve', class: 'btn btn-success'%></div>
+        </div>
+      <!-- Shipping & Assign Tracking Number -->
+    <% elsif @selected_status_id == '9' %>
+      <div class="fastway_labels">
+        <div class="row">
+          <label>Special Instruction:</label>
+        </div>
+        <div class="row">
+          <% customer = @order.customer %>
+          <%= f.text_field :SpecialInstruction1, value: customer.SpecialInstruction1, maxlength: 28 %>
+          <%= f.text_field :SpecialInstruction2, value: customer.SpecialInstruction2, maxlength: 28 %>
+          <%= f.text_field :SpecialInstruction3, value: customer.SpecialInstruction3, maxlength: 28 %>
+        </div>
+        <div class="row">
+          <div class="col-md-4">Total Bottles</div>
+          <div class="col-md-4"><%= @order.qty %></div>
+          <div class="col-md-4">
+            <%= label(:dozen, '12 Pack') %>
+            <%= text_field_tag('dozen', (@order.qty.to_f/12).to_i, placeholder: '12 pack', class: 'form-control') %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4">Dozen</div>
+          <div class="col-md-4"><%= (@order.qty.to_f/12).round(1) %></div>
+          <div class="col-md-4">
+            <%= label(:half_dozen, '6 Pack') %>
+            <%= text_field_tag('half-dozen', (((@order.qty % 12).to_f/6) + 0.9).to_i, placeholder: '6 pack', class: 'form-control') %>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4">Fastway Labels</div>
+          <div class="col-md-4"><%= (@order.qty.to_f/12 + 0.9).to_i %></div>
+        </div>
+      </div>
+
+      <div class="row">
+          <div class="col-md-6"><%= f.collection_select :courier_status_id, CourierStatus.all, :id, :name, {include_blank: 'All Status', selected: 3}, {:class => 'form-control'}%></div>
+          <div class="col-md-6"><%= submit_tag 'Create Label', class: 'btn btn-success'%></div>
+          <div class="col-md-10"><%= f.text_field :track_number, size: 30, placeholder: 'Tracking Numbers, divided by ;' %></div>
+      </div>
+
+      <script type="text/javascript">
+        $('input#order_track_number').hide();
+        $('select#order_courier_status_id').change(function(){
+          if (this.value == 3){
+            $('input#order_track_number').hide();
+            $('.fastway_labels').show();
+          }else{
+            $('input#order_track_number').show();
+            $('.fastway_labels').hide();
+          }
+        });
+      </script>
+      <!-- Delivered -->
+    <% elsif @selected_status_id == '12'%>
+        <div class="row">
+          <div class="col-md-6"><%= f.collection_select :status_id, Status.problems, :id, :name, {include_blank: 'All Status'}, {class: 'form-control'}%></div>
+          <div class="col-md-6"><%= submit_tag 'Problem', class: 'btn btn-primary'%></div>
+        </div>
+        <br/>
+        <div class="row">
+          <div class="col-md-6"><%= submit_tag 'Delivered', class: 'btn btn-success'%></div>
+          <div class="col-md-6"><%= submit_tag 'Complete', class: 'btn btn-primary'%></div>
+        </div>
+    <% elsif @selected_status_id.nil? %>
+      <!-- Super User Overwrite -->
+      <%= f.hidden_field :id %>
+      <div class="row" style="margin: auto;">
+        <div class="col-xs-2">
+          <%= label(:status, 'Status: ')%>
+          <%= f.collection_select :status_id, Status.can_update, :id, :name, {selected: @selected_status_id || @order.status_id}, {class: "status-selection", style: 'width: 80px'} %>
+        </div>
+        <div class="col-xs-2">
+          <%= label(:courier, 'Courier Status: ')%>
+          <%= f.collection_select :courier_status_id, CourierStatus.all, :id, :name, {}, {class: "courier-selection", style: 'width: 80px'} %>
+        </div>
+        <div class="col-xs-2">
+          <%= label(:account, 'Account Status: ')%>
+          <%= f.collection_select :account_status, ['Approved', 'Partially Paid', 'Unpaid', 'Paid', 'Hold-Account'], :to_s, :to_s, {}, {class: "account-selection", style: 'width: 80px'} %>
+        </div>
+      </div>
+      <div class="row" style="margin: auto;">
+          <%= submit_tag 'Update Status', class: 'btn btn-primary', comfirmation: 'Do you want to update the status of this order?'%>
+          <%= submit_tag 'Update and Next', class: 'btn btn-primary', comfirmation: 'Do you want to update the status of this order and move to the next?' unless @selected_orders.nil? || @selected_orders.blank?%>
+      </div>
+    <% end %>
+    <br/>
+    <div class="row">
+      <div class="col-md-6 col-md-offset-6"><%= submit_tag 'Skip', class: 'btn btn-danger'%></div>
+    </div>
+    <% end %>
+</div>

@@ -29,6 +29,8 @@ class Product < ActiveRecord::Base
   belongs_to :product_no_vintage
   belongs_to :product_no_ws
 
+  after_validation :bigcommerce_inventory_overwrite, on: [:update], if: -> (obj){ obj.id == 2233 and obj.inventory_changed?}
+
   scoped_search on: %i[id name portfolio_region]
 
   self.per_page = 30
@@ -98,15 +100,16 @@ class Product < ActiveRecord::Base
 			VALUES #{product}"
 
     else
-
-      sql = "UPDATE products SET sku = '#{sku}', name = '#{name}', inventory = '#{p.inventory_level}',\
+      # Deleted Inventory level update
+      sql = "UPDATE products SET sku = '#{sku}', name = '#{name}',\
 			date_created = '#{date_created}', weight = '#{p.weight}', height = '#{p.height}', width = '#{p.width}',\
 			visible = '#{visible}', featured = '#{featured}', availability = '#{p.availability}', date_modified = '#{date_modified}',\
 			date_last_imported = '#{date_last_imported}', num_sold = '#{p.total_sold}', num_viewed = '#{p.view_count}',\
 			upc = '#{p.upc}', bin_picking_num = '#{p.bin_picking_number}', search_keywords = '#{search_keywords}', meta_keywords = '#{meta_keywords}',\
 			description = '#{description}', meta_description = '#{meta_description}', page_title = '#{page_title}', retail_price = '#{p.retail_price}',\
 			sale_price = '#{p.sale_price}', calculated_price = '#{p.calculated_price}', inventory_warning_level = '#{p.inventory_warning_level}',\
-			inventory_tracking = '#{p.inventory_tracking}', keyword_filter = '#{p.keyword_filter}', sort_order = '#{p.sort_order}',\
+      inventory = '#{p.inventory_level}',\
+      inventory_tracking = '#{p.inventory_tracking}', keyword_filter = '#{p.keyword_filter}', sort_order = '#{p.sort_order}',\
 			related_products = '#{p.related_products}', rating_total = '#{p.rating_total}', rating_count = '#{p.rating_count}', updated_at = '#{time}'\
 			WHERE id = '#{p.id}'"
 
@@ -282,5 +285,11 @@ class Product < ActiveRecord::Base
 
   def self.filter_by_product_no_vintage_id(id)
     where(product_no_vintage_id: id)
+  end
+
+  private
+
+  def bigcommerce_inventory_overwrite
+    Bigcommerce::Product.update(self.id, inventory_level: self.inventory)
   end
 end

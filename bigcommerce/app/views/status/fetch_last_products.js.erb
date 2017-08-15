@@ -1,0 +1,10 @@
+<% @ops.each do |op| %>
+  <% product = op.product%>
+  last_products.append([
+          '<tr class="last-order-product" product-id="<%= product.id%>" name="<%= product.name%>" inventory="<%= product.inventory%>" price="<%= product.calculated_price * 1.29%>">',
+              '<td><%= product.name%> | <%= op.price_discounted %></td>',
+          '</tr>'
+          ].join(''));
+<% end %>
+shipping_address.val('<%= @last_order.address%>');
+billing_address.val('<%= @last_order.billing_address %>');

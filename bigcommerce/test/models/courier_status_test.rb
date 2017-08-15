@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class CmsOrderProductTest < ActiveSupport::TestCase
+class CourierStatusTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

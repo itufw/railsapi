@@ -1,6 +1,18 @@
 <%= title "Orders" %>
 <h3><%= orders_page_title(@staff_nickname, @start_date, @end_date) %></h3>
-<center><%= link_to "View My Orders", action: 'all', staff: {id: session[:user_id]} unless current_user_sales?(session[:authority]) %></center>
+<center>
+	<%= link_to '<i class="glyphicon glyphicon-search" title="View My Orders" style="color: black;"></i>'.html_safe, action: 'all', staff: {id: session[:user_id]} unless current_user_sales?(session[:authority]) %>
+	<%= link_to '<i class="glyphicon glyphicon-plus" title="Add New Orders" style="color: black;"></i>'.html_safe, action: 'create_order'%>
+</center>
+
+<div class="col-md-4 col-md-offset-7" style="margin-top: -40px;">
+	<div class="col-xs-4"><%= link_to label(:status, 'Approve'), controller: 'status', action: 'status_check', status_name: 'Approve'%></div>
+	<div class="col-xs-4"><%= link_to label(:status, 'Picking'), controller: 'status', action: 'status_check', status_name: 'Picking'%></div>
+	<div class="col-xs-4"><%= link_to label(:status, 'Courier'), controller: 'status', action: 'status_check', status_name: 'Courier'%></div>
+	<div class="col-xs-4"><%= link_to label(:status, "Problem"), controller: 'status', action: 'status_check', status_name: 'Problem' %><%= '(' + Order.joins(:status).where('statuses.send_reminder = 1').count.to_s + ')'%></div>
+	<div class="col-xs-4"><%= link_to label(:status, 'Shipped'), controller: 'status', action: 'status_check', status_name: 'Shipped'%></div>
+	<div class="col-xs-4"><%= link_to label(:status, 'Delivered'), controller: 'status', action: 'status_check', status_name: 'Delivered'%></div>
+</div>
 
 <%= form_tag({:controller => "order", :action => "all"}, {:method => "get"}) do %>
 

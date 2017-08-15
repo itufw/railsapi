@@ -92,7 +92,7 @@ class Customer < ActiveRecord::Base
 
 		end
 
-        ActiveRecord::Base.connection.execute(sql)
+    ActiveRecord::Base.connection.execute(sql)
 
 	end
 
