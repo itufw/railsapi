@@ -106,9 +106,9 @@ class Fastway
     @query[:query][:Suburb] = order.city
     @query[:query][:Postcode] = order.postcode
 
-    @query[:query][:SpecialInstruction1] = order.SpeicalInstruction1 unless order.SpeicalInstruction1.nil?
-    @query[:query][:SpecialInstruction2] = order.SpeicalInstruction2 unless order.SpeicalInstruction2.nil?
-    @query[:query][:SpecialInstruction3] = order.SpecialInstruction3 unless order.SpeicalInstruction3.nil?
+    @query[:query][:SpecialInstruction1] = order.SpecialInstruction1 unless order.SpecialInstruction1.nil?
+    @query[:query][:SpecialInstruction2] = order.SpecialInstruction2 unless order.SpecialInstruction2.nil?
+    @query[:query][:SpecialInstruction3] = order.SpecialInstruction3 unless order.SpecialInstruction3.nil?
 
     if dozen > 0
       @query[:query]["items[#{item_number}].Reference"] = order.id
