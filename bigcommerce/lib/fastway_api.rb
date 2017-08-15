@@ -1,6 +1,25 @@
 load 'fastway.rb'
 
 module FastwayApi
+  def overwrite_instruction
+    orders = Order.joins(:customer).select('customers.SpecialInstruction1 AS customer_ins, orders.SpecialInstruction1 AS order_ins, orders.id AS order_id, customers.id AS customer_id').where('customers.SpecialInstruction1 IS NULL AND orders.id > 20000')
+    orders = orders.select{|x| x}
+    while !orders.blank?
+      order = orders.delete_at(0)
+      consignment = FastwayConsignment.joins(:items).where("Reference LIKE '%#{order.order_id}%'").order('CreateDate DESC').first
+
+      next if consignment.nil?
+
+      Customer.find(order.customer_id).update_attributes({
+          'SpecialInstruction1': consignment.SpecialInstruction1,\
+          'SpecialInstruction2': consignment.SpecialInstruction2,\
+          'SpecialInstruction3': consignment.SpecialInstruction3
+      })
+
+      orders = orders.reject{|x| x.customer_id == order.customer_id}
+    end
+  end
+
   def trace_events
     fastway = Fastway.new()
     delivered_label = FastwayTrace.completed.map(&:LabelNumber)

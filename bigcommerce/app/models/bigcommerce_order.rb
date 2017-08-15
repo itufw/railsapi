@@ -139,7 +139,7 @@ class BigcommerceOrder < ActiveRecord::Base
       #   OrderAction.new.order_paid(o.id)
       # end
       order = Order.where("source = 'bigcommerce' AND source_id = ?", o.id).first
-      order = order.update_from_bigcommerce(o)
+      order = order.update_from_bigcommerce(o) unless order.nil?
     end
     ActiveRecord::Base.connection.execute(sql)
     order

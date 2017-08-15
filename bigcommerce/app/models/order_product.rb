@@ -28,6 +28,13 @@ class OrderProduct < ActiveRecord::Base
 		self
 	end
 
+	def recovery_product
+		attribuets = {'stock_previous': self.self.stock_current, 'stock_current': 0 - self.stock_incremental,\
+			 'stock_incremental': 0 - self.stock_incremental, 'display': 1, 'updated_by': 34}
+		self.update_attributes(attributes)
+		self
+	end
+
 	# Inc Tax
 	def self.order_sum(order_products)
 		order_total = 0.0
@@ -168,6 +175,7 @@ class OrderProduct < ActiveRecord::Base
 	private
 	# inventory trigger
 	def stock_change
+		return if self.order.source == 'bigcommerce'
 		sql = "UPDATE products SET inventory = inventory - '#{self.stock_incremental}' WHERE id = '#{self.product_id}'"
 		ActiveRecord::Base.connection.execute(sql)
 		# Bigcommerce::Product.update(self.product_id, inventory_level: self.product.inventory) if (self.stock_incremental != 0 && self.product_id == 2233)

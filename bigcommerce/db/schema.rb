@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170810064048) do
+ActiveRecord::Schema.define(version: 20170815024512) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -166,78 +166,6 @@ ActiveRecord::Schema.define(version: 20170810064048) do
   end
 
   add_index "categories", ["parent_id"], name: "index_categories_on_parent_id", using: :btree
-
-  create_table "cms_order_products", force: :cascade do |t|
-    t.integer  "cms_order_id",      limit: 4,                             null: false
-    t.integer  "product_id",        limit: 4,                             null: false
-    t.integer  "order_shipping_id", limit: 4
-    t.integer  "qty",               limit: 3,                             null: false
-    t.integer  "qty_shipped",       limit: 3
-    t.decimal  "base_price",                      precision: 9, scale: 4, null: false
-    t.decimal  "price_ex_tax",                    precision: 9, scale: 4, null: false
-    t.decimal  "price_inc_tax",                   precision: 9, scale: 4
-    t.decimal  "price_tax",                       precision: 9, scale: 4
-    t.datetime "created_at",                                              null: false
-    t.datetime "updated_at",                                              null: false
-    t.float    "discount",          limit: 24
-    t.integer  "stock_previous",    limit: 4
-    t.integer  "stock_current",     limit: 4
-    t.integer  "stock_incremental", limit: 4
-    t.integer  "display",           limit: 4
-    t.integer  "damaged",           limit: 4
-    t.text     "note",              limit: 65535
-    t.integer  "created_by",        limit: 4
-    t.integer  "modified_by",       limit: 4
-  end
-
-  add_index "cms_order_products", ["cms_order_id"], name: "index_cms_order_products_on_cms_order_id", using: :btree
-  add_index "cms_order_products", ["order_shipping_id"], name: "index_cms_order_products_on_order_shipping_id", using: :btree
-  add_index "cms_order_products", ["product_id"], name: "index_cms_order_products_on_product_id", using: :btree
-
-  create_table "cms_orders", force: :cascade do |t|
-    t.integer  "customer_id",                limit: 4,                             null: false
-    t.integer  "status_id",                  limit: 4
-    t.integer  "staff_id",                   limit: 4
-    t.decimal  "total_inc_tax",                            precision: 9, scale: 4
-    t.decimal  "refunded_amount",                          precision: 8, scale: 2
-    t.integer  "qty",                        limit: 3
-    t.integer  "items_shipped",              limit: 3
-    t.text     "staff_notes",                limit: 65535
-    t.text     "customer_notes",             limit: 65535
-    t.decimal  "discount_rate",                            precision: 9, scale: 4
-    t.decimal  "discount_amount",                          precision: 9, scale: 4
-    t.decimal  "subtotal_ex_tax",                          precision: 9, scale: 4
-    t.decimal  "subtotal_inc_tax",                         precision: 9, scale: 4
-    t.decimal  "subtotal_tax",                             precision: 9, scale: 4
-    t.decimal  "total_ex_tax",                             precision: 9, scale: 4
-    t.decimal  "total_tax",                                precision: 9, scale: 4
-    t.decimal  "base_shipping_cost",                       precision: 6, scale: 2
-    t.decimal  "shipping_cost_ex_tax",                     precision: 6, scale: 2
-    t.decimal  "shipping_cost_inc_tax",                    precision: 6, scale: 2
-    t.decimal  "shipping_cost_tax",                        precision: 6, scale: 2
-    t.decimal  "base_handling_cost",                       precision: 6, scale: 2
-    t.decimal  "handling_cost_ex_tax",                     precision: 6, scale: 2
-    t.decimal  "handling_cost_inc_tax",                    precision: 6, scale: 2
-    t.decimal  "handling_cost_tax",                        precision: 6, scale: 2
-    t.decimal  "base_wrapping_cost",                       precision: 6, scale: 2
-    t.decimal  "wrapping_cost_ex_tax",                     precision: 6, scale: 2
-    t.decimal  "wrapping_cost_inc_tax",                    precision: 6, scale: 2
-    t.decimal  "wrapping_cost_tax",                        precision: 6, scale: 2
-    t.decimal  "store_credit",                             precision: 6, scale: 2
-    t.decimal  "gift_certificate_amount",                  precision: 6, scale: 2
-    t.integer  "shipping_cost_tax_class_id", limit: 4
-    t.integer  "handling_cost_tax_class_id", limit: 4
-    t.integer  "wrapping_cost_tax_class_id", limit: 4
-    t.integer  "active",                     limit: 1
-    t.datetime "date_shipped"
-    t.string   "xero_invoice_id",            limit: 255
-    t.datetime "created_at",                                                       null: false
-    t.datetime "updated_at",                                                       null: false
-  end
-
-  add_index "cms_orders", ["customer_id"], name: "index_cms_orders_on_customer_id", using: :btree
-  add_index "cms_orders", ["staff_id"], name: "index_cms_orders_on_staff_id", using: :btree
-  add_index "cms_orders", ["status_id"], name: "index_cms_orders_on_status_id", using: :btree
 
   create_table "contact_roles", force: :cascade do |t|
     t.string   "role",              limit: 255
@@ -415,6 +343,9 @@ ActiveRecord::Schema.define(version: 20170810064048) do
     t.float    "lng",                     limit: 24
     t.text     "featured_image",          limit: 65535
     t.string   "google_place_id",         limit: 255
+    t.string   "SpecialInstruction1",     limit: 50
+    t.string   "SpecialInstruction2",     limit: 50
+    t.string   "SpecialInstruction3",     limit: 50
   end
 
   add_index "customers", ["cust_group_id"], name: "index_customers_on_cust_group_id", using: :btree
@@ -599,7 +530,7 @@ ActiveRecord::Schema.define(version: 20170810064048) do
     t.integer  "product_id",        limit: 4,                             null: false
     t.integer  "order_shipping_id", limit: 4
     t.integer  "qty",               limit: 3,                             null: false
-    t.integer  "qty_shipped",       limit: 3,                             null: false
+    t.integer  "qty_shipped",       limit: 3
     t.decimal  "price_luc",                       precision: 9, scale: 4, null: false
     t.decimal  "base_price",                      precision: 9, scale: 4, null: false
     t.decimal  "discount",                        precision: 9, scale: 4, null: false
@@ -685,10 +616,13 @@ ActiveRecord::Schema.define(version: 20170810064048) do
     t.string   "postcode",             limit: 255
     t.string   "country",              limit: 255
     t.string   "address",              limit: 255
-    t.string   "track_number",         limit: 255
+    t.text     "track_number",         limit: 65535
     t.float    "modified_wet",         limit: 24
     t.string   "billing_address",      limit: 255
     t.text     "delivery_instruction", limit: 65535
+    t.string   "SpecialInstruction1",  limit: 50
+    t.string   "SpecialInstruction2",  limit: 50
+    t.string   "SpecialInstruction3",  limit: 50
   end
 
   add_index "orders", ["customer_id"], name: "index_orders_on_customer_id", using: :btree
