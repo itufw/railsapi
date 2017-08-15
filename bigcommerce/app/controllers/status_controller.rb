@@ -80,12 +80,12 @@ class StatusController < ApplicationController
       if order_params[:courier_status_id] == '3'
         order = Order.find(params[:order_id])
         order.update_attributes(order_params.reject{|key, value| key == 'courier_status_id' })
-        result = ""
+        result = Fastway.new.add_consignment(order, dozen, half_dozen)
         begin
-          result = Fastway.new.add_consignment(order, dozen, half_dozen)
           order.update_attributes(order_params.merge({'track_number': result['result']['LabelNumbers'].join(';')}))
         rescue
           flash[:error] = 'Fail to connect Fastway, Check the Shipping Address'
+          flash[:error] = result['error'] unless result.nil? || result[:error].nil?
           selected_orders.unshift(params[:order_id])
           redirect_to controller: 'order', action: 'order_confirmation', order_id: selected_orders.first, selected_orders: selected_orders, status_id: params[:status_id] and return
         end
