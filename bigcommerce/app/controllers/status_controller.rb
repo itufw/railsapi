@@ -3,6 +3,7 @@ require 'sales_controller_helper.rb'
 require 'dates_helper.rb'
 require 'time_period_stats.rb'
 require 'status_helper.rb'
+require 'fastway.rb'
 
 class StatusController < ApplicationController
   before_action :confirm_logged_in
