@@ -21,6 +21,7 @@ class Order < ActiveRecord::Base
 
   geocoded_by :address  do |obj,results|
     if geo = results.first
+      obj.street = ''
       geo.data['address_components'].each do |address_detail|
         if address_detail['types'].include? 'street_number'
           obj.street = address_detail['long_name'].to_s + ' ' + obj.street.to_s
