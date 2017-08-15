@@ -1,6 +1,34 @@
 # import from zomato
 module ZomatoCalculation
 
+  def customer_lead_map
+    restaurants = ZomatoRestaurant.assigned
+    customer_list = restaurants.map(&:customer_id).uniq.compact
+    lead_list = restaurants.map(&:customer_lead_id).uniq.compact
+
+    customers = Customer.all.where('id NOT IN (?)', customer_list).where('lat IS NOT NULL').where('cust_type_id != 1')
+    leads = CustomerLead.all.where('id NOT IN (?)', lead_list).where('latitude IS NOT NULL AND firstname != "" AND cust_type_id != 1').where('latitude IS NOT NULL')
+    count = 0
+    count_lead = 0
+    customers.each do |customer|
+      match = ZomatoRestaurant.where("(name LIKE \"%#{customer.firstname}%\" OR name Like \"%#{customer.lastname}%\") AND ABS(latitude - #{customer.lat}) < 0.0002 AND ABS(longitude - #{customer.lng}) < 0.0002").first
+      next if match.nil?
+      match.customer_id = customer.id
+      match.save
+      count += 1
+    end
+
+    leads.each do |lead|
+      match = ZomatoRestaurant.where("(name LIKE \"%#{lead.firstname}%\" OR name LIKE \"%#{lead.lastname}%\") AND ABS(latitude - #{lead.latitude}) < 0.0002 AND ABS(longitude - #{lead.longitude}) < 0.0002").first
+      next if match.nil?
+      match.customer_lead_id = lead.id
+      match.save
+      count_lead += 1
+    end
+    puts count
+    puts count_lead
+  end
+
   def filter_viewed_spots
     customers_viewed = []
     restaurants = ZomatoRestaurant.all
