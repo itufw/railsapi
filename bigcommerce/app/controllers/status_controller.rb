@@ -36,8 +36,9 @@ class StatusController < ApplicationController
     @status_name = params[:status_name]
     status_ids = Status.where("alt_name LIKE '%#{@status_name}%'").map(&:id)
 
+    order_function, direction = sort_order(params, :order_by_id, 'DESC')
     per_page = params[:per_page] || Order.per_page
-    @orders = Order.statuses_filter(status_ids).paginate(per_page: @per_page, page: params[:page])
+    @orders = Order.statuses_filter(status_ids).send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
   end
 
   def status_update
@@ -73,7 +74,6 @@ class StatusController < ApplicationController
     elsif "Hold-Other" == params[:commit]
       Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 13}))
     elsif "Create Label" == params[:commit]
-      # TODO
       # Create Fastway Label & Create tracking information for orders
       # IF order_params[:courier_status_id] == 3 -> Create FASTWAY Label
       # Else: just record the label number
@@ -144,8 +144,7 @@ class StatusController < ApplicationController
     orders = Order.where(customer_id: params[:customer_id]).order('updated_at DESC')
     @last_order = orders.first
     order_ids = orders.map(&:id)
-    product_ids = OrderProduct.where("order_id IN (?) AND created_at > ?", order_ids, (Date.today - 3.month).to_s(:db)).map(&:product_id)
-    @products = Product.where(id: product_ids)
+    @ops = OrderProduct.where("order_id IN (?) AND created_at > ?", order_ids, (Date.today - 3.month).to_s(:db))
     respond_to do |format|
       format.js
     end

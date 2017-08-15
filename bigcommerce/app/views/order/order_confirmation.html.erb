@@ -77,7 +77,9 @@
     </tr>
     <tr>
       <td colspan="6" rowspan="3" align="center">
-        <%= f.text_area :delivery_instruction, style: "border: none; width: 100%; height: 90px; ", placeholder: 'Delivery Instruction'%>
+        <% last_order = Order.where('customer_id = ? AND id != ? ', @order.customer_id, @order.id).order('created_at').first %>
+        <% instruction = (last_order.nil?) ? '' : last_order.delivery_instruction %>
+        <%= f.text_area :delivery_instruction, style: "border: none; width: 100%; height: 90px; ", placeholder: 'Delivery Instruction', value: instruction%>
       </td>
       <td class="ProductCost" align="right">WET</td>
       <td class="ProductTotal num" align="right"><input readonly="readonly" type="text" value="<%= @order.wet%>" name="order[wet]" id="order_wet"></td>
@@ -109,7 +111,7 @@
         </div>
       <!-- Shipping & Assign Tracking Number -->
     <% elsif @selected_status_id == '9' %>
-      <div class="fastway_labels" style="display: none;">
+      <div class="fastway_labels">
         <div class="row">
           <div class="col-md-4">Total Bottles</div>
           <div class="col-md-4"><%= @order.qty %></div>
@@ -132,14 +134,15 @@
         </div>
       </div>
       <div class="row">
-          <div class="col-md-6"><%= f.collection_select :courier_status_id, CourierStatus.all, :id, :name, {include_blank: 'All Status'}, {:class => 'form-control'}%></div>
+          <div class="col-md-6"><%= f.collection_select :courier_status_id, CourierStatus.all, :id, :name, {include_blank: 'All Status', selected: 3}, {:class => 'form-control'}%></div>
           <div class="col-md-6"><%= submit_tag 'Create Label', class: 'btn btn-success'%></div>
           <div class="col-md-10"><%= f.text_field :track_number, size: 30, placeholder: 'Tracking Numbers, divided by ;' %></div>
       </div>
 
       <script type="text/javascript">
+
+        $('input#order_track_number').hide();
         $('select#order_courier_status_id').change(function(){
-          $('input#order_track_number').hide();
           if (this.value == 3){
             $('input#order_track_number').hide();
             $('.fastway_labels').show();
