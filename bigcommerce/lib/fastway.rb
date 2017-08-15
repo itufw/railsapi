@@ -143,7 +143,7 @@ class Fastway
     # Satchel A4 (Not available in Australia) = 6 Satchel A5 (Not available in South Africa) = 7
     result = psc(order.city, order.postcode, 5)
     parcel_color = result['result']['services'].select{|x| x.values().include? 'Parcel'}.first['labelcolour_pretty_array']
-    return 18 if (parcel_color.include? 'GREEN') || (parcel_color.include? 'ORANGE')
+    return 18 if (parcel_color.map(&:upcase).include? 'GREEN') || (parcel_color.map(&:upcase).include? 'ORANGE')
     1
   end
 
