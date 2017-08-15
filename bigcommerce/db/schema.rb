@@ -1306,10 +1306,11 @@ ActiveRecord::Schema.define(version: 20170815024512) do
   end
 
   create_table "zomato_cuisines", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.integer  "active",     limit: 4
+    t.string   "name",           limit: 255
+    t.integer  "active",         limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "priority_group", limit: 4
   end
 
   create_table "zomato_entities", force: :cascade do |t|

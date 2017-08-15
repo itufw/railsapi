@@ -22,6 +22,10 @@ module FastwayApi
 
   def trace_events
     fastway = Fastway.new()
+
+    # Delete Uncompleted Signature Obtained Record
+    uncompleted_trace = FastwayTrace.where(Description: 'Signature Obtained', contactName: '').delete_all
+
     delivered_label = FastwayTrace.completed.map(&:LabelNumber)
     undelivered_label = FastwayConsignmentItem.pending_label(delivered_label).map(&:LabelNumber)
 
