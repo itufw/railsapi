@@ -6,7 +6,7 @@
         <table id="customer_table">
           <tr>
             <th>Customer</th>
-            <td>
+            <td class="customer_autocomplete">
               <%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 15 %>
             </td>
           </tr>
@@ -22,11 +22,22 @@
           <tr>
             <th>Product</th>
             <td class="product_autocomplete">
-              <%= autocomplete_field_tag 'product', '', autocomplete_product_name_activity_index_path, placeholder: 'Search Product', id_element: '#product_id', id: 'product_search'%>
+              <%= autocomplete_field_tag 'product', '', autocomplete_product_ws_activity_index_path, placeholder: 'Search WS Product', id_element: '#product_id', id: 'product_ws_search'%>
             </td>
             <!-- No WS products -->
+            <td><input type="checkbox" id="ws" class="ws_checkbox" style="display: inline-block;" checked>Only WS</td>
           </tr>
         </table>
+        <!-- WS / All products -->
+        <script type="text/javascript">
+          $('input#ws').change(function(){
+            if (this.checked){
+              $('.product_autocomplete').html('<%= autocomplete_field_tag 'product', '', autocomplete_product_ws_activity_index_path, placeholder: 'Search WS Product', id_element: '#product_id', id: 'product_ws_search'%>');
+            }else{
+              $('.product_autocomplete').html('<%= autocomplete_field_tag 'product', '', autocomplete_product_name_activity_index_path, placeholder: 'Search Product', id_element: '#product_id', id: 'product_search'%>');
+            }
+          });
+        </script>
       </div>
     </div>
     <div class="row">
@@ -151,31 +162,29 @@
   var billing_address = $('#order_billing_address');
 
   $('#order_customer_id').hide();
+
   // Customer Search
-    $('#customer_search').bind('railsAutocomplete.select', function(event, data){
-      if ($('#customer_table tr').length < 2) {
-        $('#customer_table').append([
-          '<tr id="customer_' + data.item.id + '">',
-          '<td colspan="2"><input type="text" name="customer" id="' + data.item.id + '" value="' + data.item.value + '" readonly="readonly"><i class="glyphicon glyphicon-remove remove" title="remove"></i></td>',
-          '</tr>'
-        ].join(''));
-        $('#order_customer_id').val(data.item.id);
+  $(document).on('railsAutocomplete.select', '#customer_search', function(event, data){
+    if ($('#customer_table').find('remove').length == 0) {
+      $('.customer_autocomplete').html('<input type="text" name="customer" id="' + data.item.id + '" value="' + data.item.value + '" readonly="readonly"><i class="glyphicon glyphicon-remove remove" title="remove"></i>');
+      $('#order_customer_id').val(data.item.id);
 
-        var link = "/fetch_last_products?customer_id=" + data.item.id
-        $.ajax({
-    				type: 'GET',
-    				url: link
-    		});
+      var link = "/fetch_last_products?customer_id=" + data.item.id
+      $.ajax({
+          type: 'GET',
+          url: link
+      });
 
-        $('.remove').click(function () {
-          $(this).parent().parent().remove();
-          $('#order_customer_id').val('');
-          $('.last-order-product').remove();
-        });
-      }
-    });
+      $('.remove').click(function () {
+        $('.customer_autocomplete').html('<%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 15 %>');
+        $('#order_customer_id').val('');
+        $('.last-order-product').remove();
+      });
+    }
+  });
+
   // Product Search
-  $('#product_search').bind('railsAutocomplete.select', function(event, data){
+  $(document).on('railsAutocomplete.select', '#product_search, #product_ws_search',function(event, data){
     if($('#tr_' + data.item.id).length == 0){
       $('.product-table tbody.product-list').append([
         '<tr id="tr_'+ data.item.id +'">',

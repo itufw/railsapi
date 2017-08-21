@@ -4,6 +4,7 @@ require 'dates_helper.rb'
 require 'time_period_stats.rb'
 require 'status_helper.rb'
 require 'fastway.rb'
+require 'order_status.rb'
 
 class StatusController < ApplicationController
   before_action :confirm_logged_in
@@ -13,6 +14,7 @@ class StatusController < ApplicationController
   include DatesHelper
   include TimePeriodStats
   include StatusHelper
+  include OrderStatus
 
   def pending
     @status_id, @status_name = get_id_and_name(params)
@@ -43,83 +45,19 @@ class StatusController < ApplicationController
   end
 
   def status_update
-    selected_orders = params[:selected_orders] || []
-    selected_orders = selected_orders.first.split unless selected_orders.blank? || selected_orders.count > 1
-
-    # Print Shipping List
-    if "Paperwork" == params[:commit] && !selected_orders.blank?
-      # Print Picking Sheet
-      # Due to Rails redirect conflicts
-      pdf = print_shipping_sheet(selected_orders)
-      send_data pdf.to_pdf, filename: "picking_sheet_#{session[:username]}_#{Date.today.to_s}.pdf" and return
-    end
-
-    # Group Update
-    if ['Picked', 'Ready', 'Shipped'].include? params[:commit]
-      status_id = 8 if params[:commit] == 'Picked'
-      status_id = 9 if params[:commit] == 'Ready'
-      status_id = 2 if params[:commit] == 'Shipped'
-      Order.where(id: selected_orders).update_all(status_id: status_id)
-      redirect_to controller: 'status', action: 'order_status' and return
-    end
-
-    # Individual Update
-    # Skip current record
-    if "Skip" == params[:commit]
-    elsif "Approve" == params[:commit]
-      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 3}))
-    elsif "Hold-Stock" == params[:commit]
-      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 20}))
-    elsif "Hold-Price" == params[:commit]
-      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 7}))
-    elsif "Hold-Other" == params[:commit]
-      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 13}))
-    elsif "Create Label" == params[:commit]
-      # Create Fastway Label & Create tracking information for orders
-      # IF order_params[:courier_status_id] == 3 -> Create FASTWAY Label
-      # Else: just record the label number
-      if order_params[:courier_status_id] == '3'
-        order = Order.find(params[:order_id])
-        order.update_attributes(order_params.reject{|key, value| key == 'courier_status_id' })
-        result = Fastway.new.add_consignment(order, params['dozen'].to_i, params['half-dozen'].to_i)
-        begin
-          order.update_attributes(order_params.merge({'track_number': result['result']['LabelNumbers'].join(';')}))
-          flash[:success] = "Label Printed"
-          order.update_attributes({courier_status_id: 4, status_id: 2, date_shipped: Date.today.to_s(:db)})
-        rescue
-          flash[:error] = 'Fail to connect Fastway, Check the Shipping Address'
-          flash[:error] = result['error'] unless result.nil? || result[:error].nil?
-          selected_orders.unshift(params[:order_id])
-          redirect_to controller: 'order', action: 'order_confirmation', order_id: selected_orders.first, selected_orders: selected_orders, status_id: params[:status_id] and return
-        end
-        # create label with fastway
-      else
-        Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 2, date_shipped: Date.today.to_s(:db)}))
-      end
-    elsif "Delivered" == params[:commit]
-      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 12}))
-    elsif "Problem" == params[:commit]
-      Order.find(params[:order_id]).update_attributes(order_params)
-    elsif "Complete" == params[:commit]
-      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 10}))
-    elsif !params[:order].nil?
-      status = Status.find(params[:order][:status_id])
-      order = Order.find(params[:order][:id])
-      # Approved, Partially Paid, Unpaid, Paid, Hold-Accounts
-      account_status = params[:order][:account_status]
-      if account_status == "Hold-Account" && status.in_transit == 1
-        flash[:error] = "Account Hold for Order#" + order.id.to_s
-      else
-        order.assign_attributes(params[:order].permit(:status_id, :account_status, :courier_status_id))
-        order.save
-      end
-    end
-
-    if selected_orders.blank?
+    order_params = {} if params[:order].nil?
+    status, result = order_status_handler(params, order_params)
+    case status
+    when 'Paperwork'
+      send_data result.to_pdf, filename: "picking_sheet_#{session[:username]}_#{Date.today.to_s}.pdf" and return
+    when 'Group Update'
       redirect_to controller: 'order', action: 'all' and return
-    else
-      redirect_to controller: 'order', action: 'order_confirmation', order_id: selected_orders.first, selected_orders: selected_orders, status_id: params[:status_id] and return
+    when 'Label Error'
+      redirect_to controller: 'order', action: 'order_confirmation', order_id: result.first, selected_orders: result, status_id: params[:status_id] and return
+    when 'Next'
+      redirect_to controller: 'order', action: 'order_confirmation', order_id: result.first, selected_orders: result, status_id: params[:status_id] and return
     end
+    redirect_to controller: 'order', action: 'all' and return
   end
 
   def summary_with_product
