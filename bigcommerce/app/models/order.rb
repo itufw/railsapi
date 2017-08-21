@@ -52,7 +52,7 @@ class Order < ActiveRecord::Base
     status_id = Status.where('bigcommerce_id = ?', order.status_id).order('statuses.order').first.id
     params = {'customer_id': order.customer_id, 'status_id': status_id, 'staff_id': customer.staff_id,\
        'total_inc_tax': order.total_inc_tax, 'qty': order.items_total, 'items_shipped': order.items_shipped,\
-       'subtotal': order.subtotal_inc_tax.to_f/1.29, 'discount_rate': 0, 'discount_amount': order.discount_amount + order.coupon_discount,\
+       'subtotal': order.subtotal_inc_tax.to_f/1.1 + order.discount_amount + order.coupon_discount, 'discount_rate': 0, 'discount_amount': order.discount_amount + order.coupon_discount,\
        'handling_cost': order.items_total.to_f * 1.82, 'shipping_cost': order.shipping_cost_ex_tax,\
        'wrapping_cost': order.wrapping_cost_ex_tax, 'wet': (order.subtotal_ex_tax.to_f - order.discount_amount.to_f - order.coupon_discount.to_f) * 0.29,\
        'gst': order.total_inc_tax.to_f / 11, 'staff_notes': remove_apostrophe(order.staff_notes),\
