@@ -121,15 +121,21 @@ class ReminderMailer < ActionMailer::Base
       # The Customer Type!
       # cust_type_id: 1.Retail, 2. Wholesale, 3. Staff
       if 2 == Customer.where("customers.xero_contact_id = '#{invoice.xero_contact_id}'").first.cust_type_id
+        # attachments["invoice\##{invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
+        #   render_to_string(
+        #       :template => 'pdf/pdf_invoice',
+        #       :locals => {:invoice => invoice,
+        #                   :bill_address => bill_address,
+        #                   :customer_notes => customer_notes,
+        #                   :order => order}
+        #       )
+        # )
         attachments["invoice\##{invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
           render_to_string(
-              :template => 'pdf/pdf_invoice',
-              :locals => {:invoice => invoice,
-                          :bill_address => bill_address,
-                          :customer_notes => customer_notes,
-                          :order => order}
+              :template => 'pdf/order_invoice.pdf',
+              :locals => {order: order, customer: order.customer}
               )
-        )
+          )
       else
         attachments["invoice\##{invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
           render_to_string(
