@@ -5,9 +5,10 @@ class ReminderMailer < ActionMailer::Base
   default from: 'accounts@untappedwines.com'
   layout "mailer"
 
-  def error_warning(error_class, error_message)
+  def error_warning(error_class, error_message, backtrace)
     @error_class = error_class
     @error_message = error_message
+    @backtrace = backtrace.join("\n")
     mail(from: 'it@untappedwines.com', to: 'it@untappedwines.com', subject: "Sync Error")
   end
 

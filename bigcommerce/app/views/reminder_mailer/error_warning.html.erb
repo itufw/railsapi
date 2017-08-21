@@ -6,6 +6,7 @@
   <body>
     <h4>Error <%= @error_class %> Happened</h4>
     <p><%= @error_message %></p>
+    <p><%= @backtrace %></p>
     <%= render "reminder_mailer_partials/signature_CMS"%>
   </body>
 </html>

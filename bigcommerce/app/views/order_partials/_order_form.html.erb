@@ -141,7 +141,7 @@
 <%= f.hidden_field :modified_wet %>
 <div class="row">
   <div class="col-md-4 col-md-offset-8">
-    <button type="button" class="btn btn-warning"><%= link_to 'Cancel', controller: 'order', action: 'all'%></button>
+    <%= link_to '<button type="button" class="btn btn-warning">Cancel</button>'.html_safe, controller: 'order', action: 'all'%>
 
     <%= button_tag(type: 'submit', class: 'btn btn-primary save active', value: 'new_note') do %>
       <div> Save & New Note </div>
