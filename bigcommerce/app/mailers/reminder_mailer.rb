@@ -9,7 +9,7 @@ class ReminderMailer < ActionMailer::Base
     @error_class = error_class
     @error_message = error_message
     @backtrace = backtrace.join("\n")
-    mail(from: 'it@untappedwines.com', to: 'it@untappedwines.com', subject: "Sync Error")
+    mail(from: 'Untapped IT <it@untappedwines.com>', to: 'William Liu <it@untappedwines.com>', cc: 'Luke Voortman <lvoortman@untappedwines.com>', subject: "Sync Error")
   end
 
   def send_overdue_reminder(customer_id, email_subject,staff_id,email_content,email_address, cc, bcc, email_type, selected_invoices, cn_op, attachment_tmp)
