@@ -8,7 +8,7 @@ class ReminderMailer < ActionMailer::Base
   def error_warning(error_class, error_message)
     @error_class = error_class
     @error_message = error_message
-    mail(from: "\"CMS\" <accounts@untappedwine.com>", to:'it@untappedwines.com', subject: "Sync Error ##{Time.now.to_s}")
+    mail(to: 'it@untappedwines.com', subject: "Sync Error")
   end
 
   def send_overdue_reminder(customer_id, email_subject,staff_id,email_content,email_address, cc, bcc, email_type, selected_invoices, cn_op, attachment_tmp)
@@ -63,7 +63,7 @@ class ReminderMailer < ActionMailer::Base
 
 
     # customer_address = %("#{@xero_contact.name}" <#{email_address}>)
-    mail(from: "\"#{staff_name}\" <accounts@untappedwine.com>",to: recipients_addresses, cc: cc_group, bcc: bcc_group, subject: email_subject)
+    mail(from: "\"#{staff_name}\" <accounts@untappedwines.com>",to: recipients_addresses, cc: cc_group, bcc: bcc_group, subject: email_subject)
   end
 
   def unzip_cn_op_hash(cn_op_list)

@@ -118,7 +118,6 @@ class AccountsController < ApplicationController
 
         # attach the attachment
         attachment_tmp = params[:account_email][:attachment]
-
         ReminderMailer.send_overdue_reminder(customer_id, email_subject, staff_id, email_content, receive_address, email_cc, email_bcc, email_type, selected_invoices, cn_op, attachment_tmp).deliver_now
         flash[:success] = 'Email Sent'
 

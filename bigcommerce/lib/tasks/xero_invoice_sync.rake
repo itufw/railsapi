@@ -23,7 +23,7 @@ namespace :xero_invoice_sync do
 					Revision.xero.end_update(start_time, Time.now)
 			rescue Exception => ex
 				puts "An error of type #{ex.class} happened, message is #{ex.message}"
-				ReminderMailer.error_warning(ex.class, ex.message)
+				ReminderMailer.error_warning(ex.class, ex.message).deliver_now
 			end
 		end
 
