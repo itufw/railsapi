@@ -20,6 +20,17 @@ module FastwayApi
     end
   end
 
+  def wake_signatures
+    fastway = Fastway.new()
+    delivery_labels = FastwayTrace.select('distinct(LabelNumber)').completed.map(&:LabelNumber)
+    while !delivery_labels.blank?
+      selected_labels = delivery_labels[0..15]
+      response = fastway.track(selected_labels)
+      return response if resposne['result'].nil?
+      delivery_labels = delivery_labels.reject{|x| selected_labels.include?x}
+    end
+  end
+
   def trace_events
     fastway = Fastway.new()
 

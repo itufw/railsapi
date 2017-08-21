@@ -87,6 +87,12 @@ namespace :updates do
 		puts "Shipping Update End At #{Time.now}"
 	end
 
+	task :wake_signatures => :environment do
+		puts 'Wake Signatures Up'
+		wake_signatures
+		puts 'Waked Signature'
+	end
+
 	task :balanceupdate => :environment do
 		puts "Update contacts balance #{Time.now} started"
 		XeroContact.new.update_balance_for_all
