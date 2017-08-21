@@ -38,6 +38,10 @@ every '30 9-19,0 * * *' do
 	rake 'updates:package_trace'
 end
 
+every 1.day, :at => '10:45 pm' do
+	rake 'updates:wake_signatures'
+end
+
 every 1.day, :at => '9:00 am' do
 	rake "updates:balanceupdate"
 

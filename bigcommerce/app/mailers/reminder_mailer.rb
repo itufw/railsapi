@@ -8,7 +8,7 @@ class ReminderMailer < ActionMailer::Base
   def error_warning(error_class, error_message)
     @error_class = error_class
     @error_message = error_message
-    mail(to: 'it@untappedwines.com', subject: "Sync Error")
+    mail(from: 'it@untappedwines.com', to: 'it@untappedwines.com', subject: "Sync Error")
   end
 
   def send_overdue_reminder(customer_id, email_subject,staff_id,email_content,email_address, cc, bcc, email_type, selected_invoices, cn_op, attachment_tmp)
