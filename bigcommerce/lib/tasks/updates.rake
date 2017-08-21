@@ -13,7 +13,7 @@ namespace :updates do
 	task :models => :environment do
 
 		if can_start_update
-
+			begin
 			Revision.bigcommerce.start_update
 			start_time = Time.now
 
@@ -41,6 +41,9 @@ namespace :updates do
 			Revision.bigcommerce.end_update(start_time, Time.now)
 
 			puts "Models update #{Time.now} ended"
+			rescue Exception => ex
+				ReminderMailer.error_warning(ex.class, ex.message)
+			end
 
 		end
 	end

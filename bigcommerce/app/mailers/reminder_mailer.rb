@@ -5,6 +5,12 @@ class ReminderMailer < ActionMailer::Base
   default from: 'accounts@untappedwines.com'
   layout "mailer"
 
+  def error_warning(error_class, error_message)
+    @error_class = error_class
+    @error_message = error_message
+    mail(from: "\"CMS\" <accounts@untappedwine.com>", to:'it@untappedwines.com', subject: "Sync Error ##{Time.now.to_s}")
+  end
+
   def send_overdue_reminder(customer_id, email_subject,staff_id,email_content,email_address, cc, bcc, email_type, selected_invoices, cn_op, attachment_tmp)
     @cn_op = ("{}".eql? cn_op) ? {} : unzip_cn_op_hash(cn_op)
     @total_remaining_credit = (@cn_op.map {|x| x[:remaining_credit]}).sum
