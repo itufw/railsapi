@@ -42,7 +42,7 @@ namespace :updates do
 
 			puts "Models update #{Time.now} ended"
 			rescue Exception => ex
-				ReminderMailer.error_warning(ex.class, ex.message)
+				ReminderMailer.error_warning(ex.class, ex.message).deliver_now
 			end
 
 		end
