@@ -8,7 +8,7 @@ class OrderProduct < ActiveRecord::Base
 
 	after_validation :record_history, on: [:update, :delete]
 	after_validation :stock_change, on: [:create, :update], if: ->(obj){ obj.stock_incremental.present? and obj.stock_incremental_changed?}
-	after_validation :product_display_check, on:[:create, :update], if: ->(obj){ obj.stock_current_changed?}
+	after_validation :product_display_check, on:[:update], if: ->(obj){ obj.stock_current_changed?}
 
 	def import_from_bigcommerce(order, op)
 		attributes = {'order_id': order.id, 'product_id': op.product_id, 'price_luc': op.base_price.to_f * 1.29,\
