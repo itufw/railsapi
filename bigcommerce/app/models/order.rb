@@ -70,7 +70,12 @@ class Order < ActiveRecord::Base
 
   def update_from_bigcommerce(order)
     customer = Customer.find(order.customer_id)
-    status_id = Status.where('bigcommerce_id = ?', order.status_id).order('statuses.order').first.id
+    if order.status_id == 1 && self.status.bigcommerce_id == 1
+      status_id = self.status_id
+    else
+      status_id = Status.where('bigcommerce_id = ?', order.status_id).order('statuses.order').first.id
+    end
+
     params = {'customer_id': order.customer_id, 'status_id': status_id, 'staff_id': customer.staff_id,\
        'total_inc_tax': order.total_inc_tax, 'qty': order.items_total, 'items_shipped': order.items_shipped,\
        'subtotal': order.subtotal_inc_tax.to_f/1.1 + order.discount_amount.to_f + order.coupon_discount.to_f,\
