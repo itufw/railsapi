@@ -9,7 +9,7 @@ class BigcommerceOrderProduct < ActiveRecord::Base
     end
 
     order = Order.where('source = ? AND source_id = ?', 'bigcommerce', order_id).first
-    new_op = order.order_products unless order.nil?
+    new_op = order.order_products.select{|x| x} unless order.nil?
 
     order_products.each do |op|
       time = Time.now.to_s(:db)
@@ -27,6 +27,7 @@ class BigcommerceOrderProduct < ActiveRecord::Base
         op_main = new_op.select {|x| x.product_id == op.product_id}.first
         op_main.import_from_bigcommerce(order, op) unless op_main.nil?
         OrderProduct.new.import_from_bigcommerce(order, op) if op_main.nil?
+        new_op = new_op.reject{|x| x == op_main }
       end
     end
   end
