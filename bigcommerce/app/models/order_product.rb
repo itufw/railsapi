@@ -178,7 +178,7 @@ class OrderProduct < ActiveRecord::Base
 		return if self.order.source == 'bigcommerce'
 		sql = "UPDATE products SET inventory = inventory - '#{self.stock_incremental}' WHERE id = '#{self.product_id}'"
 		ActiveRecord::Base.connection.execute(sql)
-		# Bigcommerce::Product.update(self.product_id, inventory_level: self.product.inventory) if (self.stock_incremental != 0 && self.product_id == 2233)
+		Bigcommerce::Product.update(self.product_id, inventory_level: self.product.inventory) if (self.stock_incremental != 0)
 	end
 
 	def product_display_check
