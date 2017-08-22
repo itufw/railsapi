@@ -44,7 +44,7 @@ class Order < ActiveRecord::Base
   after_validation :record_history, on: [:update, :delete], unless: ->(obj){ obj.xero_invoice_number_changed? or obj.xero_invoice_id_changed?}
   after_validation :cancel_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id == 5}
   after_validation :recovery_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id_was == 5}
-  after_validation :bigcommerce_status_update, on: [:update], if: ->(obj){obj.source=='bigcommerce' and [2,3,4,5,6,7,8,9,10,11,12,13].include?obj.status_id }
+  after_validation :bigcommerce_status_update, on: [:update], if: ->(obj){obj.status_id_changed? and obj.source=='bigcommerce' and [2,3,4,5,6,7,8,9,10,11,12,13].include?obj.status_id and obj.last_updated_by!=34}
 
 
   self.per_page = 30
@@ -366,9 +366,17 @@ class Order < ActiveRecord::Base
     includes(:products).where('products.id IN (?)', [product_ids]).references(:products)
   end
 
+  def order_sum
+    order_total = 0.0
+    self.order_products.each {|o| order_total += (o.qty * o.price_inc_tax)}
+    return order_total
+  end
+
   private
 
   def bigcommerce_status_update
+    # Ignore lagacy datas
+    return if self.id < 20000
     Bigcommerce::Order.update(self.source_id, status_id: self.status.bigcommerce_id)
   end
 
