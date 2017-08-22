@@ -305,7 +305,7 @@ class Order < ActiveRecord::Base
   ######### ORDER BY FUNCTIONS ############
 
   def self.order_by_id(direction)
-    order('orders.id ' + direction)
+    order('orders.date_created ' + direction)
   end
 
   def self.order_by_customer(direction)

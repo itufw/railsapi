@@ -132,14 +132,16 @@
                     </tr>
                     <tr>
                       <td colspan="2" class="ProductCost" align="right"><h3>Grand Total:</h3></td>
-                      <td class="ProductTotal" align="right">$<%= '%.2f' % order.total_inc_tax %></td>
+                      <td class="ProductTotal" align="right"><h3>$<%= '%.2f' % order.total_inc_tax %></h3></td>
                       <td></td>
                     </tr>
             </table>
     </div>
       <div class="InvoiceComments" style="%%GLOBAL_HideComments%%; margin-top: -75px; font-size: 0.8em;width: 350px; text-align: justify;">
               <div class="InvoiceHeading" style="font-size: .9em;">Comments</div>
-              <%= order.customer_notes %>
+              <% order.customer_notes.split(/\n/).each do |note| %>
+                <%= note%><br/>
+              <% end %>
       </div>
     <br/><br/><br/><br/>
 <div style=" position: fixed; bottom: 0; width: 100%;">
@@ -147,19 +149,19 @@
         <b style="font-size: 1em;">Banking Details</b>
         <table>
             <tr>
-                <td style="font-size: .8em;">
+                <td style="font-size: .6em;">
                     BSB:
                 </td>
                 <td style="font-size: .8em; border-right:1px solid black; padding-right:4px;">
                     013 606
                 </td>
-                <td style="font-size: .8em;">
+                <td style="font-size: .6em;">
                     Account Number:
                 </td>
                 <td style="font-size: .8em;border-right:1px solid black; padding-right:4px;">
                     2762 95364
                 </td>
-                <td style="font-size: .8em;">
+                <td style="font-size: .6em;">
                     Please include invoice number in description
                 </td>
             </tr>
