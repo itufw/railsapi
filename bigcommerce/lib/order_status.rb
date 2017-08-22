@@ -1,7 +1,7 @@
 require 'fastway.rb'
 module OrderStatus
 
-  def order_status_handler(params, order_params)
+  def order_status_handler(params, order_params, user_id)
     selected_orders = params[:selected_orders] || []
     selected_orders = selected_orders.first.split unless selected_orders.blank? || selected_orders.count > 1
 
@@ -15,28 +15,28 @@ module OrderStatus
 
     case params[:commit]
     when 'Picked'
-      Order.where(id: selected_orders).update_all(status_id: 8)
+      Order.where(id: selected_orders).update_all(status_id: 8, last_updated_by: user_id)
       return ['Group Update', '']
     when 'Ready'
-      Order.where(id: selected_orders).update_all(status_id: 9)
+      Order.where(id: selected_orders).update_all(status_id: 9, last_updated_by: user_id)
       return ['Group Update', '']
     when 'Shipped'
-      Order.where(id: selected_orders).update_all(status_id: 2)
+      Order.where(id: selected_orders).update_all(status_id: 2, last_updated_by: user_id)
       return ['Group Update', '']
     when 'Approve'
-      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 3}))
+      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 3, last_updated_by: user_id}))
     when 'Hold-Stock'
-      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 20}))
+      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 20, last_updated_by: user_id}))
     when 'Hold-Price'
-      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 7}))
+      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 7, last_updated_by: user_id}))
     when 'Hold-Other'
-      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 13}))
+      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 13, last_updated_by: user_id}))
     when 'Delivered'
-      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 12}))
+      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 12, last_updated_by: user_id}))
     when 'Problem'
       Order.find(params[:order_id]).update_attributes(order_params)
     when 'Complete'
-      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 10}))
+      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 10, last_updated_by: user_id}))
     when 'Skip'
       # Just Skip
     when 'Create Label'
@@ -50,7 +50,7 @@ module OrderStatus
         begin
           order.update_attributes(order_params.merge({'track_number': result['result']['LabelNumbers'].join(';')}))
           flash[:success] = "Label Printed"
-          order.update_attributes({courier_status_id: 4, status_id: 2, date_shipped: Date.today.to_s(:db)})
+          order.update_attributes({courier_status_id: 4, status_id: 2, date_shipped: Date.today.to_s(:db), last_updated_by: user_id})
         rescue
           flash[:error] = 'Fail to connect Fastway, Check the Shipping Address'
           flash[:error] = result['error'] unless result.nil? || result[:error].nil?
@@ -59,7 +59,7 @@ module OrderStatus
         end
         # create label with fastway
       else
-        Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 2, date_shipped: Date.today.to_s(:db)}))
+        Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 2, date_shipped: Date.today.to_s(:db), last_updated_by: user_id}))
       end
     else
       if !params[:order].nil?
