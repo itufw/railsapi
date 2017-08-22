@@ -49,7 +49,7 @@ module OrderHelper
 
     # 100XXXXX CMS orders
     order_id = Order.select('MAX(id) as id').first.id
-    order_id = (order_id > 10000000) ? order_id + 1 : order_id + 10000000
+    order_id = (order_id > 10000000) ? order_id + 1 : order_id + 10000001
     order = Order.new(order_params)
     order_attributes = {'id': order_id, 'staff_id': Customer.find(order.customer_id).staff_id,\
       'qty': products_params.values().map {|x| x['qty'].to_i }.sum, 'items_shipped': 0,\
