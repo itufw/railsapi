@@ -42,7 +42,7 @@ namespace :updates do
 
 			puts "Models update #{Time.now} ended"
 			rescue Exception => ex
-				ReminderMailer.error_warning(ex.class, ex.message, ex.backtrace).deliver_now
+				ReminderMailer.error_warning(ex.class, ex.message, ex.backtrace).deliver_now if Revision.bigcommerce.attempt_count == 2
 			end
 
 		end
