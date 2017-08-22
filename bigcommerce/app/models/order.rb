@@ -1,4 +1,5 @@
 require 'clean_data.rb'
+require 'bigcommerce_connection.rb'
 
 class Order < ActiveRecord::Base
   include CleanData
@@ -43,6 +44,7 @@ class Order < ActiveRecord::Base
   after_validation :record_history, on: [:update, :delete], unless: ->(obj){ obj.xero_invoice_number_changed? or obj.xero_invoice_id_changed?}
   after_validation :cancel_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id == 5}
   after_validation :recovery_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id_was == 5}
+  after_validation :bigcommerce_status_update, on: [:update], if: ->(obj){obj.source=='bigcommerce' and [2,3,4,5,6,7,8,9,10,11,12,13].include?obj.status_id }
 
 
   self.per_page = 30
@@ -365,6 +367,10 @@ class Order < ActiveRecord::Base
   end
 
   private
+
+  def bigcommerce_status_update
+    Bigcommerce::Order.update(self.source_id, status_id: self.status.bigcommerce_id)
+  end
 
   def cancel_order
     self.order_products.map(&:delete_product)
