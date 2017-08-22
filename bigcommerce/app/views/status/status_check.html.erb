@@ -9,6 +9,8 @@
   <% end %>
 <% elsif ["Picking", "Ready"].include? @status_name%>
   <%= form_tag({:controller => "status", :action => "status_update"}, {:method => "get"}) do %>
+    <%= hidden_field_tag "order['id']", @orders.first.id %>
+
     <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
     <% if @status_name == "Picking" %>
       <%= submit_tag 'Picked', class: 'btn btn-primary'%>
@@ -24,10 +26,11 @@
     <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
     <%= submit_tag 'Select Courier', class: 'btn btn-primary'%>
   <% end %>
-<% elsif ['Shipping'].include? @status_name%>
+<% elsif ['Shipped'].include? @status_name%>
   <%= form_tag({:controller => "status", :action => "status_update"}, {:method => "get"}) do %>
     <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
     <%= submit_tag 'Shipped', class: 'btn btn-primary'%>
+    <%= hidden_field_tag "order['id']", @orders.first.id %>
     <button type="button" name="return" class="btn btn-primary"><%= link_to 'Back', controller: 'status', action: 'order_status', status_id: 9, status_name: 'Ready'%></button>
   <% end %>
 <% elsif ['Delivered'].include? @status_name %>

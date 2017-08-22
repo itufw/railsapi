@@ -45,8 +45,7 @@ class StatusController < ApplicationController
   end
 
   def status_update
-    order_params = {} if params[:order].nil?
-    status, result = order_status_handler(params, order_params)
+    status, result = order_status_handler(params, order_params, session[:user_id])
     case status
     when 'Paperwork'
       send_data result.to_pdf, filename: "picking_sheet_#{session[:username]}_#{Date.today.to_s}.pdf" and return
