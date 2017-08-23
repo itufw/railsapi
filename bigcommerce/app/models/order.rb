@@ -6,6 +6,7 @@ class Order < ActiveRecord::Base
   belongs_to :customer
   delegate :staff, to: :customer, allow_nil: true
   belongs_to :status
+  belongs_to :courier_status
   belongs_to :coupon
   belongs_to :staff
   has_many :order_shippings

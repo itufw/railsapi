@@ -53,7 +53,7 @@ module OrderHelper
     order = Order.new(order_params)
     order_attributes = {'id': order_id, 'staff_id': Customer.find(order.customer_id).staff_id,\
       'qty': products_params.values().map {|x| x['qty'].to_i }.sum, 'items_shipped': 0,\
-      'wrapping_cost': 0, 'active': 1, 'date_created': Date.today.to_s(:db), 'source': 'Manual',\
+      'wrapping_cost': 0, 'active': 1, 'date_created': Time.now.to_s(:db), 'source': 'Manual',\
       'courier_status_id': 1, 'status_id': 11, 'created_by': session[:user_id], 'last_updated_by': session[:user_id]}
     order.assign_attributes(order_attributes)
 

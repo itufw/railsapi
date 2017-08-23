@@ -1,7 +1,12 @@
 require 'csv_import.rb'
+require 'csv_generator.rb'
+
 
 class AdminController < ApplicationController
     before_action :confirm_logged_in
+
+    include CsvGenerator
+
 
     # CustType
     # CustGroup
@@ -147,5 +152,21 @@ class AdminController < ApplicationController
 
     def staff_order_update
       redirect_to action: 'index'
+    end
+
+    def download_customer
+      send_data export_customer(Date.today - 1.month, Date.today), filename: "customer-#{Date.today}.csv"
+    end
+
+    def download_order_products
+      send_data export_order_products(Date.today - 1.month, Date.today), filename: "order-products-#{Date.today}.csv"
+    end
+
+    def download_orders
+      send_data export_orders(Date.today - 1.month, Date.today), filename: "orders-#{Date.today}.csv"
+    end
+
+    def download_ships
+      send_data export_shippment(Date.today - 1.month, Date.today), filename: "ship-#{Date.today}.csv"
     end
 end
