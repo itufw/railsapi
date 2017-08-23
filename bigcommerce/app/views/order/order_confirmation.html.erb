@@ -92,7 +92,14 @@
     </tr>
   </tbody>
 </table>
-<div class="status-change col-md-offset-8">
+  <% if @selected_status_id == '12' %>
+    <div class="col-md-6">
+      <%= render 'partials/shipping', order_id: @order.id %>
+    </div>
+    <div class="status-change col-md-6">
+  <% else %>
+    <div class="status-change col-md-offset-6">
+  <% end %>
       <%= hidden_field_tag :order_id, @order.id%>
       <%= hidden_field_tag :status_id, @selected_status_id %>
       <%= hidden_field_tag 'selected_orders[]', @selected_orders unless @selected_orders.nil? || @selected_orders.blank?%>
