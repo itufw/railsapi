@@ -48,9 +48,8 @@ module OrderStatus
         order.update_attributes(order_params.reject{|key, value| key == 'courier_status_id' })
         result = Fastway.new.add_consignment(order, params['dozen'].to_i, params['half-dozen'].to_i)
         begin
-          order.update_attributes(order_params.merge({'track_number': result['result']['LabelNumbers'].join(';')}))
+          order.update_attributes(order_params.merge({track_number: result['result']['LabelNumbers'].join(';'), courier_status_id: 4, status_id: 2, date_shipped: Time.now.to_s(:db), last_updated_by: user_id}))
           flash[:success] = "Label Printed"
-          order.update_attributes({courier_status_id: 4, status_id: 2, date_shipped: Date.today.to_s(:db), last_updated_by: user_id})
         rescue
           flash[:error] = 'Fail to connect Fastway, Check the Shipping Address'
           flash[:error] = result['error'] unless result.nil? || result[:error].nil?
@@ -59,7 +58,7 @@ module OrderStatus
         end
         # create label with fastway
       else
-        Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 2, date_shipped: Date.today.to_s(:db), last_updated_by: user_id}))
+        Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 2, courier_status_id: order_params['courier_status_id'], date_shipped: Time.now.to_s(:db), last_updated_by: user_id}))
       end
     else
       if !params[:order].nil?

@@ -105,13 +105,17 @@
       </tr>
     </table>
   </div>
-  <div class="InvoiceComments" style="%%GLOBAL_HideComments%%; margin-top: -75px; font-size: 0.8em;width: 350px; text-align: justify;">
+  <div class="InvoiceComments" style="%%GLOBAL_HideComments%%; font-size: 0.8em;width: 350px; text-align: justify;">
     <div class="InvoiceHeading" style="font-size: .9em;">Customer Notes</div>
-    <%= order.customer_notes %>
+    <% order.customer_notes.split(/\n/).each do |note| %>
+      <%= note %> <br/>
+    <% end %>
   </div>
-  <div class="InvoiceComments" style="%%GLOBAL_HideComments%%; margin-top: -75px; font-size: 0.8em;width: 350px; text-align: justify;">
+  <div class="InvoiceComments" style="%%GLOBAL_HideComments%%; font-size: 0.8em;width: 350px; text-align: justify;">
     <div class="InvoiceHeading" style="font-size: .9em;">Staff Notes</div>
-    <%= order.staff_notes %>
+    <% order.staff_notes.split(/\n/).each do |note| %>
+      <%= note %><br/>
+    <% end %>
   </div>
   <div class="row" align="right" style=" position: fixed; bottom: 0; width: 100%;">
     <table>

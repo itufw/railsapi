@@ -7,6 +7,13 @@
 	<% end %>
 </div>
 
+<div align="center" style="margin-top: 50px;">
+	<%= link_to '<button class="btn btn-success">Customer</button>'.html_safe, action: 'download_customer' %>
+	<%= link_to '<button class="btn btn-default">Order Products</button>'.html_safe, action: 'download_order_products' %>
+	<%= link_to '<button class="btn btn-info">Orders</button>'.html_safe, action: 'download_orders' %>
+	<%= link_to '<button class="btn btn-danger">Ships</button>'.html_safe, action: 'download_ships' %>
+</div>
+
 <div style="margin-top: 50px;">
 	<%= form_tag({:action => "password_update"}, {:method => "get"}) do %>
 		<h4>Password Update : </h4>

@@ -2,7 +2,6 @@ require 'models_filter.rb'
 require 'display_helper.rb'
 require 'product_variations.rb'
 require 'order_helper.rb'
-require 'csv_generator.rb'
 
 class OrderController < ApplicationController
 
@@ -12,7 +11,6 @@ class OrderController < ApplicationController
     include DisplayHelper
     include ProductVariations
     include OrderHelper
-    include CsvGenerator
 
     def all
      	@staff_nickname = params[:staff_nickname]
@@ -23,10 +21,6 @@ class OrderController < ApplicationController
      	#@can_update_bool = allow_to_update(session[:user_id])
      	@staff, @status, orders, @search_text, @order_id = order_controller_filter(params, "display_report")
      	@per_page, @orders = order_display_(params, orders)
-
-      if params[:commit] == 'Download'
-        send_data export_to_csv(@orders), filename: "users-#{Date.today}.csv"
-      end
     end
 
   	def for_product
