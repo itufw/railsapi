@@ -120,10 +120,10 @@ class Fastway
 
     pacakging = 17 if packaging == 18
     if half_dozen > 0
-      @query[:query]["items[#{half_dozen}].Reference"] = order.id
-      @query[:query]["items[#{half_dozen}].Quantity"] = half_dozen
-      @query[:query]["items[#{half_dozen}].Weight"] = 5
-      @query[:query]["items[#{half_dozen}].Packaging"] = packaging
+      @query[:query]["items[#{item_number}].Reference"] = order.id
+      @query[:query]["items[#{item_number}].Quantity"] = half_dozen
+      @query[:query]["items[#{item_number}].Weight"] = 5
+      @query[:query]["items[#{item_number}].Packaging"] = packaging
     end
 
     # send request
