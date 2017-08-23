@@ -37,11 +37,17 @@ class StatusController < ApplicationController
 
   def status_check
     @status_name = params[:status_name]
-    status_ids = Status.where("alt_name LIKE '%#{@status_name}%'").map(&:id)
-
     order_function, direction = sort_order(params, :order_by_id, 'DESC')
     per_page = params[:per_page] || Order.per_page
-    @orders = Order.statuses_filter(status_ids).send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
+
+    if @status_name == "Delivered"
+      shipped_orders = Order.status_filter([2]).map(&:id)
+      deliveried_ids = FastwayTrace.where('Reference IN (?) AND Description IN (?)', shipped_orders, ['Signature Obtained', 'Left As Instructed', 'Left with neighbour', 'Delivery Completed', 'Authority to Leave']).map(&:Reference)
+      @orders = Order.where('status_id = 12 OR id IN (?)', deliveried_ids).send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
+    else
+      status_ids = Status.where("alt_name LIKE '%#{@status_name}%'").map(&:id)
+      @orders = Order.statuses_filter(status_ids).send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
+    end
   end
 
   def status_update
