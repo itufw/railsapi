@@ -208,7 +208,7 @@ module XeroInvoiceCalculations
     def insert_rounding_to_calculation(order_number, order_total, xero_account_code)
       amount = XeroCalculation.where(invoice_number: order_number).map{ |x| (x.discounted_unit_price.to_f * x.qty).round(2)}.sum
       amount += XeroCalculation.where(invoice_number: order_number, discounted_unit_price: nil).map(&:unit_price_inc_tax).sum
-      if (order_total - amount) != 0
+      if (order_total - amount).round(2) != 0
          XeroCalculation.insert_rounding_new(order_number, order_total - amount, order_total, xero_account_code)
       end
     end
