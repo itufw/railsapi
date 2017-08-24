@@ -136,7 +136,7 @@ class Customer < ActiveRecord::Base
 	def account_approval(order_total)
 		return 'Approved' if order_total == 0
 		return 'On-Hold' if self.xero_contact_id == 0
-		sum = XeroInvoice.select('amount_due').where("xero_contact_id = '#{self.xero_contact_id}' AND date < '#{(Date.today - 60.days).to_s(:db)}'").sum
+		sum = XeroInvoice.where("xero_contact_id = '#{self.xero_contact_id}' AND date < '#{(Date.today - 60.days).to_s(:db)}'").sum('amount_due')
 		return 'On-Hold' if sum > 0
 		'Approved'
 	end
