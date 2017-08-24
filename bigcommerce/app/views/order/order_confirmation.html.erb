@@ -4,14 +4,19 @@
 <%= form_for @order, :url => {:controller => "status", :action => "status_update"}, :method => 'get' do |f| %>
   <%= f.hidden_field :id %>
 
-  <div class="col-md-4" style="margin-top: -40px;">
-    <table id="customer_table">
-      <tbody>
-        <tr>
-          <th>Customer</th>
-          <td><%= @order.customer.actual_name%></td>
-        </tr>
-    </table>
+  <div class="row" style="margin-top: -40px;">
+    <div class="col-md-4">
+      <table id="customer_table">
+        <tbody>
+          <tr>
+            <th>Customer</th>
+            <td><%= @order.customer.actual_name%></td>
+          </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="row">
     <%= render 'partials/order_address_form', f: f %>
   </div>
 

@@ -77,7 +77,7 @@ module OrderStatus
 
     unless params[:order][:customer].nil?
       customer_params = params[:order][:customer].permit(:street, :city, :state, :postcode, :country)
-      customer = Customer.join(:orders).where('orders.id = ?', params[:order_id]).update_attributes(customer_params)
+      customer = Customer.joins(:orders).where('orders.id = ?', params[:order_id]).first.update_attributes(customer_params)
     end
 
     return ['All', ''] if selected_orders.blank?
