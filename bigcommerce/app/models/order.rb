@@ -32,7 +32,8 @@ class Order < ActiveRecord::Base
   def import_from_bigcommerce(order)
     customer = Customer.find(order.customer_id)
     status_id = Status.where('bigcommerce_id = ?', order.status_id).order('statuses.order').first.id
-    params = {'id': order.id,'customer_id': order.customer_id, 'status_id': status_id,\
+    params = {'id': order.id,'customer_id': order.customer_id,\
+       'status_id': status_id, 'account_status': customer.account_approval(order.subtotal_inc_tax),\
        'staff_id': customer.staff_id, 'total_inc_tax': order.total_inc_tax,\
        'qty': order.items_total, 'items_shipped': order.items_shipped,\
        'subtotal': order.subtotal_inc_tax.to_f/1.1 + order.discount_amount.to_f + order.coupon_discount.to_f,\
@@ -56,9 +57,10 @@ class Order < ActiveRecord::Base
       status_id = Status.where('bigcommerce_id = ?', order.status_id).order('statuses.order').first.id
     end
 
-    params = {'customer_id': order.customer_id, 'status_id': status_id, 'staff_id': customer.staff_id,\
-       'total_inc_tax': order.total_inc_tax, 'qty': order.items_total, 'items_shipped': order.items_shipped,\
-       'subtotal': order.subtotal_inc_tax.to_f/1.1 + order.discount_amount.to_f + order.coupon_discount.to_f,\
+    params = {'customer_id': order.customer_id, 'staff_id': customer.staff_id,\
+      'status_id': status_id, 'account_status': customer.account_approval(order.subtotal_inc_tax),\
+      'total_inc_tax': order.total_inc_tax, 'qty': order.items_total, 'items_shipped': order.items_shipped,\
+      'subtotal': order.subtotal_inc_tax.to_f/1.1 + order.discount_amount.to_f + order.coupon_discount.to_f,\
       'discount_rate': 0, 'discount_amount': order.discount_amount.to_f + order.coupon_discount.to_f,\
        'handling_cost': order.items_total.to_f * 1.82, 'shipping_cost': order.shipping_cost_ex_tax,\
        'wrapping_cost': order.wrapping_cost_ex_tax, 'wet': (order.subtotal_ex_tax.to_f - order.discount_amount.to_f - order.coupon_discount.to_f) * 0.29,\
