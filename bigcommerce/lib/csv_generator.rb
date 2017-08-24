@@ -51,7 +51,7 @@ module CsvGenerator
   end
 
   def export_orders(start_date, end_date)
-    sql = 'id AS "Order ID", customer_id AS "Customer ID", actual_name AS "Customer Name",
+    sql = 'orders.id AS "Order ID", customer_id AS "Customer ID", actual_name AS "Customer Name",
      email AS "Customer Email", "" AS "Customer Phone", orders.date_created AS "Order Date",
     statuses.bigcommerce_name AS "Order Status", "" AS "Subtotal(inc-Tax)", "" AS "Subtotal(ex-Tax)",
     "" AS "Tax Total", shipping_cost AS "Shipping Cost", "" AS "Shipping Cost(ex tax)",
