@@ -69,10 +69,14 @@ namespace :updates do
 		Revision.google.start_update
 
 		puts "Event Update Start At #{start_time}"
-		import_into_customer_tags
-		calendar_event_update(Revision.google.start_time)
-		puts "Event Update End AT #{Time.now}"
-		Revision.google.end_update(start_time, Time.now)
+		begin
+			import_into_customer_tags
+			calendar_event_update(Revision.google.start_time)
+			puts "Event Update End AT #{Time.now}"
+			Revision.google.end_update(start_time, Time.now)
+		rescue Exception => ex
+			ReminderMailer.error_warning(ex.class, ex.message, ex.backtrace).deliver_now
+		end
 	end
 
 	task :manifest_update => :environment do

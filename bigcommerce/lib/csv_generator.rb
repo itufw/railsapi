@@ -13,7 +13,7 @@ module CsvGenerator
 
   def export_customer(start_date, end_date)
     sql = 'customers.id AS  "Customer ID", firstname AS  "First Name", lastname AS  "Last Name", company AS  "Company", email AS  "Email", phone AS "Phone", note AS  "Notes", store_credit AS  "Store Credit", name AS  "Customer Group", date_created AS  "Date Joined", address AS "Address", description AS  "Required"'
-    customers = Customer.joins(:cust_style).select(sql).where("date_created > '#{start_date}' AND date_created < '#{end_date}'")
+    customers = Customer.joins(:cust_style).select(sql)
     attributes = customers.first.attributes.keys()
     attributes.delete('id')
 
@@ -52,12 +52,12 @@ module CsvGenerator
 
   def export_orders(start_date, end_date)
     sql = 'orders.id AS "Order ID", customer_id AS "Customer ID", actual_name AS "Customer Name",
-     email AS "Customer Email", "" AS "Customer Phone", orders.date_created AS "Order Date",
+     customers.email AS "Customer Email", "" AS "Customer Phone", orders.date_created AS "Order Date",
     statuses.bigcommerce_name AS "Order Status", "" AS "Subtotal(inc-Tax)", "" AS "Subtotal(ex-Tax)",
     "" AS "Tax Total", shipping_cost AS "Shipping Cost", "" AS "Shipping Cost(ex tax)",
-    "" AS "Ship Method", "" AS "Handling Cost", total_inc_tax AS "Order Total",
-    "" AS "Order Total(ex tax)", staffs.nickname AS "Payment Method", qty AS "Total Quantity",
-    items_shipphd AS "Total Shipped", date_shipped AS "Date Shipped"'
+    "" AS "Ship Method", "" AS "Handling Cost", orders.total_inc_tax AS "Order Total",
+    "" AS "Order Total(ex tax)", staffs.nickname AS "Payment Method", orders.qty AS "Total Quantity",
+    orders.items_shipped AS "Total Shipped", orders.date_shipped AS "Date Shipped"'
 
     orders = Order.joins(:staff, :customer, :status).select(sql).where("orders.date_created > '#{start_date}' AND orders.date_created < '#{end_date}'")
     attributes = orders.first.attributes.keys()
