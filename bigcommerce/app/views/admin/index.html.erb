@@ -8,10 +8,15 @@
 </div>
 
 <div align="center" style="margin-top: 50px;">
-	<%= link_to '<button class="btn btn-success">Customer</button>'.html_safe, action: 'download_customer' %>
-	<%= link_to '<button class="btn btn-default">Order Products</button>'.html_safe, action: 'download_order_products' %>
-	<%= link_to '<button class="btn btn-info">Orders</button>'.html_safe, action: 'download_orders' %>
-	<%= link_to '<button class="btn btn-danger">Ships</button>'.html_safe, action: 'download_ships' %>
+	<%= form_tag({action: 'download_csv'}, {method: 'get'}) do%>
+		<%= date_field( 'date', "start_date", value: (Date.today - 30.days)) %>
+		<%= date_field( 'date', "end_date", value: Date.today) %>
+		<br/>
+		<%= submit_tag 'Customer', value: 'Customer', class: 'btn btn-success' %>
+		<%= submit_tag 'Order Products', value: 'Order Products', class: 'btn btn-default' %>
+		<%= submit_tag 'Orders', value: 'Orders', class: 'btn btn-info' %>
+		<%= submit_tag 'Shippment', value: 'Shippment', class: 'btn btn-danger' %>
+	<% end %>
 </div>
 
 <div style="margin-top: 50px;">

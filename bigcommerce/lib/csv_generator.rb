@@ -29,7 +29,7 @@ module CsvGenerator
   def export_order_products(start_date, end_date)
     sql = '"" as "Co./Last Name", "" as "First Name",	"" as "Address Line 1",
      ""	as "Address Line 2", ""	as "Address Line 3", "" as "Address Line 4",
-    orders.id as "Invoice#", orders.date_created as "Date", "" as "Ship via",
+    orders.id as "Invoice#", Date(orders.date_created) as "Date", "" as "Ship via",
     product_id as "Item Number", order_products.qty as "Quantity",
     name as "Description", price_luc as "Inc-Tax Price",
     orders.total_inc_tax - orders.discount_amount * 1.1 - orders.shipping_cost * 1.1 as "Total",
@@ -52,14 +52,14 @@ module CsvGenerator
 
   def export_orders(start_date, end_date)
     sql = 'orders.id AS "Order ID", customer_id AS "Customer ID", actual_name AS "Customer Name",
-     customers.email AS "Customer Email", "" AS "Customer Phone", orders.date_created AS "Order Date",
+     customers.email AS "Customer Email", "" AS "Customer Phone", Date(orders.date_created) AS "Order Date",
     statuses.bigcommerce_name AS "Order Status", "" AS "Subtotal(inc-Tax)", "" AS "Subtotal(ex-Tax)",
     "" AS "Tax Total", shipping_cost AS "Shipping Cost", "" AS "Shipping Cost(ex tax)",
     "" AS "Ship Method", "" AS "Handling Cost", orders.total_inc_tax AS "Order Total",
     "" AS "Order Total(ex tax)", staffs.nickname AS "Payment Method", orders.qty AS "Total Quantity",
-    orders.items_shipped AS "Total Shipped", orders.date_shipped AS "Date Shipped"'
+    orders.items_shipped AS "Total Shipped", Date(orders.date_shipped) AS "Date Shipped"'
 
-    orders = Order.joins(:staff, :customer, :status).select(sql).where("orders.date_created > '#{start_date}' AND orders.date_created < '#{end_date}'")
+    orders = Order.joins(:staff, :customer, :status).select(sql).where("orders.date_created > '#{start_date}' AND orders.date_created < '#{end_date}'").order('orders.id DESC')
     attributes = orders.first.attributes.keys()
     attributes.delete('id')
     CSV.generate(headers: true) do |csv|
@@ -81,9 +81,10 @@ module CsvGenerator
   end
 
   def export_shippment(start_date, end_date)
-    sql = ' "" AS "Shipment ID", date_shipped AS "Date Shipped", orders.id AS "ORDER ID",
-      orders.date_created AS "Order Date", track_number AS "Tracking No", courier_statuses.description AS "Shipping Method"'
-    orders = Order.joins(:courier_status, :status).select(sql).where('statuses.in_transit = 1 OR statuses.delivered = 1').where("orders.date_created > '#{start_date}' AND orders.date_created < '#{end_date}'")
+    sql = ' "" AS "Shipment ID", Date(date_shipped) AS "Date Shipped", orders.id AS "ORDER ID",
+      Date(orders.date_created) AS "Order Date", track_number AS "Tracking No",
+      courier_statuses.description AS "Shipping Method"'
+    orders = Order.joins(:courier_status, :status).select(sql).where('statuses.in_transit = 1 OR statuses.delivered = 1').where("orders.date_created > '#{start_date}' AND orders.date_created < '#{end_date}'").order('orders.id DESC')
     attributes = orders.first.attributes.keys()
     attributes.delete('id')
 
