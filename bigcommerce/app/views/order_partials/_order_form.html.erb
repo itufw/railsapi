@@ -8,10 +8,10 @@
             <th>Customer</th>
             <% if @order.customer_id.nil? || @order.customer_id == ""%>
               <td class="customer_autocomplete">
-                <%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 15 %>
+                <%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 50 %>
               </td>
             <% else %>
-              <td><input type="text" name="customer" id="<%= @order.customer_id %>" value="<%= Customer.find(@order.customer_id).actual_name%>" readonly="readonly"></td>
+              <td><input type="text" name="customer" id="<%= @order.customer_id %>" value="<%= Customer.find(@order.customer_id).actual_name%>" readonly="readonly" size="50px"></td>
             <% end %>
           </tr>
         </table>
@@ -21,7 +21,7 @@
           <tr>
             <th>Product</th>
             <td class="product_autocomplete">
-              <%= autocomplete_field_tag 'product', '', autocomplete_product_ws_activity_index_path, placeholder: 'Search WS Product', id_element: '#product_id', id: 'product_ws_search'%>
+              <%= autocomplete_field_tag 'product', '', autocomplete_product_ws_activity_index_path, placeholder: 'Search WS Product', id_element: '#product_id', id: 'product_ws_search', size: 40%>
             </td>
             <!-- No WS products -->
             <td><input type="checkbox" id="ws" class="ws_checkbox" style="display: inline-block;" checked>Only WS</td>

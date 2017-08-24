@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170815024512) do
+ActiveRecord::Schema.define(version: 20170824032924) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -346,6 +346,7 @@ ActiveRecord::Schema.define(version: 20170815024512) do
     t.string   "SpecialInstruction1",     limit: 50
     t.string   "SpecialInstruction2",     limit: 50
     t.string   "SpecialInstruction3",     limit: 50
+    t.integer  "tolerance_day",           limit: 4
   end
 
   add_index "customers", ["cust_group_id"], name: "index_customers_on_cust_group_id", using: :btree
@@ -1297,13 +1298,6 @@ ActiveRecord::Schema.define(version: 20170815024512) do
   add_index "xero_receipts", ["xero_contact_id"], name: "index_xero_receipts_on_xero_contact_id", using: :btree
   add_index "xero_receipts", ["xero_receipt_id"], name: "index_xero_receipts_on_xero_receipt_id", using: :btree
   add_index "xero_receipts", ["xero_user_id"], name: "index_xero_receipts_on_xero_user_id", using: :btree
-
-  create_table "xero_revisions", force: :cascade do |t|
-    t.datetime "start_time"
-    t.datetime "end_time"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
 
   create_table "zomato_cuisines", force: :cascade do |t|
     t.string   "name",           limit: 255
