@@ -32,7 +32,12 @@ module OrderStatus
     when 'Hold-Other'
       Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 13, last_updated_by: user_id}))
     when 'Delivered'
-      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 12, last_updated_by: user_id}))
+      order = Order.find(params[:order_id])
+      if !order.xero_invoice_id.nil? && order.xero_invoice.amount_due==0
+        Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 10, last_updated_by: user_id}))
+      else
+        Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 12, last_updated_by: user_id}))
+      end
     when 'Problem'
       Order.find(params[:order_id]).update_attributes(order_params)
     when 'Complete'
@@ -48,7 +53,7 @@ module OrderStatus
         order.update_attributes(order_params.reject{|key, value| key == 'courier_status_id' })
         result = Fastway.new.add_consignment(order, params['dozen'].to_i, params['half-dozen'].to_i)
         begin
-          order.update_attributes(order_params.reject{|key, value| key == 'courier_status_id' }.merge({track_number: result['result']['LabelNumbers'].join(';'), courier_status_id: 4, status_id: 2, date_shipped: Time.now.to_s(:db), last_updated_by: user_id}))
+          order.update_attributes(order_params.reject{|key, value| key == 'courier_status_id' }.merge({track_number: result['result']['LabelNumbers'].join(';'), courier_status_id: 4, status_id: 26, date_shipped: Time.now.to_s(:db), last_updated_by: user_id}))
           flash[:success] = "Label Printed"
         rescue
           flash[:error] = 'Fail to connect Fastway, Check the Shipping Address'
@@ -58,7 +63,7 @@ module OrderStatus
         end
         # create label with fastway
       else
-        Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 2, date_shipped: Time.now.to_s(:db), last_updated_by: user_id}))
+        Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 26, date_shipped: Time.now.to_s(:db), last_updated_by: user_id}))
       end
     else
       if !params[:order].nil?

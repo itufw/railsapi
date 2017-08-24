@@ -50,6 +50,14 @@
     <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
     <%= submit_tag 'Delivered', class: 'btn btn-primary'%>
   <% end %>
+  <script type="text/javascript">
+  $('table tbody tr.odd').each(function(){
+    if($(this).find('.Signature-Obtained, .Delivery-Completed, .Left-As-Instructed, .Left-with-neighbour, .Authority-to-Leave').length == 0){
+      $(this).find('.multi-select input').attr('checked', false);
+    }
+  });
+  </script>
+
 <% else %>
   <%= form_tag({:controller => "order", :action => "order_confirmation"}, {:method => "get"}) do %>
     <%= hidden_field_tag :status_name, @status_name%>

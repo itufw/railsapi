@@ -11,6 +11,7 @@
 	<%= form_tag({action: 'download_csv'}, {method: 'get'}) do%>
 		<%= date_field( 'date', "start_date", value: (Date.today - 30.days)) %>
 		<%= date_field( 'date', "end_date", value: Date.today) %>
+		<%= collection_select(nil, :status, Status.bigcommerce_status, :id, :status, {include_blank: 'Select Status'}) %>
 		<br/>
 		<%= submit_tag 'Customer', value: 'Customer', class: 'btn btn-success' %>
 		<%= submit_tag 'Order Products', value: 'Order Products', class: 'btn btn-default' %>
