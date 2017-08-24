@@ -50,7 +50,7 @@ module CsvGenerator
     end
   end
 
-  def export_orders(start_date, end_date)
+  def export_orders(bigc_status,start_date, end_date)
     sql = 'orders.id AS "Order ID", customer_id AS "Customer ID", actual_name AS "Customer Name",
      customers.email AS "Customer Email", "" AS "Customer Phone", Date(orders.date_created) AS "Order Date",
     statuses.bigcommerce_name AS "Order Status", "" AS "Subtotal(inc-Tax)", "" AS "Subtotal(ex-Tax)",
@@ -59,7 +59,12 @@ module CsvGenerator
     "" AS "Order Total(ex tax)", staffs.nickname AS "Payment Method", orders.qty AS "Total Quantity",
     orders.items_shipped AS "Total Shipped", Date(orders.date_shipped) AS "Date Shipped"'
 
-    orders = Order.joins(:staff, :customer, :status).select(sql).where("orders.date_created > '#{start_date}' AND orders.date_created < '#{end_date}'").order('orders.id DESC')
+    if bigc_status != ''
+      orders = Order.joins(:staff, :customer, :status).select(sql).where("orders.date_created > '#{start_date}' AND orders.date_created < '#{end_date}'").order('orders.id DESC')
+    else
+      orders = Order.joins(:staff, :customer, :status).select(sql).where('statuses.bigcommerce_id = ?', bigc_status.to_i).where("orders.date_created > '#{start_date}' AND orders.date_created < '#{end_date}'").order('orders.id DESC')
+    end
+
     attributes = orders.first.attributes.keys()
     attributes.delete('id')
     CSV.generate(headers: true) do |csv|

@@ -16,4 +16,8 @@ class Status < ActiveRecord::Base
 	def self.problems
 		where(send_reminder: 1).order('statuses.order')
 	end
+
+	def self.bigcommerce_status
+		select('bigcommerce_id AS id, bigcommerce_name AS status').where('bigcommerce_id IS NOT NULL').uniq
+	end
 end
