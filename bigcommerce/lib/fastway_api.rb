@@ -54,6 +54,7 @@ module FastwayApi
           next if FastwayTrace.exists?(label['LabelNumber'], scan['Description'], scan['StatusDescription']).count > 0
           attributes = scan.select{ |key, value| key!='CompanyInfo'}.merge(scan['CompanyInfo']).merge(label_number)
           fastway_trace = FastwayTrace.new(attributes)
+          fastway_trace.Signature=label['Signature'] if fastway_trace.Description=="Signature Obtained" && (fastway_trace.Signature=="" || fastway_trace.Signature.nil?) && !label['Signature'].nil?
           fastway_trace.save
         end
       end
