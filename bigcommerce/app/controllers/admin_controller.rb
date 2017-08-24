@@ -154,19 +154,17 @@ class AdminController < ApplicationController
       redirect_to action: 'index'
     end
 
-    def download_customer
-      send_data export_customer(Date.today - 1.month, Date.today), filename: "customer-#{Date.today}.csv"
-    end
-
-    def download_order_products
-      send_data export_order_products(Date.today - 1.month, Date.today), filename: "order-products-#{Date.today}.csv"
-    end
-
-    def download_orders
-      send_data export_orders(Date.today - 1.month, Date.today), filename: "orders-#{Date.today}.csv"
-    end
-
-    def download_ships
-      send_data export_shippment(Date.today - 1.month, Date.today), filename: "ship-#{Date.today}.csv"
+    def download_csv
+      case params[:commit]
+      when 'Customer'
+        send_data export_customer(Date.parse(params[:date][:start_date]), Date.parse(params[:date][:end_date])), filename: "customer-#{Date.parse(params[:date][:end_date])}.csv" and return
+      when 'Order Products'
+        send_data export_order_products(Date.parse(params[:date][:start_date]), Date.parse(params[:date][:end_date])), filename: "order-products-#{Date.parse(params[:date][:end_date])}.csv" and return
+      when 'Orders'
+        send_data export_orders(Date.parse(params[:date][:start_date]), Date.parse(params[:date][:end_date])), filename: "orders-#{Date.parse(params[:date][:end_date])}.csv" and return
+      when 'Shippment'
+        send_data export_shippment(Date.parse(params[:date][:start_date]), Date.parse(params[:date][:end_date])), filename: "ship-#{Date.parse(params[:date][:end_date])}.csv" and return
+      end
+      redirect_to :back
     end
 end
