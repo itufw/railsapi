@@ -1,5 +1,14 @@
 <%= title "Order # " + @order.id.to_s %>
 <h3>Order #<%= @order.id %></h3>
+<center>Date: <i><%= @order.date_created.to_date%></i> Due Date:<i><%= @order.date_created.to_date + 30.days%></i></center>
+<% xero_contact = @order.customer.xero_contact %>
+<% unless xero_contact.nil?%>
+  <div style="float: right;margin-top:-60px;margin-right:200px;">
+  	<p style="color: red"><%= display_num(overdue_customer(xero_contact)) %></p>
+  	<p style="color: black"><%= display_num(outstanding_customer(xero_contact))%></p>
+  </div>
+<%end%>
+
 
 <%= form_for @order, :url => {:controller => "status", :action => "status_update"}, :method => 'get' do |f| %>
   <%= f.hidden_field :id %>
