@@ -6,5 +6,16 @@
           '</tr>'
           ].join(''));
 <% end %>
-shipping_address.val('<%= @last_order.address%>');
-billing_address.val('<%= @last_order.billing_address %>');
+street.val('<%= @last_order.street%>');
+city.val('<%= @last_order.city%>');
+state.val('<%= @last_order.state%>');
+postcode.val('<%= @last_order.postcode %>');
+country.val('<%= @last_order.country%>');
+
+
+<% customer = @last_order.customer %>
+billing_street.val('<%= customer.street%>');
+billing_city.val('<%= customer.city%>');
+billing_state.val('<%= customer.state%>');
+billing_postcode.val('<%= customer.postcode%>');
+billing_country.val('<%= customer.country%>');

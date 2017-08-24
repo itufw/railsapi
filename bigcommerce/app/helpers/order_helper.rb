@@ -42,7 +42,7 @@ module OrderHelper
     'Hold - Account'
   end
 
-  def order_creation(order_params, products_params)
+  def order_creation(order_params, products_params, customer_params)
     wet = TaxPercentage.wet_percentage * 0.01
     handling_fee = TaxPercentage.handling_fee
     gst = TaxPercentage.gst_percentage * 0.01
@@ -78,5 +78,7 @@ module OrderHelper
 
       product.save
     end
+
+    order.customer.update_attributes(customer_params) unless customer_params.nil?
   end
 end

@@ -159,7 +159,7 @@ module GoogleCalendarSync
   def push_event(customer, description, staff_ids, response_staff, start_time, end_time, subject, method, service, client)
 
     staffs = Staff.filter_by_ids(staff_ids.append(response_staff))
-    staff_calendar_addresses = StaffCalendarAddress.filter_by_ids(staff_ids)
+    staff_calendar_addresses = StaffCalendarAddress.filter_by_ids(staff_ids + staffs.map(&:id))
     response_staff = staffs.select { |x| x.id.to_s == response_staff.to_s }.first
     response_staff_email = response_staff.email
 
