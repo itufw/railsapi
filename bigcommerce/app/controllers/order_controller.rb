@@ -98,7 +98,7 @@ class OrderController < ApplicationController
 
   def save_order
     # Order Helper -> Move to Lib later
-    order_creation(order_params, products_params)
+    order_creation(order_params, products_params, customer_params)
     redirect_to controller: 'activity', action: 'add_note', customer_id: order_params[:customer_id] and return if params["button"] == "new_note"
     redirect_to action: 'all'
   end
@@ -162,6 +162,8 @@ class OrderController < ApplicationController
     order.save
     products_container.map(&:save)
 
+    order.customer.update_attributes(customer_params) unless customer_params.nil?
+
     flash[:success] = 'Edited'
     redirect_to controller: 'activity', action: 'add_note', customer_id: order_params[:customer_id] and return if params["button"] == "new_note"
     redirect_to action: 'details', order_id: order.id
@@ -179,10 +181,15 @@ class OrderController < ApplicationController
     params.require(:order).permit(:customer_id, :subtotal, :discount_rate, :discount_amount,\
                                   :shipping_cost, :total_inc_tax, :wet, :gst, \
                                   :customer_notes, :staff_notes, :address, :modified_wet,\
-                                  :billing_address, :delivery_instruction)
+                                  :billing_address, :delivery_instruction, :street,\
+                                  :city, :state, :postcode, :country)
   end
 
   def products_params
     params.require(:order).require(:products)
+  end
+
+  def customer_params
+    params.require(:order).require(:customer).permit(:street, :city, :state, :postcode, :country)
   end
 end

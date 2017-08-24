@@ -21,27 +21,6 @@ class Order < ActiveRecord::Base
   belongs_to :order_history
   belongs_to :xero_invoice
 
-  geocoded_by :address  do |obj,results|
-    if geo = results.first
-      obj.street = ''
-      geo.data['address_components'].each do |address_detail|
-        if address_detail['types'].include? 'street_number'
-          obj.street = address_detail['long_name'].to_s + ' ' + obj.street.to_s
-        elsif address_detail['types'].include? 'route'
-          obj.street = obj.street.to_s + address_detail['long_name'].to_s
-        elsif address_detail['types'].include? 'locality'
-          obj.city = address_detail['long_name']
-        elsif address_detail['types'].include? 'administrative_area_level_1'
-          obj.state = address_detail['long_name']
-        elsif address_detail['types'].include? 'postal_code'
-          obj.postcode = address_detail['long_name']
-        elsif address_detail['types'].include? 'country'
-          obj.country = address_detail['long_name']
-        end
-      end
-    end
-  end
-  after_validation :geocode, on: [:create, :update], if: ->(obj){ obj.address_changed? }
   after_validation :record_history, on: [:update, :delete], unless: ->(obj){ obj.xero_invoice_number_changed? or obj.xero_invoice_id_changed?}
   after_validation :cancel_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id == 5}
   after_validation :recovery_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id_was == 5}

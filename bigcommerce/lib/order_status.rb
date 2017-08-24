@@ -75,6 +75,11 @@ module OrderStatus
       end
     end
 
+    unless params[:order][:customer].nil?
+      customer_params = params[:order][:customer].permit(:street, :city, :state, :postcode, :country)
+      customer = Customer.join(:orders).where('orders.id = ?', params[:order_id]).update_attributes(customer_params)
+    end
+
     return ['All', ''] if selected_orders.blank?
     ['Next', selected_orders]
   end
@@ -83,24 +88,24 @@ module OrderStatus
     orders = Order.where(id: selected_orders)
     pdf = CombinePDF.new
     picking_slips = CombinePDF.new
-    # orders.each do |order|
-    #   customer = Customer.find(order.customer_id)
-    #   order_invoice = WickedPdf.new.pdf_from_string(
-    #     render_to_string(
-    #         :template => 'pdf/order_invoice.pdf',
-    #         :locals => {order: order, customer: customer}
-    #         )
-    #     )
-    #   pdf << CombinePDF.parse(order_invoice)
-    #
-    #   packing_slip = WickedPdf.new.pdf_from_string(
-    #     render_to_string(
-    #         :template => 'pdf/packing_slip.pdf',
-    #         :locals => {order: order, customer: customer}
-    #         )
-    #     )
-    #   picking_slips << CombinePDF.parse(packing_slip)
-    # end
+    orders.each do |order|
+      customer = Customer.find(order.customer_id)
+      order_invoice = WickedPdf.new.pdf_from_string(
+        render_to_string(
+            :template => 'pdf/order_invoice.pdf',
+            :locals => {order: order, customer: customer}
+            )
+        )
+      pdf << CombinePDF.parse(order_invoice)
+
+      packing_slip = WickedPdf.new.pdf_from_string(
+        render_to_string(
+            :template => 'pdf/packing_slip.pdf',
+            :locals => {order: order, customer: customer}
+            )
+        )
+      picking_slips << CombinePDF.parse(packing_slip)
+    end
     picking_sheet = WickedPdf.new.pdf_from_string(
       render_to_string(
           template: 'pdf/picking_sheet.pdf',

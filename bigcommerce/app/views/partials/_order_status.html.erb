@@ -68,11 +68,14 @@
   </tr>
 	<% end %>
 </table>
-
 <script type="text/javascript">
+  var checkboxes = $('.orders_checkbox');
+  for(var i = 0; i < checkboxes.length; i++){
+    checkboxes[i].checked = true;
+  }
+
 	$('.selected_all_checkbox').change(function(){
 		var flag = this.checked;
-		var checkboxes = $('.orders_checkbox');
 		for(var i = 0; i < checkboxes.length; i++){
 			checkboxes[i].checked = flag;
 		}

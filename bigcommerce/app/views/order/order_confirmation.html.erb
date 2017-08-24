@@ -11,15 +11,8 @@
           <th>Customer</th>
           <td><%= @order.customer.actual_name%></td>
         </tr>
-        <tr>
-          <td class="ProductCost" align="right">Shipping Address</td>
-          <td colspan="3"><%= f.text_field :address, placeholder: 'Shipping Address', size: 80 %></td>
-        </tr>
-        <tr>
-          <td class="ProductCost" align="right">Billing Address</td>
-          <td colspan="3"><%= f.text_field :billing_address, placeholder: 'Billing Address', size: 80 %></td>
-        </tr>
     </table>
+    <%= render 'partials/order_address_form', f: f %>
   </div>
 
   <table class="table table-striped table-bordered table-hover table-responsive product-table">

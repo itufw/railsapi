@@ -9,7 +9,11 @@
   <% end %>
 <% elsif ["Picking", "Ready"].include? @status_name%>
   <%= form_tag({:controller => "status", :action => "status_update"}, {:method => "get"}) do %>
-    <%= hidden_field_tag "order['id']", @orders.first.id %>
+    <% if @orders.blank?%>
+      <%= hidden_field_tag "order['id']", 100 %>
+    <% else %>
+      <%= hidden_field_tag "order['id']", @orders.first.id %>
+    <% end %>
 
     <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
     <% if @status_name == "Picking" %>
@@ -30,7 +34,13 @@
   <%= form_tag({:controller => "status", :action => "status_update"}, {:method => "get"}) do %>
     <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
     <%= submit_tag 'Shipped', class: 'btn btn-primary'%>
-    <%= hidden_field_tag "order['id']", @orders.first.id %>
+
+    <% if @orders.blank?%>
+      <%= hidden_field_tag "order['id']", 100 %>
+    <% else %>
+      <%= hidden_field_tag "order['id']", @orders.first.id %>
+    <% end %>
+
     <button type="button" name="return" class="btn btn-primary"><%= link_to 'Back', controller: 'status', action: 'order_status', status_id: 9, status_name: 'Ready'%></button>
   <% end %>
 <% elsif ['Delivered'].include? @status_name %>
@@ -48,9 +58,3 @@
     <%= submit_tag 'Check', class: 'btn btn-primary'%>
   <% end %>
 <% end %>
-<script type="text/javascript">
-  var checkboxes = $('.orders_checkbox');
-  for(var i = 0; i < checkboxes.length; i++){
-    checkboxes[i].checked = true;
-  }
-</script>
