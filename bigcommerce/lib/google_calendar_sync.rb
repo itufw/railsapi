@@ -167,6 +167,7 @@ module GoogleCalendarSync
     staffs.each do |staff|
       calendar_email = staff_calendar_addresses.select{|x|x.staff_id == staff.id}.first
       calendar_email = (calendar_email.nil?) ? staff.email : calendar_email.calendar_address
+      next if calendar_email.nil?
       attend = {
         displayName: staff.nickname,
         email: calendar_email
