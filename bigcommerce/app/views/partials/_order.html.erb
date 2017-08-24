@@ -26,7 +26,7 @@
 
 	<% orders.each do |order| %>
 	<tr>
-		<td><%= link_to order.id, controller: 'order', action: 'details', order_id: order.id %></td>
+		<td class="account-<%= order.account_status %>"><%= link_to order.id, controller: 'order', action: 'details', order_id: order.id %></td>
 		<td><%= date_format_orders(order.date_created) %></td>
 
 		<% cust_name = customer_name(order.customer) %>
