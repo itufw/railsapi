@@ -99,6 +99,8 @@ class Fastway
 
     customer = order.customer
     packaging = packaging_selection(order)
+    packaging = 1 if packaging==1765 && ((dozen > 0) || (dozen+half_dozen>1))
+
     item_number = 0
 
     @query[:query][:CompanyName] = customer.actual_name
@@ -144,6 +146,7 @@ class Fastway
     result = psc(order.city, order.postcode, 5)
     parcel_color = result['result']['services'].select{|x| x.values().include? 'Parcel'}.first['labelcolour_pretty_array']
     return 18 if (parcel_color.map(&:upcase).include? 'GREEN') || (parcel_color.map(&:upcase).include? 'ORANGE')
+    return 1765 if (parcel_color.map(&:upcase).include? 'RED') || (parcel_color.map(&:upcase).include? 'RED')
     1
   end
 

@@ -28,9 +28,9 @@ module OrderStatus
     when 'Hold-Stock'
       Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 20, last_updated_by: user_id}))
     when 'Hold-Price'
-      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 7, last_updated_by: user_id}))
+      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 26, last_updated_by: user_id}))
     when 'Hold-Other'
-      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 13, last_updated_by: user_id}))
+      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 24, last_updated_by: user_id}))
     when 'Delivered'
       order = Order.find(params[:order_id])
       if !order.xero_invoice_id.nil? && order.xero_invoice.amount_due==0
@@ -53,7 +53,8 @@ module OrderStatus
         order.update_attributes(order_params.reject{|key, value| key == 'courier_status_id' })
         result = Fastway.new.add_consignment(order, params['dozen'].to_i, params['half-dozen'].to_i)
         begin
-          order.update_attributes(order_params.reject{|key, value| key == 'courier_status_id' }.merge({track_number: result['result']['LabelNumbers'].join(';'), courier_status_id: 4, status_id: 26, date_shipped: Time.now.to_s(:db), last_updated_by: user_id}))
+          order.update_attributes(order_params.reject{|key, value| key == 'courier_status_id' }.merge({track_number: result['result']['LabelNumbers'].join(';'), courier_status_id: 4, status_id: 8, date_shipped: Time.now.to_s(:db), last_updated_by: user_id}))
+          order.customer.update_attributes({order_params.select{|key, value| ['SpecialInstruction1', 'SpecialInstruction2', 'SpecialInstruction3'].include?key}}) unless params[:customer_instruction_update].nil? || params[:customer_instruction_update]==""
           flash[:success] = "Label Printed"
         rescue
           flash[:error] = 'Fail to connect Fastway, Check the Shipping Address'
@@ -63,7 +64,7 @@ module OrderStatus
         end
         # create label with fastway
       else
-        Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 26, date_shipped: Time.now.to_s(:db), last_updated_by: user_id}))
+        Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 8, date_shipped: Time.now.to_s(:db), last_updated_by: user_id}))
       end
     else
       if !params[:order].nil?
