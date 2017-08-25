@@ -32,75 +32,10 @@
     <%= customer.country%><br/>
   </div>
 
-  <div id="products" style="margin-top: -50px;">
-    <%
-        products = order.order_products.select{ |x| x.display == 1}
-        discount_amount = products.map {|x| x.price_discounted - x.price_luc }.sum
-    %>
-    <table class="InvoiceTable">
-      <tr>
-        <th class="ProductQuantity">Qty</th>
-        <th class="ProductDetails">Product Name</th>
-        <th class="ProductCost" id="price" align="right">Price (LUC)</th>
-        <% unless discount_amount == 0%>
-        <th class="ProductCost" id="discount" align="right">Discount</th>
-        <th class="ProductCost" id="discounted_price" align="right">Discounted Price</th>
-        <% end %>
-        <th class="ProductTotal" align="right" id="amt" style="width:15px;">Total</th>
-        <th></th>
-      </tr>
-      <% products.select{ |x| x.display == 1}.each do |item| %>
-      <tr>
-        <td class="ProductQuantity"><%= item.qty.to_i%></td>
-        <td class="ProductDetails"><%= Product.find(item.product_id).name %></td>
-        <td class="ProductCost" id="price" align="right">$<%= '%.2f' % item.price_luc %></td>
-        <% unless discount_amount == 0%>
-        <td class="ProductCost" align="right"><%= '%.0f' % item.discount %>%</td>
-        <td class="ProductCost" align="right">$<%= '%.2f' % item.price_discounted %></td>
-        <% end %>
-        <td class="ProductTotal" align="right" id="amt" style="width:15px;">$<%= '%.2f' % (item.qty * item.price_discounted) %></td>
-        <td></td>
-      </tr>
-      <% end %>
-      <tr style="border-bottom:1px solid black">
-        <td colspan="100%"></td>
-      </tr>
-      <tr>
-        <% if discount_amount == 0%>
-        <td rowspan="5"></td>
-      <% else %>
-        <td colspan="3" rowspan="5"></td>
-        <% end %>
-        <td colspan="2" class="ProductCost" align="right">Subtotal(inc. WET ex. GST)</td>
-        <td class="ProductTotal" align="right">$<%= '%.2f' % (order.subtotal) %></td>
-        <td></td>
-      </tr>
-      <% unless order.discount_amount.to_f == 0%>
-      <tr>
-        <td colspan="2" class="ProductCost" align="right">Discount Rate</td>
-        <td class="ProductTotal" align="right"><%= '%.0f' % (order.discount_rate) %>%</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td colspan="2" class="ProductCost" align="right">Discount Amount(ex. GST)</td>
-        <td class="ProductTotal" align="right">$<%= '%.2f' % (order.discount_amount) %></td>
-        <td></td>
-      </tr>
-      <% end %>
-      <tr>
-        <td colspan="2" class="ProductCost" align="right">Shipping(ex. GST)</td>
-        <td class="ProductTotal" align="right">$<%= '%.2f' % (order.shipping_cost) %></td>
-        <td></td>
-      </tr>
-      <tr>
-        <td colspan="2" class="ProductCost" align="right">
-          <h3>Grand Total:</h3>
-        </td>
-        <td class="ProductTotal" align="right">$<%= '%.2f' % order.total_inc_tax %></td>
-        <td></td>
-      </tr>
-    </table>
+  <div style="margin-top: -50px;">
+    <%= render 'pdf/product_lists', order: order %>
   </div>
+
   <div class="InvoiceComments" style="%%GLOBAL_HideComments%%; font-size: 0.8em;width: 350px; text-align: justify;">
     <div class="InvoiceHeading" style="font-size: .9em;">Customer Notes</div>
     <% order.customer_notes.split(/\n/).each do |note| %>
@@ -136,324 +71,292 @@
 
   }
 
+  body {
+    margin-top: -400px;
+  }
+
+  .InvoiceTotalRow td {
+    margin-right: 10px;
+  }
+
+  .Invoice {
+    border: none;
+    font-size: 14px;
+    margin-top: -10px;
+  }
+
+  .Invoice h1 {
+    font-size: 1.25em;
+    float: right;
+  }
+
+  #invoiceDets {
+    float: right;
+    clear: right;
+    margin-right: 17px;
+    margin-right: 9px;
+  }
+
+  #invoiceDets td {
+    text-align: right;
+    padding-right: 13px;
+  }
+
+  #UFW {
+    float: left;
+    clear: left;
+    margin-top: 14px;
+  }
+
+  #terms {
+    float: right;
+    clear: right;
+    margin-top: 20px;
+    margin-right: -8px;
+  }
+
+  #terms td {
+    text-align: right;
+    padding-right: 30px;
+  }
+
+  .Invoice img {
+    width: 200px;
+    float: left;
+  }
+
+  #customerDetails {
+    float: left;
+    clear: left;
+    margin-top: 22px;
+  }
+
+  #products {
+    padding-top: 385px;
+  }
+
+  .Invoice .ProductSku {
+    display: none;
+  }
+
+  #enquiries {
+    margin-top: 51px;
+    margin-bottom: 20px;
+    line-height: 16px;
+  }
+
+  #signBoxes {
+    float: right;
+    margin-top: -113px;
+  }
+
+  #signBoxes table {
+    border-collapse: collapse;
+    /*width: 150px;*/
+  }
+
+  #signBoxes table td {
+    border: 1px solid black;
+    width: 80px;
+  }
+
+  #signBoxes table th {
+    width: 100px;
+  }
+
+  #table2 {
+    height: 50px;
+  }
+
+  #products thead {
+    background-color: lightgrey;
+
+  }
+  /*/
+  ///////////////*/
+
+  .PackingSlipItemListCustomer td.ProductBinNumber,
+  .PackingSlipItemListCustomer td.ProductSku {
+    display: none;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+    margin: 10px;
+  }
+
+  body,
+  td,
+  th {
+    font-family: Calibri serif, serif;
+    font-size: 12px;
+  }
+
+  #Logo {
+    margin-bottom: 10px;
+  }
+
+  h1,
+  h1 a {
+    color: #000;
+    text-decoration: none;
+  }
+
+  .PackingSlip {
+    padding: 5px;
+  }
+
+  .InvoiceTitle,
+  .PackingSlipTitle {
+    font-size: 15px;
+    font-weight: bold;
+    background: #000;
+    color: #fff;
+    padding: 5px;
+    margin-bottom: 10px;
+  }
+
+  .StoreAddress {
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .InvoiceHeading,
+  .PackingSlipHeading {
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .AddressRow,
+  .CustomerDetails,
+  .InvoiceDetails,
+  .InvoiceItems,
+  .PackingSlipDetails,
+  .PackingSlipItems {
+    margin-bottom: 10px;
+  }
+
+  .InvoiceTable,
+  .PackingSlipTable {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .InvoiceTable th,
+  .PackingSlipTable th {
+    font-weight: bold;
+    padding: 5px;
+    text-align: left;
+  }
+
+  .InvoiceTable td,
+  .PackingSlipTable td {
+    padding: 5px;
+    vertical-align: top;
+    text-align: left;
+  }
+
+  .InvoiceTotalRow td,
+  .InvoiceTotals td,
+  td.ProductCost,
+  td.ProductQuantity,
+  td.ProductTotal,
+  th.ProductCost,
+  th.ProductQuantity,
+  th.ProductTotal {
+    text-align: right;
+  }
+
+  .AddressRow,
+  .InvoiceDetails,
+  .PackingSlipDetails {
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .BillingAddress,
+  .InvoiceDetailsLeft,
+  .InvoiceDetailsRight,
+  .PackingSlipDetailsLeft,
+  .PackingSlipDetailsRight,
+  .ShippingAddress {
+    float: left;
+    width: 48%;
+  }
+
+  .InvoiceItems,
+  .PackingSlipItems {
+    border-top: 1px solid #000;
+    padding-top: 10px;
+  }
+
+  .InvoiceItemList {
+    border-bottom: 1px solid #000;
+  }
+
+  .InvoiceItemDivider td {
+    padding-top: 10px;
+    border-top: 1px solid #000;
+  }
+
+  .ConfigurableProductRow,
+  .DetailRow {
+    clear: left;
+    margin-top: 6px;
+    padding-left: 140px;
+  }
+
+  .ConfigurableProductRow .Label,
+  .DetailRow .Label {
+    margin: 0 0 6px -140px;
+    float: left;
+    width: 130px;
+    padding-top: 1px;
+    display: inline;
+    position: relative;
+
+  }
+
+  .ConfigurableProductRow .Value,
+  .DetailRow .Value {
+    display: inline;
+  }
+
+  .InvoiceDetails .DetailRow .Label,
+  .PackingSlipDetails .DetailRow .Label {
+    font-weight: bold;
+  }
+
+  .ConfigurableProductRow {
+    font-size: 11px;
+    margin-left: 10px;
+  }
+
+  .InvoiceTotals .InvoiceTotal td {
+    font-weight: bold;
+  }
+
+  .InvoiceTotals {
+    psoition: relative;
+    right: -100px;
+  }
+
+  .ProductQuantity {
+    width: 50px;
+  }
+
+  .ProductCost,
+  .ProductTotal {
+    width: 150px;
+  }
+
+  .PageBreak {
+    page-break-after: always;
+  }
+
+  .ProductPreOrder {
+    font-size: 11px;
+  }
 </style>
-<script>
-  d = document.getElementsByClassName("Invoice");
-  for (var d1 = 0; d1 < d.length; d1++) {
-    if (d[d1].innerHTML.indexOf("WET") > -1) {
-      var i = d[d1].getElementsByClassName("ProductCost"); // changes product cost
-      for (var w = 0; w < i.length; w++) {
-        if (i[w].innerHTML.indexOf("AUD") > -1) {
-          var x = parseFloat(i[w].innerHTML.slice(1, -4).replace(/,/g, '')) / 1.1;
-          var y = x.toFixed(2);
-          i[w].innerHTML = "$" + y.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        }
-        if (i[w].innerHTML.indexOf(".") == -1) {
-          // i[w].innerHTML = "Price(LUC)";
-        }
-      }
-
-      var j = d[d1].getElementsByClassName("ProductTotal"); // changes product total
-      for (var z = 0; z < j.length; z++) {
-        if (j[z].innerHTML.indexOf("AUD") > -1) {
-          var x = parseFloat(j[z].innerHTML.slice(1, -4).replace(/,/g, '')) / 1.1;
-          var y = x.toFixed(2);
-          j[z].innerHTML = "$" + y.toString();
-        }
-
-      }
-
-      var k = d[d1].getElementsByClassName("InvoiceSubtotal InvoiceTotalRow"); // changes subtotal
-      var l = k[0].getElementsByClassName("Total")[0].innerHTML;
-      if (l.indexOf("AUD") > -1) {
-        var p1 = l.slice(1, -3);
-        var p2 = p1.replace(/,/g, '');
-        var p3 = (parseFloat(p2) / 1.1).toFixed(2);
-
-        k[0].getElementsByClassName("Total")[0].innerHTML = "$" + p3.toString();
-        k[0].getElementsByClassName("Title")[0].innerHTML = "Subtotal (inc. WET exc. GST)";
-
-      }
-
-      var a = d[d1].getElementsByClassName("InvoiceTotals"); // changes discount using coupon codes, not hardcoded value
-      var c3 = 0;
-      for (var a1 = 0; a1 < a.length; a1++) {
-        b = /InvoiceCoupon(.*)>/.exec(a[a1].innerHTML);
-        if (b != null) {
-          var b1 = b[0].slice(0, -2);
-          var b2 = d[d1].getElementsByClassName(b1);
-          for (var c = 0; c < b2.length; c++) {
-            var c1 = />(.*)AUD/.exec(b2[c].innerHTML);
-            if (c1 != null) {
-
-              var c2 = parseFloat(c1[1].slice(2, -1).replace(/,/g, ''));
-
-              c3 = (c2 / 1.1).toFixed(2);
-
-              b2[c].innerHTML = "<td class=\"Title\" colspan=\"4\">Discount Coupon (ex. GST)</td><td class=\"Total\">-$" + c3.toString() + "</td>";
-            }
-          }
-        }
-      }
-
-      var e = d[d1].getElementsByClassName("InvoiceTax-WET InvoiceTotalRow");
-      var e1 = e[0].getElementsByClassName("Total")[0].innerHTML;
-      if (e1.indexOf("AUD") > -1) {
-        // new wet = (subtotal) - subtotal/1.29
-        q1 = ((p3 - c3) - ((p3 - c3) / 1.29)).toFixed(2);
-        e[0].getElementsByClassName("Total")[0].innerHTML = "$" + q1.toString();
-        e[0].getElementsByClassName("Title")[0].innerHTML = "WET";
-
-      }
-
-      var f6 = d[d1].getElementsByClassName("InvoiceShipping InvoiceTotalRow");
-      var f7 = f6[0].getElementsByClassName("Total")[0].innerHTML;
-      if (f7.indexOf("AUD") > -1) {
-        var f8 = parseFloat(f7.slice(1, -3));
-        if (f8 != 0) {
-          var f9 = (f8 / 1.1).toFixed(2);
-          f6[0].getElementsByClassName("Total")[0].innerHTML = "$" + f9.toString();
-        }
-        f6[0].getElementsByClassName("Total")[0].innerHTML = f6[0].getElementsByClassName("Total")[0].innerHTML.replace("AUD", '');
-        f6[0].getElementsByClassName("Title")[0].innerHTML = "Shipping (ex. GST)"
-      }
-
-      var f = d[d1].getElementsByClassName("InvoiceTotal InvoiceTotalRow");
-
-      var f1 = f[0].getElementsByClassName("Total")[0].innerHTML;
-
-      var f2 = f1.replace(/,/g, '');
-
-      var f3 = parseFloat(f2.replace("$", "")); // grand total
-
-      var f4 = (f3 / 11).toFixed(2); // GST
-
-      var f5 = f[0].innerHTML.replace("AUD</td>", "</td><td></td>");
-      f[0].innerHTML = f5;
-
-      //f[0].getElementsByClassName("Total")[0].innerHTML = f5;
-      var g5 = d[d1].getElementsByClassName("InvoiceTax-GST InvoiceTotalRow");
-      g5[0].getElementsByClassName("Total")[0].innerHTML = "$" + f4.toString();
-      g5[0].getElementsByClassName("Title")[0].innerHTML = "GST";
-
-      // change shipping
-      var ac = d[d1].getElementsByClassName("additional-comments");
-      ac[0].innerHTML = "A set shipping charge per bottle is included for all orders – additional shipping charges may also apply";
-
-      var ph = d[d1].getElementsByClassName("phone_number");
-      var sc = d[d1].getElementsByClassName("select-comments");
-
-      if (ph[0].innerHTML.indexOf("*") > -1) {
-        //console.log("yes");
-      } else {
-        sc[0].innerHTML = "All amounts payable under contract to which this invoice relates, have been transferred to Scottish Pacific Business Finance Pty Ltd (“ScotPac”). Payment to any other person will not constitute a valid discharge of the debt.";
-      }
-
-    } else {
-      var i = d[d1].getElementsByClassName("ProductCost"); // changes product cost
-      for (var w = 0; w < i.length; w++) {
-        if (i[w].innerHTML.indexOf("AUD") > -1) {
-          var x = i[w].innerHTML.replace("AUD", "");
-          i[w].innerHTML = x.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        }
-        if (i[w].innerHTML.indexOf(".") == -1) {
-          // i[w].innerHTML = "Price";
-        }
-      }
-
-      var j = d[d1].getElementsByClassName("ProductTotal"); // changes product total
-      for (var z = 0; z < j.length; z++) {
-        if (j[z].innerHTML.indexOf("AUD") > -1) {
-          var x = j[z].innerHTML.replace("AUD", "");
-          j[z].innerHTML = x;
-        }
-
-      }
-      var f = d[d1].getElementsByClassName("InvoiceTotal InvoiceTotalRow");
-
-      var f1 = f[0].getElementsByClassName("Total")[0].innerHTML;
-
-      var f2 = f1.replace(/,/g, '');
-
-      var f3 = parseFloat(f2.replace("$", "")); // grand total
-
-      var f4 = (f3 / 11).toFixed(2); // GST
-
-      var g5 = d[d1].getElementsByClassName("InvoiceTax-GST InvoiceTotalRow");
-      if (g5.length > 0) {
-        g5[0].getElementsByClassName("Title")[0].innerHTML = "GST";
-        g5[0].getElementsByClassName("Total")[0].innerHTML = "$" + f4.toString();
-      }
-
-      var a = d[d1].getElementsByClassName("InvoiceTotals"); // changes discount using coupon codes, not hardcoded value
-      var c3 = 0;
-      for (var a1 = 0; a1 < a.length; a1++) {
-        b = /InvoiceCoupon(.*)>/.exec(a[a1].innerHTML);
-        if (b != null) {
-          var b1 = b[0].slice(0, -2);
-          var b2 = d[d1].getElementsByClassName(b1);
-          for (var c = 0; c < b2.length; c++) {
-            var c1 = />(.*)AUD/.exec(b2[c].innerHTML);
-            if (c1 != null) {
-
-              var c2 = parseFloat(c1[1].slice(2, -1).replace(/,/g, ''));
-
-              c3 = (c2).toFixed(2);
-
-              b2[c].innerHTML = "<td class=\"Title\" colspan=\"4\">Discount Coupon</td><td class=\"Total\">-$" + c3.toString() + "</td>";
-            }
-          }
-        }
-      }
-
-    }
-    data = new Date();
-    term_dates = d[d1].getElementsByClassName("term_date");
-    for (var date1 = 0; date1 < term_dates.length; date1++) {
-      if (term_dates[date1].innerHTML.indexOf("/") <= -1) {
-        date = term_dates[date1].innerHTML;
-        invDate = date.split(' ');
-        invDate[0] = invDate[0].slice(0, -2);
-        if (invDate[1] == 'Jan') {
-          invDate[1] = //convert the month word into a number
-          0;
-        } else if (invDate[1] == 'Feb') {
-          invDate[1] = 1;
-        } else if (invDate[1] == 'Mar') {
-          invDate[1] = 2;
-        } else if (invDate[1] == 'Apr') {
-          invDate[1] = 3;
-        } else if (invDate[1] == 'May') {
-          invDate[1] = 4;
-        } else if (invDate[1] == 'Jun') {
-          invDate[1] = 5;
-        } else if (invDate[1] == 'Jul') {
-          invDate[1] = 6;
-        } else if (invDate[1] == 'Aug') {
-          invDate[1] = 7;
-        } else if (invDate[1] == 'Sep') {
-          invDate[1] = 8;
-        } else if (invDate[1] == 'Oct') {
-          invDate[1] = 9;
-        } else if (invDate[1] == 'Nov') {
-          invDate[1] = 10;
-        } else if (invDate[1] == 'Dec') {
-          invDate[1] = 11;
-        }
-        var month = parseInt(invDate[1]) + 1;
-        term_dates[date1].innerHTML = invDate[0] + "/" + month.toString() + "/" + invDate[2];
-        data.setDate(invDate[0]); //set the date
-        data.setMonth(invDate[1]);
-        data.setFullYear(invDate[2]);
-        fillDate(data, date1);
-
-      }
-    }
-  }
-
-  var titles = document.getElementsByClassName("Title");
-  for (var x = 0; x < titles.length; x++) {
-    titles[x].colSpan = "3";
-  }
-
-  var p = document.getElementsByClassName("Total");
-  for (var p1 = 0; p1 < p.length; p1++) {
-    var p2 = p[p1].innerHTML;
-    if (p2.indexOf("AUD") > -1) {
-      p2 = p2.replace("AUD", "");
-      p[p1].innerHTML = p2;
-    }
-  }
-
-  function fillDate(dateObj, index) {
-    date = dateObj;
-    day = date.getDate() + 30; //add on the condition of the terms, may be larger than 31
-    month = date.getMonth(); //sets the month
-    year = date.getFullYear(); //sets the year
-
-    if ((year - 2000) % 4 == 0) { //check for leap year, for february day count
-      leapYear = true;
-    } else {
-      leapYear = false;
-    }
-
-    if (month == 8 || month == 3 || month == 5 || month == 10) { //months with 30 days
-      if (day > 30) {
-        day = day - 30;
-        month += 2; //advance the month and subtract 30 to give a correct following date
-      } else {
-        month += 1;
-      }
-    } else if (month == 11) { //month december
-      if (day > 31) {
-        day = day - 31;
-        month = 1; //advance the month and subtract 30 to give a correct following date
-      } else {
-        month = 12;
-      }
-    } else if (month == 1) { //february check. Checks if its it's a leap year first
-      if (leapYear == true) {
-        if (day > 29) {
-          day = day - 29;
-          month += 2;
-        }
-      } else {
-        if (day > 28) {
-          day = day - 28;
-          month += 2;
-        }
-      }
-    } else { //all other months
-      if (day > 31) {
-        day = day - 31;
-        month += 2;
-      } else {
-        month += 1;
-      }
-    }
-
-    if (month == 0) {
-      month = 1;
-    }
-
-    d[d1].getElementsByClassName("dueDates")[index].innerHTML = String(day) + '/' + String(month) + '/' + String(year);
-    //sets the due date field as the correct due date
-
-  }
-</script>
-<script>
-
-  $(document).ready(function () {
-    inv = document.getElementsByClassName("Invoice");
-    d = document.getElementsByClassName("InvoiceTotal InvoiceTotalRow");
-    g = document.getElementsByClassName("InvoiceTax-GST InvoiceTotalRow");
-    s = document.getElementsByClassName("InvoiceShipping InvoiceTotalRow");
-
-    var i = 0;
-    var a = [];
-    var e = [];
-    for (i = 0; i < inv.length; i++) {
-      if (inv[i].getElementsByClassName("InvoiceTax-GST InvoiceTotalRow").length <= 0) {
-        a.push(i);
-      } else {
-        e.push(i);
-      }
-    }
-    for (i = 0; i < a.length; i++) {
-      var gst = document.createElement("tr");
-      $(gst).addClass("InvoiceTax-GST InvoiceTotalRow");
-      var index = a[i];
-      $(s[index]).after(gst);
-
-    }
-
-    g = document.getElementsByClassName("InvoiceTax-GST InvoiceTotalRow");
-
-    for (i = 0; i < d.length; i++) {
-      $(g[i]).after($(d[i]));
-      extra = document.createElement("tr");
-
-    }
-
-  });
-</script>

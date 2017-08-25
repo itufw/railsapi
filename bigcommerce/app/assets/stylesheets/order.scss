@@ -49,12 +49,16 @@
   color: red;
 }
 
-.Staff {
+[class*='Staff-'] {
   color: orange;
 }
 
-.CIVIC {
+[class*='CIVIC-'] {
   color: orange;
+}
+
+.Fastway-Booked {
+  color: aqua;
 }
 
 .Manual-Check-Required {

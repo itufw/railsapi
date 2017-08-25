@@ -105,11 +105,10 @@ class OrderController < ApplicationController
 
   def generate_invoice
     order = Order.find(params[:order_id])
-    customer = Customer.find(order.customer_id)
     pdf = WickedPdf.new.pdf_from_string(
       render_to_string(
           :template => 'pdf/order_invoice.pdf',
-          :locals => {order: order, customer: customer}
+          :locals => {order: order, customer: order.customer}
           )
       )
       send_data pdf, filename: "#{order.id}.pdf", type: :pdf
