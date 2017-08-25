@@ -124,15 +124,15 @@
       <!-- Shipping & Assign Tracking Number -->
     <% elsif @selected_status_id == '9' %>
       <div class="fastway_labels">
+        <% customer = @order.customer %>
         <div class="row">
           <label>Special Instruction:</label>
+          <%= check_box_tag 'customer_instruction_update', customer.id, false %>Update Customer's
         </div>
         <div class="row">
-          <% customer = @order.customer %>
           <%= f.text_field :SpecialInstruction1, value: customer.SpecialInstruction1, maxlength: 28 %>
           <%= f.text_field :SpecialInstruction2, value: customer.SpecialInstruction2, maxlength: 28 %>
           <%= f.text_field :SpecialInstruction3, value: customer.SpecialInstruction3, maxlength: 28 %>
-          
         </div>
         <div class="row">
           <div class="col-md-4">Total Bottles</div>

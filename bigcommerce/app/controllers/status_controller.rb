@@ -58,6 +58,8 @@ class StatusController < ApplicationController
   end
 
   def status_update
+    p = ccccccccccccccccccc
+    #  In lib/order_status
     status, result = order_status_handler(params, order_params, session[:user_id])
     case status
     when 'Paperwork'
