@@ -30,6 +30,13 @@
     <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
     <%= submit_tag 'Select Courier', class: 'btn btn-primary'%>
   <% end %>
+  <script type="text/javascript">
+  $('table tbody tr.odd').each(function(){
+    if($(this).find('.account-Approved').length == 0){
+      $(this).find('.multi-select input').attr('checked', false);
+    }
+  });
+  </script>
 <% elsif ['Shipped'].include? @status_name%>
   <%= form_tag({:controller => "status", :action => "status_update"}, {:method => "get"}) do %>
     <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
