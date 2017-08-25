@@ -24,7 +24,7 @@ module OrderStatus
       Order.where(id: selected_orders).update_all(status_id: 2, last_updated_by: user_id)
       return ['Group Update', '']
     when 'Approve'
-      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 3, last_updated_by: user_id}))
+      Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 9, last_updated_by: user_id}))
     when 'Hold-Stock'
       Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 20, last_updated_by: user_id}))
     when 'Hold-Price'
@@ -91,23 +91,22 @@ module OrderStatus
   end
 
   def print_shipping_sheet(selected_orders)
-    orders = Order.where(id: selected_orders)
+    orders = Order.joins(:customer).where(id: selected_orders)
     pdf = CombinePDF.new
     picking_slips = CombinePDF.new
     orders.each do |order|
-      customer = Customer.find(order.customer_id)
-      order_invoice = WickedPdf.new.pdf_from_string(
-        render_to_string(
-            :template => 'pdf/order_invoice.pdf',
-            :locals => {order: order, customer: customer}
-            )
-        )
-      pdf << CombinePDF.parse(order_invoice)
+      # order_invoice = WickedPdf.new.pdf_from_string(
+      #   render_to_string(
+      #       :template => 'pdf/order_invoice.pdf',
+      #       :locals => {order: order, customer: customer}
+      #       )
+      #   )
+      # pdf << CombinePDF.parse(order_invoice)
 
       packing_slip = WickedPdf.new.pdf_from_string(
         render_to_string(
             :template => 'pdf/packing_slip.pdf',
-            :locals => {order: order, customer: customer}
+            :locals => {order: order, customer: order.customer}
             )
         )
       picking_slips << CombinePDF.parse(packing_slip)
