@@ -32,7 +32,7 @@
 		<% cust_name = customer_name(order.customer) %>
 		<td><%= link_to cust_name, controller: 'customer', action: 'summary', customer_id: order.customer_id, customer_name: cust_name %></td>
 		<td><%= order_status(order.status)%></td>
-		<% shipping_description = shipping_status(order.id) %>
+		<% shipping_description = shipping_status(order) %>
 		<td class=<%= shipping_description.split().join('-') %>><%= shipping_description %></td>
 		<td class=<%= display_class + " num " %>><%= product_qty(product_ids, order.id) %></th>
 		<td class="num"><%= order.qty %></td>

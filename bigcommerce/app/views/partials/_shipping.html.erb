@@ -1,51 +1,61 @@
 <!-- Trace Table -->
-<% traces = FastwayTrace.track_order(order_id).order('Date ASC') %>
+<% order = Order.find(order_id) %>
+<% if [2, 6].include?order.courier_status_id %>
+  <h4><%= order.courier_status.description.to_s %> Ship: <%= order.track_number %></h4>
+<% elsif !order.track_number.nil? && order.track_number.length>7%>
+  <% traces = FastwayTrace.where('LabelNumber IN (?)', order.track_number.split(/[; ]/)).order('Date ASC') %>
+<% else%>
+  <% traces = FastwayTrace.track_order(order_id).order('Date ASC') %>
+<% end %>
+<!-- Print Fastway Tracing if there is fastway traces -->
+<% unless traces.nil? || traces.blank?%>
+  <% signature = traces.select{|x| x.StatusDescription == 'Signature Obtained'}.first%>
+  <% unless signature.nil? %>
+    <table class="table table-striped table-bordered table-hover table-responsive fastway">
+      <thead>
+        <th>Signature</th>
+        <th>Company</th>
+        <th>Receiver</th>
+        <th>Address</th>
+        <th>Comment</th>
+      </thead>
+      <tbody>
+        <tr>
+          <td><%= image_tag "#{signature.Signature}"%></td>
+          <td><%= signature.company%></td>
+          <td><%= signature.contactName%></td>
+          <td><%= signature.address1.to_s + "\n" + signature.address2 + "\n" + signature.address3%>
+            <br/>
+              <%= signature.address4.to_s + "\n" + signature.address5.to_s + "\n" + signature.address6.to_s%>
+          </td>
+          <td><%= signature.comment%><br/><%= link_to '<i class="glyphicon glyphicon-download" title="Download Pod" style="color: blue;"></i>'.html_safe, controller: 'order', action: 'generate_pod', order_id: order_id%></td>
+        </tr>
+      </tbody>
+    </table>
+  <% end %>
 
-<% signature = traces.select{|x| x.StatusDescription == 'Signature Obtained'}.first%>
-<% unless signature.nil? %>
-  <table class="table table-striped table-bordered table-hover table-responsive fastway">
-    <thead>
-      <th>Signature</th>
-      <th>Company</th>
-      <th>Receiver</th>
-      <th>Address</th>
-      <th>Comment</th>
-    </thead>
-    <tbody>
-      <tr>
-        <td><%= image_tag "#{signature.Signature}"%></td>
-        <td><%= signature.company%></td>
-        <td><%= signature.contactName%></td>
-        <td><%= signature.address1.to_s + "\n" + signature.address2 + "\n" + signature.address3%>
-          <br/>
-            <%= signature.address4.to_s + "\n" + signature.address5.to_s + "\n" + signature.address6.to_s%>
-        </td>
-        <td><%= signature.comment%><br/><%= link_to '<i class="glyphicon glyphicon-download" title="Download Pod" style="color: blue;"></i>'.html_safe, controller: 'order', action: 'generate_pod', order_id: order_id%></td>
-      </tr>
-    </tbody>
-  </table>
+  <% traces.map(&:LabelNumber).uniq.each do |label|%>
+    <%= label(:label, label)%>
+    <table class="table table-striped table-bordered table-hover table-responsive fastway <%= label %> <%= 'delivered' unless traces.select{|x| x.LabelNumber == label && x.StatusDescription == 'Signature Obtained'}.blank?%>">
+      <thead>
+        <th>Date</th>
+        <th>Franchise</th>
+        <th>Status</th>
+        <th>Comment</th>
+      </thead>
+      <%traces.select{|x| x.LabelNumber == label}.each do |scan|%>
+        <tr>
+          <td><%= scan.Date%></td>
+          <td><%= scan.Franchise%></td>
+          <td><%= scan.StatusDescription%></td>
+          <td><%= scan.comment%></td>
+        </tr>
+      <% end %>
+    </table>
+    </br>
+  <% end %>
 <% end %>
 
-<% traces.map(&:LabelNumber).uniq.each do |label|%>
-  <%= label(:label, label)%>
-  <table class="table table-striped table-bordered table-hover table-responsive fastway <%= label %> <%= 'delivered' unless traces.select{|x| x.LabelNumber == label && x.StatusDescription == 'Signature Obtained'}.blank?%>">
-    <thead>
-      <th>Date</th>
-      <th>Franchise</th>
-      <th>Status</th>
-      <th>Comment</th>
-    </thead>
-    <%traces.select{|x| x.LabelNumber == label}.each do |scan|%>
-      <tr>
-        <td><%= scan.Date%></td>
-        <td><%= scan.Franchise%></td>
-        <td><%= scan.StatusDescription%></td>
-        <td><%= scan.comment%></td>
-      </tr>
-    <% end %>
-  </table>
-  </br>
-<% end %>
 
 <script type="text/javascript">
   $('label[for*=label_]').click(function(){
