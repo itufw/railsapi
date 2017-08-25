@@ -59,7 +59,7 @@ module CsvGenerator
     "" AS "Order Total(ex tax)", staffs.nickname AS "Payment Method", orders.qty AS "Total Quantity",
     orders.items_shipped AS "Total Shipped", Date(orders.date_shipped) AS "Date Shipped"'
 
-    if bigc_status != ''
+    if bigc_status == ''
       orders = Order.joins(:staff, :customer, :status).select(sql).where("orders.date_created > '#{start_date}' AND orders.date_created < '#{end_date}'").order('orders.id DESC')
     else
       orders = Order.joins(:staff, :customer, :status).select(sql).where('statuses.bigcommerce_id = ?', bigc_status.to_i).where("orders.date_created > '#{start_date}' AND orders.date_created < '#{end_date}'").order('orders.id DESC')
@@ -85,7 +85,7 @@ module CsvGenerator
     end
   end
 
-  def export_shippment(start_date, end_date)
+  def export_shipment(start_date, end_date)
     sql = ' "" AS "Shipment ID", Date(date_shipped) AS "Date Shipped", orders.id AS "ORDER ID",
       Date(orders.date_created) AS "Order Date", track_number AS "Tracking No",
       courier_statuses.description AS "Shipping Method"'
