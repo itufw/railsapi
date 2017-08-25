@@ -54,7 +54,7 @@ module OrderStatus
         result = Fastway.new.add_consignment(order, params['dozen'].to_i, params['half-dozen'].to_i)
         begin
           order.update_attributes(order_params.reject{|key, value| key == 'courier_status_id' }.merge({track_number: result['result']['LabelNumbers'].join(';'), courier_status_id: 4, status_id: 8, date_shipped: Time.now.to_s(:db), last_updated_by: user_id}))
-          order.customer.update_attributes({order_params.select{|key, value| ['SpecialInstruction1', 'SpecialInstruction2', 'SpecialInstruction3'].include?key}}) unless params[:customer_instruction_update].nil? || params[:customer_instruction_update]==""
+          order.customer.update_attributes(order_params.select{|key, value| ['SpecialInstruction1', 'SpecialInstruction2', 'SpecialInstruction3'].include?key}) unless params[:customer_instruction_update].nil? || params[:customer_instruction_update]==""
           flash[:success] = "Label Printed"
         rescue
           flash[:error] = 'Fail to connect Fastway, Check the Shipping Address'
