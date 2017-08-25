@@ -68,7 +68,7 @@ class Order < ActiveRecord::Base
        'customer_notes': remove_apostrophe(order.customer_message), 'active': convert_bool(order.is_deleted),\
        'source': 'bigcommerce', 'source_id': order.id, 'date_created': map_date(order.date_created),\
        'date_shipped': map_date(order.date_shipped), 'created_by': 34, 'last_updated_by': 34,\
-       'courier_status_id': 1, 'address': customer.address}
+       'address': customer.address}
     self.update_attributes(params)
     self
   end
@@ -146,7 +146,7 @@ class Order < ActiveRecord::Base
   end
 
   def self.statuses_filter(status_id)
-    return where(status_id: status_id, courier_status_id: 1) if (!status_id.nil?) && (status_id.include?8)
+    return where(status_id: status_id, courier_status_id: 1) if (!status_id.nil?) && (status_id.include?8) && !(status_id.include?2)
     return where(status_id: status_id) unless status_id.nil? || status_id.blank?
     all
   end

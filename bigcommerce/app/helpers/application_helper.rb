@@ -50,9 +50,10 @@ module ApplicationHelper
     elsif order.courier_status_id == 1
       return ''
     else
-      return order.courier_status.description.to_s
+      return order.courier_status.description.to_s + " " + order.track_number
     end
 
+    return 'Fastway Booked' if records.blank? && order.courier_status_id==4
     return '' if records.blank?
 
     record_status = records.map(&:Description).uniq

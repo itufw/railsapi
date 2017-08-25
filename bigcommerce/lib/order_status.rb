@@ -95,13 +95,13 @@ module OrderStatus
     pdf = CombinePDF.new
     picking_slips = CombinePDF.new
     orders.each do |order|
-      # order_invoice = WickedPdf.new.pdf_from_string(
-      #   render_to_string(
-      #       :template => 'pdf/order_invoice.pdf',
-      #       :locals => {order: order, customer: customer}
-      #       )
-      #   )
-      # pdf << CombinePDF.parse(order_invoice)
+      order_invoice = WickedPdf.new.pdf_from_string(
+        render_to_string(
+            :template => 'pdf/order_invoice.pdf',
+            :locals => {order: order, customer: order.customer}
+            )
+        )
+      pdf << CombinePDF.parse(order_invoice)
 
       packing_slip = WickedPdf.new.pdf_from_string(
         render_to_string(
@@ -109,16 +109,17 @@ module OrderStatus
             :locals => {order: order, customer: order.customer}
             )
         )
+
       picking_slips << CombinePDF.parse(packing_slip)
     end
+    pdf << picking_slips
+
     picking_sheet = WickedPdf.new.pdf_from_string(
       render_to_string(
           template: 'pdf/picking_sheet.pdf',
           locals: {order_products: OrderProduct.where(order_id: selected_orders, display: 1) }
           )
       )
-
-    pdf << picking_slips
     pdf << CombinePDF.parse(picking_sheet)
     pdf
   end
