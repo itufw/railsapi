@@ -66,9 +66,7 @@ class Order < ActiveRecord::Base
        'wrapping_cost': order.wrapping_cost_ex_tax, 'wet': (order.subtotal_ex_tax.to_f - order.discount_amount.to_f - order.coupon_discount.to_f) * 0.29,\
        'gst': order.total_inc_tax.to_f / 11, 'staff_notes': remove_apostrophe(order.staff_notes),\
        'customer_notes': remove_apostrophe(order.customer_message), 'active': convert_bool(order.is_deleted),\
-       'source': 'bigcommerce', 'source_id': order.id, 'date_created': map_date(order.date_created),\
-       'date_shipped': map_date(order.date_shipped), 'created_by': 34, 'last_updated_by': 34,\
-       'address': customer.address}
+       'date_shipped': map_date(order.date_shipped), 'address': customer.address}
     self.update_attributes(params)
     self
   end
