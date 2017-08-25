@@ -1,6 +1,5 @@
  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
  <link rel="stylesheet" href="https://www.untappedwines.com.au/template/Styles/printinvoice.css" type="text/css">
-<script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 
 <div class="Invoice">
     <div id="heading">
@@ -43,11 +42,11 @@
         <table id="terms">
             <tr>
                 <td>Terms</td>
-                <td>30 days</td>
+                <td><%= customer.tolerance_day%> days</td>
             </tr>
             <tr>
                 <td>Due Date</td>
-                <td id="dueDate" class="dueDates"><%= (order.created_at + customer.tolerance_days.days).strftime("%e/%m/%Y") %></td>
+                <td id="dueDate" class="dueDates"><%= (order.created_at + customer.tolerance_day.days).strftime("%e/%m/%Y") %></td>
             </tr>
         </table>
     </div>
@@ -62,9 +61,7 @@
 
     <div id="products">
       <%
-        gst = 1 + 0.01 * TaxPercentage.gst_percentage
-        wet = 1 + 0.01 * TaxPercentage.wet_percentage
-        products = order.order_products
+        products = order.order_products.select{ |x| x.display == 1}
         discount_amount = products.map {|x| x.price_discounted - x.price_luc }.sum
       %>
             <table class="InvoiceTable">
@@ -79,10 +76,10 @@
                         <th class="ProductTotal" align="right" id="amt" style="width:15px;">Total</th>
                         <th></th>
                     </tr>
-                    <% products.select{ |x| x.display == 1}.each do |item| %>
+                    <% products.each do |item| %>
                       <tr>
                           <td class="ProductQuantity"><%= item.qty.to_i%></td>
-                          <td class="ProductDetails"><%= Product.find(item.product_id).name %></td>
+                          <td class="ProductDetails"><%= item.product.name %></td>
                           <td class="ProductCost" id="price" align="right">$<%= '%.2f' % item.price_luc %></td>
                           <% unless discount_amount == 0%>
                             <td class="ProductCost" align="right"><%= '%.0f' % item.discount %>%</td>
