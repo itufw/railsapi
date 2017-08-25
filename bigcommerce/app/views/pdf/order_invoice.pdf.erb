@@ -47,7 +47,7 @@
             </tr>
             <tr>
                 <td>Due Date</td>
-                <td id="dueDate" class="dueDates"><%= (order.created_at + 30.days).strftime("%e/%m/%Y") %></td>
+                <td id="dueDate" class="dueDates"><%= (order.created_at + customer.tolerance_days.days).strftime("%e/%m/%Y") %></td>
             </tr>
         </table>
     </div>
