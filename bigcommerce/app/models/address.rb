@@ -20,9 +20,9 @@ class Address < ActiveRecord::Base
 			self.company = a[:company]
 			self.street_1, self.street_2, self.city, self.state, self.postcode = a[:street_1], a[:street_2], a[:city], a[:state], a[:zip]
 			self.country = a[:country]
-			self.phone, address.email = a[:phone], a[:email]
-			self.created_at, address.updated_at = time, time
-			self.lat, address.lng = lat, lng if lat.is_a? Numeric
+			self.phone, self.email = a[:phone], a[:email]
+			self.created_at, self.updated_at = time, time
+			self.lat, self.lng = lat, lng if lat.is_a? Numeric
 			self.save
 
 			order = Order.find(order_id)
