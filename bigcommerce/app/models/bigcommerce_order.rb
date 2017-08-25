@@ -118,10 +118,13 @@ class BigcommerceOrder < ActiveRecord::Base
 			coupon_discount, active, order_source, created_at, updated_at, payment_method, staff_id)\
 			VALUES #{order}"
 
+      order = Order.new.import_from_bigcommerce(o)
+
       # insert the billing adress where the id is order_id
+      # IMPORTANT
+      # DO this after order inserted
       Address.new.insert_or_update(o.billing_address, o.customer_id, o.id)
 
-      order = Order.new.import_from_bigcommerce(o)
     else
       sql = "UPDATE bigcommerce_orders SET customer_id = '#{o.customer_id}', date_created = '#{date_created}',\
 					date_modified = '#{date_modified}', date_shipped = '#{date_shipped}', status_id = '#{o.status_id}',\
