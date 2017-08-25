@@ -146,7 +146,6 @@ class Order < ActiveRecord::Base
   end
 
   def self.statuses_filter(status_id)
-    return where(status_id: status_id, account_status: 'Approved') if (!status_id.nil?) && (status_id.include?8)
     return where(status_id: status_id) unless status_id.nil? || status_id.blank?
     all
   end
