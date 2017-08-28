@@ -39,7 +39,7 @@ module OrderHelper
     tolerance_date = (Date.today - 30.days).to_s(:db)
     over_due_orders = XeroInvoice.filter_by_contact_id(customer.xero_contact_id).period_select(tolerance_date) unless customer.xero_contact_id.nil? || customer.xero_contact_id == ""
     return 'Approved' if over_due_orders.nil? || over_due_orders.blank?
-    'Hold - Account'
+    'Hold-Account'
   end
 
   def order_creation(order_params, products_params, customer_params)

@@ -60,7 +60,14 @@
     <%= customer.postcode%><br/>
     <%= customer.country%><br/>
   </div>
-  
+
+  <% if customer.cust_group_id.to_i == 17 %>
+    <div style="float:right;">
+      <h3 style="margin-bottom: 0px;padding-right: 5px;">Coles Liquor Reference</h3>
+      Untapped Fine Wines 965586
+    </div>
+  <% end %>
+
   <%= render 'pdf/product_lists', order: order %>
 
   <div class="InvoiceComments" style="%%GLOBAL_HideComments%%; margin-top: -75px; font-size: 0.8em;width: 350px; text-align: justify;">

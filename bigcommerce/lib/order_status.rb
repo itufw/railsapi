@@ -6,11 +6,11 @@ module OrderStatus
     selected_orders = selected_orders.first.split unless selected_orders.blank? || selected_orders.count > 1
 
     # Print Shipping List
-    if "Print Picking List" == params[:commit] && !selected_orders.blank?
+    if "Print Picking Slip" == params[:commit] && !selected_orders.blank?
       # Print Picking Sheet
       # Due to Rails redirect conflicts
-      pdf = print_picking_list(selected_orders)
-      return ['print_picking_list', pdf]
+      pdf = print_picking_slip(selected_orders)
+      return ['print_picking_slip', pdf]
     elsif "Print Invoices" == params[:commit] && !selected_orders.blank?
       pdf = print_invoices(selected_orders)
       return ['print_invoice', pdf]
@@ -111,7 +111,7 @@ module OrderStatus
     pdf
   end
 
-  def print_picking_list(selected_orders)
+  def print_picking_slip(selected_orders)
     orders = Order.where(id: selected_orders)
     picking_slips = CombinePDF.new
     orders.each do |order|
