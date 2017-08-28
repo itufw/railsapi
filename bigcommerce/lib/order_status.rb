@@ -24,7 +24,7 @@ module OrderStatus
       Order.where(id: selected_orders).update_all(status_id: 27, last_updated_by: user_id)
       return ['Group Update', '']
     when 'Ready'
-      Order.where(id: selected_orders).update_all(status_id: 9, last_updated_by: user_id)
+      Order.where(id: selected_orders).update_all(status_id: 25, last_updated_by: user_id)
       return ['Group Update', '']
     when 'Shipped'
       Order.where(id: selected_orders).update_all(status_id: 2, last_updated_by: user_id)

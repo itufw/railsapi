@@ -13,7 +13,7 @@
             <% else %>
               <td><input type="text" name="customer" id="<%= @order.customer_id %>" value="<%= Customer.find(@order.customer_id).actual_name%>" readonly="readonly" size="30px"></td>
             <% end %>
-            <td><input type="checkbox" id="customer_purchase_order" style="display: inline-block;"> Customer Order</td>
+            <td><input type="checkbox" id="customer_purchase_order" style="display: inline-block;"> Customer Puchase ID</td>
           </tr>
           <tr style="display: none;" class="customer-purchase-order-tr"></tr>
           <tr style="display: none;" class="last_order"></tr>
