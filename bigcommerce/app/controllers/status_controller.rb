@@ -65,8 +65,8 @@ class StatusController < ApplicationController
       send_data result, filename: "picking_sheet_#{session[:username]}_#{Date.today.to_s}.pdf" and return
     when 'print_invoice'
       send_data result.to_pdf, filename: "Invoices_#{session[:username]}_#{Date.today.to_s}.pdf" and return
-    when 'print_picking_list'
-      send_data result.to_pdf, filename: "picking_list_#{session[:username]}_#{Date.today.to_s}.pdf" and return
+    when 'print_picking_slip'
+      send_data result.to_pdf, filename: "picking_slip_#{session[:username]}_#{Date.today.to_s}.pdf" and return
     when 'Group Update'
       redirect_to controller: 'order', action: 'all' and return
     when 'Label Error'
