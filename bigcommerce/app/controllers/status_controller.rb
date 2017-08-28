@@ -39,7 +39,7 @@ class StatusController < ApplicationController
 
   def status_check
     @status_name = params[:status_name]
-    order_function, direction = sort_order(params, :order_by_id, 'DESC')
+    order_function, direction = sort_order(params, :order_by_id, 'ASC')
     per_page = params[:per_page] || Order.per_page
 
     # TODO

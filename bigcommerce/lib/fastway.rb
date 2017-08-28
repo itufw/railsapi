@@ -167,4 +167,15 @@ class Fastway
     @query[:query][:ShowBoxProduct] = true
     self.class.get('/psc/lookup', @query)
   end
+
+  def eta(suburb, postcode, weight)
+    # result['result']['target_delivery']['earliest_delivery_date']
+    # Earliest Date
+    @query[:query][:RFCode] = 'MEL'
+    @query[:query][:Suburb] = suburb
+    @query[:query][:Postcode] = postcode
+    @query[:query][:Weight] = weight
+    @query[:query][:PickupDate] = Date.today.strftime('%d/%m/%y')
+    self.class.get('/psc/eta', @query)
+  end
 end
