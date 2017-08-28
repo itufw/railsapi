@@ -135,4 +135,8 @@ class AccountsController < ApplicationController
         @credit_note_allocation = XeroCnAllocation.apply_to_orders(@orders.map(&:id)).group_by_orders.sum_applied_amount
         @xero_line_items_sum = XeroInvoiceLineItem.is_product.belongs_to_invoice(@orders.map { |x| x.xero_invoice.xero_invoice_id }).group_by_invoice.sum_order_product_qty
     end
+
+    def account_status
+      @orders = Order.where("account_status != 'Approved'")
+    end
 end
