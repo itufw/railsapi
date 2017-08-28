@@ -22,7 +22,7 @@ class OrderProduct < ActiveRecord::Base
 	end
 
 	def delete_product
-		attributes = {'stock_previous': self.stock_current, 'stock_current': 0, 'stock_incremental': 0 - self.stock_current,\
+		attributes = {'qty': 0, 'stock_previous': self.stock_current, 'stock_current': 0, 'stock_incremental': 0 - self.stock_current,\
 			'display': 0, 'updated_by': 34}
 		self.update_attributes(attributes)
 		self
