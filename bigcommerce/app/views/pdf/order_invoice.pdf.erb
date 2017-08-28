@@ -61,10 +61,16 @@
     <%= customer.country%><br/>
   </div>
 
-  <% if customer.cust_group_id.to_i == 17 %>
+  <% if customer.cust_group_id.to_i==17 || order.customer_purchase_order.to_s!=''%>
     <div style="float:right;">
-      <h3 style="margin-bottom: 0px;padding-right: 5px;">Coles Liquor Reference</h3>
-      Untapped Fine Wines 965586
+      <%if customer.cust_group_id.to_i==17 %>
+        <h3 style="margin-bottom: 0px;padding-right: 5px;">Coles Liquor Reference</h3>
+        Untapped Fine Wines 965586<br/>
+      <% end %>
+      <%if order.customer_purchase_order.to_s!='' %>
+        <h3 style="margin-bottom: 0px;padding-right: 5px;">Customer Purchase Order</h3>
+        <%= order.customer_purchase_order %><br/>
+      <% end %>
     </div>
   <% end %>
 
