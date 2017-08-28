@@ -173,6 +173,9 @@
 
   var last_order = $('.last_order');
 
+  // Count the product numbers
+  var product_count = $('.product-table tbody.product-list tr').length
+
   $('#order_customer_id').hide();
 
   // Customer Search
@@ -199,24 +202,40 @@
 
   // Product Search
   $(document).on('railsAutocomplete.select', '#product_search, #product_ws_search',function(event, data){
-    if($('#tr_' + data.item.id).length == 0){
-      $('.product-table tbody.product-list').append([
-        '<tr id="tr_'+ data.item.id +'">',
-            '<td>'+ data.item.id +'</td>',
-            '<td>'+ data.item.label +'</td>',
-            '<td class="product-inventory">'+ data.item.inventory +'</td>',
-            '<td><input size="5" readonly="readonly" class="product-luc" type="text" value="'+ data.item.price +'" name="order[products['+ data.item.id +']][price_luc]" id="order_products_'+ data.item.id +'__price_luc"></td>',
-            '<td><input size="3" class="product-qty" type="text" value="0" name="order[products['+ data.item.id +']][qty]" id="order_products_'+ data.item.id +'__qty"></td>',
-            '<td><input size="2" class="product-discount" type="text" value="0" name="order[products['+ data.item.id +']][discount]" id="order_products_'+ data.item.id +'__discount"  placeholder="Discount"> %</td>',
-            '<td><input size="5" class="product-price" type="text" value="'+ data.item.price +'" name="order[products['+ data.item.id +']][price_discounted]" id="order_products_'+ data.item.id +'__price_discounted"></td>',
-            '<td class="product-total">0</td>',
-            '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
-        '</tr>'
-        ].join(''));
-      }
+    product_count += 1;
+
+    $('.product-table tbody.product-list').append([
+      '<tr id="tr_'+ data.item.id +'">',
+        '<td><input size="2" readonly="readonly" class="product-id" type="text" value="'+ data.item.id +'" name="order[products['+ product_count +']][product_id]" id="order_products_'+ product_count +'__product_id"></td>',
+        '<td>'+ data.item.label +'</td>',
+        '<td class="product-inventory">'+ data.item.inventory +'</td>',
+        '<td><input size="5" readonly="readonly" class="product-luc" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_luc]" id="order_products_'+ product_count +'__price_luc"></td>',
+        '<td><input size="3" class="product-qty" type="text" value="0" name="order[products['+ product_count +']][qty]" id="order_products_'+ product_count +'__qty"></td>',
+        '<td><input size="2" class="product-discount" type="text" value="0" name="order[products['+ product_count +']][discount]" id="order_products_'+ product_count +'__discount"  placeholder="Discount"> %</td>',
+        '<td><input size="5" class="product-price" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_discounted]" id="order_products_'+ product_count +'__price_discounted"></td>',
+        '<td class="product-total">0</td>',
+        '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
+      '</tr>'
+      ].join(''));
   });
 
+  $(document).on('click', '.last-order-product',function(){
+    product_count += 1;
 
+    $('.product-table tbody.product-list').append([
+      '<tr id="tr_'+ $(this).attr('product-id') +'">',
+        '<td><input size="2" readonly="readonly" class="product-id" type="text" value="'+ $(this).attr('product-id') +'" name="order[products['+ product_count +']][product_id]" id="order_products_'+ product_count +'__product_id"></td>',
+        '<td>'+ $(this).attr('name') +'</td>',
+        '<td class="product-inventory">'+ $(this).attr('inventory') +'</td>',
+        '<td><input size="5" readonly="readonly" class="product-luc" type="text" value="'+ $(this).attr('price') +'" name="order[products['+ product_count +']][price_luc]" id="order_products_'+ product_count +'__price_luc"></td>',
+        '<td><input size="3" class="product-qty" type="text" value="0" name="order[products['+ product_count +']][qty]" id="order_products_'+ product_count +'__qty"></td>',
+        '<td><input size="2" class="product-discount" type="text" value="0" name="order[products['+ product_count +']][discount]" id="order_products_'+ product_count +'__discount"  placeholder="Discount"> %</td>',
+        '<td><input size="5" class="product-price" type="text" value="'+ $(this).attr('price') +'" name="order[products['+ product_count +']][price_discounted]" id="order_products_'+ product_count +'__price_discounted"></td>',
+        '<td class="product-total">0</td>',
+        '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
+      '</tr>'
+    ].join(''));
+  });
 
 
   var update_subtotal = function(){
@@ -269,23 +288,7 @@
   $(document).on('click', '.remove_row', function(){
     $(this).parent().parent().remove();
   });
-  $(document).on('click', '.last-order-product',function(){
-    if($('#tr_' + $(this).attr('product-id')).length == 0){
-    $('.product-table tbody.product-list').append([
-      '<tr id="tr_'+ $(this).attr('product-id') +'">',
-          '<td>'+ $(this).attr('product-id') +'</td>',
-          '<td>'+ $(this).attr('name') +'</td>',
-          '<td class="product-inventory">'+ $(this).attr('inventory') +'</td>',
-          '<td><input size="5" readonly="readonly" class="product-luc" type="text" value="'+ $(this).attr('price') +'" name="order[products['+ $(this).attr('product-id') +']][price_luc]" id="order_products_'+ $(this).attr('product-id') +'__price_luc"></td>',
-          '<td><input size="3" class="product-qty" type="text" value="0" name="order[products['+ $(this).attr('product-id') +']][qty]" id="order_products_'+ $(this).attr('product-id') +'__qty"></td>',
-          '<td><input size="2" class="product-discount" type="text" value="0" name="order[products['+ $(this).attr('product-id') +']][discount]" id="order_products_'+ $(this).attr('product-id') +'__discount"  placeholder="Discount"> %</td>',
-          '<td><input size="5" class="product-price" type="text" value="'+ $(this).attr('price') +'" name="order[products['+ $(this).attr('product-id') +']][price_discounted]" id="order_products_'+ $(this).attr('product-id') +'__price_discounted"></td>',
-          '<td class="product-total">0</td>',
-          '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
-      '</tr>'
-      ].join(''));
-    }
-  });
+
 
 </script>
 
