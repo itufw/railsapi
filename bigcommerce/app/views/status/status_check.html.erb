@@ -18,7 +18,9 @@
     <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
     <% if @status_name == "Picking" %>
       <%= submit_tag 'Picked', class: 'btn btn-primary'%>
-      <%= submit_tag 'Paperwork', class: 'btn btn-primary'%>
+      <%= submit_tag 'Print Picking List', class: 'btn btn-primary'%>
+      <%= submit_tag 'Print Invoices', class: 'btn btn-primary'%>
+      <%= submit_tag 'Print Picking Sheets', class: 'btn btn-primary'%>
     <% else %>
       <%= submit_tag 'Ready', class: 'btn btn-primary'%>
     <% end %>

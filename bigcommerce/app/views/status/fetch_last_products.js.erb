@@ -12,6 +12,15 @@ state.val('<%= @last_order.state%>');
 postcode.val('<%= @last_order.postcode %>');
 country.val('<%= @last_order.country%>');
 
+last_order.append([
+  '<td class="last-order-td">',
+    '<%= link_to @last_order.id.to_s, controller: "order", action: "details", order_id: @last_order.id%>',
+  '</td>',
+  '<td class="last-order-td">',
+    '<%= @last_order.date_created.to_s + "  | Total: " + @last_order.total_inc_tax.to_s%>',
+  '</td>'
+].join(''));
+last_order.show();
 
 <% customer = @last_order.customer %>
 billing_street.val('<%= customer.street%>');

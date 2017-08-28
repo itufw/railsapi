@@ -172,6 +172,16 @@ class OrderController < ApplicationController
     @order = Order.find(params[:order_id])
   end
 
+  def order_email
+    begin
+      @order = Order.find(params[:order_id])
+      
+    rescue Exception => ex
+      flash[:error] = ex.message
+      redirect :back and return
+    end
+  end
+
 
   private
   def order_params
