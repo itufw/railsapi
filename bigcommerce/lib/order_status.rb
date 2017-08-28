@@ -6,11 +6,17 @@ module OrderStatus
     selected_orders = selected_orders.first.split unless selected_orders.blank? || selected_orders.count > 1
 
     # Print Shipping List
-    if "Paperwork" == params[:commit] && !selected_orders.blank?
+    if "Print Picking List" == params[:commit] && !selected_orders.blank?
       # Print Picking Sheet
       # Due to Rails redirect conflicts
+      pdf = print_picking_list(selected_orders)
+      return ['print_picking_list', pdf]
+    elsif "Print Invoices" == params[:commit] && !selected_orders.blank?
+      pdf = print_invoices(selected_orders)
+      return ['print_invoice', pdf]
+    elsif "Print Picking Sheets" == params[:commit] && !selected_orders.blank?
       pdf = print_shipping_sheet(selected_orders)
-      return ['Paperwork', pdf]
+      return ['print_picking_sheet', pdf]
     end
 
     case params[:commit]
@@ -90,10 +96,9 @@ module OrderStatus
     ['Next', selected_orders]
   end
 
-  def print_shipping_sheet(selected_orders)
+  def print_invoices(selected_orders)
     orders = Order.joins(:customer).where(id: selected_orders)
     pdf = CombinePDF.new
-    picking_slips = CombinePDF.new
     orders.each do |order|
       order_invoice = WickedPdf.new.pdf_from_string(
         render_to_string(
@@ -102,25 +107,32 @@ module OrderStatus
             )
         )
       pdf << CombinePDF.parse(order_invoice)
+    end
+    pdf
+  end
 
+  def print_picking_list(selected_orders)
+    orders = Order.where(id: selected_orders)
+    picking_slips = CombinePDF.new
+    orders.each do |order|
       packing_slip = WickedPdf.new.pdf_from_string(
         render_to_string(
             :template => 'pdf/packing_slip.pdf',
             :locals => {order: order, customer: order.customer}
             )
         )
-
       picking_slips << CombinePDF.parse(packing_slip)
     end
-    pdf << picking_slips
+    picking_slips
+  end
 
+  def print_shipping_sheet(selected_orders)
     picking_sheet = WickedPdf.new.pdf_from_string(
       render_to_string(
           template: 'pdf/picking_sheet.pdf',
           locals: {order_products: OrderProduct.where(order_id: selected_orders, display: 1) }
           )
       )
-    pdf << CombinePDF.parse(picking_sheet)
-    pdf
+    picking_sheet
   end
 end

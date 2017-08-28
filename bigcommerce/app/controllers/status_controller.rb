@@ -61,8 +61,12 @@ class StatusController < ApplicationController
     #  In lib/order_status
     status, result = order_status_handler(params, order_params, session[:user_id])
     case status
-    when 'Paperwork'
-      send_data result.to_pdf, filename: "picking_sheet_#{session[:username]}_#{Date.today.to_s}.pdf" and return
+    when 'print_picking_sheet'
+      send_data result, filename: "picking_sheet_#{session[:username]}_#{Date.today.to_s}.pdf" and return
+    when 'print_invoice'
+      send_data result.to_pdf, filename: "Invoices_#{session[:username]}_#{Date.today.to_s}.pdf" and return
+    when 'print_picking_list'
+      send_data result.to_pdf, filename: "picking_list_#{session[:username]}_#{Date.today.to_s}.pdf" and return
     when 'Group Update'
       redirect_to controller: 'order', action: 'all' and return
     when 'Label Error'

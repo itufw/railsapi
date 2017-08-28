@@ -5,6 +5,7 @@
   <%= link_to '<i class="glyphicon glyphicon-refresh" title="Update"></i>'.html_safe, action: 'order_confirmation', order_id: @order_id if user_full_right(session[:authority]) %>
   <%= link_to '<i class="glyphicon glyphicon-print" title="Print Invoice!"></i>'.html_safe, action: 'generate_invoice', order_id: @order_id%>
   <%= link_to '<i class="glyphicon glyphicon-hand-right" title="History!"></i>'.html_safe, action: 'order_history', order_id: @order_id%>
+  <%= link_to '<i class="glyphicon glyphicon-envelope" title="Send Email!"></i>'.html_safe, action: 'order_email', order_id: @order_id%>
 </center>
 
 <%= render "partials/order", orders: @order, display_class: "none", product_ids: nil %>
