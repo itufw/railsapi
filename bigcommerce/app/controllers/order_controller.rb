@@ -132,7 +132,8 @@ class OrderController < ApplicationController
     order.assign_attributes(order_attributes)
 
     products_container = []
-    products_params.each do |product_id, product_params|
+    products_params.each do |keys, product_params|
+      product_id = product_params['product_id']
       if products.map(&:product_id).include? product_id.to_i
         # update
         product = products.where(product_id: product_id).first
@@ -146,7 +147,7 @@ class OrderController < ApplicationController
       else
         # insert
         product = OrderProduct.new(product_params.permit(:price_luc, :qty, :discount, :price_discounted))
-        product_attributes = {'product_id': prduct_id, 'order_id': order.id, 'qty_shipped': 0,\
+        product_attributes = {'product_id': product_id, 'order_id': order.id, 'qty_shipped': 0,\
           'base_price': product.price_luc / (1 + wet), 'stock_previous': 0, 'stock_current': product.qty,\
           'stock_incremental': product.qty, 'display': 1, 'damaged': 0, 'created_by': session[:user_id],\
           'order_discount': order.discount_rate, 'price_handling': handling_fee,\

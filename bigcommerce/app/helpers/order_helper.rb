@@ -62,9 +62,9 @@ module OrderHelper
 
     order.save
 
-    products_params.each do |product_id, product_params|
-      product = OrderProduct.new(product_params.permit(:price_luc, :qty, :discount, :price_discounted))
-      product_attributes = {'product_id': product_id, 'order_id': order.id, 'qty_shipped': 0,\
+    products_params.each do |keys, product_params|
+      product = OrderProduct.new(product_params.permit(:product_id, :price_luc, :qty, :discount, :price_discounted))
+      product_attributes = {'order_id': order.id, 'qty_shipped': 0,\
           'order_discount': order.discount_rate, 'price_handling': handling_fee, 'stock_previous': 0,\
           'display': 1, 'damaged': 0, 'created_by': session[:user_id], 'updated_by': session[:user_id]}
       product.assign_attributes(product_attributes)
