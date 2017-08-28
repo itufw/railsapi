@@ -8,12 +8,14 @@
             <th>Customer</th>
             <% if @order.customer_id.nil? || @order.customer_id == ""%>
               <td class="customer_autocomplete">
-                <%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 50 %>
+                <%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 30 %>
               </td>
             <% else %>
-              <td><input type="text" name="customer" id="<%= @order.customer_id %>" value="<%= Customer.find(@order.customer_id).actual_name%>" readonly="readonly" size="50px"></td>
+              <td><input type="text" name="customer" id="<%= @order.customer_id %>" value="<%= Customer.find(@order.customer_id).actual_name%>" readonly="readonly" size="30px"></td>
             <% end %>
+            <td><input type="checkbox" id="customer_purchase_order" style="display: inline-block;"> Customer Order</td>
           </tr>
+          <tr style="display: none;" class="customer-purchase-order-tr"></tr>
           <tr style="display: none;" class="last_order"></tr>
         </table>
       </div>
@@ -35,6 +37,16 @@
               $('.product_autocomplete').html('<%= autocomplete_field_tag 'product', '', autocomplete_product_ws_activity_index_path, placeholder: 'Search WS Product', id_element: '#product_id', id: 'product_ws_search'%>');
             }else{
               $('.product_autocomplete').html('<%= autocomplete_field_tag 'product', '', autocomplete_product_name_activity_index_path, placeholder: 'Search Product', id_element: '#product_id', id: 'product_search'%>');
+            }
+          });
+
+          $('input#customer_purchase_order').change(function(){
+            if (this.checked){
+              $('.customer-purchase-order-tr').html('<td colspan="3"><input placeholder="Customer Purchase Order" type="text" name="order[customer_purchase_order]" id="order_customer_purchase_order"></td>');
+              $('.customer-purchase-order-tr').show();
+            }else{
+              $('.customer-purchase-order-tr').hide();
+              $('.customer-purchase-order-tr').html("");
             }
           });
         </script>

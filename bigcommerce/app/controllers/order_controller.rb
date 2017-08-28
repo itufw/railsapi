@@ -175,7 +175,7 @@ class OrderController < ApplicationController
   def order_email
     begin
       @order = Order.find(params[:order_id])
-      
+
     rescue Exception => ex
       flash[:error] = ex.message
       redirect :back and return
@@ -191,7 +191,7 @@ class OrderController < ApplicationController
                                   :shipping_cost, :total_inc_tax, :wet, :gst, \
                                   :customer_notes, :staff_notes, :address, :modified_wet,\
                                   :billing_address, :delivery_instruction, :street,\
-                                  :city, :state, :postcode, :country)
+                                  :city, :state, :postcode, :country, :customer_purchase_order)
   end
 
   def products_params
