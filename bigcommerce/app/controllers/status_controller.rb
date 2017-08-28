@@ -102,7 +102,7 @@ class StatusController < ApplicationController
     orders = Order.where(customer_id: params[:customer_id]).order('updated_at DESC')
     @last_order = orders.first
     order_ids = orders.map(&:id)
-    @ops = OrderProduct.where("order_id IN (?) AND created_at > ?", order_ids, (Date.today - 3.month).to_s(:db))
+    @ops = OrderProduct.where("order_id IN (?) AND created_at > ?", order_ids, (Date.today - 3.month).to_s(:db)).limit(10)
     respond_to do |format|
       format.js
     end
