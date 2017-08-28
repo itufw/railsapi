@@ -97,6 +97,11 @@ class OrderController < ApplicationController
   end
 
   def save_order
+    if products_params.nil? || products_params.blank? || products_params.values().map {|x| x['qty'].to_i }.sum
+      flash[:error] = 'Wrong Products!'
+      redirect :back and return
+    end
+
     # Order Helper -> Move to Lib later
     order_creation(order_params, products_params, customer_params)
     redirect_to controller: 'activity', action: 'add_note', customer_id: order_params[:customer_id] and return if params["button"] == "new_note"
