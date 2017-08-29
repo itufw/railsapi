@@ -103,9 +103,9 @@ class OrderController < ApplicationController
   end
 
   def save_order
-    if products_params.nil? || products_params.blank? || products_params.values().map {|x| x['qty'].to_i }.sum
+    if products_params.nil? || products_params.blank? || products_params.values().map {|x| x['qty'].to_i }.sum==0
       flash[:error] = 'Wrong Products!'
-      redirect :back and return
+      redirect_to :back and return
     end
 
     # Order Helper -> Move to Lib later
