@@ -87,16 +87,17 @@
   </thead>
   <tbody class="product-list">
     <% f.object.order_products.each do |product| %>
+      <%= f.fields_for "products[#{product.product_id}]", product do |product_form|%>
+
     <tr id="tr_<%= product.product_id%>">
-      <td><%= product.product_id %></td>
+      <td><%= product_form.text_field :product_id, size: "5", readonly: true, class: 'product_id' %></td>
       <td><%= Product.find(product.product_id).name %></td>
       <td class="product-inventory"><%= Product.find(product.product_id).inventory %></td>
-      <%= f.fields_for "products[#{product.product_id}]", product do |product_form|%>
-        <td><%= product_form.text_field :price_luc, size: "5", readonly: true, class: 'product-luc' %></td>
-        <td><%= product_form.text_field :qty, size: "3", class: 'product-qty' %></td>
-        <td><%= product_form.text_field :discount, size: "2", class: 'product-discount' %>%</td>
-        <td><%= product_form.text_field :price_discounted, size: "5", class: 'product-price' %></td>
-        <td class="product-total"><%= (product.qty * product.price_discounted).round(4) %></td>
+      <td><%= product_form.text_field :price_luc, size: "5", readonly: true, class: 'product-luc' %></td>
+      <td><%= product_form.text_field :qty, size: "3", class: 'product-qty' %></td>
+      <td><%= product_form.text_field :discount, size: "2", class: 'product-discount' %>%</td>
+      <td><%= product_form.text_field :price_discounted, size: "5", class: 'product-price' %></td>
+      <td class="product-total"><%= (product.qty * product.price_discounted).round(4) %></td>
       <% end %>
     </tr>
     <% end %>
@@ -206,7 +207,7 @@
 
     $('.product-table tbody.product-list').append([
       '<tr id="tr_'+ data.item.id +'">',
-        '<td><input size="2" readonly="readonly" class="product-id" type="text" value="'+ data.item.id +'" name="order[products['+ product_count +']][product_id]" id="order_products_'+ product_count +'__product_id"></td>',
+        '<td><input size="5" readonly="readonly" class="product-id" type="text" value="'+ data.item.id +'" name="order[products['+ product_count +']][product_id]" id="order_products_'+ product_count +'__product_id"></td>',
         '<td>'+ data.item.label +'</td>',
         '<td class="product-inventory">'+ data.item.inventory +'</td>',
         '<td><input size="5" readonly="readonly" class="product-luc" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_luc]" id="order_products_'+ product_count +'__price_luc"></td>',
@@ -224,7 +225,7 @@
 
     $('.product-table tbody.product-list').append([
       '<tr id="tr_'+ $(this).attr('product-id') +'">',
-        '<td><input size="2" readonly="readonly" class="product-id" type="text" value="'+ $(this).attr('product-id') +'" name="order[products['+ product_count +']][product_id]" id="order_products_'+ product_count +'__product_id"></td>',
+        '<td><input size="5" readonly="readonly" class="product-id" type="text" value="'+ $(this).attr('product-id') +'" name="order[products['+ product_count +']][product_id]" id="order_products_'+ product_count +'__product_id"></td>',
         '<td>'+ $(this).attr('name') +'</td>',
         '<td class="product-inventory">'+ $(this).attr('inventory') +'</td>',
         '<td><input size="5" readonly="readonly" class="product-luc" type="text" value="'+ $(this).attr('price') +'" name="order[products['+ product_count +']][price_luc]" id="order_products_'+ product_count +'__price_luc"></td>',
