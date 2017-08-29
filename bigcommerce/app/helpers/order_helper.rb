@@ -33,33 +33,26 @@ module OrderHelper
     [per_page, orders]
   end
 
-  def account_approval(customer_id)
-    customer = Customer.find(customer_id)
-    # tolerance data vary based on the customer tolerance Date (TO BE built)
-    tolerance_date = (Date.today - 30.days).to_s(:db)
-    over_due_orders = XeroInvoice.filter_by_contact_id(customer.xero_contact_id).period_select(tolerance_date) unless customer.xero_contact_id.nil? || customer.xero_contact_id == ""
-    return 'Approved' if over_due_orders.nil? || over_due_orders.blank?
-    'Hold-Account'
-  end
-
   def order_creation(order_params, products_params, customer_params)
     wet = TaxPercentage.wet_percentage * 0.01
     handling_fee = TaxPercentage.handling_fee
     gst = TaxPercentage.gst_percentage * 0.01
 
+    customer = Customer.find(order.customer_id)
+
     # 100XXXXX CMS orders
     order_id = Order.select('MAX(id) as id').first.id
     order_id = (order_id > 10000000) ? order_id + 1 : order_id + 10000001
     order = Order.new(order_params)
-    order_attributes = {'id': order_id, 'staff_id': Customer.find(order.customer_id).staff_id,\
+    order_attributes = {'id': order_id, 'staff_id': customer.staff_id,\
+      'account_status': customer.account_approval(order.total_inc_tax),\
       'qty': products_params.values().map {|x| x['qty'].to_i }.sum, 'items_shipped': 0,\
       'wrapping_cost': 0, 'active': 1, 'date_created': Time.now.to_s(:db), 'source': 'Manual',\
-      'courier_status_id': 1, 'status_id': 11, 'created_by': session[:user_id], 'last_updated_by': session[:user_id]}
+      'courier_status_id': 1, 'status_id': 11, 'created_by': session[:user_id],\
+      'last_updated_by': session[:user_id]}
     order.assign_attributes(order_attributes)
 
     order.handling_cost = order.qty * handling_fee
-    order.account_status = account_approval(order.customer_id)
-
     order.save
 
     products_params.each do |keys, product_params|
