@@ -24,7 +24,7 @@ class Order < ActiveRecord::Base
   after_validation :record_history, on: [:update, :delete], unless: ->(obj){ obj.xero_invoice_number_changed? or obj.xero_invoice_id_changed?}
   after_validation :cancel_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id == 5}
   after_validation :recovery_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id_was == 5}
-  after_validation :bigcommerce_status_update, on: [:update], if: ->(obj){obj.status_id_changed? and obj.source=='bigcommerce' and [2,3,4,5,6,7,8,9,10,11,12,13, 26].include?obj.status_id and obj.last_updated_by!=34}
+  after_validation :bigcommerce_status_update, on: [:update], if: ->(obj){obj.status_id_changed? and obj.source=='bigcommerce' and [2,3,4,5,6,7,8,9,10,11,12,13,26].include?obj.status_id and obj.last_updated_by!=34}
 
 
   self.per_page = 30
@@ -144,7 +144,7 @@ class Order < ActiveRecord::Base
   end
 
   def self.statuses_filter(status_id)
-    return where(status_id: status_id, courier_status_id: 1) if (!status_id.nil?) && (status_id.include?8) && !(status_id.include?2)
+    # return where(status_id: status_id, courier_status_id: 1) if (!status_id.nil?) && (status_id.include?8) && !(status_id.include?2)
     return where(status_id: status_id) unless status_id.nil? || status_id.blank?
     all
   end
