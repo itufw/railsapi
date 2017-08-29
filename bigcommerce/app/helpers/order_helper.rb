@@ -38,12 +38,14 @@ module OrderHelper
     handling_fee = TaxPercentage.handling_fee
     gst = TaxPercentage.gst_percentage * 0.01
 
-    customer = Customer.find(order.customer_id)
 
     # 100XXXXX CMS orders
     order_id = Order.select('MAX(id) as id').first.id
     order_id = (order_id > 10000000) ? order_id + 1 : order_id + 10000001
     order = Order.new(order_params)
+
+    customer = Customer.find(order.customer_id)
+
     order_attributes = {'id': order_id, 'staff_id': customer.staff_id,\
       'account_status': customer.account_approval(order.total_inc_tax),\
       'qty': products_params.values().map {|x| x['qty'].to_i }.sum, 'items_shipped': 0,\
