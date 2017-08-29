@@ -27,7 +27,9 @@ module OrderStatus
       Order.where(id: selected_orders).update_all(status_id: 25, last_updated_by: user_id)
       return ['Group Update', '']
     when 'Shipped'
-      Order.where(id: selected_orders).update_all(status_id: 2, last_updated_by: user_id)
+      Order.where(id: selected_orders).each do |order|
+        order.update_attributes({status_id: 2, last_updated_by: user_id})
+      end
       return ['Group Update', '']
     when 'Approve'
       Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 9, last_updated_by: user_id}))
