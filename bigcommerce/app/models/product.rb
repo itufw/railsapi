@@ -288,6 +288,10 @@ class Product < ActiveRecord::Base
     where(product_no_vintage_id: id)
   end
 
+  def self.incompleted
+    where('product_no_vintage_id IS NULL OR product_no_ws_id IS NULL OR producer_country_id IS NULL')
+  end
+
   private
 
   def bigcommerce_inventory_overwrite

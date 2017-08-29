@@ -175,10 +175,15 @@ class OrderProduct < ActiveRecord::Base
 	private
 	# inventory trigger
 	def stock_change
+		product_id = self.product_id
+		stock_incremental = self.stock_incremental
+
 		return if self.order.source == 'bigcommerce'
+		return if stock_incremental == 0
+		
+		Bigcommerce::Product.update(product_id, inventory_level: Bigcommerce::Product.find(product_id).inventory_level - stock_incremental)
 		sql = "UPDATE products SET inventory = inventory - '#{self.stock_incremental}' WHERE id = '#{self.product_id}'"
 		ActiveRecord::Base.connection.execute(sql)
-		Bigcommerce::Product.update(self.product_id, inventory_level: Bigcommerce::Product.find(self.product_id).inventory_level - self.stock_incremental) if (self.stock_incremental != 0)
 	end
 
 	def product_display_check

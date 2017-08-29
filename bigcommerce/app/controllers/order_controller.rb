@@ -149,7 +149,7 @@ class OrderController < ApplicationController
     products_container = []
     products_params.each do |keys, product_params|
       product_id = product_params['product_id']
-      if products.map(&:product_id).include? product_id.to_i
+      if products.map(&:product_id).include?product_id.to_i
         # update
         product = products.where(product_id: product_id).first
         product.assign_attributes(product_params.permit(:price_luc, :qty, :discount, :price_discounted))
