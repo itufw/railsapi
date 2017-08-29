@@ -29,6 +29,7 @@ class Product < ActiveRecord::Base
   belongs_to :product_no_vintage
   belongs_to :product_no_ws
 
+  # DO NOT USE
   after_validation :bigcommerce_inventory_overwrite, on: [:update], if: -> (obj){ obj.id == 2233 and obj.inventory_changed?}
 
   scoped_search on: %i[id name portfolio_region]
@@ -290,6 +291,6 @@ class Product < ActiveRecord::Base
   private
 
   def bigcommerce_inventory_overwrite
-    Bigcommerce::Product.update(self.id, inventory_level: self.inventory)
+    # Bigcommerce::Product.update(self.id, inventory_level: self.inventory)
   end
 end
