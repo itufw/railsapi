@@ -23,6 +23,12 @@ class OrderController < ApplicationController
      	@per_page, @orders = order_display_(params, orders)
     end
 
+    def print_order
+      #@can_update_bool = allow_to_update(session[:user_id])
+      @staff, @status, orders, @search_text, @order_id = order_controller_filter(params, "display_report")
+      @per_page, @orders = order_display_(params, orders)
+    end
+
   	def for_product
   		@product_id = params[:product_id]
   		@product_name = params[:product_name]
