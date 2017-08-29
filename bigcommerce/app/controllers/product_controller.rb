@@ -141,12 +141,7 @@ class ProductController < ApplicationController
     @pending_stock = params[:pending_stock].to_i
   end
 
-  def new_vintage
+  # TODO
+  def incomplete_product
   end
-
-  # Get Sample products
-  def samples
-
-  end
-
 end
