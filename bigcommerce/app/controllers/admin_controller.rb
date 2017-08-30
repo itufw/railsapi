@@ -165,7 +165,7 @@ class AdminController < ApplicationController
       when 'Shipment'
         send_data export_shipment(Date.parse(params[:date][:start_date]), Date.parse(params[:date][:end_date])), filename: "ship-#{Date.parse(params[:date][:end_date])}.csv" and return
       when 'ScotPac'
-        send_data export_orders(12, (Date.today - 5.years), Date.today), filename: "ScotPac-#{Date.parse(params[:date][:end_date])}.csv" and return
+        send_data export_orders(12, (Date.today - 8.years), Date.today), filename: "ScotPac-#{Date.parse(params[:date][:end_date])}.csv" and return
       end
       redirect_to :back
     end

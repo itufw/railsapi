@@ -148,8 +148,19 @@ class ProductController < ApplicationController
 
   def update
     product = Product.find(params[:product][:id])
-    product.update_attributes(product_params)
+    product.assign_attributes(product_params)
+    product.producer_country_id = product.producer.producer_country_id
+    product.name_no_vintage = product.product_no_vintage.name
+    product.save
+
     redirect_to action: 'summary', product_id: product.id, product_name: product.name, transform_column: 'product_id', total_stock: product.inventory, pending_stock: product.inventory
+  end
+
+  def fetch_product_details
+    @product = Product.find(params[:product_id])
+    respond_to do |format|
+      format.js
+    end
   end
 end
 
@@ -158,5 +169,6 @@ private
 def product_params
   params.require(:product).permit(:producer_id, :product_type_id, :warehouse_id,\
    :product_size_id, :product_no_ws_id, :name_no_ws, :product_no_vintage_id,\
-   :case_size, :product_package_type_id)
+   :case_size, :product_package_type_id, :retail_ws, :vintage, :name_no_winery_no_vintage,\
+   :blend_type, :order_1, :order_2, :combined_order, :producer_ragion_id)
 end

@@ -1,22 +1,38 @@
 <%= title 'Edit ' + @product.name %>
 <h3><%= @product.name %></h3>
 <%= form_for @product, url: {action: "update"}, method: "POST", html: {class: "form-group", style: "padding-left: 50px;"} do |f| %>
+  <%= f.label :search_for_similar_product, class: 'margin-from-top label-new' %>
+  <%= autocomplete_field_tag 'product_search', '', autocomplete_product_name_activity_index_path, placeholder: 'Search Products', id: 'product_search',size: 30 %>
+  <br/>
+
   <%= f.hidden_field :id %>
   <%= @product.id.to_s + '   ' + @product.name %><br/>
 
   <%= f.label :producer, class: 'margin-from-top label-new' %>
   <%= f.collection_select :producer_id, Producer.all.order(:name), :id, :name, {class: "form-control quarter-size"} %><br/>
+  <%= f.label :produce_ragion, class: 'margin-from-top label-new' %>
+  <%= f.collection_select :producer_region_id, ProducerRegion.all.order(:name), :id, :name, {class: "form-control quarter-size"} %><br/>
+
   <%= f.label :product_type, class: 'margin-from-top label-new' %>
   <%= f.collection_select :product_type_id, ProductType.all, :id, :name, {class: "form-control quarter-size"} %><br/>
   <%= f.label :warehouse, class: 'margin-from-top label-new' %>
   <%= f.collection_select :warehouse_id, Warehouse.all, :id, :name, {class: "form-control quarter-size"} %><br/>
   <%= f.label :product_size, class: 'margin-from-top label-new' %>
-  <%= f.collection_select :product_size_id, ProductSize.all, :id, :name, {class: "form-control quarter-size"} %><br/>
+  <%= f.collection_select :product_size_id, ProductSize.all, :id, :name, {class: "form-control quarter-size"} %>
   <%= f.label :package_type, class: 'margin-from-top label-new' %>
   <%= f.collection_select :product_package_type_id, ProductPackageType.all, :id, :name, {class: "form-control quarter-size"} %><br/>
   <%= f.label :case_size, class: 'margin-from-top label-new' %>
   <%= f.number_field :case_size, placeholder: 'Case Size'%><br/>
 
+
+  <%= f.label :retail_or_ws, class: 'margin-from-top label-new' %>
+  <%= f.collection_select :retail_ws, ['R','WS'], :to_s, :to_s %><br/>
+  <%= f.label :blend_type, class: 'margin-from-top label-new' %>
+  <%= f.text_field :blend_type, placeholder: 'Blend Type' %><br/>
+  <%= f.label :order_1_2, class: 'margin-from-top label-new'%>
+  <%= f.number_field :order_1, placeholder: 'Order 1' %>
+  <%= f.number_field :order_2, placeholder: 'Order 2' %>
+  <%= f.number_field :combined_order, placeholder: 'Combined Order' %><br/>
 
   <%= f.label :search_for_no_ws, class: 'margin-from-top label-new' %>
   <%= autocomplete_field_tag 'product_no_ws_search', '', autocomplete_product_no_ws_name_activity_index_path, placeholder: 'Search Product No WS', id: 'product_no_ws_search',size: 15 %>
@@ -24,17 +40,52 @@
   <%= f.label :product_no_ws_id, class: 'margin-from-top label-new' %>
   <%= f.text_field :product_no_ws_id, readonly: true, placeholder: 'Product No WS ID' %>
   <%= f.label :product_no_ws_name, class: 'margin-from-top label-new' %>
-  <%= f.text_field :name_no_ws, readonly: true, placeholder: 'Name No WS' %>
+  <%= f.text_field :name_no_ws, readonly: true, placeholder: 'Name No WS', size: 30 %>
   <%= f.label :product_no_vintage_id, class: 'margin-from-top label-new' %>
   <%= f.text_field :product_no_vintage_id, readonly: true, placeholder: 'Product No Vintage ID' %>
+  <%= f.label :vintage, class: 'margin-from-top label-new' %>
+  <%= f.number_field :vintage, placeholder: 'Product No Vintage ID' %>
+
   <br/>
+  <%= f.label :product_name_no_winery_no_vintage, class: 'margin-from-top label-new' %>
+  <%= f.text_field :name_no_winery_no_vintage %><br/>
+
+
   <%= submit_tag 'Edit!', class: 'btn btn-primary' %>
 <% end %>
 
 <script type="text/javascript">
+
+var producer_id = $('select#product_producer_id');
+var producer_region = $('select#product_producer_region_id');
+var product_type = $('select#product_product_type_id');
+var warehouse = $('select#product_warehouse_id');
+var product_size = $('select#product_product_size_id');
+var package_type = $('select#product_package_type_id');
+var case_size = $('select#product_case_size');
+var retail_ws = $('select#product_retail_ws');
+var blend_type = $('select#product_blend_type');
+var order_1 = $('select#product_order_1');
+var order_2 = $('select#product_order_2');
+var combined_order = $('select#product_combined_order');
+var product_no_ws = $('#product_product_no_ws_id');
+var name_no_ws = $('#product_name_no_ws');
+var product_no_vintage = $('#product_product_no_vintage_id');
+var vintage = $('#product_vintage');
+var product_name_no_winery_no_vintage = $('#product_product_name_no_winery_no_vintage');
+
 $(document).on('railsAutocomplete.select', '#product_no_ws_search',function(event, data){
-  $('#product_product_no_ws_id').attr('value', data.item.id);
-  $('#product_name_no_ws').attr('value', data.item.value);
-  $('#product_product_no_vintage_id').attr('value', data.item.product_no_vintage_id);
+  product_no_ws.attr('value', data.item.id);
+  name_no_ws.attr('value', data.item.value);
+  product_no_vintage.attr('value', data.item.product_no_vintage_id);
+});
+
+
+$(document).on('railsAutocomplete.select', '#product_search',function(event, data){
+  var link = "/fetch_product_details?product_id=" + data.item.id
+  $.ajax({
+      type: 'GET',
+      url: link
+  });
 });
 </script>
