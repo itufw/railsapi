@@ -99,6 +99,10 @@ class Fastway
 
     customer = order.customer
     packaging = packaging_selection(order)
+
+    # Return Error if cannot find the error
+    return packaging unless packaging.is_a?Integer
+
     packaging = 1 if packaging==1765 && ((dozen > 0) || (dozen+half_dozen>1))
 
     item_number = 0
@@ -143,7 +147,12 @@ class Fastway
     # Satchel A2 = 4
     # Satchel A3 = 5
     # Satchel A4 (Not available in Australia) = 6 Satchel A5 (Not available in South Africa) = 7
-    result = psc(order.city, order.postcode, 5)
+    result = eta(order.city, order.postcode, 5)
+
+    # Return error if it cannot find the address
+    return result unless result['error'].nil?
+
+    order.update_attribute(eta: result['result']['target_delivery']['earliest_delivery_date'].to_date.to_s(:db))
     parcel_color = result['result']['services'].select{|x| x.values().include? 'Parcel'}.first['labelcolour_pretty_array']
     return 18 if (parcel_color.map(&:upcase).include? 'GREEN') || (parcel_color.map(&:upcase).include? 'ORANGE')
     return 1765 if (parcel_color.map(&:upcase).include? 'RED') || (parcel_color.map(&:upcase).include? 'RED')
@@ -171,6 +180,7 @@ class Fastway
   def eta(suburb, postcode, weight)
     # result['result']['target_delivery']['earliest_delivery_date']
     # Earliest Date
+    # result['result']['target_delivery']['earliest_delivery_date'].to_date.to_s(:db)
     @query[:query][:RFCode] = 'MEL'
     @query[:query][:Suburb] = suburb
     @query[:query][:Postcode] = postcode

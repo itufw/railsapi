@@ -625,7 +625,7 @@ ActiveRecord::Schema.define(version: 20170828053912) do
     t.string   "SpecialInstruction2",     limit: 50
     t.string   "SpecialInstruction3",     limit: 50
     t.string   "customer_purchase_order", limit: 255
-    t.datetime "expected_delivery_date"
+    t.datetime "eta"
   end
 
   add_index "orders", ["customer_id"], name: "index_orders_on_customer_id", using: :btree
