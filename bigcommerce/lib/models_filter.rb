@@ -96,6 +96,8 @@ module ModelsFilter
       product_sub_type_id, product_sub_type = collection_param_filter(params, :product_sub_type, ProductSubType)
       products = Product.search(search_text).producer_country_filter(producer_country_id).sub_type_filter(product_sub_type_id)
 
+      products = Product.incompleted unless params[:incompleted].nil?
+      
       return producer_country, product_sub_type, products, search_text, producer_country_id
     end
   end
