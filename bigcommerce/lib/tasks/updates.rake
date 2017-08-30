@@ -71,7 +71,10 @@ namespace :updates do
 		puts "Event Update Start At #{start_time}"
 		begin
 			import_into_customer_tags
-			calendar_event_update(Revision.google.start_time)
+			StaffCalendarAddress.where(sync_calendar: 1).each do |staff_calendars|
+				calendar_event_update(Revision.google.start_time, [staff_calendars])
+			end
+
 			puts "Event Update End AT #{Time.now}"
 			Revision.google.end_update(start_time, Time.now)
 		rescue Exception => ex
