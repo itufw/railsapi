@@ -18,7 +18,7 @@
                 <td></td>
               <% end %>
 
-              <% if '-'.eql? customers%>
+              <% if ('-'.eql?customers) || (customers.blank?)%>
                 <td>-</td>
                 <td>-</td>
               <% else %>
@@ -34,7 +34,7 @@
                 <% end %>
               </td>
 
-                <td><%= link_to task.description, controller: "activity", action: "activity_edit", note_id: task.id%></td>
+                <td><%= link_to task.summary.to_s + "\n" + task.description.to_s, controller: "activity", action: "activity_edit", note_id: task.id%></td>
                 <td><%=Staff.find(task.response_staff).nickname%></td>
                 <%
                   # ['Created_date', 'start_date', 'end_date']
