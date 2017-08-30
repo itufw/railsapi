@@ -25,6 +25,8 @@ Rails.application.routes.draw do
   get '/fetch_last_products', to: 'status#fetch_last_products', as: 'fetch_last_products'
 
   get '/fetch_lead', to: 'lead#fetch_lead', as: 'fetch_lead'
+  get '/fetch_product_details', to: 'product#fetch_product_details', as: 'fetch_product_details'
+
 
   get '/rails/mailers' => 'rails/mailers#index'
   get '/rails/mailers/*path' => 'rails/mailers#preview'
