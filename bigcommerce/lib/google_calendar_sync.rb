@@ -52,10 +52,10 @@ module GoogleCalendarSync
     service
   end
 
-  def calendar_event_update(last_update_date = (Time.now - 1.month))
+  def calendar_event_update(last_update_date = (Time.now - 1.month), staff_calendars = StaffCalendarAddress.all)
     service = connect_google_calendar
     push_pending_events_to_google_offline(service)
-    scrap_from_calendars(service, last_update_date)
+    scrap_from_calendars(service, last_update_date, staff_calendars)
   end
 
   def push_pending_events_to_google_offline(service)
@@ -74,16 +74,14 @@ module GoogleCalendarSync
     end
   end
 
-  def scrap_from_calendars(service, last_update_date)
+  def scrap_from_calendars(service, last_update_date, staff_calendars)
     new_events = []
     # record the events and the calendar id
     calendar_events_pair = {}
 
-    staff_calendars = StaffCalendarAddress.all
-
     service.list_calendar_lists.items.select { |x| staff_calendars.map(&:calendar_address).include?x.id }.each do |calendar|
       # only sync the tasks for last month
-      items = service.list_events(calendar.id).items.select { |x| x.updated.to_s > last_update_date.to_s }
+      items = service.list_events(calendar.id, updated_min: last_update_date.to_datetime.rfc3339, show_deleted: false).items
       calendar_events_pair[calendar.id] = items.map(&:id)
       new_events += items
     end
@@ -93,6 +91,10 @@ module GoogleCalendarSync
   # scrap events from google calendar
   def update_google_events(new_events, staff_calendars, service, calendar_events_pair)
     new_events.each do |event|
+      # filter out the invalid events
+      # Cancelled events
+      next if event.created.nil?
+
       task = Task.filter_by_google_event_id(event.id).first
 
       # insert new task
