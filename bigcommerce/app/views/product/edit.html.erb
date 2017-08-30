@@ -15,7 +15,7 @@
   <%= f.label :package_type, class: 'margin-from-top label-new' %>
   <%= f.collection_select :product_package_type_id, ProductPackageType.all, :id, :name, {class: "form-control quarter-size"} %><br/>
   <%= f.label :case_size, class: 'margin-from-top label-new' %>
-  <%= f.number_field :case_size, placeholder: 'Case Size'%>
+  <%= f.number_field :case_size, placeholder: 'Case Size'%><br/>
 
 
   <%= f.label :search_for_no_ws, class: 'margin-from-top label-new' %>
