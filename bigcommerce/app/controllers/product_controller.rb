@@ -21,6 +21,7 @@ class ProductController < ApplicationController
 
   # Displays all products
   def all
+    params[:incompleted] = true if params[:commit] == 'Incomplete Product'
     filtered_products = filter(params)
     transform(params)
 
@@ -141,8 +142,21 @@ class ProductController < ApplicationController
     @pending_stock = params[:pending_stock].to_i
   end
 
-  def incomplete_product
-    @per_page = params[:per_page] || Product.per_page
-    @products = Product.incompleted.paginate( per_page: @per_page, page: params[:page])
+  def edit
+    @product = Product.find(params[:product_id])
   end
+
+  def update
+    product = Product.find(params[:product][:id])
+    product.update_attributes(product_params)
+    redirect_to action: 'summary', product_id: product.id, product_name: product.name, transform_column: 'product_id', total_stock: product.inventory, pending_stock: product.inventory
+  end
+end
+
+private
+
+def product_params
+  params.require(:product).permit(:producer_id, :product_type_id, :warehouse_id,\
+   :product_size_id, :product_no_ws_id, :name_no_ws, :product_no_vintage_id,\
+   :case_size, :product_package_type_id)
 end

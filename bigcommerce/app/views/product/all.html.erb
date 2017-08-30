@@ -2,7 +2,7 @@
 <h3>Products</h3>
 <%= form_tag({:action => "all"}, {:method => "get"}) do %>
 <% if @transform_column=='product_id' %>
-	<center><%= link_to 'Incomplete Product', controller: 'product', action: 'incomplete_product'%></center>
+	<center><%= submit_tag 'Incomplete Product', class: 'btn btn-link'%></center>
 <% end %>
 
 <div class="form-group container-fluid">

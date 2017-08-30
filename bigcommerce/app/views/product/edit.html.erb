@@ -1,0 +1,40 @@
+<%= title 'Edit ' + @product.name %>
+<h3><%= @product.name %></h3>
+<%= form_for @product, url: {action: "update"}, method: "POST", html: {class: "form-group", style: "padding-left: 50px;"} do |f| %>
+  <%= f.hidden_field :id %>
+  <%= @product.id.to_s + '   ' + @product.name %><br/>
+
+  <%= f.label :producer, class: 'margin-from-top label-new' %>
+  <%= f.collection_select :producer_id, Producer.all.order(:name), :id, :name, {class: "form-control quarter-size"} %><br/>
+  <%= f.label :product_type, class: 'margin-from-top label-new' %>
+  <%= f.collection_select :product_type_id, ProductType.all, :id, :name, {class: "form-control quarter-size"} %><br/>
+  <%= f.label :warehouse, class: 'margin-from-top label-new' %>
+  <%= f.collection_select :warehouse_id, Warehouse.all, :id, :name, {class: "form-control quarter-size"} %><br/>
+  <%= f.label :product_size, class: 'margin-from-top label-new' %>
+  <%= f.collection_select :product_size_id, ProductSize.all, :id, :name, {class: "form-control quarter-size"} %><br/>
+  <%= f.label :package_type, class: 'margin-from-top label-new' %>
+  <%= f.collection_select :product_package_type_id, ProductPackageType.all, :id, :name, {class: "form-control quarter-size"} %><br/>
+  <%= f.label :case_size, class: 'margin-from-top label-new' %>
+  <%= f.number_field :case_size, placeholder: 'Case Size'%>
+
+
+  <%= f.label :search_for_no_ws, class: 'margin-from-top label-new' %>
+  <%= autocomplete_field_tag 'product_no_ws_search', '', autocomplete_product_no_ws_name_activity_index_path, placeholder: 'Search Product No WS', id: 'product_no_ws_search',size: 15 %>
+  <br/>
+  <%= f.label :product_no_ws_id, class: 'margin-from-top label-new' %>
+  <%= f.text_field :product_no_ws_id, readonly: true, placeholder: 'Product No WS ID' %>
+  <%= f.label :product_no_ws_name, class: 'margin-from-top label-new' %>
+  <%= f.text_field :name_no_ws, readonly: true, placeholder: 'Name No WS' %>
+  <%= f.label :product_no_vintage_id, class: 'margin-from-top label-new' %>
+  <%= f.text_field :product_no_vintage_id, readonly: true, placeholder: 'Product No Vintage ID' %>
+  <br/>
+  <%= submit_tag 'Edit!', class: 'btn btn-primary' %>
+<% end %>
+
+<script type="text/javascript">
+$(document).on('railsAutocomplete.select', '#product_no_ws_search',function(event, data){
+  $('#product_product_no_ws_id').attr('value', data.item.id);
+  $('#product_name_no_ws').attr('value', data.item.value);
+  $('#product_product_no_vintage_id').attr('value', data.item.product_no_vintage_id);
+});
+</script>
