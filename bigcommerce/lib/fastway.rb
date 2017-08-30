@@ -152,7 +152,8 @@ class Fastway
     # Return error if it cannot find the address
     return result unless result['error'].nil?
 
-    order.update_attribute(eta: result['result']['target_delivery']['earliest_delivery_date'].to_date.to_s(:db))
+    order.eta = result['result']['target_delivery']['earliest_delivery_date'].to_date.to_s(:db)
+    order.save
     parcel_color = result['result']['services'].select{|x| x.values().include? 'Parcel'}.first['labelcolour_pretty_array']
     return 18 if (parcel_color.map(&:upcase).include? 'GREEN') || (parcel_color.map(&:upcase).include? 'ORANGE')
     return 1765 if (parcel_color.map(&:upcase).include? 'RED') || (parcel_color.map(&:upcase).include? 'RED')
