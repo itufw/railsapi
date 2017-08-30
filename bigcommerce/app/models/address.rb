@@ -27,7 +27,7 @@ class Address < ActiveRecord::Base
 
 			order = Order.find(order_id)
 			if order.street.nil?
-				sql = "UPDATE orders SET street = '#{self.street_1.to_s + ", " + self.street_2.to_s}',
+				sql = "UPDATE orders SET street = '#{self.street_1.to_s}', street_2 = '#{self.street_2.to_s}',
 					city = '#{self.city}', state = '#{self.state}', postcode = '#{self.postcode}',
 					country = '#{self.country}' WHERE id = #{order_id}"
 				ActiveRecord::Base.connection.execute(sql)
