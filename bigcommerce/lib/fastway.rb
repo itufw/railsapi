@@ -108,8 +108,8 @@ class Fastway
     item_number = 0
 
     @query[:query][:CompanyName] = customer.actual_name
-    @query[:query][:Address1] = order.street
-    @query[:query][:Address2] = order.street_2
+    @query[:query][:Address1] = order.street.to_s
+    @query[:query][:Address2] = order.street_2.to_s
     @query[:query][:Suburb] = order.city
     @query[:query][:Postcode] = order.postcode
 
