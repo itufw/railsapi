@@ -12,16 +12,7 @@
 
 <%= render "partials/order_product", order_products: @order.first.order_products, cust_id: @order.first.customer_id, cust_name: customer_name(@order.first.customer) %>
 
-<div class="well panel-default panel" style="margin-top:20px;margin-left:100px;width:30%;float:left;">
-  <h4 class="panel-heading">Customer Notes</h4>
-  <div class="panel-body"><%= @order.first.customer_notes %></div>
-</div>
-
-<div class="well panel-default panel" style="margin-top:20px;margin-left:200px;width:30%;float:left;">
-  <h4 class="panel-heading">Staff Notes</h4>
-  <div class="panel-body"><%= @order.first.staff_notes %></div>
-</div>
-
+<%= render "order_partials/notes", order: @order.first%>
 
 <div class="container">
   <div class="row">

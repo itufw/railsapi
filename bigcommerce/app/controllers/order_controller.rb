@@ -223,6 +223,6 @@ class OrderController < ApplicationController
   end
 
   def customer_params
-    params.require(:order).require(:customer).permit(:street, :city, :state, :postcode, :country)
+    params.require(:order).require(:customer).permit(:street, :city, :state, :postcode, :country, :street_2)
   end
 end

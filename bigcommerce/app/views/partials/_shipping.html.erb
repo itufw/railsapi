@@ -1,5 +1,8 @@
 <!-- Trace Table -->
 <% order = Order.find(order_id) %>
+<p><b>Ship To:</b> <%= order.display_ship_address %></p>
+<p><b>Instruction:  </b><%= order.SpecialInstruction1 + "  \n" + order.SpecialInstruction2 + "   \n" + order.SpecialInstruction3%></p>
+
 <% if [2, 6].include?order.courier_status_id %>
   <h4><%= order.courier_status.description.to_s %> Ship: <%= order.track_number %></h4>
 <% elsif !order.track_number.nil? && order.track_number.length>7%>
