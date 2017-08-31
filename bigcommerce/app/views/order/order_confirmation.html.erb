@@ -2,7 +2,7 @@
 <h3>Order #<%= @order.id %></h3>
 <% customer = @order.customer %>
 
-<center>Date: <i><%= @order.date_created.to_date.strftime('%m/%d/%y')%></i> Due Date:<i><%= (@order.date_created.to_date + customer.tolerance_day.days).strftime('%m/%d/%y')%></i></center>
+<center>Date: <i><%= @order.date_created.to_date.strftime('%m/%d/%y')%></i>     Due Date:<i><%= (@order.date_created.to_date + customer.tolerance_day.days).strftime('%m/%d/%y')%></i></center>
 <% xero_contact = customer.xero_contact %>
 <% unless xero_contact.nil?%>
   <div style="float: right;margin-top:-60px;margin-right:200px; text-align: right;">
@@ -192,17 +192,21 @@
       <!-- Super User Overwrite -->
       <%= f.hidden_field :id %>
       <div class="row" style="margin: auto;">
-        <div class="col-xs-2">
+        <div class="col-xs-3">
           <%= label(:status, 'Status: ')%>
           <%= f.collection_select :status_id, Status.can_update, :id, :name, {selected: @selected_status_id || @order.status_id}, {class: "status-selection", style: 'width: 80px'} %>
         </div>
-        <div class="col-xs-2">
+        <div class="col-xs-3">
           <%= label(:courier, 'Courier Status: ')%>
           <%= f.collection_select :courier_status_id, CourierStatus.all, :id, :name, {}, {class: "courier-selection", style: 'width: 80px'} %>
         </div>
-        <div class="col-xs-2">
+        <div class="col-xs-3">
           <%= label(:account, 'Account Status: ')%>
           <%= f.collection_select :account_status, ['Approved', 'Partially Paid', 'Unpaid', 'Paid', 'Hold-Account'], :to_s, :to_s, {}, {class: "account-selection", style: 'width: 80px'} %>
+        </div>
+        <div class="col-xs-3">
+          <%= label(:ship, 'Track Number: ')%>
+          <%= f.text_field :track_number%>
         </div>
       </div>
       <div class="row" style="margin: auto;">

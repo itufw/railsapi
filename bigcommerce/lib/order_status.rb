@@ -81,7 +81,7 @@ module OrderStatus
         if account_status == "Hold-Account" && status.in_transit == 1
           flash[:error] = "Account Hold for Order#" + order.id.to_s
         else
-          order.assign_attributes(params[:order].permit(:status_id, :account_status, :courier_status_id))
+          order.assign_attributes(params[:order].permit(:status_id, :account_status, :courier_status_id, :track_number))
           order.save
         end
       end

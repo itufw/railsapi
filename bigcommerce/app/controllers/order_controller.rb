@@ -153,7 +153,7 @@ class OrderController < ApplicationController
       'handling_cost': products_params.values().map {|x| x['qty'].to_i }.sum * handling_fee,\
       'last_updated_by': session[:user_id]}
     order.assign_attributes(order_attributes)
-
+    
     products_container = []
     products_params.each do |keys, product_params|
       product_id = product_params['product_id']
@@ -215,7 +215,8 @@ class OrderController < ApplicationController
                                   :shipping_cost, :total_inc_tax, :wet, :gst, \
                                   :customer_notes, :staff_notes, :address, :modified_wet,\
                                   :billing_address, :delivery_instruction, :street,\
-                                  :city, :state, :postcode, :country, :customer_purchase_order)
+                                  :city, :state, :postcode, :country, :customer_purchase_order,\
+                                  :track_number)
   end
 
   def products_params
