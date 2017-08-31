@@ -12,6 +12,9 @@ require 'dates_helper.rb'
 require 'product_helper'
 class ProductController < ApplicationController
   before_action :confirm_logged_in
+  
+  autocomplete :product, :name, full: true
+
 
   include ModelsFilter
   include ProductVariations
