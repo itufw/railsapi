@@ -1,0 +1,312 @@
+<%= f.text_field :customer_id %>
+<div class="row">
+  <div class="col-md-8">
+    <div class="row">
+      <div class="col-md-6">
+        <table id="customer_table">
+          <tr>
+            <th>Customer</th>
+            <% if @order.customer_id.nil? || @order.customer_id == ""%>
+              <td class="customer_autocomplete">
+                <%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 30 %>
+              </td>
+            <% else %>
+              <td><input type="text" name="customer" id="<%= @order.customer_id %>" value="<%= Customer.find(@order.customer_id).actual_name%>" readonly="readonly" size="30px"></td>
+            <% end %>
+            <td><input type="checkbox" id="customer_purchase_order" style="display: inline-block;"> Customer Puchase ID</td>
+          </tr>
+          <tr style="display: none;" class="customer-purchase-order-tr"></tr>
+          <tr style="display: none;" class="last_order"></tr>
+        </table>
+      </div>
+      <div class="col-md-6">
+        <table id="product_table">
+          <tr>
+            <th>Product</th>
+            <td class="product_autocomplete">
+              <%= autocomplete_field_tag 'product', '', autocomplete_product_name_activity_index_path, placeholder: 'Search Product', id_element: '#product_id', id: 'product_search'%>
+            </td>
+          </tr>
+        </table>
+        <!-- WS / All products -->
+        <script type="text/javascript">
+          $('input#customer_purchase_order').change(function(){
+            if (this.checked){
+              $('.customer-purchase-order-tr').html('<td colspan="3"><input placeholder="Customer Purchase Order" type="text" name="order[customer_purchase_order]" id="order_customer_purchase_order"></td>');
+              $('.customer-purchase-order-tr').show();
+            }else{
+              $('.customer-purchase-order-tr').hide();
+              $('.customer-purchase-order-tr').html("");
+            }
+          });
+        </script>
+      </div>
+    </div>
+    <div class="row">
+      <%= render 'partials/order_address_form', f: f %>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <table id="last_products">
+      <tr>
+        <th>Last Ordered Products</th>
+      </tr>
+      <% unless @order.customer_id.nil? || @order.customer_id == ""%>
+        <% Product.where(id: OrderProduct.where("order_id IN (?) AND created_at > ?", @order.customer.orders.map(&:id), (Date.today - 3.month).to_s(:db)).map(&:product_id)).each do |product| %>
+        <tr class="last-order-product" product-id="<%= product.id%>" name="<%= product.name%>" inventory="<%= product.inventory%>" price="<%= product.calculated_price * 1.29%>">
+          <td><%= product.name %></td>
+        </tr>
+        <% end %>
+      <% end %>
+    </table>
+  </div>
+</div>
+
+<table class = "table table-striped table-bordered table-hover table-responsive product-table">
+  <thead>
+    <tr>
+      <th>Product ID</th>
+      <th>Product</th>
+      <th style="width: 3px;">Inventory</th>
+      <th>Price (LUC)</th>
+      <th style="width: 3px;">QTY</th>
+      <th>Discount</th>
+      <th>Discounted Price</th>
+      <th style="width: 7px;">Total</th>
+    </tr>
+  </thead>
+  <tbody class="product-list">
+    <% f.object.order_products.each do |product| %>
+      <%= f.fields_for "products[#{product.product_id}]", product do |product_form|%>
+
+    <tr id="tr_<%= product.product_id%>">
+      <td><%= product_form.text_field :product_id, size: "5", readonly: true, class: 'product_id' %></td>
+      <td><%= Product.find(product.product_id).name %></td>
+      <td class="product-inventory"><%= Product.find(product.product_id).inventory %></td>
+      <td><%= product_form.text_field :price_luc, size: "5", readonly: true, class: 'product-luc' %></td>
+      <td><%= product_form.text_field :qty, size: "3", class: 'product-qty' %></td>
+      <td><%= product_form.text_field :discount, size: "2", class: 'product-discount' %>%</td>
+      <td><%= product_form.text_field :price_discounted, size: "5", class: 'product-price' %></td>
+      <td class="product-total"><%= (product.qty * product.price_discounted).round(4) %></td>
+      <% end %>
+    </tr>
+    <% end %>
+  </tbody>
+  <tr>
+    <td colspan="2" rowspan="4" align="center">
+      <%= f.text_area :customer_notes, style: "border: none; width: 100%; height: 130px; ", placeholder: 'Customer Notes'%>
+    </td>
+    <td colspan="4" rowspan="4" align="center">
+      <%= f.text_area :staff_notes, style: "border: none; width: 100%; height: 130px; ", placeholder: 'Staff Notes'%>
+    </td>
+    <td class="ProductCost" align="right">Subtotal (Inc. WET, Ex. GST)</td>
+    <td class="ProductTotal" align="right"><%= f.text_field :subtotal, readonly: true%></td>
+  </tr>
+  <tr>
+    <td class="ProductCost" align="right">Discount Rate</td>
+    <td class="ProductTotal" align="right"><%= f.text_field :discount_rate %></td>
+  </tr>
+  <tr>
+    <td class="ProductCost" align="right">Discount</td>
+    <td class="ProductTotal" align="right"><%= f.text_field :discount_amount, readonly: true%></td>
+  </tr>
+  <tr>
+    <td class="ProductCost" align="right">Shipping</td>
+    <td class="ProductTotal" align="right"><%= f.text_field :shipping_cost%></td>
+  </tr>
+  <tr>
+    <td colspan="6" rowspan="3" align="center">
+      <%= f.text_area :delivery_instruction, style: "border: none; width: 100%; height: 100px; ", placeholder: 'Delivery Instruction'%>
+    </td>
+    <td class="ProductCost" align="right">WET</td>
+    <td class="ProductTotal" align="right"><%= f.text_field :wet, readonly: true%></td>
+  </tr>
+  <tr>
+    <td class="ProductCost" align="right">GST</td>
+    <td class="ProductTotal" align="right"><%= f.text_field :gst, readonly: true%></td>
+  </tr>
+  <tr>
+    <td class="ProductCost" align="right">Grand Total</td>
+    <td class="ProductTotal" align="right"><%= f.text_field :total_inc_tax, readonly: true%></td>
+  </tr>
+</table>
+<%= f.hidden_field :modified_wet %>
+<div class="row">
+  <div class="col-md-4 col-md-offset-8">
+    <%= link_to '<button type="button" class="btn btn-warning">Cancel</button>'.html_safe, controller: 'order', action: 'all'%>
+
+    <%= button_tag(type: 'submit', class: 'btn btn-primary save active', value: 'new_note') do %>
+      <div> Save & New Note </div>
+    <% end %>
+    <button name="button" class="btn btn-primary disabled" disabled>Save & New Note</button>
+    <%= button_tag(type: 'submit', class: 'btn btn-success save active') do %>
+      <div><%= (@order.id.nil?) ? 'Create' : 'Save'%></div>
+    <% end %>
+    <button name="button" class="btn btn-success disabled" disabled><%= (@order.id.nil?) ? 'Create' : 'Save'%></button>
+  </div>
+</div>
+
+<!-- Number Calculation -->
+<script type="text/javascript">
+
+  var last_products = $('#last_products');
+  var street = $('#order_street');
+  var city = $('#order_city');
+  var state = $('#order_state');
+  var postcode = $('#order_postcode');
+  var country = $('#order_country');
+
+  var billing_street = $('#order_customer_street');
+  var billing_city = $('#order_customer_city');
+  var billing_state = $('#order_customer_state');
+  var billing_postcode = $('#order_customer_postcode');
+  var billing_country = $('#order_customer_country');
+
+  var last_order = $('.last_order');
+
+  // Count the product numbers
+  var product_count = $('.product-table tbody.product-list tr').length
+
+  $('#order_customer_id').hide();
+
+  // Customer Search
+  $(document).on('railsAutocomplete.select', '#customer_search', function(event, data){
+    if ($('#customer_table').find('remove').length == 0) {
+      $('.customer_autocomplete').html('<input type="text" name="customer" id="' + data.item.id + '" value="' + data.item.value + '" readonly="readonly"><i class="glyphicon glyphicon-remove remove" title="remove"></i>');
+      $('#order_customer_id').val(data.item.id);
+      // In view/status
+      // Update last products / last order and everything else
+      var link = "/fetch_last_products?customer_id=" + data.item.id
+      $.ajax({
+          type: 'GET',
+          url: link
+      });
+
+      $('.remove').click(function () {
+        $('.customer_autocomplete').html('<%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 15 %>');
+        $('#order_customer_id').val('');
+        $('.last-order-product').remove();
+        $('.last-order-td').remove();
+      });
+    }
+  });
+
+  // Product Search
+  $(document).on('railsAutocomplete.select', '#product_search, #product_ws_search',function(event, data){
+    product_count += 1;
+
+    $('.product-table tbody.product-list').append([
+      '<tr id="tr_'+ data.item.id +'">',
+        '<td><input size="5" readonly="readonly" class="product-id" type="text" value="'+ data.item.id +'" name="order[products['+ product_count +']][product_id]" id="order_products_'+ product_count +'__product_id"></td>',
+        '<td>'+ data.item.label +'</td>',
+        '<td class="product-inventory">'+ data.item.inventory +'</td>',
+        '<td><input size="5" readonly="readonly" class="product-luc" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_luc]" id="order_products_'+ product_count +'__price_luc"></td>',
+        '<td><input size="3" class="product-qty" type="text" value="0" name="order[products['+ product_count +']][qty]" id="order_products_'+ product_count +'__qty"></td>',
+        '<td><input size="2" class="product-discount" type="text" value="0" name="order[products['+ product_count +']][discount]" id="order_products_'+ product_count +'__discount"  placeholder="Discount"> %</td>',
+        '<td><input size="5" class="product-price" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_discounted]" id="order_products_'+ product_count +'__price_discounted"></td>',
+        '<td class="product-total">0</td>',
+        '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
+      '</tr>'
+      ].join(''));
+  });
+
+  $(document).on('click', '.last-order-product',function(){
+    product_count += 1;
+
+    $('.product-table tbody.product-list').append([
+      '<tr id="tr_'+ $(this).attr('product-id') +'">',
+        '<td><input size="5" readonly="readonly" class="product-id" type="text" value="'+ $(this).attr('product-id') +'" name="order[products['+ product_count +']][product_id]" id="order_products_'+ product_count +'__product_id"></td>',
+        '<td>'+ $(this).attr('name') +'</td>',
+        '<td class="product-inventory">'+ $(this).attr('inventory') +'</td>',
+        '<td><input size="5" readonly="readonly" class="product-luc" type="text" value="'+ $(this).attr('price') +'" name="order[products['+ product_count +']][price_luc]" id="order_products_'+ product_count +'__price_luc"></td>',
+        '<td><input size="3" class="product-qty" type="text" value="0" name="order[products['+ product_count +']][qty]" id="order_products_'+ product_count +'__qty"></td>',
+        '<td><input size="2" class="product-discount" type="text" value="0" name="order[products['+ product_count +']][discount]" id="order_products_'+ product_count +'__discount"  placeholder="Discount"> %</td>',
+        '<td><input size="5" class="product-price" type="text" value="'+ $(this).attr('price') +'" name="order[products['+ product_count +']][price_discounted]" id="order_products_'+ product_count +'__price_discounted"></td>',
+        '<td class="product-total">0</td>',
+        '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
+      '</tr>'
+    ].join(''));
+  });
+
+
+  var update_subtotal = function(){
+    var total = 0;
+    var discount = 0;
+    var wet = 0;
+    $('.product-list tr').each(function(){
+      total += parseFloat($(this).find('.product-total').html());
+      discount += (parseFloat($(this).find('.product-luc').val()) - parseFloat($(this).find('.product-price').val())) *  parseInt($(this).find('.product-qty').val());
+      wet += ((parseFloat($(this).find('.product-price').val()) - 1.82) * parseInt($(this).find('.product-qty').val() * 0.29));
+    });
+    $('#order_subtotal').val(total.toFixed(4));
+    $('#order_wet').val((total / 1.29 * 0.29).toFixed(4));
+    // Modified Wet
+    $('#order_modified_wet').val(wet);
+
+    order_discount = parseFloat($('#order_discount_rate').val()) * 0.01
+    discount += (total * order_discount)
+    shipping_cost = parseFloat($('#order_shipping_cost').val())
+
+    $('#order_gst').val(((total*(1 - order_discount) + shipping_cost)*0.1).toFixed(4));
+    $('#order_discount_amount').val(discount.toFixed(4));
+    $('#order_total_inc_tax').val(((total *( 1 - order_discount) + shipping_cost) * 1.1).toFixed(4));
+    return total;
+  }
+
+  var product_change = function(column){
+    qty = column.parent().parent().find('.product-qty').val();
+    luc = column.parent().parent().find('.product-luc').val();
+    price = column.parent().parent().find('.product-price').val();
+    discount = 0;
+
+    if(column.attr('class') == 'product-discount'){
+      price = luc * (1 - column.val() * 0.01 );
+      column.parent().parent().find('.product-price').val(price.toFixed(4));
+    }else if (column.attr('class') == 'product-price') {
+      discount = (1 - (column.val() / luc)) * 100 ;
+      column.parent().parent().find('.product-discount').val(discount.toFixed(2));
+    }
+    column.parent().parent().find('.product-total').html((price * qty).toFixed(4));
+    update_subtotal();
+  };
+
+  $(document).on('input', '.product-qty, .product-discount, .product-price', function(){
+    product_change($(this));
+  });
+  $(document).on('input', '#order_discount_rate, #order_shipping_cost', function(){
+    update_subtotal();
+  });
+  $(document).on('click', '.remove_row', function(){
+    $(this).parent().parent().remove();
+  });
+
+
+</script>
+
+<!-- Submit Tag -->
+<script type="text/javascript">
+  $('button.active').hide();
+
+  var valid_check = function(){
+    var customer_flag = $('tr input[name=customer]').size() > 0;
+    var product_flag = $('tbody.product-list tr').size() > 0;
+    var shipping_address_flag = (($('input#order_street').val() != "") && ($('input#order_city').val() != "") && ($('input#order_postcode').val() != ""));
+    var inventory_flag = true;
+    var table_flag = $('table.product-table input:text').filter(function() { return (this.value == "" || this.value=="NaN"); }).size() == 0;
+    $('.product-qty').each(function(){
+      if (parseInt($(this).val()) > parseInt($(this).parent().parent().find('.product-inventory').html())){
+        inventory_flag = false;
+      }
+    });
+    if (customer_flag && product_flag && shipping_address_flag && inventory_flag && table_flag){
+      $('button.active').show();
+      $('button.disabled').hide();
+    }else{
+      $('button.active').hide();
+      $('button.disabled').show();
+    };
+  }
+
+  $(document).on('input', valid_check);
+  $(document).on('click', valid_check);
+</script>

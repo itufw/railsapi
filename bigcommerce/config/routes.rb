@@ -52,6 +52,10 @@ Rails.application.routes.draw do
     get :autocomplete_customer_actual_name, on: :collection
   end
 
+  resources :product do
+    get :autocomplete_product_name, on: :collection
+  end
+
   resources :activity do
     get :autocomplete_product_name, on: :collection
     get :autocomplete_product_ws, on: :collection

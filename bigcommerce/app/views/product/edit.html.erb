@@ -6,7 +6,7 @@
   <%= @product.id.to_s + '   ' + @product.name %><br/>
 
   <%= f.label :search_for_similar_product, class: 'margin-from-top label-new' %>
-  <%= autocomplete_field_tag 'product_search', '', autocomplete_product_name_activity_index_path, placeholder: 'Search Products', id: 'product_search',size: 30 %>
+  <%= autocomplete_field_tag 'product_search', '', autocomplete_product_name_product_index_path, placeholder: 'Search Products', id: 'product_search',size: 30 %>
   <br/>
   <%= f.label :search_for_no_ws, class: 'margin-from-top label-new' %>
   <%= autocomplete_field_tag 'product_no_ws_search', '', autocomplete_product_no_ws_name_activity_index_path, placeholder: 'Search Product No WS', id: 'product_no_ws_search',size: 30 %>
