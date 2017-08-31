@@ -359,6 +359,10 @@ class Order < ActiveRecord::Base
     return order_total
   end
 
+  def display_ship_address
+    self.street.to_s + ' ' + self.street_2.to_s + ' ' + self.city.to_s + ' ' + self.postcode.to_s + ' ' + self.country.to_s
+  end
+
   private
 
   def bigcommerce_status_update

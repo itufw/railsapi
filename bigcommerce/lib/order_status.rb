@@ -88,7 +88,7 @@ module OrderStatus
     end
 
     unless params[:order][:customer].nil?
-      customer_params = params[:order][:customer].permit(:street, :city, :state, :postcode, :country)
+      customer_params = params[:order][:customer].permit(:street, :city, :state, :street_2, :postcode, :country)
       customer = Customer.joins(:orders).where('orders.id = ?', params[:order_id]).first.update_attributes(customer_params)
     end
 
