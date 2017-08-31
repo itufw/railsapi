@@ -70,7 +70,7 @@ module OrderStatus
         end
         # create label with fastway
       else
-        Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 8, date_shipped: Time.now.to_s(:db), last_updated_by: user_id}))
+        Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 8, date_shipped: Time.now.to_s(:db), last_updated_by: user_id, eta: Date.today.to_s(:db)}))
       end
     else
       if !params[:order].nil?
