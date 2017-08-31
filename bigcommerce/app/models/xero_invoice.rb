@@ -79,11 +79,11 @@ class XeroInvoice < ActiveRecord::Base
         						WHERE xero_invoice_id = '#{i.invoice_id}'"
 
                end
-               
+
                order = Order.where(id: i.invoice_number).first
                next if order.nil?
 
-               order.update_attribute(status_id: 10) if i.amount_due == 0 && order.status_id==12
+               order.update(status_id: 10) if i.amount_due == 0 && order.status_id==12
 
                 ActiveRecord::Base.connection.execute(sql)
 
