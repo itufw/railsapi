@@ -29,7 +29,7 @@ class OrderProduct < ActiveRecord::Base
 	end
 
 	def recovery_product
-		attribuets = {'stock_previous': self.self.stock_current, 'stock_current': 0 - self.stock_incremental,\
+		attribuets = {'stock_previous': self.stock_current, 'stock_current': 0 - self.stock_incremental,\
 			 'stock_incremental': 0 - self.stock_incremental, 'display': 1, 'updated_by': 34}
 		self.update_attributes(attributes)
 		self
@@ -180,7 +180,7 @@ class OrderProduct < ActiveRecord::Base
 
 		return if self.order.source == 'bigcommerce'
 		return if stock_incremental == 0
-		
+
 		Bigcommerce::Product.update(product_id, inventory_level: Bigcommerce::Product.find(product_id).inventory_level - stock_incremental)
 		sql = "UPDATE products SET inventory = inventory - '#{self.stock_incremental}' WHERE id = '#{self.product_id}'"
 		ActiveRecord::Base.connection.execute(sql)
