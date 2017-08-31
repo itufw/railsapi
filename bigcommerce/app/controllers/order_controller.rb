@@ -115,7 +115,7 @@ class OrderController < ApplicationController
       redirect_to :back and return
     end
 
-    if Order.where("customer_id = ? AND date_created > ?", order_params[:customer_id], (Time.now - 10.minutes).to_s(:db)).count > 0
+    if Order.where("customer_id = ? AND date_created > ? AND total_inc_tax = ?", order_params[:customer_id], (Time.now - 2.minutes).to_s(:db), order_params[:total_inc_tax]).count > 0
       flash[:error] = 'Already Created!'
       redirect_to action: 'all' and return
     end
