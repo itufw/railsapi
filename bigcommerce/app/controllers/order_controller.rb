@@ -20,7 +20,8 @@ class OrderController < ApplicationController
 
      	#@can_update_bool = allow_to_update(session[:user_id])
      	@staff, @status, orders, @search_text, @order_id = order_controller_filter(params, "display_report")
-      orders = orders.where('eta <= "?"', Date.today.to_s(:db)) if params[:delay]
+
+      orders = orders.where('eta <= ?', Date.today.to_s(:db)) unless params[:delay].nil?
 
      	@per_page, @orders = order_display_(params, orders)
     end
