@@ -9,20 +9,20 @@
   <%= autocomplete_field_tag 'product_search', '', autocomplete_product_name_product_index_path, placeholder: 'Search Products', id: 'product_search',size: 30 %>
   <br/>
   <%= f.label :search_for_no_ws, class: 'margin-from-top label-new' %>
-  <%= autocomplete_field_tag 'product_no_ws_search', '', autocomplete_product_no_ws_name_activity_index_path, placeholder: 'Search Product No WS', id: 'product_no_ws_search',size: 30 %>
+  <%= autocomplete_field_tag 'product_no_ws_search', @product.name.split(' WS').first, autocomplete_product_no_ws_name_activity_index_path, placeholder: 'Search Product No WS', id: 'product_no_ws_search',size: 30 %>
   <td><%= check_box '', 'new_product', {class: 'new_product'} %>New Product</td> &nbsp;&nbsp;&nbsp;
   <%= f.label :search_for_no_vintage, class: 'margin-from-top label-new' %>
-  <%= autocomplete_field_tag 'product_no_vintage_search', '', autocomplete_product_no_vintage_name_activity_index_path, placeholder: 'Search Product No Vintage', id: 'product_no_vintage_search',size: 30 %>
+  <%= autocomplete_field_tag 'product_no_vintage_search', @product.name.split(' WS').first.gsub(/[0-9]/, "").strip, autocomplete_product_no_vintage_name_activity_index_path, placeholder: 'Search Product No Vintage', id: 'product_no_vintage_search',size: 30 %>
 
   <br/>
   <%= f.label :product_no_ws_id, class: 'margin-from-top label-new' %>
-  <%= f.text_field :product_no_ws_id, readonly: true, placeholder: 'Product No WS ID' %>
+  <%= f.text_field :product_no_ws_id, readonly: true, placeholder: 'Product No WS ID', size: 5 %>
   <%= f.label :product_no_ws_name, class: 'margin-from-top label-new' %>
-  <%= f.text_field :name_no_ws, readonly: true, placeholder: 'Name No WS', size: 30 %>
+  <%= f.text_field :name_no_ws, value: @product.name_no_ws || @product.name.split(' WS').first,readonly: true, placeholder: 'Name No WS', size: 45 %>
   <%= f.label :product_no_vintage_id, class: 'margin-from-top label-new' %>
-  <%= f.text_field :product_no_vintage_id, readonly: true, placeholder: 'Product No Vintage ID' %>
+  <%= f.text_field :product_no_vintage_id, readonly: true, placeholder: 'Product No Vintage ID', size: 5 %>
   <%= f.label :vintage_name, class: 'margin-from-top label-new' %>
-  <%= f.text_field :name_no_vintage, readonly: true, placeholder: 'Name No Vintage', size: 30 %>
+  <%= f.text_field :name_no_vintage, value: @product.name_no_vintage || @product.name.split(' WS').first.gsub(/[0-9]/, "").strip, placeholder: 'Name No Vintage', size: 45 %>
   <%= f.label :vintage, class: 'margin-from-top label-new' %>
   <%= f.number_field :vintage, placeholder: 'Product Vintage Year' %><br/>
 
@@ -33,7 +33,9 @@
   <%= f.label :producer, class: 'margin-from-top label-new' %>
   <%= f.collection_select :producer_id, Producer.all.order(:name), :id, :name, {class: "form-control quarter-size"} %><br/>
   <%= f.label :produce_ragion, class: 'margin-from-top label-new' %>
-  <%= f.collection_select :producer_region_id, ProducerRegion.all.order(:name), :id, :name, {class: "form-control quarter-size"} %><br/>
+  <%= f.collection_select :producer_region_id, ProducerRegion.all.order(:name), :id, :name, {class: "form-control quarter-size"} %>
+  <%= f.label :produce_varietals, class: 'margin-from-top label-new' %>
+  <%= f.collection_select :product_sub_type_id, ProductSubType.all.order(:name), :id, :name, {class: "form-control quarter-size"} %><br/>
 
   <%= f.label :product_type, class: 'margin-from-top label-new' %>
   <%= f.collection_select :product_type_id, ProductType.all, :id, :name, {class: "form-control quarter-size"} %><br/>
@@ -50,7 +52,10 @@
   <%= f.label :retail_or_ws, class: 'margin-from-top label-new' %>
   <%= f.collection_select :retail_ws, ['R','WS'], :to_s, :to_s %><br/>
   <%= f.label :blend_type, class: 'margin-from-top label-new' %>
-  <%= f.text_field :blend_type, placeholder: 'Blend Type' %><br/>
+  <%= f.text_field :blend_type, placeholder: 'Blend Type' %>
+  <%= f.label :price_id, class: 'margin-from-top label-new' %>
+  <%= f.text_field :price_id, placeholder: 'Price ID' %>
+  <br/>
   <%= f.label :order_1_2, class: 'margin-from-top label-new'%>
   <%= f.number_field :order_1, placeholder: 'Order 1' %>
   <%= f.number_field :order_2, placeholder: 'Order 2' %>
@@ -67,18 +72,20 @@ var product_type = $('select#product_product_type_id');
 var warehouse = $('select#product_warehouse_id');
 var product_size = $('select#product_product_size_id');
 var package_type = $('select#product_package_type_id');
-var case_size = $('select#product_case_size');
+var case_size = $('input#product_case_size');
 var retail_ws = $('select#product_retail_ws');
-var blend_type = $('select#product_blend_type');
-var order_1 = $('select#product_order_1');
-var order_2 = $('select#product_order_2');
-var combined_order = $('select#product_combined_order');
+var blend_type = $('input#product_blend_type');
+var order_1 = $('input#product_order_1');
+var order_2 = $('input#product_order_2');
+var price_id = $('input#product_price_id');
+var combined_order = $('input#product_combined_order');
 var product_no_ws = $('#product_product_no_ws_id');
 var name_no_ws = $('#product_name_no_ws');
 var product_no_vintage = $('#product_product_no_vintage_id');
 var vintage = $('#product_vintage');
 var product_name_no_winery_no_vintage = $('#product_product_name_no_winery_no_vintage');
 var vintage_name = $('#product_name_no_vintage');
+var product_sub_type = $('#product_product_sub_type_id');
 
 $('input#_new_product').change(function(){
   if (this.checked){
