@@ -104,9 +104,11 @@ class OrderController < ApplicationController
   end
 
   def create_order
-    @order = Order.new
-    @order.discount_rate = 0
-    @order.shipping_cost = 0
+    @order = Order.new(discount_rate: 0, shipping_cost: 0)
+  end
+
+  def create_retail_order
+    @order = Order.new(discount_rate: 0, shipping_cost: 20)
   end
 
   def save_order
@@ -153,7 +155,7 @@ class OrderController < ApplicationController
       'handling_cost': products_params.values().map {|x| x['qty'].to_i }.sum * handling_fee,\
       'last_updated_by': session[:user_id]}
     order.assign_attributes(order_attributes)
-    
+
     products_container = []
     products_params.each do |keys, product_params|
       product_id = product_params['product_id']

@@ -1,0 +1,5 @@
+<%= title 'New Retail Order' %>
+<h3>New Retail Order</h3>
+<%= form_for @order, :url => {:controller => "order", :action => "save_order"}  do |f| %>
+  <%= render 'order_partials/retail_order_form', f: f%>
+<% end %>

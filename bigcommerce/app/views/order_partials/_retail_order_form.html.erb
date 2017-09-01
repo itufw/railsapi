@@ -118,8 +118,6 @@
     <td colspan="6" rowspan="3" align="center">
       <%= f.text_area :delivery_instruction, style: "border: none; width: 100%; height: 100px; ", placeholder: 'Delivery Instruction'%>
     </td>
-    <td class="ProductCost" align="right">WET</td>
-    <td class="ProductTotal" align="right"><%= f.text_field :wet, readonly: true%></td>
   </tr>
   <tr>
     <td class="ProductCost" align="right">GST</td>
@@ -130,7 +128,6 @@
     <td class="ProductTotal" align="right"><%= f.text_field :total_inc_tax, readonly: true%></td>
   </tr>
 </table>
-<%= f.hidden_field :modified_wet %>
 <div class="row">
   <div class="col-md-4 col-md-offset-8">
     <%= link_to '<button type="button" class="btn btn-warning">Cancel</button>'.html_safe, controller: 'order', action: 'all'%>
@@ -232,16 +229,11 @@
   var update_subtotal = function(){
     var total = 0;
     var discount = 0;
-    var wet = 0;
     $('.product-list tr').each(function(){
       total += parseFloat($(this).find('.product-total').html());
       discount += (parseFloat($(this).find('.product-luc').val()) - parseFloat($(this).find('.product-price').val())) *  parseInt($(this).find('.product-qty').val());
-      wet += ((parseFloat($(this).find('.product-price').val()) - 1.82) * parseInt($(this).find('.product-qty').val() * 0.29));
     });
     $('#order_subtotal').val(total.toFixed(4));
-    $('#order_wet').val((total / 1.29 * 0.29).toFixed(4));
-    // Modified Wet
-    $('#order_modified_wet').val(wet);
 
     order_discount = parseFloat($('#order_discount_rate').val()) * 0.01
     discount += (total * order_discount)
