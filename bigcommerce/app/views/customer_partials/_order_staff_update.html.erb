@@ -3,7 +3,8 @@
 	<% if can_update_staff and !staff_id.nil? and active_staff.map(&:id).include?staff_id%>
 		<%= form_tag :controller => "customer", :action => "update_staff" do %>
 			<%= select_tag(:staff_id, options_from_collection_for_select(active_staff, :id, :nickname, staff_id), html_options = {:class => 'form-control', :onchange => "this.form.submit()"}) %>
-			<%= hidden_field_tag :customer_id, customer.id %>
+			<%= hidden_field_tag :customer_id, customer.id unless (defined?customer).nil? || customer.nil? %>
+			<%= hidden_field_tag :order_id, order_id unless (defined?order_id).nil? || order_id.nil?%>
 		<% end %>
 	<% else %>
 		<%= Staff.find(staff_id).nickname %>
