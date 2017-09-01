@@ -8,7 +8,7 @@
             <th>Customer</th>
             <% if @order.customer_id.nil? || @order.customer_id == ""%>
               <td class="customer_autocomplete">
-                <%= autocomplete_field_tag 'name', '', autocomplete_customer_retail_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 30 %>
+                <%= autocomplete_field_tag 'name', '', autocomplete_customer_retail_activity_index_path, placeholder: 'Search Customer', id: 'retail_customer_search', size: 30 %>
               </td>
             <% else %>
               <td><input type="text" name="customer" id="<%= @order.customer_id %>" value="<%= Customer.find(@order.customer_id).actual_name%>" readonly="readonly" size="30px"></td>
@@ -24,7 +24,7 @@
           <tr>
             <th>Product</th>
             <td class="product_autocomplete">
-              <%= autocomplete_field_tag 'product', '', autocomplete_product_retail_activity_index_path, placeholder: 'Search Product', id_element: '#product_id', id: 'product_search'%>
+              <%= autocomplete_field_tag 'product', '', autocomplete_product_retail_activity_index_path, placeholder: 'Search Product', id_element: '#product_id', id: 'retail_product_search'%>
             </td>
           </tr>
         </table>
@@ -53,7 +53,7 @@
       </tr>
       <% unless @order.customer_id.nil? || @order.customer_id == ""%>
         <% Product.where(id: OrderProduct.where("order_id IN (?) AND created_at > ?", @order.customer.orders.map(&:id), (Date.today - 3.month).to_s(:db)).map(&:product_id)).each do |product| %>
-        <tr class="last-order-product" product-id="<%= product.id%>" name="<%= product.name%>" inventory="<%= product.inventory%>" price="<%= product.calculated_price * 1.29%>">
+        <tr class="last-order-product-retail" product-id="<%= product.id%>" name="<%= product.name%>" inventory="<%= product.inventory%>" price="<%= product.calculated_price * 1.29%>">
           <td><%= product.name %></td>
         </tr>
         <% end %>
@@ -167,7 +167,7 @@
   $('#order_customer_id').hide();
 
   // Customer Search
-  $(document).on('railsAutocomplete.select', '#customer_search', function(event, data){
+  $(document).on('railsAutocomplete.select', '#retail_customer_search', function(event, data){
     if ($('#customer_table').find('remove').length == 0) {
       $('.customer_autocomplete').html('<input type="text" name="customer" id="' + data.item.id + '" value="' + data.item.value + '" readonly="readonly"><i class="glyphicon glyphicon-remove remove" title="remove"></i>');
       $('#order_customer_id').val(data.item.id);
@@ -180,16 +180,16 @@
       });
 
       $('.remove').click(function () {
-        $('.customer_autocomplete').html('<%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 15 %>');
+        $('.customer_autocomplete').html('<%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'retail_customer_search', size: 15 %>');
         $('#order_customer_id').val('');
-        $('.last-order-product').remove();
+        $('.last-order-product-retail').remove();
         $('.last-order-td').remove();
       });
     }
   });
 
   // Product Search
-  $(document).on('railsAutocomplete.select', '#product_search, #product_ws_search',function(event, data){
+  $(document).on('railsAutocomplete.select', '#retail_product_search',function(event, data){
     product_count += 1;
 
     $('.product-table tbody.product-list').append([
@@ -207,7 +207,7 @@
       ].join(''));
   });
 
-  $(document).on('click', '.last-order-product',function(){
+  $(document).on('click', '.last-order-product-retail',function(){
     product_count += 1;
 
     $('.product-table tbody.product-list').append([
