@@ -24,11 +24,11 @@
           <tr>
             <th>Product</th>
             <td class="product_autocomplete">
-              <%= autocomplete_field_tag 'product', '', autocomplete_product_name_activity_index_path, placeholder: 'Search Product', id_element: '#product_id', id: 'product_search'%>
+              <%= autocomplete_field_tag 'product', '', autocomplete_product_retail_activity_index_path, placeholder: 'Search Product', id_element: '#product_id', id: 'product_search'%>
             </td>
           </tr>
         </table>
-        <!-- WS / All products -->
+
         <script type="text/javascript">
           $('input#customer_purchase_order').change(function(){
             if (this.checked){
@@ -68,7 +68,7 @@
       <th>Product ID</th>
       <th>Product</th>
       <th style="width: 3px;">Inventory</th>
-      <th>Price (LUC)</th>
+      <th>Price</th>
       <th style="width: 3px;">QTY</th>
       <th>Discount</th>
       <th>Discounted Price</th>
@@ -145,6 +145,8 @@
 
 <!-- Number Calculation -->
 <script type="text/javascript">
+  var gst = parseFloat('<%= TaxPercentage.gst_percentage * 0.01%>');
+  var wet = parseFloat('<%= TaxPercentage.wet_percentage * 0.01 %>');
 
   var last_products = $('#last_products');
   var street = $('#order_street');
@@ -197,10 +199,10 @@
         '<td><input size="5" readonly="readonly" class="product-id" type="text" value="'+ data.item.id +'" name="order[products['+ product_count +']][product_id]" id="order_products_'+ product_count +'__product_id"></td>',
         '<td>'+ data.item.label +'</td>',
         '<td class="product-inventory">'+ data.item.inventory +'</td>',
-        '<td><input size="5" readonly="readonly" class="product-luc" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_luc]" id="order_products_'+ product_count +'__price_luc"></td>',
+        '<td><input size="5" readonly="readonly" class="product-luc" type="text" value="'+ parseFloat(data.item.calculated_price) * (1+gst) +'" name="order[products['+ product_count +']][price_luc]" id="order_products_'+ product_count +'__price_luc"></td>',
         '<td><input size="3" class="product-qty" type="text" value="0" name="order[products['+ product_count +']][qty]" id="order_products_'+ product_count +'__qty"></td>',
         '<td><input size="2" class="product-discount" type="text" value="0" name="order[products['+ product_count +']][discount]" id="order_products_'+ product_count +'__discount"  placeholder="Discount"> %</td>',
-        '<td><input size="5" class="product-price" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_discounted]" id="order_products_'+ product_count +'__price_discounted"></td>',
+        '<td><input size="5" class="product-price" type="text" value="'+ parseFloat(data.item.calculated_price) * (1+gst) +'" name="order[products['+ product_count +']][price_discounted]" id="order_products_'+ product_count +'__price_discounted"></td>',
         '<td class="product-total">0</td>',
         '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
       '</tr>'
@@ -215,10 +217,10 @@
         '<td><input size="5" readonly="readonly" class="product-id" type="text" value="'+ $(this).attr('product-id') +'" name="order[products['+ product_count +']][product_id]" id="order_products_'+ product_count +'__product_id"></td>',
         '<td>'+ $(this).attr('name') +'</td>',
         '<td class="product-inventory">'+ $(this).attr('inventory') +'</td>',
-        '<td><input size="5" readonly="readonly" class="product-luc" type="text" value="'+ $(this).attr('price') +'" name="order[products['+ product_count +']][price_luc]" id="order_products_'+ product_count +'__price_luc"></td>',
-        '<td><input size="3" class="product-qty" type="text" value="0" name="order[products['+ product_count +']][qty]" id="order_products_'+ product_count +'__qty"></td>',
+        '<td><input size="5" readonly="readonly" class="product-luc" type="text" value="'+ parseFloat($(this).attr('price')) / (1 + wet) * (1+ gst) +'" name="order[products['+ product_count +']][price_luc]" id="order_products_'+ product_count +'__price_luc"></td>',
+        '<td><input size="3" class="product-qty" type="text" value="1" name="order[products['+ product_count +']][qty]" id="order_products_'+ product_count +'__qty"></td>',
         '<td><input size="2" class="product-discount" type="text" value="0" name="order[products['+ product_count +']][discount]" id="order_products_'+ product_count +'__discount"  placeholder="Discount"> %</td>',
-        '<td><input size="5" class="product-price" type="text" value="'+ $(this).attr('price') +'" name="order[products['+ product_count +']][price_discounted]" id="order_products_'+ product_count +'__price_discounted"></td>',
+        '<td><input size="5" class="product-price" type="text" value="'+ parseFloat($(this).attr('price')) / (1 + wet) * (1+gst) +'" name="order[products['+ product_count +']][price_discounted]" id="order_products_'+ product_count +'__price_discounted"></td>',
         '<td class="product-total">0</td>',
         '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
       '</tr>'
@@ -239,9 +241,9 @@
     discount += (total * order_discount)
     shipping_cost = parseFloat($('#order_shipping_cost').val())
 
-    $('#order_gst').val(((total*(1 - order_discount) + shipping_cost)*0.1).toFixed(4));
+    $('#order_gst').val(((total*(1 - order_discount) + shipping_cost)* gst).toFixed(4));
     $('#order_discount_amount').val(discount.toFixed(4));
-    $('#order_total_inc_tax').val(((total *( 1 - order_discount) + shipping_cost) * 1.1).toFixed(4));
+    $('#order_total_inc_tax').val(((total *( 1 - order_discount) + shipping_cost)).toFixed(4));
     return total;
   }
 
@@ -283,14 +285,9 @@
     var customer_flag = $('tr input[name=customer]').size() > 0;
     var product_flag = $('tbody.product-list tr').size() > 0;
     var shipping_address_flag = (($('input#order_street').val() != "") && ($('input#order_city').val() != "") && ($('input#order_postcode').val() != ""));
-    var inventory_flag = true;
     var table_flag = $('table.product-table input:text').filter(function() { return (this.value == "" || this.value=="NaN"); }).size() == 0;
-    $('.product-qty').each(function(){
-      if (parseInt($(this).val()) > parseInt($(this).parent().parent().find('.product-inventory').html())){
-        inventory_flag = false;
-      }
-    });
-    if (customer_flag && product_flag && shipping_address_flag && inventory_flag && table_flag){
+
+    if (customer_flag && product_flag && shipping_address_flag && table_flag){
       $('button.active').show();
       $('button.disabled').hide();
     }else{

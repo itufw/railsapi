@@ -2,6 +2,7 @@ require 'models_filter.rb'
 require 'display_helper.rb'
 require 'product_variations.rb'
 require 'order_helper.rb'
+require 'order_status.rb'
 
 class OrderController < ApplicationController
 
@@ -11,6 +12,7 @@ class OrderController < ApplicationController
     include DisplayHelper
     include ProductVariations
     include OrderHelper
+    include OrderStatus
 
     def all
      	@staff_nickname = params[:staff_nickname]
@@ -129,14 +131,8 @@ class OrderController < ApplicationController
   end
 
   def generate_invoice
-    order = Order.find(params[:order_id])
-    pdf = WickedPdf.new.pdf_from_string(
-      render_to_string(
-          :template => 'pdf/order_invoice.pdf',
-          :locals => {order: order, customer: order.customer}
-          )
-      )
-      send_data pdf, filename: "#{order.id}.pdf", type: :pdf
+    # pdf generator in lib/order_status
+    send_data print_invoices([params[:order_id]]).to_pdf, filename: "#{params[:order_id]}.pdf", type: :pdf
   end
 
   def update_order
