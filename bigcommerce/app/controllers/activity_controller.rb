@@ -6,6 +6,7 @@ class ActivityController < ApplicationController
 
   autocomplete :product, :name, full: true
   autocomplete :product, :ws, full: true
+  autocomplete :product, :retail, column_name: 'name', full: true, scopes: [:retail_products], extra_data: [:calculated_price, :inventory]
   autocomplete :product_no_ws, :name, full: true, extra_data: [:product_no_vintage_id]
   autocomplete :product_no_vintage, :name, full: true
   autocomplete :customer, :actual_name, full: true, extra_data: [:address]

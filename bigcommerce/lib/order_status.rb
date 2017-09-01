@@ -97,15 +97,28 @@ module OrderStatus
   end
 
   def print_invoices(selected_orders)
-    orders = Order.joins(:customer).where(id: selected_orders)
+    orders = Order.where(id: selected_orders)
     pdf = CombinePDF.new
     orders.each do |order|
-      order_invoice = WickedPdf.new.pdf_from_string(
-        render_to_string(
-            :template => 'pdf/order_invoice.pdf',
-            :locals => {order: order, customer: order.customer}
-            )
-        )
+
+      customer = order.customer
+      if customer.cust_type_id == 1
+        order_invoice = WickedPdf.new.pdf_from_string(
+          render_to_string(
+              :template => 'pdf/retail_order_invoice.pdf',
+              :locals => {order: order, customer: customer}
+              )
+          )
+      else
+        order_invoice = WickedPdf.new.pdf_from_string(
+          render_to_string(
+              :template => 'pdf/order_invoice.pdf',
+              :locals => {order: order, customer: customer}
+              )
+          )
+      end
+
+
       pdf << CombinePDF.parse(order_invoice)
     end
     pdf

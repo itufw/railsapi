@@ -77,7 +77,90 @@
     </div>
   <% end %>
 
-  <%= render 'pdf/product_lists', order: order %>
+
+    <div id="products">
+      <% products = order.order_products.select{ |x| x.display == 1}%>
+      <% discount_amount = products.map{|x| x.price_discounted - x.price_luc }.sum %>
+      <% wine_club = (products.select{|x| x.product.name.downcase.include?'wine club'}.count > 0) %>
+      <table class="InvoiceTable">
+        <tr>
+          <th class="ProductQuantity">Qty</th>
+
+          <% if wine_club || discount_amount==0 %>
+            <th class="ProductDetails">Product Name</th>
+            <th class="ProductCost" id="price" align="right">Price</th>
+          <% else %>
+            <th colspan="3">Product Name</th>
+            <th style="text-align: right;"  id="price" align="right">Price</th>
+            <th style="text-align: right;"  id="discount" align="right">Discount</th>
+            <th style="text-align: right;"  id="discounted_price" align="right">Discounted Price</th>
+          <% end %>
+
+          <th class="ProductTotal" align="right" id="amt" style="width:15px;">Total</th>
+          <th></th>
+        </tr>
+        <% products.each do |item| %>
+        <tr>
+          <td class="ProductQuantity"><%= item.qty.to_i%></td>
+          <% if wine_club || discount_amount==0 %>
+            <td class="ProductDetails"><%= item.product.name %></td>
+            <td class="ProductCost" id="price" align="right">$<%= '%.2f' % (item.price_luc / 1.29 * 1.1) %></td>
+          <% else %>
+            <td colspan="3"><%= item.product.name %></td>
+            <td style="text-align: right;" id="price" align="right">$<%= '%.2f' % (item.price_luc / 1.29 * 1.1) %></td>
+            <td style="text-align: right;" align="right"><%= '%.0f' % item.discount %>%</td>
+            <td style="text-align: right;" align="right">$<%= '%.2f' % (item.price_discounted / 1.29 * 1.1) %></td>
+          <% end %>
+          <td class="ProductTotal" align="right" id="amt" style="width:15px;">$<%= '%.2f' % (item.qty * item.price_discounted / 1.29 * 1.1) %></td>
+          <td></td>
+        </tr>
+        <% end %>
+        <tr style="border-bottom:1px solid black">
+          <td colspan="100%"></td>
+        </tr>
+        <tr>
+        <% if wine_club || discount_amount==0 %>
+          <td rowspan="7"></td>
+        <% else %>
+          <td colspan="5" rowspan="7"></td>
+        <% end %>
+          <td colspan="2" class="ProductCost" align="right">Subtotal</td>
+          <td class="ProductTotal" align="right">$<%= '%.2f' % (order.subtotal * 1.1) %></td>
+          <td></td>
+        </tr>
+        <% if !wine_club && discount_amount!=0 %>
+        <tr>
+          <td colspan="2" class="ProductCost" align="right">Discount Rate</td>
+          <td class="ProductTotal" align="right"><%= '%.0f' % (order.discount_rate) %>%</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td colspan="2" class="ProductCost" align="right">Discount Amount(ex. GST)</td>
+          <td class="ProductTotal" align="right">$<%= '%.2f' % (order.discount_amount) %></td>
+          <td></td>
+        </tr>
+        <% end %>
+        <tr>
+          <td colspan="2" class="ProductCost" align="right">Shipping</td>
+          <td class="ProductTotal" align="right">$<%= '%.2f' % (order.shipping_cost) %></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td colspan="2" class="ProductCost" align="right">GST</td>
+          <td class="ProductTotal" align="right">$<%= '%.2f' % (order.gst) %></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td colspan="2" class="ProductCost" align="right">
+            <h3>Grand Total:</h3>
+          </td>
+          <td class="ProductTotal" align="right">
+            <h3>$<%= '%.2f' % order.total_inc_tax %></h3>
+          </td>
+          <td></td>
+        </tr>
+      </table>
+    </div>
 
   <div class="InvoiceComments" style="%%GLOBAL_HideComments%%; margin-top: -75px; font-size: 0.8em;width: 350px; text-align: justify;">
     <div class="InvoiceHeading" style="font-size: .9em;">Comments</div>
