@@ -169,10 +169,16 @@ class CustomerController < ApplicationController
 
   def update_staff
     customer_id = params[:customer_id]
+    order_id = params[:order_id]
+
     staff_id = params[:staff_id]
 
-    Customer.staff_change(staff_id, customer_id)
-    CustomerTag.exist?('Customer', customer_id).first.staff_change(Staff.find(staff_id).nickname)
+    unless customer_id.nil?
+      Customer.staff_change(staff_id, customer_id)
+      CustomerTag.exist?('Customer', customer_id).first.staff_change(Staff.find(staff_id).nickname)
+    end
+
+    Order.find(order_id).update(staff_id: staff_id) unless order_id.nil?
     # render html: "#{customer_id}, #{staff_id}".html_safe
     flash[:success] = 'Staff Successfully Changed.'
     redirect_to request.referrer
