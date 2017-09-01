@@ -249,6 +249,10 @@ class Customer < ActiveRecord::Base
 		return customer.xero_contact_id unless customer.nil?
 	end
 
+	def self.retail_customer
+		where(cust_type_id: 1)
+	end
+
 	# def self.due_date_num_days(customer)
 	# 	if customer.end_of_month.nil?
 	# 		return customer.num_days

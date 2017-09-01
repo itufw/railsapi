@@ -1,5 +1,29 @@
 <%= title 'New Order' %>
-<h3>New Order</h3>
+<h3 class="title">New Order</h3>
+
 <%= form_for @order, :url => {:controller => "order", :action => "save_order"}  do |f| %>
-  <%= render 'order_partials/order_form', f: f%>
+  <div id="selector" class="btn-group" style="float: right; margin-top: -35px; margin-right: 450px;">
+    <label type="button" class="btn btn-default order-type" value="WS">WS</label>
+    <label type="button" class="btn btn-default order-type" value="Retail">Retail</label>
+  </div>
+
+  <div class="order_form" value="WS">
+    <%= render 'order_partials/order_form', f: f%>
+  </div>
+
+  <script>
+    $('.order-type').click(function(){
+      if($(this).attr('value') != $('.order_form').attr('value')){
+        if ($(this).attr('value') == 'WS'){
+          $('.order_form').html('<%=j render 'order_partials/order_form', f: f %>');
+          $('.order_form').attr('value', 'WS');
+          $('.title').html('New Order');
+        }else{
+          $('.order_form').html('<%=j render 'order_partials/retail_order_form', f: f %>');
+          $('.order_form').attr('value', 'Retail');
+          $('.title').html('New Retail Order');
+        }
+      }
+    });
+  </script>
 <% end %>
