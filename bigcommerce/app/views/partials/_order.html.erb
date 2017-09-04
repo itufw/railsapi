@@ -39,7 +39,7 @@
 		<td class="num"><%= display_num(order.total_inc_tax) %></td>
 
 		<%= render "customer_partials/order_staff_update", staff_id: order.staff_id, order_id: order.id, can_update_staff: can_update_staff %>
-		<% invoice_status = invoice_status(order.xero_invoice) %>
+		<% invoice_status = invoice_status(order.xero_invoice, order) %>
 		<td class=<%= invoice_status[0].downcase %>><%= invoice_status[0] %></td>
 	</tr>
 	<tr data-href="<%= fetch_order_detail_path(order_id: order.id) %>">

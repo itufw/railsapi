@@ -15,10 +15,15 @@ module OrderHelper
     Order.order_filter_(order_id).order_product_filter(product_ids).sum_order_product_qty
   end
 
-  def invoice_status(xero_invoice)
+  def invoice_status(xero_invoice, order = nil)
+    return [order.account_status, order.account_status] if !order.nil? \
+      && !order.account_status.nil? \
+      && order.account_status!="Approved"
+
     XeroInvoice.paid(xero_invoice) || XeroInvoice.over(xero_invoice) \
-    || XeroInvoice.unpaid(xero_invoice) \
-    || XeroInvoice.partially_paid(xero_invoice) || [' ', ' ']
+      || XeroInvoice.unpaid(xero_invoice) \
+      || XeroInvoice.partially_paid(xero_invoice) \
+      || [' ', ' ']
   end
 
   def order_controller_filter(params, _rights_col)

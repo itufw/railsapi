@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <%= favicon_link_tag 'logo.ico' %>
     <title><%= content_for?(:title) ? content_for(:title) : "Untapped" %></title>
     <%= stylesheet_link_tag    'vendor',      media: 'all', debug: false %>
     <%= stylesheet_link_tag    'application', media: 'all' %>
