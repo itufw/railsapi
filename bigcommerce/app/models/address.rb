@@ -38,7 +38,7 @@ class Address < ActiveRecord::Base
 			unless os.nil? || os.street_1.to_s.nil?
 				sql = "UPDATE orders SET street = '#{os.street_1.to_s}', street_2 = '#{os.street_2.to_s}',
 					city = '#{os.city}', state = '#{os.state}', postcode = '#{os.zip}',
-					country = '#{os.country}', ship_name= \"#{os.first_name.to_s + " " + os.last_name.to)s}\" WHERE id = #{order_id}"
+					country = '#{os.country}', ship_name= \"#{os.first_name.to_s + " " + os.last_name.to_s}\" WHERE id = #{order_id}"
 				ActiveRecord::Base.connection.execute(sql)
 			end
 
