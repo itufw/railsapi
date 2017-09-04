@@ -55,7 +55,7 @@
     <i>Bill To:</i><br/>
     <h3 style="margin-bottom: 0px;padding-right: 5px;"><%= customer.actual_name%></h3>
     <%= customer.street%><br/>
-    <% unless customer.street_2.nil? %>
+    <% unless customer.street_2=="" %>
       <%= customer.street_2%><br/>
     <% end %>
     <%= customer.city%>,
