@@ -7,7 +7,7 @@ product_list.html([
   '&nbsp;&nbsp;&nbsp;',
   '<%= link_to "Update Status", {action: "order_confirmation", order_id: @order_id}, class: "btn btn-warning" if user_full_right(session[:authority]) %>',
   '&nbsp;&nbsp;&nbsp;',
-  '<%=j render "order_partials/order_email", order: order if it_working(session[:authority]) %>',
+  '<%=j render "order_partials/order_email", order: order %>',
   '<%=j render "partials/order_product", order_products: order.order_products, cust_id: order.customer_id, cust_name: customer_name(order.customer) %>',
   '<%=j render "order_partials/notes", order: order %>'
 ].join(''));

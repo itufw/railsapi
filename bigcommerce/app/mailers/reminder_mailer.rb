@@ -1,6 +1,9 @@
 class ReminderMailer < ActionMailer::Base
   require 'mail'
   require 'wicked_pdf'
+  require 'order_status.rb'
+
+  include OrderStatus
 
   default from: 'accounts@untappedwines.com'
   layout "mailer"
@@ -10,6 +13,18 @@ class ReminderMailer < ActionMailer::Base
     @error_message = error_message
     @backtrace = backtrace.join("\n")
     mail(from: 'Untapped IT <it@untappedwines.com>', to: 'William Liu <it@untappedwines.com>', cc: 'Luke Voortman <lvoortman@untappedwines.com>', subject: "Sync Error")
+  end
+
+  def order_confirmation(order_id, email_address)
+    @order = Order.find(order_id)
+    @customer = @order.customer
+    @staff = @order.staff
+
+    customer_address = %("#{@customer.actual_name}" <#{email_address}>)
+    subject = "Untapped Fine Wines Order #{@order.id} – [#{@customer.actual_name}]"
+    attachments["Invoice##{order_id}.pdf"] = print_single_invoice(@order)
+
+    mail(from: "Untapped Fine Wines <accounts@untappedwines.com>", to: customer_address, reply_to: @staff.email, subject: subject)
   end
 
   def send_overdue_reminder(customer_id, email_subject,staff_id,email_content,email_address, cc, bcc, email_type, selected_invoices, cn_op, attachment_tmp)
