@@ -42,9 +42,18 @@ module ApplicationHelper
   end
 
   # Return the latest shipping status
-  def shipping_status(order_id)
-    # FastwayTrace.where(id: FastwayTrace.track_order('22642').group('LabelNumber').maximum('id').values())
-    records = FastwayTrace.where(id: FastwayTrace.track_order(order_id).group('LabelNumber').maximum('id').values())
+  def shipping_status(order)
+    if order.track_number.nil? || order.track_number==""
+      records = FastwayTrace.where(id: FastwayTrace.track_order(order.id).group('LabelNumber').maximum('id').values())
+    elsif order.courier_status_id == 4
+      records = FastwayTrace.where(id: FastwayTrace.where('LabelNumber IN (?)', order.track_number.split(';')).group('LabelNumber').maximum('id').values())
+    elsif order.courier_status_id == 1
+      return ''
+    else
+      return order.courier_status.description.to_s + " " + order.track_number
+    end
+
+    return 'Fastway Booked' if records.blank? && order.courier_status_id==4
     return '' if records.blank?
 
     record_status = records.map(&:Description).uniq

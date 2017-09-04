@@ -5,7 +5,12 @@ class ActivityController < ApplicationController
   before_action :confirm_logged_in
 
   autocomplete :product, :name, full: true
-  autocomplete :customer, :actual_name, full: true
+  autocomplete :product, :ws, full: true
+  autocomplete :product, :retail, column_name: 'name', full: true, scopes: [:retail_products], extra_data: [:calculated_price, :inventory]
+  autocomplete :product_no_ws, :name, full: true, extra_data: [:product_no_vintage_id]
+  autocomplete :product_no_vintage, :name, full: true
+  autocomplete :customer, :actual_name, full: true, extra_data: [:address]
+  autocomplete :customer, :retail, column_name: 'actual_name', full: true, scopes: [:retail_customer]
   autocomplete :customer_lead, :actual_name, full: true, scopes: :not_customer
   autocomplete :contact, :name, display_value: :display_position, scopes: :has_role
   autocomplete :staff, :nickname, extra_data: [:nickname]
@@ -141,7 +146,12 @@ class ActivityController < ApplicationController
   end
 
   def autocomplete_product_name
-    products = Product.search_for(params[:term]).order('name_no_vintage ASC, vintage DESC').all
+    products = Product.search_for(params[:term]).where('inventory > 0').order('name_no_vintage ASC, vintage DESC').all
+    render :json => products.map { |product| {:id => product.id, :label => product.name, :value => product.name, :price => (product.calculated_price * (1.29)).round(4), :inventory => product.inventory}}
+  end
+
+  def autocomplete_product_ws
+    products = Product.search_for(params[:term]).where("inventory > 0 AND name LIKE '%WS'").order('name_no_vintage ASC, vintage DESC').all
     render :json => products.map { |product| {:id => product.id, :label => product.name, :value => product.name, :price => (product.calculated_price * (1.29)).round(4), :inventory => product.inventory}}
   end
 

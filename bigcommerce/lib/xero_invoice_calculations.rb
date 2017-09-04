@@ -48,7 +48,7 @@ module XeroInvoiceCalculations
         discounted_ex_gst_unit_price = {}
         discounted_unit_price.each { |op_id, d| discounted_ex_gst_unit_price[op_id] = get_ex_gst_price(d, gst_percentage) }
 
-        inc_gst_shipping_price = order.shipping_cost_inc_tax
+        inc_gst_shipping_price = order.shipping_cost
         ex_gst_shipping_price = get_ex_gst_price(inc_gst_shipping_price, gst_percentage)
 
         if is_customer_wholesale
@@ -208,13 +208,13 @@ module XeroInvoiceCalculations
     def insert_rounding_to_calculation(order_number, order_total, xero_account_code)
       amount = XeroCalculation.where(invoice_number: order_number).map{ |x| (x.discounted_unit_price.to_f * x.qty).round(2)}.sum
       amount += XeroCalculation.where(invoice_number: order_number, discounted_unit_price: nil).map(&:unit_price_inc_tax).sum
-      if (order_total - amount) != 0
+      if (order_total - amount).round(2) != 0
          XeroCalculation.insert_rounding_new(order_number, order_total - amount, order_total, xero_account_code)
       end
     end
 
     def get_discount_rate(order)
-        order_total_ex_shipping = order.total_inc_tax - order.shipping_cost_inc_tax
+        order_total_ex_shipping = order.total_inc_tax - order.shipping_cost
         order_product_total = OrderProduct.order_sum(order.order_products)
         order_total_ex_shipping / order_product_total
     end

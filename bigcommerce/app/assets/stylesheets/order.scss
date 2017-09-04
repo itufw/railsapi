@@ -1,6 +1,14 @@
 // Place all the styles related to the Order controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+.account-Approved {
+  color: green;
+}
+
+.account-Account-Hold, .account-Hold-Account {
+  color: red;
+}
+
 .Onboard {
   color: blue;
 }
@@ -41,6 +49,37 @@
   color: red;
 }
 
+[class*='Staff-'] {
+  color: orange;
+}
+
+[class*='CIVIC-'] {
+  color: orange;
+}
+
+.Fastway-Booked {
+  color: purple;
+}
+
 .Manual-Check-Required {
   color: red;
+}
+
+.status-inactive {
+  display: none;
+  cursor: not-allowed;
+}
+
+.status-active {
+  float: none;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+textarea {
+  -webkit-box-sizing: border-box; /* <=iOS4, <= Android  2.3 */
+   -moz-box-sizing: border-box; /* FF1+ */
+        box-sizing: border-box; /* Chrome, IE8, Opera, Safari 5.1*/
 }

@@ -1,0 +1,24 @@
+<button name="commit" value="Email" class="btn btn-danger send-email">Send Email</button>
+<div class="email-addresses" style="display: none">
+  <br/>
+  <% customer = order.customer %>
+  <p><b>Customer Email:</b><%= link_to customer.email, controller: 'order', action: 'send_email', order_id: order.id, email_address: customer.email unless customer.email.nil? %></p>
+  <p><b>Sales Email:</b><%= link_to customer.email_for_sales, controller: 'order', action: 'send_email', order_id: order.id, email_address: customer.email_for_sales unless customer.email_for_sales.nil? %></p>
+  <p><b>Account Email:</b><%= link_to customer.email_for_accounts, controller: 'order', action: 'send_email', order_id: order.id, email_address: customer.email_for_accounts unless customer.email_for_accounts.nil? %></p>
+  <%unless customer.xero_contact_id.nil?%>
+  <% XeroContactPerson.all_contact_people(customer.xero_contact_id).each do |person| %>
+    <p><b><%= person.first_name+"  "+person.last_name %>:</b><%= link_to person.email_address, controller: 'order', action: 'send_email', order_id: order.id, email_address: person.email_address unless person.email_address.nil? %></p>
+  <% end %>
+  <% end %>
+  <% customer.cust_contacts.each do |contact| %>
+    <% person = contact.contact%>
+    <p><b><%= contact.title%> <%= person.name %>:</b><%= link_to contact.email, controller: 'order', action: 'send_email', order_id: order.id, email_address: contact.email unless contact.email.nil? %></p>
+  <% end %>
+  <br/>
+</div>
+
+<script type="text/javascript">
+  $('button.send-email').click(function(){
+    $('.email-addresses').toggle();
+  });
+</script>

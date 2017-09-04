@@ -1,0 +1,95 @@
+<span class="orders-view default">
+	<%= render "partials/form_paginate", objects: orders unless orders.is_a? Array %>
+</span>
+<% can_update_staff = allow_to_update(session[:user_id]) %>
+<table class="table table-striped table-bordered table-hover table-responsive orders-view default" id="orders-view-table">
+	<thead>
+		<tr>
+			<th class="multi-select"><input type="checkbox" name="selected_all" class="selected_all_checkbox"></th>
+			<th>Order Id
+				<%= render "partials/sort_arrows", order: 'order_by_id' %></th>
+			<th>Date</th>
+			<th>Customer
+				<%= render "partials/sort_arrows", order: 'order_by_customer' %></th>
+			<th>Status
+				<%= render "partials/sort_arrows", order: 'order_by_status' %></th>
+			<th>Shipping Status</th>
+			<th class=<%= display_class %>>Selected Prod Qty</th>
+			<th>Qty
+				<%= render "partials/sort_arrows", order: 'order_by_qty' %></th>
+			<th>Total
+				<%= render "partials/sort_arrows", order: 'order_by_total' %></th>
+			<th>Sales Rep
+				<%= render "partials/sort_arrows", order: 'order_by_staff' %></th>
+			<th>Invoice Status</th>
+		</tr>
+	</thead>
+
+	<% orders.each do |order| %>
+  <% next if order.customer.nil? %>
+	<tr class='odd'>
+		<td class="multi-select"><%= check_box_tag 'selected_orders[]', order.id, false, class: "orders_checkbox" %></td>
+		<td class="account-<%= order.account_status %>"><%= link_to order.id, controller: 'order', action: 'details', order_id: order.id %></td>
+		<td><%= date_format_orders(order.date_created) %></td>
+
+		<% cust_name = customer_name(order.customer) %>
+		<td><%= link_to cust_name, controller: 'customer', action: 'summary', customer_id: order.customer_id, customer_name: cust_name %></td>
+
+		<td class="<%= order.status.name.split.join('-')%>"><%= order.status.name %></td>
+
+		<% shipping_description = shipping_status(order) %>
+		<td class=<%= shipping_description.split().join('-') %>><%= shipping_description %></td>
+		<td class=<%= display_class + " num " %>><%= product_qty(product_ids, order.id) %></th>
+		<td class="num"><%= order.qty %></td>
+		<td class="num"><%= display_num(order.total_inc_tax) %></td>
+
+		<%= render "customer_partials/order_staff_update", customer: order.customer, staff_id: order.staff_id, order_id: order.id, can_update_staff: can_update_staff %>
+		<% invoice_status = invoice_status(order.xero_invoice) %>
+		<td class=<%= invoice_status[0].downcase %>><%= invoice_status[0] %></td>
+	</tr>
+  <tr data-href="<%= fetch_order_detail_path(order_id: order.id) %>">
+		<td colspan="4">
+			<div class="shippment"></div>
+		</td>
+		<td colspan="5">
+			<div class="product-list"></div>
+		</td>
+	</tr>
+	<% end %>
+</table>
+<script type="text/javascript">
+  var checkboxes = $('.orders_checkbox');
+  for(var i = 0; i < checkboxes.length; i++){
+    checkboxes[i].checked = true;
+  }
+
+	$('.selected_all_checkbox').change(function(){
+		var flag = this.checked;
+		for(var i = 0; i < checkboxes.length; i++){
+			checkboxes[i].checked = flag;
+		}
+	});
+</script>
+<script>
+$("table.orders-view tbody tr:not(.odd)").hide();
+
+var shippment = null;
+var product_list = null;
+
+$("table.orders-view tbody tr.odd td:not(.multi-select)").click(function () {
+    var trToToggle = $(this).parent().next("tr");
+    $("table.orders-view tbody tr:not(.odd)").not(trToToggle).hide();
+
+    shippment = trToToggle.find('div.shippment');
+    product_list = trToToggle.find('div.product-list');
+
+    var link = trToToggle.data('href');
+    $.ajax({
+        type: 'GET',
+        url: link
+    });
+
+    $(trToToggle).toggle();
+    $(this).find(".arrow").toggleClass("up");
+});
+</script>

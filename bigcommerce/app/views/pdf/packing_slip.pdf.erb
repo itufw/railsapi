@@ -1,0 +1,365 @@
+<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+
+<div class="Invoice">
+  <div id="heading">
+    <div id="Logo">
+      <b>Packing Slip</b>
+      <h1 style="margin-bottom: 0px;padding-right: 2px;">Untapped Fine Wines</h1><br/>
+    </div>
+    <table id="invoiceDets">
+      <tr>
+        <td>
+          <b>Invoice No</b>
+        </td>
+        <td>
+          <b><%= order.id %></b>
+        </td>
+      </tr>
+      <tr>
+        <td>Date</td>
+        <td id="dateRef" class="term_date"><%= order.created_at.strftime("%e/%m/%Y") %></td>
+      </tr>
+    </table>
+  </div>
+
+  <div id="customerDetails">
+    <i>Ship To:</i><br/>
+    <h3 style="margin-bottom: 0px;padding-right: 5px;"><%= (order.ship_name.to_s=="")? customer.actual_name : order.ship_name%></h3>
+    <%= order.street%><br/>
+    <% unless order.street_2.to_s=="" %>
+      <%= order.street_2 %><br/>
+    <% end %>
+    <%= order.city%>,
+    <%= order.state%>
+    <%= order.postcode%><br/>
+    <%= order.country%><br/>
+  </div>
+
+  <div style="margin-top: -200px;">
+    <%= render 'pdf/product_lists', order: order %>
+  </div>
+
+  <div class="InvoiceComments" style="%%GLOBAL_HideComments%%; font-size: 0.8em;width: 350px; text-align: justify;">
+    <div class="InvoiceHeading" style="font-size: 14;">Customer Notes</div>
+    <% order.customer_notes.split(/\n/).each do |note| %>
+      <%= note %> <br/>
+    <% end %>
+  </div>
+  <div class="InvoiceComments" style="%%GLOBAL_HideComments%%; font-size: 0.8em;width: 350px; text-align: justify;">
+    <div class="InvoiceHeading" style="font-size: 14;">Staff Notes</div>
+    <% order.staff_notes.split(/\n/).each do |note| %>
+      <b><%= note %></b><br/>
+    <% end %>
+  </div>
+  <div class="row" align="right" style=" position: fixed; bottom: 0; width: 100%;">
+    <table>
+      <tr>
+        <th>Acceptance:</th>
+        <th>____________________</th>
+        <th>____________________</th>
+        <th>__________________________</th>
+      </tr>
+      <tr>
+        <td></td>
+        <td>Name</td>
+        <td>Sign</td>
+        <td>Date</td>
+      </tr>
+    </table>
+  </div>
+</div>
+<style>
+  .InvoiceTotal.InvoiceTotalRow {
+    background-color: lightgrey;
+
+  }
+
+  body {
+    margin-top: -400px;
+  }
+
+  .InvoiceTotalRow td {
+    margin-right: 10px;
+  }
+
+  .Invoice {
+    border: none;
+    font-size: 14px;
+    margin-top: -10px;
+  }
+
+  .Invoice h1 {
+    font-size: 1.25em;
+    float: right;
+  }
+
+  #invoiceDets {
+    float: right;
+    clear: right;
+    margin-right: 17px;
+    margin-right: 9px;
+  }
+
+  #invoiceDets td {
+    text-align: right;
+    padding-right: 13px;
+  }
+
+  #UFW {
+    float: left;
+    clear: left;
+    margin-top: 14px;
+  }
+
+  #terms {
+    float: right;
+    clear: right;
+    margin-top: 20px;
+    margin-right: -8px;
+  }
+
+  #terms td {
+    text-align: right;
+    padding-right: 30px;
+  }
+
+  .Invoice img {
+    width: 200px;
+    float: left;
+  }
+
+  #customerDetails {
+    float: left;
+    clear: left;
+    margin-top: 22px;
+  }
+
+  #products {
+    padding-top: 385px;
+  }
+
+  .Invoice .ProductSku {
+    display: none;
+  }
+
+  #enquiries {
+    margin-top: 51px;
+    margin-bottom: 20px;
+    line-height: 16px;
+  }
+
+  #signBoxes {
+    float: right;
+    margin-top: -113px;
+  }
+
+  #signBoxes table {
+    border-collapse: collapse;
+    /*width: 150px;*/
+  }
+
+  #signBoxes table td {
+    border: 1px solid black;
+    width: 80px;
+  }
+
+  #signBoxes table th {
+    width: 100px;
+  }
+
+  #table2 {
+    height: 50px;
+  }
+
+  #products thead {
+    background-color: lightgrey;
+
+  }
+  /*/
+  ///////////////*/
+
+  .PackingSlipItemListCustomer td.ProductBinNumber,
+  .PackingSlipItemListCustomer td.ProductSku {
+    display: none;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+    margin: 10px;
+  }
+
+  body,
+  td,
+  th {
+    font-family: Calibri serif, serif;
+    font-size: 12px;
+  }
+
+  #Logo {
+    margin-bottom: 10px;
+  }
+
+  h1,
+  h1 a {
+    color: #000;
+    text-decoration: none;
+  }
+
+  .PackingSlip {
+    padding: 5px;
+  }
+
+  .InvoiceTitle,
+  .PackingSlipTitle {
+    font-size: 15px;
+    font-weight: bold;
+    background: #000;
+    color: #fff;
+    padding: 5px;
+    margin-bottom: 10px;
+  }
+
+  .StoreAddress {
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .InvoiceHeading,
+  .PackingSlipHeading {
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .AddressRow,
+  .CustomerDetails,
+  .InvoiceDetails,
+  .InvoiceItems,
+  .PackingSlipDetails,
+  .PackingSlipItems {
+    margin-bottom: 10px;
+  }
+
+  .InvoiceTable,
+  .PackingSlipTable {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .InvoiceTable th,
+  .PackingSlipTable th {
+    font-weight: bold;
+    padding: 5px;
+    text-align: left;
+  }
+
+  .InvoiceTable td,
+  .PackingSlipTable td {
+    padding: 5px;
+    vertical-align: top;
+    text-align: left;
+  }
+
+  .InvoiceTotalRow td,
+  .InvoiceTotals td,
+  td.ProductCost,
+  td.ProductQuantity,
+  td.ProductTotal,
+  th.ProductCost,
+  th.ProductQuantity,
+  th.ProductTotal {
+    text-align: right;
+  }
+
+  .AddressRow,
+  .InvoiceDetails,
+  .PackingSlipDetails {
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .BillingAddress,
+  .InvoiceDetailsLeft,
+  .InvoiceDetailsRight,
+  .PackingSlipDetailsLeft,
+  .PackingSlipDetailsRight,
+  .ShippingAddress {
+    float: left;
+    width: 48%;
+  }
+
+  .InvoiceItems,
+  .PackingSlipItems {
+    border-top: 1px solid #000;
+    padding-top: 10px;
+  }
+
+  .InvoiceItemList {
+    border-bottom: 1px solid #000;
+  }
+
+  .InvoiceItemDivider td {
+    padding-top: 10px;
+    border-top: 1px solid #000;
+  }
+
+  .ConfigurableProductRow,
+  .DetailRow {
+    clear: left;
+    margin-top: 6px;
+    padding-left: 140px;
+  }
+
+  .ConfigurableProductRow .Label,
+  .DetailRow .Label {
+    margin: 0 0 6px -140px;
+    float: left;
+    width: 130px;
+    padding-top: 1px;
+    display: inline;
+    position: relative;
+
+  }
+
+  .ConfigurableProductRow .Value,
+  .DetailRow .Value {
+    display: inline;
+  }
+
+  .InvoiceDetails .DetailRow .Label,
+  .PackingSlipDetails .DetailRow .Label {
+    font-weight: bold;
+  }
+
+  .ConfigurableProductRow {
+    font-size: 11px;
+    margin-left: 10px;
+  }
+
+  .InvoiceTotals .InvoiceTotal td {
+    font-weight: bold;
+  }
+
+  .InvoiceTotals {
+    psoition: relative;
+    right: -100px;
+  }
+
+  .ProductQuantity {
+    width: 50px;
+  }
+
+  .ProductCost,
+  .ProductTotal {
+    width: 150px;
+  }
+
+  .PageBreak {
+    page-break-after: always;
+  }
+
+  .ProductPreOrder {
+    font-size: 11px;
+  }
+</style>

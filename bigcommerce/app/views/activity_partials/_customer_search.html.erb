@@ -12,7 +12,7 @@
       </td>
     </tr>
       <% customers = Customer.filter_by_ids(customer_list)
-      customers.each do|customer| %>
+      customers.reject{|x| x.id==0}.each do|customer| %>
     <tr id="tr_customer_<%=customer.id%>">
       <td colspan="2"><%= text_field_tag 'customer '+customer.id.to_s, customer.actual_name, readonly: true %>
         <i class="glyphicon glyphicon-remove remove" title="remove"></i>

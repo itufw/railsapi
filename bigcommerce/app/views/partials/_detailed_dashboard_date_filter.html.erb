@@ -12,5 +12,10 @@
 	<div class="col-xs-3" style="float: left;margin-top: 2px;">
 	   	End Date:   <%= date_field( "selected_date", "selected_date", value: @end_date) %>
 	</div>
-
+	<div class="col-xs-3">
+		<%= radio_button_tag(:order_owner, "customer_owner", !@order_owner) %> Customer
+		<span style="margin-left: 50px;">
+		<%= radio_button_tag(:order_owner, "order_owner", @order_owner) %> Order
+		</span>
+	</div>
 </div>

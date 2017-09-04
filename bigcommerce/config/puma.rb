@@ -1,6 +1,9 @@
 # Change to match your CPU core count
 workers 1
 
+# Worker Timeout Setting
+worker_timeout 90
+
 # Min and Max threads per worker
 threads 1, 6
 

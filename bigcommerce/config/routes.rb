@@ -22,8 +22,11 @@ Rails.application.routes.draw do
   get '/calendar/local_calendar', to: 'calendar#local_calendar'
 
   get '/fetch_order_detail', to: 'order#fetch_order_detail', as: 'fetch_order_detail'
+  get '/fetch_last_products', to: 'status#fetch_last_products', as: 'fetch_last_products'
 
   get '/fetch_lead', to: 'lead#fetch_lead', as: 'fetch_lead'
+  get '/fetch_product_details', to: 'product#fetch_product_details', as: 'fetch_product_details'
+
 
   get '/rails/mailers' => 'rails/mailers#index'
   get '/rails/mailers/*path' => 'rails/mailers#preview'
@@ -49,9 +52,18 @@ Rails.application.routes.draw do
     get :autocomplete_customer_actual_name, on: :collection
   end
 
+  resources :product do
+    get :autocomplete_product_name, on: :collection
+  end
+
   resources :activity do
     get :autocomplete_product_name, on: :collection
+    get :autocomplete_product_ws, on: :collection
+    get :autocomplete_product_retail, on: :collection
+    get :autocomplete_product_no_ws_name, on: :collection
+    get :autocomplete_product_no_vintage_name, on: :collection
     get :autocomplete_customer_actual_name, on: :collection
+    get :autocomplete_customer_retail, on: :collection
     get :autocomplete_contact_name, on: :collection
     get :autocomplete_customer_lead_actual_name, on: :collection
     get :autocomplete_staff_nickname, on: :collection

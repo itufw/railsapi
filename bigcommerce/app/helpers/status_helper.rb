@@ -3,8 +3,8 @@ module StatusHelper
         status_id = params[:status_id]
         status_name = params[:status_name]
         if status_id.nil?
-            status_id = 1
-            status_name = 'Pending'
+            status_id = 11
+            status_name = 'Created'
         end
         [status_id, status_name]
     end
@@ -64,4 +64,5 @@ module StatusHelper
       end
       last_order_date
     end
+
 end

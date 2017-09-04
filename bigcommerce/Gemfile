@@ -77,9 +77,10 @@ gem 'will_paginate', '~> 3.1.0'
 
 gem 'uuidtools'
 
+# pdf generator / merger
 gem 'wicked_pdf'
-
 gem 'wkhtmltopdf-binary'
+gem 'combine_pdf'
 
 gem 'bootsy'
 

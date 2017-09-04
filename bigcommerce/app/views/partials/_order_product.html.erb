@@ -8,7 +8,7 @@
 	</tr>
 
 
-	<% order_products.each do |op| %>
+	<% order_products.select{|x| x.display > 0}.each do |op| %>
 	<tr>
 		<td><%= link_to op.product.name, controller: 'customer', action: 'summary_with_product', product_id: op.product.id, product_name: op.product.name, customer_id: cust_id, customer_name: cust_name %></td>
 		<td class="num"><%= op.qty %></td>
