@@ -1,6 +1,13 @@
 <%= title "Orders" %>
 <h3><%= orders_page_title(@staff_nickname, @start_date, @end_date) %></h3>
-<center><%= link_to "View My Orders", action: 'all', staff: {id: session[:user_id]} unless current_user_sales?(session[:authority]) %></center>
+<center>
+	<%= link_to '<i class="glyphicon glyphicon-search" title="View My Orders" style="color: black;"></i>'.html_safe, action: 'all', staff: {id: session[:user_id]} unless current_user_sales?(session[:authority]) %>
+	<%= link_to '<i class="glyphicon glyphicon-plus" title="Add New Orders" style="color: black;"></i>'.html_safe, action: 'create_order'%>
+</center>
+
+<div class="col-md-4 col-md-offset-7" style="margin-top: -40px;">
+	<%= render 'order_partials/order_status_label' if user_full_right(session[:authority]) %>
+</div>
 
 <%= form_tag({:controller => "order", :action => "all"}, {:method => "get"}) do %>
 
@@ -8,10 +15,10 @@
 
 	<%= render "partials/order_filter" %>
 
-	<%= hidden_field_tag :start_date, @start_date %>
+		<%= hidden_field_tag :start_date, @start_date %>
    	<%= hidden_field_tag :end_date, @end_date %>
    	<%= submit_tag "Filter", class: 'btn btn-primary' %>
-   	<%= link_to "Reset", {controller: "order", action: "all"}, class: "btn btn-primary" %></button>
+   	<%= link_to "Reset", {controller: "order", action: "all"}, class: "btn btn-primary" %>
 </div>
 <% end %>
 

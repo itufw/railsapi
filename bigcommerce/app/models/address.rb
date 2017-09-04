@@ -16,15 +16,32 @@ class Address < ActiveRecord::Base
 			time = Time.now.to_s(:db)
 
 			lat, lng = get_lat_lng(a[:street_1], a[:street_2], a[:city], a[:state], a[:country])
-			address = Address.new
-			address.id, address.customer_id, address.firstname, address.lastname = order_id, customer_id, a[:first_name], a[:last_name]
-			address.company = a[:company]
-			address.street_1, address.street_2, address.city, address.state, address.postcode = a[:street_1], a[:street_2], a[:city], a[:state], a[:zip]
-			address.country = a[:country]
-			address.phone, address.email = a[:phone], a[:email]
-			address.created_at, address.updated_at = time, time
-			address.lat, address.lng = lat, lng if lat.is_a? Numeric
-			address.save
+			self.id, self.customer_id, self.firstname, self.lastname = order_id, customer_id, a[:first_name], a[:last_name]
+			self.company = a[:company]
+			self.street_1, self.street_2, self.city, self.state, self.postcode = a[:street_1], a[:street_2], a[:city], a[:state], a[:zip]
+			self.country = a[:country]
+			self.phone, self.email = a[:phone], a[:email]
+			self.created_at, self.updated_at = time, time
+			self.lat, self.lng = lat, lng if lat.is_a? Numeric
+			self.save
+
+			customer = Customer.find(customer_id)
+			if customer.street.nil?
+				sql = "UPDATE customers SET street = '#{self.street_1.to_s}', street_2 = '#{self.street_2.to_s}',
+					city = '#{self.city}', state = '#{self.state}', postcode = '#{self.postcode}',
+					country = '#{self.country}' WHERE id = #{customer_id}"
+				ActiveRecord::Base.connection.execute(sql)
+			end
+
+			order_ship_api = Bigcommerce::OrderShippingAddress
+			os = order_ship_api.all(order_id).first
+			unless os.nil? || os.street_1.to_s.nil?
+				sql = "UPDATE orders SET street = '#{os.street_1.to_s}', street_2 = '#{os.street_2.to_s}',
+					city = '#{os.city}', state = '#{os.state}', postcode = '#{os.zip}',
+					country = '#{os.country}', ship_name= \"#{os.first_name.to_s + " " + os.last_name.to_s}\" WHERE id = #{order_id}"
+				ActiveRecord::Base.connection.execute(sql)
+			end
+
 		end
 	end
 

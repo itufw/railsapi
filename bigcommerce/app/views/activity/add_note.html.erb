@@ -52,7 +52,7 @@
 var invoice_table = $('#invoice_table');
 
   <% customer_relations = (@parent.nil?) ? nil : @parent.task_relations.map(&:customer_id).uniq.compact %>
-  <% unless customer_relations.nil?%>
+  <% unless (customer_relations.nil?) || (customer_relations.blank?)%>
     <% Customer.filter_by_ids(customer_relations).each do |customer| %>
       <% customer.xero_invoices.has_amount_due.each do |invoice| %>
         $('#invoice_table').append([

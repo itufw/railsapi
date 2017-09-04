@@ -1,0 +1,27 @@
+<table>
+  <tr>
+    <td class="ProductCost" align="right">Billing Address</td>
+    <td colspan="2">
+      <%= f.fields_for "customer", f.object.customer do |c|%>
+      <%= c.text_field :street, placeholder: 'Street'%>
+      <%= c.text_field :street_2, placeholder: 'Street 2'%>
+      <%= c.text_field :city, placeholder: 'City'%>
+      <%= c.text_field :state, placeholder: 'State'%>
+      <%= c.text_field :postcode, placeholder: 'Postcode'%>
+      <%= c.text_field :country, placeholder: 'Country'%>
+      <% end %>
+    </td>
+  </tr>
+  <tr>
+    <td class="ProductCost" align="right">Shipping Address</td>
+    <td colspan="2">
+      <%= f.text_field :ship_name, placeholder: 'Recipient or Leave it Blank'%>
+      <%= f.text_field :street, placeholder: 'Street'%>
+      <%= f.text_field :street_2, placeholder: 'Street 2'%>
+      <%= f.text_field :city, placeholder: 'City'%>
+      <%= f.text_field :state, placeholder: 'State'%>
+      <%= f.text_field :postcode, placeholder: 'Postcode'%>
+      <%= f.text_field :country, placeholder: 'Country'%>
+    </td>
+  </tr>
+</table>

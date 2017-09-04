@@ -1,0 +1,14 @@
+<%= title "Order # " + @order.id.to_s + " History"%>
+<h3>Order #<%= @order.id %></h3>
+
+<% @order.order_histories.each do |order_history|%>
+  <%= render "partials/order_product", order_products: order_history.order_product_histories, cust_id: order_history.customer_id, cust_name: customer_name(order_history.customer) %>
+  <div class="well panel-default panel" style="margin-top:20px;margin-left:100px;width:30%;float:left;">
+    <h4 class="panel-heading">Customer Notes</h4>
+    <div class="panel-body"><%= order_history.customer_notes %></div>
+  </div>
+  <div class="well panel-default panel" style="margin-top:20px;margin-left:200px;width:30%;float:left;">
+    <h4 class="panel-heading">Staff Notes</h4>
+    <div class="panel-body"><%= order_history.staff_notes %></div>
+  </div>
+<% end %>

@@ -12,6 +12,9 @@ require 'dates_helper.rb'
 require 'product_helper'
 class ProductController < ApplicationController
   before_action :confirm_logged_in
+  
+  autocomplete :product, :name, full: true
+
 
   include ModelsFilter
   include ProductVariations
@@ -21,6 +24,7 @@ class ProductController < ApplicationController
 
   # Displays all products
   def all
+    params[:incompleted] = true if params[:commit] == 'Incomplete Product'
     filtered_products = filter(params)
     transform(params)
 
@@ -131,6 +135,7 @@ class ProductController < ApplicationController
 
   def get_id_activerecord_h(customers)
     id_activerecord_h = {}
+    return id_activerecord_h if customers.blank?
     customers.map { |c| id_activerecord_h[c.id] = c }
     id_activerecord_h
   end
@@ -140,4 +145,46 @@ class ProductController < ApplicationController
     @pending_stock = params[:pending_stock].to_i
   end
 
+  def edit
+    @product = Product.find(params[:product_id])
+  end
+
+  def update
+    if params[:new_product]=='1' && (product_params[:name_no_vintage].nil? || product_params[:name_no_ws].nil?)
+      flash[:error] = 'Incorrect!'
+      redirect_to :back and return
+    elsif params[:new_product]=='1'
+      product_no_ws = ProductNoWs.where("name LIKE ? ", '%' + product_params[:name_no_ws].to_s + '%').first
+      if product_no_ws.nil?
+        product_no_ws = ProductNoWs.new({name: product_params[:name_no_ws], product_no_vintage_id: product_params[:product_no_vintage_id]})
+        product_no_ws.save
+      end
+    end
+
+    product = Product.find(params[:product][:id])
+    product.assign_attributes(product_params)
+    product.product_no_ws_id = product_no_ws.id unless product_no_ws.nil?
+    product.producer_country_id = product.producer.producer_country_id unless product.producer.nil?
+    product.name_no_vintage = product.product_no_vintage.name unless product.product_no_vintage.nil?
+    product.save
+
+    redirect_to action: 'summary', product_id: product.id, product_name: product.name, transform_column: 'product_id', total_stock: product.inventory, pending_stock: product.inventory
+  end
+
+  def fetch_product_details
+    @product = Product.find(params[:product_id])
+    respond_to do |format|
+      format.js
+    end
+  end
+end
+
+private
+
+def product_params
+  params.require(:product).permit(:producer_id, :product_type_id, :warehouse_id,\
+   :product_size_id, :product_no_ws_id, :name_no_ws, :name_no_vintage,\
+   :product_no_vintage_id, :case_size, :product_package_type_id, :retail_ws,\
+   :vintage, :name_no_winery_no_vintage,\
+   :blend_type, :order_1, :order_2, :combined_order, :producer_ragion_id)
 end

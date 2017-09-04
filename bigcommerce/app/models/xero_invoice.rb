@@ -80,6 +80,11 @@ class XeroInvoice < ActiveRecord::Base
 
                end
 
+               order = Order.where(id: i.invoice_number).first
+               next if order.nil?
+
+               order.update(status_id: 10) if i.amount_due == 0 && order.status_id==12
+
                 ActiveRecord::Base.connection.execute(sql)
 
                 XeroInvoiceLineItem.new.download_data_from_api(i.line_items, i.invoice_id, i.invoice_number)

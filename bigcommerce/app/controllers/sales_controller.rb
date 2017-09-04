@@ -115,7 +115,12 @@ class SalesController < ApplicationController
     date_function = period_date_functions(@selected_period)[2]
     @sums_by_periods = sum_orders(@dates[0], @dates[-1], date_function.to_sym, sum_function, nil)
     staff_id, @staff_nicknames = display_reports_for_sales_dashboard(session[:user_id])
-    @staff_sum_by_periods = sum_orders(@dates[0], @dates[-1], (date_function + '_and_staff_id').to_sym, sum_function, staff_id)
+
+    @order_owner =  (params[:order_owner].to_s == 'order_owner') ? true : false
+
+    group_by_date_function_staff = @order_owner ? '_and_order_staff_id' : '_and_staff_id'
+
+    @staff_sum_by_periods = sum_orders(@dates[0], @dates[-1], (date_function + group_by_date_function_staff).to_sym, sum_function, staff_id)
 
     @current_user = Staff.find(session[:user_id])
     @display_all = params[:display_all] || 'No'

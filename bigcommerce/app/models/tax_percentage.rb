@@ -11,4 +11,8 @@ class TaxPercentage < ActiveRecord::Base
 	def self.ship_charge_percentage
 		return where(tax_name: 'Shipcharge').first.tax_percentage
 	end
+
+	def self.handling_fee
+		return where(tax_name: 'Handling').first.tax_percentage
+	end
 end

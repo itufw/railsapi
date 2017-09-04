@@ -13,7 +13,7 @@ namespace :updates do
 	task :models => :environment do
 
 		if can_start_update
-
+			begin
 			Revision.bigcommerce.start_update
 			start_time = Time.now
 
@@ -41,6 +41,9 @@ namespace :updates do
 			Revision.bigcommerce.end_update(start_time, Time.now)
 
 			puts "Models update #{Time.now} ended"
+			rescue Exception => ex
+				ReminderMailer.error_warning(ex.class, ex.message, ex.backtrace).deliver_now if Revision.bigcommerce.attempt_count == 2
+			end
 
 		end
 	end
@@ -66,10 +69,15 @@ namespace :updates do
 		Revision.google.start_update
 
 		puts "Event Update Start At #{start_time}"
-		import_into_customer_tags
-		calendar_event_update(Revision.google.start_time)
-		puts "Event Update End AT #{Time.now}"
-		Revision.google.end_update(start_time, Time.now)
+		begin
+			import_into_customer_tags
+			calendar_event_update(Revision.google.start_time, StaffCalendarAddress.where(sync_calendar: 1))
+
+			puts "Event Update End AT #{Time.now}"
+			Revision.google.end_update(start_time, Time.now)
+		rescue Exception => ex
+			ReminderMailer.error_warning(ex.class, ex.message, ex.backtrace).deliver_now
+		end
 	end
 
 	task :manifest_update => :environment do
@@ -82,6 +90,12 @@ namespace :updates do
 		puts "Shipping Update Start At #{Time.now}"
 		trace_events
 		puts "Shipping Update End At #{Time.now}"
+	end
+
+	task :wake_signatures => :environment do
+		puts 'Wake Signatures Up'
+		wake_signatures
+		puts 'Waked Signature'
 	end
 
 	task :balanceupdate => :environment do

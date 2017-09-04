@@ -92,7 +92,7 @@ class Customer < ActiveRecord::Base
 
 		end
 
-        ActiveRecord::Base.connection.execute(sql)
+    ActiveRecord::Base.connection.execute(sql)
 
 	end
 
@@ -131,6 +131,14 @@ class Customer < ActiveRecord::Base
 
 		end
 
+	end
+
+	def account_approval(order_total)
+		return 'Approved' if order_total == 0
+		return 'Hold-Account' if self.xero_contact_id == 0
+		sum = XeroInvoice.where("xero_contact_id = '#{self.xero_contact_id}' AND due_date < '#{(Date.today - self.tolerance_day.to_i.days).to_s(:db)}'").sum('amount_due')
+		return 'Hold-Account' if sum > 0
+		'Approved'
 	end
 
 	def self.staff_search_filter(search_text = nil, staff_id = nil)
@@ -239,6 +247,10 @@ class Customer < ActiveRecord::Base
 	def self.xero_contact_id_of_duplicate_customer(customer_name)
 		customer = where('actual_name = ? and xero_contact_id IS NOT NULL', customer_name).first
 		return customer.xero_contact_id unless customer.nil?
+	end
+
+	def self.retail_customer
+		where(cust_type_id: 1)
 	end
 
 	# def self.due_date_num_days(customer)

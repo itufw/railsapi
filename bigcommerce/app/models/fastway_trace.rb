@@ -23,7 +23,7 @@ class FastwayTrace < ActiveRecord::Base
   end
 
   def self.track_order(order_id)
-    where("Reference LIKE '%#{order_id}%'")
+    where("Reference = '#{order_id}'")
   end
 
   def self.lastest

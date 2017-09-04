@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=ISO-8859-1' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h4>Error <%= @error_class %> Happened</h4>
+    <p><%= @error_message %></p>
+    <p><%= @backtrace %></p>
+    <%= render "reminder_mailer_partials/signature_CMS"%>
+  </body>
+</html>

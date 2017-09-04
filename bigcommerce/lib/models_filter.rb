@@ -15,8 +15,8 @@ module ModelsFilter
 
     status_id, status = collection_param_filter(params, :status, Status)
 
-    if order_id_text.to_i > 0
-      orders = Order.order_filter_by_ids([order_id_text.to_i])
+    if order_id_text.to_s != ''
+      orders = Order.search_for(order_id_text)
     else
       orders = Order.date_filter(params[:start_date], params[:end_date]).customer_filter(customer_ids).staff_filter(staff_id).status_filter(status_id)
     end
@@ -95,6 +95,8 @@ module ModelsFilter
       producer_country_id, producer_country = collection_param_filter(params, :producer_country, ProducerCountry)
       product_sub_type_id, product_sub_type = collection_param_filter(params, :product_sub_type, ProductSubType)
       products = Product.search(search_text).producer_country_filter(producer_country_id).sub_type_filter(product_sub_type_id)
+
+      products = Product.incompleted unless params[:incompleted].nil?
 
       return producer_country, product_sub_type, products, search_text, producer_country_id
     end

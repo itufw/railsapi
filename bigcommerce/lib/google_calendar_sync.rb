@@ -52,10 +52,10 @@ module GoogleCalendarSync
     service
   end
 
-  def calendar_event_update(last_update_date = (Time.now - 1.month))
+  def calendar_event_update(last_update_date = (Time.now - 1.month), staff_calendars = StaffCalendarAddress.all)
     service = connect_google_calendar
     push_pending_events_to_google_offline(service)
-    scrap_from_calendars(service, last_update_date)
+    scrap_from_calendars(service, last_update_date, staff_calendars)
   end
 
   def push_pending_events_to_google_offline(service)
@@ -74,16 +74,14 @@ module GoogleCalendarSync
     end
   end
 
-  def scrap_from_calendars(service, last_update_date)
+  def scrap_from_calendars(service, last_update_date, staff_calendars)
     new_events = []
     # record the events and the calendar id
     calendar_events_pair = {}
 
-    staff_calendars = StaffCalendarAddress.all
-
     service.list_calendar_lists.items.select { |x| staff_calendars.map(&:calendar_address).include?x.id }.each do |calendar|
       # only sync the tasks for last month
-      items = service.list_events(calendar.id).items.select { |x| x.updated.to_s > last_update_date.to_s }
+      items = service.list_events(calendar.id, updated_min: last_update_date.to_datetime.rfc3339, show_deleted: false).items
       calendar_events_pair[calendar.id] = items.map(&:id)
       new_events += items
     end
@@ -93,6 +91,10 @@ module GoogleCalendarSync
   # scrap events from google calendar
   def update_google_events(new_events, staff_calendars, service, calendar_events_pair)
     new_events.each do |event|
+      # filter out the invalid events
+      # Cancelled events
+      next if event.created.nil?
+
       task = Task.filter_by_google_event_id(event.id).first
 
       # insert new task
@@ -159,15 +161,18 @@ module GoogleCalendarSync
   def push_event(customer, description, staff_ids, response_staff, start_time, end_time, subject, method, service, client)
 
     staffs = Staff.filter_by_ids(staff_ids.append(response_staff))
-    staff_calendar_addresses = StaffCalendarAddress.filter_by_ids(staff_ids)
+    staff_calendar_addresses = StaffCalendarAddress.filter_by_ids(staff_ids + staffs.map(&:id))
     response_staff = staffs.select { |x| x.id.to_s == response_staff.to_s }.first
     response_staff_email = response_staff.email
 
     attendee_list = []
     staffs.each do |staff|
+      calendar_email = staff_calendar_addresses.select{|x|x.staff_id == staff.id}.first
+      calendar_email = (calendar_email.nil?) ? staff.email : calendar_email.calendar_address
+      next if calendar_email.nil?
       attend = {
         displayName: staff.nickname,
-        email: staff_calendar_addresses.select{|x|x.staff_id == staff.id}.first.calendar_address
+        email: calendar_email
       }
       attendee_list.append(attend)
     end

@@ -1,7 +1,7 @@
 <span class="orders-view default">
 	<%= render "partials/form_paginate", objects: orders %>
 </span>
-
+<% can_update_staff = allow_to_update(session[:user_id]) %>
 <table class="table table-striped table-bordered table-hover table-responsive orders-view default" id="orders-view-table">
 	<thead>
 		<tr>
@@ -26,20 +26,19 @@
 
 	<% orders.each do |order| %>
 	<tr>
-		<td><%= link_to order.id, controller: 'order', action: 'details', order_id: order.id %></td>
-		<td><%= date_format_orders(order.date_created) %></td>
+		<td class="account-<%= order.account_status %>"><%= link_to order.id, controller: 'order', action: 'details', order_id: order.id %></td>
+		<td><%= date_format_orders(order.date_created) %><%= ('<br><i>' + date_format_orders(order.eta) + '</i>').html_safe  unless (order.eta.nil?) || ([10, 12].include?order.status_id)%></td>
 
 		<% cust_name = customer_name(order.customer) %>
 		<td><%= link_to cust_name, controller: 'customer', action: 'summary', customer_id: order.customer_id, customer_name: cust_name %></td>
-
-		<td><%= order_status(order.status) %></td>
-		<% shipping_description = shipping_status(order.id) %>
+		<td><%= order_status(order.status)%></td>
+		<% shipping_description = shipping_status(order) %>
 		<td class=<%= shipping_description.split().join('-') %>><%= shipping_description %></td>
 		<td class=<%= display_class + " num " %>><%= product_qty(product_ids, order.id) %></th>
 		<td class="num"><%= order.qty %></td>
 		<td class="num"><%= display_num(order.total_inc_tax) %></td>
 
-		<%= render "customer_partials/order_staff_update", customer: order.customer, staff_id: order.staff_id, order_id: order.id, can_update_staff: allow_to_update(session[:user_id]) %>
+		<%= render "customer_partials/order_staff_update", staff_id: order.staff_id, order_id: order.id, can_update_staff: can_update_staff %>
 		<% invoice_status = invoice_status(order.xero_invoice) %>
 		<td class=<%= invoice_status[0].downcase %>><%= invoice_status[0] %></td>
 	</tr>

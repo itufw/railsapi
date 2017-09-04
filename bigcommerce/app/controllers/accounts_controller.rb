@@ -118,7 +118,6 @@ class AccountsController < ApplicationController
 
         # attach the attachment
         attachment_tmp = params[:account_email][:attachment]
-
         ReminderMailer.send_overdue_reminder(customer_id, email_subject, staff_id, email_content, receive_address, email_cc, email_bcc, email_type, selected_invoices, cn_op, attachment_tmp).deliver_now
         flash[:success] = 'Email Sent'
 
@@ -135,5 +134,9 @@ class AccountsController < ApplicationController
         @orders = Order.total_dismatch.order_by_id('DESC')
         @credit_note_allocation = XeroCnAllocation.apply_to_orders(@orders.map(&:id)).group_by_orders.sum_applied_amount
         @xero_line_items_sum = XeroInvoiceLineItem.is_product.belongs_to_invoice(@orders.map { |x| x.xero_invoice.xero_invoice_id }).group_by_invoice.sum_order_product_qty
+    end
+
+    def account_status
+      @orders = Order.where("account_status != 'Approved'")
     end
 end

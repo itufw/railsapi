@@ -7,6 +7,20 @@
 	<% end %>
 </div>
 
+<div align="center" style="margin-top: 50px;">
+	<%= form_tag({action: 'download_csv'}, {method: 'get'}) do%>
+		<%= date_field( 'date', "start_date", value: (Date.today - 30.days)) %>
+		<%= date_field( 'date', "end_date", value: Date.today) %>
+		<%= collection_select(nil, :status, Status.bigcommerce_status, :id, :status, {include_blank: 'Select Status'}) %>
+		<br/>
+		<%= submit_tag 'Customer', value: 'Customer', class: 'btn btn-success' %>
+		<%= submit_tag 'Order Products', value: 'Order Products', class: 'btn btn-default' %>
+		<%= submit_tag 'Orders', value: 'Orders', class: 'btn btn-info' %>
+		<%= submit_tag 'Shipment', value: 'Shipment', class: 'btn btn-danger' %>
+		<%= submit_tag 'ScotPac', value: 'ScotPac', class: 'btn btn-warning' %>
+	<% end %>
+</div>
+
 <div style="margin-top: 50px;">
 	<%= form_tag({:action => "password_update"}, {:method => "get"}) do %>
 		<h4>Password Update : </h4>

@@ -1,175 +1,29 @@
 <%= title 'New Order' %>
-<h3>New Order</h3>
+<h3 class="title">New Order</h3>
+
 <%= form_for @order, :url => {:controller => "order", :action => "save_order"}  do |f| %>
-<%= f.text_field :customer_id %>
-<div class="row">
-  <div class="col-md-4">
-    <table id="customer_table">
-      <tr>
-        <th>Customer</th>
-        <td>
-          <%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 15 %>
-        </td>
-      </tr>
-    </table>
+  <div id="selector" class="btn-group" style="float: right; margin-top: -35px; margin-right: 450px;">
+    <label type="button" class="btn btn-default order-type" value="WS">WS</label>
+    <label type="button" class="btn btn-default order-type" value="Retail">Retail</label>
   </div>
-  <div class="col-md-4">
-    <table id="product_table">
-      <tr>
-        <th>Product</th>
-        <td>
-          <%= autocomplete_field_tag 'product', '', autocomplete_product_name_activity_index_path, placeholder: 'Search Product', id_element: '#product_id', id: 'product_search'%>
-        </td>
-      </tr>
-    </table>
+
+  <div class="order_form" value="WS">
+    <%= render 'order_partials/order_form', f: f%>
   </div>
-</div>
 
-<table class = "table table-striped table-bordered table-hover table-responsive product-table">
-  <thead>
-    <tr>
-      <th>Product ID</th>
-      <th>Product</th>
-      <th>Inventory</th>
-      <th>Price (Luc)</th>
-      <th>QTY</th>
-      <th>Discount</th>
-      <th>Discounted Price</th>
-      <th>Total</th>
-    </tr>
-  </thead>
-  <tbody class="product-list">
-  </tbody>
-  <tr>
-    <td colspan="6" rowspan="6" style="background-color:rgb(255,255,255); border: 0px;">
-      <div class="well panel-default panel" style="margin-top:20px;margin-left:100px;width:30%;float:left;">
-        <h4 class="panel-heading">Customer Notes</h4>
-        <div class="panel-body"><%= f.text_area :customer_notes%></div>
-      </div>
-
-      <div class="well panel-default panel" style="margin-top:20px;margin-left:200px;width:30%;float:left;">
-        <h4 class="panel-heading">Staff Notes</h4>
-        <div class="panel-body"><%= f.text_area :staff_notes%></div>
-      </div>
-    </td>
-    <td class="ProductCost" align="right">Subtotal (Inc. WET, Ex. GST)</td>
-    <td class="ProductTotal" align="right"><%= f.text_field :subtotal_inc_tax, readonly: true%></td>
-  </tr>
-  <tr>
-    <td class="ProductCost" align="right">Discount Rate</td>
-    <td class="ProductTotal" align="right"><%= f.text_field :discount_rate %></td>
-  </tr>
-  <tr>
-    <td class="ProductCost" align="right">Discount</td>
-    <td class="ProductTotal" align="right"><%= f.text_field :discount_amount, readonly: true%></td>
-  </tr>
-  <tr>
-    <td class="ProductCost" align="right">WET</td>
-    <td class="ProductTotal" align="right"><%= f.text_field :subtotal_tax, readonly: true%></td>
-  </tr>
-  <tr>
-    <td class="ProductCost" align="right">GST</td>
-    <td class="ProductTotal" align="right"><%= f.text_field :total_tax, readonly: true%></td>
-  </tr>
-  <tr>
-    <td class="ProductCost" align="right">Grand Total</td>
-    <td class="ProductTotal" align="right"><%= f.text_field :total_inc_tax, readonly: true%></td>
-  </tr>
-</table>
-<div class="row">
-  <div class="col-md-4 col-md-offset-4">
-    <%= button_tag(type: 'submit', class: 'btn btn-primary') do %>
-      <div> Save </div>
-    <% end %>
-  </div>
-</div>
-
-<% end %>
-
-
-<script type="text/javascript">
-$('#cms_order_customer_id').hide();
-
-var update_subtotal = function(){
-  var total = 0;
-  var discount = 0;
-  $('.product-item').each(function(){
-    total += parseFloat($(this).find('.product-total').val());
-    discount += (parseFloat($(this).find('.product-luc').val()) - parseFloat($(this).find('.product-price').val())) *  parseInt($(this).find('.product-qty').val());
-  });
-  $('#cms_order_subtotal_inc_tax').val(total.toFixed(4));
-  $('#cms_order_subtotal_tax').val((total/1.29 * 0.29).toFixed(4));
-  $('#cms_order_total_tax').val((total*0.1).toFixed(4));
-  $('#cms_order_discount_amount').val(discount.toFixed(4));
-  $('#cms_order_total_inc_tax').val((total*1.1).toFixed(4));
-  return total
-}
-
-$('#cms_order_discount_rate').on('input',function(){
-  var discount = 1 - (parseFloat($('#cms_order_discount_rate').val()) / 100);
-  $('#cms_order_discount_amount').val(((1 - discount) * parseFloat($('#cms_order_subtotal_inc_tax').val())).toFixed(4));
-  var total = discount * parseFloat($('#cms_order_subtotal_inc_tax').val());
-  $('#cms_order_total_tax').val((total*0.1).toFixed(4));
-  $('#cms_order_total_inc_tax').val((total*1.1).toFixed(4));
-});
-
-// Customer Search
-  $('#customer_search').bind('railsAutocomplete.select', function(event, data){
-    if ($('#customer_table tr').length < 2) {
-      $('#customer_table').append([
-        '<tr id="customer_' + data.item.id + '">',
-        '<td colspan="2"><input type="text" name="customer" id="' + data.item.id + '" value="' + data.item.value + '" readonly="readonly"><i class="glyphicon glyphicon-remove remove" title="remove"></i></td>',
-        '</tr>'
-      ].join(''));
-      $('#cms_order_customer_id').val(data.item.id);
-      $('.remove').click(function () {
-        $(this).parent().parent().remove();
-        $('#cms_order_customer_id').val('');
-      });
-    }
-  });
-
-  // Product Search
-  $('#product_search').bind('railsAutocomplete.select', function(event, data){
-    if($('#tr_' + data.item.id).length == 0){
-      $('.product-table tbody.product-list').append([
-        '<tr class="product-item" id="tr_' + data.item.id + '">',
-            '<td>'+ data.item.id +'</td>',
-            '<td><input type="text" name="product_name ' + data.item.id + '" id="product_name_'+ data.item.id +'" value="'+ data.item.label +'" size="40" readonly="readonly"></td>',
-            '<td>'+ data.item.inventory +'</td>',
-            '<td class="num"><input class="product-luc" type="text" name="price_luc '+ data.item.id +'" id="price_luc_'+ data.item.id +'" value="'+ data.item.price +'" readonly="readonly"></td>',
-            '<td><input class="product-qty" type="text" name="qty '+ data.item.id +'" id="qty_'+ data.item.id +'" value="0" placeholder="QTY" size="3"></td>',
-            '<td><input class="product-discount" type="text" name="discount '+ data.item.id +'" id="discount_'+ data.item.id +'" value="0" placeholder="Discount" size="3"> %</td>',
-            '<td><input class="product-price" type="text" name="price '+ data.item.id +'" id="price_'+ data.item.id +'" value="'+ data.item.price +'" placeholder="Price" size="5"></td>',
-            '<td class="num"><input class="product-total" type="text" name="total '+ data.item.id +'" id="total_'+ data.item.id +'" value="'+ parseFloat(parseFloat($('input#qty_'+data.item.id).val()) * parseFloat($('input#price_'+data.item.id).val())).toFixed(4) +'" readonly="readonly"></td>',
-            '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
-        '</tr>'
-        ].join(''));
-
-        $('#price_'+ data.item.id).on('input',function(){
-          var d = $('#price_'+ data.item.id).val();
-          var c = data.item.price;
-          $('#discount_'+ data.item.id).val((100 - (d/c*100)).toFixed(0));
-          $('#total_' + data.item.id).val((parseFloat($('input#qty_'+data.item.id).val()) * parseFloat($('input#price_'+data.item.id).val())).toFixed(4));
-          update_subtotal();
-        });
-
-        $('#discount_'+ data.item.id).on('input',function(){
-          var d = $('#discount_'+ data.item.id).val();
-          var c = data.item.price;
-          $('#price_'+ data.item.id).val(((1-d*0.01)*c).toFixed(2));
-          $('#total_' + data.item.id).val((parseFloat($('input#qty_'+data.item.id).val()) * parseFloat($('input#price_'+data.item.id).val())).toFixed(4));
-          update_subtotal();
-        });
-
-        $('#qty_'+ data.item.id).on('input', function(){
-          $('#total_' + data.item.id).val((parseFloat($('input#qty_'+data.item.id).val()) * parseFloat($('input#price_'+data.item.id).val())).toFixed(4));
-          update_subtotal();
-        });
-
-        $('.remove_row').click(function(){
-          $(this).parent().parent().remove();
-        });
+  <script>
+    $('.order-type').click(function(){
+      if($(this).attr('value') != $('.order_form').attr('value')){
+        if ($(this).attr('value') == 'WS'){
+          $('.order_form').html('<%=j render 'order_partials/order_form', f: f %>');
+          $('.order_form').attr('value', 'WS');
+          $('.title').html('New Order');
+        }else{
+          $('.order_form').html('<%=j render 'order_partials/retail_order_form', f: f %>');
+          $('.order_form').attr('value', 'Retail');
+          $('.title').html('New Retail Order');
+        }
       }
-  });
-</script>
+    });
+  </script>
+<% end %>

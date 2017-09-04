@@ -1,7 +1,12 @@
 require 'csv_import.rb'
+require 'csv_generator.rb'
+
 
 class AdminController < ApplicationController
     before_action :confirm_logged_in
+
+    include CsvGenerator
+
 
     # CustType
     # CustGroup
@@ -46,7 +51,7 @@ class AdminController < ApplicationController
     end
 
     def update_orders
-        Order.new.update_from_api(Revision.bigcommerce.update_time_iso)
+        BigcommerceOrder.new.update_from_api(Revision.bigcommerce.update_time_iso)
     end
 
     def import_from_csv
@@ -147,5 +152,21 @@ class AdminController < ApplicationController
 
     def staff_order_update
       redirect_to action: 'index'
+    end
+
+    def download_csv
+      case params[:commit]
+      when 'Customer'
+        send_data export_customer(Date.parse(params[:date][:start_date]), Date.parse(params[:date][:end_date])), filename: "customer-#{Date.parse(params[:date][:end_date])}.csv" and return
+      when 'Order Products'
+        send_data export_order_products(Date.parse(params[:date][:start_date]), Date.parse(params[:date][:end_date])), filename: "order-products-#{Date.parse(params[:date][:end_date])}.csv" and return
+      when 'Orders'
+        send_data export_orders(params[:status],Date.parse(params[:date][:start_date]), Date.parse(params[:date][:end_date])), filename: "orders-#{Date.parse(params[:date][:end_date])}.csv" and return
+      when 'Shipment'
+        send_data export_shipment(Date.parse(params[:date][:start_date]), Date.parse(params[:date][:end_date])), filename: "ship-#{Date.parse(params[:date][:end_date])}.csv" and return
+      when 'ScotPac'
+        send_data export_orders(12, (Date.today - 8.years), Date.today), filename: "ScotPac-#{Date.parse(params[:date][:end_date])}.csv" and return
+      end
+      redirect_to :back
     end
 end

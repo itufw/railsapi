@@ -1,6 +1,36 @@
 load 'fastway.rb'
 
 module FastwayApi
+  def overwrite_instruction
+    orders = Order.joins(:customer).select('customers.SpecialInstruction1 AS customer_ins, orders.SpecialInstruction1 AS order_ins, orders.id AS order_id, customers.id AS customer_id').where('customers.SpecialInstruction1 IS NULL AND orders.id > 20000')
+    orders = orders.select{|x| x}
+    while !orders.blank?
+      order = orders.delete_at(0)
+      consignment = FastwayConsignment.joins(:items).where("Reference LIKE '%#{order.order_id}%'").order('CreateDate DESC').first
+
+      next if consignment.nil?
+
+      Customer.find(order.customer_id).update_attributes({
+          'SpecialInstruction1': consignment.SpecialInstruction1,\
+          'SpecialInstruction2': consignment.SpecialInstruction2,\
+          'SpecialInstruction3': consignment.SpecialInstruction3
+      })
+
+      orders = orders.reject{|x| x.customer_id == order.customer_id}
+    end
+  end
+
+  def wake_signatures
+    fastway = Fastway.new()
+    delivery_labels = FastwayTrace.select('distinct(LabelNumber)').completed.map(&:LabelNumber)
+    while !delivery_labels.blank?
+      selected_labels = delivery_labels[0..15]
+      response = fastway.track(selected_labels)
+      return response if resposne['result'].nil?
+      delivery_labels = delivery_labels.reject{|x| selected_labels.include?x}
+    end
+  end
+
   def trace_events
     fastway = Fastway.new()
 
@@ -24,6 +54,7 @@ module FastwayApi
           next if FastwayTrace.exists?(label['LabelNumber'], scan['Description'], scan['StatusDescription']).count > 0
           attributes = scan.select{ |key, value| key!='CompanyInfo'}.merge(scan['CompanyInfo']).merge(label_number)
           fastway_trace = FastwayTrace.new(attributes)
+          fastway_trace.Signature=label['Signature'] if fastway_trace.Description=="Signature Obtained" && (fastway_trace.Signature=="" || fastway_trace.Signature.nil?) && !label['Signature'].nil?
           fastway_trace.save
         end
       end
