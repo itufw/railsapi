@@ -97,7 +97,6 @@ class Fastway
     # Items[1].Weight
     # Items[1].Packaging
 
-    customer = order.customer
     packaging = packaging_selection(order)
 
     # Return Error if cannot find the error
@@ -106,8 +105,8 @@ class Fastway
     packaging = 1 if packaging==1765 && ((dozen > 0) || (dozen+half_dozen>1))
 
     item_number = 0
-
-    @query[:query][:CompanyName] = customer.actual_name
+    @query[:query][:CompanyName] = ((order.ship_name.nil?) || (order.ship_name.to_s=="")) ? order.customer.actual_name : order.ship_name
+    
     @query[:query][:Address1] = order.street.to_s
     @query[:query][:Address2] = order.street_2.to_s
     @query[:query][:Suburb] = order.city

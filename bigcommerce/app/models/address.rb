@@ -25,13 +25,23 @@ class Address < ActiveRecord::Base
 			self.lat, self.lng = lat, lng if lat.is_a? Numeric
 			self.save
 
-			order = Order.find(order_id)
-			if order.street.nil?
-				sql = "UPDATE orders SET street = '#{self.street_1.to_s}', street_2 = '#{self.street_2.to_s}',
+			customer = Customer.find(customer_id)
+			if customer.street.nil?
+				sql = "UPDATE customers SET street = '#{self.street_1.to_s}', street_2 = '#{self.street_2.to_s}',
 					city = '#{self.city}', state = '#{self.state}', postcode = '#{self.postcode}',
-					country = '#{self.country}' WHERE id = #{order_id}"
+					country = '#{self.country}' WHERE id = #{customer_id}"
 				ActiveRecord::Base.connection.execute(sql)
 			end
+
+			order_ship_api = Bigcommerce::OrderShippingAddress
+			os = order_ship_api.all(order_id).first
+			unless os.nil? || os.street_1.to_s.nil?
+				sql = "UPDATE orders SET street = '#{os.street_1.to_s}', street_2 = '#{os.street_2.to_s}',
+					city = '#{os.city}', state = '#{os.state}', postcode = '#{os.zip}',
+					country = '#{os.country}', ship_name= \"#{os.first_name.to_s + " " + os.last_name.to)s}\" WHERE id = #{order_id}"
+				ActiveRecord::Base.connection.execute(sql)
+			end
+
 		end
 	end
 
