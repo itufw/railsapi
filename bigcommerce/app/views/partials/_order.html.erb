@@ -27,7 +27,7 @@
 	<% orders.each do |order| %>
 	<tr>
 		<td class="account-<%= order.account_status %>"><%= link_to order.id, controller: 'order', action: 'details', order_id: order.id %></td>
-		<td><%= date_format_orders(order.date_created) %></td>
+		<td><%= date_format_orders(order.date_created) %><%= '<br>'.html_safe + date_format_orders(order.eta) unless order.eta.nil? || order.status_id==10%></td>
 
 		<% cust_name = customer_name(order.customer) %>
 		<td><%= link_to cust_name, controller: 'customer', action: 'summary', customer_id: order.customer_id, customer_name: cust_name %></td>
