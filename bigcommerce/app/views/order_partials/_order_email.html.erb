@@ -1,0 +1,24 @@
+<button name="commit" value="Email" class="btn btn-danger send-email">Send Email</button>
+<div class="email-addresses" style="display: none">
+  <br/>
+  <% customer = order.customer %>
+  <p><b>Customer Email:</b><%= mail_to(customer.email) unless customer.email.nil? %></p>
+  <p><b>Sales Email:</b><%= mail_to(customer.email_for_sales) unless customer.email_for_sales.nil? %></p>
+  <p><b>Account Email:</b><%= mail_to(customer.email_for_accounts) unless customer.email_for_accounts.nil? %></p>
+  <%unless customer.xero_contact_id.nil?%>
+  <% XeroContactPerson.all_contact_people(customer.xero_contact_id).each do |person| %>
+    <p><b><%= person.first_name+"  "+person.last_name %>:</b><%= mail_to(person.email_address) unless person.email_address.nil? %></p>
+  <% end %>
+  <% end %>
+  <% customer.cust_contacts.each do |contact| %>
+    <% person = contact.contact%>
+    <p><b><%= contact.title%> <%= person.name %>:</b><%= mail_to(contact.email) unless contact.email.nil? %></p>
+  <% end %>
+  <br/>
+</div>
+
+<script type="text/javascript">
+  $('button.send-email').click(function(){
+    $('.email-addresses').toggle();
+  });
+</script>
