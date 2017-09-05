@@ -26,6 +26,55 @@ class Customer < ActiveRecord::Base
 
 	self.per_page = 15
 
+	def create_in_bigcommerce
+		# property :id
+		# property :_authentication
+		# property :count
+		# property :company
+		# property :first_name
+		# property :last_name
+		# property :email
+		# property :phone
+		# property :date_created
+		# property :date_modified
+		# property :store_credit
+		# property :registration_ip_address
+		# property :customer_group_id
+		# property :notes
+		# property :addresses
+		# property :tax_exempt_category
+		# property :accepts_marketing
+		customer_api = Bigcommerce::Customer
+		bigc_customer = customer_api.create(
+			company: self.actual_name,
+			first_name: self.firstname,
+			last_name: self.lastname,
+			email: self.email,
+			phone: self.phone,
+			store_credit: self.store_credit,
+			customer_group_id: self.customer_group_id,
+			notes: self.notes
+		)
+		self.id = bigc_customer.id
+		self.save
+		
+		unless self.street.nil?
+			customer_address = Bigcommerce::CustomerAddress.create(
+			  bigc_customer.id,
+			  first_name: self.firstname,
+			  last_name: self.lastname,
+			  phone: self.phone,
+			  street_1: self.street,
+			  city: self.city,
+			  state: self.state,
+			  zip: self.postcode,
+			  country: self.country
+			)
+		end
+
+		bigc_customer
+	end
+
 	# mass insert from bigcommerce api
 	def scrape
 

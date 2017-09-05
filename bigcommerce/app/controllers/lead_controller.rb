@@ -106,6 +106,10 @@ class LeadController < ApplicationController
     redirect_to action: 'link_leads'
   end
 
+  def convert_to_customer
+    customer = CustomerLead.find(params[:lead_id]).convert_to_customer
+    redirect_to controller: 'customer', action: 'summary', customer_id: customer.id, customer_name: customer.actual_name
+  end
 
   # -----------private --------------------
   private
