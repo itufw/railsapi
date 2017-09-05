@@ -62,7 +62,7 @@
   <%= f.label :tolerance_day, class: 'margin-from-top label-new'%>
   <%= f.number_field :tolerance_day, placeholder: 'Tolerance Day'%>
   <%= f.label :account_type, class: 'margin-from-top label-new' %>
-  <%= f.collection_select :account_type, ['COD', 'I2I'], :to_s, :to_s, {include_blank: 'Based on Invoice Date'}%>
+  <%= f.collection_select :account_type, ['COD', 'I2I', 'EOM'], :to_s, :to_s, {include_blank: 'Based on Invoice Date'}%>
   <%= f.label :default_courier, class: 'margin-from-top label-new' %>
   <%= f.collection_select :default_courier, ['CIVIC', 'Staff'], :to_s, :to_s, {include_blank: 'Fastway'}%>
   <%= f.label :payment_method, class: 'margin-from-top label-new' %>

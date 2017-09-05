@@ -106,14 +106,14 @@ $('input#_new_product').change(function(){
 
 
 $(document).on('railsAutocomplete.select', '#product_no_ws_search',function(event, data){
-  product_no_ws.attr('value', data.item.id);
-  name_no_ws.attr('value', data.item.value);
-  product_no_vintage.attr('value', data.item.product_no_vintage_id);
+  product_no_ws.val(data.item.id);
+  name_no_ws.val(data.item.value);
+  product_no_vintage.val(data.item.product_no_vintage_id);
 });
 
 $(document).on('railsAutocomplete.select', '#product_no_vintage_search',function(event, data){
-  product_no_vintage.attr('value', data.item.id);
-  vintage_name.attr('value', data.item.value);
+  product_no_vintage.val(data.item.id);
+  vintage_name.val(data.item.value);
 });
 
 
