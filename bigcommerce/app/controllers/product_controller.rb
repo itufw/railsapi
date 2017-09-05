@@ -12,7 +12,7 @@ require 'dates_helper.rb'
 require 'product_helper'
 class ProductController < ApplicationController
   before_action :confirm_logged_in
-  
+
   autocomplete :product, :name, full: true
 
 
@@ -185,6 +185,6 @@ def product_params
   params.require(:product).permit(:producer_id, :product_type_id, :warehouse_id,\
    :product_size_id, :product_no_ws_id, :name_no_ws, :name_no_vintage,\
    :product_no_vintage_id, :case_size, :product_package_type_id, :retail_ws,\
-   :vintage, :name_no_winery_no_vintage,\
-   :blend_type, :order_1, :order_2, :combined_order, :producer_ragion_id)
+   :vintage, :name_no_winery_no_vintage, :price_id, :product_sub_type_id,\
+   :blend_type, :order_1, :order_2, :combined_order, :producer_region_id)
 end
