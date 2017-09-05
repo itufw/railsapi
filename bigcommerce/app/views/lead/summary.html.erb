@@ -3,6 +3,7 @@
 
 <center><%= link_to 'Edit', controller: 'lead', action: 'edit_leads', lead_id: @lead.id, lead_name: @lead.actual_name %></center>
 <center><%= link_to 'Link to Customer', controller: 'lead', action: 'edit_leads', lead_id: @lead.id, lead_name: @lead.actual_name, link_to_customer: true %></center>
+<center><%= link_to 'Create a New Customer', {controller: 'lead', action: 'convert_to_customer', lead_id: @lead.id, create_customer: true}, data: {confirm: 'Do you want to convert this Lead and create a new Customer?'}%></center>
     <div class="row" style="margin-top: 10px;">
     	<div class="col-md-6">
     		<%= render "customer_partials/summary_header", customer: @lead %>
