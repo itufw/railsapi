@@ -179,6 +179,11 @@
             $('.fastway_labels').hide();
           }
         });
+        if ('<%= customer.default_courier.to_s%>' == 'CIVIC'){
+          $('select#order_courier_status_id').val(2);
+          $('input#order_track_number').show();
+          $('.fastway_labels').hide();
+        }
       </script>
       <!-- Delivered -->
     <% elsif @selected_status_id == '12'%>

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170904011510) do
+ActiveRecord::Schema.define(version: 20170905020920) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -348,6 +348,9 @@ ActiveRecord::Schema.define(version: 20170904011510) do
     t.string   "SpecialInstruction3",     limit: 50
     t.integer  "tolerance_day",           limit: 4,                             default: 30
     t.string   "street_2",                limit: 255
+    t.string   "account_type",            limit: 255
+    t.string   "payment_method",          limit: 255
+    t.string   "default_courier",         limit: 255
   end
 
   add_index "customers", ["cust_group_id"], name: "index_customers_on_cust_group_id", using: :btree

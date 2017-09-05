@@ -29,8 +29,13 @@
 		<td class="account-<%= order.account_status %>"><%= link_to order.id, controller: 'order', action: 'details', order_id: order.id %></td>
 		<td><%= date_format_orders(order.date_created) %><%= ('<br><i>' + date_format_orders(order.eta) + '</i>').html_safe  unless (order.eta.nil?) || ([10, 12].include?order.status_id)%></td>
 
-		<% cust_name = customer_name(order.customer) %>
-		<td><%= link_to cust_name, controller: 'customer', action: 'summary', customer_id: order.customer_id, customer_name: cust_name %></td>
+		<% customer = order.customer %>
+		<td>
+			<%= link_to customer_name(customer), controller: 'customer', action: 'summary', customer_id: order.customer_id, customer_name: customer_name(customer) %>
+			<%= '<br/>'.html_safe unless customer.account_type.nil? && customer.default_courier.nil?%>
+			<%= ('<i style="color: orange">' + customer.account_type + '</i>').html_safe unless customer.account_type.nil?%>
+			<%= ('<i style="color: blue">' + customer.default_courier + '</i>').html_safe unless customer.default_courier.nil?%>
+		</td>
 		<td><%= order_status(order.status)%></td>
 		<% shipping_description = shipping_status(order) %>
 		<td class=<%= shipping_description.split().join('-') %>><%= shipping_description %></td>
