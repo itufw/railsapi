@@ -21,7 +21,7 @@ class ReminderMailer < ActionMailer::Base
     @staff = @order.staff
 
     customer_address = %("#{@customer.actual_name}" <#{email_address}>)
-    subject = "Untapped Fine Wines Order #{@order.id} – [#{@customer.actual_name}]"
+    subject = "Untapped Fine Wines Order #{@order.id} – #{@customer.actual_name}"
     attachments["Invoice##{order_id}.pdf"] = print_single_invoice(@order)
 
     mail(from: "Untapped Fine Wines <accounts@untappedwines.com>", to: customer_address, reply_to: @staff.email, subject: subject)
