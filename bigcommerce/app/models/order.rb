@@ -25,6 +25,7 @@ class Order < ActiveRecord::Base
   after_validation :cancel_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id == 5}
   after_validation :recovery_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id_was == 5}
   after_validation :bigcommerce_status_update, on: [:update], if: ->(obj){obj.status_id_changed? and obj.source=='bigcommerce' and [2,3,4,5,6,7,8,9,10,11,12,13,26].include?obj.status_id and obj.last_updated_by!=34}
+  after_validation :update_notes, on: [:update], if: ->(obj){obj.source=='bigcommerce' and (obj.staff_notes_changed? or obj.customer_notes_changed?)}
 
   scoped_search on: [:id, :customer_purchase_order], validator: ->(value){!value.nil?}
 
@@ -389,6 +390,10 @@ class Order < ActiveRecord::Base
     # Ignore lagacy datas
     return if self.id < 20000
     Bigcommerce::Order.update(self.source_id, status_id: self.status.bigcommerce_id)
+  end
+
+  def update_notes
+    Bigcommerce::Order.update(self.source_id, staff_notes: self.staff_notes, customer_message: self.customer_notes)
   end
 
   def cancel_order
