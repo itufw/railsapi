@@ -12,7 +12,7 @@
     <% @leads.each do |lead| %>
     <tr>
       <td><%= link_to lead.lead_name, controller: 'lead', action: 'summary', lead_id: lead.lead_id%></td>
-      <td><%= lead.lead_address %></td>
+      <td><%= lead.address %></td>
       <td><%= link_to lead.customer_name, controller: 'customer', action:'summary', customer_id: lead.customer_id, customer_name: lead.customer_name%></td>
       <td><%= lead.customer_address%></td>
       <td><%= link_to '<i class="glyphicon glyphicon-ok" title="Match" style="color: blue;"></i>'.html_safe, controller: 'lead', action: 'turn_customer', lead_id: lead.lead_id, customer_id: lead.customer_id%></td>
