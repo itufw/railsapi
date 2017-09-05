@@ -5,6 +5,11 @@ module OrderStatus
     selected_orders = params[:selected_orders] || []
     selected_orders = selected_orders.first.split unless selected_orders.blank? || selected_orders.count > 1
 
+    if params[:commit].nil? && !selected_orders.blank?
+      Order.where(id: selected_orders).map{ |x| x.update_attributes({status_id: params[:status], last_updated_by: user_id})}
+      return ['All', '']
+    end
+
     # Print Shipping List
     if "Print Picking Slip" == params[:commit] && !selected_orders.blank?
       # Print Picking Sheet
