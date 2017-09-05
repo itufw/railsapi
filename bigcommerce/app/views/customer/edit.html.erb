@@ -28,20 +28,20 @@
 <%= form_for @customer, url: {action: "update"}, method: "POST", html: {class: "form-group", style: "padding-left: 50px;"} do |f| %>
 
   <%= f.hidden_field :id %>
+  <div class="row">
+    <div class="col-md-6">
+      <%= f.label :firstname, class: 'margin-from-top label-new' %>
+      <%= f.text_field :firstname, class: 'form-control quarter-size' %>
+      <%= f.label @customer.cust_type.name, class: 'form-control quarter-size label-new' %>
+    </div>
+    <div class="col-md-6">
+      <%= f.label :lastname, class: 'margin-from-top label-new' %>
+      <%= f.text_field :lastname, class: 'form-control quarter-size' %>
+    </div>
+  </div>
 
-  <%= f.label :firstname, class: 'margin-from-top label-new' %>
-  <%= f.text_field :firstname, class: 'form-control quarter-size' %>
-  <%= f.label @customer.cust_type.name, class: 'form-control quarter-size label-new' %>
-
-  <%= f.label :lastname, class: 'margin-from-top label-new' %>
-  <%= f.text_field :lastname, class: 'form-control quarter-size' %>
-
-  <%= f.label :actual_name, class: 'margin-from-top label-new' %>
-  <%= f.text_field :actual_name, class: 'form-control quarter-size' %>
-  <br/>
-
-  <%= f.label :tolerance_day, class: 'margin-from-top label-new'%>
-  <%= f.number_field :tolerance_day, placeholder: 'Tolerance Day'%>
+    <%= f.label :actual_name, class: 'margin-from-top label-new' %>
+    <%= f.text_field :actual_name, class: 'form-control quarter-size' %>
   <br/>
 
   <%= f.label :address, class: 'margin-from-top label-new' %>
@@ -59,14 +59,30 @@
   <%= f.text_field :SpecialInstruction3, placeholder: 'SpecialInstruction3'%>
   <br/>
 
-  <%= f.label :staff, class: 'margin-from-top label-new' %>
-  <%= f.collection_select :staff_id, Staff.sales_list.order_by_order, :id, :nickname, {selected: @customer.staff_id}, {class: "form-control quarter-size"} %>
+  <%= f.label :tolerance_day, class: 'margin-from-top label-new'%>
+  <%= f.number_field :tolerance_day, placeholder: 'Tolerance Day'%>
+  <%= f.label :account_type, class: 'margin-from-top label-new' %>
+  <%= f.collection_select :account_type, ['COD', 'I2I'], :to_s, :to_s, {include_blank: 'Based on Invoice Date'}%>
+  <%= f.label :default_courier, class: 'margin-from-top label-new' %>
+  <%= f.collection_select :default_courier, ['CIVIC', 'Staff'], :to_s, :to_s, {include_blank: 'Fastway'}%>
+  <%= f.label :payment_method, class: 'margin-from-top label-new' %>
+  <%= f.text_field :payment_method, placeholder: 'Payment Method'%>
+  <br/>
 
-  <%= f.label :channel, class: 'margin-from-top label-new' %>
-  <%= f.collection_select :cust_style_id, CustStyle.all, :id, :name, {:selected => @customer.cust_style_id, :include_blank => 'Not Assigned'}, {class: "form-control quarter-size"} %>
+  <div class="col-md-4">
+    <%= f.label :staff, class: 'margin-from-top label-new' %>
+    <%= f.collection_select :staff_id, Staff.sales_list.order_by_order, :id, :nickname, {selected: @customer.staff_id}, {class: "form-control quarter-size"} %>
+  </div>
+  <div class="col-md-4">
+    <%= f.label :channel, class: 'margin-from-top label-new' %>
+    <%= f.collection_select :cust_style_id, CustStyle.all, :id, :name, {:selected => @customer.cust_style_id, :include_blank => 'Not Assigned'}, {class: "form-control quarter-size"} %>
+  </div>
+  <div class="col-md-4">
+    <%= f.label :group, class: 'margin-from-top label-new' %>
+    <%= f.collection_select :cust_group_id, CustGroup.all, :id, :name, {:selected => @customer.cust_group_id, :include_blank => 'Not Assigned'}, {class: "form-control quarter-size"} %>
+  </div>
 
-  <%= f.label :group, class: 'margin-from-top label-new' %>
-  <%= f.collection_select :cust_group_id, CustGroup.all, :id, :name, {:selected => @customer.cust_group_id, :include_blank => 'Not Assigned'}, {class: "form-control quarter-size"} %>
+
 
 
   <%= f.submit "Update", class: 'btn btn-primary' %>
