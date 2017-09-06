@@ -3,6 +3,7 @@ require 'display_helper.rb'
 require 'product_variations.rb'
 require 'order_helper.rb'
 require 'order_status.rb'
+require 'application_helper.rb'
 
 class OrderController < ApplicationController
 
@@ -13,8 +14,14 @@ class OrderController < ApplicationController
     include ProductVariations
     include OrderHelper
     include OrderStatus
+    include ApplicationHelper
 
     def all
+      # if status -> print
+      if !params[:start_date].nil? && !params[:commit] && user_full_right(session[:authority])
+        redirect_to controller: 'status', action: 'status_check', params: params, status_name: 'Print' and return
+      end
+
      	@staff_nickname = params[:staff_nickname]
      	@start_date = params[:start_date]
      	@end_date = params[:end_date]
@@ -26,12 +33,6 @@ class OrderController < ApplicationController
       orders = orders.where('eta <= ?', Date.today.to_s(:db)) unless params[:delay].nil?
 
      	@per_page, @orders = order_display_(params, orders)
-    end
-
-    def print_order
-      #@can_update_bool = allow_to_update(session[:user_id])
-      @staff, @status, orders, @search_text, @order_id = order_controller_filter(params, "display_report")
-      @per_page, @orders = order_display_(params, orders)
     end
 
   	def for_product

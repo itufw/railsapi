@@ -1,6 +1,6 @@
 <%= title @status_name + " Checklist" %>
 <h3><%= @status_name + " Checklist" %></h3>
-<% if ["Picking", "Ready", "Shipped"].include? @status_name%>
+<% if ["Picking", "Ready", "Shipped", 'Print'].include? @status_name%>
   <%= form_tag({:controller => "status", :action => "status_update"}, {:method => "get"}) do %>
     <%= hidden_field_tag "order['id']", (@orders.blank?) ? 100 : @orders.first.id %>
     <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
@@ -12,11 +12,15 @@
       <%= submit_tag 'Print Picking Sheets', class: 'btn btn-primary'%>
     <% when "Shipped"%>
       <%= submit_tag 'Shipped', class: 'btn btn-primary'%>
+    <% when 'Print'%>
+      <%= submit_tag 'Print Picking Slip', class: 'btn btn-primary'%>
+      <%= submit_tag 'Print Invoices', class: 'btn btn-primary'%>
+      <%= submit_tag 'Print Picking Sheets', class: 'btn btn-primary'%>
     <% else %>
       <%= submit_tag 'Ready', class: 'btn btn-primary'%>
     <% end %>
     <button type="button" name="return" class="btn btn-primary"><%= link_to 'Back', controller: 'order', action: 'all'%></button>
-    <div class="status_change col-md-1" style="margin-top: -50px; margin-right: 300px; float: right;">
+    <div class="status_change col-md-2" style="margin-top: -20px; margin-right: 300px; float: right;">
     	<%= label(:status_overwrite, 'Status Overwrite')%>
     	<%= collection_select(nil, :status, Status.all, :id, :name, {include_blank: 'All Statuses'}, {class: 'form-control', onchange: 'this.form.submit();'}) %>
     </div>
