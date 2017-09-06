@@ -6,6 +6,7 @@ require 'status_helper.rb'
 require 'fastway.rb'
 require 'order_status.rb'
 require 'application_helper.rb'
+require 'order_helper.rb'
 
 class StatusController < ApplicationController
   before_action :confirm_logged_in
@@ -17,6 +18,7 @@ class StatusController < ApplicationController
   include StatusHelper
   include OrderStatus
   include ApplicationHelper
+  include OrderHelper
 
   def pending
     @status_id, @status_name = get_id_and_name(params)
@@ -42,19 +44,13 @@ class StatusController < ApplicationController
     order_function, direction = sort_order(params, :order_by_id, 'ASC')
     per_page = params[:per_page] || Order.per_page
 
-    # TODO
-    # if @status_name == "Delivered"
-    #   shipped_orders = Order.status_filter([2]).map(&:id)
-    #   fastway_traces = FastwayTrace.where('Reference IN (?)', shipped_orders).order('Date DESC')
-    #   other_ids = shipped_orders.reject {|x| fastway_traces.map(&:Reference).include? x}
-    #
-    #
-    #
-    #   @orders = Order.where('status_id IN (2, 12) AND id NOT IN (?)', undeliver_ids).send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
-    # else
-    status_ids = Status.where("alt_name LIKE '%#{@status_name}%'").map(&:id)
-    @orders = Order.statuses_filter(status_ids).send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
-    # end
+    if @status_name == 'Print'
+      @staff, @status, orders, @search_text, @order_id = order_controller_filter(params, "display_report")
+      @per_page, @orders = order_display_(params, orders)
+    else
+      status_ids = Status.where("alt_name LIKE '%#{@status_name}%'").map(&:id)
+      @orders = Order.statuses_filter(status_ids).send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
+    end
   end
 
   def status_update
