@@ -6,7 +6,13 @@
           '</tr>'
           ].join(''));
 <% end %>
+
+<% customer = @last_order.customer %>
+
+
+recipient.val('<%= (@last_order.ship_name.to_s=="") ? customer.actual_name : @last_order.ship_name%>');
 street.val('<%= @last_order.street%>');
+street_2.val('<%= @last_order.street_2%>');
 city.val('<%= @last_order.city%>');
 state.val('<%= @last_order.state%>');
 postcode.val('<%= @last_order.postcode %>');
@@ -22,8 +28,9 @@ last_order.append([
 ].join(''));
 last_order.show();
 
-<% customer = @last_order.customer %>
+billing_company.val('<%= (customer.company.to_s=="") ? customer.actual_name : customer.company %>');
 billing_street.val('<%= customer.street%>');
+billing_street_2.val('<%= customer.street_2%>');
 billing_city.val('<%= customer.city%>');
 billing_state.val('<%= customer.state%>');
 billing_postcode.val('<%= customer.postcode%>');
