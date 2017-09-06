@@ -3,6 +3,7 @@
     <td class="ProductCost" align="right">Billing Address</td>
     <td colspan="2">
       <%= f.fields_for "customer", f.object.customer do |c|%>
+      <%= c.text_field :company, placeholder: 'Company'%>
       <%= c.text_field :street, placeholder: 'Street'%>
       <%= c.text_field :street_2, placeholder: 'Street 2'%>
       <%= c.text_field :city, placeholder: 'City'%>
