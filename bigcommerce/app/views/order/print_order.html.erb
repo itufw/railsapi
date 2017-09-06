@@ -11,4 +11,8 @@
     <%= submit_tag 'Print Picking Slip', class: 'btn btn-primary'%>
     <%= submit_tag 'Print Invoices', class: 'btn btn-primary'%>
     <%= submit_tag 'Print Picking Sheets', class: 'btn btn-primary'%>
+    <div class="status_change col-md-1" style="margin-top: -50px; margin-right: 300px; float: right;">
+      <%= label(:status_overwrite, 'Status Overwrite')%>
+      <%= collection_select(nil, :status, Status.all, :id, :name, {include_blank: 'All Statuses'}, {class: 'form-control', onchange: 'this.form.submit();'}) %>
+    </div>
   <% end %>
