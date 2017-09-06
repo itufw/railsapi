@@ -53,7 +53,7 @@ module LeadHelper
       phone: place.formatted_phone_number, actual_name: place.name,\
       address: place.formatted_address, website: place.website,\
       cust_style_id: spot_style(place.types), street: place.street_number.to_s + " " + place.street.to_s,\
-      city: place.city, postcode: place.postal_code, country: place.country)
+      city: place.city, postalcode: place.postal_code, country: place.country)
 
     [customer_lead, place]
   end
