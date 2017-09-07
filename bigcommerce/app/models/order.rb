@@ -145,6 +145,11 @@ class Order < ActiveRecord::Base
     all
   end
 
+  # Problem status include Account Status
+  def self.problem_status_filter(status_id)
+    where("(account_status != 'Approved' AND status_id != 10) OR status_id IN (?)", status_id)
+  end
+
   def self.statuses_filter(status_id)
     # return where(status_id: status_id, courier_status_id: 1) if (!status_id.nil?) && (status_id.include?8) && !(status_id.include?2)
     return where(status_id: status_id) unless status_id.nil? || status_id.blank?

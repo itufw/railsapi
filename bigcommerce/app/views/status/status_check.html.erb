@@ -16,6 +16,11 @@
       <%= submit_tag 'Print Picking Slip', class: 'btn btn-primary'%>
       <%= submit_tag 'Print Invoices', class: 'btn btn-primary'%>
       <%= submit_tag 'Print Picking Sheets', class: 'btn btn-primary'%>
+      <script type="text/javascript">
+        $('table tbody tr.odd').each(function () {
+          $(this).find('.multi-select input').attr('checked', false);
+        });
+      </script>
     <% else %>
       <%= submit_tag 'Ready', class: 'btn btn-primary'%>
     <% end %>
