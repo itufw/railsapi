@@ -146,8 +146,8 @@ class Order < ActiveRecord::Base
   end
 
   # Problem status include Account Status
-  def self.problem_status_filter(status_id)
-    where("(account_status != 'Approved' AND status_id != 10) OR status_id IN (?)", status_id)
+  def self.problem_status_filter
+    joins(:status).where('statuses.send_reminder = 1 OR (orders.account_status != "Approved" AND statuses.valid_order = 1 AND statuses.in_transit = 0 AND statuses.delivered = 0)')
   end
 
   def self.statuses_filter(status_id)
