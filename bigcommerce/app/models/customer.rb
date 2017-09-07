@@ -47,17 +47,16 @@ class Customer < ActiveRecord::Base
 		customer_api = Bigcommerce::Customer
 		bigc_customer = customer_api.create(
 			company: self.actual_name,
-			first_name: self.firstname,
-			last_name: self.lastname,
-			email: self.email,
-			phone: self.phone,
-			store_credit: self.store_credit,
-			customer_group_id: self.customer_group_id,
-			notes: self.notes
+			first_name: self.actual_name,
+			last_name: self.firstnname.to_s + '' + self.lastname.to_s,
+			email: self.email || self.actual_name+"@untappedwines.com",
+			store_credit: self.store_credit || 0,
+			customer_group_id: self.cust_group_id || 0,
+			notes: self.notes || ""
 		)
 		self.id = bigc_customer.id
 		self.save
-		
+
 		unless self.street.nil?
 			customer_address = Bigcommerce::CustomerAddress.create(
 			  bigc_customer.id,

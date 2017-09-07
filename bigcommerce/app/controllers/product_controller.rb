@@ -74,6 +74,46 @@ class ProductController < ApplicationController
       customer_pending_amount(product_ids, params, @customer_ids)
   end
 
+  def allocate
+    params[:direction] = params[:direction] || -1
+    params[:order_col] = params[:order_col] || 'Last Quarter'
+
+    params_for_one_product(params)
+    transform(params)
+    # total_stock is inventory in bigcommerce + pending stock
+    get_total_stock(params)
+    # WS + Retail + Pending stock
+    # Ignore Pending Stock -> the 0
+    @total_stock_no_ws = total_stock_no_ws(@transform_column, @product_id, 0, @total_stock)
+
+    # either we want stats for a product_id
+    # or for products based on a product_no_vintage_id
+    # or based on a product_no_ws_id
+    # this gives product_ids based on that transform_column
+    @products = get_products_after_transformation(@transform_column, @product_id)
+    product_ids = @products.pluck('id') || @product_id
+
+    # Collect the allocated_stocks
+    @allocated_stock = allocated_stock(product_ids)
+
+    # form filter for top customers
+
+    # i only need to check product rights on this page
+    # So if product rights is 0, then restrict by staff
+    # otherwise just do a normal param filter
+    @staff, customers_filtered, @search_text, staff_id, @cust_style = \
+      customer_filter(params, session[:user_id], 'product_rights')
+    customers_filtered_ids = customers_filtered.pluck('id')
+    # both overall stats and top customers change based on the customer filter
+
+    # top customers
+    top_customers(params, product_ids, customers_filtered_ids)
+
+    # calculate the pending stock for each customer
+    @customer_pendings, @customer_ids = \
+      customer_pending_amount(product_ids, params, @customer_ids)
+  end
+
   def overall(params, product_ids, customers_filtered_ids, total_stock)
     # period type for overall stats - monthly or weekly
     @selected_period, @period_types = define_period_types(params)

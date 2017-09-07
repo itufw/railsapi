@@ -1,0 +1,98 @@
+<%= title @product_name %>
+
+<h3><%= @product_name %></h3><br/>
+<center><%= link_to 'Edit', controller: 'product', action: 'edit', product_id: @product_id if @transform_column == 'product_id' %></center>
+
+<h4>Available Stock : <%= @total_stock_no_ws %></h4>
+<h4>Total Stock (WS + Retail + Allocated) : <%= @total_stock_no_ws + @allocated_stock %></h4>
+
+
+<%# Top Customers Display %>
+<div class="form-group col-xs-offset-5" style="margin-top:50px;">
+<%= form_tag({:action => "summary"}, {:method => "get"}) do %>
+
+   <%= render "partials/cust_style_filter" %>
+   <%= render "partials/staff_filter" %>
+
+   <%= hidden_field_tag :product_id, @product_id %>
+   <%= hidden_field_tag :product_name, @product_name %>
+   <%= hidden_field_tag :transform_column, @transform_column %>
+
+   <%= submit_tag "Filter", class: 'btn btn-primary' %>
+<% end %>
+</div>
+
+<button class="button" style="float: right;margin-top: -130px;"><%= link_to "Orders", controller: 'order', action: 'for_product', product_id: @product_id, product_name: @product_name, transform_column: @transform_column %></button>
+<button class="button" style="float: right;margin-top: -50px;"><%= link_to "Product", controller: 'product', action: 'summary', product_id: @product_id, product_name: @product_name, transform_column: @transform_column, total_stock: @total_stock, pending_stock: @pending_stock%></button>
+
+<%= form_tag :controller => "products", :action => "allocate_products" do  %>
+<div class="col-md-6 col-md-offset-3">
+	<table class="table table-striped table-bordered table-hover table-responsive">
+		<tr>
+			<th>Average/Month:</th>
+			<td><%= monthly_average(@top_customers_timeperiod_h['Last Quarter'], 3) %></td>
+			<th>Monthly Supply:</th>
+			<td><%= monthly_supply(monthly_average(@top_customers_timeperiod_h['Last Quarter'], 3), @total_stock_no_ws) %></td>
+		</tr>
+		<tr>
+			<th>Allocated</th>
+			<td><%= @allocated_stock %></td>
+			<th></th>
+			<td><%= monthly_supply(monthly_average(@top_customers_timeperiod_h['Last Quarter'], 3), @total_stock_no_ws+@allocated_stock) %></td>
+		</tr>
+		<tr>
+			<th colspan="2">Months to Allocate</th>
+			<td colspan="2"><%= text_field_tag('months_to_allocate', 3, placeholder: 'Months to Allocate', class: 'form-control', id: 'months_to_allocate') %></td>
+		</tr>
+	</table>
+</div>
+
+<table class = "table table-striped table-bordered table-hover table-responsive">
+	<tr class="info">
+		<th>Customer <%= render "partials/sort_arrows", order: 'order_by_name' %></th>
+		<th>Staff <%= render "partials/sort_arrows", order: 'order_by_staff' %></th>
+		<th>Channel <%= render "partials/sort_arrows", order: 'order_by_style' %></th>
+		<th></th>
+		<th></th>
+		<th>Pending Stock</th>
+		<% @time_periods.each do |t| %>
+			<th><%= t %><%= render "partials/sort_arrows", order: t %></th>
+		<% end %>
+	</tr>
+
+	<% @customer_ids.each do |id| %>
+	<tr>
+		<td><%= link_to customer_name(@top_customers[id]), controller: 'customer', action: 'summary_with_product', product_id: @product_id, product_name: @product_name, customer_id: id, customer_name: customer_name(@top_customers[id]), transform_column: @transform_column %></td>
+		<td><%= staff_nickname(@top_customers[id]) %></td>
+		<td><%= customer_style_name(@top_customers[id]) %></td>
+		<td class="auto-allocate" customer="<%= id %>"></td>
+		<td><%= text_field_tag('customer-'+id.to_s, '', placeholder: '', class: 'form-control manual-allocate', id: 'manual-allocate-customer-'+id.to_s) %></td>
+		<td><%= @customer_pendings[id] %></td>
+		<% @time_periods.each do |t| %>
+			<td class="<%= t.split().join('-').to_s%> customer-<%= id %>"><%= exists_in_h(@top_customers_timeperiod_h[t], id) %></td>
+		<% end %>
+	</tr>
+	<% end %>
+
+</table>
+<!-- End of Form -->
+<% end %>
+
+<script type="text/javascript">
+	var update_auto_allocate = function(){
+		var months_to_allocate = parseFloat($('#months_to_allocate').val() || 0);
+		$('.auto-allocate').each(function(){
+																var sale = parseFloat($('.Last-Quarter.customer-'+$(this).attr('customer')).html()) / 3;
+																var allocate = parseInt(sale * months_to_allocate) || 0;
+																$(this).html( allocate);
+
+																$('#manual-allocate-customer-'+$(this).attr('customer')).val(allocate);
+															});
+	};
+
+	update_auto_allocate();
+
+	$('#months_to_allocate').bind('change keyup',function(){
+		update_auto_allocate();
+	});
+</script>
