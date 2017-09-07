@@ -48,8 +48,7 @@ class StatusController < ApplicationController
       @staff, @status, orders, @search_text, @order_id = order_controller_filter(params, "display_report")
       @per_page, @orders = order_display_(params, orders)
     elsif @status_name == 'Problem'
-      status_ids = Status.where("alt_name LIKE '%#{@status_name}%'").map(&:id)
-      @orders = Order.problem_status_filter(status_ids).send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
+      @orders = Order.problem_status_filter.send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
     else
       status_ids = Status.where("alt_name LIKE '%#{@status_name}%'").map(&:id)
       @orders = Order.statuses_filter(status_ids).send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
