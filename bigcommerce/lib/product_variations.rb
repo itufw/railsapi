@@ -122,6 +122,10 @@ module ProductVariations
         # end
     end
 
+    def allocated_stock(product_ids)
+      OrderProduct.joins(:order).where("orders.status_id": 1, product_id: product_ids).sum(:qty)
+    end
+
     def total_stock_no_ws(transform_column, product_id, pending_stock, total_stock)
         unless transform_column != "product_id"
             product_no_ws_id = Product.no_ws_id(product_id)

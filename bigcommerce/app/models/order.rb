@@ -398,7 +398,7 @@ class Order < ActiveRecord::Base
   end
 
   def update_notes
-    Bigcommerce::Order.update(self.source_id, staff_notes: self.staff_notes, customer_message: self.customer_notes)
+    Bigcommerce::Order.update(self.source_id, staff_notes: self.staff_notes.to_s.gsub("''","'"), customer_message: self.customer_notes.to_s.gsub("''","'"))
   end
 
   def cancel_order
