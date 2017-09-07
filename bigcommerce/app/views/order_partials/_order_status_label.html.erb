@@ -5,7 +5,7 @@
   <div class="col-xs-4"><%= link_to label(:status, 'Courier'), controller: 'status', action: 'status_check', status_name: 'Courier'%></div>
   <div class="col-xs-4"><%= link_to label(:status, 'Shipped'), controller: 'status', action: 'status_check', status_name: 'Shipped'%></div>
   <div class="col-xs-4"><%= link_to label(:status, 'Delivered'), controller: 'status', action: 'status_check', status_name: 'Delivered'%></div>
-  <div class="col-xs-4"><%= link_to label(:status, "Problem"), controller: 'status', action: 'status_check', status_name: 'Problem' %><%= '(' + Order.joins(:status).where('statuses.send_reminder = 1').count.to_s + ')'%></div>
+  <div class="col-xs-4"><%= link_to label(:status, "Problem"), controller: 'status', action: 'status_check', status_name: 'Problem' %><%= '(' + Order.joins(:status).where('statuses.send_reminder = 1 OR (orders.account_status != "Approved" AND orders.status_id != 10)').count.to_s + ')'%></div>
   <div class="col-xs-4"><%= label(:status, 'Print', onclick: "this.parentElement.parentElement.parentElement.parentElement.submit()")%></div>
   <div class="col-xs-4"><%= link_to label(:status, "Delayed"), controller: 'order', action: 'all', status: {'id'=> 2 }, delay: true, order_id_search: '', staff: {'id' => ''}, search: '', start_date: '', end_date: '' %></div>
 <% end %>
