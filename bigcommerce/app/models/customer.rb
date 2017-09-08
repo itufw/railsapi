@@ -51,7 +51,7 @@ class Customer < ActiveRecord::Base
 			last_name: self.firstname.to_s + ' ' + self.lastname.to_s,
 			email: self.email || "not_use@untappedwines.com",
 			store_credit: self.store_credit || 0,
-			customer_group_id: self.cust_tyoe_id || 2,
+			customer_group_id: self.cust_type_id || 2,
 			notes: self.notes || ""
 		)
 		self.id = bigc_customer.id
