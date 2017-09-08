@@ -7,9 +7,17 @@
           ].join(''));
 <% end %>
 
-<% customer = @last_order.customer || Customer.find(params[:customer_id])%>
+<% customer = (@last_order.nil?) ? Customer.find(params[:customer_id]) : @last_order.customer %>
 // In case new customer
-<% unless @last_order.nil? %>
+<% if @last_order.nil? %>
+  recipient.val('<%= (customer.company.to_s=="") ? customer.actual_name : customer.company %>');
+  street.val('<%= customer.street%>');
+  street_2.val('<%= customer.street_2%>');
+  city.val('<%= customer.city%>');
+  state.val('<%= customer.state%>');
+  postcode.val('<%= customer.postcode %>');
+  country.val('<%= customer.country%>');
+<% else %>
   recipient.val('<%= (@last_order.ship_name.to_s=="") ? customer.actual_name : @last_order.ship_name%>');
   street.val('<%= @last_order.street%>');
   street_2.val('<%= @last_order.street_2%>');
