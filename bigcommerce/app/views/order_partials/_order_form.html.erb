@@ -71,6 +71,7 @@
     </table>
   </div>
 </div>
+<div class="allocation-products"></div>
 <table class = "table table-striped table-bordered table-hover table-responsive product-table">
   <thead>
     <tr>
@@ -93,7 +94,14 @@
 
     <tr id="tr_<%= product.product_id%>">
       <td><%= product_form.text_field :product_id, size: "5", readonly: true, class: 'product_id' %></td>
-      <td><%= Product.find(product.product_id).name %></td>
+      <td>
+        <%= Product.find(product.product_id).name %>
+        <% if @order.status_id==1%>
+          <br>
+          Revision Date:
+          <%= product.revision_date.strftime('%d/%m/%Y') unless product.revision_date.nil? %>
+        <% end %>
+      </td>
       <td class="product-inventory"><%= Product.find(product.product_id).inventory %></td>
       <td><%= product_form.text_field :price_luc, size: "5", readonly: true, class: 'product-luc' %></td>
       <td><%= product_form.text_field :qty, size: "3", class: 'product-qty' %></td>
@@ -160,6 +168,7 @@
 
 <!-- Number Calculation -->
 <script type="text/javascript">
+  var allocation_products = $('.allocation-products');
 
   var last_products = $('#last_products');
   var recipient = $('#order_ship_name');

@@ -49,7 +49,7 @@ class Customer < ActiveRecord::Base
 			company: self.actual_name,
 			first_name: self.actual_name,
 			last_name: self.firstname.to_s + ' ' + self.lastname.to_s,
-			email: self.email || "not_use@untappedwines.com",
+			email: self.email || self.actual_name.split()[0..1].join('_')"@untappedwines.com",
 			store_credit: self.store_credit || 0,
 			customer_group_id: self.cust_type_id || 2,
 			notes: self.notes || ""
@@ -403,7 +403,7 @@ class Customer < ActiveRecord::Base
 		Order.where(customer_id: self.id, status_id: 1)
 	end
 
-	def allocate_products(product_id, product_qty)
+	def allocate_products(product_id, product_qty, revision_date)
 		order = allocated_orders.first
 		product = Product.find(product_id)
 
@@ -424,7 +424,7 @@ class Customer < ActiveRecord::Base
 		 qty: product_qty, discount: 0, price_discounted: 0, qty_shipped: 0,\
 		 order_discount: 100, price_handling: 0, stock_previous: 0, stock_current: product_qty,\
 		 stock_incremental: product_qty, price_gst: 0, price_wet: 0, base_price: product.calculated_price*1.29,\
-		 price_inc_tax: 0, display: 1, damaged: 0,\
+		 price_inc_tax: 0, display: 1, damaged: 0, revision_date: revision_date.to_s(:db),\
 		 created_by: session[:user_id], updated_by: session[:user_id]).save
 
 		order

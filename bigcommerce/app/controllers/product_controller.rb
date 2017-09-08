@@ -115,10 +115,16 @@ class ProductController < ApplicationController
   end
 
   def allocate_products
-    p = cccc
-    
+    # Revision Date Conveter
+    # From {"(1i)"=>"2017", "(2i)"=>"10", "(3i)"=>"8"} to Date
+    revision_date = Date.parse params[:revision_date].values().join('-')
+    # Find the correct Product(s)
+    # No WS marks or product itself
     products = get_products_after_transformation(params[:transform_column], params[:product_id])
+    # the valid customer - allocation pair
     allocated = params[:customer].select{ |key, value| value.to_i > 0 }
+
+
     if allocated.values().map(&:to_i).sum > products.sum(:inventory)
       flash[:error] = "Not Enough Stock, Return to Product Page and Refresh!"
       redirect_to request.referrer and return
@@ -138,11 +144,7 @@ class ProductController < ApplicationController
     if 'Bulk Allocate'.eql?params[:commit]
       # Bulk Allocated
       # Product id IS WS Product ID
-      Customer.where(id: allocated.keys()).map{|x| x.allocate_products(product_id, allocated[x.id.to_s]) }
-    else
-      customer_ids = allocated.keys()
-      customer_id = customer_ids.delete_at(0)
-      p = cccc
+      Customer.where(id: allocated.keys()).map{|x| x.allocate_products(product_id, allocated[x.id.to_s], revision_date) }
     end
 
     redirect_to action: 'summary', transform_column: params[:transform_column], product_id: product_id, total_stock: products.sum(:inventory)
