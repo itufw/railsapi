@@ -104,10 +104,22 @@
 		$('.remaining-products').html("Remain: " + remain_stock);
 	};
 
-	
+	var remainning_product = function(){
+		var remain_stock = parseInt('<%= @total_stock_no_ws%>');
+		$('.manual-allocate').each(function(){
+			var allocated = parseInt($(this).val()) || 0;
+			remain_stock -= allocated;
+		});
+		$('.remaining-products').html("Remain: " + remain_stock);
+	};
+
 	update_auto_allocate();
 
 	$('#months_to_allocate').bind('change keyup',function(){
 		update_auto_allocate();
+	});
+
+	$('.manual-allocate').bind('change keyup', function(){
+		remainning_product();
 	});
 </script>
