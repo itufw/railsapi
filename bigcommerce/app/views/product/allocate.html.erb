@@ -25,7 +25,10 @@
 <button class="button" style="float: right;margin-top: -130px;"><%= link_to "Orders", controller: 'order', action: 'for_product', product_id: @product_id, product_name: @product_name, transform_column: @transform_column %></button>
 <button class="button" style="float: right;margin-top: -50px;"><%= link_to "Product", controller: 'product', action: 'summary', product_id: @product_id, product_name: @product_name, transform_column: @transform_column, total_stock: @total_stock, pending_stock: @pending_stock%></button>
 
-<%= form_tag :controller => "products", :action => "allocate_products" do  %>
+<%= form_tag :controller => "product", :action => "allocate_products" do  %>
+	<%= hidden_field_tag :product_id, @product_id %>
+	<%= hidden_field_tag :transform_column, @transform_column %>
+
 <div class="col-md-6 col-md-offset-3">
 	<table class="table table-striped table-bordered table-hover table-responsive">
 		<tr>
@@ -44,6 +47,10 @@
 			<th colspan="2">Months to Allocate</th>
 			<td colspan="2"><%= text_field_tag('months_to_allocate', 3, placeholder: 'Months to Allocate', class: 'form-control', id: 'months_to_allocate') %></td>
 		</tr>
+		<tr>
+			<td colspan="2" style="strip: 0px; border: 0px;" align="center"><%= submit_tag "Allocate", class: 'btn btn-primary'%></td>
+			<td colspan="2" style="strip: 0px; border: 0px;" align="center"><%= submit_tag "Bulk Allocate", class: 'btn btn-warning'%></td>
+		</tr>
 	</table>
 </div>
 
@@ -52,8 +59,8 @@
 		<th>Customer <%= render "partials/sort_arrows", order: 'order_by_name' %></th>
 		<th>Staff <%= render "partials/sort_arrows", order: 'order_by_staff' %></th>
 		<th>Channel <%= render "partials/sort_arrows", order: 'order_by_style' %></th>
-		<th></th>
-		<th></th>
+		<th><%= @total_stock_no_ws %></th>
+		<th class="remaining-products"></th>
 		<th>Pending Stock</th>
 		<% @time_periods.each do |t| %>
 			<th><%= t %><%= render "partials/sort_arrows", order: t %></th>
@@ -66,7 +73,7 @@
 		<td><%= staff_nickname(@top_customers[id]) %></td>
 		<td><%= customer_style_name(@top_customers[id]) %></td>
 		<td class="auto-allocate" customer="<%= id %>"></td>
-		<td><%= text_field_tag('customer-'+id.to_s, '', placeholder: '', class: 'form-control manual-allocate', id: 'manual-allocate-customer-'+id.to_s) %></td>
+		<td><%= text_field 'customer', id.to_s, {placeholder: '0', class: 'form-control manual-allocate', id: 'manual-allocate-customer-'+id.to_s} %></td>
 		<td><%= @customer_pendings[id] %></td>
 		<% @time_periods.each do |t| %>
 			<td class="<%= t.split().join('-').to_s%> customer-<%= id %>"><%= exists_in_h(@top_customers_timeperiod_h[t], id) %></td>
@@ -81,15 +88,23 @@
 <script type="text/javascript">
 	var update_auto_allocate = function(){
 		var months_to_allocate = parseFloat($('#months_to_allocate').val() || 0);
+		var remain_stock = parseInt('<%= @total_stock_no_ws%>');
 		$('.auto-allocate').each(function(){
-																var sale = parseFloat($('.Last-Quarter.customer-'+$(this).attr('customer')).html()) / 3;
-																var allocate = parseInt(sale * months_to_allocate) || 0;
-																$(this).html( allocate);
-
-																$('#manual-allocate-customer-'+$(this).attr('customer')).val(allocate);
-															});
+			var sale = parseFloat($('.Last-Quarter.customer-'+$(this).attr('customer')).html()) / 3;
+			var allocate = parseInt(sale * months_to_allocate) || 0;
+			if (remain_stock > allocate){
+				remain_stock -= allocate;
+			}else{
+				allocate = remain_stock;
+				remain_stock = 0;
+			}
+			$(this).html( allocate);
+			$('#manual-allocate-customer-'+$(this).attr('customer')).val(allocate);
+		});
+		$('.remaining-products').html("Remain: " + remain_stock);
 	};
 
+	
 	update_auto_allocate();
 
 	$('#months_to_allocate').bind('change keyup',function(){

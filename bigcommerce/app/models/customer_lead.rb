@@ -100,7 +100,7 @@ class CustomerLead < ActiveRecord::Base
     return unless self.customer_id.nil?
     customer = Customer.new({firstname: self.firstname, lastname: self.lastname,\
       company: self.company, email: self.email, phone: self.phone, actual_name: self.actual_name,\
-      staff_id: self.staff_id, cust_type_id: self.cust_type_id, cust_group_id: self.cust_group_id,\
+      staff_id: self.staff_id, cust_type_id: self.cust_type_id || 2, cust_group_id: self.cust_group_id || 0,\
       cust_style_id: self.cust_style_id, address: self.address,\
       lat: self.latitude, lng: self.longitude, tolerance_day: 30,\
       street: self.street, city: self.city, postcode: self.postalcode, country: self.country})

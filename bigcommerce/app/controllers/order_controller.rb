@@ -126,7 +126,7 @@ class OrderController < ApplicationController
     redirect_to controller: 'activity', action: 'add_note', customer_id: order_params[:customer_id] and return if params["button"] == "new_note"
     redirect_to action: 'all'
   end
-
+  
   def generate_invoice
     # pdf generator in lib/order_status
     send_data print_invoices([params[:order_id]]).to_pdf, filename: "#{params[:order_id]}.pdf", type: :pdf
