@@ -6,8 +6,9 @@
 <h4>Total Stock (WS + Retail + Pending) : <%= @total_stock_no_ws %></h4>
 
 <button class="button" style="float: right;margin-top: -130px;"><%= link_to "Orders", controller: 'order', action: 'for_product', product_id: @product_id, product_name: @product_name, transform_column: @transform_column %></button>
-<button class="button" style="float: right;margin-top: -50px;"><%= link_to "Allocate", controller: 'product', action: 'allocate', product_id: @product_id, product_name: @product_name, transform_column: @transform_column  if it_working(session[:user_id])%></button>
-
+<% if it_working(session[:user_id]) %>
+	<button class="button" style="float: right;margin-top: -50px;"><%= link_to "Allocate", controller: 'product', action: 'allocate', product_id: @product_id, product_name: @product_name, transform_column: @transform_column, total_stock: @total_stock %></button>
+<% end %>
 
 <%# Overall Stats Display %>
 <div style="margin-top: 50px;">

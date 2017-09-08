@@ -1,6 +1,7 @@
 # this module transforms data about all the products
 # into data about product with no vintages, or product with no WS in the name, etc.
 # presents data in the product table grouping by these transform columns.
+require 'bigcommerce_connection.rb'
 module ProductVariations
 
     # Steps for a new transform column to work:
@@ -137,6 +138,26 @@ module ProductVariations
             end
         end
         return total_stock
+    end
+
+    def allocate_inventory(product_id, product_ids)
+      product_ids = product_ids.reject{|x| x == product_id}
+      return if product_ids.blank?
+
+      product_api = Bigcommerce::Product
+      product = product_api.find(product_id)
+
+      inventory_pending = 0
+      product_ids.each do |p|
+        product_other = product_api.find(p)
+        inventory_pending += product_other.inventory
+        product_api.update(p, inventory: 0)
+      end
+      product_api.update(product_id, inventory: product_api.find(product_id).inventory + inventory_pending)
+      sql = "Update products SET inventory = 0 WHERE id IN (#{product_ids.join(',')}) "
+      ActiveRecord::Base.connection.execute(sql)
+      sql = "Update products SET inventory = inventory + #{inventory_pending} WHERE id = #{product_id}"
+      ActiveRecord::Base.connection.execute(sql)
     end
 
     # # Given an array of product ids

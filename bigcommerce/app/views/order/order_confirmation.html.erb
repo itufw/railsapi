@@ -208,7 +208,7 @@
         <% if [36, 26, 9].include?session[:user_id]%>
         <div class="col-xs-3">
           <%= label(:account, 'Account Status: ')%>
-          <%= f.collection_select :account_status, ['Approved', 'Partially Paid', 'Unpaid', 'Paid', 'Hold-Account'], :to_s, :to_s, {}, {class: "account-selection", style: 'width: 80px'} %>
+          <%= f.collection_select :account_status, ['Approved', 'Partially Paid', 'Unpaid', 'Paid', 'Hold-Account', 'Hold-Overdue', 'No Credit App'], :to_s, :to_s, {}, {class: "account-selection", style: 'width: 80px'} %>
         </div>
         <% end %>
         <div class="col-xs-3">

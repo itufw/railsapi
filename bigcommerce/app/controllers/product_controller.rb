@@ -114,6 +114,40 @@ class ProductController < ApplicationController
       customer_pending_amount(product_ids, params, @customer_ids)
   end
 
+  def allocate_products
+    p = cccc
+    
+    products = get_products_after_transformation(params[:transform_column], params[:product_id])
+    allocated = params[:customer].select{ |key, value| value.to_i > 0 }
+    if allocated.values().map(&:to_i).sum > products.sum(:inventory)
+      flash[:error] = "Not Enough Stock, Return to Product Page and Refresh!"
+      redirect_to request.referrer and return
+    elsif user_full_right(session[:authority])
+      flash[:error] = "User Right Limitated"
+      redirect_to request.referrer and return
+    elsif params[:transform_column]!="product_id" && products.select{|x| x.name.end_with?'WS'}.first.nil?
+      flash[:error] = "Not Enough Stock, Return to Product Page and Refresh!"
+      redirect_to request.referrer and return
+    elsif allocated.values().map(&:to_i).sum > products.select{|x| x.name.end_with?'WS'}.sum(&:inventory)
+      product = products.select{|x| x.name.end_with?'WS'}.first
+      allocate_inventory(product.id, products.map(&:id))
+    end
+
+    product_id = (params[:transform_column]!="product_id")? products.select{|x| x.name.end_with?'WS'}.first.id : prarams[:product_id]
+
+    if 'Bulk Allocate'.eql?params[:commit]
+      # Bulk Allocated
+      # Product id IS WS Product ID
+      Customer.where(id: allocated.keys()).map{|x| x.allocate_products(product_id, allocated[x.id.to_s]) }
+    else
+      customer_ids = allocated.keys()
+      customer_id = customer_ids.delete_at(0)
+      p = cccc
+    end
+
+    redirect_to action: 'summary', transform_column: params[:transform_column], product_id: product_id, total_stock: products.sum(:inventory)
+  end
+
   def overall(params, product_ids, customers_filtered_ids, total_stock)
     # period type for overall stats - monthly or weekly
     @selected_period, @period_types = define_period_types(params)
