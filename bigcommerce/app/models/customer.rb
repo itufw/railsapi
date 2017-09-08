@@ -49,7 +49,7 @@ class Customer < ActiveRecord::Base
 			company: self.actual_name,
 			first_name: self.actual_name,
 			last_name: self.firstname.to_s + ' ' + self.lastname.to_s,
-			email: self.email || self.actual_name.split()[0..1].join('_')"@untappedwines.com",
+			email: self.email || (self.actual_name.split()[0..1].join('_')+"@untappedwines.com"),
 			store_credit: self.store_credit || 0,
 			customer_group_id: self.cust_type_id || 2,
 			notes: self.notes || ""
