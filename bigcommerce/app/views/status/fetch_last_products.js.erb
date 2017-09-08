@@ -8,6 +8,12 @@
 <% end %>
 
 <% customer = (@last_order.nil?) ? Customer.find(params[:customer_id]) : @last_order.customer %>
+
+<% allocation_order = Order.where(customer_id: customer.id, status_id: 1).first%>
+<% unless allocation_order.nil?%>
+  allocation_products.html('<%= j render "order_partials/allocation_order", order: allocation_order %>');
+<% end %>
+
 // In case new customer
 <% if @last_order.nil? %>
   recipient.val('<%= (customer.company.to_s=="") ? customer.actual_name : customer.company %>');

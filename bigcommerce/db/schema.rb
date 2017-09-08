@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170905020920) do
+ActiveRecord::Schema.define(version: 20170908035532) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -555,6 +555,7 @@ ActiveRecord::Schema.define(version: 20170905020920) do
     t.datetime "created_at",                                              null: false
     t.datetime "updated_at",                                              null: false
     t.decimal  "price_discounted",                precision: 9, scale: 4
+    t.datetime "revision_date"
   end
 
   add_index "order_products", ["order_id"], name: "index_order_products_on_order_id", using: :btree
