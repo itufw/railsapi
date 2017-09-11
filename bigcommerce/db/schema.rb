@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170908035532) do
+ActiveRecord::Schema.define(version: 20170911033356) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -244,6 +244,61 @@ ActiveRecord::Schema.define(version: 20170908035532) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
+
+  create_table "customer_credit_app_signeds", force: :cascade do |t|
+    t.integer  "customer_credit_app_id", limit: 4
+    t.integer  "contact_id",             limit: 4
+    t.integer  "customer_id",            limit: 4
+    t.integer  "assigned_staff",         limit: 4
+    t.integer  "active",                 limit: 4
+    t.datetime "end_date"
+    t.text     "end_note",               limit: 65535
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
+  end
+
+  create_table "customer_credit_apps", force: :cascade do |t|
+    t.integer  "customer_id",                     limit: 4
+    t.integer  "credit_application_version",      limit: 4
+    t.datetime "date_signed"
+    t.integer  "director_signed",                 limit: 4
+    t.text     "company_name",                    limit: 255
+    t.text     "trading_name",                    limit: 255
+    t.text     "abn",                             limit: 255
+    t.integer  "abn_checked",                     limit: 4
+    t.integer  "abn_checked_staff_id",            limit: 4
+    t.text     "liquor_license_number",           limit: 255
+    t.integer  "liquor_license_checked",          limit: 4
+    t.integer  "liquor_license_checked_staff_id", limit: 4
+    t.text     "address",                         limit: 65535
+    t.text     "street",                          limit: 65535
+    t.text     "street_2",                        limit: 65535
+    t.text     "city",                            limit: 65535
+    t.text     "state",                           limit: 65535
+    t.text     "postcode",                        limit: 65535
+    t.text     "phone",                           limit: 65535
+    t.text     "fax",                             limit: 65535
+    t.datetime "business_commenced"
+    t.string   "current_premises",                limit: 255
+    t.datetime "date_occupied"
+    t.string   "payment_method_credit_app",       limit: 255
+    t.string   "payment_method",                  limit: 255
+    t.datetime "payment_method_updated_date"
+    t.string   "credit_terms",                    limit: 255
+    t.integer  "credit_days",                     limit: 4
+    t.integer  "tolerance_days",                  limit: 4
+    t.string   "credit_app_doc_id",               limit: 255
+    t.integer  "credit_limit",                    limit: 4
+    t.integer  "reference_check",                 limit: 4
+    t.datetime "approved_date"
+    t.integer  "approved_by",                     limit: 4
+    t.integer  "staff_id",                        limit: 4
+    t.datetime "created_at",                                    null: false
+    t.datetime "updated_at",                                    null: false
+  end
+
+  add_index "customer_credit_apps", ["credit_application_version"], name: "index_customer_credit_apps_on_credit_application_version", using: :btree
+  add_index "customer_credit_apps", ["customer_id"], name: "index_customer_credit_apps_on_customer_id", using: :btree
 
   create_table "customer_leads", force: :cascade do |t|
     t.text     "firstname",              limit: 255
