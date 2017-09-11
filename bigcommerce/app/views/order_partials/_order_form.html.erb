@@ -71,7 +71,15 @@
     </table>
   </div>
 </div>
-<div class="allocation-products"></div>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3 allocation-products">
+    <% if !@order.customer.nil? %>
+      <% allocation_order = Order.where(customer_id: @order.customer_id, status_id: 1).first %>
+      <%= render 'order_partials/allocation_order', order: allocation_order unless allocation_order.nil?%>
+    <% end %>
+  </div>
+</div>
+
 <table class = "table table-striped table-bordered table-hover table-responsive product-table">
   <thead>
     <tr>
@@ -102,7 +110,7 @@
           <%= product.revision_date.strftime('%d/%m/%Y') unless product.revision_date.nil? %>
         <% end %>
       </td>
-      <td class="product-inventory"><%= Product.find(product.product_id).inventory %></td>
+      <td class="product-inventory"><%= Product.find(product.product_id).inventory + product.qty %></td>
       <td><%= product_form.text_field :price_luc, size: "5", readonly: true, class: 'product-luc' %></td>
       <td><%= product_form.text_field :qty, size: "3", class: 'product-qty' %></td>
       <td><%= product_form.text_field :discount, size: "2", class: 'product-discount' %>%</td>
@@ -234,8 +242,10 @@
       '</tr>'
       ].join(''));
   });
+// Import Last order products
+// Import Allocated Products
 
-  $(document).on('click', '.last-order-product',function(){
+  $(document).on('click', '.last-order-product, .allocated-product',function(){
     product_count += 1;
 
     $('.product-table tbody.product-list').append([
@@ -252,7 +262,6 @@
       '</tr>'
     ].join(''));
   });
-
 
   var update_subtotal = function(){
     var total = 0;
@@ -319,7 +328,7 @@
     var inventory_flag = true;
     var table_flag = $('table.product-table input:text').filter(function() { return (this.value == "" || this.value=="NaN"); }).size() == 0;
     $('.product-qty').each(function(){
-      if (parseInt($(this).val()) > parseInt($(this).parent().parent().find('.product-inventory').html())){
+      if (parseInt($(this).val()) > parseInt($(this).parent().parent().find('.product-inventory').html()) ){
         inventory_flag = false;
       }
     });
