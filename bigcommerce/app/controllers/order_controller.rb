@@ -223,7 +223,7 @@ class OrderController < ApplicationController
                                   :customer_notes, :staff_notes, :address, :modified_wet,\
                                   :billing_address, :delivery_instruction, :street,\
                                   :city, :state, :postcode, :country, :customer_purchase_order,\
-                                  :track_number, :ship_name)
+                                  :track_number, :ship_name, :street_2)
   end
 
   def products_params

@@ -113,5 +113,5 @@ private
       :account_status, :address, :billing_address, :customer_notes,\
       :staff_notes, :delivery_instruction, :SpecialInstruction1, :SpecialInstruction2,\
       :SpecialInstruction3, :track_number,:street, :city, :state, :postcode, :country,\
-      :customer_purchase_order, :ship_name, :company)
+      :customer_purchase_order, :ship_name, :company, :street_2)
   end
