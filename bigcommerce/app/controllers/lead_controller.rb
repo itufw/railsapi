@@ -98,7 +98,7 @@ class LeadController < ApplicationController
   end
 
   def link_leads
-    @leads = CustomerLead.select('customer_leads.id AS lead_id, customer_leads.actual_name AS lead_name, customers.id AS customer_id, customers.actual_name AS customer_name, customers.address AS customer_address, customer_leads.address AS lead_address').joins("Left JOIN customers ON customer_leads.actual_name LIKE customers.actual_name").not_customer.where('customer_leads.actual_name IS NOT NULL AND customers.actual_name IS NOT NULL')
+    @leads = CustomerLead.select('customer_leads.id AS lead_id, customer_leads.actual_name AS lead_name, customers.id AS customer_id, customers.actual_name AS customer_name, customers.address AS customer_address, customer_leads.address AS address').joins("Left JOIN customers ON customer_leads.actual_name LIKE customers.actual_name").not_customer.where('customer_leads.actual_name IS NOT NULL AND customers.actual_name IS NOT NULL')
   end
 
   def turn_customer
@@ -106,15 +106,18 @@ class LeadController < ApplicationController
     redirect_to action: 'link_leads'
   end
 
+  def convert_to_customer
+    customer = CustomerLead.find(params[:lead_id]).convert_to_customer
+    redirect_to controller: 'customer', action: 'summary', customer_id: customer.id, customer_name: customer.actual_name
+  end
 
   # -----------private --------------------
   private
 
   def lead_params
     params.require(:customer_lead).permit(:firstname, :lastname, :actual_name,\
-                                          :staff_id, :cust_style_id, \
-                                          :cust_group_id, :cust_type_id, \
-                                          :address, :region, :website,\
-                                          :featured_image, :google_place_id)
+      :staff_id, :cust_style_id, :cust_group_id, :cust_type_id, :address,\
+      :region, :website, :featured_image, :google_place_id, :street, :city,\
+      :state, :country)
   end
 end

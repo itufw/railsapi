@@ -6,24 +6,46 @@
           '</tr>'
           ].join(''));
 <% end %>
-street.val('<%= @last_order.street%>');
-city.val('<%= @last_order.city%>');
-state.val('<%= @last_order.state%>');
-postcode.val('<%= @last_order.postcode %>');
-country.val('<%= @last_order.country%>');
 
-last_order.append([
-  '<td class="last-order-td">',
-    '<%= link_to @last_order.id.to_s, controller: "order", action: "details", order_id: @last_order.id%>',
-  '</td>',
-  '<td class="last-order-td">',
-    '<%= @last_order.date_created.to_s + "  | Total: " + @last_order.total_inc_tax.to_s%>',
-  '</td>'
-].join(''));
-last_order.show();
+<% customer = (@last_order.nil?) ? Customer.find(params[:customer_id]) : @last_order.customer %>
 
-<% customer = @last_order.customer %>
+<% allocation_order = Order.where(customer_id: customer.id, status_id: 1).first%>
+<% unless allocation_order.nil?%>
+  allocation_products.html('<%= j render "order_partials/allocation_order", order: allocation_order %>');
+<% end %>
+
+// In case new customer
+<% if @last_order.nil? %>
+  recipient.val('<%= (customer.company.to_s=="") ? customer.actual_name : customer.company %>');
+  street.val('<%= customer.street%>');
+  street_2.val('<%= customer.street_2%>');
+  city.val('<%= customer.city%>');
+  state.val('<%= customer.state%>');
+  postcode.val('<%= customer.postcode %>');
+  country.val('<%= customer.country%>');
+<% else %>
+  recipient.val('<%= (@last_order.ship_name.to_s=="") ? customer.actual_name : @last_order.ship_name%>');
+  street.val('<%= @last_order.street%>');
+  street_2.val('<%= @last_order.street_2%>');
+  city.val('<%= @last_order.city%>');
+  state.val('<%= @last_order.state%>');
+  postcode.val('<%= @last_order.postcode %>');
+  country.val('<%= @last_order.country%>');
+
+  last_order.append([
+    '<td class="last-order-td">',
+      '<%= link_to @last_order.id.to_s, controller: "order", action: "details", order_id: @last_order.id%>',
+    '</td>',
+    '<td class="last-order-td">',
+      '<%= @last_order.date_created.to_s + "  | Total: " + @last_order.total_inc_tax.to_s%>',
+    '</td>'
+  ].join(''));
+  last_order.show();
+<% end %>
+
+billing_company.val('<%= (customer.company.to_s=="") ? customer.actual_name : customer.company %>');
 billing_street.val('<%= customer.street%>');
+billing_street_2.val('<%= customer.street_2%>');
 billing_city.val('<%= customer.city%>');
 billing_state.val('<%= customer.state%>');
 billing_postcode.val('<%= customer.postcode%>');

@@ -274,6 +274,7 @@ class CustomerController < ApplicationController
                                      :staff_id, :cust_style_id, :cust_group_id,\
                                      :address, :street, :street_2, :city, :state, :postcode,\
                                      :country, :SpecialInstruction1, :SpecialInstruction2,\
-                                     :SpecialInstruction3, :tolerance_day)
+                                     :SpecialInstruction3, :tolerance_day, :account_type,\
+                                     :default_courier, :payment_method)
   end
 end

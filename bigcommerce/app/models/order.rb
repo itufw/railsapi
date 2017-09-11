@@ -25,6 +25,7 @@ class Order < ActiveRecord::Base
   after_validation :cancel_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id == 5}
   after_validation :recovery_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id_was == 5}
   after_validation :bigcommerce_status_update, on: [:update], if: ->(obj){obj.status_id_changed? and obj.source=='bigcommerce' and [2,3,4,5,6,7,8,9,10,11,12,13,26].include?obj.status_id and obj.last_updated_by!=34}
+  after_validation :update_notes, on: [:update], if: ->(obj){obj.source=='bigcommerce' and (obj.staff_notes_changed? or obj.customer_notes_changed?)}
 
   scoped_search on: [:id, :customer_purchase_order], validator: ->(value){!value.nil?}
 
@@ -59,7 +60,7 @@ class Order < ActiveRecord::Base
     end
 
     params = {'customer_id': order.customer_id, 'staff_id': customer.staff_id,\
-      'status_id': status_id, 'account_status': customer.account_approval(order.subtotal_inc_tax),\
+      'status_id': status_id,\
       'total_inc_tax': order.total_inc_tax, 'qty': order.items_total, 'items_shipped': order.items_shipped,\
       'subtotal': order.subtotal_inc_tax.to_f/1.1 + order.discount_amount.to_f + order.coupon_discount.to_f,\
       'discount_rate': 0, 'discount_amount': order.discount_amount.to_f + order.coupon_discount.to_f,\
@@ -142,6 +143,11 @@ class Order < ActiveRecord::Base
   def self.status_filter(status_id)
     return where('status_id = ?', status_id) unless status_id.nil?
     all
+  end
+
+  # Problem status include Account Status
+  def self.problem_status_filter
+    joins(:status).where('statuses.send_reminder = 1 OR (orders.account_status != "Approved" AND statuses.valid_order = 1 AND statuses.in_transit = 0 AND statuses.delivered = 0)')
   end
 
   def self.statuses_filter(status_id)
@@ -389,6 +395,10 @@ class Order < ActiveRecord::Base
     # Ignore lagacy datas
     return if self.id < 20000
     Bigcommerce::Order.update(self.source_id, status_id: self.status.bigcommerce_id)
+  end
+
+  def update_notes
+    Bigcommerce::Order.update(self.source_id, staff_notes: self.staff_notes.to_s.gsub("''","'"), customer_message: self.customer_notes.to_s.gsub("''","'"))
   end
 
   def cancel_order

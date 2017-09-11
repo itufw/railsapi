@@ -1,5 +1,5 @@
 lead_form.html("<%= j render 'lead_partials/lead_creation_form', customer_lead: @customer_lead, spot: @spot %>");
-lead_pictures.html("<%= j render 'lead_partials/lead_pictures', spot: @spot%>");
+lead_pictures.html("<%= j render 'lead_partials/lead_pictures', spot: @spot, size: 100%>");
 
 <% unless @spot.nil?%>
   markers = handler.addMarkers([

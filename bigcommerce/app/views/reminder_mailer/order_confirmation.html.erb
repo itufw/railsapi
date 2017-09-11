@@ -10,14 +10,17 @@
       <p>Please find the attached a copy of the invoice for Invoice <%= @order.id%>. The total of the invoice is $<%= @order.total_inc_tax%>.</p>
       <p>Should you have any questions please be in contact with your sales executive or our office team.</p>
     </div>
-    <div>
-      <b>Sales Executive</b>
-      <p>
-         <%= @staff.firstname + " " + @staff.lastname%><br/>
-         <%= @staff.contact_number[0..1] + " " + @staff.contact_number[2..5] + " " + @staff.contact_number[6..9] %><br/>
-         <%= @staff.email%>
-       </p>
-    </div>
-    <%= render 'reminder_mailer_partials/signature_general' %>
+
+    <b>Untapped Fine Wines</b><br/>
+      <table>
+        <tr>
+          <td>03 9676 9663</td>
+        </tr>
+        <tr>
+          <td>customerservice@untappedwines.com</td>
+        </tr>
+      </table>
+
+    <%= render 'reminder_mailer_partials/signature_sales', staff: @staff %>
   </body>
 </html>
