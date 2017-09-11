@@ -43,7 +43,6 @@ module OrderHelper
     handling_fee = TaxPercentage.handling_fee
     gst = TaxPercentage.gst_percentage * 0.01
 
-
     # 100XXXXX CMS orders
     order_id = Order.select('MAX(id) as id').first.id
     order_id = (order_id > 10000000) ? order_id + 1 : order_id + 10000001
@@ -63,8 +62,25 @@ module OrderHelper
     order.save
 
     products_params.each do |keys, product_params|
-      product = OrderProduct.new(product_params.permit(:product_id, :price_luc, :qty, :discount, :price_discounted))
-      product_attributes = {'order_id': order.id, 'qty_shipped': 0,\
+      product_id = product_params['product_id'].split('-').first
+      # if product comes from allocated Order
+      if product_params['product_id'].split('-').count>1
+        allocated_product = OrderProduct.where('orders.customer_id': order.customer_id, 'orders.status_id': 1, product_id: product_id, qty: (1..200)).first
+
+
+        allocated_product.assign_attributes(qty: allocated_product.qty - product_params[:qty].to_i,\
+         stock_previous: allocated_product.qty, stock_current: allocated_product.qty - product_params[:qty].to_i,\
+         stock_incremental: 0 - product_params[:qty].to_i, updated_by: session[:user_id],\
+         display: ((allocated_product.qty - product_params[:qty].to_i)==0)? 0 : 1)
+
+        allocated_product.save
+        allocated_order = Order.where(customer_id: order.customer_id, status_id: 1).first
+        allocated_order.update(qty: allocated_order.qty - product_params[:qty].to_i)
+      end
+
+
+      product = OrderProduct.new(product_params.permit(:price_luc, :qty, :discount, :price_discounted))
+      product_attributes = {'product_id': product_id,'order_id': order.id, 'qty_shipped': 0,\
           'order_discount': order.discount_rate, 'price_handling': handling_fee, 'stock_previous': 0,\
           'display': 1, 'damaged': 0, 'created_by': session[:user_id], 'updated_by': session[:user_id]}
       product.assign_attributes(product_attributes)

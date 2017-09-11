@@ -10,6 +10,7 @@ require 'time_period_stats.rb'
 # for calendar period types for overall stats - weekly, monthly, quarterly
 require 'dates_helper.rb'
 require 'product_helper'
+require 'application_helper.rb'
 class ProductController < ApplicationController
   before_action :confirm_logged_in
 
@@ -21,6 +22,7 @@ class ProductController < ApplicationController
   include TimePeriodStats
   include DatesHelper
   include ProductHelper
+  include ApplicationHelper
 
   # Displays all products
   def all
@@ -124,11 +126,10 @@ class ProductController < ApplicationController
     # the valid customer - allocation pair
     allocated = params[:customer].select{ |key, value| value.to_i > 0 }
 
-
     if allocated.values().map(&:to_i).sum > products.sum(:inventory)
       flash[:error] = "Not Enough Stock, Return to Product Page and Refresh!"
       redirect_to request.referrer and return
-    elsif user_full_right(session[:authority])
+    elsif !user_full_right(session[:authority])
       flash[:error] = "User Right Limitated"
       redirect_to request.referrer and return
     elsif params[:transform_column]!="product_id" && products.select{|x| x.name.end_with?'WS'}.first.nil?
@@ -144,10 +145,10 @@ class ProductController < ApplicationController
     if 'Bulk Allocate'.eql?params[:commit]
       # Bulk Allocated
       # Product id IS WS Product ID
-      Customer.where(id: allocated.keys()).map{|x| x.allocate_products(product_id, allocated[x.id.to_s], revision_date) }
+      Customer.where(id: allocated.keys()).map{|x| x.allocate_products(product_id, allocated[x.id.to_s].to_i, revision_date, session[:user_id]) }
     end
-
-    redirect_to action: 'summary', transform_column: params[:transform_column], product_id: product_id, total_stock: products.sum(:inventory)
+    
+    redirect_to action: 'summary', pending_stock: allocated.values().map(&:to_i).sum, transform_column: params[:transform_column], product_name: params[:product_name], product_id: params[:product_id], total_stock: products.sum(:inventory)
   end
 
   def overall(params, product_ids, customers_filtered_ids, total_stock)
