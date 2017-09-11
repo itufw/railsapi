@@ -9,5 +9,7 @@ product_list.html([
   '&nbsp;&nbsp;&nbsp;',
   '<%=j render "order_partials/order_email", order: order %>',
   '<%=j render "partials/order_product", order_products: order.order_products, cust_id: order.customer_id, cust_name: customer_name(order.customer) %>',
+  '<%= ("<p><b>Order Discount:</b> " + order.discount_rate.to_s + "%</p>").html_safe %>',
+  '<p><%= ("<b>Created By:</b> " + Staff.find(order.created_by).nickname + "&nbsp;&nbsp;<b>Last Edited By:</b>" + Staff.find(order.last_updated_by).nickname).html_safe%></p>',
   '<%=j render "order_partials/notes", order: order %>'
 ].join(''));
