@@ -49,14 +49,11 @@ module LeadHelper
     client = GooglePlaces::Client.new('AIzaSyBvfTZH0XCVEJQTgR9QDYt18XIeV5MIkPI')
     place = client.spot(place_id)
 
-    customer_lead = CustomerLead.new
-    customer_lead.staff_id = staff_id
-    customer_lead.cust_type_id = 2
-    customer_lead.phone = place.formatted_phone_number
-    customer_lead.actual_name = place.name
-    customer_lead.address = place.formatted_address
-    customer_lead.website = place.website
-    customer_lead.cust_style_id = spot_style(place.types)
+    customer_lead = CustomerLead.new(staff_id: staff_id, cust_type_id: 2,\
+      phone: place.formatted_phone_number, actual_name: place.name,\
+      address: place.formatted_address, website: place.website,\
+      cust_style_id: spot_style(place.types), street: place.street_number.to_s + " " + place.street.to_s,\
+      city: place.city, state: place.region, postalcode: place.postal_code, country: place.country)
 
     [customer_lead, place]
   end
@@ -67,16 +64,12 @@ module LeadHelper
     end
 
     customer = Customer.find(customer_id)
-    customer.address = lead.address if customer.address.nil?
-    customer.save
+    customer.update(address: lead.address) if customer.address.nil?
 
-    lead.task_relations.each do |relation|
-      if relation.customer_id.to_i == 0
-        relation.customer_id = customer_id
-        relation.save
-      else
-        TaskRelation.create(task_id: relation.task_id, customer_id: customer_id, completed_date: relation.completed_date)
-      end
+    TaskRelation.where(customer_lead_id: lead.id, customer_id: nil).update_all(customer_id: customer_id)
+
+    TaskRelation.where('customer_lead_id = ? AND customer_id IS NOT NULL', lead.id).each do |relation|
+      TaskRelation.create(task_id: relation.task_id, customer_id: customer_id, completed_date: relation.completed_date)
     end
 
     CustomerTag.where(role: 'Lead', customer_id: lead.id).destroy_all

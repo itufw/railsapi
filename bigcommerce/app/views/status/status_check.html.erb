@@ -1,77 +1,71 @@
 <%= title @status_name + " Checklist" %>
 <h3><%= @status_name + " Checklist" %></h3>
-<% if ['Approval'].include? @status_name %>
-  <%= form_tag({:controller => "order", :action => "order_confirmation"}, {:method => "get"}) do %>
-    <%= hidden_field_tag :status_name, @status_name%>
-    <%= hidden_field_tag :status_id, 3%>
-    <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
-    <%= submit_tag 'Check', class: 'btn btn-primary'%>
-  <% end %>
-<% elsif ["Picking", "Ready"].include? @status_name%>
+<% if ["Picking", "Ready", "Shipped", 'Print'].include? @status_name%>
   <%= form_tag({:controller => "status", :action => "status_update"}, {:method => "get"}) do %>
-    <% if @orders.blank?%>
-      <%= hidden_field_tag "order['id']", 100 %>
-    <% else %>
-      <%= hidden_field_tag "order['id']", @orders.first.id %>
-    <% end %>
-
+    <%= hidden_field_tag "order['id']", (@orders.blank?) ? 100 : @orders.first.id %>
     <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
-    <% if @status_name == "Picking" %>
+    <% case @status_name %>
+    <% when "Picking" %>
       <%= submit_tag 'Picked', class: 'btn btn-primary'%>
       <%= submit_tag 'Print Picking Slip', class: 'btn btn-primary'%>
       <%= submit_tag 'Print Invoices', class: 'btn btn-primary'%>
       <%= submit_tag 'Print Picking Sheets', class: 'btn btn-primary'%>
+    <% when "Shipped"%>
+      <%= submit_tag 'Shipped', class: 'btn btn-primary'%>
+    <% when 'Print'%>
+      <%= submit_tag 'Print Picking Slip', class: 'btn btn-primary'%>
+      <%= submit_tag 'Print Invoices', class: 'btn btn-primary'%>
+      <%= submit_tag 'Print Picking Sheets', class: 'btn btn-primary'%>
+      <script type="text/javascript">
+        $('table tbody tr.odd').each(function () {
+          $(this).find('.multi-select input').attr('checked', false);
+        });
+      </script>
     <% else %>
       <%= submit_tag 'Ready', class: 'btn btn-primary'%>
     <% end %>
+    <button type="button" name="return" class="btn btn-primary"><%= link_to 'Back', controller: 'order', action: 'all'%></button>
+    <div class="status_change col-md-2" style="margin-top: -20px; margin-right: 300px; float: right;">
+    	<%= label(:status_overwrite, 'Status Overwrite')%>
+    	<%= collection_select(nil, :status, Status.all, :id, :name, {include_blank: 'All Statuses'}, {class: 'form-control', onchange: 'this.form.submit();'}) %>
+    </div>
   <% end %>
-<% elsif ['Courier'].include? @status_name%>
-  <%= form_tag({:controller => "order", :action => "order_confirmation"}, {:method => "get"}) do %>
-    <%= hidden_field_tag :status_name, @status_name%>
-    <%= hidden_field_tag :status_id, 9%>
-    <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
-    <%= submit_tag 'Select Courier', class: 'btn btn-primary'%>
-  <% end %>
-  <script type="text/javascript">
-  $('table tbody tr.odd').each(function(){
-    if($(this).find('.account-Approved').length == 0){
-      $(this).find('.multi-select input').attr('checked', false);
-    }
-  });
-  </script>
-<% elsif ['Shipped'].include? @status_name%>
-  <%= form_tag({:controller => "status", :action => "status_update"}, {:method => "get"}) do %>
-    <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
-    <%= submit_tag 'Shipped', class: 'btn btn-primary'%>
-
-    <% if @orders.blank?%>
-      <%= hidden_field_tag "order['id']", 100 %>
-    <% else %>
-      <%= hidden_field_tag "order['id']", @orders.first.id %>
-    <% end %>
-
-    <button type="button" name="return" class="btn btn-primary"><%= link_to 'Back', controller: 'status', action: 'order_status', status_id: 9, status_name: 'Ready'%></button>
-  <% end %>
-<% elsif ['Delivered'].include? @status_name %>
-  <%= form_tag({:controller => "order", :action => "order_confirmation"}, {:method => "get"}) do %>
-    <%= hidden_field_tag :status_name, @status_name%>
-    <%= hidden_field_tag :status_id, 12 %>
-    <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
-    <%= submit_tag 'Delivered', class: 'btn btn-primary'%>
-  <% end %>
-  <script type="text/javascript">
-  $('table tbody tr.odd').each(function(){
-    if($(this).find('.Signature-Obtained, .Delivery-Completed, .Left-As-Instructed, .Left-with-neighbour, .Authority-to-Leave').length == 0){
-      $(this).find('.multi-select input').attr('checked', false);
-    }
-  });
-  </script>
 
 <% else %>
   <%= form_tag({:controller => "order", :action => "order_confirmation"}, {:method => "get"}) do %>
     <%= hidden_field_tag :status_name, @status_name%>
-    <%= hidden_field_tag :status_id, 3 %>
     <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
-    <%= submit_tag 'Check', class: 'btn btn-primary'%>
+
+    <% case @status_name %>
+    <% when 'Approval'%>
+      <%= hidden_field_tag :status_id, 3%>
+      <%= submit_tag 'Check', class: 'btn btn-primary'%>
+    <% when 'Courier' %>
+      <%= hidden_field_tag :status_id, 9%>
+      <%= submit_tag 'Select Courier', class: 'btn btn-primary'%>
+      <script type="text/javascript">
+        $('table tbody tr.odd').each(function () {
+          if ($(this).find('.account-Approved').length == 0) {
+            $(this).find('.multi-select input').attr('checked', false);
+          }
+        });
+      </script>
+    <% when 'Delivered' %>
+      <%= hidden_field_tag :status_id, 12 %>
+      <%= submit_tag 'Delivered', class: 'btn btn-primary'%>
+      <script type="text/javascript">
+        $('table tbody tr.odd').each(function () {
+          if ($(this).find('.Signature-Obtained, .Delivery-Completed, .Left-As-Instructed, .Left-with-neighbour, .Authority-to-Leave').length == 0) {
+            $(this).find('.multi-select input').attr('checked', false);
+          }
+        });
+      </script>
+    <% else %>
+      <%= hidden_field_tag :status_id, 3 %>
+      <%= submit_tag 'Check', class: 'btn btn-primary'%>
+    <!-- End Case -->
+    <% end %>
+  <!-- End Form -->
   <% end %>
+<!-- End If -->
 <% end %>

@@ -20,4 +20,14 @@ module ProductHelper
     return customer_pendings.order('qty ASC') if direction != -1
     customer_pendings.order('qty DESC')
   end
+
+  def monthly_average(sales_h, months)
+    months = 1 if months.to_i == 0
+    sales_h.values().sum/months
+  end
+
+  def monthly_supply(monthly_average, total_stock)
+    return '--' if monthly_average == 0
+    total_stock / monthly_average
+  end
 end

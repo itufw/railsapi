@@ -26,6 +26,54 @@ class Customer < ActiveRecord::Base
 
 	self.per_page = 15
 
+	def create_in_bigcommerce
+		# property :id
+		# property :_authentication
+		# property :count
+		# property :company
+		# property :first_name
+		# property :last_name
+		# property :email
+		# property :phone
+		# property :date_created
+		# property :date_modified
+		# property :store_credit
+		# property :registration_ip_address
+		# property :customer_group_id
+		# property :notes
+		# property :addresses
+		# property :tax_exempt_category
+		# property :accepts_marketing
+		customer_api = Bigcommerce::Customer
+		bigc_customer = customer_api.create(
+			company: self.actual_name,
+			first_name: self.actual_name,
+			last_name: self.firstname.to_s + ' ' + self.lastname.to_s,
+			email: self.email || (self.actual_name.split()[0..2].join('_')+"@untappedwines.com"),
+			store_credit: self.store_credit || 0,
+			customer_group_id: self.cust_type_id || 2,
+			notes: self.notes || ""
+		)
+		self.id = bigc_customer.id
+		self.save
+
+		unless self.street.nil?
+			customer_address = Bigcommerce::CustomerAddress.create(
+			  bigc_customer.id,
+			  first_name: self.firstname,
+			  last_name: self.lastname,
+			  phone: self.phone,
+			  street_1: self.street,
+			  city: self.city,
+			  state: self.state,
+			  zip: self.postcode,
+			  country: self.country
+			)
+		end
+
+		bigc_customer
+	end
+
 	# mass insert from bigcommerce api
 	def scrape
 
@@ -135,7 +183,8 @@ class Customer < ActiveRecord::Base
 
 	def account_approval(order_total)
 		return 'Approved' if order_total == 0
-		return 'Hold-Account' if self.xero_contact_id == 0
+		return 'Hold-Account' if self.xero_contact_id.nil? || self.account_type=="COD"
+		return (XeroInvoice.where("xero_contact_id = '#{self.xero_contact_id}' AND due_date < '#{Date.today.beginning_of_month.to_s(:db)}'").sum('amount_due') > 0) ? 'Hold-Account' : 'Approved' if self.account_type == "EOM"
 		sum = XeroInvoice.where("xero_contact_id = '#{self.xero_contact_id}' AND due_date < '#{(Date.today - self.tolerance_day.to_i.days).to_s(:db)}'").sum('amount_due')
 		return 'Hold-Account' if sum > 0
 		'Approved'
@@ -348,5 +397,36 @@ class Customer < ActiveRecord::Base
 
 	def self.group_by_year_created_and_staff_id
 	   group(['customers.staff_id', 'YEAR(customers.date_created)'])
+	end
+
+	def allocated_orders
+		Order.where(customer_id: self.id, status_id: 1)
+	end
+
+	def allocate_products(product_id, product_qty, revision_date, user_id)
+		order = allocated_orders.first
+		product = Product.find(product_id)
+
+		if order.nil?
+			order = Order.new(customer_id: self.id, status_id: 1, staff_id: self.staff_id,\
+		 		total_inc_tax: 0, qty: 0, items_shipped: 0, subtotal: 0,\
+				discount_rate: 100, discount_amount: 0, handling_cost: 0, shipping_cost: 0,\
+				wrapping_cost: 0, wet: 0, gst: 0, staff_notes: 'Allocated Order', customer_notes: '',\
+				active: 1, source: 'manual', date_created: Time.now.to_s(:db),\
+				created_by: user_id, last_updated_by: user_id,\
+				courier_status_id: 1, account_status: 'Approved')
+	 	end
+		order.qty += product_qty
+		order.discount_amount += (product_qty*product.calculated_price*1.29).round(4)
+		order.save
+
+		product = OrderProduct.new(product_id: product_id, order_id: order.id, price_luc: 0,\
+		 qty: product_qty, discount: 0, price_discounted: 0, qty_shipped: 0,\
+		 order_discount: 100, price_handling: 0, stock_previous: 0, stock_current: product_qty,\
+		 stock_incremental: product_qty, price_gst: 0, price_wet: 0, base_price: product.calculated_price*1.29,\
+		 price_inc_tax: 0, display: 1, damaged: 0, revision_date: revision_date.to_s(:db),\
+		 created_by: user_id, updated_by: user_id).save
+
+		order
 	end
 end

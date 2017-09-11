@@ -4,6 +4,7 @@
     <% place_id = (spot.nil?) ? '' : spot.id %>
     <%= f.hidden_field :featured_image, value: url%>
     <%= f.hidden_field :google_place_id, value: place_id%>
+
     <div id="selector" class="btn-group">
       <button type="button" class="btn btn-default <%= 'active' if @customer_lead_button %>" value="customer">Customer Lead</button>
       <button type="button" class="btn btn-default <%= 'active' unless @customer_lead_button %>" value="region">Region Lead</button>
@@ -15,6 +16,11 @@
       <%= f.text_field :firstname, placeholder: 'First Name', maxlength: 45 %>
       <%= f.text_field :lastname, placeholder: 'Last Name', maxlength: 45 %>
     </div>
+    <%= f.text_field :street, placeholder: 'Street'%>
+    <%= f.text_field :city, placeholder: 'Suburb'%>
+    <%= f.text_field :state, placeholder: 'State'%>
+    <%= f.text_field :postalcode, placeholder: 'Postcode'%>
+    <%= f.text_field :country, placeholder: 'Country'%>
     <br/>
     <%= f.text_field :address, placeholder: 'Address', size: 100 %>
     <br/>

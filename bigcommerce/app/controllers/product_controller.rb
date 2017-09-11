@@ -10,9 +10,10 @@ require 'time_period_stats.rb'
 # for calendar period types for overall stats - weekly, monthly, quarterly
 require 'dates_helper.rb'
 require 'product_helper'
+require 'application_helper.rb'
 class ProductController < ApplicationController
   before_action :confirm_logged_in
-  
+
   autocomplete :product, :name, full: true
 
 
@@ -21,6 +22,7 @@ class ProductController < ApplicationController
   include TimePeriodStats
   include DatesHelper
   include ProductHelper
+  include ApplicationHelper
 
   # Displays all products
   def all
@@ -72,6 +74,81 @@ class ProductController < ApplicationController
     # calculate the pending stock for each customer
     @customer_pendings, @customer_ids = \
       customer_pending_amount(product_ids, params, @customer_ids)
+  end
+
+  def allocate
+    params[:direction] = params[:direction] || -1
+    params[:order_col] = params[:order_col] || 'Last Quarter'
+
+    params_for_one_product(params)
+    transform(params)
+    # total_stock is inventory in bigcommerce + pending stock
+    get_total_stock(params)
+    # WS + Retail + Pending stock
+    # Ignore Pending Stock -> the 0
+    @total_stock_no_ws = total_stock_no_ws(@transform_column, @product_id, 0, @total_stock)
+
+    # either we want stats for a product_id
+    # or for products based on a product_no_vintage_id
+    # or based on a product_no_ws_id
+    # this gives product_ids based on that transform_column
+    @products = get_products_after_transformation(@transform_column, @product_id)
+    product_ids = @products.pluck('id') || @product_id
+
+    # Collect the allocated_stocks
+    @allocated_stock = allocated_stock(product_ids)
+
+    # form filter for top customers
+
+    # i only need to check product rights on this page
+    # So if product rights is 0, then restrict by staff
+    # otherwise just do a normal param filter
+    @staff, customers_filtered, @search_text, staff_id, @cust_style = \
+      customer_filter(params, session[:user_id], 'product_rights')
+    customers_filtered_ids = customers_filtered.pluck('id')
+    # both overall stats and top customers change based on the customer filter
+
+    # top customers
+    top_customers(params, product_ids, customers_filtered_ids)
+
+    # calculate the pending stock for each customer
+    @customer_pendings, @customer_ids = \
+      customer_pending_amount(product_ids, params, @customer_ids)
+  end
+
+  def allocate_products
+    # Revision Date Conveter
+    # From {"(1i)"=>"2017", "(2i)"=>"10", "(3i)"=>"8"} to Date
+    revision_date = Date.parse params[:revision_date].values().join('-')
+    # Find the correct Product(s)
+    # No WS marks or product itself
+    products = get_products_after_transformation(params[:transform_column], params[:product_id])
+    # the valid customer - allocation pair
+    allocated = params[:customer].select{ |key, value| value.to_i > 0 }
+
+    if allocated.values().map(&:to_i).sum > products.sum(:inventory)
+      flash[:error] = "Not Enough Stock, Return to Product Page and Refresh!"
+      redirect_to request.referrer and return
+    elsif !user_full_right(session[:authority])
+      flash[:error] = "User Right Limitated"
+      redirect_to request.referrer and return
+    elsif params[:transform_column]!="product_id" && products.select{|x| x.name.end_with?'WS'}.first.nil?
+      flash[:error] = "Not Enough Stock, Return to Product Page and Refresh!"
+      redirect_to request.referrer and return
+    elsif allocated.values().map(&:to_i).sum > products.select{|x| x.name.end_with?'WS'}.sum(&:inventory)
+      product = products.select{|x| x.name.end_with?'WS'}.first
+      allocate_inventory(product.id, products.map(&:id))
+    end
+
+    product_id = (params[:transform_column]!="product_id")? products.select{|x| x.name.end_with?'WS'}.first.id : prarams[:product_id]
+
+    if 'Bulk Allocate'.eql?params[:commit]
+      # Bulk Allocated
+      # Product id IS WS Product ID
+      Customer.where(id: allocated.keys()).map{|x| x.allocate_products(product_id, allocated[x.id.to_s].to_i, revision_date, session[:user_id]) }
+    end
+    
+    redirect_to action: 'summary', pending_stock: allocated.values().map(&:to_i).sum, transform_column: params[:transform_column], product_name: params[:product_name], product_id: params[:product_id], total_stock: products.sum(:inventory)
   end
 
   def overall(params, product_ids, customers_filtered_ids, total_stock)
@@ -185,6 +262,6 @@ def product_params
   params.require(:product).permit(:producer_id, :product_type_id, :warehouse_id,\
    :product_size_id, :product_no_ws_id, :name_no_ws, :name_no_vintage,\
    :product_no_vintage_id, :case_size, :product_package_type_id, :retail_ws,\
-   :vintage, :name_no_winery_no_vintage,\
-   :blend_type, :order_1, :order_2, :combined_order, :producer_ragion_id)
+   :vintage, :name_no_winery_no_vintage, :price_id, :product_sub_type_id,\
+   :blend_type, :order_1, :order_2, :combined_order, :producer_region_id)
 end

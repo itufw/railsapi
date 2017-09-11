@@ -3,6 +3,7 @@ require 'display_helper.rb'
 require 'product_variations.rb'
 require 'order_helper.rb'
 require 'order_status.rb'
+require 'application_helper.rb'
 
 class OrderController < ApplicationController
 
@@ -13,8 +14,14 @@ class OrderController < ApplicationController
     include ProductVariations
     include OrderHelper
     include OrderStatus
+    include ApplicationHelper
 
     def all
+      # if status -> print
+      if !params[:start_date].nil? && !params[:commit] && user_full_right(session[:authority])
+        redirect_to controller: 'status', action: 'status_check', params: params, status_name: 'Print' and return
+      end
+
      	@staff_nickname = params[:staff_nickname]
      	@start_date = params[:start_date]
      	@end_date = params[:end_date]
@@ -26,12 +33,6 @@ class OrderController < ApplicationController
       orders = orders.where('eta <= ?', Date.today.to_s(:db)) unless params[:delay].nil?
 
      	@per_page, @orders = order_display_(params, orders)
-    end
-
-    def print_order
-      #@can_update_bool = allow_to_update(session[:user_id])
-      @staff, @status, orders, @search_text, @order_id = order_controller_filter(params, "display_report")
-      @per_page, @orders = order_display_(params, orders)
     end
 
   	def for_product
@@ -150,7 +151,22 @@ class OrderController < ApplicationController
 
     products_container = []
     products_params.each do |keys, product_params|
-      product_id = product_params['product_id']
+      product_id = product_params['product_id'].split('-').first
+      # if product comes from allocated Order
+      if product_params['product_id'].split('-').count>1
+        allocated_product = OrderProduct.where('orders.customer_id': order.customer_id, 'orders.status_id': 1, product_id: product_id, qty: (1..200)).first
+
+        allocated_product.assign_attributes(qty: allocated_product.qty - product_params[:qty].to_i,\
+         stock_previous: allocated_product.qty, stock_current: allocated_product.qty - product_params[:qty].to_i,\
+         stock_incremental: 0 - product_params[:qty].to_i, updated_by: session[:user_id],\
+         display: ((allocated_product.qty - product_params[:qty].to_i)==0)? 0 : 1)
+
+        allocated_product.save
+        allocated_order = Order.where(customer_id: order.customer_id, status_id: 1).first
+        allocated_order.update(qty: allocated_order.qty - product_params[:qty].to_i)
+      end
+
+
       if products.map(&:product_id).include?product_id.to_i
         # update
         product = products.where(product_id: product_id).first
@@ -215,6 +231,7 @@ class OrderController < ApplicationController
   end
 
   def customer_params
-    params.require(:order).require(:customer).permit(:street, :city, :state, :postcode, :country, :street_2)
+    params.require(:order).require(:customer).permit(:street, :city, :state,\
+     :postcode, :country, :street_2, :company)
   end
 end
