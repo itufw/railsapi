@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170911033356) do
+ActiveRecord::Schema.define(version: 20170911042106) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -243,6 +243,21 @@ ActiveRecord::Schema.define(version: 20170911033356) do
     t.text     "name",       limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+  end
+
+  create_table "customer_credit_app_references", force: :cascade do |t|
+    t.integer  "customer_credit_app_id", limit: 4
+    t.integer  "customer_id",            limit: 4
+    t.text     "company_name",           limit: 65535
+    t.text     "contact_name",           limit: 65535
+    t.text     "check1",                 limit: 65535
+    t.text     "check2",                 limit: 65535
+    t.text     "check3",                 limit: 65535
+    t.text     "check4",                 limit: 65535
+    t.text     "notes",                  limit: 65535
+    t.integer  "checked_by",             limit: 4
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
   end
 
   create_table "customer_credit_app_signeds", force: :cascade do |t|
