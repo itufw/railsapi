@@ -69,7 +69,7 @@ module OrderStatus
           flash[:success] = "Label Printed"
         rescue
           flash[:error] = 'Fail to connect Fastway, Check the Shipping Address'
-          flash[:error] = result['error'] unless result.nil? || result[:error].nil?
+          flash[:error] = result['error'] unless result.nil? || result['error'].nil?
           selected_orders.unshift(params[:order_id])
           return ['Label Error', selected_orders]
         end
