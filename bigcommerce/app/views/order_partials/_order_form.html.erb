@@ -1,84 +1,85 @@
 <%= f.text_field :customer_id %>
-<div class="row">
-  <div class="col-md-8">
-    <div class="row">
-      <div class="col-md-6">
-        <table id="customer_table">
-          <tr>
-            <th>Customer</th>
-            <% if @order.customer_id.nil? || @order.customer_id == ""%>
-              <td class="customer_autocomplete">
-                <%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 30 %>
+  <div class="row">
+    <div class="col-md-8">
+      <div class="row">
+        <div class="col-md-6">
+          <table id="customer_table">
+            <tr>
+              <th>Customer</th>
+              <% if @order.customer_id.nil? || @order.customer_id == ""%>
+                <td class="customer_autocomplete">
+                  <%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 30 %>
+                </td>
+              <% else %>
+                <td><input type="text" name="customer" id="<%= @order.customer_id %>" value="<%= Customer.find(@order.customer_id).actual_name%>" readonly="readonly" size="30px"></td>
+              <% end %>
+              <td><input type="checkbox" id="customer_purchase_order" style="display: inline-block;"> Customer Puchase ID</td>
+            </tr>
+            <tr style="display: none;" class="customer-purchase-order-tr"></tr>
+            <tr style="display: none;" class="last_order"></tr>
+          </table>
+        </div>
+        <div class="col-md-6">
+          <table id="product_table">
+            <tr>
+              <th>Product</th>
+              <td class="product_autocomplete">
+                <%= autocomplete_field_tag 'product', '', autocomplete_product_ws_activity_index_path, placeholder: 'Search WS Product', id_element: '#product_id', id: 'product_ws_search', size: 40%>
               </td>
-            <% else %>
-              <td><input type="text" name="customer" id="<%= @order.customer_id %>" value="<%= Customer.find(@order.customer_id).actual_name%>" readonly="readonly" size="30px"></td>
-            <% end %>
-            <td><input type="checkbox" id="customer_purchase_order" style="display: inline-block;"> Customer Puchase ID</td>
-          </tr>
-          <tr style="display: none;" class="customer-purchase-order-tr"></tr>
-          <tr style="display: none;" class="last_order"></tr>
-        </table>
-      </div>
-      <div class="col-md-6">
-        <table id="product_table">
-          <tr>
-            <th>Product</th>
-            <td class="product_autocomplete">
-              <%= autocomplete_field_tag 'product', '', autocomplete_product_ws_activity_index_path, placeholder: 'Search WS Product', id_element: '#product_id', id: 'product_ws_search', size: 40%>
-            </td>
-            <!-- No WS products -->
-            <td><input type="checkbox" id="ws" class="ws_checkbox" style="display: inline-block;" checked>Only WS</td>
-          </tr>
-        </table>
-        <!-- WS / All products -->
-        <script type="text/javascript">
-          $('input#ws').change(function(){
-            if (this.checked){
-              $('.product_autocomplete').html('<%= autocomplete_field_tag 'product', '', autocomplete_product_ws_activity_index_path, placeholder: 'Search WS Product', id_element: '#product_id', id: 'product_ws_search'%>');
-            }else{
-              $('.product_autocomplete').html('<%= autocomplete_field_tag 'product', '', autocomplete_product_name_activity_index_path, placeholder: 'Search Product', id_element: '#product_id', id: 'product_search'%>');
-            }
-          });
+              <!-- No WS products -->
+              <td><input type="checkbox" id="ws" class="ws_checkbox" style="display: inline-block;" checked>Only WS</td>
+            </tr>
+          </table>
+          <!-- WS / All products -->
+          <script type="text/javascript">
+            $('input#ws').change(function(){
+              if (this.checked){
+                $('.product_autocomplete').html('<%= autocomplete_field_tag 'product', '', autocomplete_product_ws_activity_index_path, placeholder: 'Search WS Product', id_element: '#product_id', id: 'product_ws_search'%>');
+              }else{
+                $('.product_autocomplete').html('<%= autocomplete_field_tag 'product', '', autocomplete_product_name_activity_index_path, placeholder: 'Search Product', id_element: '#product_id', id: 'product_search'%>');
+              }
+            });
 
-          $('input#customer_purchase_order').change(function(){
-            if (this.checked){
-              $('.customer-purchase-order-tr').html('<td colspan="3"><input placeholder="Customer Purchase Order" type="text" name="order[customer_purchase_order]" id="order_customer_purchase_order"></td>');
-              $('.customer-purchase-order-tr').show();
-            }else{
-              $('.customer-purchase-order-tr').hide();
-              $('.customer-purchase-order-tr').html("");
-            }
-          });
-        </script>
+            $('input#customer_purchase_order').change(function(){
+              if (this.checked){
+                $('.customer-purchase-order-tr').html('<td colspan="3"><input placeholder="Customer Purchase Order" type="text" name="order[customer_purchase_order]" id="order_customer_purchase_order"></td>');
+                $('.customer-purchase-order-tr').show();
+              }else{
+                $('.customer-purchase-order-tr').hide();
+                $('.customer-purchase-order-tr').html("");
+              }
+            });
+          </script>
+        </div>
+      </div>
+      <div class="row">
+        <%= render 'partials/order_address_form', f: f %>
       </div>
     </div>
-    <div class="row">
-      <%= render 'partials/order_address_form', f: f %>
+    <div class="col-md-4">
+      <table id="last_products">
+        <tr>
+          <th>Last Ordered Products</th>
+        </tr>
+        <% unless @order.customer_id.nil? || @order.customer_id == ""%>
+          <% Product.where(id: OrderProduct.where("order_id IN (?) AND created_at > ?", @order.customer.orders.map(&:id), (Date.today - 3.month).to_s(:db)).map(&:product_id)).each do |product| %>
+          <tr class="last-order-product" product-id="<%= product.id%>" name="<%= product.name%>" inventory="<%= product.inventory%>" price="<%= product.calculated_price * 1.29%>">
+            <td><%= product.name %></td>
+          </tr>
+          <% end %>
+        <% end %>
+      </table>
     </div>
   </div>
-  <div class="col-md-4">
-    <table id="last_products">
-      <tr>
-        <th>Last Ordered Products</th>
-      </tr>
-      <% unless @order.customer_id.nil? || @order.customer_id == ""%>
-        <% Product.where(id: OrderProduct.where("order_id IN (?) AND created_at > ?", @order.customer.orders.map(&:id), (Date.today - 3.month).to_s(:db)).map(&:product_id)).each do |product| %>
-        <tr class="last-order-product" product-id="<%= product.id%>" name="<%= product.name%>" inventory="<%= product.inventory%>" price="<%= product.calculated_price * 1.29%>">
-          <td><%= product.name %></td>
-        </tr>
-        <% end %>
+  <div class="row">
+    <div class="col-md-6 col-md-offset-3 allocation-products">
+      <% if !@order.customer.nil? %>
+        <% allocation_order = Order.where(customer_id: @order.customer_id, status_id: 1).first %>
+        <%= render 'order_partials/allocation_order', order: allocation_order unless allocation_order.nil?%>
       <% end %>
-    </table>
+    </div>
   </div>
-</div>
-<div class="row">
-  <div class="col-md-6 col-md-offset-3 allocation-products">
-    <% if !@order.customer.nil? %>
-      <% allocation_order = Order.where(customer_id: @order.customer_id, status_id: 1).first %>
-      <%= render 'order_partials/allocation_order', order: allocation_order unless allocation_order.nil?%>
-    <% end %>
-  </div>
-</div>
+
 
 <table class = "table table-striped table-bordered table-hover table-responsive product-table">
   <thead>
@@ -159,6 +160,7 @@
   </tr>
 </table>
 <%= f.hidden_field :modified_wet %>
+
 <div class="row">
   <div class="col-md-4 col-md-offset-8">
     <%= link_to '<button type="button" class="btn btn-warning">Cancel</button>'.html_safe, controller: 'order', action: 'all'%>
@@ -220,6 +222,7 @@
         $('#order_customer_id').val('');
         $('.last-order-product').remove();
         $('.last-order-td').remove();
+        $('.allocation-products').html('');
       });
     }
   });

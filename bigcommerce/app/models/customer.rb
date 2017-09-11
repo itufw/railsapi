@@ -403,7 +403,7 @@ class Customer < ActiveRecord::Base
 		Order.where(customer_id: self.id, status_id: 1)
 	end
 
-	def allocate_products(product_id, product_qty, revision_date)
+	def allocate_products(product_id, product_qty, revision_date, user_id)
 		order = allocated_orders.first
 		product = Product.find(product_id)
 
@@ -413,19 +413,19 @@ class Customer < ActiveRecord::Base
 				discount_rate: 100, discount_amount: 0, handling_cost: 0, shipping_cost: 0,\
 				wrapping_cost: 0, wet: 0, gst: 0, staff_notes: 'Allocated Order', customer_notes: '',\
 				active: 1, source: 'manual', date_created: Time.now.to_s(:db),\
-				created_by: session[:user_id], last_updated_by: session[:user_id],\
+				created_by: user_id, last_updated_by: user_id,\
 				courier_status_id: 1, account_status: 'Approved')
 	 	end
 		order.qty += product_qty
 		order.discount_amount += (product_qty*product.calculated_price*1.29).round(4)
 		order.save
 
-		product = OrderProduct.new(product_id: product_id, order_id: order_id, price_luc: 0,\
+		product = OrderProduct.new(product_id: product_id, order_id: order.id, price_luc: 0,\
 		 qty: product_qty, discount: 0, price_discounted: 0, qty_shipped: 0,\
 		 order_discount: 100, price_handling: 0, stock_previous: 0, stock_current: product_qty,\
 		 stock_incremental: product_qty, price_gst: 0, price_wet: 0, base_price: product.calculated_price*1.29,\
 		 price_inc_tax: 0, display: 1, damaged: 0, revision_date: revision_date.to_s(:db),\
-		 created_by: session[:user_id], updated_by: session[:user_id]).save
+		 created_by: user_id, updated_by: user_id).save
 
 		order
 	end

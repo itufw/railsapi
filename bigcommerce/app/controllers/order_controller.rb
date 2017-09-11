@@ -126,7 +126,7 @@ class OrderController < ApplicationController
     redirect_to controller: 'activity', action: 'add_note', customer_id: order_params[:customer_id] and return if params["button"] == "new_note"
     redirect_to action: 'all'
   end
-  
+
   def generate_invoice
     # pdf generator in lib/order_status
     send_data print_invoices([params[:order_id]]).to_pdf, filename: "#{params[:order_id]}.pdf", type: :pdf
@@ -151,7 +151,22 @@ class OrderController < ApplicationController
 
     products_container = []
     products_params.each do |keys, product_params|
-      product_id = product_params['product_id']
+      product_id = product_params['product_id'].split('-').first
+      # if product comes from allocated Order
+      if product_params['product_id'].split('-').count>1
+        allocated_product = OrderProduct.where('orders.customer_id': order.customer_id, 'orders.status_id': 1, product_id: product_id, qty: (1..200)).first
+
+        allocated_product.assign_attributes(qty: allocated_product.qty - product_params[:qty].to_i,\
+         stock_previous: allocated_product.qty, stock_current: allocated_product.qty - product_params[:qty].to_i,\
+         stock_incremental: 0 - product_params[:qty].to_i, updated_by: session[:user_id],\
+         display: ((allocated_product.qty - product_params[:qty].to_i)==0)? 0 : 1)
+
+        allocated_product.save
+        allocated_order = Order.where(customer_id: order.customer_id, status_id: 1).first
+        allocated_order.update(qty: allocated_order.qty - product_params[:qty].to_i)
+      end
+
+
       if products.map(&:product_id).include?product_id.to_i
         # update
         product = products.where(product_id: product_id).first

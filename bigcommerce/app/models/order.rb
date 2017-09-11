@@ -60,7 +60,7 @@ class Order < ActiveRecord::Base
     end
 
     params = {'customer_id': order.customer_id, 'staff_id': customer.staff_id,\
-      'status_id': status_id, 'account_status': customer.account_approval(order.subtotal_inc_tax),\
+      'status_id': status_id,\
       'total_inc_tax': order.total_inc_tax, 'qty': order.items_total, 'items_shipped': order.items_shipped,\
       'subtotal': order.subtotal_inc_tax.to_f/1.1 + order.discount_amount.to_f + order.coupon_discount.to_f,\
       'discount_rate': 0, 'discount_amount': order.discount_amount.to_f + order.coupon_discount.to_f,\

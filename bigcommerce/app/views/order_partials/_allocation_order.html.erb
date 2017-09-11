@@ -11,10 +11,10 @@
     </tr>
   </thead>
   <% order.order_products.select{|x| x.qty > 0}.each do |op|%>
-    <tr>
+    <tr class="allocated-product" product-id="<%= op.product_id%>-allocated" inventory="<%= op.qty %>" name="<%= op.product.name%>" qty="<%= op.qty%>" price="<%= op.product.calculated_price*1.29%>">
       <td><%= op.product_id%></td>
       <td><%= op.product.name%></td>
-      <td><%= op.qty%></td>
+      <td class="allocated_<%= op.product_id%>"><%= op.qty%></td>
       <td><%= op.revision_date.strftime('%d/%m/%Y') unless op.revision_date.nil?%></td>
     </tr>
   <% end %>
