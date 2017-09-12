@@ -414,7 +414,8 @@ class Customer < ActiveRecord::Base
 				wrapping_cost: 0, wet: 0, gst: 0, staff_notes: 'Allocated Order', customer_notes: '',\
 				active: 1, source: 'manual', date_created: Time.now.to_s(:db),\
 				created_by: user_id, last_updated_by: user_id,\
-				courier_status_id: 1, account_status: 'Approved')
+				courier_status_id: 1, account_status: 'Approved', street: self.street,\
+				street_2: self.street_2, city: self.city, postcode: self.postcode, country: self.country)
 	 	end
 		order.qty += product_qty
 		order.discount_amount += (product_qty*product.calculated_price*1.29).round(4)
