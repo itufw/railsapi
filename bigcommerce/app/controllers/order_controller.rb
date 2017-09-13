@@ -79,7 +79,7 @@ class OrderController < ApplicationController
 
   def order_update
     @order = Order.find(params[:order_id])
-    if !user_full_right(session[:authority]) && [@order.status.in_transit, @order.status.delivered].include?1
+    if (!user_full_right(session[:authority])) && ([@order.status.in_transit, @order.status.delivered].include?1)
       flash[:error] = 'Cannot Update Shipped Orders'
       redirect_to :back and return
     end
