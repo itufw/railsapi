@@ -118,6 +118,6 @@ class LeadController < ApplicationController
     params.require(:customer_lead).permit(:firstname, :lastname, :actual_name,\
       :staff_id, :cust_style_id, :cust_group_id, :cust_type_id, :address,\
       :region, :website, :featured_image, :google_place_id, :street, :city,\
-      :state, :country)
+      :state, :country, :email, :phone)
   end
 end
