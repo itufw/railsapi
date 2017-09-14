@@ -90,6 +90,9 @@ GEM
       json (>= 1.7)
       mime-types (>= 1.16)
       mimemagic (>= 0.3.0)
+    carrierwave-dropbox (1.2.1)
+      carrierwave (~> 0.9)
+      dropbox-sdk (~> 1.6)
     chronic (0.10.2)
     coffee-rails (4.1.1)
       coffee-script (>= 2.2.0)
@@ -104,6 +107,8 @@ GEM
     debug_inspector (0.0.2)
     declarative (0.0.9)
     declarative-option (0.1.0)
+    dropbox-sdk (1.6.5)
+      json
     erubis (2.7.0)
     execjs (2.7.0)
     faraday (0.13.1)
@@ -301,6 +306,8 @@ DEPENDENCIES
   bootstrap3-datetimepicker-rails (~> 4.17.47)
   bootsy
   byebug
+  carrierwave
+  carrierwave-dropbox
   coffee-rails (~> 4.1.0)
   combine_pdf
   filterrific

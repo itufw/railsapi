@@ -1,0 +1,26 @@
+<div style="vertical-align: middle;">
+  <h4>Credit Application List<%= link_to '<i class="glyphicon glyphicon-plus" title="Add Credit App"></i>'.html_safe, controller: 'credit', action: 'credit_application', customer_id: customer.id%></h4>
+
+  <table class="reference-table">
+    <thead>
+      <tr>
+        <th>Credit App #</th>
+        <th>Company Name</th>
+        <th>Signed Date</th>
+        <th>Reference Checked</th>
+        <th>Preview</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% customer.customer_credit_apps.each do |credit_app|%>
+       <tr>
+         <th><%= link_to credit_app.id, controller: 'credit', action: 'credit_application', customer_id: customer.id, credit_app_id: credit_app.id %></th>
+         <td><%= link_to credit_app.company_name, controller: 'credit', action: 'credit_application', customer_id: customer.id, credit_app_id: credit_app.id %></td>
+         <td><%= credit_app.customer_credit_app_signeds.map(&:created_at).map(&:to_date).first || "N/A"%></td>
+         <td><%= (credit_app.customer_credit_app_references.map(&:check4).select{|x| x==1}.count>0) ? '<i class="glyphicon glyphicon-ok"></i>'.html_safe : 'N/A'%></td>
+         <td><%= link_to '<i class="glyphicon glyphicon-check"></i></a>'.html_safe, credit_app.credit_app_doc_id.to_s%></td>
+       </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

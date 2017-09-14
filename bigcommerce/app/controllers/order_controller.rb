@@ -18,7 +18,7 @@ class OrderController < ApplicationController
 
     def all
       # if status -> print
-      if !params[:start_date].nil? && !params[:commit] && user_full_right(session[:authority])
+      if !params[:start_date].nil? && !params[:commit] && user_full_right(session[:authority]) && params[:delay].nil?
         redirect_to controller: 'status', action: 'status_check', params: params, status_name: 'Print' and return
       end
 
@@ -150,6 +150,7 @@ class OrderController < ApplicationController
     order.assign_attributes(order_attributes)
 
     products_container = []
+
     products_params.each do |keys, product_params|
       product_id = product_params['product_id'].split('-').first
       # if product comes from allocated Order
@@ -169,14 +170,15 @@ class OrderController < ApplicationController
 
       if products.map(&:product_id).include?product_id.to_i
         # update
-        product = products.where(product_id: product_id).first
+        product = products.where("product_id = ? AND updated_at < ?", product_id, (Time.now-2.minutes).to_s(:db)).first
         product.assign_attributes(product_params.permit(:price_luc, :qty, :discount, :price_discounted))
         product_attributes = {'display': (product.qty == 0) ? 0 : 1, 'stock_previous': product.stock_current,\
           'stock_current': product.qty, 'stock_incremental': product.qty - product.stock_current,\
           'order_discount': order.discount_rate, 'price_handling': handling_fee,\
           'price_inc_tax': product.price_discounted * (1 + gst),\
           'price_wet': (product.price_discounted / (1 + wet) - handling_fee) * wet,\
-          'price_gst': product.price_discounted * gst, 'updated_by': session[:user_id]}
+          'price_gst': product.price_discounted * gst, 'updated_by': session[:user_id],\
+          'updated_at': Time.now.to_s(:db)}
       else
         # insert
         product = OrderProduct.new(product_params.permit(:price_luc, :qty, :discount, :price_discounted))

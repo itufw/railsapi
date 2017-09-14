@@ -95,8 +95,10 @@
     </tr>
   </thead>
   <tbody class="product-list">
+    <% p_count = 0 %>
     <% f.object.order_products.each do |product| %>
-      <%= f.fields_for "products[#{product.product_id}]", product do |product_form|%>
+      <% p_count += 1%>
+      <%= f.fields_for "products[#{p_count}]", product do |product_form|%>
 
     <tr id="tr_<%= product.product_id%>">
       <td><%= product_form.text_field :product_id, size: "5", readonly: true, class: 'product_id' %></td>

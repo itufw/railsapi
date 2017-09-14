@@ -113,3 +113,6 @@ gem 'simple_calendar'
 gem 'rails-rateit', '~> 1.0.22', github:'berikin/rails-rateit'
 
 gem 'httparty'
+
+gem 'carrierwave'
+gem 'carrierwave-dropbox'
