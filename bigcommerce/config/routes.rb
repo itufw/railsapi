@@ -26,7 +26,8 @@ Rails.application.routes.draw do
 
   get '/fetch_lead', to: 'lead#fetch_lead', as: 'fetch_lead'
   get '/fetch_product_details', to: 'product#fetch_product_details', as: 'fetch_product_details'
-
+  get '/verify_abn', to: 'credit#verify_abn', as: 'verify_abn'
+  get '/credit_list', to: 'credit#credit_list', as: 'credit_list'
 
   get '/rails/mailers' => 'rails/mailers#index'
   get '/rails/mailers/*path' => 'rails/mailers#preview'

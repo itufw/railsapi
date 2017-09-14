@@ -1,0 +1,19 @@
+// Place all the styles related to the Credit controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+.form-table{
+  font-family: 'Lato Bold', sans-serif;
+  background-color: white;
+  border: 0px;
+}
+.form-table th{
+  background-color: #f9f9f9;
+}
+.reference-table{
+  font-family: 'Lato Bold', sans-serif;
+  border-collapse: collapse;
+  margin: 0 auto;
+}
+.reference-table th{
+  background-color: #f9f9f9;
+}

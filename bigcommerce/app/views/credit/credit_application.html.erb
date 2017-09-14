@@ -1,0 +1,241 @@
+<%= title "Credit Application"%>
+<h3>Credit Application</h3>
+<center class="alert" style="color: red;"></center>
+<%= form_for @credit_app, url: {controller: 'credit', action: 'save_credit_app'}, html: {class: "form-group", style: "padding-left: 50px;"} do |f| %>
+  <%= f.hidden_field :id %>
+  <%= f.hidden_field :customer_id %>
+  <%= f.hidden_field :credit_application_version %>
+
+
+    <table class="business-information form-table" style="margin-top: -50px;">
+      <tr>
+        <th colspan="8" class="business_information" style="background-color: black; color: white;">Business Information</th>
+      </tr>
+      <tr>
+        <th colspan="2"><%= f.label :company_name %></th>
+        <td colspan="6"><%= f.text_field :company_name, class: 'form-control', size: 200%></td>
+      </tr>
+      <tr>
+        <th colspan="2"><%= f.label :trading_name, size: 120 %></th>
+        <td colspan="6"><%= f.text_field :trading_name, class: 'form-control', size: 200 %></td>
+      </tr>
+      <tr>
+        <th><%= f.label :phone%></th>
+        <td><%= f.text_field :phone, class: 'form-control'%></td>
+        <th><%= f.label :fax%></th>
+        <td><%= f.text_field :fax, class: 'form-control'%></td>
+        <th><%= f.label :abn%><i class="glyphicon glyphicon-play-circle verify-abn" title="Verfity ABN"></i></th>
+        <td colspan="3"><%= f.text_field :abn, class: 'form-control'%></td>
+      </tr>
+      <tr class="trading_name">
+        <th colspan="4"></th>
+        <th>Trading Name</th>
+      </tr>
+      <tr>
+        <th><%= f.label :address%></th>
+        <td colspan="3"><%= f.text_field :street, placeholder: 'Address', class: 'form-control'%></td>
+        <td><%= f.text_field :street_2, placeholder: 'Address 2', class: 'form-control'%></td>
+        <td><%= f.text_field :city, placeholder: 'Suburb', class: 'form-control'%></td>
+        <td><%= f.text_field :state, placeholder: 'State', class: 'form-control'%></td>
+        <td><%= f.text_field :postcode, placeholder: 'postcode', class: 'form-control'%></td>
+      </tr>
+      <tr>
+        <th colspan="2"><%= f.label :liquor_license%></th>
+        <td colspan="3"><%= f.text_field :liquor_license_number, class: 'form-control', size: 100 %></td>
+        <th><%= f.label :current_premises %></th>
+        <td><%= f.radio_button :current_premises, 'Leased', value: true %><%= label :director_signed, "Leased", value: false %></td>
+        <td><%= f.radio_button :current_premises, 'Owned', checked: true, value: true %><%= label :director_signed, "Owned", value: false %></td>
+      </tr>
+      <tr>
+        <th colspan="2"><%= f.label :business_commenced, class: 'margin-from-top label-new' %></th>
+        <td colspan="2"><%= f.date_field :business_commenced %></td>
+        <th colspan="2"><%= f.label :date_occupied, class: 'margin-from-top label-new' %></th>
+        <td colspan="2"><%= f.date_field :date_occupied %></td>
+      </tr>
+      <tr>
+        <th colspan="8" align="center"><b>File Upload: </b><%= f.file_field :credit_app_doc_id %></th>
+      </tr>
+      <tr>
+        <th colspan="8" class="payment_method" style="background-color: black; color: white;">Payment Method / Credit Limit</th>
+      </tr>
+      <tr>
+        <th colspan="3"><%= f.label :payment_method, class: 'margin-from-top label-new' %></th>
+        <% ['Direct Debit', 'EFT', 'Credit Card Surcharge', 'Credit Card', 'Cheque'].each do |method|%>
+        <td><%= f.radio_button :payment_method, method, value: true %><%= label :payment_method, method, value: false %></td>
+        <% end %>
+      </tr>
+      <tr>
+        <th colspan="2"><%= f.label :credit_limit_approved, class: 'margin-from-top label-new' %></th>
+        <td colspan="2"><%= f.number_field :credit_limit, class: 'form-control', default: 1000 %></td>
+        <th><%= f.label :date, class: 'margin-from-top label-new' %></th>
+        <td colspan="2"><%= f.date_field :approved_date, class: 'form-control', default: Date.today %></td>
+        <th></th>
+      </tr>
+      <tr>
+        <th colspan="8" class="payment_method" style="background-color: black; color: white;">References</th>
+      </tr>
+      <% f.object.customer_credit_app_references.each do |reference| %>
+      <tr>
+        <%= f.fields_for "reference[#{reference.id}]", reference do |reference_form|%>
+          <th><%= f.label :business_name, class: 'margin-from-top label-new' %></th>
+          <td colspan="2"><%= reference_form.text_field :company_name %></td>
+          <th><%= f.label :contact, class: 'margin-from-top label-new' %></th>
+          <td><%= reference_form.text_field :contact_name %></td>
+          <th>
+            <%= f.label :title, class: 'margin-from-top label-new' %>
+            <%= reference_form.text_field :check1 %>
+          </th>
+          <th>
+            <%= f.label :phone, class: 'margin-from-top label-new' %>
+            <%= reference_form.text_field :check2 %>
+          </th>
+          <th>
+            <%= f.label :email, class: 'margin-from-top label-new' %>
+            <%= reference_form.text_field :check3 %>
+          </th>
+        <% end %>
+      </tr>
+      <% end %>
+      <% (1..2 - f.object.customer_credit_app_references.count).each do |reference|%>
+      <tr>
+        <th><%= f.label :business_name, class: 'margin-from-top label-new' %></th>
+        <td colspan="2"><%= text_field_tag "reference[#{reference}][company_name]" %></td>
+        <th><%= f.label :contact, class: 'margin-from-top label-new' %></th>
+        <td><%= text_field_tag "reference[#{reference}][contact_name]" %></td>
+        <th>
+          <%= f.label :title, class: 'margin-from-top label-new' %>
+          <%= text_field_tag "reference[#{reference}][check1]" %>
+        </th>
+        <th>
+          <%= f.label :phone, class: 'margin-from-top label-new' %>
+          <%= text_field_tag "reference[#{reference}][check2]" %>
+        </th>
+        <th>
+          <%= f.label :email, class: 'margin-from-top label-new' %>
+          <%= text_field_tag "reference[#{reference}][check3]" %>
+        </th>
+      </tr>
+      <% end %>
+      <tr>
+        <th colspan="7" rowspan="2" class="contact-information" style="background-color: black; color: white;">Contacts</th>
+        <th rowspan="2" class="contact-information" style="background-color: black; color: white;" align="center"><i class="glyphicon glyphicon-plus add-contact" title="Add Contact" style="color: white;"></i></th>
+      </tr>
+      <tr><th colspan="8"></th></tr>
+      <tr>
+        <td colspan="4"></td>
+        <th>Phone</th>
+        <th>Email</th>
+        <th>Director / Account / Buyer</th>
+        <th><label for="director_signed_Leased_false">Signed:</label></th>
+      </tr>
+      <% f.object.customer_credit_app_signeds.each do |signed| %>
+      <tr>
+        <%= f.fields_for "signed[#{signed.id}]", signed do |signed_form| %>
+          <% cust_contact = CustContact.where(contact_id: signed.contact_id, customer_id: signed.customer_id).first %>
+          <td><%= signed.contact_id %></td>
+          <td><%= cust_contact.contact.name%></td>
+          <td><%= cust_contact.position %></td>
+          <td><%= cust_contact.title %></td>
+          <td><input class="form-control" type="text" name="signed['<%= signed.id %>'][phone]" placeholder="Phone" value="<%= cust_contact.phone%>"></td>
+          <td><input class="form-control" type="text" name="signed['<%= signed.id %>'][email]" placeholder="Email" value="<%= cust_contact.email%>"></td>
+          <th></th>
+          <td>
+            <%= signed_form.radio_button :active, 1 %>
+            <label for="director_signed_Leased_false">Yes</label>
+            <%= signed_form.radio_button :active, 0 %>
+            <label for="director_signed_Leased_false">No</label>
+          </td>
+        <% end %>
+      </tr>
+      <% end %>
+
+
+      <% @customer.cust_contacts.reject{|x| f.object.customer_credit_app_signeds.map(&:contact_id).include?x.contact_id}.each do |cust_contact|%>
+      <tr>
+        <td><input class="customer_id" type="text" value="<%= cust_contact.contact_id%>" name="contact_signed['<%= cust_contact.contact_id %>'][contact_id]" id="cust_contact_<%=cust_contact.contact_id %>__contact_id" size="5" readonly></td>
+        <td><%= cust_contact.contact.name%></td>
+        <td><%= cust_contact.position %></td>
+        <td><%= cust_contact.title %></td>
+        <td><input class="form-control" type="text" name="contact_signed['<%= cust_contact.contact_id %>'][phone]" placeholder="Phone"></td>
+        <td><input class="form-control" type="text" name="contact_signed['<%= cust_contact.contact_id %>'][email]" placeholder="Email"></td>
+        <th>
+            <input type="checkbox" name="contact_signed['<%= cust_contact.contact_id%>'][director]" value="<%= cust_contact.contact_id%>" class="contact_signed_director" style="display: inline-block;">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="checkbox" name="contact_signed['<%= cust_contact.contact_id%>'][account]" value="<%= cust_contact.contact_id%>" class="contact_signed_account" style="display: inline-block;">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="checkbox" name="contact_signed['<%= cust_contact.contact_id%>'][buyer]" value="<%= cust_contact.contact_id%>" class="contact_signed_buyer" style="display: inline-block;">
+        </th>
+        <td>
+          <input value="1" type="radio" name="contact_signed['<%= cust_contact.contact_id%>'][signed]" id="contact_signed_<%=cust_contact.contact_id%>_signed">
+          <label for="director_signed_Leased_false">Yes</label>
+          <input value="0" type="radio" checked="checked" name="contact_signed['<%= cust_contact.contact_id%>'][signed]" id="contact_signed_<%=cust_contact.contact_id%>_unsigned">
+          <label for="director_signed_Leased_false">No</label>
+        </td>
+      </tr>
+      <% end %>
+    </table>
+
+  <%= f.submit "Save", class: 'btn btn-primary' %>
+<% end %>
+
+<script type="text/javascript">
+  var count = 0;
+  $('.add-contact').click(function(){
+    count += 1;
+    $('.business-information').append([
+      '<tr>',
+        '<td><i class="glyphicon glyphicon-minus remove-contact"></i></td>',
+        '<td><input class="customer_name" type="text" value="" name="contact_signed[new_'+ count +'][contact_name]" placeholder="Name"></td>',
+        '<td>',
+          '<select class="form-control" name="contact_signed[new_'+ count +'][position]"><option value="">All Position</option>',
+            '<option value="Accounts">Accounts</option>',
+            '<option value="Assistant Buyer">Assistant Buyer</option>',
+            '<option value="Assistant Manager">Assistant Manager</option>',
+            '<option value="Chef">Chef</option>',
+            '<option value="Floor Staff">Floor Staff</option>',
+            '<option value="Manager">Manager</option>',
+            '<option value="Owner / Director">Owner / Director</option>',
+            '<option value="Bar / Cellar Manager">Bar / Cellar Manager</option>',
+            '<option value="Sommelier / Buyer">Sommelier / Buyer</option>',
+            '<option value="Other">Other</option>',
+          '</select>',
+        '</td>',
+        '<td><input class="title" type="text" value="" name="contact_signed[new_'+ count +'][title]" placeholder="title"></td>',
+        '<td><input class="form-control" type="text" name="contact_signed[new_'+ count +'][phone]" placeholder="Phone"></td>',
+        '<td><input class="form-control" type="text" name="contact_signed[new_'+ count +'][email]" placeholder="Email"></td>',
+        '<th>',
+        '<input type="checkbox" name="contact_signed[new_'+ count +'][director]" value="1" class="contact_signed_director" style="display: inline-block;">',
+        '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        '<input type="checkbox" name="contact_signed[new_'+ count +'][account]" value="1" class="contact_signed_account" style="display: inline-block;">',
+        '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        '<input type="checkbox" name="contact_signed[new_'+ count +'][buyer]" value="1" class="contact_signed_buyer" style="display: inline-block;">',
+        '</th>',
+        '<td>',
+          '<input value="1" type="radio" name="contact_signed[new_'+ count +'][signed]">',
+          '<label for="director_signed_Leased_false">Yes</label>',
+          '<input value="0" type="radio" checked="checked" name="contact_signed[new_'+ count +'][signed]" >',
+          '<label for="director_signed_Leased_false">No</label>',
+        '</td>',
+      '</tr>'
+    ].join(''));
+  });
+
+  $(document).on('click', '.remove-contact', function(){
+    $(this).parent().parent().remove();
+  });
+
+  var alert = $('.alert');
+  var company_name = $('#customer_credit_app_company_name');
+  var trading_name = $('.trading_name');
+  var abn_identify = $('#customer_credit_app_abn');
+  trading_name.hide();
+  $('.verify-abn').click(function(){
+    // In view/status
+    // Update last products / last order and everything else
+    var link = "/verify_abn?abn=" + $('#customer_credit_app_abn').val();
+    $.ajax({
+        type: 'GET',
+        url: link
+    });
+  });
+</script>

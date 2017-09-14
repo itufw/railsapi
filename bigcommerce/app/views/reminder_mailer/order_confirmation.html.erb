@@ -7,7 +7,7 @@
     <div>
       <p>Hi,</p>
       <p>Thank you for your recent order for <%= @customer.actual_name%>.</p>
-      <p>Please find the attached a copy of the invoice for Invoice <%= @order.id%>. The total of the invoice is $<%= @order.total_inc_tax%>.</p>
+      <p>Please find the attached a copy of the invoice for Invoice <%= @order.id%>. The total of the invoice is $<%= @order.total_inc_tax.round(2)%>.</p>
       <p>Should you have any questions please be in contact with your sales executive or our office team.</p>
     </div>
 

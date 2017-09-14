@@ -29,16 +29,6 @@ class StatusController < ApplicationController
       orders(params, product_filtered_ids, staff_id, @status_id)
   end
 
-  # DON'T Use
-  def order_status
-    customer_ids = (params[:search].nil?) ? [] : Customer.search_for(params[:search]).pluck("id")
-    per_page = params[:per_page] || Order.per_page
-    order_function, direction = sort_order(params, :order_by_id, 'DESC')
-
-    @orders = Order.where('status_id != 10').customer_filter(customer_ids)\
-      .send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
-  end
-
   def status_check
     @status_name = params[:status_name]
     order_function, direction = sort_order(params, :order_by_id, 'ASC')

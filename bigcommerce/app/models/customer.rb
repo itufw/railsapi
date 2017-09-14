@@ -8,6 +8,7 @@ class Customer < ActiveRecord::Base
 	has_many :addresses
 	has_many :contacts
 	has_many :cust_contacts
+	has_many :customer_credit_apps
 	belongs_to :cust_type
 	belongs_to :cust_group
 	belongs_to :cust_style
@@ -45,11 +46,11 @@ class Customer < ActiveRecord::Base
 		# property :tax_exempt_category
 		# property :accepts_marketing
 		customer_api = Bigcommerce::Customer
+		splited_name = self.actual_name.split()
 		bigc_customer = customer_api.create(
-			company: self.actual_name,
-			first_name: self.actual_name,
-			last_name: self.firstname.to_s + ' ' + self.lastname.to_s,
-			email: self.email || (self.actual_name.split()[0..2].join('_')+"@untappedwines.com"),
+			first_name: splited_name[0],
+			last_name: (splited_name[1..splited_name.length].join(' ')=="") ? "UFW" : splited_name[1..splited_name.length].join(' '),
+			email: self.email || (self.actual_name.split().join('_')+"@untappedwines.com"),
 			store_credit: self.store_credit || 0,
 			customer_group_id: self.cust_type_id || 2,
 			notes: self.notes || ""

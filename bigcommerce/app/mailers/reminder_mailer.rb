@@ -24,7 +24,7 @@ class ReminderMailer < ActionMailer::Base
     subject = "Untapped Fine Wines Order #{@order.id} – #{@customer.actual_name}"
     attachments["Invoice##{order_id}.pdf"] = print_single_invoice(@order)
 
-    mail(from: "Untapped Fine Wines <accounts@untappedwines.com>", to: customer_address, bcc: @staff.email, reply_to: @staff.email, subject: subject)
+    mail(from: "Untapped Fine Wines <accounts@untappedwines.com>", to: customer_address, bcc: @staff.email + ";" + Staff.find(session[:user_id]).email, reply_to: @staff.email, subject: subject)
   end
 
   def send_overdue_reminder(customer_id, email_subject,staff_id,email_content,email_address, cc, bcc, email_type, selected_invoices, cn_op, attachment_tmp)
