@@ -88,5 +88,5 @@ private
      :postcode, :liquor_license_number,:business_commenced, :date_occupied,\
      :credit_app_doc_id, :payment_method, :credit_limit, :approved_date,\
      :customer_id, :credit_application_version, :abn_checked, :director_signed,\
-     :liquor_license_checked)
+     :liquor_license_checked, :note)
   end
