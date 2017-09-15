@@ -170,7 +170,10 @@ class OrderController < ApplicationController
 
       if products.map(&:product_id).include?product_id.to_i
         # update
-        product = products.where("product_id = ? AND updated_at < ?", product_id, (Time.now-2.minutes).to_s(:db)).first
+        product = products.where("product_id = ? AND updated_at < ?", product_id, (Time.now-1.minutes).to_s(:db)).first
+
+        next if product.nil?
+
         product.assign_attributes(product_params.permit(:price_luc, :qty, :discount, :price_discounted))
         product_attributes = {'display': (product.qty == 0) ? 0 : 1, 'stock_previous': product.stock_current,\
           'stock_current': product.qty, 'stock_incremental': product.qty - product.stock_current,\

@@ -1,5 +1,9 @@
 <% if (@alert.nil?) && (!@business_entity.nil?)%>
-  company_name.val("<%= @business_entity['mainName']['organisationName'] %>");
+  <% if !@business_entity['mainName'].nil? %>
+    company_name.val("<%= @business_entity['mainName']['organisationName'] %>");
+  <% elsif !@business_entity['legalName'].nil?%>
+    company_name.val("<%= @business_entity['legalName']['givenName'] + ' ' + @business_entity['legalName']['givenName'] + ' | ' +@business_entity['entityType']['entityDescription']%>");
+  <% end %>
   trading_name.show();
   trading_name.find('td').remove();
   <% unless @business_entity['businessName'].nil? %>

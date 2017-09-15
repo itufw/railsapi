@@ -185,9 +185,9 @@ class Customer < ActiveRecord::Base
 	def account_approval(order_total)
 		return 'Approved' if order_total == 0
 		return 'Hold-Account' if self.xero_contact_id.nil? || self.account_type=="COD"
-		return (XeroInvoice.where("xero_contact_id = '#{self.xero_contact_id}' AND due_date < '#{Date.today.beginning_of_month.to_s(:db)}'").sum('amount_due') > 0) ? 'Hold-Account' : 'Approved' if self.account_type == "EOM"
+		return (XeroInvoice.where("xero_contact_id = '#{self.xero_contact_id}' AND due_date < '#{Date.today.beginning_of_month.to_s(:db)}'").sum('amount_due') > 0) ? 'Hold-Overdue' : 'Approved' if self.account_type == "EOM"
 		sum = XeroInvoice.where("xero_contact_id = '#{self.xero_contact_id}' AND due_date < '#{(Date.today - self.tolerance_day.to_i.days).to_s(:db)}'").sum('amount_due')
-		return 'Hold-Account' if sum > 0
+		return 'Hold-Overdue' if sum > 0
 		'Approved'
 	end
 

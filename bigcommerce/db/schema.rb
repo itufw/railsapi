@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170911042106) do
+ActiveRecord::Schema.define(version: 20170915042620) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -310,6 +310,7 @@ ActiveRecord::Schema.define(version: 20170911042106) do
     t.integer  "staff_id",                        limit: 4
     t.datetime "created_at",                                    null: false
     t.datetime "updated_at",                                    null: false
+    t.text     "note",                            limit: 65535
   end
 
   add_index "customer_credit_apps", ["credit_application_version"], name: "index_customer_credit_apps_on_credit_application_version", using: :btree
@@ -774,6 +775,11 @@ ActiveRecord::Schema.define(version: 20170911042106) do
     t.integer  "product_no_vintage_id", limit: 4
     t.datetime "created_at",                        null: false
     t.datetime "updated_at",                        null: false
+    t.integer  "selected",              limit: 4
+    t.integer  "warehouse_id",          limit: 4
+    t.string   "row",                   limit: 255
+    t.string   "column",                limit: 255
+    t.string   "area",                  limit: 255
   end
 
   add_index "product_no_ws", ["product_no_vintage_id"], name: "index_product_no_ws_on_product_no_vintage_id", using: :btree
@@ -1078,6 +1084,36 @@ ActiveRecord::Schema.define(version: 20170911042106) do
     t.decimal  "tax_percentage",             precision: 8, scale: 2
     t.datetime "created_at",                                         null: false
     t.datetime "updated_at",                                         null: false
+  end
+
+  create_table "warehouse_examinings", force: :cascade do |t|
+    t.string   "product_name",        limit: 255
+    t.string   "country",             limit: 255
+    t.integer  "product_no_ws_id",    limit: 4
+    t.integer  "current_dm",          limit: 4
+    t.integer  "current_vc",          limit: 4
+    t.integer  "current_retail",      limit: 4
+    t.integer  "current_ws",          limit: 4
+    t.integer  "current_total",       limit: 4
+    t.integer  "allocation",          limit: 4
+    t.integer  "on_order",            limit: 4
+    t.integer  "current_stock",       limit: 4
+    t.integer  "count_dm",            limit: 4
+    t.integer  "count_vc",            limit: 4
+    t.integer  "count_retail",        limit: 4
+    t.integer  "count_ws",            limit: 4
+    t.integer  "count_total",         limit: 4
+    t.integer  "count_size",          limit: 4
+    t.integer  "count_pack",          limit: 4
+    t.integer  "count_loose",         limit: 4
+    t.integer  "count_sample",        limit: 4
+    t.integer  "difference",          limit: 4
+    t.integer  "count_staff_id",      limit: 4
+    t.integer  "authorised_staff_id", limit: 4
+    t.datetime "count_date"
+    t.datetime "authorised_date"
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
   end
 
   create_table "warehouses", force: :cascade do |t|
