@@ -7,9 +7,9 @@
   <%= f.hidden_field :credit_application_version %>
 
 
-    <table class="business-information form-table" style="margin-top: -50px;">
+    <table class="business-information form-table" style="margin-top: -30px;">
       <tr>
-        <th colspan="8" class="business_information" style="background-color: black; color: white;">Business Information</th>
+        <th colspan="8" class="business_information" style="background-color: black; color: white;">&nbsp;&nbsp;&nbsp;Business Information</th>
       </tr>
       <tr>
         <th colspan="2"><%= f.label :company_name %></th>
@@ -25,7 +25,11 @@
         <th><%= f.label :fax%></th>
         <td><%= f.text_field :fax, class: 'form-control'%></td>
         <th><%= f.label :abn%><i class="glyphicon glyphicon-play-circle verify-abn" title="Verfity ABN"></i></th>
-        <td colspan="3"><%= f.text_field :abn, class: 'form-control'%></td>
+        <td colspan="2"><%= f.text_field :abn, class: 'form-control'%></td>
+        <td>
+          <%= f.radio_button :abn_checked, 1, value: true %><%= label :director_signed, "Checked", value: false %>
+          <%= f.radio_button :abn_checked, 0, value: true %><%= label :director_signed, "No", value: false %>
+        </td>
       </tr>
       <tr class="trading_name">
         <th colspan="4"></th>
@@ -41,10 +45,14 @@
       </tr>
       <tr>
         <th colspan="2"><%= f.label :liquor_license%></th>
-        <td colspan="3"><%= f.text_field :liquor_license_number, class: 'form-control', size: 100 %></td>
+        <td colspan="2"><%= f.text_field :liquor_license_number, class: 'form-control' %></td>
+        <td>
+          <%= f.radio_button :liquor_license_checked, 1, value: true %><%= label :liquor_license_checked, "Checked", value: false %>
+          <%= f.radio_button :liquor_license_checked, 0, value: true %><%= label :liquor_license_checked, "No", value: false %>
+        </td>
         <th><%= f.label :current_premises %></th>
         <td><%= f.radio_button :current_premises, 'Leased', value: true %><%= label :director_signed, "Leased", value: false %></td>
-        <td><%= f.radio_button :current_premises, 'Owned', checked: true, value: true %><%= label :director_signed, "Owned", value: false %></td>
+        <td><%= f.radio_button :current_premises, 'Owned', value: true %><%= label :director_signed, "Owned", value: false %></td>
       </tr>
       <tr>
         <th colspan="2"><%= f.label :business_commenced, class: 'margin-from-top label-new' %></th>
@@ -53,10 +61,10 @@
         <td colspan="2"><%= f.date_field :date_occupied %></td>
       </tr>
       <tr>
-        <th colspan="8" align="center"><b>File Upload: </b><%= f.file_field :credit_app_doc_id %></th>
+        <td colspan="8" align="center"><b>File Upload: </b><%= f.file_field :credit_app_doc_id %></td>
       </tr>
       <tr>
-        <th colspan="8" class="payment_method" style="background-color: black; color: white;">Payment Method / Credit Limit</th>
+        <th colspan="8" class="payment_method" style="background-color: black; color: white;">&nbsp;&nbsp;&nbsp;Payment Method / Credit Limit</th>
       </tr>
       <tr>
         <th colspan="3"><%= f.label :payment_method, class: 'margin-from-top label-new' %></th>
@@ -72,15 +80,17 @@
         <th></th>
       </tr>
       <tr>
-        <th colspan="8" class="payment_method" style="background-color: black; color: white;">References</th>
+        <th colspan="8" class="payment_method" style="background-color: black; color: white;">&nbsp;&nbsp;&nbsp;References</th>
       </tr>
       <% f.object.customer_credit_app_references.each do |reference| %>
       <tr>
         <%= f.fields_for "reference[#{reference.id}]", reference do |reference_form|%>
           <th><%= f.label :business_name, class: 'margin-from-top label-new' %></th>
           <td colspan="2"><%= reference_form.text_field :company_name %></td>
-          <th><%= f.label :contact, class: 'margin-from-top label-new' %></th>
-          <td><%= reference_form.text_field :contact_name %></td>
+          <th>
+            <%= f.label :contact, class: 'margin-from-top label-new' %>
+            <%= reference_form.text_field :contact_name %>
+          </th>
           <th>
             <%= f.label :title, class: 'margin-from-top label-new' %>
             <%= reference_form.text_field :check1 %>
@@ -93,6 +103,10 @@
             <%= f.label :email, class: 'margin-from-top label-new' %>
             <%= reference_form.text_field :check3 %>
           </th>
+          <td>
+            <%= reference_form.radio_button :check4, 1, value: true %><%= label :director_signed, "Checked", value: false %>
+            <%= reference_form.radio_button :check4, 0, value: true %><%= label :director_signed, "No", value: false %>
+          </td>
         <% end %>
       </tr>
       <% end %>
@@ -100,29 +114,41 @@
       <tr>
         <th><%= f.label :business_name, class: 'margin-from-top label-new' %></th>
         <td colspan="2"><%= text_field_tag "reference[#{reference}][company_name]" %></td>
-        <th><%= f.label :contact, class: 'margin-from-top label-new' %></th>
-        <td><%= text_field_tag "reference[#{reference}][contact_name]" %></td>
         <th>
-          <%= f.label :title, class: 'margin-from-top label-new' %>
+          <%= f.label :contact, class: 'margin-from-top label-new' %><br/>
+          <%= text_field_tag "reference[#{reference}][contact_name]" %>
+        </th>
+        <th>
+          <%= f.label :title, class: 'margin-from-top label-new' %><br/>
           <%= text_field_tag "reference[#{reference}][check1]" %>
         </th>
         <th>
-          <%= f.label :phone, class: 'margin-from-top label-new' %>
+          <%= f.label :phone, class: 'margin-from-top label-new' %><br/>
           <%= text_field_tag "reference[#{reference}][check2]" %>
         </th>
         <th>
-          <%= f.label :email, class: 'margin-from-top label-new' %>
+          <%= f.label :email, class: 'margin-from-top label-new' %><br/>
           <%= text_field_tag "reference[#{reference}][check3]" %>
         </th>
+        <td>
+          <%= radio_button_tag "reference[#{reference}][check4]", 1, value: true %><%= label :director_signed, "Checked", value: false %>
+          <%= radio_button_tag "reference[#{reference}][check4]", 0, value: true %><%= label :director_signed, "No", value: false %>
+        </td>
       </tr>
       <% end %>
       <tr>
-        <th colspan="7" rowspan="2" class="contact-information" style="background-color: black; color: white;">Contacts</th>
-        <th rowspan="2" class="contact-information" style="background-color: black; color: white;" align="center"><i class="glyphicon glyphicon-plus add-contact" title="Add Contact" style="color: white;"></i></th>
+        <th colspan="7" class="contact-information" style="background-color: black; color: white;">&nbsp;&nbsp;&nbsp;Contacts</th>
+        <th class="contact-information" style="background-color: black; color: white;" align="center"><i class="glyphicon glyphicon-plus add-contact" title="Add Contact" style="color: white;"></i></th>
       </tr>
-      <tr><th colspan="8"></th></tr>
       <tr>
-        <td colspan="4"></td>
+        <th>
+          <%= f.label :director_signed %>
+        </th>
+        <td>
+          <%= f.radio_button :director_signed, 1, value: true %><%= label :director_signed, "Yes", value: false %>
+          <%= f.radio_button :director_signed, 0, value: true %><%= label :director_signed, "No", value: false %>
+        </td>
+        <td colspan="2"></td>
         <th>Phone</th>
         <th>Email</th>
         <th>Director / Account / Buyer</th>
@@ -168,7 +194,7 @@
         <td>
           <input value="1" type="radio" name="contact_signed['<%= cust_contact.contact_id%>'][signed]" id="contact_signed_<%=cust_contact.contact_id%>_signed">
           <label for="director_signed_Leased_false">Yes</label>
-          <input value="0" type="radio" checked="checked" name="contact_signed['<%= cust_contact.contact_id%>'][signed]" id="contact_signed_<%=cust_contact.contact_id%>_unsigned">
+          <input value="0" type="radio" name="contact_signed['<%= cust_contact.contact_id%>'][signed]" id="contact_signed_<%=cust_contact.contact_id%>_unsigned">
           <label for="director_signed_Leased_false">No</label>
         </td>
       </tr>
@@ -213,7 +239,7 @@
         '<td>',
           '<input value="1" type="radio" name="contact_signed[new_'+ count +'][signed]">',
           '<label for="director_signed_Leased_false">Yes</label>',
-          '<input value="0" type="radio" checked="checked" name="contact_signed[new_'+ count +'][signed]" >',
+          '<input value="0" type="radio" name="contact_signed[new_'+ count +'][signed]" >',
           '<label for="director_signed_Leased_false">No</label>',
         '</td>',
       '</tr>'
