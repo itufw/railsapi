@@ -7,8 +7,12 @@
   trading_name.show();
   trading_name.find('td').remove();
   <% unless @business_entity['businessName'].nil? %>
-    <% @business_entity['businessName'].each do |venue| %>
-      trading_name.append('<td><%= venue["organisationName"]%></td>');
+    <% if @business_entity['businessName'].is_a?Array %>
+      <% @business_entity['businessName'].each do |venue| %>
+        trading_name.append('<td><%= venue["organisationName"]%></td>');
+      <% end %>
+    <% else %>
+      trading_name.append('<td><%= @business_entity["businessName"]["organisationName"]%></td>');
     <% end %>
   <% end %>
   abn_identify.val("<%= @business_entity['ABN']['identifierValue']%>");

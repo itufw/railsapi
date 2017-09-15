@@ -50,7 +50,7 @@ class Customer < ActiveRecord::Base
 		bigc_customer = customer_api.create(
 			first_name: splited_name[0],
 			last_name: (splited_name[1..splited_name.length].join(' ')=="") ? "UFW" : splited_name[1..splited_name.length].join(' '),
-			email: self.email || (self.actual_name.split().join('_')+"@untappedwines.com"),
+			email: (self.email.to_s=="") ? (self.actual_name.split().join('_')+"@untappedwines.com") : self.email,
 			store_credit: self.store_credit || 0,
 			customer_group_id: self.cust_type_id || 2,
 			notes: self.notes || ""

@@ -34,6 +34,8 @@ class ProductController < ApplicationController
     @stock_h, @price_h, @pending_stock_h, @name_h = \
       transform_product_data(@transform_column, filtered_products)
     display_all(params)
+
+    @count_selected = ProductNoWs.where(selected: 1).map(&:id) if @transform_column=="product_no_ws_id"
   end
 
   # Displays Overall Stats and Top Customers for Product
