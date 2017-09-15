@@ -2,8 +2,10 @@
   company_name.val("<%= @business_entity['mainName']['organisationName'] %>");
   trading_name.show();
   trading_name.find('td').remove();
-  <% @business_entity['businessName'].each do |venue| %>
-    trading_name.append('<td><%= venue["organisationName"]%></td>');
+  <% unless @business_entity['businessName'].nil? %>
+    <% @business_entity['businessName'].each do |venue| %>
+      trading_name.append('<td><%= venue["organisationName"]%></td>');
+    <% end %>
   <% end %>
   abn_identify.val("<%= @business_entity['ABN']['identifierValue']%>");
 <% else %>

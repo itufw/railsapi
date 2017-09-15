@@ -16,8 +16,13 @@ class CreditController < ApplicationController
   end
 
   def save_credit_app
-    
-    credit_app = CustomerCreditApp.new(credit_params)
+
+    if credit_params[:id].nil?
+      credit_app = CustomerCreditApp.new(credit_params)
+    else
+      credit_app = CustomerCreditApp.find(credit_params[:id])
+      credit_app.assign_attributes(credit_params)
+    end
     credit_app.save
 
     params[:contact_signed].values().select{|x| (x.keys().include?'contact_id') && (x['signed']=="1")}.each do |existed_contact|
@@ -29,12 +34,15 @@ class CreditController < ApplicationController
        personal_number: contact["phone"])
       new_contact.save
 
-      cust_contact = CustContact.new(customer_id: params[:customer_id], contact_id: new_contact.id,\
+      # require cleafication to identify:
+      # receive_statement	key_sales  receive_invoice  receive_portfolio  key_accountant
+      # based on Director / Account / Buyer parameters
+      cust_contact = CustContact.new(customer_id: credit_app.customer_id, contact_id: new_contact.id,\
        position: contact[:position], title: contact[:title], phone: contact[:phone], email: contact[:email])
       cust_contact.save
 
       if contact[:signed]=="1"
-        CustomerCreditAppSigned.credit_app_update(credit_app.id, new_contact.id,\
+        CustomerCreditAppSigned.new.credit_app_update(credit_app.id, new_contact.id,\
          credit_app.customer_id, session[:user_id], 1)
       end
     end
@@ -79,5 +87,6 @@ private
      :phone,:fax, :abn, :current_premises, :street, :street_2, :city, :state,\
      :postcode, :liquor_license_number,:business_commenced, :date_occupied,\
      :credit_app_doc_id, :payment_method, :credit_limit, :approved_date,\
-     :customer_id, :credit_application_version)
+     :customer_id, :credit_application_version, :abn_checked, :director_signed,\
+     :liquor_license_checked)
   end
