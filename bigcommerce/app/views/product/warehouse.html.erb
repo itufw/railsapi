@@ -1,5 +1,7 @@
 <%= title 'Warehouse'%>
-<!--  if browser.device.mobile? -->
+<% if browser.device.mobile? %>
+  <p>This is test Text</p>
+<% end %>
 
 <%= form_for @warehouse_examing, :url => {:controller => "product", :action => "warehouse_counting"}  do |f| %>
   <%= hidden_field_tag :pending_products, @product_list, multiple: true%>
