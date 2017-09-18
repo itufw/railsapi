@@ -18,7 +18,7 @@ class OrderController < ApplicationController
 
     def all
       # if status -> print
-      if !params[:start_date].nil? && !params[:commit] && user_full_right(session[:authority]) && params[:delay].nil?
+      if !params[:start_date].nil? && !params[:commit] && user_full_right(session[:authority]) && params[:delay].nil? && params[:end_date].to_s==""
         redirect_to controller: 'status', action: 'status_check', params: params, status_name: 'Print' and return
       end
 
