@@ -40,7 +40,8 @@
 		<%= render "customer_partials/summary_header", customer: @customer %>
 	</div>
 	<div class="col-md-6">
-		<% spot = GooglePlaces::Client.new('AIzaSyBvfTZH0XCVEJQTgR9QDYt18XIeV5MIkPI').spots_by_query(@customer.actual_name.to_s + ' ' + @customer.city.to_s).first if @customer.cust_type_id != 1 %>
+		<!-- spot = GooglePlaces::Client.new('AIzaSyBvfTZH0XCVEJQTgR9QDYt18XIeV5MIkPI').spots_by_query(@customer.actual_name.to_s + ' ' + @customer.city.to_s).first if @customer.cust_type_id != 1 -->
+		<% spot = nil %>
 		<% if spot.nil? %>
 			<div class="col-md-6"></div>
 		<% else %>
