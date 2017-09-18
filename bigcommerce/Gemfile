@@ -114,5 +114,9 @@ gem 'rails-rateit', '~> 1.0.22', github:'berikin/rails-rateit'
 
 gem 'httparty'
 
+# FILE Stored
 gem 'carrierwave'
 gem 'carrierwave-dropbox'
+
+# Browser Detactor
+gem "browser"

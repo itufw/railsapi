@@ -270,7 +270,7 @@
     var discount = 0;
     var wet = 0;
     $('.product-list tr').each(function(){
-      total += parseFloat($(this).find('.product-total').html());
+      total += (parseFloat($(this).find('.product-total').html()) || 0);
       discount += (parseFloat($(this).find('.product-luc').val()) - parseFloat($(this).find('.product-price').val())) *  parseInt($(this).find('.product-qty').val());
       wet += ((parseFloat($(this).find('.product-price').val()) - 1.82) * parseInt($(this).find('.product-qty').val() * 0.29));
     });
@@ -279,9 +279,9 @@
     // Modified Wet
     $('#order_modified_wet').val(wet);
 
-    order_discount = parseFloat($('#order_discount_rate').val()) * 0.01
+    order_discount = (parseFloat($('#order_discount_rate').val()) * 0.01) || 0
     discount += (total * order_discount)
-    shipping_cost = parseFloat($('#order_shipping_cost').val())
+    shipping_cost = (parseFloat($('#order_shipping_cost').val())) || 0
 
     $('#order_gst').val(((total*(1 - order_discount) + shipping_cost)*0.1).toFixed(4));
     $('#order_discount_amount').val(discount.toFixed(4));

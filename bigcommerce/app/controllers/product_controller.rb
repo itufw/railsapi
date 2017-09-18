@@ -250,12 +250,48 @@ class ProductController < ApplicationController
     redirect_to action: 'summary', product_id: product.id, product_name: product.name, transform_column: 'product_id', total_stock: product.inventory, pending_stock: product.inventory
   end
 
+  def warehouse
+    @product_list = (params[:pending_products].nil?) ? ProductNoWs.counting : ProductNoWs.filter_by_ids(params[:pending_products])
+    @product = @product_list.first
+    @product_list = @product_list.reject{|x| x==@product}.map(&:id)
+
+    products = @product.products
+    @product_dm = products.select{|x| x.name.include?'DM'}.first
+    @product_vc = products.select{|x| x.name.include?'VC'}.first
+    @product_ws = products.select{|x| x.name.include?'WS'}.first
+    @product_retail = products.select{|x| x.retail_ws=='R'}.first
+
+    @warehouse_examing = WarehouseExamining.new(product_name: @product.name,\
+      product_no_ws_id: @product.id, current_stock: products.map(&:inventory).sum,\
+      allocation: OrderProduct.allocation_products(products.map(&:id)).map(&:qty).sum,\
+      on_order: OrderProduct.on_order(products.map(&:id)).map(&:qty).sum,\
+      current_dm: @product_dm.nil? ? 0 : @product_dm.inventory,\
+      current_vc: @product_vc.nil? ? 0 : @product_vc.inventory,\
+      current_retail: @product_retail.nil? ? 0 : @product_retail.inventory,\
+      current_ws: @product_ws.nil? ? 0 : @product_ws.inventory,\
+      )
+    @warehouse_examing.current_total = @warehouse_examing.current_stock.to_i + @warehouse_examing.allocation.to_i + @warehouse_examing.on_order.to_i
+  end
+
+  def warehouse_counting
+    p = c
+  end
+
   def fetch_product_details
     @product = Product.find(params[:product_id])
     respond_to do |format|
       format.js
     end
   end
+
+  def fetch_product_selected
+    @product = ProductNoWs.find(params[:product_no_ws_id])
+    @product.update(selected: (@product.selected.to_i==0)? 1 : 0 )
+    respond_to do |format|
+      format.js
+    end
+  end
+
 end
 
 private
