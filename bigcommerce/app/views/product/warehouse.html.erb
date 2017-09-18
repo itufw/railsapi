@@ -1,0 +1,86 @@
+<%= title 'Warehouse'%>
+<!--  if browser.device.mobile? -->
+
+<%= form_for @warehouse_examing, :url => {:controller => "product", :action => "warehouse_counting"}  do |f| %>
+  <%= hidden_field_tag :pending_products, @product_list, multiple: true%>
+  <%= f.hidden_field :product_name%>
+  <%= f.hidden_field :product_no_ws_id%>
+
+  <table class="reference-table">
+    <thead>
+      <tr>
+        <th></th>
+        <th>WS</th>
+        <th>DM</th>
+        <th>VC</th>
+        <th>Retail</th>
+      </tr>
+    </thead>
+    <tr>
+      <th>Current</th>
+      <td><%= @warehouse_examing.current_ws %><%= f.hidden_field :current_ws%></td>
+      <td><%= @warehouse_examing.current_dm %><%= f.hidden_field :current_dm, readonly: true%></td>
+      <td><%= @warehouse_examing.current_vc %><%= f.hidden_field :current_vc, readonly: true%></td>
+      <td><%= @warehouse_examing.current_retail %><%= f.hidden_field :current_retail, readonly: true%></td>
+    </tr>
+    <tr>
+      <th></th>
+      <th>
+        Stock<br/>
+        <%= @warehouse_examing.current_stock %>
+        <%= f.hidden_field :current_stock, readonly: true%>
+      </th>
+      <th>
+        Allocation<br/>
+        <%= @warehouse_examing.allocation %>
+        <%= f.hidden_field :allocation, readonly: true%>
+      </th>
+      <th>
+        On Order<br/>
+        <%= @warehouse_examing.on_order %>
+        <%= f.hidden_field :on_order, readonly: true%>
+      </th>
+      <th>
+        Total<br/>
+        <%= @warehouse_examing.current_total %>
+        <%= f.hidden_field :current_total, readonly: true%>
+      </th>
+    </tr>
+    <tr>
+      <th>Count</th>
+      <td><%= f.number_field :count_ws%></td>
+      <td><%= f.number_field :count_dm%></td>
+      <td><%= f.number_field :count_vc%></td>
+      <td><%= f.number_field :count_retail%></td>
+    </tr>
+
+    <tr>
+      <th colspan="3"></th>
+      <th>
+        Stock
+        <p class="count-total"></p>
+        <%= f.hidden_field :count_total, class: 'count-total' %>
+      </th>
+      <th>
+        Difference
+        <p class="difference"></p>
+        <%= f.hidden_field :difference, class: 'difference' %>
+      </th>
+    </tr>
+  </table>
+<% end %>
+
+<script type="text/javascript">
+  $(document).on('input','[type=number]',function(){
+    var total = 0;
+    $('input[type=number]').each(function(){
+      total += (parseInt($(this).val()) || 0);
+    });
+    var difference = parseInt($('#warehouse_examining_current_stock').val()) - total;
+
+    $('.count-total').val(total);
+    $('.difference').val(difference);
+    $('p.count-total').html(total);
+    $('p.difference').html(difference);
+  });
+</script>

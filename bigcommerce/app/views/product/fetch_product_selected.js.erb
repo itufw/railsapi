@@ -1,0 +1,4 @@
+var current_colour = '<%= (@product.selected==0) ? "grey" : "red" %>';
+var last_colour = 'greyred'.replace(current_colour, '');
+
+flags.filter('[product=<%= @product.id %>]').removeClass(last_colour).addClass(current_colour);

@@ -35,6 +35,15 @@ class OrderProduct < ActiveRecord::Base
 		self
 	end
 
+	# find the products in allocation status
+	def self.allocation_products(product_ids)
+		joins(:order).where('orders.status_id': 1, product_id: product_ids)
+	end
+
+	def self.on_order(product_ids)
+		joins(:order).where('orders.status_id': [9, 11, 20, 24, 26, 27], product_id: product_ids)
+	end
+
 	# Inc Tax
 	def self.order_sum(order_products)
 		order_total = 0.0
