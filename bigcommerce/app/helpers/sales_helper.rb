@@ -6,7 +6,7 @@ module SalesHelper
   include ProductVariations
   include TimePeriodStats
 
-  def cust_group_sales(cust_group_id, start_date, end_date, cust_group_name, sum_function)
+  def cust_group_sales(cust_group_id, start_date, end_date, cust_group_name, sum_function, dates_paired=nil)
       case sum_function
       when :sum_qty
         function = "sum(orders.qty)"
@@ -30,6 +30,17 @@ module SalesHelper
       sales.each do |daily_sale|
         cust_group_sums[daily_sale.date] = ((:avg_bottle_price).eql? sum_function) ? daily_sale.sum/(daily_sale.qty * gst) : daily_sale.sum
       end
+
+      unless dates_paired.nil?
+        cust_group_sums_h = {}
+        dates_paired.keys().each do |date|
+          begin_at = dates_paired[date].first
+          end_at = dates_paired[date].last
+          cust_group_sums_h[date] = cust_group_sums.select{|key, value| begin_at<=key && end_at>key}.values().sum
+        end
+        cust_group_sums = cust_group_sums_h
+      end
+
       # cust_group_name = CustGroup.find(cust_group_id).name
     [cust_group_sums,cust_group_name]
   end
