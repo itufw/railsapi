@@ -106,16 +106,18 @@
             <td class="ProductDetails"><%= item.product.name %></td>
             <% if [2427, 2582, 2341, 2579].include?item.product_id%>
               <td class="ProductCost" id="price" align="right">$<%= '%.2f' % (item.price_luc) %></td>
+              <td class="ProductTotal" align="right" id="amt" style="width:15px;">$<%= '%.2f' % (item.qty * item.price_discounted) %></td>
             <% else %>
               <td class="ProductCost" id="price" align="right">$<%= '%.2f' % (item.price_luc / 1.29 * 1.1) %></td>
+              <td class="ProductTotal" align="right" id="amt" style="width:15px;">$<%= '%.2f' % (item.qty * item.price_discounted / 1.29 * 1.1) %></td>
             <% end %>
           <% else %>
             <td colspan="3"><%= item.product.name %></td>
             <td style="text-align: right;" id="price" align="right">$<%= '%.2f' % (item.price_luc / 1.29 * 1.1) %></td>
             <td style="text-align: right;" align="right"><%= '%.0f' % item.discount %>%</td>
             <td style="text-align: right;" align="right">$<%= '%.2f' % (item.price_discounted / 1.29 * 1.1) %></td>
+            <td class="ProductTotal" align="right" id="amt" style="width:15px;">$<%= '%.2f' % (item.qty * item.price_discounted / 1.29 * 1.1) %></td>
           <% end %>
-          <td class="ProductTotal" align="right" id="amt" style="width:15px;">$<%= '%.2f' % (item.qty * item.price_discounted / 1.29 * 1.1) %></td>
           <td></td>
         </tr>
         <% end %>
