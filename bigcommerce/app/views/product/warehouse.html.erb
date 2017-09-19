@@ -18,16 +18,16 @@
   </div>
 </div>
 <div class="row">
-  <div class="col-md-2">
+  <div class="col-md-3">
     <label>Ready:<%= OrderProduct.ready(@products.map(&:id)).map(&:qty).sum%></label>
   </div>
-  <div class="col-md-2">
+  <div class="col-md-3">
     <label>Allocation:<%= @warehouse_examining.allocation %></label>
   </div>
-  <div class="col-md-2">
+  <div class="col-md-3">
     <label>On Order:<%= @warehouse_examining.on_order %></label>
   </div>
-  <div class="col-md-2">
+  <div class="col-md-3">
     <label>Stock:<%= @warehouse_examining.current_stock %></label>
   </div>
   <%= f.hidden_field :allocation, readonly: true%>
@@ -39,7 +39,7 @@
   <div class="col-md-3">
     <label for="pack_size">Case Size: <%= product_form.number_field :case_size, min: 0, max: 30, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Case Size' %></label>
   </div>
-  <div class="col-md-3">
+  <div class="col-md-9">
     <label for="location">
       Location:
       <%= product_form.text_field :row, size: 2, placeholder: 'row'%>
@@ -50,13 +50,13 @@
   <% end %>
 </div>
 <div class="pack-count">
-  <div class="col-md-2">
+  <div class="col-md-4">
     <label for="packs">Packs:<%= f.number_field :count_pack, {min: 0, max: 999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Pack'} %></label>
   </div>
-  <div class="col-md-2">
+  <div class="col-md-4">
     <label for="loose">Loose:<%= f.number_field :count_loose, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Loose'} %></label>
   </div>
-  <div class="col-md-2">
+  <div class="col-md-4">
     <label for="sample">Sample:<%= f.number_field :count_sample, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Sample'} %></label>
   </div>
 </div>
@@ -68,6 +68,13 @@
   <%= f.hidden_field :difference, class: 'difference' %>
 </div>
   <table>
+    <tr>
+      <th></th>
+      <th>WS</th>
+      <th>DM</th>
+      <th>VC</th>
+      <th>Retail</th>
+    </tr>
     <tr>
       <th>Count</th>
       <td><%= f.number_field :count_ws, {min: 0, max: 999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'WS', class: 'distribuetd'}%></td>
