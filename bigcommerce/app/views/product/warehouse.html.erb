@@ -7,37 +7,37 @@
 <!-- Mobile Version -->
 <% if browser.device.mobile? %>
 <div class="row">
-    <div class="col-md-6 col-xs-4">
+    <div class="col-md-6 col-xs-8">
       <%= @warehouse_examining.product_name%><br/>
     </div>
-    <div class="col-md-6 col-xs-4">
+    <div class="col-md-6 col-xs-8">
       <label>Total:<%= @warehouse_examining.current_total %></label>
       <%= f.hidden_field :current_total, readonly: true%>
     </div>
 </div>
 <div class="row">
-  <div class="col-md-3 col-xs-2">
+  <div class="col-md-3 col-xs-1">
     <label>Ready:<%= OrderProduct.ready(@products.map(&:id)).map(&:qty).sum%></label>
   </div>
-  <div class="col-md-3 col-xs-2">
+  <div class="col-md-3 col-xs-1">
     <label>Allocation:<%= @warehouse_examining.allocation %></label>
   </div>
-  <div class="col-md-3 col-xs-2">
+  <div class="col-md-3 col-xs-1">
     <label>On Order:<%= @warehouse_examining.on_order %></label>
   </div>
-  <div class="col-md-3 col-xs-2">
+  <div class="col-md-3 col-xs-1">
     <label>Stock:<%= @warehouse_examining.current_stock %></label>
   </div>
   <%= f.hidden_field :allocation, readonly: true%>
   <%= f.hidden_field :current_stock, readonly: true%>
   <%= f.hidden_field :on_order, readonly: true%>
 </div>
-<div class="product-details">
+<div class="row product-details">
   <%= f.fields_for "product", @product do |product_form|%>
-  <div class="col-md-3 col-xs-4">
+  <div class="col-md-3 col-xs-1">
     <label for="pack_size">Case Size: <%= product_form.number_field :case_size, min: 0, max: 30, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Case Size' %></label>
   </div>
-  <div class="col-md-9 col-xs-8">
+  <div class="col-md-9 col-xs-2">
     <label for="location">
       Location:
       <%= product_form.text_field :row, size: 2, placeholder: 'row'%>
@@ -47,14 +47,14 @@
   </div>
   <% end %>
 </div>
-<div class="pack-count">
-  <div class="col-md-4 col-xs-4">
+<div class="row pack-count">
+  <div class="col-md-4 col-xs-1">
     <label for="packs">Packs:<%= f.number_field :count_pack, {min: 0, max: 999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Pack'} %></label>
   </div>
-  <div class="col-md-4 col-xs-4">
+  <div class="col-md-4 col-xs-1">
     <label for="loose">Loose:<%= f.number_field :count_loose, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Loose'} %></label>
   </div>
-  <div class="col-md-4 col-xs-4">
+  <div class="col-md-4 col-xs-1">
     <label for="sample">Sample:<%= f.number_field :count_sample, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Sample'} %></label>
   </div>
 </div>
