@@ -193,6 +193,7 @@ class OrderProduct < ActiveRecord::Base
 
 		return if self.order.source == 'bigcommerce'
 		return if stock_incremental == 0
+		return if [2427, 2582, 2341, 2579].include?self.product_id
 
 		Bigcommerce::Product.update(product_id, inventory_level: Bigcommerce::Product.find(product_id).inventory_level - stock_incremental)
 		sql = "UPDATE products SET inventory = inventory - '#{self.stock_incremental}' WHERE id = '#{self.product_id}'"
@@ -214,10 +215,10 @@ class OrderProduct < ActiveRecord::Base
 		return if order_history.nil?
 		order_history_id = order_history.id
 
-		product_attributes =  "('#{self.order_id_was}', '#{order_history.id}', '#{self.product_id_was}',\
-		'#{self.order_shipping_id_was.to_i}', '#{self.qty_was.to_i}', '#{self.qty_shipped_was.to_i}', '#{self.price_luc_was}',\
-		'#{self.base_price_was}', '#{self.discount_was}', '#{self.order_discount_was}', '#{self.price_handling_was}',\
-		'#{self.price_inc_tax_was}', '#{self.price_wet_was}', '#{self.price_gst_was}', '#{self.price_discounted_was}',\
+		product_attributes =  "('#{self.order_id_was.to_i}', '#{order_history.id}', '#{self.product_id_was.to_i}',\
+		'#{self.order_shipping_id_was.to_i}', '#{self.qty_was.to_i}', '#{self.qty_shipped_was.to_i}', '#{self.price_luc_was.to_f}',\
+		'#{self.base_price_was.to_f}', '#{self.discount_was.to_f}', '#{self.order_discount_was.to_f}', '#{self.price_handling_was.to_f}',\
+		'#{self.price_inc_tax_was.to_f}', '#{self.price_wet_was.to_f}', '#{self.price_gst_was.to_f}', '#{self.price_discounted_was.to_f}',\
 		'#{self.stock_previous_was.to_i}', '#{self.stock_current_was.to_i}', '#{self.stock_incremental_was.to_i}',\
 		'#{self.display_was.to_i}', '#{self.damaged_was.to_i}', '#{self.note_was.to_s}', '#{self.created_by_was.to_s}',\
 		'#{self.updated_by_was.to_s}', '#{self.created_at_was.to_s(:db)}', '#{self.updated_at_was.to_s(:db)}')"

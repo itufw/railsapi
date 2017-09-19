@@ -413,13 +413,13 @@ class Order < ActiveRecord::Base
     order_attributes =  "('#{self.id_was}', '#{self.customer_id_was}', '#{self.status_id_was}',\
     '#{self.courier_status_id_was}', '#{self.account_status_was}', \"#{self.street_was}\", \"#{self.city_was}\",\
     \"#{self.state_was}\", \"#{self.postcode_was}\", '#{self.country_was}', \"#{self.address_was}\",\
-    '#{self.staff_id_was}', '#{self.total_inc_tax_was}', '#{self.qty_was}', '#{self.items_shipped_was}',\
-    '#{self.subtotal_was}', '#{self.discount_rate_was}', '#{self.discount_amount_was}',\
-    '#{self.handling_cost_was}', '#{self.shipping_cost_was}', '#{self.wrapping_cost_was}',\
-    '#{self.wet_was}', '#{self.gst_was}',\
-    '#{self.active_was}', '#{self.xero_invoice_id_was}', '#{self.xero_invoice_number_was}',\
-    '#{self.source_was}', '#{self.source_id_was}', '#{self.date_created_was.to_s(:db)}',\
-    '#{self.created_by_was}', '#{self.last_updated_by_was}', '#{self.created_at_was.to_s(:db)}', '#{self.updated_at_was.to_s(:db)}')"
+    '#{self.staff_id_was}', '#{self.total_inc_tax_was.to_f}', '#{self.qty_was.to_i}', '#{self.items_shipped_was.to_i}',\
+    '#{self.subtotal_was.to_f}', '#{self.discount_rate_was.to_f}', '#{self.discount_amount_was.to_f}',\
+    '#{self.handling_cost_was.to_f}', '#{self.shipping_cost_was.to_f}', '#{self.wrapping_cost_was.to_f}',\
+    '#{self.wet_was.to_f}', '#{self.gst_was.to_f}',\
+    '#{self.active_was.to_i}', '#{self.xero_invoice_id_was.to_s}', '#{self.xero_invoice_number_was.to_s}',\
+    '#{self.source_was.to_s}', '#{self.source_id_was.to_s}', '#{self.date_created_was.to_s(:db)}',\
+    '#{self.created_by_was.to_i}', '#{self.last_updated_by_was.to_i}', '#{self.created_at_was.to_s(:db)}', '#{self.updated_at_was.to_s(:db)}')"
     sql = "INSERT INTO order_histories(order_id, customer_id, status_id, courier_status_id,\
     account_status, street, city, state, postcode, country, address, staff_id,\
     total_inc_tax, qty, items_shipped, subtotal, discount_rate, discount_amount,\
