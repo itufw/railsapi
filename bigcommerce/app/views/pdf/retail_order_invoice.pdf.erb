@@ -104,7 +104,11 @@
           <td class="ProductQuantity"><%= item.qty.to_i%></td>
           <% if wine_club || discount_amount==0 %>
             <td class="ProductDetails"><%= item.product.name %></td>
-            <td class="ProductCost" id="price" align="right">$<%= '%.2f' % (item.price_luc / 1.29 * 1.1) %></td>
+            <% if [2427, 2582, 2341, 2579].include?item.product_id%>
+              <td class="ProductCost" id="price" align="right">$<%= '%.2f' % (item.price_luc) %></td>
+            <% else %>
+              <td class="ProductCost" id="price" align="right">$<%= '%.2f' % (item.price_luc / 1.29 * 1.1) %></td>
+            <% end %>
           <% else %>
             <td colspan="3"><%= item.product.name %></td>
             <td style="text-align: right;" id="price" align="right">$<%= '%.2f' % (item.price_luc / 1.29 * 1.1) %></td>
@@ -121,11 +125,14 @@
         <tr>
         <% if wine_club || discount_amount==0 %>
           <td rowspan="7"></td>
+
+          <td colspan="2" class="ProductCost" align="right">Subtotal</td>
+          <td class="ProductTotal" align="right">$<%= '%.2f' % (order.subtotal) %></td>
         <% else %>
           <td colspan="5" rowspan="7"></td>
-        <% end %>
           <td colspan="2" class="ProductCost" align="right">Subtotal</td>
           <td class="ProductTotal" align="right">$<%= '%.2f' % (order.subtotal * 1.1) %></td>
+        <% end %>
           <td></td>
         </tr>
         <% if !wine_club && discount_amount!=0 %>
