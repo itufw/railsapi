@@ -44,6 +44,10 @@ class OrderProduct < ActiveRecord::Base
 		joins(:order).where('orders.status_id': [9, 11, 20, 24, 26, 27], product_id: product_ids)
 	end
 
+	def self.ready(product_ids)
+		joins(:order).where('orders.status_id': 25, product_id: product_ids)
+	end
+
 	# Inc Tax
 	def self.order_sum(order_products)
 		order_total = 0.0

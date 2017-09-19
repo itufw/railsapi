@@ -1,12 +1,119 @@
 <%= title 'Warehouse'%>
-<% if browser.device.mobile? %>
-  <p>This is test Text</p>
-<% end %>
-
-<%= form_for @warehouse_examing, :url => {:controller => "product", :action => "warehouse_counting"}  do |f| %>
+<%= form_for @warehouse_examining, :url => {:controller => "product", :action => "warehouse_counting"}  do |f| %>
   <%= hidden_field_tag :pending_products, @product_list, multiple: true%>
   <%= f.hidden_field :product_name%>
   <%= f.hidden_field :product_no_ws_id%>
+
+  <!-- Mobile Version -->
+  <% unless browser.device.mobile? %>
+  <div class="row">
+    <div class="col-md-4">
+      <div class="row">
+        <div class="col-md-6">
+          <%= @warehouse_examining.product_name%><br/>
+        </div>
+        <div class="col-md-6">
+          Total<br/>
+          <%= @warehouse_examining.current_total %>
+          <%= f.hidden_field :current_total, readonly: true%>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3">
+          Ready<br/>
+          <%= OrderProduct.ready(@products.map(&:id)).map(&:qty).sum%>
+        </div>
+        <div class="col-md-3">
+          Allocation<br/>
+          <%= @warehouse_examining.allocation %>
+          <%= f.hidden_field :allocation, readonly: true%>
+        </div>
+        <div class="col-md-3">
+          On Order<br/>
+          <%= @warehouse_examining.on_order %>
+          <%= f.hidden_field :on_order, readonly: true%>
+        </div>
+        <div class="col-md-3">
+          Stock<br/>
+          <%= @warehouse_examining.current_stock %>
+          <%= f.hidden_field :current_stock, readonly: true%>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <table>
+      <tr>
+        <th>
+          Ready<br/>
+          <%= OrderProduct.ready(@products.map(&:id)).map(&:qty).sum%>
+        </th>
+        <th>
+          Allocation<br/>
+          <%= @warehouse_examining.allocation %>
+          <%= f.hidden_field :allocation, readonly: true%>
+        </th>
+        <th>
+          On Order<br/>
+          <%= @warehouse_examining.on_order %>
+          <%= f.hidden_field :on_order, readonly: true%>
+        </th>
+        <th>
+          Stock<br/>
+          <%= @warehouse_examining.current_stock %>
+          <%= f.hidden_field :current_stock, readonly: true%>
+        </th>
+        <th>
+          Total<br/>
+          <%= @warehouse_examining.current_total %>
+          <%= f.hidden_field :current_total, readonly: true%>
+        </th>
+      </tr>
+      <%= f.fields_for "product", @product do |product_form|%>
+        <tr>
+          <th>Pack Size</th>
+          <td><%= product_form.text_field :case_size %></td>
+          <th>Location</th>
+          <td>
+            <%= product_form.text_field :row, size: 1, placeholder: 'row'%>
+            <%= product_form.text_field :column, size: 1, placeholder:'column'%>
+            <%= product_form.text_field :area, size: 1, placeholder:'area'%>
+          </td>
+        </tr>
+      <% end %>
+      <tr>
+        <th>Packs</th>
+        <th><%= f.text_field :count_pack %></th>
+        <th>Loose</th>
+        <th><%= f.text_field :count_loose %></th>
+        <th>Sample</th>
+        <th><%= f.text_field :count_sample %></th>
+      </tr>
+      <tr>
+        <th>Count</th>
+        <td><%= f.number_field :count_ws, {min: "0", inputmod: "numeric", pattern:"[0-9]*", placeholder: 'WS'}%></td>
+        <td><%= f.number_field :count_dm, {min: "0", inputmod: "numeric", pattern:"[0-9]*", placeholder: 'DM'}%></td>
+        <td><%= f.number_field :count_vc, {min: "0", inputmod: "numeric", pattern:"[0-9]*", placeholder: 'VC'}%></td>
+        <td><%= f.number_field :count_retail, {min: "0", inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Retail'}%></td>
+      </tr>
+      <tr>
+        <th colspan="3"></th>
+        <th>
+          Stock
+          <p class="count-total"></p>
+          <%= f.hidden_field :count_total, class: 'count-total' %>
+        </th>
+        <th>
+          Difference
+          <p class="difference"></p>
+          <%= f.hidden_field :difference, class: 'difference' %>
+        </th>
+      </tr>
+    </table>
+
+
+  <% else %>
+  <!-- Desktop Version -->
 
   <table class="reference-table">
     <thead>
@@ -20,40 +127,40 @@
     </thead>
     <tr>
       <th>Current</th>
-      <td><%= @warehouse_examing.current_ws %><%= f.hidden_field :current_ws%></td>
-      <td><%= @warehouse_examing.current_dm %><%= f.hidden_field :current_dm, readonly: true%></td>
-      <td><%= @warehouse_examing.current_vc %><%= f.hidden_field :current_vc, readonly: true%></td>
-      <td><%= @warehouse_examing.current_retail %><%= f.hidden_field :current_retail, readonly: true%></td>
+      <td><%= @warehouse_examining.current_ws %><%= f.hidden_field :current_ws%></td>
+      <td><%= @warehouse_examining.current_dm %><%= f.hidden_field :current_dm, readonly: true%></td>
+      <td><%= @warehouse_examining.current_vc %><%= f.hidden_field :current_vc, readonly: true%></td>
+      <td><%= @warehouse_examining.current_retail %><%= f.hidden_field :current_retail, readonly: true%></td>
     </tr>
     <tr>
       <th></th>
       <th>
         Stock<br/>
-        <%= @warehouse_examing.current_stock %>
+        <%= @warehouse_examining.current_stock %>
         <%= f.hidden_field :current_stock, readonly: true%>
       </th>
       <th>
         Allocation<br/>
-        <%= @warehouse_examing.allocation %>
+        <%= @warehouse_examining.allocation %>
         <%= f.hidden_field :allocation, readonly: true%>
       </th>
       <th>
         On Order<br/>
-        <%= @warehouse_examing.on_order %>
+        <%= @warehouse_examining.on_order %>
         <%= f.hidden_field :on_order, readonly: true%>
       </th>
       <th>
         Total<br/>
-        <%= @warehouse_examing.current_total %>
+        <%= @warehouse_examining.current_total %>
         <%= f.hidden_field :current_total, readonly: true%>
       </th>
     </tr>
     <tr>
       <th>Count</th>
-      <td><%= f.number_field :count_ws%></td>
-      <td><%= f.number_field :count_dm%></td>
-      <td><%= f.number_field :count_vc%></td>
-      <td><%= f.number_field :count_retail%></td>
+      <td><%= f.number_field :count_ws, {min: "0", inputmod: "numeric", pattern:"[0-9]*"}%></td>
+      <td><%= f.number_field :count_dm, {min: "0", inputmod: "numeric", pattern:"[0-9]*"}%></td>
+      <td><%= f.number_field :count_vc, {min: "0", inputmod: "numeric", pattern:"[0-9]*"}%></td>
+      <td><%= f.number_field :count_retail, {min: "0", inputmod: "numeric", pattern:"[0-9]*"}%></td>
     </tr>
 
     <tr>
@@ -70,6 +177,7 @@
       </th>
     </tr>
   </table>
+<% end %>
 <% end %>
 
 <script type="text/javascript">

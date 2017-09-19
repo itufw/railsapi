@@ -255,22 +255,23 @@ class ProductController < ApplicationController
     @product = @product_list.first
     @product_list = @product_list.reject{|x| x==@product}.map(&:id)
 
-    products = @product.products
-    @product_dm = products.select{|x| x.name.include?'DM'}.first
-    @product_vc = products.select{|x| x.name.include?'VC'}.first
-    @product_ws = products.select{|x| x.name.include?'WS'}.first
-    @product_retail = products.select{|x| x.retail_ws=='R'}.first
+    @products = @product.products
+    @product_dm = @products.select{|x| x.name.include?'DM'}.first
+    @product_vc = @products.select{|x| x.name.include?'VC'}.first
+    @product_ws = @products.select{|x| x.name.include?'WS'}.first
+    @product_retail = @products.select{|x| x.retail_ws=='R'}.first
 
-    @warehouse_examing = WarehouseExamining.new(product_name: @product.name,\
-      product_no_ws_id: @product.id, current_stock: products.map(&:inventory).sum,\
-      allocation: OrderProduct.allocation_products(products.map(&:id)).map(&:qty).sum,\
-      on_order: OrderProduct.on_order(products.map(&:id)).map(&:qty).sum,\
+    @warehouse_examining = WarehouseExamining.new(product_name: @product.name,\
+      product_no_ws_id: @product.id, current_stock: @products.map(&:inventory).sum,\
+      allocation: OrderProduct.allocation_products(@products.map(&:id)).map(&:qty).sum,\
+      on_order: OrderProduct.on_order(@products.map(&:id)).map(&:qty).sum,\
       current_dm: @product_dm.nil? ? 0 : @product_dm.inventory,\
       current_vc: @product_vc.nil? ? 0 : @product_vc.inventory,\
       current_retail: @product_retail.nil? ? 0 : @product_retail.inventory,\
       current_ws: @product_ws.nil? ? 0 : @product_ws.inventory,\
       )
-    @warehouse_examing.current_total = @warehouse_examing.current_stock.to_i + @warehouse_examing.allocation.to_i + @warehouse_examing.on_order.to_i
+    @warehouse_examining.current_total = @warehouse_examining.current_stock.to_i + @warehouse_examining.allocation.to_i + @warehouse_examining.on_order.to_i
+    @product.case_size = @product_ws.case_size if !@product_ws.nil? && @product.case_size.to_i==0
   end
 
   def warehouse_counting

@@ -411,7 +411,7 @@ class Order < ActiveRecord::Base
 
   def record_history
     order_attributes =  "('#{self.id_was}', '#{self.customer_id_was}', '#{self.status_id_was}',\
-    '#{self.courier_status_id_was}', '#{self.account_status_was}', '#{self.street_was}', '#{self.city_was}',\
+    '#{self.courier_status_id_was}', '#{self.account_status_was}', \"#{self.street_was}\", \"#{self.city_was}\",\
     \"#{self.state_was}\", \"#{self.postcode_was}\", '#{self.country_was}', \"#{self.address_was}\",\
     '#{self.staff_id_was}', '#{self.total_inc_tax_was}', '#{self.qty_was}', '#{self.items_shipped_was}',\
     '#{self.subtotal_was}', '#{self.discount_rate_was}', '#{self.discount_amount_was}',\
