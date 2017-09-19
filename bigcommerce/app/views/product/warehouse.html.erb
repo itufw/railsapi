@@ -5,7 +5,7 @@
 <%= f.hidden_field :product_no_ws_id%>
 
 <!-- Mobile Version -->
-<% unless browser.device.mobile? %>
+<% if browser.device.mobile? %>
 <div class="row">
   <div class="col-md-8">
     <div class="col-md-6">
@@ -50,9 +50,15 @@
   <% end %>
 </div>
 <div class="pack-count">
-  <label for="packs">Packs:<%= f.number_field :count_pack, {min: 0, max: 999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Pack'} %></label>
-  <label for="loose">Loose:<%= f.number_field :count_loose, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Loose'} %></label>
-  <label for="sample">Sample:<%= f.number_field :count_sample, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Sample'} %></label>
+  <div class="col-md-2">
+    <label for="packs">Packs:<%= f.number_field :count_pack, {min: 0, max: 999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Pack'} %></label>
+  </div>
+  <div class="col-md-2">
+    <label for="loose">Loose:<%= f.number_field :count_loose, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Loose'} %></label>
+  </div>
+  <div class="col-md-2">
+    <label for="sample">Sample:<%= f.number_field :count_sample, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Sample'} %></label>
+  </div>
 </div>
 <div class="distribution">
   <label for="total-stock">Stock: <i class="count-total"></i></label>
