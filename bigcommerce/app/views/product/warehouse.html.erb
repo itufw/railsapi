@@ -1,3 +1,7 @@
+<head>
+  <meta content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0" name="viewport" />
+</head>
+
 <%= title 'Warehouse'%>
 <%= form_for @warehouse_examining, :url => {:controller => "product", :action => "warehouse_counting"}  do |f| %>
 <%= hidden_field_tag :pending_products, @product_list, multiple: true%>
@@ -5,22 +9,51 @@
 <%= f.hidden_field :product_no_ws_id%>
 
 <!-- Mobile Version -->
+<!-- browser.device.mobile? -->
+  <div class="counting-table">
+    <ul>
+      <p><%= @warehouse_examining.product_name %></p>
+      <li>
+          <b>Ready</b><%= OrderProduct.ready(@products.map(&:id)).map(&:qty).sum%>
+          <b>On Order</b><%= @warehouse_examining.on_order %>
+          <b>Allocation</b><%= @warehouse_examining.allocation %>
+          <b>stock</b><%= @warehouse_examining.current_stock %>
+        <%= f.hidden_field :allocation, readonly: true%>
+        <%= f.hidden_field :current_stock, readonly: true%>
+        <%= f.hidden_field :on_order, readonly: true%>
+      </li>
+      <%= f.fields_for "product", @product do |product_form|%>
+
+        <li>
+            <b>Size</b><%= product_form.number_field :case_size, min: 0, max: 100, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Case Size' %>
+            <b>Location</b>
+            <%= product_form.text_field :row, size: 5, placeholder: 'row'%>
+            <%= product_form.text_field :column, size: 5, placeholder:'column'%>
+            <%= product_form.text_field :area, size: 5, placeholder:'area'%>
+        </li>
+        <li class="value-one"><b>New Mail</b>Ding</li>
+      <% end %>
+    </ul>
+  </div>
+
+
+
 <div class="row">
     <div class="col-md-4 col-xs-6">
       <%= @warehouse_examining.product_name%><br/>
     </div>
 </div>
 <div class="row">
-  <div class="col-md-3 col-xs-3">
+  <div class="col-md-3 col-xs-2">
     <label>Ready:<%= OrderProduct.ready(@products.map(&:id)).map(&:qty).sum%></label>
   </div>
-  <div class="col-md-3 col-xs-3">
+  <div class="col-md-3 col-xs-2">
     <label>On Order:<%= @warehouse_examining.on_order %></label>
   </div>
-  <div class="col-md-3 col-xs-3 col-xs-offset-6">
+  <div class="col-md-3 col-xs-2">
     <label>Allocation:<%= @warehouse_examining.allocation %></label>
   </div>
-  <div class="col-md-3 col-xs-3">
+  <div class="col-md-3 col-xs-2">
     <label>Stock:<%= @warehouse_examining.current_stock %></label>
   </div>
   <%= f.hidden_field :allocation, readonly: true%>
@@ -29,10 +62,10 @@
 </div>
 <div class="row product-details">
   <%= f.fields_for "product", @product do |product_form|%>
-  <div class="col-md-2 col-xs-2">
-    <label for="pack_size">Case Size: <%= product_form.number_field :case_size, min: 0, max: 100, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Case Size' %></label>
+  <div class="col-md-2 col-xs-1">
+    <label for="pack_size">Size: <%= product_form.number_field :case_size, min: 0, max: 100, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Case Size' %></label>
   </div>
-  <div class="col-md-4 col-xs-2">
+  <div class="col-md-4 col-xs-3">
     <label for="location">
       Location:
       <%= product_form.text_field :row, size: 5, placeholder: 'row'%>
@@ -52,7 +85,7 @@
   <div class="col-md-2 col-xs-1">
     <label for="sample">Sample:<%= f.number_field :count_sample, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Sample'} %></label>
   </div>
-  <div class="col-md-1 col-xs-1">
+  <div class="col-md-1 col-xs-2 col-xs-offset-4">
     <input type="checkbox" name="latter_count" id="ios-checkbox" class="ios-toggle"/>
     <label for="ios-checkbox" class="checkbox-label" data-off="Now" data-on="Yes">Latter</label>
   </div>

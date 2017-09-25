@@ -1,6 +1,71 @@
 // Place all the styles related to the Product controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+.counting-table{
+  div {
+    border:1px solid #B2B4B8;
+    border-radius:10px;
+    box-shadow:inset 0px 1px 0px rgba(0, 0, 0, 0.075), 0px 1px 0px rgba(255, 255, 255, 0.75);
+    margin:10px;
+    padding:0;
+  }
+  ul {
+  list-style-type:none;
+  font-family:"Helvetica";
+  font-size:16px;
+  margin:10px;
+  padding:0;
+  }
+
+  ul li {
+    background-color:#F7F7F7;
+    padding:14px 10px;
+    border-left:1px solid #B2B4B8;
+    border-right:1px solid #B2B4B8;
+    border-bottom:1px solid #CBCBCB;
+    border-top:1px solid #FDFDFD;
+    color:#385487;
+  }
+
+  ul li b {
+    color:black;
+  }
+
+  ul li.value-one {
+    text-align:right;
+  }
+
+  ul li.value-one b {
+    float:left;
+  }
+
+  ul li:first-of-type {
+    box-shadow:inset 0px 1px 0px rgba(0, 0, 0, 0.075);
+    border-top:1px solid #B2B4B8;
+    border-top-right-radius:10px;
+    border-top-left-radius:10px;
+  }
+
+  ul li:last-of-type {
+    border-bottom:1px solid #B2B4B8;
+    border-bottom-right-radius:10px;
+    border-bottom-left-radius:10px;
+    box-shadow:0px 1px 0px rgba(255, 255, 255, 0.75);
+  }
+
+  ul li:only-of-type {
+    box-shadow:inset 0px 1px 0px rgba(0, 0, 0, 0.075), 0px 1px 0px rgba(255, 255, 255, 0.75);
+  }
+
+  ul p {
+    text-shadow:0px 1px 0px rgba(255, 255, 255, 0.75);
+    margin:15px 10px 7px 10px;
+    font-weight:bold;
+    color:rgb(77,87,104);
+  }
+}
+
+
 *,*:before,*:after{
 box-sizing:border-box;
 margin:0;
