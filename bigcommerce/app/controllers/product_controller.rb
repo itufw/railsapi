@@ -254,7 +254,7 @@ class ProductController < ApplicationController
     if browser.device.mobile?
     else
     end
-    
+
     @product_list = (params[:pending_products].nil?) ? ProductNoWs.counting : ProductNoWs.filter_by_ids(params[:pending_products])
     @product = @product_list.first
     @product_list = @product_list.reject{|x| x==@product}.map(&:id)
@@ -269,10 +269,10 @@ class ProductController < ApplicationController
       product_no_ws_id: @product.id, current_stock: @products.map(&:inventory).sum,\
       allocation: OrderProduct.allocation_products(@products.map(&:id)).map(&:qty).sum,\
       on_order: OrderProduct.on_order(@products.map(&:id)).map(&:qty).sum,\
-      current_dm: @product_dm.nil? ? 0 : @product_dm.inventory,\
-      current_vc: @product_vc.nil? ? 0 : @product_vc.inventory,\
-      current_retail: @product_retail.nil? ? 0 : @product_retail.inventory,\
-      current_ws: @product_ws.nil? ? 0 : @product_ws.inventory,\
+      current_dm: @product_dm.nil? ? -1 : @product_dm.inventory,\
+      current_vc: @product_vc.nil? ? -1 : @product_vc.inventory,\
+      current_retail: @product_retail.nil? ? -1 : @product_retail.inventory,\
+      current_ws: @product_ws.nil? ? -1 : @product_ws.inventory,\
       )
     @warehouse_examining.current_total = @warehouse_examining.current_stock.to_i + @warehouse_examining.allocation.to_i + @warehouse_examining.on_order.to_i
     @product.case_size = @product_ws.case_size if !@product_ws.nil? && @product.case_size.to_i==0
@@ -280,6 +280,12 @@ class ProductController < ApplicationController
 
   def warehouse_counting
     p = c
+    if params[:commit]=='Skip'
+    elsif params[:commit]=='Save'
+      warehouse = WarehouseExamining.new(warehouse_examining)
+      warehouse.save
+      redirect_to action: 'warehouse', pending_products: params[:pending_products].split()
+    end
   end
 
   def fetch_product_details
@@ -296,7 +302,6 @@ class ProductController < ApplicationController
       format.js
     end
   end
-
 end
 
 private
@@ -307,4 +312,11 @@ def product_params
    :product_no_vintage_id, :case_size, :product_package_type_id, :retail_ws,\
    :vintage, :name_no_winery_no_vintage, :price_id, :product_sub_type_id,\
    :blend_type, :order_1, :order_2, :combined_order, :producer_region_id)
+end
+
+def warehouse_params
+  params.require(:warehouse_examining).permit(:product_name, :product_no_ws_id,\
+   :current_total, :allocation, :current_stock, :on_order, :count_pack, :count_loose,\
+   :count_sample, :count_total, :difference, :count_ws, :count_dm, :count_vc, :count_retail,\
+   :current_ws, :current_dm, :current_vc, :current_retail)
 end

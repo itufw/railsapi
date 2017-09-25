@@ -7,7 +7,7 @@ class OrderProduct < ActiveRecord::Base
 	belongs_to :order_shipping
 
 	after_validation :record_history, on: [:update, :delete]
-	after_validation :stock_change, on: [:create, :update], if: ->(obj){ obj.stock_incremental.present? and obj.stock_incremental_changed?}
+	after_validation :stock_change, on: [:create, :update], if: ->(obj){ obj.stock_incremental.present? and obj.stock_incremental_changed? and obj.stock_incremental!=0 }
 	after_validation :product_display_check, on:[:update], if: ->(obj){ obj.stock_current_changed?}
 
 	def import_from_bigcommerce(order, op)
@@ -188,14 +188,12 @@ class OrderProduct < ActiveRecord::Base
 	private
 	# inventory trigger
 	def stock_change
-		product_id = self.product_id
-		stock_incremental = self.stock_incremental
-
+		# Do Not Change the Stock Level for bigcommerce Orders
 		return if self.order.source == 'bigcommerce'
-		return if stock_incremental == 0
+		# return if it was WINE CLUB (product) -> not real products
 		return if [2427, 2582, 2341, 2579].include?self.product_id
 
-		Bigcommerce::Product.update(product_id, inventory_level: Bigcommerce::Product.find(product_id).inventory_level - stock_incremental)
+		Bigcommerce::Product.update(self.product_id, inventory_level: Bigcommerce::Product.find(self.product_id).inventory_level - self.stock_incremental)
 		sql = "UPDATE products SET inventory = inventory - '#{self.stock_incremental}' WHERE id = '#{self.product_id}'"
 		ActiveRecord::Base.connection.execute(sql)
 	end
