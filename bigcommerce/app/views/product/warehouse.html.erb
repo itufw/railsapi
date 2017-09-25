@@ -11,16 +11,16 @@
     </div>
 </div>
 <div class="row">
-  <div class="col-md-3 col-xs-6">
+  <div class="col-md-3 col-xs-3">
     <label>Ready:<%= OrderProduct.ready(@products.map(&:id)).map(&:qty).sum%></label>
   </div>
-  <div class="col-md-3 col-xs-6">
+  <div class="col-md-3 col-xs-3">
     <label>On Order:<%= @warehouse_examining.on_order %></label>
   </div>
-  <div class="col-md-3 col-xs-6">
+  <div class="col-md-3 col-xs-3 col-xs-offset-6">
     <label>Allocation:<%= @warehouse_examining.allocation %></label>
   </div>
-  <div class="col-md-3 col-xs-6">
+  <div class="col-md-3 col-xs-3">
     <label>Stock:<%= @warehouse_examining.current_stock %></label>
   </div>
   <%= f.hidden_field :allocation, readonly: true%>
@@ -29,30 +29,30 @@
 </div>
 <div class="row product-details">
   <%= f.fields_for "product", @product do |product_form|%>
-  <div class="col-md-2 col-xs-4">
-    <label for="pack_size">Case Size: <%= product_form.number_field :case_size, min: 0, max: 30, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Case Size' %></label>
+  <div class="col-md-2 col-xs-2">
+    <label for="pack_size">Case Size: <%= product_form.number_field :case_size, min: 0, max: 100, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Case Size' %></label>
   </div>
-  <div class="col-md-4 col-xs-4">
+  <div class="col-md-4 col-xs-2">
     <label for="location">
       Location:
-      <%= product_form.text_field :row, size: 2, placeholder: 'row'%>
-      <%= product_form.text_field :column, size: 2, placeholder:'column'%>
-      <%= product_form.text_field :area, size: 2, placeholder:'area'%>
+      <%= product_form.text_field :row, size: 5, placeholder: 'row'%>
+      <%= product_form.text_field :column, size: 5, placeholder:'column'%>
+      <%= product_form.text_field :area, size: 5, placeholder:'area'%>
     </label>
   </div>
   <% end %>
 </div>
 <div class="row pack-count">
-  <div class="col-md-2 col-xs-3">
+  <div class="col-md-2 col-xs-1">
     <label for="packs">Packs:<%= f.number_field :count_pack, {min: 0, max: 999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Pack'} %></label>
   </div>
-  <div class="col-md-2 col-xs-3">
+  <div class="col-md-2 col-xs-1">
     <label for="loose">Loose:<%= f.number_field :count_loose, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Loose'} %></label>
   </div>
-  <div class="col-md-2 col-xs-3">
+  <div class="col-md-2 col-xs-1">
     <label for="sample">Sample:<%= f.number_field :count_sample, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Sample'} %></label>
   </div>
-  <div class="col-md-1 col-xs-2">
+  <div class="col-md-1 col-xs-1">
     <input type="checkbox" name="latter_count" id="ios-checkbox" class="ios-toggle"/>
     <label for="ios-checkbox" class="checkbox-label" data-off="Now" data-on="Yes">Latter</label>
   </div>
