@@ -279,12 +279,20 @@ class ProductController < ApplicationController
   end
 
   def warehouse_counting
+    pending_products = params[:pending_products].split()
+    pending_products.append(warehouse_params[:product_no_ws_id]) unless params[:latter_count].nil?
+
+    if pending_products==''
+      flash[:success] = 'Counted all selected product, please review it!'
+      redirect_to controller: 'sales', action: 'dashboard' and return
+    end
     p = c
     if params[:commit]=='Skip'
+      redirect_to action: 'warehouse', pending_products: pending_products
     elsif params[:commit]=='Save'
-      warehouse = WarehouseExamining.new(warehouse_examining)
+      warehouse = WarehouseExamining.new(warehouse_params)
       warehouse.save
-      redirect_to action: 'warehouse', pending_products: params[:pending_products].split()
+      redirect_to action: 'warehouse', pending_products: pending_products
     end
   end
 

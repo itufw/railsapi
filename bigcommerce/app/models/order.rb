@@ -9,6 +9,8 @@ class Order < ActiveRecord::Base
   belongs_to :courier_status
   belongs_to :coupon
   belongs_to :staff
+  belongs_to :creator, foreign_key: 'created_by', class_name: 'Staff'
+  belongs_to :updator, foreign_key: 'last_updated_by', class_name: 'Staff'
   has_many :order_shippings
   has_many :addresses, through: :order_shippings
   has_many :order_actions
@@ -148,6 +150,10 @@ class Order < ActiveRecord::Base
   # Problem status include Account Status
   def self.problem_status_filter
     joins(:status).where('statuses.send_reminder = 1 OR (orders.account_status != "Approved" AND statuses.valid_order = 1 AND statuses.in_transit = 0 AND statuses.delivered = 0)')
+  end
+
+  def self.courier_not_confirmed
+    return joins(:courier_status).where('courier_statuses.confirmed': 0)
   end
 
   def self.statuses_filter(status_id)
