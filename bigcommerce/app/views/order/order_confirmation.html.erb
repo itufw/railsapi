@@ -106,8 +106,8 @@
     </tr>
     <tr>
       <td colspan="8" align="right" >
-        <i>Created By: <%= @order.creator.nickname%> at <%= @order.created_at.strftime('%d/%m/%Y %H:%M')%></i><br/>
-        <i>Updated By: <%= @order.updator.nickname%> at <%= @order.updated_at.strftime('%d/%m/%Y %H:%M')%></i>
+        <i>Created By: <%= @order.creator.nickname%> at <%= @order.created_at.getlocal.strftime('%d/%m/%Y %H:%M')%></i><br/>
+        <i>Updated By: <%= @order.updator.nickname%> at <%= @order.updated_at.getlocal.strftime('%d/%m/%Y %H:%M')%></i>
       </td>
     </tr>
   </tbody>
