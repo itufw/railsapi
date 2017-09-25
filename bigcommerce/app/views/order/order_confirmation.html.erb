@@ -104,8 +104,15 @@
       <td class="ProductCost" align="right">Grand Total</td>
       <td class="ProductTotal num" align="right"><input readonly="readonly" type="text" value="<%= @order.total_inc_tax%>" name="order[total_inc_tax]" id="order_total_inc_tax"></td>
     </tr>
+    <tr>
+      <td colspan="8" align="right" >
+        <i>Created By: <%= @order.creator.nickname%> at <%= @order.created_at.strftime('%d/%m/%Y %H:%M')%></i><br/>
+        <i>Updated By: <%= @order.updator.nickname%> at <%= @order.updated_at.strftime('%d/%m/%Y %H:%M')%></i>
+      </td>
+    </tr>
   </tbody>
 </table>
+
   <% if @selected_status_id == '12' %>
     <div class="col-md-6">
       <%= render 'partials/shipping', order_id: @order.id %>
@@ -127,6 +134,7 @@
         <br/>
         <div class="row">
           <div class="col-md-4"><%= submit_tag 'Approve', class: 'btn btn-success'%></div>
+          <div class="col-md-4 col-md-offset-4"><%= submit_tag 'Skip', class: 'btn btn-danger'%></div>
         </div>
       <!-- Shipping & Assign Tracking Number -->
     <% elsif @selected_status_id == '9' %>
@@ -167,6 +175,9 @@
           <div class="col-md-6"><%= submit_tag 'Create Label', class: 'btn btn-success'%></div>
           <div class="col-md-10"><%= f.text_field :track_number, size: 30, placeholder: 'Tracking Numbers, divided by ;' %></div>
       </div>
+      <div class="row">
+        <div class="col-md-6 col-md-offset-6"><%= submit_tag 'Skip', class: 'btn btn-danger'%></div>
+      </div>
 
       <script type="text/javascript">
         $('input#order_track_number').hide();
@@ -189,9 +200,11 @@
     <% elsif @selected_status_id == '12'%>
         <div class="row">
           <div class="col-md-4"><%= submit_tag 'Delivered', class: 'btn btn-success'%></div>
+          <div class="col-md-2"><%= f.collection_select :status_id, Status.problems, :id, :name, {include_blank: 'All Status'}, {class: 'form-control'}%></div>
+          <div class="col-md-3"><%= submit_tag 'Problem', class: 'btn btn-primary'%></div>
+          <div class="col-md-3"><%= submit_tag 'Skip', class: 'btn btn-danger'%></div>
 
-          <div class="col-md-4"><%= f.collection_select :status_id, Status.problems, :id, :name, {include_blank: 'All Status'}, {class: 'form-control'}%></div>
-          <div class="col-md-4"><%= submit_tag 'Problem', class: 'btn btn-primary'%></div>
+          </div>
         </div>
     <% elsif @selected_status_id.nil? %>
       <!-- Super User Overwrite -->
@@ -219,11 +232,8 @@
       <div class="row" style="margin: auto;">
           <%= submit_tag 'Update Status', class: 'btn btn-primary', comfirmation: 'Do you want to update the status of this order?'%>
           <%= submit_tag 'Update and Next', class: 'btn btn-primary', comfirmation: 'Do you want to update the status of this order and move to the next?' unless @selected_orders.nil? || @selected_orders.blank?%>
+          <%= submit_tag 'Skip', class: 'btn btn-danger'%>
       </div>
     <% end %>
-    <br/>
-    <div class="row">
-      <div class="col-md-6 col-md-offset-6"><%= submit_tag 'Skip', class: 'btn btn-danger'%></div>
-    </div>
     <% end %>
 </div>
