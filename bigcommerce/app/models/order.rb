@@ -372,7 +372,7 @@ class Order < ActiveRecord::Base
   end
 
   def self.total_dismatch
-    includes(:xero_invoice).where('ROUND(orders.total_inc_tax, 1) <> Round(xero_invoices.total, 1)').references(:xero_invoice)
+    includes(:xero_invoice).where('ROUND(orders.total_inc_tax, 2) <> Round(xero_invoices.total, 2)').references(:xero_invoice)
   end
 
   # return sample order and products
