@@ -1,0 +1,110 @@
+
+<head>
+  <meta content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0" name="viewport" />
+</head>
+
+<%= title 'Warehouse'%>
+<%= form_for @warehouse_examining, :url => {:controller => "product", :action => "warehouse_counting"}  do |f| %>
+<%= hidden_field_tag :pending_products, @product_list, multiple: true%>
+<%= f.hidden_field :product_name%>
+<%= f.hidden_field :product_no_ws_id%>
+<%= f.hidden_field :current_ws%>
+<%= f.hidden_field :current_dm%>
+<%= f.hidden_field :current_vc%>
+<%= f.hidden_field :current_retail%>
+<%= f.hidden_field :count_size%>
+
+
+<!-- Mobile Version -->
+<!-- browser.device.mobile? -->
+  <div class="counting-table block">
+    <ul>
+      <p><%= @warehouse_examining.product_name %></p>
+      <p>
+        <b>Ready</b>:<i><%= OrderProduct.ready(@products.map(&:id)).map(&:qty).sum%></i>
+        <b>On Order</b>:<i><%= @warehouse_examining.on_order %></i>
+        <b>Allocation</b>:<i><%= @warehouse_examining.allocation %></i>
+        <b>Stock</b>:<i><%= @warehouse_examining.current_stock %></i>
+        <b>Total</b>:<i><%= @warehouse_examining.current_total %></i>
+      </p>
+      <%= f.hidden_field :allocation, readonly: true%>
+      <%= f.hidden_field :current_stock, readonly: true%>
+      <%= f.hidden_field :on_order, readonly: true%>
+
+      <%= f.fields_for "product", @product do |product_form|%>
+        <%= product_form.hidden_field :id %>
+        <li class="value-one">
+          <b>Size</b><%= product_form.number_field :case_size, min: 0, max: 100, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Case Size' %>
+        </li>
+        <li class="value-one">
+          <b>Location</b>
+          <%= product_form.text_field :row, size: 5, placeholder: 'row'%>
+          <%= product_form.text_field :column, size: 5, placeholder:'column'%>
+          <%= product_form.text_field :area, size: 5, placeholder:'area'%>
+        </li>
+      <% end %>
+      <li class="value-one"><b>Packs:</b><%= f.number_field :count_pack, {min: 0, max: 999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Pack'} %></li>
+      <li class="value-one"><b>Loose:</b><%= f.number_field :count_loose, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Loose'} %></li>
+      <li class="value-one"><b>Sample:</b><%= f.number_field :count_sample, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Sample'} %></li>
+      <li class="value-one">
+        <b>Stock</b> <i class="count-total">0</i>
+      </li>
+    </ul>
+    <ul>
+      <% unless @product_ws.nil?%>
+        <li class="value-one"><b>WS</b><%= f.number_field :count_ws, {min: 0, max: 999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'WS', class: 'distribuetd', value: @product_ws.inventory} %></li>
+      <% end %>
+      <% unless @product_retail.nil?%>
+        <li class="value-one"><b>Retail</b><%= f.number_field :count_retail, {min: 0, max: 999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'retail', class: 'distribuetd', value: @product_retail.inventory} %></li>
+      <% end %>
+      <% unless @product_dm.nil?%>
+        <li class="value-one"><b>DM</b><%= f.number_field :count_dm, {min: 0, max: 999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'dm', class: 'distribuetd', value: @product_dm.inventory} %></li>
+      <% end %>
+      <% unless @product_vc.nil?%>
+        <li class="value-one"><b>VC</b><%= f.number_field :count_vc, {min: 0, max: 999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'vc', class: 'distribuetd', value: @product_vc.inventory} %></li>
+      <% end %>
+      <li class="value-one">
+        <b>Difference</b> <i class="difference">0</i>
+        <%= f.hidden_field :current_total, readonly: true%>
+        <%= f.hidden_field :count_total, class: 'count-total' %>
+        <%= f.hidden_field :difference, class: 'difference' %>
+      </li>
+      <li class="value-one">
+        <b>Remaining</b><i class="remain-stock">0</i>
+      </li>
+      <li>
+        <div style="align: center;">
+          <%= submit_tag 'Save', class: 'btn btn-primary'%>
+          <%= submit_tag 'Skip', class: 'btn btn-default'%>
+          <div class="col-md-2 col-xs-3" style="float: right;">
+            <input type="checkbox" name="latter_count" id="ios-checkbox" class="ios-toggle"/>
+            <label for="ios-checkbox" class="checkbox-label" data-off="Now" data-on="Yes">Latter</label>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+  $(document).on('input', '[type=number]', function () {
+    var caseSize = parseInt($('#warehouse_examining_product_case_size').val()) || 0;
+    var countPack = parseInt($('#warehouse_examining_count_pack').val()) || 0;
+    var countLoose = parseInt($('#warehouse_examining_count_loose').val()) || 0;
+    var countSample = parseInt($('#warehouse_examining_count_sample').val()) || 0;
+
+    var total = caseSize*countPack+countLoose+countSample;
+
+    var distributed = 0
+    $('input.distribuetd').each(function () {
+      distributed += (parseInt($(this).val()) || 0);
+    });
+    var difference = parseInt($('#warehouse_examining_current_stock').val()) - total;
+
+    $('.count-total').val(total);
+    $('.difference').val(difference);
+    $('i.count-total').html(total);
+    $('i.difference').html(difference);
+    $('i.remain-stock').html(total-distributed);
+  });
+</script>

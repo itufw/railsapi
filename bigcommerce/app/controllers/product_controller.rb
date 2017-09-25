@@ -252,48 +252,49 @@ class ProductController < ApplicationController
 
   def warehouse
     if browser.device.mobile?
+      @product_list = (params[:pending_products].nil?) ? ProductNoWs.counting : ProductNoWs.filter_by_ids(params[:pending_products])
+      @product = @product_list.first
+      @product_list = @product_list.reject{|x| x==@product}.map(&:id)
+
+      @products = @product.products
+      @product_dm = @products.select{|x| x.name.include?'DM'}.first
+      @product_vc = @products.select{|x| x.name.include?'VC'}.first
+      @product_ws = @products.select{|x| x.name.include?'WS'}.first
+      @product_retail = @products.select{|x| x.retail_ws=='R'}.first
+
+      @warehouse_examining = WarehouseExamining.new(product_name: @product.name,\
+        product_no_ws_id: @product.id, current_stock: @products.map(&:inventory).sum,\
+        allocation: OrderProduct.allocation_products(@products.map(&:id)).map(&:qty).sum,\
+        on_order: OrderProduct.on_order(@products.map(&:id)).map(&:qty).sum,\
+        current_dm: @product_dm.nil? ? -1 : @product_dm.inventory,\
+        current_vc: @product_vc.nil? ? -1 : @product_vc.inventory,\
+        current_retail: @product_retail.nil? ? -1 : @product_retail.inventory,\
+        current_ws: @product_ws.nil? ? -1 : @product_ws.inventory,\
+        )
+      @product.case_size = @product_ws.case_size if !@product_ws.nil? && @product.case_size.to_i==0
+
+      @warehouse_examining.current_total = @warehouse_examining.current_stock.to_i + @warehouse_examining.allocation.to_i + @warehouse_examining.on_order.to_i
+      @warehouse_examining.count_size = @product.case_size
     else
+      @warehouse_reviews = WarehouseExamining.pending
     end
-
-    @product_list = (params[:pending_products].nil?) ? ProductNoWs.counting : ProductNoWs.filter_by_ids(params[:pending_products])
-    @product = @product_list.first
-    @product_list = @product_list.reject{|x| x==@product}.map(&:id)
-
-    @products = @product.products
-    @product_dm = @products.select{|x| x.name.include?'DM'}.first
-    @product_vc = @products.select{|x| x.name.include?'VC'}.first
-    @product_ws = @products.select{|x| x.name.include?'WS'}.first
-    @product_retail = @products.select{|x| x.retail_ws=='R'}.first
-
-    @warehouse_examining = WarehouseExamining.new(product_name: @product.name,\
-      product_no_ws_id: @product.id, current_stock: @products.map(&:inventory).sum,\
-      allocation: OrderProduct.allocation_products(@products.map(&:id)).map(&:qty).sum,\
-      on_order: OrderProduct.on_order(@products.map(&:id)).map(&:qty).sum,\
-      current_dm: @product_dm.nil? ? -1 : @product_dm.inventory,\
-      current_vc: @product_vc.nil? ? -1 : @product_vc.inventory,\
-      current_retail: @product_retail.nil? ? -1 : @product_retail.inventory,\
-      current_ws: @product_ws.nil? ? -1 : @product_ws.inventory,\
-      )
-    @warehouse_examining.current_total = @warehouse_examining.current_stock.to_i + @warehouse_examining.allocation.to_i + @warehouse_examining.on_order.to_i
-    @product.case_size = @product_ws.case_size if !@product_ws.nil? && @product.case_size.to_i==0
   end
 
   def warehouse_counting
     pending_products = params[:pending_products].split()
     pending_products.append(warehouse_params[:product_no_ws_id]) unless params[:latter_count].nil?
+    if params[:commit]=='Save'
+      warehouse = WarehouseExamining.new(warehouse_params.merge({count_staff_id: session[:user_id], count_date: Time.now().to_s(:db)}))
+      warehouse.save
+    end
 
+    # if no more pending products to be Counted
+    # return to dashboard
     if pending_products==''
       flash[:success] = 'Counted all selected product, please review it!'
       redirect_to controller: 'sales', action: 'dashboard' and return
     end
-    p = c
-    if params[:commit]=='Skip'
-      redirect_to action: 'warehouse', pending_products: pending_products
-    elsif params[:commit]=='Save'
-      warehouse = WarehouseExamining.new(warehouse_params)
-      warehouse.save
-      redirect_to action: 'warehouse', pending_products: pending_products
-    end
+    redirect_to action: 'warehouse', pending_products: pending_products
   end
 
   def fetch_product_details
