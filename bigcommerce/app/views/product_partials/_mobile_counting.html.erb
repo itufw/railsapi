@@ -32,18 +32,17 @@
         <%= product_form.hidden_field :id %>
         <li class="value-one">
           <b>Location</b>
-          <%= product_form.text_field :row, size: 5, placeholder: 'row'%>
-          <%= product_form.text_field :column, size: 5, placeholder:'column'%>
-          <%= product_form.text_field :area, size: 5, placeholder:'area'%>
+          <%= product_form.text_field :row, size: 8, placeholder: 'row'%>
+          <%= product_form.text_field :column, size: 8, placeholder:'column'%>
+          <%= product_form.text_field :area, size: 8, placeholder:'area'%>
         </li>
       <li class="value-one">
-        <b>Size / Packs:</b>
-        <%= product_form.number_field :case_size, min: 0, max: 100, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Case Size' %>
+        <%= product_form.number_field :case_size, min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Case Size' %>
         <% end %>
 
-        <%= f.number_field :count_pack, {min: 0, max: 999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Pack'} %>
-        <%= f.number_field :count_loose, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Loose'} %>
-        <%= f.number_field :count_sample, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Sample'} %>
+        <%= f.number_field :count_pack, {min: 0, max: 999999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Pack'} %>
+        <%= f.number_field :count_loose, {min: 0, max: 99999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Loose'} %>
+        <%= f.number_field :count_sample, {min: 0, max: 99999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Sample'} %>
       </li>
 
       <li class="value-one">
@@ -52,16 +51,16 @@
     </ul>
     <ul>
       <% unless @product_ws.nil?%>
-        <li class="value-one"><b>WS</b><%= f.number_field :count_ws, {min: 0, max: 999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'WS', class: 'distribuetd', value: @product_ws.inventory} %></li>
+        <li class="value-one"><b>WS</b><%= f.number_field :count_ws, {min: 0, max: 99999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'WS', class: 'distribuetd', value: @product_ws.inventory} %></li>
       <% end %>
       <% unless @product_retail.nil?%>
-        <li class="value-one"><b>Retail</b><%= f.number_field :count_retail, {min: 0, max: 999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'retail', class: 'distribuetd', value: @product_retail.inventory} %></li>
+        <li class="value-one"><b>Retail</b><%= f.number_field :count_retail, {min: 0, max: 99999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'retail', class: 'distribuetd', value: @product_retail.inventory} %></li>
       <% end %>
       <% unless @product_dm.nil?%>
-        <li class="value-one"><b>DM</b><%= f.number_field :count_dm, {min: 0, max: 999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'dm', class: 'distribuetd', value: @product_dm.inventory} %></li>
+        <li class="value-one"><b>DM</b><%= f.number_field :count_dm, {min: 0, max: 99999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'dm', class: 'distribuetd', value: @product_dm.inventory} %></li>
       <% end %>
       <% unless @product_vc.nil?%>
-        <li class="value-one"><b>VC</b><%= f.number_field :count_vc, {min: 0, max: 999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'vc', class: 'distribuetd', value: @product_vc.inventory} %></li>
+        <li class="value-one"><b>VC</b><%= f.number_field :count_vc, {min: 0, max: 99999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'vc', class: 'distribuetd', value: @product_vc.inventory} %></li>
       <% end %>
       <li class="value-one">
         <b>Difference</b> <i class="difference">0</i>
@@ -74,8 +73,8 @@
       </li>
       <li>
         <div style="align: center;">
-          <%= submit_tag 'Save', class: 'btn btn-primary'%>
-          <%= submit_tag 'Skip', class: 'btn btn-default'%>
+          <%= submit_tag 'Save', class: 'btn btn-success btn-lg'%>
+          <%= submit_tag 'Skip', class: 'btn btn-default btn-lg'%>
           <div class="col-md-2 col-xs-4" style="float: right;">
             Latter:
             <input type="checkbox" name="latter_count" id="ios-checkbox" class="ios-toggle"/>
