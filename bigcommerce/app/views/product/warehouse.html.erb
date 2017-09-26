@@ -1,6 +1,6 @@
 <%= title 'Warehouse'%>
 
- <% if browser.device.mobile? %>
+ <% unless browser.device.mobile? %>
   <%= render 'product_partials/mobile_counting' %>
  <% else %>
   <%= render 'product_partials/desktop_review' %>
