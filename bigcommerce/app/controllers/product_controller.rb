@@ -278,7 +278,7 @@ class ProductController < ApplicationController
   end
 
   def warehouse
-    unless browser.device.mobile?
+    if browser.device.mobile?
       @product_list = (params[:pending_products].nil?) ? ProductNoWs.counting.map(&:id) : params[:pending_products]
       @product = ProductNoWs.find(@product_list.first)
       @product_list = @product_list.reject{|x| x.to_s==@product.id.to_s}
