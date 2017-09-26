@@ -47,7 +47,6 @@ var customer_markers = null;
 var lead_markers = null;
 var restaurant_markers = null;
 <% customer_markers, lead_markers, restaurant_markers =  marks_by_distance(@customers, @leads, @restaurants) %>
-
   var handler = Gmaps.build('Google');
   handler.buildMap({
         internal: {
@@ -57,7 +56,14 @@ var restaurant_markers = null;
       customer_markers = handler.addMarkers(<%=raw customer_markers.to_json%>);
       lead_markers = handler.addMarkers(<%= raw lead_markers.to_json%>);
       restaurant_markers = handler.addMarkers(<%= raw restaurant_markers.to_json%>);
-      handler.bounds.extendWith(customer_markers);
+      console.log(customer_markers);
+      console.log(lead_markers);
+      console.log(restaurant_markers);
+      if (customer_markers.length==0){
+        handler.bounds.extendWith(lead_markers);
+      }else{
+        handler.bounds.extendWith(customer_markers);
+      }
       handler.fitMapToBounds();
   });
 

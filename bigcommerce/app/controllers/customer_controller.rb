@@ -250,10 +250,17 @@ class CustomerController < ApplicationController
     customer = Customer.where('lat IS NOT NULL').search_for(@search_text).first
     customer = ZomatoRestaurant.unassigned.cuisine_search(params[:cuisine]).search_for(@search_text).first if customer.nil?
     customer = CustomerLead.where('latitude IS NOT NULL').search_for(@search_text).first if customer.nil?
-    latitude = (customer.is_a? Customer) ? customer.lat : customer.latitude
-    longitude = (customer.is_a? Customer) ? customer.lng : customer.longitude
 
-    @customers, @leads, @resaurants = near_by_customers(latitude, longitude, radius)
+    if customer.nil?
+      @customers = []
+      @leads = []
+      @restaurants = []
+    else
+      latitude = (customer.is_a? Customer) ? customer.lat : customer.latitude
+      longitude = (customer.is_a? Customer) ? customer.lng : customer.longitude
+
+      @customers, @leads, @resaurants = near_by_customers(latitude, longitude, radius)
+    end
   end
 
   def map_geocode

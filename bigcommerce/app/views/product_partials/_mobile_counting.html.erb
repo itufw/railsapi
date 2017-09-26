@@ -1,9 +1,6 @@
 
-<head>
-  <meta content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0" name="viewport" />
-</head>
+<meta content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0" name="viewport" />
 
-<%= title 'Warehouse'%>
 <%= form_for @warehouse_examining, :url => {:controller => "product", :action => "warehouse_counting"}  do |f| %>
 <%= hidden_field_tag :pending_products, @product_list, multiple: true%>
 <%= f.hidden_field :product_name%>
@@ -34,18 +31,20 @@
       <%= f.fields_for "product", @product do |product_form|%>
         <%= product_form.hidden_field :id %>
         <li class="value-one">
-          <b>Size</b><%= product_form.number_field :case_size, min: 0, max: 100, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Case Size' %>
-        </li>
-        <li class="value-one">
           <b>Location</b>
           <%= product_form.text_field :row, size: 5, placeholder: 'row'%>
           <%= product_form.text_field :column, size: 5, placeholder:'column'%>
           <%= product_form.text_field :area, size: 5, placeholder:'area'%>
         </li>
+      <li class="value-one">
+        <b>Size / Packs:</b>
+        <%= product_form.number_field :case_size, min: 0, max: 100, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Case Size' %>
+        <%= f.number_field :count_pack, {min: 0, max: 999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Pack'} %>
+        <%= f.number_field :count_loose, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Loose'} %>
+        <%= f.number_field :count_sample, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Sample'} %>
+      </li>
       <% end %>
-      <li class="value-one"><b>Packs:</b><%= f.number_field :count_pack, {min: 0, max: 999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Pack'} %></li>
-      <li class="value-one"><b>Loose:</b><%= f.number_field :count_loose, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Loose'} %></li>
-      <li class="value-one"><b>Sample:</b><%= f.number_field :count_sample, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Sample'} %></li>
+
       <li class="value-one">
         <b>Stock</b> <i class="count-total">0</i>
       </li>
@@ -76,9 +75,10 @@
         <div style="align: center;">
           <%= submit_tag 'Save', class: 'btn btn-primary'%>
           <%= submit_tag 'Skip', class: 'btn btn-default'%>
-          <div class="col-md-2 col-xs-3" style="float: right;">
+          <div class="col-md-2 col-xs-4" style="float: right;">
+            Latter:
             <input type="checkbox" name="latter_count" id="ios-checkbox" class="ios-toggle"/>
-            <label for="ios-checkbox" class="checkbox-label" data-off="Now" data-on="Yes">Latter</label>
+            <label for="ios-checkbox" class="checkbox-label" data-off="Now" data-on="Yes"></label>
           </div>
         </div>
       </li>
