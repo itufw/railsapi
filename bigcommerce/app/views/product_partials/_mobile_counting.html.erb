@@ -63,8 +63,7 @@
         <li class="value-one"><b>VC</b><%= f.number_field :count_vc, {min: 0, max: 99999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'vc', class: 'distribuetd', value: @product_vc.inventory} %></li>
       <% end %>
       <li class="value-one">
-        <b>Difference:       <i class="difference">0</i></b>
-        <b>Remaining:</b>
+        <b>Difference:       <i class="difference">0</i>        Remaining:</b>
         <i class="remain-stock">0</i>
         <%= f.hidden_field :current_total, readonly: true%>
         <%= f.hidden_field :count_total, class: 'count-total' %>
