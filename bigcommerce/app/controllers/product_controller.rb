@@ -255,10 +255,10 @@ class ProductController < ApplicationController
       pending_products.append(warehouse_params[:product_no_ws_id]) unless params[:latter_count].nil?
 
       if params[:commit]=='Save'
-        if WarehouseExamining.duplicated(warehouse_params[:id]).blank?
+        if WarehouseExamining.duplicated(warehouse_params[:product_no_ws_id]).blank?
           warehouse = WarehouseExamining.new()
         else
-          warehouse = WarehouseExamining.duplicated(warehouse_params[:id]).first
+          warehouse = WarehouseExamining.duplicated(warehouse_params[:product_no_ws_id]).first
         end
         warehouse.update_attributes(warehouse_params.merge({count_staff_id: session[:user_id], count_date: Time.now().to_s(:db)}))
       end
