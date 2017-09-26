@@ -170,7 +170,7 @@ class OrderController < ApplicationController
 
       if products.map(&:product_id).include?product_id.to_i
         # update
-        product = products.where("product_id = ? AND updated_at < ?", product_id, (Time.now-1.minutes).to_s(:db)).first
+        product = products.where("product_id = ? AND updated_at < ?", product_id, (Time.now-2.minutes).to_s(:db)).first
 
         next if product.nil?
 
@@ -191,9 +191,10 @@ class OrderController < ApplicationController
           'order_discount': order.discount_rate, 'price_handling': handling_fee,\
           'price_inc_tax': product.price_discounted * (1 + gst),\
           'price_wet': (product.price_discounted / (1 + wet) - handling_fee) * wet,\
-          'price_gst': product.price_discounted * gst, 'updated_by': session[:user_id]}
+          'price_gst': product.price_discounted * gst, 'updated_by': session[:user_id],\
+          'updated_at': Time.now.to_s(:db)}
       end
-      product.assign_attributes(product_attributes)
+      product.update_attributes(product_attributes)
       products_container.append(product)
     end
 

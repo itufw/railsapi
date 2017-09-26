@@ -308,6 +308,10 @@ class ProductController < ApplicationController
     end
   end
 
+  def warehouse_review
+    p = ccccc
+  end
+
   def fetch_product_details
     @product = Product.find(params[:product_id])
     respond_to do |format|
