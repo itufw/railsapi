@@ -1,7 +1,7 @@
 
 <meta content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0" name="viewport" />
 
-<%= form_for @warehouse_examining, :url => {:controller => "product", :action => "warehouse_counting"}  do |f| %>
+<%= form_for @warehouse_examining, :url => {controller: 'product', action: "update"}  do |f| %>
 <%= hidden_field_tag :pending_products, @product_list, multiple: true%>
 <%= f.hidden_field :product_name%>
 <%= f.hidden_field :product_no_ws_id%>
@@ -39,11 +39,12 @@
       <li class="value-one">
         <b>Size / Packs:</b>
         <%= product_form.number_field :case_size, min: 0, max: 100, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Case Size' %>
+        <% end %>
+
         <%= f.number_field :count_pack, {min: 0, max: 999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Pack'} %>
         <%= f.number_field :count_loose, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Loose'} %>
         <%= f.number_field :count_sample, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Sample'} %>
       </li>
-      <% end %>
 
       <li class="value-one">
         <b>Stock</b> <i class="count-total">0</i>

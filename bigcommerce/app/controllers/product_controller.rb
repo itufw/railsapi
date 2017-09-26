@@ -229,29 +229,52 @@ class ProductController < ApplicationController
   end
 
   def update
-    if params[:new_product]=='1' && (product_params[:name_no_vintage].nil? || product_params[:name_no_ws].nil?)
-      flash[:error] = 'Incorrect!'
-      redirect_to :back and return
-    elsif params[:new_product]=='1'
-      product_no_ws = ProductNoWs.where("name LIKE ? ", '%' + product_params[:name_no_ws].to_s + '%').first
-      if product_no_ws.nil?
-        product_no_ws = ProductNoWs.new({name: product_params[:name_no_ws], product_no_vintage_id: product_params[:product_no_vintage_id]})
-        product_no_ws.save
+    if params[:warehouse_examining].nil?
+      if params[:new_product]=='1' && (product_params[:name_no_vintage].nil? || product_params[:name_no_ws].nil?)
+        flash[:error] = 'Incorrect!'
+        redirect_to :back and return
+      elsif params[:new_product]=='1'
+        product_no_ws = ProductNoWs.where("name LIKE ? ", '%' + product_params[:name_no_ws].to_s + '%').first
+        if product_no_ws.nil?
+          product_no_ws = ProductNoWs.new({name: product_params[:name_no_ws], product_no_vintage_id: product_params[:product_no_vintage_id]})
+          product_no_ws.save
+        end
       end
+
+      product = Product.find(params[:product][:id])
+      product.assign_attributes(product_params)
+      product.product_no_ws_id = product_no_ws.id unless product_no_ws.nil?
+      product.producer_country_id = product.producer.producer_country_id unless product.producer.nil?
+      product.name_no_vintage = product.product_no_vintage.name unless product.product_no_vintage.nil?
+      product.save
+
+      redirect_to action: 'summary', product_id: product.id, product_name: product.name, transform_column: 'product_id', total_stock: product.inventory, pending_stock: product.inventory and return
+    else
+      # Warehouse Counting
+      pending_products = params[:pending_products].split()
+      pending_products.append(warehouse_params[:product_no_ws_id]) unless params[:latter_count].nil?
+
+      if params[:commit]=='Save'
+        if WarehouseExamining.duplicated(warehouse_params[:id]).blank?
+          warehouse = WarehouseExamining.new()
+        else
+          warehouse = WarehouseExamining.duplicated(warehouse_params[:id]).first
+        end
+        warehouse.update_attributes(warehouse_params.merge({count_staff_id: session[:user_id], count_date: Time.now().to_s(:db)}))
+      end
+
+      # if no more pending products to be Counted
+      # return to dashboard
+      if pending_products.blank?
+        flash[:success] = 'Counted all selected product, please review it!'
+        redirect_to controller: 'sales', action: 'sales_dashboard' and return
+      end
+      redirect_to action: 'warehouse', pending_products: pending_products and return
     end
-
-    product = Product.find(params[:product][:id])
-    product.assign_attributes(product_params)
-    product.product_no_ws_id = product_no_ws.id unless product_no_ws.nil?
-    product.producer_country_id = product.producer.producer_country_id unless product.producer.nil?
-    product.name_no_vintage = product.product_no_vintage.name unless product.product_no_vintage.nil?
-    product.save
-
-    redirect_to action: 'summary', product_id: product.id, product_name: product.name, transform_column: 'product_id', total_stock: product.inventory, pending_stock: product.inventory
   end
 
   def warehouse
-    # if browser.device.mobile?
+    if browser.device.mobile?
       @product_list = (params[:pending_products].nil?) ? ProductNoWs.counting : ProductNoWs.filter_by_ids(params[:pending_products])
       @product = @product_list.first
       @product_list = @product_list.reject{|x| x==@product}.map(&:id)
@@ -280,30 +303,9 @@ class ProductController < ApplicationController
 
       @warehouse_examining.current_total = @warehouse_examining.current_stock.to_i + @warehouse_examining.allocation.to_i + @warehouse_examining.on_order.to_i
       @warehouse_examining.count_size = @product.case_size
-    # else
-      # @warehouse_reviews = WarehouseExamining.pending
-    # end
-  end
-
-  def warehouse_counting
-    pending_products = params[:pending_products].split()
-    pending_products.append(warehouse_params[:product_no_ws_id]) unless params[:latter_count].nil?
-    if params[:commit]=='Save'
-      if WarehouseExamining.duplicated(warehouse_params[:id]).blank?
-        warehouse = WarehouseExamining.new()
-      else
-        warehouse = WarehouseExamining.duplicated(warehouse_params[:id]).first
-      end
-      warehouse.update_attributes(warehouse_params.merge({count_staff_id: session[:user_id], count_date: Time.now().to_s(:db)}))
+    else
+      @warehouse_reviews = WarehouseExamining.pending
     end
-
-    # if no more pending products to be Counted
-    # return to dashboard
-    if pending_products==''
-      flash[:success] = 'Counted all selected product, please review it!'
-      redirect_to controller: 'sales', action: 'dashboard' and return
-    end
-    redirect_to action: 'warehouse', pending_products: pending_products
   end
 
   def fetch_product_details
