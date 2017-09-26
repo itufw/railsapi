@@ -37,12 +37,12 @@
           <%= product_form.text_field :area, size: 8, placeholder:'area'%>
         </li>
       <li class="value-one">
-        <%= product_form.number_field :case_size, min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Case Size' %>
+        <%= product_form.number_field :case_size, min: 0, max: 99999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Case Size' %>
         <% end %>
 
-        <%= f.number_field :count_pack, {min: 0, max: 999999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Pack'} %>
-        <%= f.number_field :count_loose, {min: 0, max: 99999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Loose'} %>
-        <%= f.number_field :count_sample, {min: 0, max: 99999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Sample'} %>
+        <%= f.number_field :count_pack, {min: 0, max: 999999999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Pack'} %>
+        <%= f.number_field :count_loose, {min: 0, max: 9999999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Loose'} %>
+        <%= f.number_field :count_sample, {min: 0, max: 9999999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Sample'} %>
       </li>
 
       <li class="value-one">
@@ -76,7 +76,6 @@
           <%= submit_tag 'Save', class: 'btn btn-success btn-lg'%>
           <%= submit_tag 'Skip', class: 'btn btn-default btn-lg'%>
           <div class="col-md-2 col-xs-4" style="float: right;">
-            Latter:
             <input type="checkbox" name="latter_count" id="ios-checkbox" class="ios-toggle"/>
             <label for="ios-checkbox" class="checkbox-label" data-off="Now" data-on="Yes"></label>
           </div>
@@ -99,12 +98,12 @@
     $('input.distribuetd').each(function () {
       distributed += (parseInt($(this).val()) || 0);
     });
-    var difference = parseInt($('#warehouse_examining_current_stock').val()) - total;
+    var difference = total -  parseInt($('#warehouse_examining_current_total').val());
 
     $('.count-total').val(total);
     $('.difference').val(difference);
     $('i.count-total').html(total);
     $('i.difference').html(difference);
-    $('i.remain-stock').html(total-distributed);
+    $('i.remain-stock').html(parseInt($('#warehouse_examining_current_stock').val())-distributed);
   });
 </script>
