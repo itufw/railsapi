@@ -32,9 +32,9 @@
         <%= product_form.hidden_field :id %>
         <li class="value-one">
           <b>Location</b>
-          <%= product_form.text_field :row, size: 8, placeholder: 'row'%>
-          <%= product_form.text_field :column, size: 8, placeholder:'column'%>
-          <%= product_form.text_field :area, size: 8, placeholder:'area'%>
+          <%= product_form.text_field :row, size: 6, placeholder: 'row'%>
+          <%= product_form.text_field :column, size: 6, placeholder:'column'%>
+          <%= product_form.text_field :area, size: 6, placeholder:'area'%>
         </li>
       <li class="value-one">
         <%= product_form.number_field :case_size, min: 0, max: 99999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Case Size' %>
@@ -63,13 +63,12 @@
         <li class="value-one"><b>VC</b><%= f.number_field :count_vc, {min: 0, max: 99999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'vc', class: 'distribuetd', value: @product_vc.inventory} %></li>
       <% end %>
       <li class="value-one">
-        <b>Difference</b> <i class="difference">0</i>
+        <b>Difference:<i class="difference">0</i></b>
+        <b>Remaining:<i class="remain-stock">0</i></b>
+
         <%= f.hidden_field :current_total, readonly: true%>
         <%= f.hidden_field :count_total, class: 'count-total' %>
         <%= f.hidden_field :difference, class: 'difference' %>
-      </li>
-      <li class="value-one">
-        <b>Remaining</b><i class="remain-stock">0</i>
       </li>
       <li>
         <div style="align: center;">
