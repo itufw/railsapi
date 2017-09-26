@@ -260,7 +260,10 @@ class ProductController < ApplicationController
         else
           warehouse = WarehouseExamining.duplicated(warehouse_params[:product_no_ws_id]).first
         end
+        warehouse.count_size = params[:warehouse_examining][:product][:case_size]
         warehouse.update_attributes(warehouse_params.merge({count_staff_id: session[:user_id], count_date: Time.now().to_s(:db)}))
+
+        ProductNoWs.find(params[:warehouse_examining][:product][:id]).update(params[:warehouse_examining][:product])
       end
 
       # if no more pending products to be Counted

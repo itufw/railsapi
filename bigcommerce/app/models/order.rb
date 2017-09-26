@@ -23,7 +23,7 @@ class Order < ActiveRecord::Base
   belongs_to :order_history
   belongs_to :xero_invoice
 
-  after_validation :record_history, on: [:update, :delete], unless: ->(obj){ obj.xero_invoice_number_changed? or obj.xero_invoice_id_changed?}
+  after_validation :record_history, on: [:update, :delete], unless: ->(obj){ obj.xero_invoice_number_changed? or obj.xero_invoice_id_changed? or !obj.total_inc_tax_changed?}
   after_validation :cancel_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id == 5}
   after_validation :recovery_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id_was == 5}
   after_validation :bigcommerce_status_update, on: [:update], if: ->(obj){obj.status_id_changed? and obj.source=='bigcommerce' and [2,3,4,5,6,7,8,9,10,11,12,13,26].include?obj.status_id and obj.last_updated_by!=34}
@@ -425,13 +425,13 @@ class Order < ActiveRecord::Base
     '#{self.wet_was.to_f}', '#{self.gst_was.to_f}',\
     '#{self.active_was.to_i}', '#{self.xero_invoice_id_was.to_s}', '#{self.xero_invoice_number_was.to_s}',\
     '#{self.source_was.to_s}', '#{self.source_id_was.to_s}', '#{self.date_created_was.to_s(:db)}',\
-    '#{self.created_by_was.to_i}', '#{self.last_updated_by_was.to_i}', '#{self.created_at_was.to_s(:db)}', '#{self.updated_at_was.to_s(:db)}')"
+    '#{self.created_by_was.to_i}', '#{self.last_updated_by_was.to_i}', '#{self.updated_at_was.to_s(:db)}')"
     sql = "INSERT INTO order_histories(order_id, customer_id, status_id, courier_status_id,\
     account_status, street, city, state, postcode, country, address, staff_id,\
     total_inc_tax, qty, items_shipped, subtotal, discount_rate, discount_amount,\
     handling_cost, shipping_cost, wrapping_cost, wet, gst,\
     active, xero_invoice_id, xero_invoice_number, source, source_id, date_created,\
-    created_by, last_updated_by, created_at, updated_at) VALUES #{order_attributes}"
+    created_by, last_updated_by, updated_at) VALUES #{order_attributes}"
 
     ActiveRecord::Base.connection.execute(sql)
   end
