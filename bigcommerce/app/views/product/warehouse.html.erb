@@ -1,4 +1,7 @@
 <%= title 'Warehouse'%>
 
+<% if browser.device.mobile? %>
   <%= render 'product_partials/mobile_counting' %>
-  <!-- render 'product_partials/desktop_review' -->
+<% else %>
+  <%= render 'product_partials/desktop_review' %>
+<% end %>
