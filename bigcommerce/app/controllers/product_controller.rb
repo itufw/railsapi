@@ -263,7 +263,8 @@ class ProductController < ApplicationController
         warehouse.count_size = params[:warehouse_examining][:product][:case_size]
         warehouse.update_attributes(warehouse_params.merge({count_staff_id: session[:user_id], count_date: Time.now().to_s(:db)}))
 
-        ProductNoWs.find(params[:warehouse_examining][:product][:id]).update(params[:warehouse_examining][:product])
+        ProductNoWs.find(params[:warehouse_examining][:product][:id])
+         .update(params[:warehouse_examining][:product].permit(:row, :column, :area, :case_size))
       end
 
       # if no more pending products to be Counted
