@@ -44,7 +44,7 @@ Rails.application.routes.draw do
   post 'contact/edit_contact', to: 'contact#contact_edition'
 
   # this needs to be replaced sometime
-  match ':controller(/:action(/:id))', via: %i[get post]
+  match ':controller(/:action(/:id))', via: %i[get post patch]
 
   resources :calendar do
     get :autocomplete_customer_tag_name, on: :collection

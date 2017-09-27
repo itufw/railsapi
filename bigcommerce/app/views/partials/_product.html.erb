@@ -58,6 +58,8 @@
 
 <script type="text/javascript">
   var flags = $('.count-select');
+	var checkboxes = $('input[id*=selected_product]');
+
 	$('.count-select').click(function(){
 		var link = "/fetch_product_selected?product_no_ws_id=" + $(this).attr('product')
 		$.ajax({

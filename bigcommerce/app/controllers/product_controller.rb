@@ -316,6 +316,7 @@ class ProductController < ApplicationController
 
   def warehouse_review
     p = ccccc
+    
   end
 
   def fetch_product_details

@@ -222,7 +222,7 @@ class XeroInvoice < ActiveRecord::Base
       sql = "xero_invoices.amount_due > 0 AND ("
       select_days.each do |days|
         start_date, end_date = days.split('|')
-        sql += " (xero_invoices.due_date>'#{start_date}' AND xero_invoices.due_date<'#{end_date}')"
+        sql += " (xero_invoices.due_date>='#{start_date}' AND xero_invoices.due_date<'#{end_date}')"
         sql += " OR "
       end
       sql = sql[0..-4]
@@ -234,7 +234,7 @@ class XeroInvoice < ActiveRecord::Base
         sql = "xero_invoices.amount_due > 0 AND ("
         select_days.each do |days|
           start_date, end_date = days.split('|')
-          sql += " (xero_invoices.date>'#{start_date}' AND xero_invoices.date<'#{end_date}')"
+          sql += " (xero_invoices.date>='#{start_date}' AND xero_invoices.date<'#{end_date}')"
           sql += " OR "
         end
         sql = sql[0..-4]

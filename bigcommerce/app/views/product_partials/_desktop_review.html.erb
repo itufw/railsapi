@@ -1,4 +1,4 @@
-<%= form_tag({:controller => "customer", :action => customer_filter_path}, {:method => "get"}) do %>
+<%= form_tag({:controller => 'product', :action => 'warehouse_review'}, {:method => "get"}) do %>
 <table class="reference-table" style="text-align: center; min-width: 10px;">
   <thead>
     <tr>
@@ -63,5 +63,5 @@
     <% end %>
   <% end %>
 </table>
-
+  <%= submit_tag "Confirm!",class: 'btn btn-primary'%>
 <% end %>
