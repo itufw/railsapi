@@ -257,5 +257,15 @@ class SalesController < ApplicationController
     # stats View!
     # helpers - > sales_helper
     @stats_info, @stats_sum = stats_info(@product_ids, @product_name_h, @transform_column, @inventory_h, @pending_stock_h) if @checked_stats
+
+    # product Helper
+    # Product Selection for Counting
+    unless params[:selected_product].nil?
+      selected = params[:selected_product].select{|key, value| value=='1'}.keys()
+      unselected = params[:selected_product].select{|key, value| value=='0'}.keys()
+      ProductNoWs.where(id: selected).update_all(selected: 1) unless selected.blank?
+      ProductNoWs.where(id: unselected).update_all(selected: 0) unless unselected.blank?
+    end
+    @count_selected = ProductNoWs.where(selected: 1).map(&:id) if @transform_column=="product_no_ws_id"
   end
 end
