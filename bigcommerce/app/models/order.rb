@@ -114,6 +114,11 @@ class Order < ActiveRecord::Base
     all
   end
 
+  def self.customer_staff_filter(staff_id)
+    return includes(:customer).where('customers.staff_id = ?', staff_id).references(:customers) unless staff_id.nil?
+    all
+  end
+
   def self.product_customer_filter(product_ids, customer_ids)
     return includes(:order_products).where('order_products.product_id IN (?)', product_ids).references(:order_products) if customer_ids.nil? || customer_ids.empty?
     includes(:order_products).where('order_products.product_id IN (?) OR orders.customer_id IN (?)', product_ids, customer_ids).references(:order_products)
