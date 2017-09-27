@@ -41,8 +41,8 @@
       <td><%= warehouse_count.product_name%></td>
       <td><%= warehouse_count.current_dm if warehouse_count.current_dm>0 %></td>
       <td><%= warehouse_count.current_vc if warehouse_count.current_vc>0 %></td>
-      <td><%= warehouse_count.current_ws if warehouse_count.current_ws>0 %></td>
       <td><%= warehouse_count.current_retail if warehouse_count.current_retail>0 %></td>
+      <td><%= warehouse_count.current_ws if warehouse_count.current_ws>0 %></td>
       <td><%= warehouse_count.on_order %></td>
       <td><%= warehouse_count.allocation %></td>
       <td><%= warehouse_count.current_stock %></td>
@@ -52,10 +52,10 @@
       <td><%= warehouse.text_field :count_sample, size: 5%></td>
       <td><%= warehouse.text_field :count_total, size: 5, readonly: true%></td>
       <td><%= warehouse_count.difference%></td>
-      <td><%= warehouse.text_field :count_dm, size: 5%></td>
-      <td><%= warehouse.text_field :count_vc, size: 5%></td>
-      <td><%= warehouse.text_field :count_retail, size: 5%></td>
-      <td><%= warehouse.text_field :count_ws, size: 5%></td>
+      <td><%= warehouse.text_field :count_dm, size: 5 if warehouse_count.current_dm>0%></td>
+      <td><%= warehouse.text_field :count_vc, size: 5 if warehouse_count.current_vc>0%></td>
+      <td><%= warehouse.text_field :count_retail, size: 5 if warehouse_count.current_retail>0%></td>
+      <td><%= warehouse.text_field :count_ws, size: 5 if warehouse_count.current_ws>0%></td>
       <td><%= warehouse_count.count_date.strftime('%d/%m %H:%M')%></td>
       <td><%= warehouse_count.creator.nickname %></td>
       <td></td>
