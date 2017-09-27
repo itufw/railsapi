@@ -29,10 +29,9 @@
 		<tr>
 			<td><%= link_to customer_name(c), controller: 'customer', action: 'summary', customer_id: c.id, customer_name: customer_name(c) %></td>
 			<% sums_dates_h = give_sum_date_h(c.id, @customer_sum_h) %>
-			<td class="num"><%= sums_dates_h.values().sum %></td>
-
+			<td class="num"><%= link_to sums_dates_h.values().sum, controller: 'order', action: 'all', end_date: @dates.max.to_s, start_date: @dates.min.to_s, search: '"'+customer_name(c)+'"' %></td>
 			<% @dates_paired.keys.each do |d| %>
-				<td class="num"><%= exists_in_h(sums_dates_h, d) %></td>
+				<td class="num"><%= link_to exists_in_h(sums_dates_h, d), controller: 'order', action: 'all', end_date: @dates_paired[d].max.to_s, start_date: @dates_paired[d].min.to_s, search: '"'+customer_name(c)+'"' %></td>
 			<% end %>
 		</tr>
 

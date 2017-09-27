@@ -34,30 +34,33 @@
     </tr>
   </thead>
   <% @warehouse_reviews.each do |warehouse_count|%>
+  <%= fields_for "warehouse[#{warehouse_count.id}]", warehouse_count do |warehouse| %>
     <tr>
+      <%= warehouse.hidden_field :id %>
       <td><%= warehouse_count.product_no_ws_id%></td>
       <td><%= warehouse_count.product_name%></td>
-      <td><%= warehouse_count.current_dm %></td>
-      <td><%= warehouse_count.current_vc %></td>
-      <td><%= warehouse_count.current_ws %></td>
-      <td><%= warehouse_count.current_retail %></td>
+      <td><%= warehouse_count.current_dm if warehouse_count.current_dm>0 %></td>
+      <td><%= warehouse_count.current_vc if warehouse_count.current_vc>0 %></td>
+      <td><%= warehouse_count.current_ws if warehouse_count.current_ws>0 %></td>
+      <td><%= warehouse_count.current_retail if warehouse_count.current_retail>0 %></td>
       <td><%= warehouse_count.on_order %></td>
       <td><%= warehouse_count.allocation %></td>
       <td><%= warehouse_count.current_stock %></td>
-      <td><%= warehouse_count.count_size%></td>
-      <td><%= warehouse_count.count_pack%></td>
-      <td><%= warehouse_count.count_loose%></td>
-      <td><%= warehouse_count.count_sample%></td>
-      <td><%= warehouse_count.count_total%></td>
+      <td><%= warehouse.text_field :count_size, size: 5%></td>
+      <td><%= warehouse.text_field :count_pack, size: 5%></td>
+      <td><%= warehouse.text_field :count_loose, size: 5%></td>
+      <td><%= warehouse.text_field :count_sample, size: 5%></td>
+      <td><%= warehouse.text_field :count_total, size: 5, readonly: true%></td>
       <td><%= warehouse_count.difference%></td>
-      <td><%= warehouse_count.count_dm%></td>
-      <td><%= warehouse_count.count_vc%></td>
-      <td><%= warehouse_count.count_retail%></td>
-      <td><%= warehouse_count.count_ws%></td>
+      <td><%= warehouse.text_field :count_dm, size: 5%></td>
+      <td><%= warehouse.text_field :count_vc, size: 5%></td>
+      <td><%= warehouse.text_field :count_retail, size: 5%></td>
+      <td><%= warehouse.text_field :count_ws, size: 5%></td>
       <td><%= warehouse_count.count_date.strftime('%d/%m %H:%M')%></td>
       <td><%= warehouse_count.creator.nickname %></td>
       <td></td>
     </tr>
+    <% end %>
   <% end %>
 </table>
 
