@@ -30,4 +30,11 @@ module ProductHelper
     return '--' if monthly_average == 0
     total_stock / monthly_average
   end
+
+  def product_selection(params)
+    selected = params.select{|key, value| value=='1'}.keys()
+    unselected = params.select{|key, value| value=='0'}.keys()
+    ProductNoWs.where(id: selected).update_all(selected: 1) unless selected.blank?
+    ProductNoWs.where(id: unselected).update_all(selected: 0) unless unselected.blank?
+  end
 end

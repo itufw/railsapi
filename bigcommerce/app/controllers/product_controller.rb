@@ -35,6 +35,8 @@ class ProductController < ApplicationController
       transform_product_data(@transform_column, filtered_products)
     display_all(params)
 
+    # product Helper
+    product_selection(params[:selected_product]) unless params[:selected_product].nil?
     @count_selected = ProductNoWs.where(selected: 1).map(&:id) if @transform_column=="product_no_ws_id"
   end
 

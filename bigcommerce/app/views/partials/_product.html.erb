@@ -16,6 +16,7 @@
 			<td><%= id %></td>
 
 			<td>
+				<%= check_box 'selected_product', id, {checked: (@count_selected.include?id)? true : false}, '1', '0' if @transform_column=="product_no_ws_id" %>
 				<%= link_to @name_h[id], controller: 'product', action: 'summary',\
 			   product_id: id, product_name: @name_h[id], transform_column: @transform_column,\
 			   total_stock: @pending_stock_h[id].to_i + @stock_h[id].to_i, pending_stock: @pending_stock_h[id].to_i %>
