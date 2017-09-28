@@ -36,8 +36,8 @@ class ProductController < ApplicationController
     display_all(params)
 
     # product Helper
-    product_selection(params[:selected_product]) unless params[:selected_product].nil?
-    @count_selected = ProductNoWs.where(selected: 1).map(&:id) if @transform_column=="product_no_ws_id"
+    product_selection(params[:selected_product]) unless params[:selected_product].nil? || session[:default_group].nil?
+    @count_selected = StaffGroupItem.productNoWs(session[:default_group]).map(&:item_id) if @transform_column=="product_no_ws_id" && !session[:default_group].nil?
   end
 
   # Displays Overall Stats and Top Customers for Product
@@ -281,7 +281,7 @@ class ProductController < ApplicationController
 
   def warehouse
     if browser.device.mobile?
-      @product_list = (params[:pending_products].nil?) ? ProductNoWs.counting.map(&:id) : params[:pending_products]
+      @product_list = (params[:pending_products].nil?) ? StaffGroupItem.productNoWs(session[:default_group]).map(&:item_id) : params[:pending_products]
       @product = ProductNoWs.find(@product_list.first)
       @product_list = @product_list.reject{|x| x.to_s==@product.id.to_s}
 
@@ -316,7 +316,7 @@ class ProductController < ApplicationController
 
   def warehouse_review
     p = ccccc
-    
+
   end
 
   def fetch_product_details
@@ -326,13 +326,20 @@ class ProductController < ApplicationController
     end
   end
 
-  def fetch_product_selected
-    @product = ProductNoWs.find(params[:product_no_ws_id])
-    @product.update(selected: (@product.selected.to_i==0)? 1 : 0 )
-    respond_to do |format|
-      format.js
-    end
-  end
+  # Flag for product Selection
+  # Do Not Use
+
+  # def fetch_product_selected
+  #   unless session[:default_group].nil?
+  #     product = StaffGroupItem.products(session[:default_group], params[:product_no_ws_id])
+  #     product.delete if
+  #     @product = ProductNoWs.find(params[:product_no_ws_id])
+  #     @product.update(selected: (@product.selected.to_i==0)? 1 : 0 )
+  #   end
+  #   respond_to do |format|
+  #     format.js
+  #   end
+  # end
 end
 
 private
