@@ -83,17 +83,17 @@ var CompleteForm = function(){
     $('.incomplete_form').show();
   };
 };
-
 CompleteForm();
 
-$('.activity-customers').click(function(){
-  CompleteForm();
-});
-$('.remove_customer').click(function(){
+$(document).on('click', '.activity-customers, .remove_customer', function(){
   CompleteForm();
 });
 
-$('#task_subject_1').on('change',function(){
+$(document).on('change', '#task_subject_1', function(){
+  CompleteForm();
+});
+
+$(document).on('input', '#task_description', function(){
   CompleteForm();
 });
 </script>
