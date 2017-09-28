@@ -20,7 +20,6 @@
 				<%= link_to @name_h[id], controller: 'product', action: 'summary',\
 			   product_id: id, product_name: @name_h[id], transform_column: @transform_column,\
 			   total_stock: @pending_stock_h[id].to_i + @stock_h[id].to_i, pending_stock: @pending_stock_h[id].to_i %>
-				<%= "<i class='count-select glyphicon glyphicon-flag #{(@count_selected.include?id)? "red" : "grey"}' product='#{id}'></i>".html_safe if @transform_column=="product_no_ws_id" %>
 			</td>
 
 			<td class="num"><%= display_num(@price_h[id]) %></td>
@@ -57,14 +56,17 @@
 </span>
 
 <script type="text/javascript">
-  var flags = $('.count-select');
-	var checkboxes = $('input[id*=selected_product]');
+// Flag for product Selection
+// Do Not Use
 
-	$('.count-select').click(function(){
-		var link = "/fetch_product_selected?product_no_ws_id=" + $(this).attr('product')
-		$.ajax({
-				type: 'GET',
-				url: link
-		});
-	});
+  // var flags = $('.count-select');
+	// var checkboxes = $('input[id*=selected_product]');
+	//
+	// $('.count-select').click(function(){
+	// 	var link = "/fetch_product_selected?product_no_ws_id=" + $(this).attr('product')
+	// 	$.ajax({
+	// 			type: 'GET',
+	// 			url: link
+	// 	});
+	// });
 </script>

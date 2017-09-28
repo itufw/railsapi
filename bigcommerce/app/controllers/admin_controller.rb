@@ -172,6 +172,7 @@ class AdminController < ApplicationController
 
     def group_list
       group_creation(params) unless params[:staff_group].nil?
+      default_group_update(params) unless params[:default_group].nil?
 
       params = {}
       @groups = StaffGroup.personal(session[:user_id])
@@ -187,5 +188,9 @@ class AdminController < ApplicationController
       else
         flash[:error] = 'Duplicated Group Name!'
       end
+    end
+
+    def default_group_update(params)
+      session[:default_group] = params[:default_group]
     end
 end

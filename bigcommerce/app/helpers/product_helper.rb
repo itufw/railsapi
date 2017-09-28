@@ -34,7 +34,19 @@ module ProductHelper
   def product_selection(params)
     selected = params.select{|key, value| value=='1'}.keys()
     unselected = params.select{|key, value| value=='0'}.keys()
-    ProductNoWs.where(id: selected).update_all(selected: 1) unless selected.blank?
-    ProductNoWs.where(id: unselected).update_all(selected: 0) unless unselected.blank?
+
+    # Delete All unselected items
+    # staffGroupItems_unselected
+    staffGroupItems_unselected = StaffGroupItem.productNoWs(session[:default_group], unselected)
+    staffGroupItems_unselected.delete_all unless staffGroupItems_unselected.blank?
+
+    # Find the existing Products
+    staffGroupItems = StaffGroupItem.productNoWs(session[:default_group], selected)
+    # Insert New Products
+    (selected - staffGroupItems.map(&:item_id)).each do |product_id|
+      StaffGroupItem.new(staff_group_id: session[:default_group], item_id: product_id,\
+        item_model: 'ProductNoWs').save
+    end
+    flash[:success] = "Updated Group #{StaffGroup.find(session[:default_group]).group_name}"
   end
 end

@@ -79,8 +79,6 @@
               </ul>
             </li>
             <li><%= link_to "Admin", controller: "admin", action: "index" %></li>
-            <%else%>
-            <li><%= link_to "Password Update", controller: "admin", action: "admin" %></li>
             <% end%>
 
             <li class="dropdown">
@@ -93,36 +91,35 @@
                 <li><%= link_to "Add Task", controller: 'activity', action: 'add_activity'%></li>
                 <li><%= link_to "Calendar", controller: "calendar", action: "local_calendar" %></li>
                 <li><%= link_to "Events Check", controller: "calendar", action: "event_check_offline" %></li>
-                <% if user_full_right(session[:authority]) %>
-                <% if Rails.env.development? %>
-                <li><%= link_to "Sync", controller: "calendar", action: "event_censor" %></li>
-              <% else %>
-                <li><%= link_to "Sync", "http://cms.untappedwines.com.au/redirect" %></li>
-                <% end %>
-                <% end %>
+                <!-- if user_full_right(session[:authority])
+                if Rails.env.development?
+                <li> link_to "Sync", controller: "calendar", action: "event_censor" </li>
+                 else
+                <li>< link_to "Sync", "http://cms.untappedwines.com.au/redirect"</li>
+                 end
+                 end  -->
               </ul>
             </li>
-            <% if it_working(session[:user_id])%>
-
-            <li class="dropdown">
-              <a class="" data-toggle="dropdown" href="#">Event
-                <span class="caret"></span>
-              </a>
-              <ul class="dropdown-menu">
-                <li><%= link_to "My Note", controller: "task", action: "staff_task" %></li>
-                <li><%= link_to "Add Note", controller: "task", action: "add_task" %></li>
-                <li>Activity down there
-                <li>
-                <li><%= link_to "Add Note", controller: 'activity', action: 'add_note'%></li>
-                <li><%= link_to "Add Task", controller: 'activity', action: 'add_activity'%></li>
-                <li>Generate Order</li>
-                <li><%= link_to "Orders-Temp", controller: 'order', action: 'cms_order_all'%></li>
-              </ul>
-            </li>
-            <% end %>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li><%= link_to "Hi," + "  " + session[:username] %></li>
+            <li class="dropdown">
+              <a class="" data-toggle="dropdown" href="#"><%= "Hi," + "  " + session[:username] %></a>
+              <ul class="dropdown-menu">
+                <li><%= link_to 'My Group', controller: 'admin', action: 'group_list'%></li>
+                <li><%= link_to "Password Update", controller: "admin", action: "admin" %></li>
+                <li><%= link_to "My Note", controller: "task", action: "staff_task" %></li>
+                <% if it_working(session[:user_id])%>
+                  <li>In case you need it</li>
+                  <li><%= link_to "My Note", controller: "task", action: "staff_task" %></li>
+                  <li><%= link_to "Add Note", controller: "task", action: "add_task" %></li>
+                  <li>Activity down there</li>
+                  <li><%= link_to "Add Note", controller: 'activity', action: 'add_note'%></li>
+                  <li><%= link_to "Add Task", controller: 'activity', action: 'add_activity'%></li>
+                  <li>Generate Order</li>
+                  <li><%= link_to "Orders-Temp", controller: 'order', action: 'cms_order_all'%></li>
+                <% end %>
+              </ul>
+            </li>
             <li><%= link_to session[:authority]%></li>
             <li><%= link_to "Logout", controller: "access", action: "logout" %></li>
           </ul>

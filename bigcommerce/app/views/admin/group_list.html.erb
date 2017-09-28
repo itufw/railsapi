@@ -12,6 +12,12 @@
   <tr>
     <td><%= group.id %></td>
     <td><%= group.group_name%></td>
+    <td>
+      <!--Set Default Group -->
+      <%= link_to ('<i class="glyphicon glyphicon-heart" title="Set as default" style="color:  '+ (group.id.to_s==session[:default_group] ? 'red' : 'black') +';"></i>').html_safe,\
+        controller: 'admin', action: 'group_list', default_group: group.id
+      %>
+    </td>
   </tr>
   <% end %>
 </table>
@@ -24,7 +30,7 @@
         '<tr class="new-group">',
         '<td></td>',
         '<td><input type="text" name="staff_group[group_name]" id="staff_group_group_name"></td>',
-        '<td><input type="submit" name="commit" value="Submit" class="btn&nbsp;submit-button"></td>',
+        '<td><button name="submit" type="submit" class="btn btn-ok" value="Create!"><span class="glyphicon glyphicon-plus"></span></button></td>',
         '</tr>'
       ].join());
     }
