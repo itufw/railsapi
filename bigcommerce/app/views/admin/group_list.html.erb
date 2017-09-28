@@ -1,0 +1,32 @@
+<%= title session[:username]+"'s Groups"%>
+<h3>Groups</h3>
+<%= form_for @group, :url => {:controller => "admin", :action => "group_list"}  do |f|%>
+
+<table class="reference-table group-table table table-striped table-bordered table-hover table-responsive ">
+  <tr>
+    <th>ID</th>
+    <th>Group Name</th>
+    <th><i class="glyphicon glyphicon-plus add-group" title="Add!"></i></th>
+  </tr>
+  <% @groups.each do |group|%>
+  <tr>
+    <td><%= group.id %></td>
+    <td><%= group.group_name%></td>
+  </tr>
+  <% end %>
+</table>
+<% end %>
+
+<script type="text/javascript">
+  $('.add-group').click(function(){
+    if ($('.new-group').length<1){
+      $('.group-table').append([
+        '<tr class="new-group">',
+        '<td></td>',
+        '<td><input type="text" name="staff_group[group_name]" id="staff_group_group_name"></td>',
+        '<td><input type="submit" name="commit" value="Submit" class="btn&nbsp;submit-button"></td>',
+        '</tr>'
+      ].join());
+    }
+  });
+</script>
