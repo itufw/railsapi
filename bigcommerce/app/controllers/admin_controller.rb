@@ -169,4 +169,23 @@ class AdminController < ApplicationController
       end
       redirect_to :back
     end
+
+    def group_list
+      group_creation(params) unless params[:staff_group].nil?
+
+      params = {}
+      @groups = StaffGroup.personal(session[:user_id])
+      @group = StaffGroup.new(staff_id: session[:user_id])
+    end
+
+    def group_creation(params)
+      if params[:staff_group][:group_name].to_s == ""
+        flash[:error] = 'Group must have a name!'
+      elsif StaffGroup.duplicated(session[:user_id], params[:staff_group][:group_name]).blank?
+        StaffGroup.new({group_name: params[:staff_group][:group_name], staff_id: session[:user_id]}).save
+        flash[:success] = 'Group Created!'
+      else
+        flash[:error] = 'Duplicated Group Name!'
+      end
+    end
 end
