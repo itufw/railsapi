@@ -193,4 +193,25 @@ class AdminController < ApplicationController
     def default_group_update(params)
       session[:default_group] = params[:default_group]
     end
+
+    def fetch_group_detail
+      @group = StaffGroup.where(id: params[:group_id]).first
+      respond_to do |format|
+        format.js
+      end
+    end
+
+    def fetch_add_item
+      StaffGroupItem.new(staff_group_id: params[:group_id], item_model: params[:item_model], item_id: params[:item_id]).save
+      respond_to do |format|
+        format.js
+      end
+    end
+
+    def fetch_remove_item
+      StaffGroupItem.where(staff_group_id: params[:group_id], item_model: params[:item_model], item_id: params[:item_id]).delete_all
+      respond_to do |format|
+        format.js
+      end
+    end
 end

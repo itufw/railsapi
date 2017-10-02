@@ -87,4 +87,8 @@ class Staff < ActiveRecord::Base
     def self.order_by_order
         order(:staff_order)
     end
+
+    def name
+      nickname
+    end
 end

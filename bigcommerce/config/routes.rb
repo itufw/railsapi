@@ -24,6 +24,9 @@ Rails.application.routes.draw do
   get '/fetch_order_detail', to: 'order#fetch_order_detail', as: 'fetch_order_detail'
   get '/fetch_last_products', to: 'status#fetch_last_products', as: 'fetch_last_products'
   get '/fetch_product_selected', to: 'product#fetch_product_selected', as: 'fetch_product_selected'
+  get '/fetch_group_detail', to: 'admin#fetch_group_detail', as: 'fetch_group_detail'
+  get '/fetch_add_item', to: 'admin#fetch_add_item', as: 'fetch_add_item'
+  get '/fetch_remove_item', to: 'admin#fetch_remove_item', as: 'fetch_remove_item'
 
   get '/fetch_lead', to: 'lead#fetch_lead', as: 'fetch_lead'
   get '/fetch_product_details', to: 'product#fetch_product_details', as: 'fetch_product_details'

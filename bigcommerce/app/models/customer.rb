@@ -431,4 +431,8 @@ class Customer < ActiveRecord::Base
 
 		order
 	end
+
+	def name
+		actual_name
+	end
 end
