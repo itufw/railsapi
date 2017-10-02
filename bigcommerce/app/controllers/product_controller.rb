@@ -231,6 +231,8 @@ class ProductController < ApplicationController
   end
 
   def update
+    # Product Update
+    # IN Product Detail -> assign Country / Name
     if params[:warehouse_examining].nil?
       if params[:new_product]=='1' && (product_params[:name_no_vintage].nil? || product_params[:name_no_ws].nil?)
         flash[:error] = 'Incorrect!'
@@ -251,8 +253,9 @@ class ProductController < ApplicationController
       product.save
 
       redirect_to action: 'summary', product_id: product.id, product_name: product.name, transform_column: 'product_id', total_stock: product.inventory, pending_stock: product.inventory and return
+
+    # Warehouse Counting
     else
-      # Warehouse Counting
       pending_products = params[:pending_products].split()
       pending_products.append(warehouse_params[:product_no_ws_id]) unless params[:latter_count].nil?
 
@@ -317,8 +320,25 @@ class ProductController < ApplicationController
   end
 
   def warehouse_review
-    p = ccccc
-
+    params[:warehouse].values.each do |examining|
+      product_no_ws = ProductNoWs.find(examining[:product_no_ws_id])
+      # IMPORTANT
+      # Update Product Inventory
+      # Overwrite Master records
+      product_no_ws.products.each do |product|
+        if product.name.include?' DM'
+          product.inventory_overwrite(examining['count_dm']) if examining['count_dm'] && examining['count_dm']>0
+        elsif product.name.include?' VC'
+          product.inventory_overwrite(examining['count_vc']) if examining['count_vc'] && examining['count_vc']>0
+        elsif product.name.include?' WS'
+          product.inventory_overwrite(examining['count_ws']) if examining['count_ws'] && examining['count_ws']>0
+        elsif product.retail_ws=='R'
+          product.inventory_overwrite(examining['count_retail']) if examining['count_retail'] && examining['count_retail']>0
+        end
+      end
+      # Update examining and quit
+      WarehouseExamining.find(examining[:id]).update_attributes(examining.merge{authorised_staff_id: session[:user_id], authorised_date: Time.now().to_s(:db)})
+    end
   end
 
   def fetch_product_details
