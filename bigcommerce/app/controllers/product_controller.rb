@@ -337,7 +337,8 @@ class ProductController < ApplicationController
         end
       end
       # Update examining and quit
-      WarehouseExamining.find(examining[:id]).update_attributes(examining.merge{authorised_staff_id: session[:user_id], authorised_date: Time.now().to_s(:db)})
+      authorised = {authorised_staff_id: session[:user_id], authorised_date: Time.now().to_s(:db)}
+      WarehouseExamining.find(examining[:id]).update_attributes(examining.merge(authorised))
     end
   end
 
