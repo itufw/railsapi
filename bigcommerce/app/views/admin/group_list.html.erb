@@ -2,21 +2,28 @@
 <h3>Groups</h3>
 <%= form_for @group, :url => {:controller => "admin", :action => "group_list"}  do |f|%>
 
-<table class="reference-table group-table table table-striped table-bordered table-hover table-responsive ">
-  <tr>
-    <th>ID</th>
-    <th>Group Name</th>
-    <th><i class="glyphicon glyphicon-plus add-group" title="Add!"></i></th>
-  </tr>
+<table class="reference-table group-table table table-striped table-bordered table-hover table-responsive">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Group Name</th>
+      <th><i class="glyphicon glyphicon-plus add-group" title="Add!"></i></th>
+    </tr>
+  </thead>
   <% @groups.each do |group|%>
   <tr>
     <td><%= group.id %></td>
     <td><%= group.group_name%></td>
     <td>
       <!--Set Default Group -->
-      <%= link_to ('<i class="glyphicon glyphicon-heart" title="Set as default" style="color:  '+ (group.id.to_s==session[:default_group] ? 'red' : 'black') +';"></i>').html_safe,\
+      <%= link_to ('<i class="glyphicon glyphicon-heart" title="Set as default" style="color:  '+ (group.id.to_s==session[:default_group].to_s ? 'red' : 'black') +';"></i>').html_safe,\
         controller: 'admin', action: 'group_list', default_group: group.id
       %>
+    </td>
+  </tr>
+  <tr data-href="<%= fetch_group_detail_path(group_id: group.id) %>">
+    <td colspan="3">
+      <div class="group-items"></div>
     </td>
   </tr>
   <% end %>
@@ -27,12 +34,34 @@
   $('.add-group').click(function(){
     if ($('.new-group').length<1){
       $('.group-table').append([
-        '<tr class="new-group">',
+        '<tr class="new-group odd">',
         '<td></td>',
         '<td><input type="text" name="staff_group[group_name]" id="staff_group_group_name"></td>',
         '<td><button name="submit" type="submit" class="btn btn-ok" value="Create!"><span class="glyphicon glyphicon-plus"></span></button></td>',
         '</tr>'
       ].join());
     }
+  });
+
+
+  $(".group-table tr:odd").addClass("odd");
+  $(".group-table tr:not(.odd)").hide();
+  $(".group-table tr:first-child").show();
+
+  var item_divisions = null;
+
+  $(".group-table tr.odd").click(function () {
+      var trToToggle = $(this).next("tr");
+      $(".group-table tbody tr:not(.odd)").not(trToToggle).hide();
+      item_divisions = trToToggle.find('div.group-items');
+
+      var link = trToToggle.data('href');
+  		$.ajax({
+  				type: 'GET',
+  				url: link
+  		});
+
+      $(trToToggle).toggle();
+      $(this).find(".arrow").toggleClass("up");
   });
 </script>
