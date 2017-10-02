@@ -1,6 +1,8 @@
 class StaffGroupItem < ActiveRecord::Base
   belongs_to :staff_group
 
+  validates_uniqueness_of :item_id, scope: [:staff_group_id, :item_model]
+
   def self.filter_by_group(group_id)
     where(staff_group_id: group_id)
   end

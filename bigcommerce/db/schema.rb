@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170927060913) do
+ActiveRecord::Schema.define(version: 20171002024943) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -944,6 +944,8 @@ ActiveRecord::Schema.define(version: 20170927060913) do
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false
   end
+
+  add_index "staff_group_items", ["staff_group_id", "item_id", "item_model"], name: "index_staff_group_items", unique: true, using: :btree
 
   create_table "staff_groups", force: :cascade do |t|
     t.integer  "staff_id",   limit: 4

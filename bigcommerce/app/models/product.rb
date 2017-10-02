@@ -29,9 +29,6 @@ class Product < ActiveRecord::Base
   belongs_to :product_no_vintage
   belongs_to :product_no_ws
 
-  # DO NOT USE
-  after_validation :bigcommerce_inventory_overwrite, on: [:update], if: -> (obj){ obj.id == 2233 and obj.inventory_changed?}
-
   scoped_search on: %i[id name portfolio_region]
 
   self.per_page = 30
@@ -296,9 +293,15 @@ class Product < ActiveRecord::Base
     where('product_no_vintage_id IS NULL OR product_no_ws_id IS NULL OR producer_country_id IS NULL')
   end
 
+  def inventory_overwrite(inventory)
+    return false if inventory < 0
+    update(inventory: inventory)
+    bigcommerce_inventory_overwrite
+  end
+
   private
 
   def bigcommerce_inventory_overwrite
-    # Bigcommerce::Product.update(self.id, inventory_level: self.inventory)
+    Bigcommerce::Product.update(self.id, inventory_level: self.inventory)
   end
 end

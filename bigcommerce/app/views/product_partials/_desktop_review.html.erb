@@ -37,6 +37,8 @@
   <%= fields_for "warehouse[#{warehouse_count.id}]", warehouse_count do |warehouse| %>
     <tr>
       <%= warehouse.hidden_field :id %>
+      <%= warehouse.hidden_field :product_no_ws_id %>
+
       <td><%= warehouse_count.product_no_ws_id%></td>
       <td><%= warehouse_count.product_name%></td>
       <td><%= warehouse_count.current_dm if warehouse_count.current_dm>0 %></td>
@@ -63,5 +65,5 @@
     <% end %>
   <% end %>
 </table>
-  <%= submit_tag "Confirm!",class: 'btn btn-primary'%>
+  <center>  <%= submit_tag "Confirm!",class: 'btn btn-primary'%></center>
 <% end %>

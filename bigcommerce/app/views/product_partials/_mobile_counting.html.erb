@@ -63,8 +63,12 @@
         <li class="value-one"><b>VC</b><%= f.number_field :count_vc, {min: 0, max: 99999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'vc', class: 'distribuetd', value: @product_vc.inventory} %></li>
       <% end %>
       <li class="value-one">
-        <b>Difference:       <i class="difference">0</i>        Remaining:</b>
-        <i class="remain-stock">0</i>
+        <b>Difference:       <i class="difference">0</i></b>
+        <div class="col-md-2 col-xs-4" style="float: right; ">
+          <input type="checkbox" name="latter_count" id="ios-checkbox" class="ios-toggle"/>
+          <label for="ios-checkbox" class="checkbox-label" data-off="Now" data-on="Yes" style="margin-left: 10px;"></label>
+        </div>
+        Remaining:<i class="remain-stock">0</i>
         <%= f.hidden_field :current_total, readonly: true%>
         <%= f.hidden_field :count_total, class: 'count-total' %>
         <%= f.hidden_field :difference, class: 'difference' %>
@@ -73,10 +77,6 @@
         <div style="align: center;">
           <%= submit_tag 'Save', class: 'btn btn-success btn-lg'%>
           <%= submit_tag 'Skip', class: 'btn btn-default btn-lg'%>
-          <div class="col-md-2 col-xs-4" style="float: right;">
-            <input type="checkbox" name="latter_count" id="ios-checkbox" class="ios-toggle"/>
-            <label for="ios-checkbox" class="checkbox-label" data-off="Now" data-on="Yes"></label>
-          </div>
         </div>
       </li>
     </ul>
