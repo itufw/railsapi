@@ -1,19 +1,19 @@
 <%= title session[:username]+"'s Groups"%>
 <h3>Groups</h3>
-<%= form_for @group, :url => {:controller => "admin", :action => "group_list"}  do |f|%>
+<%= form_tag({controller: "admin", action: "group_list"}) do %>
 
 <table class="reference-table group-table table table-striped table-bordered table-hover table-responsive">
   <thead>
     <tr>
-      <th>ID</th>
       <th>Group Name</th>
+      <th>Owner</th>
       <th><i class="glyphicon glyphicon-plus add-group" title="Add!"></i></th>
     </tr>
   </thead>
   <% @groups.each do |group|%>
   <tr>
-    <td><%= group.id %></td>
-    <td><%= group.group_name%></td>
+    <td><%= group.group_name %></td>
+    <td><%= group.staff.nickname %></td>
     <td>
       <!--Set Default Group -->
       <%= link_to ('<i class="glyphicon glyphicon-heart" title="Set as default" style="color:  '+ (group.id.to_s==session[:default_group].to_s ? 'red' : 'black') +';"></i>').html_safe,\

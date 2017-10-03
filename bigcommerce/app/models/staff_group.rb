@@ -14,6 +14,10 @@ class StaffGroup < ActiveRecord::Base
     items.where(item_model: 'ProductNoWs')
   end
 
+  def self.staff_groups(staff_id)
+    joins(:items).where('staff_groups.staff_id = ? OR (staff_group_items.item_model LIKE "Staff" AND staff_group_items.item_id = ?)', staff_id, staff_id)
+  end
+
   def staffs
     items.where(item_model: 'Staff')
   end
