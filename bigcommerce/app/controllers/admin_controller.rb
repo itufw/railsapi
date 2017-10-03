@@ -175,8 +175,7 @@ class AdminController < ApplicationController
       default_group_update(params) unless params[:default_group].nil?
 
       params = {}
-      @groups = StaffGroup.personal(session[:user_id])
-      @group = StaffGroup.new(staff_id: session[:user_id])
+      @groups = StaffGroup.staff_groups(session[:user_id])
     end
 
     def group_creation(params)

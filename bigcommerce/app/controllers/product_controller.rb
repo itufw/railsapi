@@ -283,6 +283,12 @@ class ProductController < ApplicationController
   end
 
   def warehouse
+    # Assign new group
+    session[:default_group] = params[:selected_group] if params[:select_group] && (!session[:default_group] || StaffGroupItem.productNoWs(session[:default_group]).blank?)
+
+    if !session[:default_group] || StaffGroupItem.productNoWs(session[:default_group]).blank?
+      @group_list = StaffGroup.staff_groups(session[:user_id])
+    else
       @product_list = (params[:pending_products].nil?) ? StaffGroupItem.productNoWs(session[:default_group]).map(&:item_id) : params[:pending_products]
       @product = ProductNoWs.find(@product_list.first)
       @product_list = @product_list.reject{|x| x.to_s==@product.id.to_s}
@@ -311,6 +317,7 @@ class ProductController < ApplicationController
 
       @warehouse_examining.current_total = @warehouse_examining.current_stock.to_i + @warehouse_examining.allocation.to_i + @warehouse_examining.on_order.to_i
       @warehouse_examining.count_size = @product.case_size
+    end
   end
 
   # Temporary

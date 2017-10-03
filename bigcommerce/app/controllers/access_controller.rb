@@ -22,9 +22,9 @@ class AccessController < ApplicationController
       session[:authority] = authorized_user.user_type
       session[:state] = authorized_user.state
 
-      staffGroup = StaffGroup.personal(session[:user_id]).first
+      staffGroup = StaffGroup.personal(session[:user_id]).order(updated_at: :desc).first
       session[:default_group] = staffGroup.id unless staffGroup.nil?
-      
+
       flash[:success] = "You are now logged in."
       redirect_to controller: 'sales', action: 'sales_dashboard'
     else
