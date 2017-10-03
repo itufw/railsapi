@@ -15,7 +15,8 @@ class StaffGroup < ActiveRecord::Base
   end
 
   def self.staff_groups(staff_id)
-    joins(:items).where('staff_groups.staff_id = ? OR (staff_group_items.item_model LIKE "Staff" AND staff_group_items.item_id = ?)', staff_id, staff_id)
+    groups = StaffGroup.joins(:items).where('staff_groups.staff_id = ? OR (staff_group_items.item_model LIKE "Staff" AND staff_group_items.item_id = ?)', staff_id, staff_id)
+    where('id IN (?) OR staff_id = ?', groups.map(&:id), staff_id)
   end
 
   def staffs

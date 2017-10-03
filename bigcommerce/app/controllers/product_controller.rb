@@ -284,7 +284,7 @@ class ProductController < ApplicationController
 
   def warehouse
     # Assign new group
-    session[:default_group] = params[:selected_group] if params[:select_group] && (!session[:default_group] || StaffGroupItem.productNoWs(session[:default_group]).blank?)
+    session[:default_group] = params[:selected_group] if params[:selected_group]
 
     if !session[:default_group] || StaffGroupItem.productNoWs(session[:default_group]).blank?
       @group_list = StaffGroup.staff_groups(session[:user_id])
