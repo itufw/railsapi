@@ -21,6 +21,10 @@
         </tr>
       </table>
 
+    <% if @staff.id==45 %>
+    <%= render 'reminder_mailer_partials/signature_general'%>
+    <% else %>
     <%= render 'reminder_mailer_partials/signature_sales', staff: @staff %>
+    <% end %>
   </body>
 </html>

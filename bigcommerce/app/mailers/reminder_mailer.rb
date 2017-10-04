@@ -20,6 +20,10 @@ class ReminderMailer < ActionMailer::Base
     @customer = @order.customer
     @staff = @order.staff
 
+    # TODO
+    # Change it after new sales joined
+    @staff = Staff.find(45) if @staff.nickname=='Tasso'
+
     customer_address = %("#{@customer.actual_name}" <#{email_address}>)
     subject = "Untapped Fine Wines Order #{@order.id} – #{@customer.actual_name}"
     attachments["Invoice##{order_id}.pdf"] = print_single_invoice(@order)
