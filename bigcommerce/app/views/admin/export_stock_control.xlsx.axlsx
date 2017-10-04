@@ -3,19 +3,25 @@ wb = xlsx_package.workbook
 
 wb.add_worksheet(name: "Stock Control") do |sheet|
 
-  title_hash = {bg_color: '000000', fg_color: 'FFFFFF'}
-  black_cell = wb.styles.add_style title_hash
-  country_cell = wb.styles.add_style title_hash
+  winery_hash = {bg_color: '000000', fg_color: 'FFFFFF'}
+  country_hash = {b: true}
+
+  black_cell = wb.styles.add_style winery_hash
+  country_cell = wb.styles.add_style country_hash
 
 
   @countries.each do |country|
     sheet.add_row([country.name], style: [country_cell])
     country.producers.each do |producer|
-      sheet.add_row([producer.name, 'Case', 'Bot.', 'LUC'], style: [black_cell, black_cell, black_cell, black_cell])
+      next if producer.id==21
 
-      products = producer.products.select('id, name_no_winery AS name, SUM(inventory) AS stock, MAX(case_size) AS case_size, MIN(calculated_price)*1.29 AS luc, product_no_ws_id').group('product_no_ws_id').having('stock>0').order(name: :asc)
-      products.each do |product|
-        sheet.add_row [product.name, product.case_size, product.stock, product.luc]
+      sheet.add_row([nil, producer.name, 'Case', 'Bot.', 'RRP', 'LUC'], style: [black_cell, black_cell, black_cell, black_cell, black_cell, black_cell])
+
+      product_ids = producer.products.group('product_no_ws_id').map(&:product_no_ws_id)
+      product_ids.each do |product_id|
+        product = @product_hash[product_id]
+        next if product.nil?
+        sheet.add_row [product[:ws_id], product[:name], product[:case_size], product[:inventory], product[:rrp], product[:luc]]
       end
     end
   end
