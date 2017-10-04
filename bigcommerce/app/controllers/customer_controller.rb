@@ -282,6 +282,7 @@ class CustomerController < ApplicationController
                                      :address, :street, :street_2, :city, :state, :postcode,\
                                      :country, :SpecialInstruction1, :SpecialInstruction2,\
                                      :SpecialInstruction3, :tolerance_day, :account_type,\
-                                     :default_courier, :payment_method)
+                                     :default_courier, :payment_method, :phone,\
+                                     :email)
   end
 end

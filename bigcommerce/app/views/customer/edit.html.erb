@@ -53,6 +53,17 @@
   <%= f.text_field :country, placeholder: 'Country', class: 'address'%>
   <%= f.text_field :address, class: 'form-control quarter-size' %>
 
+  <div class="row">
+    <div class="col-md-6">
+      <%= f.label :phone, class: 'margin-from-top label-new' %>
+      <%= f.text_field :phone, class: 'form-control quarter-size' %>
+    </div>
+    <div class="col-md-6">
+      <%= f.label :email, class: 'margin-from-top label-new' %>
+      <%= f.text_field :email, class: 'form-control quarter-size' %>
+    </div>
+  </div>
+
   <%= f.label :special_instruction_for_fastway, class: 'margin-from-top label-new' %>
   <%= f.text_field :SpecialInstruction1, placeholder: 'SpecialInstruction1'%>
   <%= f.text_field :SpecialInstruction2, placeholder: 'SpecialInstruction2'%>

@@ -19,6 +19,9 @@
 		<%= submit_tag 'Shipment', value: 'Shipment', class: 'btn btn-danger' %>
 		<%= submit_tag 'ScotPac', value: 'ScotPac', class: 'btn btn-warning' %>
 	<% end %>
+	<%= link_to "Stock Control", {controller: "admin", action: "download_stock_control"}, class: "btn btn-primary" %>
+	<%= link_to "Stock Control-Excel", {controller: "admin", action: "export_stock_control", format: 'xlsx'}, class: "btn btn-primary" %>
+
 </div>
 
 <div style="margin-top: 50px;">

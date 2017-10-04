@@ -16,3 +16,17 @@
   align: "right";
   font-size: 9px;
 }
+
+.stock-control-table{
+  font-size: 4px;
+
+  .country tr{
+    background-color: white;
+  }
+  .producer th{
+    color: white;
+  }
+  .producer tr{
+    background-color: black;
+  }
+}

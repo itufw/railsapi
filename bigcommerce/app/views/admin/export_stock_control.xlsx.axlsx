@@ -1,0 +1,20 @@
+wb = xlsx_package.workbook
+
+wb.add_worksheet(name: "Stock Control") do |sheet|
+
+  black_cell = sheet.add_style bg_color: "00", fg_color: "FF"
+  country_cell = sheet.add_style bg_color: 'FF', fg_color: '00', border: { style: :thick, color: "00" }
+
+
+  @countries.each do |country|
+    sheet.add_row [country.name], style: [country_cell]
+    country.producers.each do |producer|
+      sheet.add_row [producer.name, 'Case', 'Bot.', 'LUC'], style: [black_cell, black_cell, black_cell, black_cell]
+
+      products = producer.products.select('id, name_no_winery AS name, SUM(inventory) AS stock, MAX(case_size) AS case_size, MIN(calculated_price)*1.29 AS luc, product_no_ws_id').group('product_no_ws_id').having('stock>0').order(name: :asc)
+      products.each do |product|
+        sheet.add_row [product.name, product.case_size, product.stock, product.luc]
+      end
+    end
+  end
+end
