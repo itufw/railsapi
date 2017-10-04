@@ -2,8 +2,8 @@ wb = xlsx_package.workbook
 
 wb.add_worksheet(name: "Stock Control") do |sheet|
 
-  black_cell = sheet.add_style bg_color: "00", fg_color: "FF"
-  country_cell = sheet.add_style bg_color: 'FF', fg_color: '00', border: { style: :thick, color: "00" }
+  black_cell = {bg_color: "00", fg_color: "FF"}
+  country_cell = {bg_color: 'FF', fg_color: '00', border: { style: :thick, color: "00" }}
 
 
   @countries.each do |country|
