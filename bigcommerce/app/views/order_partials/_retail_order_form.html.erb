@@ -274,19 +274,6 @@
   $(document).on('click', '.remove_row', function(){
     $(this).parent().parent().remove();
   });
-
-
-  // Include GST
-  $(document).on('change', 'input#include_gst_1', function(){
-    var checkboxes = $('input#include_gst_1');
-    for(var i = 0; i < checkboxes.length; i++){
-      if (checkboxes[i].checked){
-        var total = (parseFloat($('#order_gst').val()) + parseFloat($('#order_total_inc_tax').val())).toFixed(4);
-        $('#order_total_inc_tax').val(total);
-        return
-      }
-    }
-  })
 </script>
 
 <!-- Submit Tag -->

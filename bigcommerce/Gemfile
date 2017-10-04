@@ -120,3 +120,9 @@ gem 'carrierwave-dropbox'
 
 # Browser Detactor
 gem "browser"
+
+# Excel Export
+gem 'rubyzip'
+gem 'axlsx', '= 2.0.1'
+gem 'axlsx_rails'
+gem 'axlsx_styler'

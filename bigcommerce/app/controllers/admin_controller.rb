@@ -170,6 +170,24 @@ class AdminController < ApplicationController
       redirect_to :back
     end
 
+    def download_stock_control
+      pdf = WickedPdf.new.pdf_from_string(
+        render_to_string(
+            :template => 'pdf/stock_control.pdf',
+            :locals => {countries: ProducerCountry.product_country }
+            )
+        )
+        send_data pdf, filename: "StockControl-#{Date.today.to_s}.pdf", type: :pdf
+    end
+
+    def export_stock_control
+      @countries = ProducerCountry.product_country
+      respond_to do |format|
+        format.html
+        format.xlsx
+      end
+    end
+
     def group_list
       group_creation(params) unless params[:staff_group].nil?
       default_group_update(params) unless params[:default_group].nil?

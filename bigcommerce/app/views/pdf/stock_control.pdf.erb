@@ -1,0 +1,28 @@
+<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+
+<table class="stock-control-table table">
+  <% countries.each do |country|%>
+    <tr class="country">
+      <th><%= country.name %></th>
+    </tr>
+    <% country.producers.each do |producer|%>
+      <tr class="producer">
+        <th></th>
+        <th><%= producer.name %></th>
+        <th>Case</th>
+        <th>Bottles</th>
+        <th>LUC</th>
+      </tr>
+      <% products = producer.products.select('id, name_no_winery AS name, SUM(inventory) AS stock, MAX(case_size) AS case_size, MIN(calculated_price)*1.29 AS luc, product_no_ws_id').group('product_no_ws_id').having('stock>0').order(name: :asc) %>
+      <% products.each do |product| %>
+        <tr>
+          <td><%= product.id%></td>
+          <td><%= product.name%></td>
+          <td><%= product.case_size%></td>
+          <td><%= product.stock %></td>
+          <td><%= product.luc%></td>
+        </tr>
+      <% end %>
+    <% end %>
+  <% end %>
+</table>
