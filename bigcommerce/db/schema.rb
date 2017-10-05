@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171002024943) do
+ActiveRecord::Schema.define(version: 20171004050251) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -900,6 +900,11 @@ ActiveRecord::Schema.define(version: 20171002024943) do
     t.integer  "product_no_vintage_id",     limit: 4
     t.integer  "product_no_ws_id",          limit: 4
     t.integer  "on_order",                  limit: 1
+    t.integer  "sale_term_1",               limit: 4
+    t.integer  "sale_term_2",               limit: 4
+    t.integer  "sale_term_3",               limit: 4
+    t.integer  "sale_term_4",               limit: 4
+    t.decimal  "monthly_supply",                          precision: 6, scale: 2
   end
 
   create_table "promotions", force: :cascade do |t|
@@ -917,6 +922,16 @@ ActiveRecord::Schema.define(version: 20171002024943) do
     t.datetime "updated_at",                null: false
     t.integer  "attempt_count", limit: 4
     t.string   "description",   limit: 255
+  end
+
+  create_table "sale_rate_terms", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.integer  "days_from",  limit: 4
+    t.integer  "days_until", limit: 4
+    t.integer  "weight",     limit: 4
+    t.integer  "term",       limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
   end
 
   create_table "staff_calendar_addresses", force: :cascade do |t|

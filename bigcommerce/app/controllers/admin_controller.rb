@@ -1,12 +1,12 @@
 require 'csv_import.rb'
 require 'csv_generator.rb'
-
+require 'stock_control.rb'
 
 class AdminController < ApplicationController
     before_action :confirm_logged_in
 
     include CsvGenerator
-
+    include StockControl
 
     # CustType
     # CustGroup
@@ -170,50 +170,11 @@ class AdminController < ApplicationController
       redirect_to :back
     end
 
-    def download_stock_control
-      pdf = WickedPdf.new.pdf_from_string(
-        render_to_string(
-            :template => 'pdf/stock_control.pdf',
-            :locals => {countries: ProducerCountry.product_country }
-            )
-        )
-        send_data pdf, filename: "StockControl-#{Date.today.to_s}.pdf", type: :pdf
-    end
-
     def export_stock_control
       @countries = ProducerCountry.product_country
-      product_hash = {}
-      products_no_ws = ProductNoWs.joins(:products)
-       .select('product_no_ws.*, products.case_size as case_size, products.calculated_price AS price, products.retail_ws AS retail_ws, products.name as product_name, products.inventory as inventory, products.id as product_id, products.name_no_winery as name_no_winery')
-
-      allocated_products = OrderProduct.joins(:order).select('product_id, SUM(order_products.qty) as qty').where('orders.status_id': 1).group('product_id')
-
-      products_no_ws.each do |p|
-        # Separate Perth Stock
-        next if p.product_name.include?'Perth'
-
-        # initialise the hash
-        product = (product_hash[p.id].nil?) ? {inventory: 0, allocated: 0} : product_hash[p.id]
-
-        product[:name] = p.name_no_winery unless p.name_no_winery.nil?
-        product[:inventory] += p.inventory
-        product[:case_size] = p.case_size
-
-        allocated = allocated_products.detect{|x| x.product_id==p.product_id}
-        product[:allocated] += allocated.qty unless allocated.nil?
-
-        if p.retail_ws=='R'
-          product[:rrp] = p.price * 1.1
-        elsif p.product_name.include?'WS'
-          product[:ws_id] = p.product_id
-          product[:luc] = p.price * 1.29
-        end
-
-        product_hash[p.id] = product
-      end
-
       # Include Only In Stock Products
-      @product_hash = product_hash.select{|key, value| value[:inventory]>0 }
+      # Function in lib stock control
+      @product_hash = stock_calculation()
 
       respond_to do |format|
         format.html

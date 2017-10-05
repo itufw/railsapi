@@ -5,23 +5,32 @@ wb.add_worksheet(name: "Stock Control") do |sheet|
 
   winery_hash = {bg_color: '000000', fg_color: 'FFFFFF'}
   country_hash = {b: true}
+  red_font_hash = {fg_color: 'FF0000'}
 
   black_cell = wb.styles.add_style winery_hash
   country_cell = wb.styles.add_style country_hash
 
+  highlight_font = wb.styles.add_style red_font_hash
+
 
   @countries.each do |country|
-    sheet.add_row([country.name], style: [country_cell])
+    sheet.add_row([nil, country.name], style: country_cell)
     country.producers.each do |producer|
       next if producer.id==21
 
-      sheet.add_row([nil, producer.name, 'Case', 'Bot.', 'RRP', 'LUC'], style: [black_cell, black_cell, black_cell, black_cell, black_cell, black_cell])
+      sheet.add_row(
+        [nil, producer.name, 'Case', 'RRP', 'LUC', 'Bot.', 'Last 30 Days', 'Supply'],
+        style: [nil, (1..7).map { |x| black_cell }].flatten
+      )
 
-      product_ids = producer.products.group('product_no_ws_id').map(&:product_no_ws_id)
+      product_ids = producer.products.group('product_no_ws_id').order('name').map(&:product_no_ws_id)
       product_ids.each do |product_id|
         product = @product_hash[product_id]
         next if product.nil?
-        sheet.add_row [product[:ws_id], product[:name], product[:case_size], product[:inventory], product[:rrp], product[:luc]]
+        sheet.add_row(
+          [product[:ws_id], product[:name], product[:case_size], product[:rrp], product[:luc], product[:inventory], product[:term_1], product[:monthly_supply]],
+          style: [ (1..7).map {|x| nil}, (product[:monthly_supply].between?(0.001, 3))? highlight_font : nil].flatten
+        )
       end
     end
   end
