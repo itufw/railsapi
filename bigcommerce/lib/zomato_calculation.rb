@@ -110,8 +110,8 @@ module ZomatoCalculation
 
     start = 0
     results_found = 100
-    while (results_found > 40) && ((start * 20) < results_found) && start < 80
-      response = HTTParty.get(query, query: {lat: lat, lon: lng, radius: 200, cuisines: selected_cuisines, start: start}, headers: {"user-key" => Rails.application.secrets.zomato_key })
+    while (results_found > 40) && (start < results_found) && start < 80
+      response = HTTParty.get(query, query: {lat: lat, lon: lng, radius: 1000, cuisines: selected_cuisines, start: start}, headers: {"user-key" => Rails.application.secrets.zomato_key })
 
       # if hit the daily limit, return the function
       return if response['results_found'].nil?
@@ -123,6 +123,29 @@ module ZomatoCalculation
       puts 'Counting ' + count_ping.to_s if count_ping % 100 == 0
     end
     return count_ping
+  end
+
+  def search_by_suburb(suburb)
+    suburb_query = 'https://developers.zomato.com/api/v2.1/locations'
+    query = 'https://developers.zomato.com/api/v2.1/search'
+
+    inactive_cuisines = ZomatoCuisine.inactive_cuisines.map(&:name).sort.uniq
+
+    response = HTTParty.get(suburb_query, query: {query: suburb}, headers: {"user-key" => Rails.application.secrets.zomato_key })
+
+    response['location_suggestions'].each do |zone|
+      start = 0
+      results_found = 100
+      while (results_found > 40) && (start < results_found) && start < 80
+        rest_response = HTTParty.get(query, query: {entity_id: zone['entity_id'], entity_type: zone['entity_type'], start: start}, headers: {"user-key" => Rails.application.secrets.zomato_key })
+
+        break if rest_response['results_found'].nil?
+        restaurant_update_attribuets(rest_response['restaurants'], inactive_cuisines)
+
+        results_found = rest_response['results_found'].to_i
+        start += 20
+      end
+    end
   end
 
   def restaurant_update_attribuets(restaurants, inactive_cuisines)
