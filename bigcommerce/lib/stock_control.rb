@@ -50,7 +50,9 @@ module StockControl
       allocated = allocated_products.detect{|x| x.product_id==p.product_id}
       product[:allocated] += allocated.qty unless allocated.nil?
 
-      if p.product_name.include?'WS'
+      if p.retail_ws=='R'
+        product[:rrp] = (p.price * 1.1).round(2)
+      elsif p.product_name.include?'WS'
         product[:ws_id] = p.product_id
         product[:luc] = (p.price * 1.29).round(2)
         product[:term_1] = p.sale_term_1 unless p.sale_term_1.nil? || p.sale_term_1.zero?

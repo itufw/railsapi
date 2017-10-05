@@ -29,7 +29,7 @@ class Order < ActiveRecord::Base
   after_validation :bigcommerce_status_update, on: [:update], if: ->(obj){obj.status_id_changed? and obj.source=='bigcommerce' and [2,3,4,5,6,7,8,9,10,11,12,13,26].include?obj.status_id and obj.last_updated_by!=34}
   after_validation :update_notes, on: [:update], if: ->(obj){obj.source=='bigcommerce' and (obj.staff_notes_changed? or obj.customer_notes_changed?)}
 
-  scoped_search on: [:id, :customer_purchase_order], validator: ->(value){!value.nil?}
+  scoped_search on: [:id, :customer_purchase_order, :track_number], validator: ->(value){!value.nil?}
 
   self.per_page = 30
 
