@@ -63,5 +63,5 @@ every 1.day, :at => '7:00 pm' do
 
 	rake 'updates:manifest_update'
 
-	rake 'updates:sales_rate_update'
+	rake "updates:sales_rate_update"
 end
