@@ -2,7 +2,7 @@ require 'rake_task_helper.rb'
 load 'zomato_calculation.rb'
 load 'fastway_api.rb'
 require 'google_calendar_sync.rb'
-load 'stock_control'
+load 'stock_control.rb'
 
 include RakeTaskHelper
 include ZomatoCalculation
