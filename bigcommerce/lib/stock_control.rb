@@ -50,17 +50,30 @@ module StockControl
       allocated = allocated_products.detect{|x| x.product_id==p.product_id}
       product[:allocated] += allocated.qty unless allocated.nil?
 
-      if p.retail_ws=='R'
-        product[:rrp] = (p.price * 1.1).round(2)
-      elsif p.product_name.include?'WS'
+      if p.product_name.include?'WS'
         product[:ws_id] = p.product_id
         product[:luc] = (p.price * 1.29).round(2)
-        product[:term_1] = p.sale_term_1
-        product[:monthly_supply] = p.monthly_supply
+        product[:term_1] = p.sale_term_1 unless p.sale_term_1.nil? || p.sale_term_1.zero?
+        product[:monthly_supply] = p.monthly_supply.round(0) unless p.monthly_supply.nil? || p.monthly_supply.round(0).zero?
       end
 
       product_hash[p.id] = product
     end
+
+    # color defination in axlsx file
+    product_hash.select{|key, value| value[:inventory]>=120 }.each do |id, product|
+      next if product[:luc].nil?
+      if product[:luc].between?(0, 16) && product[:inventory]>=180
+        product[:name_color] = 'green_cell'
+      elsif product[:luc].between?(16, 22)
+        product[:name_color] = 'lightgreen_cell'
+      elsif product[:luc].between?(22, 35)
+        product[:name_color] = 'orange_cell'
+      elsif product[:luc].between?(35, 50)
+        product[:name_color] = 'lightorange_cell'
+      end
+    end
+
     product_hash.select{|key, value| value[:inventory]>0 }
   end
 end
