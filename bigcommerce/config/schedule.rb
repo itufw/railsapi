@@ -62,4 +62,6 @@ every 1.day, :at => '7:00 pm' do
 	rake "updates:zomato_update"
 
 	rake 'updates:manifest_update'
+
+	rake 'updates:sales_rate_update'
 end
