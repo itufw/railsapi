@@ -50,4 +50,6 @@ wb.add_worksheet(name: "Stock Control") do |sheet|
       end
     end
   end
+
+  sheet.column_info[3].hidden = true
 end
