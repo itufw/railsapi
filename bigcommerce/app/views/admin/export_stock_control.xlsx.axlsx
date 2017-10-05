@@ -19,8 +19,8 @@ wb.add_worksheet(name: "Stock Control") do |sheet|
       next if producer.id==21
 
       sheet.add_row(
-        [nil, producer.name, 'Case', 'RRP', 'LUC', 'Bot.', 'Last 30 Days', 'Supply'],
-        style: [nil, (1..7).map { |x| black_cell }].flatten
+        [nil, producer.name, 'Case', 'RRP', 'LUC', 'Aloc.', 'Bot.', '30 D.S.', 'Supply'],
+        style: [nil, (1..8).map { |x| black_cell }].flatten
       )
 
       product_ids = producer.products.group('product_no_ws_id').order('name').map(&:product_no_ws_id)
@@ -28,8 +28,8 @@ wb.add_worksheet(name: "Stock Control") do |sheet|
         product = @product_hash[product_id]
         next if product.nil?
         sheet.add_row(
-          [product[:ws_id], product[:name], product[:case_size], product[:rrp], product[:luc], product[:inventory], product[:term_1], product[:monthly_supply]],
-          style: [ (1..7).map {|x| nil}, (product[:monthly_supply].between?(0.001, 3))? highlight_font : nil].flatten
+          [product[:ws_id], product[:name], product[:case_size], product[:rrp], product[:luc], product[:allocation], product[:inventory], product[:term_1], product[:monthly_supply]],
+          style: [ (1..8).map {|x| nil}, (product[:monthly_supply].between?(0.001, 3))? highlight_font : nil].flatten
         )
       end
     end
