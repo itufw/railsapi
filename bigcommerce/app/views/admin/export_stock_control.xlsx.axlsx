@@ -4,7 +4,7 @@ wb = xlsx_package.workbook
 wb.add_worksheet(name: "Stock Control") do |sheet|
 
   winery_hash = {bg_color: '000000', fg_color: 'FFFFFF'}
-  country_hash = {b: true}
+  bond_hash = {b: true}
   red_font_hash = {fg_color: 'FF0000'}
   green_hash = {bg_color: '80ff00'}
   light_green_hash = {bg_color: 'e6ffcc'}
@@ -17,9 +17,17 @@ wb.add_worksheet(name: "Stock Control") do |sheet|
   orange_cell = wb.styles.add_style orange_hash
   lightorange_cell = wb.styles.add_style light_orange_hash
 
-  country_cell = wb.styles.add_style country_hash
+  country_cell = wb.styles.add_style bond_hash
   highlight_font = wb.styles.add_style red_font_hash
-  bordered_cell = wb.styles.add_style country_hash.merge({border: { style: :thin, color: '000000', edges: [:left, :right, :bottom, :top]}})
+  bordered_cell = wb.styles.add_style bond_hash.merge({border: { style: :thin, color: '000000', edges: [:left, :right, :bottom, :top]}})
+  title_cell = wb.styles.add_style bond_hash.merge({sz: 18})
+
+  sheet.add_row(
+    [nil, 'Stock Control'],
+    style: [nil, title_cell]
+  )
+  sheet.merge_cells "B1:E1"
+  sheet.add_row([nil, Date.today.strftime('%d/%m/%Y')])
 
   @countries.each do |country|
     sheet.add_row([nil, country.name], style: country_cell)
@@ -27,8 +35,8 @@ wb.add_worksheet(name: "Stock Control") do |sheet|
       next if producer.id==21
 
       sheet.add_row(
-        [nil, producer.name, 'Case', 'LUC', 'Aloc.', 'Bot.', '30 D.S.', 'Supply'],
-        style: [nil, (1..7).map { |x| black_cell }].flatten
+        [nil, producer.name, 'Case', 'RRP', 'LUC', 'Aloc.', 'Bot.', '30 D.S.', 'Supply'],
+        style: [nil, (1..8).map { |x| black_cell }].flatten
       )
 
       product_ids = producer.products.group('product_no_ws_id').order('name').map(&:product_no_ws_id)
@@ -36,8 +44,8 @@ wb.add_worksheet(name: "Stock Control") do |sheet|
         product = @product_hash[product_id]
         next if product.nil?
         sheet.add_row(
-          [product[:ws_id], product[:name], product[:case_size], product[:luc], product[:allocation], product[:inventory], product[:term_1], product[:monthly_supply]],
-          style: [nil, (eval product[:name_color].to_s), (1..4).map {|x| nil}, bordered_cell, bordered_cell].flatten
+          [product[:ws_id], product[:name], product[:case_size], product[:rrp], product[:luc], product[:allocation], product[:inventory], product[:term_1], product[:monthly_supply]],
+          style: [nil, (eval product[:name_color].to_s), (1..5).map {|x| nil}, bordered_cell, bordered_cell].flatten
         )
       end
     end
