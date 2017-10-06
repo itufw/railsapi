@@ -26,6 +26,7 @@ module FastwayApi
     while !delivery_labels.blank?
       selected_labels = delivery_labels[0..15]
       response = fastway.track(selected_labels)
+      puts response
       return response if resposne['result'].nil?
       delivery_labels = delivery_labels.reject{|x| selected_labels.include?x}
     end
