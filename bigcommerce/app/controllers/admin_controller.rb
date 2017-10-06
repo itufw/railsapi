@@ -178,7 +178,9 @@ class AdminController < ApplicationController
 
       respond_to do |format|
         format.html
-        format.xlsx
+        format.xlsx {
+          response.headers['Content-Disposition'] = "attachment; filename=Stock Control #{Date.today.to_s}.xlsx"
+        }
       end
     end
 

@@ -1,6 +1,9 @@
 require 'axlsx'
 wb = xlsx_package.workbook
 
+@countries = countries if @countries.nil? && countries.present?
+@product_hash = product_hash if @product_hash.nil? && product_hash.present?
+
 wb.add_worksheet(name: "Stock Control") do |sheet|
 
   winery_hash = {bg_color: '000000', fg_color: 'FFFFFF'}
@@ -17,7 +20,7 @@ wb.add_worksheet(name: "Stock Control") do |sheet|
   orange_cell = wb.styles.add_style orange_hash
   lightorange_cell = wb.styles.add_style light_orange_hash
 
-  country_cell = wb.styles.add_style bond_hash
+  country_cell = wb.styles.add_style bond_hash.merge({sz: 16})
   highlight_font = wb.styles.add_style red_font_hash
   bordered_cell = wb.styles.add_style bond_hash.merge({border: { style: :thin, color: '000000', edges: [:left, :right, :bottom, :top]}})
   title_cell = wb.styles.add_style bond_hash.merge({sz: 18})

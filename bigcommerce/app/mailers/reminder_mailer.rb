@@ -2,8 +2,10 @@ class ReminderMailer < ActionMailer::Base
   require 'mail'
   require 'wicked_pdf'
   require 'order_status.rb'
+  require 'stock_control.rb'
 
   include OrderStatus
+  include StockControl
 
   default from: 'accounts@untappedwines.com'
   layout "mailer"
@@ -13,6 +15,29 @@ class ReminderMailer < ActionMailer::Base
     @error_message = error_message
     @backtrace = backtrace.join("\n")
     mail(from: 'Untapped IT <it@untappedwines.com>', to: 'William Liu <it@untappedwines.com>', cc: 'Luke Voortman <lvoortman@untappedwines.com>', subject: "Sync Error")
+  end
+
+  def stock_control_reminder
+    xlsx = render_to_string formats: [:xlsx], template: "admin/export_stock_control", locals: {countries: ProducerCountry.product_country, product_hash: stock_calculation()}
+    attachments["Stock Control #{Date.today.to_s}.xlsx"] = {mime_type: Mime::XLSX, content: Base64.encode64(xlsx), encoding: 'base64'}
+
+    # sales = []
+    # sales.push(%("SalesTeam" <salesteam@untappedwines.com>))
+    # sales.push(%("Paola <paola@untappedwines.com>"))
+    #
+    # managers = []
+    # managers.push(%("Adam" <adam@untappedwines.com>))
+    # managers.push(%("Angelica" <accounts@untappedwines.com>))
+    # managers.push(%("Luke" <lvoortman@untappedwines.com>))
+    # managers.push(%("Lucia" <lgaldona@untappedwines.com>))
+
+    email_address.split(";").each do |contact_address|
+      customer_address = %("#{@xero_contact.name}" <#{contact_address}>)
+      recipients_addresses.push(customer_address)
+    end
+    mail(from: 'Untapped CMS <it@untappedwines.com>', to: 'Lucia <lgaldona@untappedwines.com>', bcc: 'William Liu <it@untappedwines.com>', subject: "Stock Control #{Date.today.to_s}")
+
+    # mail(from: 'Untapped CMS <it@untappedwines.com>', to: sales, cc: managers, bcc: 'William Liu <it@untappedwines.com>', subject: "Stock Control #{Date.today.to_s}")
   end
 
   def order_confirmation(order_id, email_address, user_id)

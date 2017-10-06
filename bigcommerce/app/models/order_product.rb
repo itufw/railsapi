@@ -68,6 +68,10 @@ class OrderProduct < ActiveRecord::Base
 		includes([{:order => :status}]).where('statuses.valid_order = 1').references(:statuses)
 	end
 
+	def self.valid_products
+		where(display: 1)
+	end
+
 	def self.staff_filter(staff_id)
 		return all if staff_id.nil?
 		return includes([{:order => :staff}]).where('staffs.id = ?', staff_id).references(:staffs)

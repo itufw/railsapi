@@ -29,7 +29,7 @@ module XeroInvoiceCalculations
     def invoice_line_items(order)
         order_id = order.id
         is_customer_wholesale = Customer.is_wholesale(order.customer)
-        order_products = order.order_products
+        order_products = order.order_products.valid_products
         order_total = order.total_inc_tax
 
         gst_percentage = TaxPercentage.gst_percentage
@@ -48,7 +48,7 @@ module XeroInvoiceCalculations
         discounted_ex_gst_unit_price = {}
         discounted_unit_price.each { |op_id, d| discounted_ex_gst_unit_price[op_id] = get_ex_gst_price(d, gst_percentage) }
 
-        inc_gst_shipping_price = order.shipping_cost
+        inc_gst_shipping_price = order.shipping_cost * (1 + gst_percentage * 0.01)
         ex_gst_shipping_price = get_ex_gst_price(inc_gst_shipping_price, gst_percentage)
 
         if is_customer_wholesale
