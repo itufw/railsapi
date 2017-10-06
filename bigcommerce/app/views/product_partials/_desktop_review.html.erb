@@ -39,7 +39,10 @@
       <%= warehouse.hidden_field :id %>
       <%= warehouse.hidden_field :product_no_ws_id %>
 
-      <td><%= warehouse_count.product_no_ws_id%></td>
+      <td>
+        <%= check_box_tag 'selected_product[]', warehouse_count.id, false, class: "product_checkbox" %>
+        <%= warehouse_count.product_no_ws_id%>
+      </td>
       <td><%= warehouse_count.product_name%></td>
       <td><%= warehouse_count.current_dm if warehouse_count.current_dm>0 %></td>
       <td><%= warehouse_count.current_vc if warehouse_count.current_vc>0 %></td>

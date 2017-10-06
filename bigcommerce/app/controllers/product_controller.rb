@@ -327,26 +327,33 @@ class ProductController < ApplicationController
   end
 
   def warehouse_review
-    params[:warehouse].values.each do |examining|
+    params[:selected_product].each do |warehouse_id|
+      examining = params[:warehouse][warehouse_id]
       product_no_ws = ProductNoWs.find(examining[:product_no_ws_id])
       # IMPORTANT
       # Update Product Inventory
       # Overwrite Master records
       product_no_ws.products.each do |product|
         if product.name.include?' DM'
-          product.inventory_overwrite(examining['count_dm']) if examining['count_dm'] && examining['count_dm']>0
+          product.inventory_overwrite(examining['count_dm'].to_i) if examining['count_dm']
         elsif product.name.include?' VC'
-          product.inventory_overwrite(examining['count_vc']) if examining['count_vc'] && examining['count_vc']>0
+          product.inventory_overwrite(examining['count_vc'].to_i) if examining['count_vc']
         elsif product.name.include?' WS'
-          product.inventory_overwrite(examining['count_ws']) if examining['count_ws'] && examining['count_ws']>0
+          product.inventory_overwrite(examining['count_ws'].to_i) if examining['count_ws']
         elsif product.retail_ws=='R'
-          product.inventory_overwrite(examining['count_retail']) if examining['count_retail'] && examining['count_retail']>0
+          product.inventory_overwrite(examining['count_retail'].to_i) if examining['count_retail']
         end
       end
       # Update examining and quit
       authorised = {authorised_staff_id: session[:user_id], authorised_date: Time.now().to_s(:db)}
-      WarehouseExamining.find(examining[:id]).update_attributes(examining.merge(authorised))
+      WarehouseExamining.find(examining[:id])
+        .update_attributes(
+          examining
+            .permit(:count_size, :count_pack, :count_loose, :count_sample, :count_total,
+              :count_dm, :count_vc, :count_ws, :count_retail).merge(authorised))
     end
+    flash[:success] = 'Stock Updaetd!'
+    redirect_to request.referrer
   end
 
   def fetch_product_details

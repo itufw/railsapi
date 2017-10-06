@@ -21,7 +21,18 @@ module StockControl
 
       product.send("sale_term_#{term.term}=", sales.to_i)
     end
-    product.monthly_supply = monthly_supply.zero? ? 0 : Product.where(product_no_ws_id: product.product_no_ws_id).sum(:inventory) * weight / monthly_supply.to_f
+
+    unless monthly_supply.zero?
+      products = Product.where(product_no_ws_id: product.product_no_ws_id)
+      inventory = products.sum(:inventory)
+      # include allocated product into monthly supply calculation
+      allocated = OrderProduct.joins(:order).select('SUM(order_products.qty) as qty')
+        .where('orders.status_id': 1, product_id: products.map(&:id)).first.qty.to_i
+
+      inventory += allocated
+
+      product.monthly_supply = inventory * weight / monthly_supply.to_f
+    end
     product.save
   end
 
@@ -31,7 +42,7 @@ module StockControl
      .select('product_no_ws.*, products.case_size as case_size, products.calculated_price AS price,
        products.retail_ws AS retail_ws, products.name as product_name, products.inventory as inventory,
        products.id as product_id, products.name_no_winery as name_no_winery,
-       products.sale_term_1, products.monthly_supply')
+       products.sale_term_1, products.monthly_supply, products.current')
 
     allocated_products = OrderProduct.joins(:order).select('product_id, SUM(order_products.qty) as qty')
       .where('orders.status_id': 1).group('product_id')
@@ -41,13 +52,14 @@ module StockControl
       next if p.product_name.include?'Perth'
 
       # initialise the hash
-      product = (product_hash[p.id].nil?) ? {inventory: 0, allocated: 0} : product_hash[p.id]
+      product = (product_hash[p.id].nil?) ? {inventory: 0} : product_hash[p.id]
 
       product[:name] = p.name_no_winery unless p.name_no_winery.nil?
       product[:inventory] += p.inventory
       product[:case_size] = p.case_size
 
       allocated = allocated_products.detect{|x| x.product_id==p.product_id}
+      product[:allocated] = 0 if !allocated.nil? && product[:allocated].nil?
       product[:allocated] += allocated.qty unless allocated.nil?
 
       if p.retail_ws=='R'
@@ -57,6 +69,7 @@ module StockControl
         product[:luc] = (p.price * 1.29).round(2)
         product[:term_1] = p.sale_term_1 unless p.sale_term_1.nil? || p.sale_term_1.zero?
         product[:monthly_supply] = p.monthly_supply.round(0) unless p.monthly_supply.nil? || p.monthly_supply.round(0).zero?
+        product[:current] = p.current
       end
 
       product_hash[p.id] = product

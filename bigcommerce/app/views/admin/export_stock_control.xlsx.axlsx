@@ -47,12 +47,16 @@ wb.add_worksheet(name: "Stock Control") do |sheet|
         product = @product_hash[product_id]
         next if product.nil?
         sheet.add_row(
-          [product[:ws_id], product[:name], product[:case_size], product[:rrp], product[:luc], product[:allocation], product[:inventory], product[:term_1], product[:monthly_supply]],
-          style: [nil, (eval product[:name_color].to_s), (1..5).map {|x| nil}, bordered_cell, bordered_cell].flatten
+          [product[:ws_id], product[:name], product[:case_size], product[:rrp], product[:luc], product[:allocated], product[:inventory], product[:term_1], product[:monthly_supply]],
+          style: [nil, (eval product[:name_color].to_s), (1..4).map {|x| nil}, (product[:current].to_i.zero?)? highlight_font : nil, bordered_cell, bordered_cell].flatten
         )
       end
     end
   end
 
+  sheet.add_row(
+    [nil, '4+ months supply', 'Waiting for container or stock for retail'],
+    style: [nil, orange_cell, highlight_font]
+  )
   sheet.column_info[3].hidden = true
 end
