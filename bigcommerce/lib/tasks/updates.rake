@@ -106,6 +106,10 @@ namespace :updates do
 		puts 'Sales Rate Update End'
 	end
 
+	task :send_stock_control => :environment do
+		ReminderMailer.stock_control_reminder.deliver_now
+	end
+
 	task :balanceupdate => :environment do
 		puts "Update contacts balance #{Time.now} started"
 		XeroContact.new.update_balance_for_all
