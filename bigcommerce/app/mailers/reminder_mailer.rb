@@ -31,10 +31,6 @@ class ReminderMailer < ActionMailer::Base
     # managers.push(%("Luke" <lvoortman@untappedwines.com>))
     # managers.push(%("Lucia" <lgaldona@untappedwines.com>))
 
-    email_address.split(";").each do |contact_address|
-      customer_address = %("#{@xero_contact.name}" <#{contact_address}>)
-      recipients_addresses.push(customer_address)
-    end
     mail(from: 'Untapped CMS <it@untappedwines.com>', to: 'Lucia <lgaldona@untappedwines.com>', bcc: 'William Liu <it@untappedwines.com>', subject: "Stock Control #{Date.today.to_s}")
 
     # mail(from: 'Untapped CMS <it@untappedwines.com>', to: sales, cc: managers, bcc: 'William Liu <it@untappedwines.com>', subject: "Stock Control #{Date.today.to_s}")
