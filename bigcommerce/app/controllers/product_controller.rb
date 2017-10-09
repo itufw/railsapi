@@ -78,6 +78,9 @@ class ProductController < ApplicationController
     # calculate the pending stock for each customer
     @customer_pendings, @customer_ids = \
       customer_pending_amount(product_ids, params, @customer_ids)
+
+    # Include all relevant products to overwrite stock level
+    @products = Product.filter_by_ids_nil_allowed(product_ids)
   end
 
   def allocate
@@ -335,13 +338,13 @@ class ProductController < ApplicationController
       # Overwrite Master records
       product_no_ws.products.each do |product|
         if product.name.include?' DM'
-          product.inventory_overwrite(examining['count_dm'].to_i) if examining['count_dm']
+          product.inventory_overwrite(examining['count_dm'].to_i, session[:user_id]) if examining['count_dm']
         elsif product.name.include?' VC'
-          product.inventory_overwrite(examining['count_vc'].to_i) if examining['count_vc']
+          product.inventory_overwrite(examining['count_vc'].to_i, session[:user_id]) if examining['count_vc']
         elsif product.name.include?' WS'
-          product.inventory_overwrite(examining['count_ws'].to_i) if examining['count_ws']
+          product.inventory_overwrite(examining['count_ws'].to_i, session[:user_id]) if examining['count_ws']
         elsif product.retail_ws=='R'
-          product.inventory_overwrite(examining['count_retail'].to_i) if examining['count_retail']
+          product.inventory_overwrite(examining['count_retail'].to_i, session[:user_id]) if examining['count_retail']
         end
       end
       # Update examining and quit
