@@ -6,6 +6,8 @@
 <h4>Total Stock (WS + Retail + Pending) : <%= @total_stock_no_ws %></h4>
 
 <button class="button" style="float: right;margin-top: -130px;"><%= link_to "Orders", controller: 'order', action: 'for_product', product_id: @product_id, product_name: @product_name, transform_column: @transform_column %></button>
+
+<!-- Allocate Products -->
 <% if @transform_column!='product_no_vintage_id' && user_full_right(session[:authority]) %>
 	<button class="button" style="float: right;margin-top: -50px;"><%= link_to "Allocate", controller: 'product', action: 'allocate', product_id: @product_id, product_name: @product_name, transform_column: @transform_column, total_stock: @total_stock %></button>
 <% end %>
