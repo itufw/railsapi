@@ -32,9 +32,9 @@
 		<% customer = order.customer %>
 		<td>
 			<%= link_to customer_name(customer), controller: 'customer', action: 'summary', customer_id: order.customer_id, customer_name: customer_name(customer) %>
-			<%= '<br/>'.html_safe unless customer.account_type.nil? && customer.default_courier.nil?%>
-			<%= ('<i style="color: orange">' + customer.account_type + '</i>').html_safe unless customer.account_type.nil?%>
-			<%= ('<i style="color: blue">' + customer.default_courier + '</i>').html_safe unless customer.default_courier.nil?%>
+			<%= '<br/>'.html_safe unless customer.account_type.nil? && (customer.default_courier.nil? || customer.default_courier=='Fastway')%>
+			<%= ('<i style="color: orange">' + customer.account_type + '</i>').html_safe unless customer.account_type.nil? %>
+			<%= ('<i style="color: blue">' + customer.default_courier + '</i>').html_safe unless customer.default_courier.nil? || customer.default_courier=='Fastway'%>
 		</td>
 		<td><%= order_status(order.status)%></td>
 		<% shipping_description = shipping_status(order) %>
