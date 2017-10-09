@@ -289,6 +289,14 @@
     return total;
   }
 
+ var shipping_cost_update = function(){
+   var bottles = 0;
+   $('.product-list tr').each(function(){
+     bottles += parseInt($(this).find('.product-qty').val());
+   });
+   $('#order_shipping_cost').val(parseInt(bottles/6)*10);
+ };
+
   var product_change = function(column){
     qty = column.parent().parent().find('.product-qty').val();
     luc = column.parent().parent().find('.product-luc').val();
@@ -308,6 +316,11 @@
 
   $(document).on('input', '.product-qty, .product-discount, .product-price', function(){
     product_change($(this));
+
+    // If it is vintage cellar order, automatically update shipping cost
+    if (/Vintage Cellars/i.test($('input[name=customer]').val())){
+      shipping_cost_update();
+    }
   });
   $(document).on('input', '#order_discount_rate, #order_shipping_cost', function(){
     update_subtotal();

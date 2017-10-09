@@ -36,7 +36,7 @@ class ProductController < ApplicationController
     display_all(params)
 
     # product Helper
-    product_selection(params[:selected_product]) unless params[:selected_product].nil? || session[:default_group].nil?
+    product_selection(params[:selected_product]) unless params[:selected_product].nil? || session[:default_group].nil? || params[:commit]=='Update'
     @count_selected = StaffGroupItem.productNoWs(session[:default_group]).map(&:item_id) if @transform_column=="product_no_ws_id" && !session[:default_group].nil?
   end
 
@@ -386,7 +386,7 @@ def product_params
    :product_size_id, :product_no_ws_id, :name_no_ws, :name_no_vintage,\
    :product_no_vintage_id, :case_size, :product_package_type_id, :retail_ws,\
    :vintage, :name_no_winery_no_vintage, :price_id, :product_sub_type_id,\
-   :blend_type, :order_1, :order_2, :combined_order, :producer_region_id)
+   :blend_type, :order_1, :order_2, :combined_order, :producer_region_id, :current)
 end
 
 def warehouse_params
