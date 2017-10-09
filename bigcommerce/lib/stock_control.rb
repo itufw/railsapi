@@ -1,17 +1,26 @@
 module StockControl
 
   def sales_rate_update
+    standard_term = SaleRateTerm.standard_term
     products = Product.where(retail_ws: 'WS')
-    products.each{|product| sales_rate_update_product(product)}
+    products.each{|product| sales_rate_update_product(product, standard_term)}
+
+    StaffGroupItem.where(item_model: 'SaleRateTerm').map(&:staff_group).uniq.each do |staff_group|
+      product_ids = staff_group.products(staff_group.id).map(&:item_id)
+      products = Product.where(id: product_ids)
+      special_term = SaleRateTerm.special_term(staff_group.id)
+
+      products.each{|product| sales_rate_update_product(product, special_term)}
+    end
   end
 
-  def sales_rate_update_product(product)
+  def sales_rate_update_product(product, terms)
     product_sales = product.order_products.valid_orders
     monthly_supply = 0
     # only calculate weight for month with sales
     weight = 0
 
-    SaleRateTerm.standard_term.each do |term|
+    terms.each do |term|
       next unless term.term.between?(1, 4)
 
       sales = product_sales.select{ |x| x.created_at.between?(Date.today-term.days_until.day, Date.today-term.days_from.day) }.map(&:qty).sum
