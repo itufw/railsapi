@@ -12,4 +12,8 @@ class ProducerCountry < ActiveRecord::Base
     all
   end
 
+  def self.product_country
+    where('short_name NOT IN (?)', ['UFW', 'na'])
+  end
+
 end

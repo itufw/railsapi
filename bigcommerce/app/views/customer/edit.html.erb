@@ -45,13 +45,24 @@
   <br/>
 
   <%= f.label :address, class: 'margin-from-top label-new' %>
-  <%= f.text_field :street, placeholder: 'Street'%>
-  <%= f.text_field :street_2, placeholder: 'Street 2'%>
-  <%= f.text_field :city, placeholder: 'City'%>
-  <%= f.text_field :state, placeholder: 'State'%>
-  <%= f.text_field :postcode, placeholder: 'Postcode'%>
-  <%= f.text_field :country, placeholder: 'Country'%>
+  <%= f.text_field :street, placeholder: 'Street', class: 'address'%>
+  <%= f.text_field :street_2, placeholder: 'Street 2', class: 'address'%>
+  <%= f.text_field :city, placeholder: 'City', class: 'address'%>
+  <%= f.text_field :state, placeholder: 'State', class: 'address'%>
+  <%= f.text_field :postcode, placeholder: 'Postcode', class: 'address'%>
+  <%= f.text_field :country, placeholder: 'Country', class: 'address'%>
   <%= f.text_field :address, class: 'form-control quarter-size' %>
+
+  <div class="row">
+    <div class="col-md-6">
+      <%= f.label :phone, class: 'margin-from-top label-new' %>
+      <%= f.text_field :phone, class: 'form-control quarter-size' %>
+    </div>
+    <div class="col-md-6">
+      <%= f.label :email, class: 'margin-from-top label-new' %>
+      <%= f.text_field :email, class: 'form-control quarter-size' %>
+    </div>
+  </div>
 
   <%= f.label :special_instruction_for_fastway, class: 'margin-from-top label-new' %>
   <%= f.text_field :SpecialInstruction1, placeholder: 'SpecialInstruction1'%>
@@ -94,5 +105,12 @@
 <script type="text/javascript">
   $('.google-place').click(function(){
     $('input#customer_address').val($('p.google-place-address.'+ $(this).attr('place-id')).text());
+  });
+
+  $(document).on('input', '.address', function(){
+    var street = $('#customer_street').val() + $('#customer_street_2').val()
+    var city = $('#customer_city').val() + $('#customer_state').val() + $('#customer_postcode').val() + $('#customer_country').val();
+
+    $('#customer_address').val(street + city);
   });
 </script>

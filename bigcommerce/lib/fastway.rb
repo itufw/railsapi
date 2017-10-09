@@ -106,13 +106,7 @@ class Fastway
 
     item_number = 0
 
-    # cust_type_id == 1 : Retail Customer
-    if order.customer.cust_type_id == 1
-      @query[:query][:CompanyName] = ((order.ship_name.nil?) || (order.ship_name.to_s=="")) ? order.customer.actual_name : order.ship_name
-    else
-      @query[:query][:ContactName] = order.ship_name unless (order.ship_name.to_s=="")
-      @query[:query][:CompanyName] = order.customer.actual_name
-    end
+    @query[:query][:CompanyName] = (order.ship_name.to_s=="") ? order.customer.actual_name : order.ship_name
 
     @query[:query][:Address1] = order.street.to_s
     @query[:query][:Address2] = order.street_2.to_s

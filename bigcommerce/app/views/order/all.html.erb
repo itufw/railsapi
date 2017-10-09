@@ -8,7 +8,7 @@
 
 <%= form_tag({:controller => "order", :action => "all"}, {:method => "get"}) do %>
 	<div class="row">
-		<div class="col-md-4 col-md-offset-7" style="margin-top: -50px;">
+		<div class="col-md-4 col-md-offset-8" style="margin-top: -50px;">
 			<%= render 'order_partials/order_status_label' if user_full_right(session[:authority]) %>
 		</div>
 	</div>

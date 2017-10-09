@@ -6,6 +6,9 @@
 		<th>Discount</th>
 		<th>Discounted Price</th>
 		<th>Total</th>
+		<% unless order_products.select{|x| !x.revision_date.nil?}.count==0%>
+			<th>Review Date</th>
+		<% end %>
 	</tr>
 
 	<% order_products.select{|x| x.display > 0}.each do |op| %>
@@ -16,6 +19,9 @@
 		<td class="num"><%= op.discount %>%</td>
 		<td class="num"><%= display_num(op.price_discounted) %></td>
 		<td class="num"><%= display_num(op.price_discounted * op.qty)%></td>
+		<% unless op.revision_date.nil? %>
+			<td><%= op.revision_date.strftime('%m/%d/%Y')%></td>
+		<% end %>
 	</tr>
 	<% end %>
 </table>

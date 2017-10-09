@@ -29,16 +29,6 @@ class StatusController < ApplicationController
       orders(params, product_filtered_ids, staff_id, @status_id)
   end
 
-  # DON'T Use
-  def order_status
-    customer_ids = (params[:search].nil?) ? [] : Customer.search_for(params[:search]).pluck("id")
-    per_page = params[:per_page] || Order.per_page
-    order_function, direction = sort_order(params, :order_by_id, 'DESC')
-
-    @orders = Order.where('status_id != 10').customer_filter(customer_ids)\
-      .send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
-  end
-
   def status_check
     @status_name = params[:status_name]
     order_function, direction = sort_order(params, :order_by_id, 'ASC')
@@ -49,6 +39,9 @@ class StatusController < ApplicationController
       @per_page, @orders = order_display_(params, orders)
     elsif @status_name == 'Problem'
       @orders = Order.problem_status_filter.send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
+    elsif @status_name == 'Courier'
+      status_ids = Status.where("alt_name LIKE '%#{@status_name}%'").map(&:id)
+      @orders = Order.statuses_filter(status_ids).courier_not_confirmed.send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
     else
       status_ids = Status.where("alt_name LIKE '%#{@status_name}%'").map(&:id)
       @orders = Order.statuses_filter(status_ids).send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
@@ -113,5 +106,5 @@ private
       :account_status, :address, :billing_address, :customer_notes,\
       :staff_notes, :delivery_instruction, :SpecialInstruction1, :SpecialInstruction2,\
       :SpecialInstruction3, :track_number,:street, :city, :state, :postcode, :country,\
-      :customer_purchase_order, :ship_name, :company)
+      :customer_purchase_order, :ship_name, :company, :street_2)
   end

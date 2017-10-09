@@ -24,6 +24,14 @@
       <br/>
       <% end %>
     </div>
+    <div class="row cuisine-list" style="display: none;">
+      <div class="col-md-4">
+        <%= text_field_tag('suburb', '', placeholder: 'Include Suburb', class: 'form-control') %>
+      </div>
+      <div class="col-md-4">
+        <%= submit_tag "Include", class: 'btn btn-primary' %>
+      </div>
+    </div>
   </div>
   <%= render 'customer_partials/zomato_list', zomatos: @zomato%>
 

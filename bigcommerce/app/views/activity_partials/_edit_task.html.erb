@@ -41,22 +41,15 @@ var TaskCompleteForm = function(){
 };
 TaskCompleteForm();
 
-$('.activity-customers').click(function(){
-  TaskCompleteForm();
-});
-$('.remove_customer').click(function(){
-  TaskCompleteForm();
-});
-$('.activity-staffs').click(function(){
-  TaskCompleteForm();
-});
-$('.remove_staff').click(function(){
+$(document).on('click', '.activity-customers, .remove_customer, .activity-staffs, .remove_staff', function(){
   TaskCompleteForm();
 });
 
-$('#task_subject_1').on('change',function(){
+$(document).on('change', '#task_subject_1', function(){
   TaskCompleteForm();
 });
 
-
+$(document).on('input', '#task_description', function(){
+  TaskCompleteForm();
+});
 </script>

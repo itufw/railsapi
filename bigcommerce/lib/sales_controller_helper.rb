@@ -18,7 +18,7 @@ module SalesControllerHelper
       end
       return avg_bottle_price
     else
-      return Order.date_filter(start_date, end_date.next_day).valid_order.staff_filter(staff_id).send(group_by_date_function).send(sum_function)
+      return Order.date_filter(start_date, end_date.next_day).valid_order.customer_staff_filter(staff_id).send(group_by_date_function).send(sum_function)
     end
   end
 

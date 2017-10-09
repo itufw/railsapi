@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170908035532) do
+ActiveRecord::Schema.define(version: 20171004050251) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -244,6 +244,77 @@ ActiveRecord::Schema.define(version: 20170908035532) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
+
+  create_table "customer_credit_app_references", force: :cascade do |t|
+    t.integer  "customer_credit_app_id", limit: 4
+    t.integer  "customer_id",            limit: 4
+    t.text     "company_name",           limit: 65535
+    t.text     "contact_name",           limit: 65535
+    t.text     "check1",                 limit: 65535
+    t.text     "check2",                 limit: 65535
+    t.text     "check3",                 limit: 65535
+    t.text     "check4",                 limit: 65535
+    t.text     "notes",                  limit: 65535
+    t.integer  "checked_by",             limit: 4
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
+  end
+
+  create_table "customer_credit_app_signeds", force: :cascade do |t|
+    t.integer  "customer_credit_app_id", limit: 4
+    t.integer  "contact_id",             limit: 4
+    t.integer  "customer_id",            limit: 4
+    t.integer  "assigned_staff",         limit: 4
+    t.integer  "active",                 limit: 4
+    t.datetime "end_date"
+    t.text     "end_note",               limit: 65535
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
+  end
+
+  create_table "customer_credit_apps", force: :cascade do |t|
+    t.integer  "customer_id",                     limit: 4
+    t.integer  "credit_application_version",      limit: 4
+    t.datetime "date_signed"
+    t.integer  "director_signed",                 limit: 4
+    t.text     "company_name",                    limit: 255
+    t.text     "trading_name",                    limit: 255
+    t.text     "abn",                             limit: 255
+    t.integer  "abn_checked",                     limit: 4
+    t.integer  "abn_checked_staff_id",            limit: 4
+    t.text     "liquor_license_number",           limit: 255
+    t.integer  "liquor_license_checked",          limit: 4
+    t.integer  "liquor_license_checked_staff_id", limit: 4
+    t.text     "address",                         limit: 65535
+    t.text     "street",                          limit: 65535
+    t.text     "street_2",                        limit: 65535
+    t.text     "city",                            limit: 65535
+    t.text     "state",                           limit: 65535
+    t.text     "postcode",                        limit: 65535
+    t.text     "phone",                           limit: 65535
+    t.text     "fax",                             limit: 65535
+    t.datetime "business_commenced"
+    t.string   "current_premises",                limit: 255
+    t.datetime "date_occupied"
+    t.string   "payment_method_credit_app",       limit: 255
+    t.string   "payment_method",                  limit: 255
+    t.datetime "payment_method_updated_date"
+    t.string   "credit_terms",                    limit: 255
+    t.integer  "credit_days",                     limit: 4
+    t.integer  "tolerance_days",                  limit: 4
+    t.string   "credit_app_doc_id",               limit: 255
+    t.integer  "credit_limit",                    limit: 4
+    t.integer  "reference_check",                 limit: 4
+    t.datetime "approved_date"
+    t.integer  "approved_by",                     limit: 4
+    t.integer  "staff_id",                        limit: 4
+    t.datetime "created_at",                                    null: false
+    t.datetime "updated_at",                                    null: false
+    t.text     "note",                            limit: 65535
+  end
+
+  add_index "customer_credit_apps", ["credit_application_version"], name: "index_customer_credit_apps_on_credit_application_version", using: :btree
+  add_index "customer_credit_apps", ["customer_id"], name: "index_customer_credit_apps_on_customer_id", using: :btree
 
   create_table "customer_leads", force: :cascade do |t|
     t.text     "firstname",              limit: 255
@@ -523,6 +594,7 @@ ActiveRecord::Schema.define(version: 20170908035532) do
     t.integer  "updated_by",        limit: 4
     t.datetime "created_at",                                              null: false
     t.datetime "updated_at",                                              null: false
+    t.datetime "revision_date"
   end
 
   add_index "order_product_histories", ["order_history_id"], name: "index_order_product_histories_on_order_history_id", using: :btree
@@ -704,6 +776,12 @@ ActiveRecord::Schema.define(version: 20170908035532) do
     t.integer  "product_no_vintage_id", limit: 4
     t.datetime "created_at",                        null: false
     t.datetime "updated_at",                        null: false
+    t.integer  "selected",              limit: 4
+    t.integer  "warehouse_id",          limit: 4
+    t.string   "row",                   limit: 255
+    t.string   "column",                limit: 255
+    t.string   "area",                  limit: 255
+    t.integer  "case_size",             limit: 4
   end
 
   add_index "product_no_ws", ["product_no_vintage_id"], name: "index_product_no_ws_on_product_no_vintage_id", using: :btree
@@ -822,6 +900,11 @@ ActiveRecord::Schema.define(version: 20170908035532) do
     t.integer  "product_no_vintage_id",     limit: 4
     t.integer  "product_no_ws_id",          limit: 4
     t.integer  "on_order",                  limit: 1
+    t.integer  "sale_term_1",               limit: 4
+    t.integer  "sale_term_2",               limit: 4
+    t.integer  "sale_term_3",               limit: 4
+    t.integer  "sale_term_4",               limit: 4
+    t.decimal  "monthly_supply",                          precision: 6, scale: 2
   end
 
   create_table "promotions", force: :cascade do |t|
@@ -841,6 +924,16 @@ ActiveRecord::Schema.define(version: 20170908035532) do
     t.string   "description",   limit: 255
   end
 
+  create_table "sale_rate_terms", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.integer  "days_from",  limit: 4
+    t.integer  "days_until", limit: 4
+    t.integer  "weight",     limit: 4
+    t.integer  "term",       limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "staff_calendar_addresses", force: :cascade do |t|
     t.integer  "staff_id",         limit: 4
     t.text     "calendar_address", limit: 65535
@@ -857,6 +950,23 @@ ActiveRecord::Schema.define(version: 20170908035532) do
     t.date     "date"
     t.datetime "created_at",           null: false
     t.datetime "updated_at",           null: false
+  end
+
+  create_table "staff_group_items", force: :cascade do |t|
+    t.integer  "staff_group_id", limit: 4
+    t.integer  "item_id",        limit: 4
+    t.string   "item_model",     limit: 255
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+  end
+
+  add_index "staff_group_items", ["staff_group_id", "item_id", "item_model"], name: "index_staff_group_items", unique: true, using: :btree
+
+  create_table "staff_groups", force: :cascade do |t|
+    t.integer  "staff_id",   limit: 4
+    t.string   "group_name", limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
   end
 
   create_table "staff_time_periods", force: :cascade do |t|
@@ -1008,6 +1118,36 @@ ActiveRecord::Schema.define(version: 20170908035532) do
     t.decimal  "tax_percentage",             precision: 8, scale: 2
     t.datetime "created_at",                                         null: false
     t.datetime "updated_at",                                         null: false
+  end
+
+  create_table "warehouse_examinings", force: :cascade do |t|
+    t.string   "product_name",        limit: 255
+    t.string   "country",             limit: 255
+    t.integer  "product_no_ws_id",    limit: 4
+    t.integer  "current_dm",          limit: 4
+    t.integer  "current_vc",          limit: 4
+    t.integer  "current_retail",      limit: 4
+    t.integer  "current_ws",          limit: 4
+    t.integer  "current_total",       limit: 4
+    t.integer  "allocation",          limit: 4
+    t.integer  "on_order",            limit: 4
+    t.integer  "current_stock",       limit: 4
+    t.integer  "count_dm",            limit: 4
+    t.integer  "count_vc",            limit: 4
+    t.integer  "count_retail",        limit: 4
+    t.integer  "count_ws",            limit: 4
+    t.integer  "count_total",         limit: 4
+    t.integer  "count_size",          limit: 4
+    t.integer  "count_pack",          limit: 4
+    t.integer  "count_loose",         limit: 4
+    t.integer  "count_sample",        limit: 4
+    t.integer  "difference",          limit: 4
+    t.integer  "count_staff_id",      limit: 4
+    t.integer  "authorised_staff_id", limit: 4
+    t.datetime "count_date"
+    t.datetime "authorised_date"
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
   end
 
   create_table "warehouses", force: :cascade do |t|

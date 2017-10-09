@@ -1,0 +1,72 @@
+<%= form_tag({:controller => 'product', :action => 'warehouse_review'}, {:method => "get"}) do %>
+<table class="reference-table" style="text-align: center; min-width: 10px;">
+  <thead>
+    <tr>
+      <th colspan="2"></th>
+      <th colspan="7">Current</th>
+      <th colspan="6">Count</th>
+      <th colspan="4">Distribute</th>
+      <th colspan="3"></th>
+    </tr>
+    <tr>
+      <th>No WS ID</th>
+      <th>Name</th>
+      <th>DM</th>
+      <th>VC</th>
+      <th>Retail</th>
+      <th>WS</th>
+      <th>On Order</th>
+      <th>Allocated</th>
+      <th>Total</th>
+      <th>Size</th>
+      <th>Packs</th>
+      <th>Loose</th>
+      <th>Sample</th>
+      <th>Total</th>
+      <th>Difference</th>
+      <th>DM</th>
+      <th>VC</th>
+      <th>Retail</th>
+      <th>WS</th>
+      <th>Date</th>
+      <th>Staff</th>
+      <th></th>
+    </tr>
+  </thead>
+  <% @warehouse_reviews.each do |warehouse_count|%>
+  <%= fields_for "warehouse[#{warehouse_count.id}]", warehouse_count do |warehouse| %>
+    <tr>
+      <%= warehouse.hidden_field :id %>
+      <%= warehouse.hidden_field :product_no_ws_id %>
+
+      <td>
+        <%= check_box_tag 'selected_product[]', warehouse_count.id, false, class: "product_checkbox" %>
+        <%= warehouse_count.product_no_ws_id%>
+      </td>
+      <td><%= warehouse_count.product_name%></td>
+      <td><%= warehouse_count.current_dm if warehouse_count.current_dm>0 %></td>
+      <td><%= warehouse_count.current_vc if warehouse_count.current_vc>0 %></td>
+      <td><%= warehouse_count.current_retail if warehouse_count.current_retail>0 %></td>
+      <td><%= warehouse_count.current_ws if warehouse_count.current_ws>0 %></td>
+      <td><%= warehouse_count.on_order %></td>
+      <td><%= warehouse_count.allocation %></td>
+      <td><%= warehouse_count.current_stock %></td>
+      <td><%= warehouse.text_field :count_size, size: 5%></td>
+      <td><%= warehouse.text_field :count_pack, size: 5%></td>
+      <td><%= warehouse.text_field :count_loose, size: 5%></td>
+      <td><%= warehouse.text_field :count_sample, size: 5%></td>
+      <td><%= warehouse.text_field :count_total, size: 5, readonly: true%></td>
+      <td><%= warehouse_count.difference%></td>
+      <td><%= warehouse.text_field :count_dm, size: 5 if warehouse_count.current_dm>0%></td>
+      <td><%= warehouse.text_field :count_vc, size: 5 if warehouse_count.current_vc>0%></td>
+      <td><%= warehouse.text_field :count_retail, size: 5 if warehouse_count.current_retail>0%></td>
+      <td><%= warehouse.text_field :count_ws, size: 5 if warehouse_count.current_ws>0%></td>
+      <td><%= warehouse_count.count_date.strftime('%d/%m %H:%M')%></td>
+      <td><%= warehouse_count.creator.nickname %></td>
+      <td></td>
+    </tr>
+    <% end %>
+  <% end %>
+</table>
+  <center>  <%= submit_tag "Confirm!",class: 'btn btn-primary'%></center>
+<% end %>

@@ -13,4 +13,8 @@ class ProductNoWs < ActiveRecord::Base
   def self.order_by_id(direction)
     order('id ' + direction)
   end
+
+  def self.counting
+    where(selected: 1)
+  end
 end

@@ -1,12 +1,12 @@
 require 'csv_import.rb'
 require 'csv_generator.rb'
-
+require 'stock_control.rb'
 
 class AdminController < ApplicationController
     before_action :confirm_logged_in
 
     include CsvGenerator
-
+    include StockControl
 
     # CustType
     # CustGroup
@@ -168,5 +168,63 @@ class AdminController < ApplicationController
         send_data export_orders(12, (Date.today - 8.years), Date.today), filename: "ScotPac-#{Date.parse(params[:date][:end_date])}.csv" and return
       end
       redirect_to :back
+    end
+
+    def export_stock_control
+      @countries = ProducerCountry.product_country
+      # Include Only In Stock Products
+      # Function in lib stock control
+      @product_hash = stock_calculation()
+
+      respond_to do |format|
+        format.html
+        format.xlsx {
+          response.headers['Content-Disposition'] = "attachment; filename=Stock Control #{Date.today.to_s}.xlsx"
+        }
+      end
+    end
+
+    def group_list
+      group_creation(params) unless params[:staff_group].nil?
+      default_group_update(params) unless params[:default_group].nil?
+
+      params = {}
+      @groups = StaffGroup.staff_groups(session[:user_id])
+    end
+
+    def group_creation(params)
+      if params[:staff_group][:group_name].to_s == ""
+        flash[:error] = 'Group must have a name!'
+      elsif StaffGroup.duplicated(session[:user_id], params[:staff_group][:group_name]).blank?
+        StaffGroup.new({group_name: params[:staff_group][:group_name], staff_id: session[:user_id]}).save
+        flash[:success] = 'Group Created!'
+      else
+        flash[:error] = 'Duplicated Group Name!'
+      end
+    end
+
+    def default_group_update(params)
+      session[:default_group] = params[:default_group]
+    end
+
+    def fetch_group_detail
+      @group = StaffGroup.where(id: params[:group_id]).first
+      respond_to do |format|
+        format.js
+      end
+    end
+
+    def fetch_add_item
+      StaffGroupItem.new(staff_group_id: params[:group_id], item_model: params[:item_model], item_id: params[:item_id]).save
+      respond_to do |format|
+        format.js
+      end
+    end
+
+    def fetch_remove_item
+      StaffGroupItem.where(staff_group_id: params[:group_id], item_model: params[:item_model], item_id: params[:item_id]).delete_all
+      respond_to do |format|
+        format.js
+      end
     end
 end

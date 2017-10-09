@@ -86,7 +86,7 @@ module CustomerHelper
   def near_by_customers(latitude, longitude, radius, staff_id = nil)
     restaurants = ZomatoRestaurant.near([latitude, longitude], radius.to_f, units: :km).select{|x| x}
     customers = Customer.staff_search_filter(staff_id = staff_id).near([latitude, longitude], radius.to_f, units: :km).select{|x| x}
-    leads = CustomerLead.filter_by_staff(staff_id).active_lead.near([latitude, longitude], radius.to_f, units: :km).select{|x| x}
+    leads = CustomerLead.filter_by_staff(staff_id).near([latitude, longitude], radius.to_f, units: :km).select{|x| x}
 
     [customers, leads, restaurants]
   end

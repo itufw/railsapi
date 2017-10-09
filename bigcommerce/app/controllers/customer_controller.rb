@@ -5,6 +5,7 @@ require 'dates_helper.rb'
 require 'customer_helper.rb'
 require 'accounts_helper.rb'
 require 'lead_helper.rb'
+require 'zomato_calculation.rb'
 
 class CustomerController < ApplicationController
   before_action :confirm_logged_in
@@ -16,6 +17,7 @@ class CustomerController < ApplicationController
   include CustomerHelper
   include AccountsHelper
   include LeadHelper
+  include ZomatoCalculation
 
   # NEW CUSTOMER PAGE
   def contact
@@ -232,10 +234,12 @@ class CustomerController < ApplicationController
   end
 
   def zomato
+    search_by_suburb(params[:suburb]) if params[:commit].to_s=='Include' && params[:suburb].to_s!=''
+
     @selected_cuisine = params[:selected_cuisine] || ZomatoCuisine.filter_priority(1).map(&:name)
     @selected_cuisine.map(&:strip)
 
-    @search_text = params['search']
+    @search_text = params[:search] || params[:suburb]
     @per_page = params[:per_page] || ZomatoRestaurant.per_page
 
     order_function, direction = sort_order(params, :order_by_name, 'ASC')
@@ -248,12 +252,19 @@ class CustomerController < ApplicationController
     radius = params[:radius] || 0.5
 
     customer = Customer.where('lat IS NOT NULL').search_for(@search_text).first
-    customer = ZomatoRestaurant.unassigned.cuisine_search(params[:cuisine]).search_for(@search_text).first if customer.nil?
+    customer = ZomatoRestaurant.unassigned.search_for(@search_text).first if customer.nil?
     customer = CustomerLead.where('latitude IS NOT NULL').search_for(@search_text).first if customer.nil?
-    latitude = (customer.is_a? Customer) ? customer.lat : customer.latitude
-    longitude = (customer.is_a? Customer) ? customer.lng : customer.longitude
 
-    @customers, @leads, @resaurants = near_by_customers(latitude, longitude, radius)
+    if customer.nil?
+      @customers = []
+      @leads = []
+      @restaurants = []
+    else
+      latitude = (customer.is_a? Customer) ? customer.lat : customer.latitude
+      longitude = (customer.is_a? Customer) ? customer.lng : customer.longitude
+
+      @customers, @leads, @resaurants = near_by_customers(latitude, longitude, radius)
+    end
   end
 
   def map_geocode
@@ -275,6 +286,7 @@ class CustomerController < ApplicationController
                                      :address, :street, :street_2, :city, :state, :postcode,\
                                      :country, :SpecialInstruction1, :SpecialInstruction2,\
                                      :SpecialInstruction3, :tolerance_day, :account_type,\
-                                     :default_courier, :payment_method)
+                                     :default_courier, :payment_method, :phone,\
+                                     :email)
   end
 end

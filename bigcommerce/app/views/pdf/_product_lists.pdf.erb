@@ -69,12 +69,12 @@
       </tr>
       <tr>
         <td colspan="2" class="ProductCost" align="right">WET</td>
-        <td class="ProductTotal" align="right">$<%= '%.2f' % (order.wet) %></td>
+        <td class="ProductTotal" align="right">$<%= '%.2f' % (order.wet.to_f) %></td>
         <td></td>
       </tr>
       <tr>
         <td colspan="2" class="ProductCost" align="right">GST</td>
-        <td class="ProductTotal" align="right">$<%= '%.2f' % (order.gst) %></td>
+        <td class="ProductTotal" align="right">$<%= '%.2f' % (order.gst.to_f) %></td>
         <td></td>
       </tr>
       <tr>

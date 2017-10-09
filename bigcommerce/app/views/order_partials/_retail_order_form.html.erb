@@ -122,7 +122,9 @@
     <td class="ProductTotal" align="right"><%= f.text_field :gst, readonly: true%></td>
   </tr>
   <tr>
-    <td class="ProductCost" align="right">Grand Total</td>
+    <td class="ProductCost" align="right">
+      Grand Total
+    </td>
     <td class="ProductTotal" align="right"><%= f.text_field :total_inc_tax, readonly: true%></td>
   </tr>
 </table>
@@ -271,8 +273,6 @@
   $(document).on('click', '.remove_row', function(){
     $(this).parent().parent().remove();
   });
-
-
 </script>
 
 <!-- Submit Tag -->

@@ -2,8 +2,10 @@ class ReminderMailer < ActionMailer::Base
   require 'mail'
   require 'wicked_pdf'
   require 'order_status.rb'
+  require 'stock_control.rb'
 
   include OrderStatus
+  include StockControl
 
   default from: 'accounts@untappedwines.com'
   layout "mailer"
@@ -15,16 +17,39 @@ class ReminderMailer < ActionMailer::Base
     mail(from: 'Untapped IT <it@untappedwines.com>', to: 'William Liu <it@untappedwines.com>', cc: 'Luke Voortman <lvoortman@untappedwines.com>', subject: "Sync Error")
   end
 
-  def order_confirmation(order_id, email_address)
+  def stock_control_reminder
+    xlsx = render_to_string formats: [:xlsx], template: "admin/export_stock_control", locals: {countries: ProducerCountry.product_country, product_hash: stock_calculation()}
+    attachments["Stock Control #{Date.today.to_s}.xlsx"] = {mime_type: Mime::XLSX, content: Base64.encode64(xlsx), encoding: 'base64'}
+
+    # sales = []
+    # sales.push(%("SalesTeam" <salesteam@untappedwines.com>))
+    # sales.push(%("Paola <paola@untappedwines.com>"))
+    #
+    # managers = []
+    # managers.push(%("Adam" <adam@untappedwines.com>))
+    # managers.push(%("Angelica" <accounts@untappedwines.com>))
+    # managers.push(%("Luke" <lvoortman@untappedwines.com>))
+    # managers.push(%("Lucia" <lgaldona@untappedwines.com>))
+
+    mail(from: 'Untapped CMS <it@untappedwines.com>', to: 'Lucia <lgaldona@untappedwines.com>', bcc: 'William Liu <it@untappedwines.com>', subject: "Stock Control #{Date.today.to_s}")
+
+    # mail(from: 'Untapped CMS <it@untappedwines.com>', to: sales, cc: managers, bcc: 'William Liu <it@untappedwines.com>', subject: "Stock Control #{Date.today.to_s}")
+  end
+
+  def order_confirmation(order_id, email_address, user_id)
     @order = Order.find(order_id)
     @customer = @order.customer
     @staff = @order.staff
+
+    # TODO
+    # Change it after new sales joined
+    @staff = Staff.find(45) if @staff.nickname=='Tasso'
 
     customer_address = %("#{@customer.actual_name}" <#{email_address}>)
     subject = "Untapped Fine Wines Order #{@order.id} – #{@customer.actual_name}"
     attachments["Invoice##{order_id}.pdf"] = print_single_invoice(@order)
 
-    mail(from: "Untapped Fine Wines <accounts@untappedwines.com>", to: customer_address, bcc: @staff.email, reply_to: @staff.email, subject: subject)
+    mail(from: "Untapped Fine Wines <accounts@untappedwines.com>", to: customer_address, bcc: @staff.email + ";" + Staff.find(user_id).email, reply_to: @staff.email, subject: subject)
   end
 
   def send_overdue_reminder(customer_id, email_subject,staff_id,email_content,email_address, cc, bcc, email_type, selected_invoices, cn_op, attachment_tmp)

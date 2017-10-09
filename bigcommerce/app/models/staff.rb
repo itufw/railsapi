@@ -7,6 +7,7 @@ class Staff < ActiveRecord::Base
     has_many :customer_leads
     has_many :orders
     has_many :staff_daily_samples
+    has_many :staff_groups
 
     has_many :staff_time_periods
     has_many :staff_calendar_addresses
@@ -85,5 +86,9 @@ class Staff < ActiveRecord::Base
 
     def self.order_by_order
         order(:staff_order)
+    end
+
+    def name
+      nickname
     end
 end

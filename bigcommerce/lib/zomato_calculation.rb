@@ -77,17 +77,11 @@ module ZomatoCalculation
       end
 
     end
-
   end
 
   def search_by_geo
     # MultiGeocoder.geocode(location)
     count_ping = 0
-    query = 'https://developers.zomato.com/api/v2.1/search'
-
-    # Selected Cuisines and useless Cuisines
-    selected_cuisines = get_cuisines.map(&:to_s)
-    inactive_cuisines = ZomatoCuisine.inactive_cuisines.map(&:name).sort.uniq
 
     customers_viewed = []
     customers = Customer.where('lng IS NOT NULL AND cust_type_id != 1').select{ |x| x}
@@ -96,33 +90,63 @@ module ZomatoCalculation
     # customers_viewed = filter_viewed_spots
     # customers = customers.select{ |x| !customers_viewed.include?x.id }
     # ------------------------------------------------------------------
-
     while !customers.blank?
       customer = customers.last
 
       existed_customer = ZomatoRestaurant.near([customer.lat, customer.lng], 0.5, units: :km).map(&:id)
-      start = 0
-      results_found = 100
-      while (results_found > 40) && ((start * 20) < results_found) && start < 80 && existed_customer.count < 40
-        response = HTTParty.get(query, query: {lat: customer.lat, lon: customer.lng, radius: 200, cuisines: selected_cuisines, start: start}, headers: {"user-key" => Rails.application.secrets.zomato_key })
-
-        # if hit the daily limit, return the function
-        return if response['results_found'].nil?
-
-        restaurant_update_attribuets(response['restaurants'], inactive_cuisines)
-
-        # search for next customer or search for next page
-        results_found = response['results_found'].to_i
-        start += 20
-        count_ping += 1
-        puts 'Counting ' + count_ping.to_s if count_ping % 100 == 0
-        return if count_ping > 900
-      end
+      return if search_location(customer.lat, customer.lng, count_ping)>900
 
       customers_viewed += Customer.near([customer.lat, customer.lng], 0.5, units: :km).map(&:id)
       customers = customers.select{ |x| !customers_viewed.include?x.id }
     end
   end # end def
+
+  def search_location(lat, lng, count_ping)
+    query = 'https://developers.zomato.com/api/v2.1/search'
+
+    # Selected Cuisines and useless Cuisines
+    selected_cuisines = get_cuisines.map(&:to_s)
+    inactive_cuisines = ZomatoCuisine.inactive_cuisines.map(&:name).sort.uniq
+
+    start = 0
+    results_found = 100
+    while (results_found > 40) && (start < results_found) && start < 80
+      response = HTTParty.get(query, query: {lat: lat, lon: lng, radius: 1000, cuisines: selected_cuisines, start: start}, headers: {"user-key" => Rails.application.secrets.zomato_key })
+
+      # if hit the daily limit, return the function
+      return if response['results_found'].nil?
+      restaurant_update_attribuets(response['restaurants'], inactive_cuisines)
+      # search for next customer or search for next page
+      results_found = response['results_found'].to_i
+      start += 20
+      count_ping += 1
+      puts 'Counting ' + count_ping.to_s if count_ping % 100 == 0
+    end
+    return count_ping
+  end
+
+  def search_by_suburb(suburb)
+    suburb_query = 'https://developers.zomato.com/api/v2.1/locations'
+    query = 'https://developers.zomato.com/api/v2.1/search'
+
+    inactive_cuisines = ZomatoCuisine.inactive_cuisines.map(&:name).sort.uniq
+
+    response = HTTParty.get(suburb_query, query: {query: suburb}, headers: {"user-key" => Rails.application.secrets.zomato_key })
+
+    response['location_suggestions'].each do |zone|
+      start = 0
+      results_found = 100
+      while (results_found > 40) && (start < results_found) && start < 80
+        rest_response = HTTParty.get(query, query: {entity_id: zone['entity_id'], entity_type: zone['entity_type'], start: start}, headers: {"user-key" => Rails.application.secrets.zomato_key })
+
+        break if rest_response['results_found'].nil?
+        restaurant_update_attribuets(rest_response['restaurants'], inactive_cuisines)
+
+        results_found = rest_response['results_found'].to_i
+        start += 20
+      end
+    end
+  end
 
   def restaurant_update_attribuets(restaurants, inactive_cuisines)
     return if restaurants.nil? || restaurants.blank?

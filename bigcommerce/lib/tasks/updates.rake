@@ -2,11 +2,13 @@ require 'rake_task_helper.rb'
 load 'zomato_calculation.rb'
 load 'fastway_api.rb'
 require 'google_calendar_sync.rb'
+load 'stock_control.rb'
 
 include RakeTaskHelper
 include ZomatoCalculation
 include GoogleCalendarSync
 include FastwayApi
+include StockControl
 
 namespace :updates do
 	desc "Rake task to update data"
@@ -96,6 +98,16 @@ namespace :updates do
 		puts 'Wake Signatures Up'
 		wake_signatures
 		puts 'Waked Signature'
+	end
+
+	task :sales_rate_update => :environment do
+		puts 'Sales Rate Update Start'
+		sales_rate_update
+		puts 'Sales Rate Update End'
+	end
+
+	task :send_stock_control => :environment do
+		ReminderMailer.stock_control_reminder.deliver_now
 	end
 
 	task :balanceupdate => :environment do

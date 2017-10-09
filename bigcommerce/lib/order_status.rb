@@ -64,18 +64,18 @@ module OrderStatus
         order.update_attributes(order_params.reject{|key, value| key == 'courier_status_id' })
         result = Fastway.new.add_consignment(order, params['dozen'].to_i, params['half-dozen'].to_i)
         begin
-          order.update_attributes(order_params.reject{|key, value| key == 'courier_status_id' }.merge({track_number: result['result']['LabelNumbers'].join(';'), courier_status_id: 4, status_id: 8, date_shipped: Time.now.to_s(:db), last_updated_by: user_id}))
+          order.update_attributes(order_params.reject{|key, value| key == 'courier_status_id' }.merge({track_number: result['result']['LabelNumbers'].join(';'), courier_status_id: 4, date_shipped: Time.now.to_s(:db), last_updated_by: user_id}))
           order.customer.update_attributes(order_params.select{|key, value| ['SpecialInstruction1', 'SpecialInstruction2', 'SpecialInstruction3'].include?key}) unless params[:customer_instruction_update].nil? || params[:customer_instruction_update]==""
           flash[:success] = "Label Printed"
         rescue
           flash[:error] = 'Fail to connect Fastway, Check the Shipping Address'
-          flash[:error] = result['error'] unless result.nil? || result[:error].nil?
+          flash[:error] = result['error'] unless result.nil? || result['error'].nil?
           selected_orders.unshift(params[:order_id])
           return ['Label Error', selected_orders]
         end
         # create label with fastway
       else
-        Order.find(params[:order_id]).update_attributes(order_params.merge({status_id: 8, date_shipped: Time.now.to_s(:db), last_updated_by: user_id, eta: Date.today.to_s(:db)}))
+        Order.find(params[:order_id]).update_attributes(order_params.merge({date_shipped: Time.now.to_s(:db), last_updated_by: user_id, eta: Date.today.to_s(:db)}))
       end
     else
       if !params[:order].nil?
@@ -93,7 +93,7 @@ module OrderStatus
     end
 
     unless params[:order][:customer].nil?
-      customer_params = params[:order][:customer].permit(:street, :city, :state, :street_2, :postcode, :country)
+      customer_params = params[:order][:customer].permit(:street, :city, :state, :street_2, :postcode, :country, :company)
       customer = Customer.joins(:orders).where('orders.id = ?', params[:order_id]).first.update_attributes(customer_params)
     end
 

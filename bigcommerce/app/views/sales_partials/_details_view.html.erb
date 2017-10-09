@@ -31,7 +31,6 @@
 	<tr>
 		<td><%= id %></td>
 		<td>
-			<%= check_box_tag 'selected_product[]', id, (@product_order_number.keys.include?id), class: "product_name_checkbox" if ([9,36].include?session[:user_id]) && (@checked_id) %>
 			<%= link_to @product_name_h[id], controller: 'product', action: 'summary', product_id: id, product_name: @product_name_h[id], transform_column: @transform_column, total_stock: @inventory_h[id].to_i, pending_stock: @pending_stock_h[id].to_i %>
 		</td>
 		<td class="num"><%= display_num(@price_h[id]) %>
