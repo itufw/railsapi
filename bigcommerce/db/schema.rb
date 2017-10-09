@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171004050251) do
+ActiveRecord::Schema.define(version: 20171009025631) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -241,6 +241,14 @@ ActiveRecord::Schema.define(version: 20171004050251) do
 
   create_table "cust_types", force: :cascade do |t|
     t.text     "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "customer_account_types", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.string   "status",     limit: 255
+    t.integer  "alert",      limit: 4
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
