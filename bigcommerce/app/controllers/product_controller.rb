@@ -366,6 +366,17 @@ class ProductController < ApplicationController
     end
   end
 
+  def product_inventory_overwrite
+    if Staff.find(session[:user_id]).product_rights.zero?
+      flash[:error] = 'No Authority'
+      redirect_to request.referrer and return
+    else
+      params[:product].each {|product_id, inventory| Product.find(product_id).inventory_overwrite(inventory.to_i, session[:user_id])}
+      flash[:success] = 'Stock Level Overwrote'
+    end
+    redirect_to request.referrer
+  end
+
   # Flag for product Selection
   # Do Not Use
 
