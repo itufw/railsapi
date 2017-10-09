@@ -182,7 +182,7 @@ class Product < ActiveRecord::Base
   end
 
   def self.filter_by_ids_nil_allowed(product_ids_a)
-    where('products.id IN (?)', product_ids_a)
+    where('products.id': product_ids_a)
   end
 
   def self.include_orders
@@ -293,8 +293,9 @@ class Product < ActiveRecord::Base
     where('product_no_vintage_id IS NULL OR product_no_ws_id IS NULL OR producer_country_id IS NULL')
   end
 
-  def inventory_overwrite(inventory)
+  def inventory_overwrite(inventory, user_id)
     return false if inventory < 0
+    return false if Staff.find(user_id).product_rights!=1
     update(inventory: inventory)
     bigcommerce_inventory_overwrite
   end
