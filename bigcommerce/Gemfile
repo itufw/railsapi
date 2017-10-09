@@ -113,3 +113,16 @@ gem 'simple_calendar'
 gem 'rails-rateit', '~> 1.0.22', github:'berikin/rails-rateit'
 
 gem 'httparty'
+
+# FILE Stored
+gem 'carrierwave'
+gem 'carrierwave-dropbox'
+
+# Browser Detactor
+gem "browser"
+
+# Excel Export
+gem 'rubyzip'
+gem 'axlsx', '= 2.0.1'
+gem 'axlsx_rails'
+gem 'axlsx_styler'

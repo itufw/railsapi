@@ -5,6 +5,9 @@
   <%= f.hidden_field :id %>
   <%= @product.id.to_s + '   ' + @product.name %><br/>
 
+  <%= f.radio_button :current, '1', checked: !@product.current.zero? %> Current
+  <%= f.radio_button :current, '0', checked: @product.current.zero? %> No
+  <br/>
   <%= f.label :search_for_similar_product, class: 'margin-from-top label-new' %>
   <%= autocomplete_field_tag 'product_search', '', autocomplete_product_name_product_index_path, placeholder: 'Search Products', id: 'product_search',size: 30 %>
   <br/>

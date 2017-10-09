@@ -1,0 +1,62 @@
+require 'axlsx'
+wb = xlsx_package.workbook
+
+@countries = countries if @countries.nil? && countries.present?
+@product_hash = product_hash if @product_hash.nil? && product_hash.present?
+
+wb.add_worksheet(name: "Stock Control") do |sheet|
+
+  winery_hash = {bg_color: '000000', fg_color: 'FFFFFF'}
+  bond_hash = {b: true}
+  red_font_hash = {fg_color: 'FF0000'}
+  green_hash = {bg_color: '80ff00'}
+  light_green_hash = {bg_color: 'e6ffcc'}
+  orange_hash = {bg_color: 'ff6600'}
+  light_orange_hash = {bg_color: 'ffc299'}
+
+  black_cell = wb.styles.add_style winery_hash
+  green_cell = wb.styles.add_style green_hash
+  lightgreen_cell = wb.styles.add_style light_green_hash
+  orange_cell = wb.styles.add_style orange_hash
+  lightorange_cell = wb.styles.add_style light_orange_hash
+
+  country_cell = wb.styles.add_style bond_hash.merge({sz: 16})
+  highlight_font = wb.styles.add_style red_font_hash
+  bordered_cell = wb.styles.add_style bond_hash.merge({border: { style: :thin, color: '000000', edges: [:left, :right, :bottom, :top]}})
+  title_cell = wb.styles.add_style bond_hash.merge({sz: 18})
+
+  sheet.add_row(
+    [nil, 'Stock Control'],
+    style: [nil, title_cell]
+  )
+  sheet.merge_cells "B1:E1"
+  sheet.add_row([nil, Date.today.strftime('%d/%m/%Y')])
+
+  @countries.each do |country|
+    sheet.add_row([nil, country.name], style: country_cell)
+    country.producers.each do |producer|
+      next if producer.id==21
+
+      sheet.add_row(
+        [nil, producer.name, 'Case', 'RRP', 'LUC', 'Aloc.', 'Bot.', '30 D.S.', 'Supply'],
+        style: [nil, (1..8).map { |x| black_cell }].flatten
+      )
+
+      product_ids = producer.products.group('product_no_ws_id').order('name').map(&:product_no_ws_id)
+      product_ids.each do |product_id|
+        product = @product_hash[product_id]
+        next if product.nil?
+        sheet.add_row(
+          [product[:ws_id], product[:name], product[:case_size], product[:rrp], product[:luc], product[:allocated], product[:inventory], product[:term_1], product[:monthly_supply]],
+          style: [nil, (eval product[:name_color].to_s), (1..4).map {|x| nil}, (product[:current].to_i.zero?)? highlight_font : nil, bordered_cell, bordered_cell].flatten
+        )
+      end
+    end
+  end
+
+  sheet.add_row(
+    [nil, '4+ months supply', 'Waiting for container or stock for retail'],
+    style: [nil, orange_cell, highlight_font]
+  )
+  sheet.column_info[3].hidden = true
+end

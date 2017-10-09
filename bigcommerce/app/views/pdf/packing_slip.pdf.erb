@@ -39,14 +39,14 @@
     <%= render 'pdf/product_lists', order: order %>
   </div>
 
-  <div class="InvoiceComments" style="%%GLOBAL_HideComments%%; font-size: 0.8em;width: 350px; text-align: justify;">
-    <div class="InvoiceHeading" style="font-size: 14;">Customer Notes</div>
+  <div class="InvoiceComments" style="%%GLOBAL_HideComments%%; font-size: 0.8em;width: 350px; text-align: justify; margin-top: -100px">
+    <div class="InvoiceHeading" style="font-size: 18;">Customer Notes</div>
     <% order.customer_notes.split(/\n/).each do |note| %>
       <%= note %> <br/>
     <% end %>
   </div>
   <div class="InvoiceComments" style="%%GLOBAL_HideComments%%; font-size: 0.8em;width: 350px; text-align: justify;">
-    <div class="InvoiceHeading" style="font-size: 14;">Staff Notes</div>
+    <div class="InvoiceHeading" style="font-size: 18;">Staff Notes</div>
     <% order.staff_notes.split(/\n/).each do |note| %>
       <b><%= note %></b><br/>
     <% end %>

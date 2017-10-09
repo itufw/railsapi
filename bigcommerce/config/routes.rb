@@ -23,10 +23,15 @@ Rails.application.routes.draw do
 
   get '/fetch_order_detail', to: 'order#fetch_order_detail', as: 'fetch_order_detail'
   get '/fetch_last_products', to: 'status#fetch_last_products', as: 'fetch_last_products'
+  get '/fetch_product_selected', to: 'product#fetch_product_selected', as: 'fetch_product_selected'
+  get '/fetch_group_detail', to: 'admin#fetch_group_detail', as: 'fetch_group_detail'
+  get '/fetch_add_item', to: 'admin#fetch_add_item', as: 'fetch_add_item'
+  get '/fetch_remove_item', to: 'admin#fetch_remove_item', as: 'fetch_remove_item'
 
   get '/fetch_lead', to: 'lead#fetch_lead', as: 'fetch_lead'
   get '/fetch_product_details', to: 'product#fetch_product_details', as: 'fetch_product_details'
-
+  get '/verify_abn', to: 'credit#verify_abn', as: 'verify_abn'
+  get '/credit_list', to: 'credit#credit_list', as: 'credit_list'
 
   get '/rails/mailers' => 'rails/mailers#index'
   get '/rails/mailers/*path' => 'rails/mailers#preview'
@@ -42,7 +47,7 @@ Rails.application.routes.draw do
   post 'contact/edit_contact', to: 'contact#contact_edition'
 
   # this needs to be replaced sometime
-  match ':controller(/:action(/:id))', via: %i[get post]
+  match ':controller(/:action(/:id))', via: %i[get post patch]
 
   resources :calendar do
     get :autocomplete_customer_tag_name, on: :collection

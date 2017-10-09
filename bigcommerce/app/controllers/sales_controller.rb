@@ -122,6 +122,11 @@ class SalesController < ApplicationController
 
     @staff_sum_by_periods = sum_orders(@dates[0], @dates[-1], (date_function + group_by_date_function_staff).to_sym, sum_function, staff_id)
 
+    # Vintage Cellars
+    vc_group_number = 17
+    @cust_group_sum, @cust_group_name = cust_group_sales(vc_group_number, @dates[0], @dates[-1], 'Vintage Cellars', sum_function, @dates_paired)
+
+
     @current_user = Staff.find(session[:user_id])
     @display_all = params[:display_all] || 'No'
     @avg_sum = sum_function.to_s.start_with? 'avg'

@@ -26,6 +26,7 @@ module FastwayApi
     while !delivery_labels.blank?
       selected_labels = delivery_labels[0..15]
       response = fastway.track(selected_labels)
+      puts response
       return response if resposne['result'].nil?
       delivery_labels = delivery_labels.reject{|x| selected_labels.include?x}
     end
@@ -35,11 +36,17 @@ module FastwayApi
     fastway = Fastway.new()
 
     # Delete Uncompleted Signature Obtained Record
-    uncompleted_trace = FastwayTrace.where(Description: 'Signature Obtained', contactName: '').delete_all
+    # uncompleted_trace = FastwayTrace.where(Description: 'Signature Obtained', contactName: '').delete_all
 
-    delivered_label = FastwayTrace.completed.map(&:LabelNumber)
-    undelivered_label = FastwayConsignmentItem.pending_label(delivered_label).map(&:LabelNumber)
+    # delivered_label = FastwayTrace.completed.map(&:LabelNumber)
+    # undelivered_label = FastwayConsignmentItem.pending_label(delivered_label).map(&:LabelNumber)
 
+    # DO NOT Use
+    # Testing Only
+    # fast_orders = Order.select('track_number').where('courier_status_id = 4 AND track_number IS NOT NULL AND date_created > ?', (Date.today-3.days).to_s(:db))
+
+    fast_orders = Order.joins(:status).select('track_number').where('courier_status_id = 4 AND track_number IS NOT NULL AND statuses.in_transit = 1')
+    undelivered_label = fast_orders.map(&:track_number).join(';').split(';')
     while !undelivered_label.blank?
       # maximum for 15, otherwise url error
       selected_labels = undelivered_label[0..15]

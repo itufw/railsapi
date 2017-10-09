@@ -9,6 +9,8 @@ class Order < ActiveRecord::Base
   belongs_to :courier_status
   belongs_to :coupon
   belongs_to :staff
+  belongs_to :creator, foreign_key: 'created_by', class_name: 'Staff'
+  belongs_to :updator, foreign_key: 'last_updated_by', class_name: 'Staff'
   has_many :order_shippings
   has_many :addresses, through: :order_shippings
   has_many :order_actions
@@ -21,13 +23,13 @@ class Order < ActiveRecord::Base
   belongs_to :order_history
   belongs_to :xero_invoice
 
-  after_validation :record_history, on: [:update, :delete], unless: ->(obj){ obj.xero_invoice_number_changed? or obj.xero_invoice_id_changed?}
+  after_validation :record_history, on: [:update, :delete], unless: ->(obj){ obj.xero_invoice_number_changed? or obj.xero_invoice_id_changed? or !obj.total_inc_tax_changed?}
   after_validation :cancel_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id == 5}
   after_validation :recovery_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id_was == 5}
   after_validation :bigcommerce_status_update, on: [:update], if: ->(obj){obj.status_id_changed? and obj.source=='bigcommerce' and [2,3,4,5,6,7,8,9,10,11,12,13,26].include?obj.status_id and obj.last_updated_by!=34}
   after_validation :update_notes, on: [:update], if: ->(obj){obj.source=='bigcommerce' and (obj.staff_notes_changed? or obj.customer_notes_changed?)}
 
-  scoped_search on: [:id, :customer_purchase_order], validator: ->(value){!value.nil?}
+  scoped_search on: [:id, :customer_purchase_order, :track_number], validator: ->(value){!value.nil?}
 
   self.per_page = 30
 
@@ -112,6 +114,11 @@ class Order < ActiveRecord::Base
     all
   end
 
+  def self.customer_staff_filter(staff_id)
+    return includes(:customer).where('customers.staff_id = ?', staff_id).references(:customers) unless staff_id.nil?
+    all
+  end
+
   def self.product_customer_filter(product_ids, customer_ids)
     return includes(:order_products).where('order_products.product_id IN (?)', product_ids).references(:order_products) if customer_ids.nil? || customer_ids.empty?
     includes(:order_products).where('order_products.product_id IN (?) OR orders.customer_id IN (?)', product_ids, customer_ids).references(:order_products)
@@ -148,6 +155,10 @@ class Order < ActiveRecord::Base
   # Problem status include Account Status
   def self.problem_status_filter
     joins(:status).where('statuses.send_reminder = 1 OR (orders.account_status != "Approved" AND statuses.valid_order = 1 AND statuses.in_transit = 0 AND statuses.delivered = 0)')
+  end
+
+  def self.courier_not_confirmed
+    return joins(:courier_status).where('courier_statuses.confirmed': 0)
   end
 
   def self.statuses_filter(status_id)
@@ -366,7 +377,7 @@ class Order < ActiveRecord::Base
   end
 
   def self.total_dismatch
-    includes(:xero_invoice).where('ROUND(orders.total_inc_tax, 1) <> Round(xero_invoices.total, 1)').references(:xero_invoice)
+    includes(:xero_invoice).where('ROUND(orders.total_inc_tax, 2) <> Round(xero_invoices.total, 2)').references(:xero_invoice)
   end
 
   # return sample order and products
@@ -411,15 +422,15 @@ class Order < ActiveRecord::Base
 
   def record_history
     order_attributes =  "('#{self.id_was}', '#{self.customer_id_was}', '#{self.status_id_was}',\
-    '#{self.courier_status_id_was}', '#{self.account_status_was}', '#{self.street_was}', '#{self.city_was}',\
+    '#{self.courier_status_id_was}', '#{self.account_status_was}', \"#{self.street_was}\", \"#{self.city_was}\",\
     \"#{self.state_was}\", \"#{self.postcode_was}\", '#{self.country_was}', \"#{self.address_was}\",\
-    '#{self.staff_id_was}', '#{self.total_inc_tax_was}', '#{self.qty_was}', '#{self.items_shipped_was}',\
-    '#{self.subtotal_was}', '#{self.discount_rate_was}', '#{self.discount_amount_was}',\
-    '#{self.handling_cost_was}', '#{self.shipping_cost_was}', '#{self.wrapping_cost_was}',\
-    '#{self.wet_was}', '#{self.gst_was}',\
-    '#{self.active_was}', '#{self.xero_invoice_id_was}', '#{self.xero_invoice_number_was}',\
-    '#{self.source_was}', '#{self.source_id_was}', '#{self.date_created_was.to_s(:db)}',\
-    '#{self.created_by_was}', '#{self.last_updated_by_was}', '#{self.created_at_was.to_s(:db)}', '#{self.updated_at_was.to_s(:db)}')"
+    '#{self.staff_id_was}', '#{self.total_inc_tax_was.to_f}', '#{self.qty_was.to_i}', '#{self.items_shipped_was.to_i}',\
+    '#{self.subtotal_was.to_f}', '#{self.discount_rate_was.to_f}', '#{self.discount_amount_was.to_f}',\
+    '#{self.handling_cost_was.to_f}', '#{self.shipping_cost_was.to_f}', '#{self.wrapping_cost_was.to_f}',\
+    '#{self.wet_was.to_f}', '#{self.gst_was.to_f}',\
+    '#{self.active_was.to_i}', '#{self.xero_invoice_id_was.to_s}', '#{self.xero_invoice_number_was.to_s}',\
+    '#{self.source_was.to_s}', '#{self.source_id_was.to_s}', '#{self.date_created_was.to_s(:db)}',\
+    '#{self.created_by_was.to_i}', '#{self.last_updated_by_was.to_i}', '#{Time.now.to_s(:db)}', '#{self.updated_at_was.to_s(:db)}')"
     sql = "INSERT INTO order_histories(order_id, customer_id, status_id, courier_status_id,\
     account_status, street, city, state, postcode, country, address, staff_id,\
     total_inc_tax, qty, items_shipped, subtotal, discount_rate, discount_amount,\

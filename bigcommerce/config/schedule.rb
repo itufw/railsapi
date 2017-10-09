@@ -38,6 +38,10 @@ every '30 9-19,0 * * *' do
 	rake 'updates:package_trace'
 end
 
+every '0 8 * * 1' do
+	rake 'updates:send_stock_control'
+end
+
 every 1.day, :at => '10:45 pm' do
 	rake 'updates:wake_signatures'
 end
@@ -62,4 +66,6 @@ every 1.day, :at => '7:00 pm' do
 	rake "updates:zomato_update"
 
 	rake 'updates:manifest_update'
+
+	rake "updates:sales_rate_update"
 end

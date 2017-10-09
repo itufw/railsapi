@@ -22,13 +22,15 @@
 				<%= render "partials/sort_arrows", order: 'order_by_total' %></th>
 			<th>Sales Rep
 				<%= render "partials/sort_arrows", order: 'order_by_staff' %></th>
-			<th>Invoice Status</th>
+			<th class="invoice-status">Invoice Status</th>
 		</tr>
 	</thead>
 
 	<% orders.each do |order| %>
   <% next if order.customer.nil? %>
-	<tr class='odd'>
+	<% invoice_status = invoice_status(order.xero_invoice, order) %>
+
+	<tr class='odd' status="<%= invoice_status[0]%>">
 		<td class="multi-select"><%= check_box_tag 'selected_orders[]', order.id, false, class: "orders_checkbox" %></td>
 		<td class="account-<%= order.account_status %>"><%= link_to order.id, controller: 'order', action: 'details', order_id: order.id %></td>
 		<td><%= date_format_orders(order.date_created) %><%= ('<br><i>' + date_format_orders(order.eta) + '</i>').html_safe  unless (order.eta.nil?) || ([10, 12].include?order.status_id)%></td>
@@ -50,8 +52,7 @@
 		<td class="num"><%= display_num(order.total_inc_tax) %></td>
 
 		<%= render "customer_partials/order_staff_update", customer: order.customer, staff_id: order.staff_id, order_id: order.id, can_update_staff: can_update_staff %>
-		<% invoice_status = invoice_status(order.xero_invoice, order) %>
-		<td class=<%= invoice_status[0].downcase %>><%= invoice_status[0] %></td>
+		<td class='<%= invoice_status[0].downcase %> account-status' status="<%= invoice_status[0] %>"><%= invoice_status[0] %></td>
 	</tr>
   <tr data-href="<%= fetch_order_detail_path(order_id: order.id) %>">
 		<td colspan="4">
@@ -78,25 +79,32 @@
 	});
 </script>
 <script>
-$("table.orders-view tbody tr:not(.odd)").hide();
+	$("table.orders-view tbody tr:not(.odd)").hide();
 
-var shippment = null;
-var product_list = null;
+	var shippment = null;
+	var product_list = null;
 
-$("table.orders-view tbody tr.odd td:not(.multi-select)").click(function () {
-    var trToToggle = $(this).parent().next("tr");
-    $("table.orders-view tbody tr:not(.odd)").not(trToToggle).hide();
+	$("table.orders-view tbody tr.odd td:not(.multi-select)").click(function () {
+	    var trToToggle = $(this).parent().next("tr");
+	    $("table.orders-view tbody tr:not(.odd)").not(trToToggle).hide();
 
-    shippment = trToToggle.find('div.shippment');
-    product_list = trToToggle.find('div.product-list');
+	    shippment = trToToggle.find('div.shippment');
+	    product_list = trToToggle.find('div.product-list');
 
-    var link = trToToggle.data('href');
-    $.ajax({
-        type: 'GET',
-        url: link
-    });
+	    var link = trToToggle.data('href');
+	    $.ajax({
+	        type: 'GET',
+	        url: link
+	    });
 
-    $(trToToggle).toggle();
-    $(this).find(".arrow").toggleClass("up");
-});
+	    $(trToToggle).toggle();
+	    $(this).find(".arrow").toggleClass("up");
+	});
+
+	$('td.account-status').click(function(){
+		$('tr.odd[status!='+ $(this).attr('status') +']').hide();
+	});
+	$('.invoice-status').click(function(){
+		$('tr.odd').show();
+	});
 </script>

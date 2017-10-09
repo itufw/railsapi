@@ -18,7 +18,7 @@ class OrderController < ApplicationController
 
     def all
       # if status -> print
-      if !params[:start_date].nil? && !params[:commit] && user_full_right(session[:authority])
+      if !params[:start_date].nil? && !params[:commit] && user_full_right(session[:authority]) && params[:delay].nil? && params[:end_date].to_s==""
         redirect_to controller: 'status', action: 'status_check', params: params, status_name: 'Print' and return
       end
 
@@ -79,7 +79,7 @@ class OrderController < ApplicationController
 
   def order_update
     @order = Order.find(params[:order_id])
-    if [@order.status.in_transit, @order.status.delivered].include?1
+    if (!user_full_right(session[:authority])) && ([@order.status.in_transit, @order.status.delivered].include?1)
       flash[:error] = 'Cannot Update Shipped Orders'
       redirect_to :back and return
     end
@@ -150,11 +150,12 @@ class OrderController < ApplicationController
     order.assign_attributes(order_attributes)
 
     products_container = []
+
     products_params.each do |keys, product_params|
       product_id = product_params['product_id'].split('-').first
       # if product comes from allocated Order
       if product_params['product_id'].split('-').count>1
-        allocated_product = OrderProduct.where('orders.customer_id': order.customer_id, 'orders.status_id': 1, product_id: product_id, qty: (1..200)).first
+        allocated_product = OrderProduct.joins(:order).where('orders.customer_id': order.customer_id, 'orders.status_id': 1, product_id: product_id, qty: (1..200)).first
 
         allocated_product.assign_attributes(qty: allocated_product.qty - product_params[:qty].to_i,\
          stock_previous: allocated_product.qty, stock_current: allocated_product.qty - product_params[:qty].to_i,\
@@ -169,14 +170,18 @@ class OrderController < ApplicationController
 
       if products.map(&:product_id).include?product_id.to_i
         # update
-        product = products.where(product_id: product_id).first
+        product = products.where("product_id = ? AND updated_at < ?", product_id, (Time.now-2.minutes).to_s(:db)).first
+
+        next if product.nil?
+
         product.assign_attributes(product_params.permit(:price_luc, :qty, :discount, :price_discounted))
         product_attributes = {'display': (product.qty == 0) ? 0 : 1, 'stock_previous': product.stock_current,\
           'stock_current': product.qty, 'stock_incremental': product.qty - product.stock_current,\
           'order_discount': order.discount_rate, 'price_handling': handling_fee,\
           'price_inc_tax': product.price_discounted * (1 + gst),\
           'price_wet': (product.price_discounted / (1 + wet) - handling_fee) * wet,\
-          'price_gst': product.price_discounted * gst, 'updated_by': session[:user_id]}
+          'price_gst': product.price_discounted * gst, 'updated_by': session[:user_id],\
+          'updated_at': Time.now.to_s(:db)}
       else
         # insert
         product = OrderProduct.new(product_params.permit(:price_luc, :qty, :discount, :price_discounted))
@@ -186,9 +191,10 @@ class OrderController < ApplicationController
           'order_discount': order.discount_rate, 'price_handling': handling_fee,\
           'price_inc_tax': product.price_discounted * (1 + gst),\
           'price_wet': (product.price_discounted / (1 + wet) - handling_fee) * wet,\
-          'price_gst': product.price_discounted * gst, 'updated_by': session[:user_id]}
+          'price_gst': product.price_discounted * gst, 'updated_by': session[:user_id],\
+          'updated_at': Time.now.to_s(:db)}
       end
-      product.assign_attributes(product_attributes)
+      product.update_attributes(product_attributes)
       products_container.append(product)
     end
 
@@ -208,7 +214,7 @@ class OrderController < ApplicationController
 
   # Send out the confirmation Email
   def send_email
-    ReminderMailer.order_confirmation(params[:order_id], params[:email_address]).deliver_now
+    ReminderMailer.order_confirmation(params[:order_id], params[:email_address], session[:user_id]).deliver_now
     flash[:success] = 'Email Sent!'
     redirect_to request.referrer
   end
@@ -223,7 +229,7 @@ class OrderController < ApplicationController
                                   :customer_notes, :staff_notes, :address, :modified_wet,\
                                   :billing_address, :delivery_instruction, :street,\
                                   :city, :state, :postcode, :country, :customer_purchase_order,\
-                                  :track_number, :ship_name)
+                                  :track_number, :ship_name, :street_2)
   end
 
   def products_params

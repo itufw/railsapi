@@ -1,0 +1,21 @@
+<% if (@alert.nil?) && (!@business_entity.nil?)%>
+  <% if !@business_entity['mainName'].nil? %>
+    company_name.val("<%= @business_entity['mainName']['organisationName'] %>");
+  <% elsif !@business_entity['legalName'].nil?%>
+    company_name.val("<%= @business_entity['legalName']['givenName'] + ' ' + @business_entity['legalName']['givenName'] + ' | ' +@business_entity['entityType']['entityDescription']%>");
+  <% end %>
+  trading_name.show();
+  trading_name.find('td').remove();
+  <% unless @business_entity['businessName'].nil? %>
+    <% if @business_entity['businessName'].is_a?Array %>
+      <% @business_entity['businessName'].each do |venue| %>
+        trading_name.append('<td><%= venue["organisationName"]%></td>');
+      <% end %>
+    <% else %>
+      trading_name.append('<td><%= @business_entity["businessName"]["organisationName"]%></td>');
+    <% end %>
+  <% end %>
+  abn_identify.val("<%= @business_entity['ABN']['identifierValue']%>");
+<% else %>
+  alert.html('<%= @alert%>');
+<% end %>

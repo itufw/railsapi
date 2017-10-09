@@ -8,6 +8,7 @@ class Customer < ActiveRecord::Base
 	has_many :addresses
 	has_many :contacts
 	has_many :cust_contacts
+	has_many :customer_credit_apps
 	belongs_to :cust_type
 	belongs_to :cust_group
 	belongs_to :cust_style
@@ -45,11 +46,11 @@ class Customer < ActiveRecord::Base
 		# property :tax_exempt_category
 		# property :accepts_marketing
 		customer_api = Bigcommerce::Customer
+		splited_name = self.actual_name.split()
 		bigc_customer = customer_api.create(
-			company: self.actual_name,
-			first_name: self.actual_name,
-			last_name: self.firstname.to_s + ' ' + self.lastname.to_s,
-			email: self.email || (self.actual_name.split()[0..2].join('_')+"@untappedwines.com"),
+			first_name: splited_name[0],
+			last_name: (splited_name[1..splited_name.length].join(' ')=="") ? "UFW" : splited_name[1..splited_name.length].join(' '),
+			email: (self.email.to_s=="") ? (self.actual_name.split().join('_')+"@untappedwines.com") : self.email,
 			store_credit: self.store_credit || 0,
 			customer_group_id: self.cust_type_id || 2,
 			notes: self.notes || ""
@@ -184,9 +185,9 @@ class Customer < ActiveRecord::Base
 	def account_approval(order_total)
 		return 'Approved' if order_total == 0
 		return 'Hold-Account' if self.xero_contact_id.nil? || self.account_type=="COD"
-		return (XeroInvoice.where("xero_contact_id = '#{self.xero_contact_id}' AND due_date < '#{Date.today.beginning_of_month.to_s(:db)}'").sum('amount_due') > 0) ? 'Hold-Account' : 'Approved' if self.account_type == "EOM"
+		return (XeroInvoice.where("xero_contact_id = '#{self.xero_contact_id}' AND due_date < '#{Date.today.beginning_of_month.to_s(:db)}'").sum('amount_due') > 0) ? 'Hold-Overdue' : 'Approved' if self.account_type == "EOM"
 		sum = XeroInvoice.where("xero_contact_id = '#{self.xero_contact_id}' AND due_date < '#{(Date.today - self.tolerance_day.to_i.days).to_s(:db)}'").sum('amount_due')
-		return 'Hold-Account' if sum > 0
+		return 'Hold-Overdue' if sum > 0
 		'Approved'
 	end
 
@@ -414,7 +415,8 @@ class Customer < ActiveRecord::Base
 				wrapping_cost: 0, wet: 0, gst: 0, staff_notes: 'Allocated Order', customer_notes: '',\
 				active: 1, source: 'manual', date_created: Time.now.to_s(:db),\
 				created_by: user_id, last_updated_by: user_id,\
-				courier_status_id: 1, account_status: 'Approved')
+				courier_status_id: 1, account_status: 'Approved', street: self.street,\
+				street_2: self.street_2, city: self.city, postcode: self.postcode, country: self.country)
 	 	end
 		order.qty += product_qty
 		order.discount_amount += (product_qty*product.calculated_price*1.29).round(4)
@@ -428,5 +430,9 @@ class Customer < ActiveRecord::Base
 		 created_by: user_id, updated_by: user_id).save
 
 		order
+	end
+
+	def name
+		actual_name
 	end
 end

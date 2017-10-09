@@ -95,8 +95,10 @@
     </tr>
   </thead>
   <tbody class="product-list">
+    <% p_count = 0 %>
     <% f.object.order_products.each do |product| %>
-      <%= f.fields_for "products[#{product.product_id}]", product do |product_form|%>
+      <% p_count += 1%>
+      <%= f.fields_for "products[#{p_count}]", product do |product_form|%>
 
     <tr id="tr_<%= product.product_id%>">
       <td><%= product_form.text_field :product_id, size: "5", readonly: true, class: 'product_id' %></td>
@@ -268,7 +270,7 @@
     var discount = 0;
     var wet = 0;
     $('.product-list tr').each(function(){
-      total += parseFloat($(this).find('.product-total').html());
+      total += (parseFloat($(this).find('.product-total').html()) || 0);
       discount += (parseFloat($(this).find('.product-luc').val()) - parseFloat($(this).find('.product-price').val())) *  parseInt($(this).find('.product-qty').val());
       wet += ((parseFloat($(this).find('.product-price').val()) - 1.82) * parseInt($(this).find('.product-qty').val() * 0.29));
     });
@@ -277,15 +279,23 @@
     // Modified Wet
     $('#order_modified_wet').val(wet);
 
-    order_discount = parseFloat($('#order_discount_rate').val()) * 0.01
+    order_discount = (parseFloat($('#order_discount_rate').val()) * 0.01) || 0
     discount += (total * order_discount)
-    shipping_cost = parseFloat($('#order_shipping_cost').val())
+    shipping_cost = (parseFloat($('#order_shipping_cost').val())) || 0
 
     $('#order_gst').val(((total*(1 - order_discount) + shipping_cost)*0.1).toFixed(4));
     $('#order_discount_amount').val(discount.toFixed(4));
     $('#order_total_inc_tax').val(((total *( 1 - order_discount) + shipping_cost) * 1.1).toFixed(4));
     return total;
   }
+
+ var shipping_cost_update = function(){
+   var bottles = 0;
+   $('.product-list tr').each(function(){
+     bottles += parseInt($(this).find('.product-qty').val());
+   });
+   $('#order_shipping_cost').val(parseInt(bottles/6)*10);
+ };
 
   var product_change = function(column){
     qty = column.parent().parent().find('.product-qty').val();
@@ -306,6 +316,11 @@
 
   $(document).on('input', '.product-qty, .product-discount, .product-price', function(){
     product_change($(this));
+
+    // If it is vintage cellar order, automatically update shipping cost
+    if (/Vintage Cellars/i.test($('input[name=customer]').val())){
+      shipping_cost_update();
+    }
   });
   $(document).on('input', '#order_discount_rate, #order_shipping_cost', function(){
     update_subtotal();
