@@ -14,6 +14,14 @@
   allocation_products.html('<%= j render "order_partials/allocation_order", order: allocation_order %>');
 <% end %>
 
+billing_company.val('<%= (customer.company.to_s=="") ? customer.actual_name : customer.company %>');
+billing_street.val('<%= customer.street%>');
+billing_street_2.val('<%= customer.street_2%>');
+billing_city.val('<%= customer.city%>');
+billing_state.val('<%= customer.state%>');
+billing_postcode.val('<%= customer.postcode%>');
+billing_country.val('<%= customer.country%>');
+
 // In case new customer
 <% if @last_order.nil? %>
   recipient.val('<%= (customer.company.to_s=="") ? customer.actual_name : customer.company %>');
@@ -42,11 +50,3 @@
   ].join(''));
   last_order.show();
 <% end %>
-
-billing_company.val('<%= (customer.company.to_s=="") ? customer.actual_name : customer.company %>');
-billing_street.val('<%= customer.street%>');
-billing_street_2.val('<%= customer.street_2%>');
-billing_city.val('<%= customer.city%>');
-billing_state.val('<%= customer.state%>');
-billing_postcode.val('<%= customer.postcode%>');
-billing_country.val('<%= customer.country%>');
