@@ -74,11 +74,11 @@ module StockControl
       if p.retail_ws=='R'
         product[:rrp] = (p.price * 1.1).round(2)
       elsif p.product_name.include?'WS'
-        product[:ws_id] = p.product_id
-        product[:luc] = (p.price * 1.29).round(2)
+        product = product.merge({ws_id: p.product_id, luc: (p.price * 1.29).round(2),
+          current: p.current})
+
         product[:term_1] = p.sale_term_1 unless p.sale_term_1.nil? || p.sale_term_1.zero?
         product[:monthly_supply] = p.monthly_supply.round(0) unless p.monthly_supply.nil? || p.monthly_supply.round(0).zero?
-        product[:current] = p.current
       end
 
       product_hash[p.id] = product

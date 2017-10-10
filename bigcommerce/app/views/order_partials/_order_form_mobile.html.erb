@@ -150,6 +150,10 @@
     $('#product_ws_search').val('');
   });
 
+  $(document).on('click', '.remove_row', function(){
+    $(this).parent().parent().remove();
+  });
+
   var update_subtotal = function(){
     var total = 0;
     var discount = 0;
@@ -211,9 +215,7 @@
   $(document).on('input', '#order_discount_rate, #order_shipping_cost', function(){
     update_subtotal();
   });
-  $(document).on('click', '.remove_row', function(){
-    $(this).parent().parent().remove();
-  });
+
 </script>
 
 
