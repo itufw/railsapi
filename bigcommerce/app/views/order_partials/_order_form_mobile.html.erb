@@ -135,18 +135,15 @@
         data.item.label,
         '<br/>',
         'Inventory: <i class="product-inventory">'+ data.item.inventory +'</i>',
-        '<br/>',
-        'Luc: <input size="5" readonly="readonly" class="product-luc" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_luc]" id="order_products_'+ product_count +'__price_luc">',
+        'Luc: <input size="8" readonly="readonly" class="product-luc" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_luc]" id="order_products_'+ product_count +'__price_luc">',
         '<br/>',
         'QTY: <input size="3" class="product-qty" type="text" value="0" name="order[products['+ product_count +']][qty]" id="order_products_'+ product_count +'__qty">',
-        '<br/>',
-        'Discount Rate<input size="2" class="product-discount" type="text" value="0" name="order[products['+ product_count +']][discount]" id="order_products_'+ product_count +'__discount"  placeholder="Discount"> %',
-        'Price<input size="5" class="product-price" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_discounted]" id="order_products_'+ product_count +'__price_discounted">',
+        'Disc.R.<input size="3" class="product-discount" type="text" value="0" name="order[products['+ product_count +']][discount]" id="order_products_'+ product_count +'__discount"  placeholder="Discount"> %',
+        'Price<input size="8" class="product-price" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_discounted]" id="order_products_'+ product_count +'__price_discounted">',
         '<br/>',
         'Total: <i class="product-total">0</i>',
-        '<br/>',
-        '<i class="glyphicon glyphicon-remove remove_row" title="remove"></i>',
         '</p>',
+        '<i class="glyphicon glyphicon-remove remove_row" title="remove"></i>',
       '</li>'].join(''));
   });
 
@@ -212,7 +209,7 @@
     update_subtotal();
   });
   $(document).on('click', '.remove_row', function(){
-    $(this).parent().parent().remove();
+    $(this).parent().remove();
   });
 </script>
 
