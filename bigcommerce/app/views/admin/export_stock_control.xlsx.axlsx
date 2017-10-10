@@ -42,7 +42,7 @@ wb.add_worksheet(name: "Stock Control") do |sheet|
         style: [nil, (1..8).map { |x| black_cell }].flatten
       )
 
-      product_ids = producer.products.group('product_no_ws_id').order('name').map(&:product_no_ws_id)
+      product_ids = producer.products.group('product_no_ws_id').order('calculated_price').map(&:product_no_ws_id)
       product_ids.each do |product_id|
         product = @product_hash[product_id]
         next if product.nil?
