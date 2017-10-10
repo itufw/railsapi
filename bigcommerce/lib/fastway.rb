@@ -6,6 +6,10 @@ class Fastway
     @query = { query: {'api_key': Rails.application.secrets.fastway_key, 'UserID': '2374' } }
   end
 
+  def stock_level
+    self.class.get('/fastlabel/getstocklevel', @query)
+  end
+
   def track(trace_number)
     @query[:query]['CountryCode'] = 1
     begin

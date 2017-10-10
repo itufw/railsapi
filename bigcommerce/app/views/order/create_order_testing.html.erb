@@ -1,0 +1,9 @@
+<%= title 'New Order' %>
+<h3 class="title">New Order</h3>
+
+<%= form_for @order, :url => {:controller => "order", :action => "save_order"}  do |f| %>
+
+  <div class="order_form" value="WS">
+    <%= render 'order_partials/order_form_mobile', f: f%>
+  </div>
+<% end %>

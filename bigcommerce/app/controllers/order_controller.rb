@@ -110,6 +110,10 @@ class OrderController < ApplicationController
     @order = Order.new(discount_rate: 0, shipping_cost: 0)
   end
 
+  def create_order_testing
+    @order = Order.new(discount_rate: 0, shipping_cost: 0)
+  end
+
   def save_order
     if products_params.nil? || products_params.blank? || products_params.values().map {|x| x['qty'].to_i }.sum==0
       flash[:error] = 'Wrong Products!'
