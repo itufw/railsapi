@@ -7,30 +7,32 @@
       Customer
       <%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search'%>
     </p>
-    <%= f.fields_for "customer", f.object.customer do |c|%>
-    <li>
-      <b>Billing Address</b>
-      <p>
-      <%= c.text_field :company, placeholder: 'Company'%>
-      <%= c.text_field :street, placeholder: 'Street'%>
-      <%= c.text_field :street_2, placeholder: 'Street 2'%>
-      <%= c.text_field :city, placeholder: 'City'%>
-      <%= c.text_field :state, placeholder: 'State'%>
-      <%= c.text_field :postcode, placeholder: 'Postcode'%>
-      <%= c.text_field :country, placeholder: 'Country'%>
-    </p></li>
-    <% end %>
-    <li>
-      <b>Shipping Address</b>
-      <p>
-      <%= f.text_field :ship_name, placeholder: 'Recipient or Leave it Blank'%>
-      <%= f.text_field :street, placeholder: 'Street'%>
-      <%= f.text_field :street_2, placeholder: 'Street 2'%>
-      <%= f.text_field :city, placeholder: 'City'%>
-      <%= f.text_field :state, placeholder: 'State'%>
-      <%= f.text_field :postcode, placeholder: 'Postcode'%>
-      <%= f.text_field :country, placeholder: 'Country'%>
-    </p></li>
+    <div class="order-address" style="display:none;">
+      <%= f.fields_for "customer", f.object.customer do |c|%>
+      <li>
+        <b>Billing Address</b>
+        <p>
+        <%= c.text_field :company, placeholder: 'Company'%>
+        <%= c.text_field :street, placeholder: 'Street'%>
+        <%= c.text_field :street_2, placeholder: 'Street 2'%>
+        <%= c.text_field :city, placeholder: 'City'%>
+        <%= c.text_field :state, placeholder: 'State'%>
+        <%= c.text_field :postcode, placeholder: 'Postcode'%>
+        <%= c.text_field :country, placeholder: 'Country'%>
+      </p></li>
+      <% end %>
+      <li>
+        <b>Shipping Address</b>
+        <p>
+        <%= f.text_field :ship_name, placeholder: 'Recipient or Leave it Blank'%>
+        <%= f.text_field :street, placeholder: 'Street'%>
+        <%= f.text_field :street_2, placeholder: 'Street 2'%>
+        <%= f.text_field :city, placeholder: 'City'%>
+        <%= f.text_field :state, placeholder: 'State'%>
+        <%= f.text_field :postcode, placeholder: 'Postcode'%>
+        <%= f.text_field :country, placeholder: 'Country'%>
+      </p></li>
+    </div>
   </ul>
 
   <ul class="product-list">
@@ -100,6 +102,8 @@
   // Customer Search
   $(document).on('railsAutocomplete.select', '#customer_search', function(event, data){
     if ($('#customer_table').find('remove').length == 0) {
+      $('.order-address').show();
+
       $('.customer_autocomplete').html('<input type="text" name="customer" id="' + data.item.id + '" value="' + data.item.value + '" readonly="readonly"><i class="glyphicon glyphicon-remove remove" title="remove"></i>');
       $('#order_customer_id').val(data.item.id);
       // In view/status
@@ -116,6 +120,7 @@
         $('.last-order-product').remove();
         $('.last-order-td').remove();
         $('.allocation-products').html('');
+        $('.order-address').hide();
       });
     }
   });
@@ -139,6 +144,7 @@
         'Price<input size="5" class="product-price" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_discounted]" id="order_products_'+ product_count +'__price_discounted">',
         '<br/>',
         'Total: <i class="product-total">0</i>',
+        '<br/>',
         '<i class="glyphicon glyphicon-remove remove_row" title="remove"></i>',
         '</p>',
       '</li>'].join(''));
