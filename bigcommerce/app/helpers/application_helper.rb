@@ -1,5 +1,3 @@
-
-
 module ApplicationHelper
   # Sets Title of a page
   def title(page_title)
