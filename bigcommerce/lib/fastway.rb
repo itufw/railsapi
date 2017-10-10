@@ -163,7 +163,9 @@ class Fastway
 
     # TODO!!!
     # !!!Temporary!!!
-    # return 18 if (parcel_color.map(&:upcase).include? 'GREEN') || (parcel_color.map(&:upcase).include? 'ORANGE')
+    return 1 if (parcel_color.map(&:upcase).include? 'ORANGE')
+    return 18 if (parcel_color.map(&:upcase).include? 'GREEN') || (parcel_color.map(&:upcase).include? 'GREY')
+    # Red 6
     return 1765 if (parcel_color.map(&:upcase).include? 'RED') || (parcel_color.map(&:upcase).include? 'RED')
     1
   end
