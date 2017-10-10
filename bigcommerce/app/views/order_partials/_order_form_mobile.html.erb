@@ -132,6 +132,7 @@
     $('.product-list').append([
       '<li id="li_'+ data.item.id +'">',
         '<p>',
+        '<i class="glyphicon glyphicon-remove remove_row" title="remove"></i>',
         data.item.label,
         '<br/>',
         'Inventory: <i class="product-inventory">'+ data.item.inventory +'</i>',
@@ -143,7 +144,6 @@
         '<br/>',
         'Total: <i class="product-total">0</i>',
         '</p>',
-        '<i class="glyphicon glyphicon-remove remove_row" title="remove"></i>',
       '</li>'].join(''));
   });
 
@@ -209,7 +209,7 @@
     update_subtotal();
   });
   $(document).on('click', '.remove_row', function(){
-    $(this).parent().remove();
+    $(this).parent().parent().remove();
   });
 </script>
 
