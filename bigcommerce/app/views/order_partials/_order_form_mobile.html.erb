@@ -14,8 +14,6 @@
       <%= c.text_field :company, placeholder: 'Company'%>
       <%= c.text_field :street, placeholder: 'Street'%>
       <%= c.text_field :street_2, placeholder: 'Street 2'%>
-    </p></li>
-    <li><p>
       <%= c.text_field :city, placeholder: 'City'%>
       <%= c.text_field :state, placeholder: 'State'%>
       <%= c.text_field :postcode, placeholder: 'Postcode'%>
@@ -28,8 +26,6 @@
       <%= f.text_field :ship_name, placeholder: 'Recipient or Leave it Blank'%>
       <%= f.text_field :street, placeholder: 'Street'%>
       <%= f.text_field :street_2, placeholder: 'Street 2'%>
-    </p></li>
-    <li><p>
       <%= f.text_field :city, placeholder: 'City'%>
       <%= f.text_field :state, placeholder: 'State'%>
       <%= f.text_field :postcode, placeholder: 'Postcode'%>
@@ -45,12 +41,12 @@
   </ul>
   <ul class="total-price">
     <li><p>
-      Subtotal (Inc. WET, Ex. GST)<%= f.text_field :subtotal, readonly: true%><br/>
-      Discount Rate<%= f.text_field :discount_rate %>
-      Discount<%= f.text_field :discount_amount, readonly: true%><br/>
-      Shipping<%= f.text_field :shipping_cost%><br/>
-      WET<%= f.text_field :wet, readonly: true%>GST<%= f.text_field :gst, readonly: true%><br/>
-      Grand Total<%= f.text_field :total_inc_tax, readonly: true%>
+      Subtotal (Inc. WET, Ex. GST)<%= f.text_field :subtotal, readonly: true, size: 5%><br/>
+      Discount Rate<%= f.text_field :discount_rate, size: 5 %>%
+      Amount<%= f.text_field :discount_amount, readonly: true, size: 5%><br/>
+      Shipping<%= f.text_field :shipping_cost, size:3%><br/>
+      WET<%= f.text_field :wet, readonly: true, size: 5%>GST<%= f.text_field :gst, readonly: true, size: 5%><br/>
+      Grand Total<%= f.text_field :total_inc_tax, readonly: true, size: 8%>
       <%= f.hidden_field :modified_wet %>
     </p></li>
   </ul>
@@ -120,33 +116,35 @@
     }
   });
 
-  // // Product Search
-  // $(document).on('railsAutocomplete.select', '#product_search, #product_ws_search',function(event, data){
-  //   product_count += 1;
-  //
-  //   $('.product-list').append([
-  //     '<li id="li_'+ data.item.id +'">',
-  //
-  //
-  //     '<tr id="tr_'+ data.item.id +'">',
-  //       '<td><input size="5" readonly="readonly" class="product-id" type="text" value="'+ data.item.id +'" name="order[products['+ product_count +']][product_id]" id="order_products_'+ product_count +'__product_id"></td>',
-  //       '<td>'+ data.item.label +'</td>',
-  //       '<td class="product-inventory">'+ data.item.inventory +'</td>',
-  //       '<td><input size="5" readonly="readonly" class="product-luc" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_luc]" id="order_products_'+ product_count +'__price_luc"></td>',
-  //       '<td><input size="3" class="product-qty" type="text" value="0" name="order[products['+ product_count +']][qty]" id="order_products_'+ product_count +'__qty"></td>',
-  //       '<td><input size="2" class="product-discount" type="text" value="0" name="order[products['+ product_count +']][discount]" id="order_products_'+ product_count +'__discount"  placeholder="Discount"> %</td>',
-  //       '<td><input size="5" class="product-price" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_discounted]" id="order_products_'+ product_count +'__price_discounted"></td>',
-  //       '<td class="product-total">0  <p style="color:red;">'+ data.item.monthly_supply +'</p></td>',
-  //       '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
-  //     '</tr>'
-  //     ].join(''));
-  // });
+  // Product Search
+  $(document).on('railsAutocomplete.select', '#product_search, #product_ws_search',function(event, data){
+    product_count += 1;
+
+    $('.product-list').append([
+      '<li id="li_'+ data.item.id +'">',
+        '<p>',
+        data.item.label,
+        '<br/>',
+        'Inventory: <i class="product-inventory">'+ data.item.inventory +'</i>',
+        '<br/>',
+        'Luc: <input size="5" readonly="readonly" class="product-luc" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_luc]" id="order_products_'+ product_count +'__price_luc">',
+        '<br/>',
+        'QTY: <input size="3" class="product-qty" type="text" value="0" name="order[products['+ product_count +']][qty]" id="order_products_'+ product_count +'__qty">',
+        '<br/>',
+        'Discount Rate<input size="2" class="product-discount" type="text" value="0" name="order[products['+ product_count +']][discount]" id="order_products_'+ product_count +'__discount"  placeholder="Discount"> %',
+        'Price<input size="5" class="product-price" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_discounted]" id="order_products_'+ product_count +'__price_discounted">',
+        '<br/>',
+        'Total: <i class="product-total">0</i>',
+        '<i class="glyphicon glyphicon-remove remove_row" title="remove"></i>',
+        '</p>',
+      '</li>'].join(''));
+  });
 
   var update_subtotal = function(){
     var total = 0;
     var discount = 0;
     var wet = 0;
-    $('.product-list tr').each(function(){
+    $('.product-list li').each(function(){
       total += (parseFloat($(this).find('.product-total').html()) || 0);
       discount += (parseFloat($(this).find('.product-luc').val()) - parseFloat($(this).find('.product-price').val())) *  parseInt($(this).find('.product-qty').val());
       wet += ((parseFloat($(this).find('.product-price').val()) - 1.82) * parseInt($(this).find('.product-qty').val() * 0.29));
@@ -168,7 +166,7 @@
 
   var shipping_cost_update = function(){
     var bottles = 0;
-    $('.product-list tr').each(function(){
+    $('.product-list li').each(function(){
       bottles += parseInt($(this).find('.product-qty').val());
     });
     $('#order_shipping_cost').val(parseInt(bottles/6)*10);
@@ -206,4 +204,33 @@
   $(document).on('click', '.remove_row', function(){
     $(this).parent().parent().remove();
   });
+</script>
+
+
+<!-- Submit Tag -->
+<script type="text/javascript">
+  $('button.active').hide();
+
+  var valid_check = function(){
+    var customer_flag = $('input[name=customer]').size() > 0;
+    var product_flag = $('.product-list li').size() > 0;
+    var shipping_address_flag = (($('input#order_street').val() != "") && ($('input#order_city').val() != "") && ($('input#order_postcode').val() != ""));
+    var inventory_flag = true;
+    var table_flag = $('.total-price input:text').filter(function() { return (this.value == "" || this.value=="NaN"); }).size() == 0;
+    $('.product-qty').each(function(){
+      if (parseInt($(this).val()) > parseInt($(this).parent().parent().find('.product-inventory').html()) ){
+        inventory_flag = false;
+      }
+    });
+    if (customer_flag && product_flag && shipping_address_flag && inventory_flag && table_flag){
+      $('button.active').show();
+      $('button.disabled').hide();
+    }else{
+      $('button.active').hide();
+      $('button.disabled').show();
+    };
+  }
+
+  $(document).on('input', valid_check);
+  $(document).on('click', valid_check);
 </script>
