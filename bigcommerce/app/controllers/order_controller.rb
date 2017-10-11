@@ -110,6 +110,8 @@ class OrderController < ApplicationController
     @order = Order.new(discount_rate: 0, shipping_cost: 0)
   end
 
+  # Testing Order Creation on Mobile
+  # Entry via User panel -> IT Working
   def create_order_testing
     @order = Order.new(discount_rate: 0, shipping_cost: 0)
   end
