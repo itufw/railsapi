@@ -214,7 +214,7 @@ module XeroInvoiceCalculations
     end
 
     def get_discount_rate(order)
-        order_total_ex_shipping = order.total_inc_tax - order.shipping_cost
+        order_total_ex_shipping = order.total_inc_tax - (order.shipping_cost * 1.1)
         order_product_total = OrderProduct.order_sum(order.order_products)
         order_total_ex_shipping / order_product_total
     end
