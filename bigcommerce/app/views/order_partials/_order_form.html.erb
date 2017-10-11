@@ -317,12 +317,11 @@
   };
 
   $(document).on('input', '.product-qty, .product-discount, .product-price', function(){
-    product_change($(this));
-
     // If it is vintage cellar order, automatically update shipping cost
     if (/Vintage Cellars/i.test($('input[name=customer]').val())){
       shipping_cost_update();
     }
+    product_change($(this));
   });
   $(document).on('input', '#order_discount_rate, #order_shipping_cost', function(){
     update_subtotal();
