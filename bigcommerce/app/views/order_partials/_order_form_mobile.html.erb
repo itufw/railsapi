@@ -130,10 +130,10 @@
     product_count += 1;
 
     $('.product-list').append([
-      '<i class="glyphicon glyphicon-remove remove_row" title="remove" product="li_'+ data.item.id +'"></i>',
       '<li id="li_'+ data.item.id +'">',
         '<p>',
         data.item.label,
+        '<i class="glyphicon glyphicon-remove remove_row" title="remove" product="li_'+ data.item.id +'"></i>',
         '<br/>',
         'Inventory: <i class="product-inventory">'+ data.item.inventory +'  </i>',
         'Luc: <input size="8" readonly="readonly" class="product-luc" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_luc]" id="order_products_'+ product_count +'__price_luc">',
@@ -148,12 +148,17 @@
       '</li>'].join(''));
 
     $('#product_ws_search').val('');
-  });
 
-  $(document).on('click', '.remove_row', function(){
-    $('#'+$(this).attr('product')).remove();
-    $(this).remove();
+    $('.remove_row').click(function(){
+      $('#'+$(this).attr('product')).remove();
+      $(this).remove();
+    });
   });
+  //
+  // $(document).on('click', '.remove_row', function(){
+  //   $('#'+$(this).attr('product')).remove();
+  //   $(this).remove();
+  // });
 
   var update_subtotal = function(){
     var total = 0;
