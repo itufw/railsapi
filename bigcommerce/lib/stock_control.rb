@@ -71,7 +71,7 @@ module StockControl
       product[:allocated] = 0 if !allocated.nil? && product[:allocated].nil?
       product[:allocated] += allocated.qty unless allocated.nil?
 
-      if p.retail_ws=='R'
+      if (p.retail_ws=='R')&&(!p.product_name.include?'DM')
         product[:rrp] = (p.price * 1.1).round(2)
       elsif p.product_name.include?'WS'
         product = product.merge({ws_id: p.product_id, luc: (p.price * 1.29).round(2),
