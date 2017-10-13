@@ -35,8 +35,8 @@
 		<% product_rights = !Staff.find(session[:user_id]).product_rights.zero?%>
 			<% @products.each do |product| %>
 			<tr>
-				<td><%= link_to product.id, controller: 'product', action: 'summary', pending_stock: 0, product_id: product.id, product_name: product.name, total_stock: p.inventory, transform_column: 'product_id' %></td>
-				<td><%= link_to product.name, controller: 'product', action: 'summary', pending_stock: 0, product_id: product.id, product_name: product.name, total_stock: p.inventory, transform_column: 'product_id' %></td>
+				<td><%= link_to product.id, controller: 'product', action: 'summary', pending_stock: 0, product_id: product.id, product_name: product.name, total_stock: product.inventory, transform_column: 'product_id' %></td>
+				<td><%= link_to product.name, controller: 'product', action: 'summary', pending_stock: 0, product_id: product.id, product_name: product.name, total_stock: product.inventory, transform_column: 'product_id' %></td>
 				<td>
 					<%= product_rights ? text_field_tag("product[#{product.id}]", product.inventory, placeholder: 'Inventory', class: 'form-control')  : product.inventory %>
 				</td>
