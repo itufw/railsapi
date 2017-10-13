@@ -1,0 +1,50 @@
+
+<meta content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0" name="viewport" />
+
+<%= form_for @warehouse_examining, :url => {controller: 'product', action: "update"}  do |f| %>
+<%= hidden_field_tag :pending_products, @product_list, multiple: true%>
+<%= f.hidden_field :product_name%>
+<%= f.hidden_field :product_no_ws_id%>
+<%= f.hidden_field :current_ws%>
+<%= f.hidden_field :current_dm%>
+<%= f.hidden_field :current_vc%>
+<%= f.hidden_field :current_retail%>
+<%= f.hidden_field :count_size%>
+
+
+<!-- Mobile Version -->
+<!-- browser.device.mobile? -->
+  <div class="counting-table block">
+    <ul>
+      <p><%= @warehouse_examining.product_name %></p>
+      <%= f.hidden_field :allocation, readonly: true%>
+      <%= f.hidden_field :current_stock, readonly: true%>
+      <%= f.hidden_field :on_order, readonly: true%>
+
+      <%= f.fields_for "product", @product do |product_form|%>
+        <%= product_form.hidden_field :id %>
+        <li class="value-one">
+          <b>Location</b>
+          <%= product_form.text_field :row, size: 6, placeholder: 'row'%>
+          <%= product_form.text_field :column, size: 6, placeholder:'column'%>
+          <%= product_form.text_field :area, size: 6, placeholder:'area'%>
+        </li>
+      <% end %>
+    </ul>
+    <ul>
+      <li>
+        Later:
+        <div class="col-md-2 col-xs-4" style="float: right; ">
+          <input type="checkbox" name="latter_count" id="ios-checkbox" class="ios-toggle"/>
+          <label for="ios-checkbox" class="checkbox-label" data-off="Now" data-on="Yes" style="margin-left: 10px;"></label>
+        </div>
+      </li>
+      <li>
+        <div style="align: center;">
+          <%= submit_tag 'Save', class: 'btn btn-success btn-lg'%>
+          <%= submit_tag 'Skip', class: 'btn btn-default btn-lg'%>
+        </div>
+      </li>
+    </ul>
+  </div>
+<% end %>
