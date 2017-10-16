@@ -5,33 +5,34 @@
   <%= f.hidden_field :id %>
   <%= @product.id.to_s + '   ' + @product.name %><br/>
 
-  <%= f.radio_button :current, '1', checked: !@product.current.zero? %> Current
-  <%= f.radio_button :current, '0', checked: @product.current.zero? %> No
+  <%= f.radio_button :current, '1', checked: !@product.current.to_i.zero? %> Current
+  <%= f.radio_button :current, '0', checked: @product.current.to_i.zero? %> No
   <br/>
   <%= f.label :search_for_similar_product, class: 'margin-from-top label-new' %>
   <%= autocomplete_field_tag 'product_search', '', autocomplete_product_name_product_index_path, placeholder: 'Search Products', id: 'product_search',size: 30 %>
   <br/>
   <%= f.label :search_for_no_ws, class: 'margin-from-top label-new' %>
-  <%= autocomplete_field_tag 'product_no_ws_search', @product.name.split(' WS').first, autocomplete_product_no_ws_name_activity_index_path, placeholder: 'Search Product No WS', id: 'product_no_ws_search',size: 30 %>
+  <%= autocomplete_field_tag 'product_no_ws_search', @product.name.split(' WS').first, autocomplete_product_no_ws_name_activity_index_path, placeholder: 'Search Product No WS', id: 'product_no_ws_search',size: 60 %>
   <td><%= check_box '', 'new_product', {class: 'new_product'} %>New Product</td> &nbsp;&nbsp;&nbsp;
+  <br/>
   <%= f.label :search_for_no_vintage, class: 'margin-from-top label-new' %>
-  <%= autocomplete_field_tag 'product_no_vintage_search', @product.name.split(' WS').first.gsub(/[0-9]/, "").strip, autocomplete_product_no_vintage_name_activity_index_path, placeholder: 'Search Product No Vintage', id: 'product_no_vintage_search',size: 30 %>
+  <%= autocomplete_field_tag 'product_no_vintage_search', @product.name.split(' WS').first.gsub(/[0-9]/, "").strip, autocomplete_product_no_vintage_name_activity_index_path, placeholder: 'Search Product No Vintage', id: 'product_no_vintage_search',size: 60 %>
 
   <br/>
   <label class="margin-from-top label-new" for="product_product_no_ws_id">Product No WS ID</label>
   <%= f.text_field :product_no_ws_id, readonly: true, placeholder: 'Product No WS ID', size: 5 %>
   <%= f.label :product_no_ws_name, class: 'margin-from-top label-new' %>
-  <%= f.text_field :name_no_ws, value: @product.name_no_ws || @product.name.split(' WS').first,readonly: true, placeholder: 'Name No WS', size: 45 %>
+  <%= f.text_field :name_no_ws, value: @product.name_no_ws || @product.name.split(' WS').first,readonly: true, placeholder: 'Name No WS', size: 60 %>
+  <br/>
   <label class="margin-from-top label-new" for="product_no_vintage_id">Product No Vintage ID</label>
-
   <%= f.text_field :product_no_vintage_id, readonly: true, placeholder: 'Product No Vintage ID', size: 5 %>
   <%= f.label :no_vintage_name, class: 'margin-from-top label-new' %>
-  <%= f.text_field :name_no_vintage, value: @product.name_no_vintage || @product.name.split(' WS').first.gsub(/[0-9]/, "").strip, placeholder: 'Name No Vintage', size: 45 %>
+  <%= f.text_field :name_no_vintage, value: @product.name_no_vintage || @product.name.split(' WS').first.gsub(/[0-9]/, "").strip, placeholder: 'Name No Vintage', size: 60 %>
+  <br/>
   <%= f.label :vintage, class: 'margin-from-top label-new' %>
-  <%= f.number_field :vintage, placeholder: 'Product Vintage Year' %><br/>
-
+  <%= f.number_field :vintage, placeholder: 'Product Vintage Year' %>
   <%= f.label :product_name_no_winery_no_vintage, class: 'margin-from-top label-new' %>
-  <%= f.text_field :name_no_winery_no_vintage %><br/>
+  <%= f.text_field :name_no_winery_no_vintage, size: 50 %><br/>
 
 
   <%= f.label :producer, class: 'margin-from-top label-new' %>
