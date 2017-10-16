@@ -6,9 +6,9 @@
 
   <li vlass="value_one">
     <b>Location</b>
-    <%= text_field_tag "products[#{product_no_ws.id}][:column]", product_no_ws.column.to_s, {size: 6, placeholder: 'Column'}%>
-    <%= number_field_tag "products[#{product_no_ws.id}][:row]", product_no_ws.row, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Row'} %>
-    <%= text_field_tag "products[#{product_no_ws.id}][:area]", product_no_ws.area.to_s,{size: 6, placeholder: 'Area'}%>
+    <%= text_field_tag "products[#{product_no_ws.id}][column]", product_no_ws.column.to_s, {size: 6, placeholder: 'Column'}%>
+    <%= number_field_tag "products[#{product_no_ws.id}][row]", product_no_ws.row, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Row'} %>
+    <%= text_field_tag "products[#{product_no_ws.id}][area]", product_no_ws.area.to_s,{size: 6, placeholder: 'Area'}%>
   </li>
 </ul>
 

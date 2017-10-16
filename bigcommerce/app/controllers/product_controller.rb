@@ -235,17 +235,15 @@ class ProductController < ApplicationController
 
   def update
     # Product Update
-
     # Location Updated
     if !params[:location_update].nil?
       unless params[:commit]=='Skip'
         params[:products].each do |id, location|
-          ProductNoWs.find(id).update(location.permit(:row, :column, :area))
+          ProductNoWs.find(id).update_attributes(location.permit(:row, :column, :area))
         end
         flash[:success] = 'Location Updated'
       end
-
-      redirect_to controller: 'product', acrtion: 'location' and return
+      redirect_to action: 'location' and return
 
     # IN Product Detail -> assign Country / Name
     elsif params[:warehouse_examining].nil?
