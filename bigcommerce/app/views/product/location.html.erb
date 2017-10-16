@@ -34,5 +34,6 @@
   $(document).on('click', '.removeProduct', function(event, data){
     var product_id = $(this).attr('product-id');
     $('ul.product-'+product_id).remove();
+    $('p.product-'+product_id).remove();
   });
 </script>
