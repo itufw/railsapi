@@ -15,6 +15,7 @@ class ActivityController < ApplicationController
   autocomplete :contact, :name, display_value: :display_position, scopes: :has_role
   autocomplete :staff, :nickname, extra_data: [:nickname]
   autocomplete :sale_rate_term, :name, full: true
+  autocomplete :producer, :name, full: true
 
   include ActivityHelper
 

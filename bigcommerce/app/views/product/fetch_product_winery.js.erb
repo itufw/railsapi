@@ -1,0 +1,3 @@
+<% @product_no_ws.each do |product_no_ws| %>
+  product_table.append("<%=j render 'product_partials/mobile_location', product_no_ws: product_no_ws %>");
+<% end %>
