@@ -99,7 +99,7 @@
     <td colspan="4" rowspan="4" align="center">
       <%= f.text_area :staff_notes, style: "border: none; width: 100%; height: 130px; ", placeholder: 'Staff Notes'%>
     </td>
-    <td class="ProductCost" align="right">Subtotal (Inc. WET, Ex. GST)</td>
+    <td class="ProductCost" align="right">Subtotal (Inc. GST)</td>
     <td class="ProductTotal" align="right"><%= f.text_field :subtotal, readonly: true%></td>
   </tr>
   <tr>
@@ -241,9 +241,9 @@
     discount += (total * order_discount)
     shipping_cost = parseFloat($('#order_shipping_cost').val())
 
-    $('#order_gst').val(((total*(1 - order_discount) + shipping_cost)* gst).toFixed(4));
+    $('#order_gst').val((total*(1-order_discount)/11 + (shipping_cost)* gst).toFixed(4));
     $('#order_discount_amount').val(discount.toFixed(4));
-    $('#order_total_inc_tax').val(((total *( 1 - order_discount) + shipping_cost)).toFixed(4));
+    $('#order_total_inc_tax').val(((total *( 1 - order_discount) + shipping_cost*gst)).toFixed(4));
     return total;
   }
 

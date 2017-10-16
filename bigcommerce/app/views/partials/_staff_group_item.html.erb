@@ -2,13 +2,21 @@
     <thead>
       <tr>
         <th>
-          <%= autocomplete_field_tag 'product_name', '', autocomplete_product_no_ws_name_activity_index_path, placeholder: 'Product', id: 'product_search', model: 'ProductNoWs'%>
+          <%= autocomplete_field_tag 'product_name', '', autocomplete_product_no_ws_name_activity_index_path, placeholder: 'Product No WS', id: 'product_no_ws_search', model: 'ProductNoWs'%>
         </th>
         <th>
           <%= autocomplete_field_tag 'staff_name', '', autocomplete_staff_nickname_activity_index_path, placeholder: 'Staff', id: 'staff_search', model: 'Staff' %>
         </th>
         <th>
           <%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Customer', id: 'customer_search', model: 'Customer' %>
+        </th>
+      </tr>
+      <tr>
+        <th>
+          <%= autocomplete_field_tag 'product_names', '', autocomplete_product_name_activity_index_path, placeholder: 'Product', id: 'product_search', model: 'Product'%>
+        </th>
+        <th>
+          <%= autocomplete_field_tag 'sale_rate_term', '', autocomplete_sale_rate_term_name_activity_index_path, placeholder: 'Sale Rate Term', id: 'term_search', model: 'SaleRateTerm'%>
         </th>
       </tr>
       <tr>
@@ -28,7 +36,7 @@
   </table>
 
 <script type="text/javascript">
-  $(document).on('railsAutocomplete.select', '#product_search, #staff_search, #customer_search', function(event, data){
+  $(document).on('railsAutocomplete.select', '#product_search, #staff_search, #customer_search, #product_no_ws_search, #term_search', function(event, data){
     // No duplicated item in Staff Group Lists
     if ($('.group-item-table').find('[model='+ $(this).attr('model') +'][item-id='+ data.item.id +']').length == 0){
       $('.group-item-table').append([

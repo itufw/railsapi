@@ -1,17 +1,26 @@
 module StockControl
 
   def sales_rate_update
+    standard_term = SaleRateTerm.standard_term
     products = Product.where(retail_ws: 'WS')
-    products.each{|product| sales_rate_update_product(product)}
+    products.each{|product| sales_rate_update_product(product, standard_term)}
+
+    StaffGroupItem.where(item_model: 'SaleRateTerm').map(&:staff_group).uniq.each do |staff_group|
+      product_ids = staff_group.products(staff_group.id).map(&:item_id)
+      products = Product.where(id: product_ids)
+      special_term = SaleRateTerm.special_term(staff_group.id)
+
+      products.each{|product| sales_rate_update_product(product, special_term)}
+    end
   end
 
-  def sales_rate_update_product(product)
+  def sales_rate_update_product(product, terms)
     product_sales = product.order_products.valid_orders
     monthly_supply = 0
     # only calculate weight for month with sales
     weight = 0
 
-    SaleRateTerm.standard_term.each do |term|
+    terms.each do |term|
       next unless term.term.between?(1, 4)
 
       sales = product_sales.select{ |x| x.created_at.between?(Date.today-term.days_until.day, Date.today-term.days_from.day) }.map(&:qty).sum
@@ -62,14 +71,14 @@ module StockControl
       product[:allocated] = 0 if !allocated.nil? && product[:allocated].nil?
       product[:allocated] += allocated.qty unless allocated.nil?
 
-      if p.retail_ws=='R'
+      if (p.retail_ws=='R')&&(!p.product_name.include?'DM')
         product[:rrp] = (p.price * 1.1).round(2)
       elsif p.product_name.include?'WS'
-        product[:ws_id] = p.product_id
-        product[:luc] = (p.price * 1.29).round(2)
+        product = product.merge({ws_id: p.product_id, luc: (p.price * 1.29).round(2),
+          current: p.current})
+
         product[:term_1] = p.sale_term_1 unless p.sale_term_1.nil? || p.sale_term_1.zero?
         product[:monthly_supply] = p.monthly_supply.round(0) unless p.monthly_supply.nil? || p.monthly_supply.round(0).zero?
-        product[:current] = p.current
       end
 
       product_hash[p.id] = product

@@ -1,0 +1,247 @@
+<meta content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0" name="viewport" />
+
+<div class="counting-table block">
+  <ul>
+    <!-- Customer Info -->
+    <p class="customer_autocomplete">
+      Customer
+      <%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search'%>
+    </p>
+    <div class="order-address" style="display:none;">
+      <%= f.fields_for "customer", f.object.customer do |c|%>
+      <li>
+        <b>Billing Address</b>
+        <p>
+        <%= c.text_field :company, placeholder: 'Company'%>
+        <%= c.text_field :street, placeholder: 'Street'%>
+        <%= c.text_field :street_2, placeholder: 'Street 2'%>
+        <%= c.text_field :city, placeholder: 'City'%>
+        <%= c.text_field :state, placeholder: 'State'%>
+        <%= c.text_field :postcode, placeholder: 'Postcode'%>
+        <%= c.text_field :country, placeholder: 'Country'%>
+      </p></li>
+      <% end %>
+      <li>
+        <b>Shipping Address</b>
+        <p>
+        <%= f.text_field :ship_name, placeholder: 'Recipient or Leave it Blank'%>
+        <%= f.text_field :street, placeholder: 'Street'%>
+        <%= f.text_field :street_2, placeholder: 'Street 2'%>
+        <%= f.text_field :city, placeholder: 'City'%>
+        <%= f.text_field :state, placeholder: 'State'%>
+        <%= f.text_field :postcode, placeholder: 'Postcode'%>
+        <%= f.text_field :country, placeholder: 'Country'%>
+      </p></li>
+    </div>
+  </ul>
+
+  <ul class="product-list">
+    <p class="product_autocomplete">
+      Product
+      <%= autocomplete_field_tag 'product', '', autocomplete_product_ws_activity_index_path, placeholder: 'Search WS Product', id_element: '#product_id', id: 'product_ws_search' %>
+    </p>
+  </ul>
+  <ul class="total-price">
+    <li><p>
+      Subtotal<%= f.text_field :subtotal, readonly: true, size: 5%><br/>
+      Discount<%= f.text_field :discount_rate, size: 5 %>%
+      Amount<%= f.text_field :discount_amount, readonly: true, size: 5%><br/>
+      Shipping<%= f.text_field :shipping_cost, size:3%><br/>
+      WET<%= f.text_field :wet, readonly: true, size: 7%>GST<%= f.text_field :gst, readonly: true, size: 7%><br/>
+      Grand Total<%= f.text_field :total_inc_tax, readonly: true, size: 8%>
+      <%= f.hidden_field :modified_wet %>
+    </p></li>
+  </ul>
+  <ul>
+    <p>Notes</p>
+    <li>
+      <b>Customer Notes</b>
+      <%= f.text_area :customer_notes, style: "border: none; width: 100%;", placeholder: 'Customer Notes'%>
+    </li>
+    <li>
+      <b>Staff Notes</b>
+      <%= f.text_area :staff_notes, style: "border: none; width: 100%;", placeholder: 'Staff Notes'%>
+    </li>
+    <li>
+      <b>Delivery Instruction</b>
+      <%= f.text_area :delivery_instruction, style: "border: none; width: 100%;", placeholder: 'Delivery Instruction'%>
+    </li>
+    <li>
+      <%= link_to '<button type="button" class="btn btn-warning">Cancel</button>'.html_safe, controller: 'order', action: 'all'%>
+      <%= button_tag(type: 'submit', class: 'btn btn-success save active') do %>
+        <div><%= (@order.id.nil?) ? 'Create' : 'Save'%></div>
+      <% end %>
+    </li>
+  </ul>
+</div>
+
+<script type="text/javascript">
+  var allocation_products = $('.allocation-products');
+
+  var last_products = $('#last_products');
+  var recipient = $('#order_ship_name');
+  var street = $('#order_street');
+  var street_2 = $('#order_street_2');
+  var city = $('#order_city');
+  var state = $('#order_state');
+  var postcode = $('#order_postcode');
+  var country = $('#order_country');
+
+  var billing_company = $('#order_customer_company');
+  var billing_street = $('#order_customer_street');
+  var billing_street_2 = $('#order_customer_street_2');
+  var billing_city = $('#order_customer_city');
+  var billing_state = $('#order_customer_state');
+  var billing_postcode = $('#order_customer_postcode');
+  var billing_country = $('#order_customer_country');
+
+  var product_count = $('.product-table tbody.product-list tr').length
+  $('#order_customer_id').hide();
+
+
+  // Customer Search
+  $(document).on('railsAutocomplete.select', '#customer_search', function(event, data){
+    if ($('#customer_table').find('remove').length == 0) {
+      $('.order-address').show();
+
+      $('.customer_autocomplete').html('<input type="text" name="customer" id="' + data.item.id + '" value="' + data.item.value + '" readonly="readonly"><i class="glyphicon glyphicon-remove remove" title="remove"></i>');
+      $('#order_customer_id').val(data.item.id);
+      // In view/status
+      // Update last products / last order and everything else
+      var link = "/fetch_last_products?customer_id=" + data.item.id
+      $.ajax({
+          type: 'GET',
+          url: link
+      });
+
+      $('.remove').click(function () {
+        $('.customer_autocomplete').html('<%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 15 %>');
+        $('#order_customer_id').val('');
+        $('.last-order-product').remove();
+        $('.last-order-td').remove();
+        $('.allocation-products').html('');
+        $('.order-address').hide();
+      });
+    }
+  });
+
+  // Product Search
+  $(document).on('railsAutocomplete.select', '#product_search, #product_ws_search',function(event, data){
+    product_count += 1;
+
+    $('.product-list').append([
+      '<div id="li_'+ data.item.id +'">',
+      '<li><p>',
+        data.item.label,
+        '<i class="glyphicon glyphicon-remove remove_row" title="remove" product="li_'+ data.item.id +'"></i>',
+        '<br/>',
+        'Inventory: <i class="product-inventory">'+ data.item.inventory +'  </i>',
+        'Luc: <input size="8" readonly="readonly" class="product-luc" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_luc]" id="order_products_'+ product_count +'__price_luc">',
+        'Total: <i class="product-total">0</i>',
+        '</p></li>',
+        '<li>',
+        'QTY:<input size="3" class="product-qty" type="text" value="0" name="order[products['+ product_count +']][qty]" id="order_products_'+ product_count +'__qty">',
+        'Discount:<input size="3" class="product-discount" type="text" value="0" name="order[products['+ product_count +']][discount]" id="order_products_'+ product_count +'__discount"  placeholder="Discount">%  ',
+        'Price<input size="8" class="product-price" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_discounted]" id="order_products_'+ product_count +'__price_discounted">',
+      '</li>',
+     '</div>'].join(''));
+
+    $('#product_ws_search').val('');
+
+    $('.remove_row').click(function(){
+      $('#'+$(this).attr('product')).remove();
+    });
+  });
+
+  var update_subtotal = function(){
+    var total = 0;
+    var discount = 0;
+    var wet = 0;
+    $('.product-list li').each(function(){
+      total += (parseFloat($(this).find('.product-total').html()) || 0);
+      discount += (parseFloat($(this).find('.product-luc').val()) - parseFloat($(this).find('.product-price').val())) *  parseInt($(this).find('.product-qty').val());
+      wet += ((parseFloat($(this).find('.product-price').val()) - 1.82) * parseInt($(this).find('.product-qty').val() * 0.29));
+    });
+    $('#order_subtotal').val(total.toFixed(4));
+    $('#order_wet').val((total / 1.29 * 0.29).toFixed(4));
+    // Modified Wet
+    $('#order_modified_wet').val(wet);
+
+    order_discount = (parseFloat($('#order_discount_rate').val()) * 0.01) || 0
+    discount += (total * order_discount)
+    shipping_cost = (parseFloat($('#order_shipping_cost').val())) || 0
+
+    $('#order_gst').val(((total*(1 - order_discount) + shipping_cost)*0.1).toFixed(4));
+    $('#order_discount_amount').val(discount.toFixed(4));
+    $('#order_total_inc_tax').val(((total *( 1 - order_discount) + shipping_cost) * 1.1).toFixed(4));
+    return total;
+  };
+
+  var shipping_cost_update = function(){
+    var bottles = 0;
+    $('.product-list li').each(function(){
+      bottles += parseInt($(this).find('.product-qty').val());
+    });
+    $('#order_shipping_cost').val(parseInt(bottles/6)*10);
+  };
+
+  var product_change = function(column){
+    qty = column.parent().parent().find('.product-qty').val();
+    luc = column.parent().parent().find('.product-luc').val();
+    price = column.parent().parent().find('.product-price').val();
+    discount = 0;
+
+    if(column.attr('class') == 'product-discount'){
+      price = luc * (1 - column.val() * 0.01 );
+      column.parent().parent().find('.product-price').val(price.toFixed(4));
+    }else if (column.attr('class') == 'product-price') {
+      discount = (1 - (column.val() / luc)) * 100 ;
+      column.parent().parent().find('.product-discount').val(discount.toFixed(2));
+    }
+    column.parent().parent().find('.product-total').html((price * qty).toFixed(4));
+    update_subtotal();
+  };
+
+  $(document).on('input', '.product-qty, .product-discount, .product-price', function(){
+    product_change($(this));
+
+    // If it is vintage cellar order, automatically update shipping cost
+    if (/Vintage Cellars/i.test($('input[name=customer]').val())){
+      shipping_cost_update();
+    }
+  });
+
+  $(document).on('input', '#order_discount_rate, #order_shipping_cost', function(){
+    update_subtotal();
+  });
+
+</script>
+
+
+<!-- Submit Tag -->
+<script type="text/javascript">
+  $('button.active').hide();
+
+  var valid_check = function(){
+    var customer_flag = $('input[name=customer]').size() > 0;
+    var product_flag = $('.product-list li').size() > 0;
+    var shipping_address_flag = (($('input#order_street').val() != "") && ($('input#order_city').val() != "") && ($('input#order_postcode').val() != ""));
+    var inventory_flag = true;
+    var table_flag = $('.total-price input:text').filter(function() { return (this.value == "" || this.value=="NaN"); }).size() == 0;
+    $('.product-qty').each(function(){
+      if (parseInt($(this).val()) > parseInt($(this).parent().parent().find('.product-inventory').html()) ){
+        inventory_flag = false;
+      }
+    });
+    if (customer_flag && product_flag && shipping_address_flag && inventory_flag && table_flag){
+      $('button.active').show();
+      $('button.disabled').hide();
+    }else{
+      $('button.active').hide();
+      $('button.disabled').show();
+    };
+  }
+
+  $(document).on('input', valid_check);
+  $(document).on('click', valid_check);
+</script>

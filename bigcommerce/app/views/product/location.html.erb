@@ -1,0 +1,33 @@
+<meta content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0" name="viewport" />
+<%= autocomplete_field_tag 'name', '', autocomplete_producer_name_activity_index_path, placeholder: 'Search Winery', id: 'winery_search', size: 30 %>
+
+<%= form_tag({:controller => "product", :action => "update"}, {:method => "get"}) do %>
+  <%= hidden_field_tag :location_update, true %>
+
+  <div class="counting-table block"></div>
+  <div class="block save">
+    <ul>
+      <li>
+        <div style="align: center;">
+          <%= submit_tag 'Save', class: 'btn btn-success btn-lg'%>
+          <%= submit_tag 'Skip', class: 'btn btn-default btn-lg'%>
+        </div>
+      </li>
+    </ul>
+  </div>
+<% end %>
+
+
+<script type="text/javascript">
+  var product_table = $('.counting-table');
+
+  $(document).on('railsAutocomplete.select', '#winery_search', function(event, data){
+      // In view/status
+      // Update last products / last order and everything else
+      var link = "/product/fetch_product_winery?producer_id=" + data.item.id
+      $.ajax({
+          type: 'GET',
+          url: link
+      });
+  });
+</script>

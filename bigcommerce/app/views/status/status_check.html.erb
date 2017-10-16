@@ -41,6 +41,17 @@
       <%= hidden_field_tag :status_id, 3%>
       <%= submit_tag 'Check', class: 'btn btn-primary'%>
     <% when 'Courier' %>
+      <!-- Label Stock in Status helper -->
+      <% label_stock = fastway_stock_level() %>
+      <% unless label_stock.nil?%>
+        <p>
+          Label Stock:
+          <% label_stock.each do |label|%>
+            <i><%= label['Colour'].to_s + ':' %> <i style="color:red;"><%= label['AvailableStock'].to_s + ' | ' %></i> </i>
+          <% end %>
+        </p>
+      <% end %>
+
       <%= hidden_field_tag :status_id, 9%>
       <%= submit_tag 'Select Courier', class: 'btn btn-primary'%>
       <script type="text/javascript">
