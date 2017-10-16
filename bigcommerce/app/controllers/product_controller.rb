@@ -235,8 +235,17 @@ class ProductController < ApplicationController
 
   def update
     # Product Update
+
+    # Location Updated
+    if !params[:location_update].nil?
+      params[:products].each do |id, location|
+        ProductNoWs.find(id).update(location.permit(:row, :column, :area))
+      end
+      flash[:success] = 'Location Updated'
+      redirect_to controller: 'product', acrtion: 'location' and return
+
     # IN Product Detail -> assign Country / Name
-    if params[:warehouse_examining].nil?
+    elsif params[:warehouse_examining].nil?
       if params[:new_product]=='1' && (product_params[:name_no_vintage].nil? || product_params[:name_no_ws].nil?)
         flash[:error] = 'Incorrect!'
         redirect_to :back and return
@@ -375,6 +384,18 @@ class ProductController < ApplicationController
       flash[:success] = 'Stock Level Overwrote'
     end
     redirect_to request.referrer
+  end
+
+  def location
+
+  end
+
+  def fetch_product_winery
+    products = Producer.find(params[:producer_id]).products.where('inventory > 0')
+    @product_no_ws = ProductNoWs.where(id: products.map(&:product_no_ws_id).uniq)
+    respond_to do |format|
+      format.js
+    end
   end
 
   # Flag for product Selection

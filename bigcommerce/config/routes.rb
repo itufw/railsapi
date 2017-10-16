@@ -73,6 +73,7 @@ Rails.application.routes.draw do
     get :autocomplete_customer_lead_actual_name, on: :collection
     get :autocomplete_staff_nickname, on: :collection
     get :autocomplete_sale_rate_term_name, on: :collection
+    get :autocomplete_producer_name, on: :collection
   end
 
   # The priority is based upon order of creation: first created ->
