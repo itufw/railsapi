@@ -30,4 +30,9 @@
           url: link
       });
   });
+  
+  $(document).on('click', '.removeProduct', function(){
+    var product_id = $(this).attr('product-id');
+    $('ul.product-'+product_id).remove();
+  });
 </script>
