@@ -1,5 +1,8 @@
-<ul>
-  <p><%= product_no_ws.name %></p>
+<ul class="<%= producer %> product-<%= product_no_ws.id %>">
+  <p>
+    <%= product_no_ws.name %>
+    <i class="glyphicon glyphicon-remove removeProduct" title="Expired" product-id="<%= product_no_ws.id %>"></i>
+  </p>
   <li vlass="value_one">
     <b>Location</b>
     <%= text_field_tag "products[#{product_no_ws.id}][:row]", product_no_ws.row.to_s, {size: 6, placeholder: 'Row'}%>

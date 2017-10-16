@@ -238,10 +238,13 @@ class ProductController < ApplicationController
 
     # Location Updated
     if !params[:location_update].nil?
-      params[:products].each do |id, location|
-        ProductNoWs.find(id).update(location.permit(:row, :column, :area))
+      unless params[:commit]=='Skip'
+        params[:products].each do |id, location|
+          ProductNoWs.find(id).update(location.permit(:row, :column, :area))
+        end
+        flash[:success] = 'Location Updated'
       end
-      flash[:success] = 'Location Updated'
+
       redirect_to controller: 'product', acrtion: 'location' and return
 
     # IN Product Detail -> assign Country / Name
@@ -387,12 +390,12 @@ class ProductController < ApplicationController
   end
 
   def location
-
   end
 
   def fetch_product_winery
     products = Producer.find(params[:producer_id]).products.where('inventory > 0')
     @product_no_ws = ProductNoWs.where(id: products.map(&:product_no_ws_id).uniq)
+    @producer = params[:producer_id]
     respond_to do |format|
       format.js
     end

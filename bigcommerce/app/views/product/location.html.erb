@@ -1,7 +1,6 @@
 <meta content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0" name="viewport" />
 <%= autocomplete_field_tag 'name', '', autocomplete_producer_name_activity_index_path, placeholder: 'Search Winery', id: 'winery_search', size: 30 %>
 
-
 <%= form_tag({:controller => "product", :action => "update"}, {:method => "get"}) do %>
   <%= hidden_field_tag :location_update, true %>
 
@@ -23,9 +22,6 @@
   var product_table = $('.counting-table');
 
   $(document).on('railsAutocomplete.select', '#winery_search', function(event, data){
-    if ($('#customer_table').find('remove').length == 0) {
-      $('.customer_autocomplete').html('<input type="text" name="customer" id="' + data.item.id + '" value="' + data.item.value + '" readonly="readonly"><i class="glyphicon glyphicon-remove remove" title="remove"></i>');
-      $('#order_customer_id').val(data.item.id);
       // In view/status
       // Update last products / last order and everything else
       var link = "/product/fetch_product_winery?producer_id=" + data.item.id
@@ -33,7 +29,10 @@
           type: 'GET',
           url: link
       });
-    }
   });
 
+  $(document).on('click', '.removeProduct', function(event, data){
+    var product_id = $(this).attr('product-id');
+    $('ul.product-'+product_id).remove();
+  });
 </script>
