@@ -173,7 +173,6 @@ class OrderController < ApplicationController
         allocated_order.update(qty: allocated_order.qty - product_params[:qty].to_i)
       end
 
-
       if products.map(&:product_id).include?product_id.to_i
         # update
         product = products.where("product_id = ? AND updated_at < ?", product_id, (Time.now-2.minutes).to_s(:db)).first
