@@ -1,9 +1,8 @@
-<p class="product-<%= product_no_ws.id%>">
-  <%= product_no_ws.name %>
-  <i class="glyphicon glyphicon-remove removeProduct" title="Expired" product-id="<%= product_no_ws.id %>"></i>
-</p>
-
 <ul class="<%= producer %> product-<%= product_no_ws.id %>">
+  <p class="product-<%= product_no_ws.id%>">
+    <%= product_no_ws.name %>
+    <i class="glyphicon glyphicon-remove removeProduct" title="Expired" product-id="<%= product_no_ws.id %>"></i>
+  </p>
 
   <li vlass="value_one">
     <b>Location</b>
@@ -12,3 +11,10 @@
     <%= text_field_tag "products[#{product_no_ws.id}][:area]", product_no_ws.area.to_s,{size: 6, placeholder: 'Area'}%>
   </li>
 </ul>
+
+<script type="text/javascript">
+  $(document).on('click', '.removeProduct', function(event, data){
+    var product_id = $(this).attr('product-id');
+    $('ul.product-'+product_id).remove();
+  });
+</script>
