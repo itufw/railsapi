@@ -6,6 +6,10 @@ class Fastway
     @query = { query: {'api_key': Rails.application.secrets.fastway_key, 'UserID': '2374' } }
   end
 
+  def stock_level
+    self.class.get('/fastlabel/getstocklevel', @query)
+  end
+
   def track(trace_number)
     @query[:query]['CountryCode'] = 1
     begin
@@ -156,7 +160,12 @@ class Fastway
     order.eta = result['result']['target_delivery']['earliest_delivery_date'].to_date.to_s(:db)
     order.save
     parcel_color = result['result']['services'].select{|x| x.values().include? 'Parcel'}.first['labelcolour_pretty_array']
-    return 18 if (parcel_color.map(&:upcase).include? 'GREEN') || (parcel_color.map(&:upcase).include? 'ORANGE')
+
+    # TODO!!!
+    # !!!Temporary!!!
+    return 1 if (parcel_color.map(&:upcase).include? 'ORANGE')
+    return 18 if (parcel_color.map(&:upcase).include? 'GREEN') || (parcel_color.map(&:upcase).include? 'GREY')
+    # Red 6
     return 1765 if (parcel_color.map(&:upcase).include? 'RED') || (parcel_color.map(&:upcase).include? 'RED')
     1
   end

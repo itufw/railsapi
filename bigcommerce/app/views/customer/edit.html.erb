@@ -73,9 +73,9 @@
   <%= f.label :tolerance_day, class: 'margin-from-top label-new'%>
   <%= f.number_field :tolerance_day, placeholder: 'Tolerance Day'%>
   <%= f.label :account_type, class: 'margin-from-top label-new' %>
-  <%= f.collection_select :account_type, ['COD', 'I2I', 'EOM'], :to_s, :to_s, {include_blank: 'Based on Invoice Date'}%>
+  <%= f.collection_select :account_type, CustomerAccountType.account_type, :name, :name, {include_blank: 'Based on Invoice Date'}%>
   <%= f.label :default_courier, class: 'margin-from-top label-new' %>
-  <%= f.collection_select :default_courier, ['CIVIC', 'Staff'], :to_s, :to_s, {include_blank: 'Fastway'}%>
+  <%= f.collection_select :default_courier, CustomerAccountType.default_courier, :name, :name %>
   <%= f.label :payment_method, class: 'margin-from-top label-new' %>
   <%= f.text_field :payment_method, placeholder: 'Payment Method'%>
   <br/>
@@ -108,8 +108,8 @@
   });
 
   $(document).on('input', '.address', function(){
-    var street = $('#customer_street').val() + $('#customer_street_2').val()
-    var city = $('#customer_city').val() + $('#customer_state').val() + $('#customer_postcode').val() + $('#customer_country').val();
+    var street = $('#customer_street').val() + ' '+ $('#customer_street_2').val() + ' ';
+    var city = $('#customer_city').val() + ' '+ $('#customer_state').val() +' '+ $('#customer_postcode').val() +' '+ $('#customer_country').val();
 
     $('#customer_address').val(street + city);
   });

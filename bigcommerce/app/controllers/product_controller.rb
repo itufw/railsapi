@@ -78,6 +78,9 @@ class ProductController < ApplicationController
     # calculate the pending stock for each customer
     @customer_pendings, @customer_ids = \
       customer_pending_amount(product_ids, params, @customer_ids)
+
+    # Include all relevant products to overwrite stock level
+    @products = Product.filter_by_ids_nil_allowed(product_ids)
   end
 
   def allocate
@@ -232,8 +235,20 @@ class ProductController < ApplicationController
 
   def update
     # Product Update
+
+    # Location Updated
+    if !params[:location_update].nil?
+      unless params[:commit]=='Skip'
+        params[:products].each do |id, location|
+          ProductNoWs.find(id).update(location.permit(:row, :column, :area))
+        end
+        flash[:success] = 'Location Updated'
+      end
+
+      redirect_to controller: 'product', acrtion: 'location' and return
+
     # IN Product Detail -> assign Country / Name
-    if params[:warehouse_examining].nil?
+    elsif params[:warehouse_examining].nil?
       if params[:new_product]=='1' && (product_params[:name_no_vintage].nil? || product_params[:name_no_ws].nil?)
         flash[:error] = 'Incorrect!'
         redirect_to :back and return
@@ -335,13 +350,13 @@ class ProductController < ApplicationController
       # Overwrite Master records
       product_no_ws.products.each do |product|
         if product.name.include?' DM'
-          product.inventory_overwrite(examining['count_dm'].to_i) if examining['count_dm']
+          product.inventory_overwrite(examining['count_dm'].to_i, session[:user_id]) if examining['count_dm']
         elsif product.name.include?' VC'
-          product.inventory_overwrite(examining['count_vc'].to_i) if examining['count_vc']
+          product.inventory_overwrite(examining['count_vc'].to_i, session[:user_id]) if examining['count_vc']
         elsif product.name.include?' WS'
-          product.inventory_overwrite(examining['count_ws'].to_i) if examining['count_ws']
+          product.inventory_overwrite(examining['count_ws'].to_i, session[:user_id]) if examining['count_ws']
         elsif product.retail_ws=='R'
-          product.inventory_overwrite(examining['count_retail'].to_i) if examining['count_retail']
+          product.inventory_overwrite(examining['count_retail'].to_i, session[:user_id]) if examining['count_retail']
         end
       end
       # Update examining and quit
@@ -358,6 +373,29 @@ class ProductController < ApplicationController
 
   def fetch_product_details
     @product = Product.find(params[:product_id])
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def product_inventory_overwrite
+    if Staff.find(session[:user_id]).product_rights.zero?
+      flash[:error] = 'No Authority'
+      redirect_to request.referrer and return
+    else
+      params[:product].each {|product_id, inventory| Product.find(product_id).inventory_overwrite(inventory.to_i, session[:user_id])}
+      flash[:success] = 'Stock Level Overwrote'
+    end
+    redirect_to request.referrer
+  end
+
+  def location
+  end
+
+  def fetch_product_winery
+    products = Producer.find(params[:producer_id]).products.where('inventory > 0')
+    @product_no_ws = ProductNoWs.where(id: products.map(&:product_no_ws_id).uniq)
+    @producer = params[:producer_id]
     respond_to do |format|
       format.js
     end

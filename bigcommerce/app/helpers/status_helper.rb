@@ -1,3 +1,5 @@
+load 'fastway.rb'
+
 module StatusHelper
     def get_id_and_name(params)
         status_id = params[:status_id]
@@ -63,6 +65,10 @@ module StatusHelper
         last_order_date[order.id] = product_orders.customer_filter([order.customer_id]).order_by_date_created('DESC').map{|x| x[:date_created]}[1]
       end
       last_order_date
+    end
+
+    def fastway_stock_level
+      Fastway.new.stock_level['result']
     end
 
 end

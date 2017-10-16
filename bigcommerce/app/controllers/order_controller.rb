@@ -110,6 +110,12 @@ class OrderController < ApplicationController
     @order = Order.new(discount_rate: 0, shipping_cost: 0)
   end
 
+  # Testing Order Creation on Mobile
+  # Entry via User panel -> IT Working
+  def create_order_testing
+    @order = Order.new(discount_rate: 0, shipping_cost: 0)
+  end
+
   def save_order
     if products_params.nil? || products_params.blank? || products_params.values().map {|x| x['qty'].to_i }.sum==0
       flash[:error] = 'Wrong Products!'
@@ -166,7 +172,6 @@ class OrderController < ApplicationController
         allocated_order = Order.where(customer_id: order.customer_id, status_id: 1).first
         allocated_order.update(qty: allocated_order.qty - product_params[:qty].to_i)
       end
-
 
       if products.map(&:product_id).include?product_id.to_i
         # update
