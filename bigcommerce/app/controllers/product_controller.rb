@@ -393,7 +393,7 @@ class ProductController < ApplicationController
   def fetch_product_winery
     if params[:producer_id]
       products = Producer.find(params[:producer_id]).products.where('inventory > 0')
-      @product_no_ws = ProductNoWs.where(id: products.map(&:product_no_ws_id).uniq)
+      @product_no_ws = ProductNoWs.where(id: products.map(&:product_no_ws_id).uniq).order(:name)
       @producer = params[:producer_id]
     else
       @product_no_ws = ProductNoWs.where(id: params[:product_no_ws_id])
