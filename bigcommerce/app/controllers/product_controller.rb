@@ -391,9 +391,14 @@ class ProductController < ApplicationController
   end
 
   def fetch_product_winery
-    products = Producer.find(params[:producer_id]).products.where('inventory > 0')
-    @product_no_ws = ProductNoWs.where(id: products.map(&:product_no_ws_id).uniq)
-    @producer = params[:producer_id]
+    if params[:producer_id]
+      products = Producer.find(params[:producer_id]).products.where('inventory > 0')
+      @product_no_ws = ProductNoWs.where(id: products.map(&:product_no_ws_id).uniq)
+      @producer = params[:producer_id]
+    else
+      @product_no_ws = ProductNoWs.where(id: params[:product_no_ws_id])
+      @producer = params[:product_no_ws_id]
+    end
     respond_to do |format|
       format.js
     end
