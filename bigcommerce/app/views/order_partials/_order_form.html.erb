@@ -231,17 +231,24 @@
   // Product Search
   $(document).on('railsAutocomplete.select', '#product_search, #product_ws_search',function(event, data){
     product_count += 1;
+    var color = 'black';
+
+    if (parseInt(data.item.monthly_supply)<3){
+      color = 'red';
+    }else if (parseInt(data.item.monthly_supply)<6){
+      color = 'orange';
+    };
 
     $('.product-table tbody.product-list').append([
       '<tr id="tr_'+ data.item.id +'">',
         '<td><input size="5" readonly="readonly" class="product-id" type="text" value="'+ data.item.id +'" name="order[products['+ product_count +']][product_id]" id="order_products_'+ product_count +'__product_id"></td>',
         '<td>'+ data.item.label +'</td>',
-        '<td class="product-inventory">'+ data.item.inventory +'</td>',
+        '<td class="product-inventory">'+ data.item.inventory +' |  <i style="color:'+ color +';">'+ data.item.monthly_supply +'</i> </td>',
         '<td><input size="5" readonly="readonly" class="product-luc" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_luc]" id="order_products_'+ product_count +'__price_luc"></td>',
         '<td><input size="3" class="product-qty" type="text" value="0" name="order[products['+ product_count +']][qty]" id="order_products_'+ product_count +'__qty"></td>',
         '<td><input size="2" class="product-discount" type="text" value="0" name="order[products['+ product_count +']][discount]" id="order_products_'+ product_count +'__discount"  placeholder="Discount"> %</td>',
         '<td><input size="5" class="product-price" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_discounted]" id="order_products_'+ product_count +'__price_discounted"></td>',
-        '<td class="product-total">0  <p style="color:red;">'+ data.item.monthly_supply +'</p></td>',
+        '<td class="product-total">0</td>',
         '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
       '</tr>'
       ].join(''));

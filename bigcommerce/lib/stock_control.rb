@@ -51,7 +51,8 @@ module StockControl
      .select('product_no_ws.*, products.case_size as case_size, products.calculated_price AS price,
        products.retail_ws AS retail_ws, products.name as product_name, products.inventory as inventory,
        products.id as product_id, products.name_no_winery as name_no_winery,
-       products.sale_term_1, products.monthly_supply, products.current')
+       products.sale_term_1, products.monthly_supply, products.current,
+       order_1, order_2')
 
     allocated_products = OrderProduct.joins(:order).select('product_id, SUM(order_products.qty) as qty')
       .where('orders.status_id': 1).group('product_id')
@@ -62,10 +63,13 @@ module StockControl
 
       # initialise the hash
       product = (product_hash[p.id].nil?) ? {inventory: 0} : product_hash[p.id]
+      product[:order_total] = 0 unless product[:order_total].to_i!=0
+
 
       product[:name] = p.name_no_winery unless p.name_no_winery.nil?
       product[:inventory] += p.inventory
       product[:case_size] = p.case_size
+      product[:order_total] = (p.order_1.to_i + p.order_2.to_f*0.1).to_f unless p.order_1.to_i==0
 
       allocated = allocated_products.detect{|x| x.product_id==p.product_id}
       product[:allocated] = 0 if !allocated.nil? && product[:allocated].nil?
