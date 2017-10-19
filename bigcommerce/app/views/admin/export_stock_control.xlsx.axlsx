@@ -51,7 +51,7 @@ wb.add_worksheet(name: "Stock Control", page_setup: setup) do |sheet|
       )
       products.each do |product|
         sheet.add_row(
-          [product[:ws_id], product[:name], product[:case_size], product[:rrp], product[:luc], product[:allocated], product[:inventory], product[:term_1], product[:monthly_supply]],
+          [product[:ws_id], product[:name], product[:case_size], '%.2f' % product[:rrp], '%.2f' % product[:luc], product[:allocated], product[:inventory], product[:term_1], product[:monthly_supply]],
           style: [nil, (eval product[:name_color].to_s), (1..4).map {|x| nil}, (product[:current].to_i.zero?)? highlight_font : nil, bordered_cell, bordered_cell].flatten
         )
       end
@@ -70,7 +70,7 @@ wb.add_worksheet(name: "Product Ref") do |sheet|
   @portfolio_list.each do |product|
     sheet.add_row([product[:id], product[:country], product[:winery], product[:name],
      product[:name_no_winery], product[:name_no_winery_no_vintage], product[:portfolio_name],
-     product[:vol], product[:case], product[:wholesale], product[:luc]
+     product[:vol], product[:case], '%.2f' % product[:wholesale], '%.2f' % product[:luc]
     ])
   end
 end
@@ -83,7 +83,7 @@ wb.add_worksheet(name: 'Product List') do |sheet|
   )
   @portfolio_list.each do |product|
     sheet.add_row([product[:id], product[:variety], product[:sub_type],
-     product[:name], product[:region], product[:luc]
+     product[:name], product[:region], '%.2f' % product[:luc]
     ])
   end
 end
