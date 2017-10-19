@@ -96,16 +96,6 @@ class AdminController < ApplicationController
         redirect_to controller: 'admin', action: 'index'
     end
 
-
-    def xero_sync_temp
-        Revision.xero.update_end_time(Time.now.utc)
-
-        system 'rake xero_invoice_sync:sync'
-        flash[:success] = 'Sync is Done! (Temporary!)'
-        redirect_to controller: 'admin', action: 'index'
-    end
-
-
     def password_update
         current_user = Staff.find(session[:user_id])
         if current_user.can_update
@@ -175,6 +165,8 @@ class AdminController < ApplicationController
       # Include Only In Stock Products
       # Function in lib stock control
       @product_hash = stock_calculation()
+
+      @portfolio_list = portfolio_products()
 
       respond_to do |format|
         format.html
