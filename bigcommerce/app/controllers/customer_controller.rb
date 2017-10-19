@@ -212,12 +212,15 @@ class CustomerController < ApplicationController
     # group_by can be group_by_product_id, group_by_product_no_vintage_id
     @top_products_timeperiod_h, @product_ids, @time_periods, sorted_bool = \
       top_objects(where_query, ('group_by_' + @transform_column).to_sym, :sum_qty, order_col, order_direction)
-    @price_h, @product_name_h = get_data_after_transformation(@transform_column, @product_ids)
+    @price_h, @product_name_h, @inventory_h, @pending_stock_h, @monthly_supply_h = get_data_after_transformation(@transform_column, @product_ids, @customer_id)
+
     # Sort by name/price
     ####################################
     # PUT THIS IN A LIB
     unless sorted_bool
-      sort_column_map = { '0' => @product_name_h, '1' => @price_h }
+      sort_column_map = { '0' => @product_name_h, '1' => @price_h,
+        'supply' => @monthly_supply_h, 'inventory' => @inventory_h,
+        'pending' => @pending_stock_h}
       # @name_h or @price_h are the structure {id => val}
       # sort the hash using the val, then get the product_ids in order using map
       hash_to_be_sorted = sort_column_map[order_col] || @product_name_h
@@ -230,7 +233,6 @@ class CustomerController < ApplicationController
       end
     end
     ####################################
-    @products = Product.send('filter_by_' + @transform_column, @product_ids)
   end
 
   def zomato
