@@ -104,4 +104,34 @@ module StockControl
 
     product_hash.select{|key, value| value[:inventory]>0 }
   end
+
+  def portfolio_products
+    products = Product.where('inventory > 0 AND name_no_winery IS NOT NULL AND product_type_id!=6').group(:product_no_ws_id)
+    wet = TaxPercentage.wet_percentage * 0.01 + 1
+    producer_country = ProducerCountry.all.order(:id).unshift(ProducerCountry.new(id: 0, name: nil, short_name: nil))
+    product_size = ProductSize.all.order(:id).unshift(ProductSize.new(id: 0, name: nil))
+    product_type = ProductType.all.order(:id).unshift(ProductType.new(id: 0, name: nil))
+    product_sub_type = ProductSubType.all.order(:id).unshift(ProductSubType.new(id: 0, name: nil))
+    producer_region = ProducerRegion.all.order(:id).unshift(ProducerRegion.new(id: 0, name: nil))
+    producer = Producer.all.order(:id).unshift(Producer.new(id: 0, name: nil))
+
+    portfolio_list = []
+
+
+    products.each do |product|
+      portfolio = {id: product.id, country: producer_country[product.producer_country_id.to_i].name,
+        winery: producer[product.producer_id.to_i].name,
+        name: product.name_no_ws, name_no_winery: product.name_no_winery,
+        name_no_winery_no_vintage: product.name_no_winery_no_vintage,
+        portfolio_name: product.vintage.to_s + "  " + product.name_no_winery_no_vintage,
+        vol: product_size[product.product_size_id.to_i].name,
+        case: product.case_size, wholesale: (product.case_size.to_i*product.calculated_price*wet).round(2),
+        luc: (product.calculated_price*wet).round(2), variety: product_type[product.product_type_id.to_i].name,
+        sub_type: product_sub_type[product.product_sub_type_id.to_i].name,
+        region: producer_country[product.producer_country_id.to_i].short_name.to_s+', '+producer_region[product.producer_region_id.to_i].name.to_s }
+
+      portfolio_list.append(portfolio)
+    end
+    portfolio_list
+  end
 end

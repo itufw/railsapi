@@ -4,9 +4,8 @@ wb = xlsx_package.workbook
 @countries = countries if @countries.nil? && countries.present?
 @product_hash = product_hash if @product_hash.nil? && product_hash.present?
 
-setup = {orientation: :portrait, scale: 75}
+  setup = {orientation: :portrait, scale: 75}
 
-wb.add_worksheet(name: "Stock Control", page_setup: setup) do |sheet|
 
   winery_hash = {bg_color: '000000', fg_color: 'FFFFFF'}
   bond_hash = {b: true}
@@ -27,6 +26,7 @@ wb.add_worksheet(name: "Stock Control", page_setup: setup) do |sheet|
   bordered_cell = wb.styles.add_style bond_hash.merge({border: { style: :thin, color: '000000', edges: [:left, :right, :bottom, :top]}})
   title_cell = wb.styles.add_style bond_hash.merge({sz: 18})
 
+wb.add_worksheet(name: "Stock Control", page_setup: setup) do |sheet|
   sheet.add_row(
     [nil, 'Stock Control'],
     style: [nil, title_cell]
@@ -59,4 +59,31 @@ wb.add_worksheet(name: "Stock Control", page_setup: setup) do |sheet|
     sheet.add_page_break('A' + (sheet.rows.last.index + 2).to_s)
   end
   sheet.column_info[3].hidden = true
+end
+
+# For Winery Portfolio
+wb.add_worksheet(name: "Product Ref") do |sheet|
+  sheet.add_row(
+    ['id', 'Country', 'Winery', 'Name', 'Name without Winery', 'Name without Winery And Vintage', 'Portfolio Name', 'Vol.', 'Case', 'Wholesale', 'LUC'],
+    style: [nil, (1..10).map { |x| black_cell }].flatten
+  )
+  @portfolio_list.each do |product|
+    sheet.add_row([product[:id], product[:country], product[:winery], product[:name],
+     product[:name_no_winery], product[:name_no_winery_no_vintage], product[:portfolio_name],
+     product[:vol], product[:case], product[:wholesale], product[:luc]
+    ])
+  end
+end
+
+# For Portfolio List
+wb.add_worksheet(name: 'Product List') do |sheet|
+  sheet.add_row(
+    ['id', 'Variety', 'Type', 'Name without WS', 'Region', 'LUC'],
+    style: [nil, (1..5).map { |x| black_cell }].flatten
+  )
+  @portfolio_list.each do |product|
+    sheet.add_row([product[:id], product[:variety], product[:sub_type],
+     product[:name], product[:region], product[:luc]
+    ])
+  end
 end
