@@ -49,4 +49,16 @@ module ProductHelper
     end
     flash[:success] = "Updated Group #{StaffGroup.find(session[:default_group]).group_name}"
   end
+
+  def product_name_inventory_after_transform(product_id, transform_column)
+    if transform_column.to_s=='product_no_ws_id'
+      product = ProductNoWs.find(product_id)
+      inventory = product.products.sum(:inventory)
+      return product.name, inventory
+    end
+    product = Product.find(product_id)
+    inventory = product.inventory
+    return product.name, inventory
+  end
+
 end

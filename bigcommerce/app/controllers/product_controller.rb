@@ -84,6 +84,12 @@ class ProductController < ApplicationController
   end
 
   def allocate
+    unless params[:selected_product].nil? || params[:selected_product].blank?
+      params[:product_id] = params[:selected_product].delete_at(0)
+      params[:product_name], params[:total_stock] = product_name_inventory_after_transform(params[:product_id], params[:transform_column])
+      @selected_product = params[:selected_product]
+    end
+
     params[:direction] = params[:direction] || -1
     params[:order_col] = params[:order_col] || 'Last Quarter'
 
@@ -124,6 +130,12 @@ class ProductController < ApplicationController
   end
 
   def allocate_products
+    if params[:commit]=='Skip'
+      redirect_to controller: 'product', action: 'allocate', transform_column: params[:transform_column], selected_product: params[:selected_product].split() and return
+    end
+    # transform_column=product_no_ws_id&selected_product%5B%5D=861&selected_product%5B%5D=40&selected_product%5B%5D=1271
+
+
     # Revision Date Conveter
     # From {"(1i)"=>"2017", "(2i)"=>"10", "(3i)"=>"8"} to Date
     revision_date = Date.parse params[:revision_date].values().join('-')
@@ -153,6 +165,10 @@ class ProductController < ApplicationController
       # Bulk Allocated
       # Product id IS WS Product ID
       Customer.where(id: allocated.keys()).map{|x| x.allocate_products(product_id, allocated[x.id.to_s].to_i, revision_date, session[:user_id]) }
+    end
+
+    if params[:commit]=='Allocate and Next'
+      redirect_to controller: 'product', action: 'allocate', transform_column: params[:transform_column], selected_product: params[:selected_product].split() and return
     end
 
     redirect_to action: 'summary', pending_stock: allocated.values().map(&:to_i).sum, transform_column: params[:transform_column], product_name: params[:product_name], product_id: params[:product_id], total_stock: products.sum(:inventory)

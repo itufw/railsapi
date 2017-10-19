@@ -1,6 +1,6 @@
 <%= title 'Order#' + @order.id.to_s %>
 <h3>Order#<%= @order.id %></h3>
-<center>Date: <i><%= @order.date_created.to_date%></i> Due Date:<i><%= @order.date_created.to_date + 30.days%></i></center>
+<center>Date: <i><%= @order.date_created.to_date.strftime('%d/%m/%Y')%></i> Due Date:<i><%= (@order.date_created.to_date + 30.days).strftime('%d/%m/%Y')%></i></center>
 <%= form_for @order, url: {controller: "order", action: "update_order"}, method: :POST  do |f| %>
   <%= f.hidden_field :id %>
   <%= render 'order_partials/order_form', f: f%>

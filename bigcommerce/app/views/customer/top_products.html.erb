@@ -8,6 +8,9 @@
 	  <%= hidden_field_tag :customer_name, @customer_name %>
 	<% end %>
 </div>
+<%= form_tag({:controller => "product", :action => "allocate"}, {:method => "get"}) do %>
+	<%= submit_tag 'Allocate!', class: 'btn btn-warning', style: 'float: right; margin-top: -85px; margin-right: 80px;' unless @transform_column=='product_no_vintage_id'%>
+	<%= hidden_field_tag :transform_column, @transform_column %>
 
 <table class = "table table-striped table-bordered table-hover table-responsive">
 	<tr class="info">
@@ -21,10 +24,12 @@
 			<th><%= t %><%= render "partials/sort_arrows", order: t %></th>
 		<% end %>
 	</tr>
-
 	<% @product_ids.each do |id| %>
 	<tr>
-		<td><%= id %></td>
+		<td>
+			<%= check_box_tag 'selected_product[]', id, false, class: "contact_name_checkbox" unless @transform_column=='product_no_vintage_id' %>
+			<%= id %>
+		</td>
 		<td><%= link_to @product_name_h[id], action: 'summary_with_product', customer_id: @customer_id, customer_name: @customer_name, product_id: id, product_name: @product_name_h[id], transform_column: @transform_column %></td>
 		<td><%= @monthly_supply_h[id] %></td>
 		<td><%= @inventory_h[id] %></td>
@@ -36,5 +41,6 @@
 		<% end %>
 	</tr>
 	<% end %>
-
+	<!-- End form -->
+	<% end %>
 </table>
