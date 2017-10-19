@@ -106,7 +106,7 @@ module StockControl
   end
 
   def portfolio_products
-    products = Product.where('inventory > 0 AND name_no_winery IS NOT NULL AND product_type_id!=6').group(:product_no_ws_id)
+    products = Product.where('inventory > 0 AND name_no_winery IS NOT NULL AND product_type_id!=6 AND retail_ws LIKE "WS"').group(:product_no_ws_id)
     wet = TaxPercentage.wet_percentage * 0.01 + 1
     producer_country = ProducerCountry.all.order(:id).unshift(ProducerCountry.new(id: 0, name: nil, short_name: nil))
     product_size = ProductSize.all.order(:id).unshift(ProductSize.new(id: 0, name: nil))
