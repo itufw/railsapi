@@ -13,6 +13,9 @@
 	<tr class="info">
 		<th>ID</th>
 		<th>Product <%= render "partials/sort_arrows", order: 0 %></th>
+		<th>Supply <%= render "partials/sort_arrows", order: 'supply' %></th>
+		<th>Inventory <%= render "partials/sort_arrows", order: 'inventory' %></th>
+		<th>Pending <%= render "partials/sort_arrows", order: 'pending' %></th>
 		<th>Price <%= render "partials/sort_arrows", order: 1 %></th>
 		<%  @time_periods.each do |t| %>
 			<th><%= t %><%= render "partials/sort_arrows", order: t %></th>
@@ -23,6 +26,9 @@
 	<tr>
 		<td><%= id %></td>
 		<td><%= link_to @product_name_h[id], action: 'summary_with_product', customer_id: @customer_id, customer_name: @customer_name, product_id: id, product_name: @product_name_h[id], transform_column: @transform_column %></td>
+		<td><%= @monthly_supply_h[id] %></td>
+		<td><%= @inventory_h[id] %></td>
+		<td><%= @pending_stock_h[id] %></td>
 		<td><%= display_num(@price_h[id]) %></td>
 
 		<% @time_periods.each do |t| %>

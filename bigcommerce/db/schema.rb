@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171009025631) do
+ActiveRecord::Schema.define(version: 20171018234531) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -713,6 +713,7 @@ ActiveRecord::Schema.define(version: 20171009025631) do
     t.datetime "eta"
     t.string   "street_2",                limit: 255
     t.string   "ship_name",               limit: 255
+    t.string   "proof_of_delivery",       limit: 255
   end
 
   add_index "orders", ["customer_id"], name: "index_orders_on_customer_id", using: :btree
@@ -790,6 +791,7 @@ ActiveRecord::Schema.define(version: 20171009025631) do
     t.string   "column",                limit: 255
     t.string   "area",                  limit: 255
     t.integer  "case_size",             limit: 4
+    t.integer  "product_status_id",     limit: 4
   end
 
   add_index "product_no_ws", ["product_no_vintage_id"], name: "index_product_no_ws_on_product_no_vintage_id", using: :btree
@@ -820,6 +822,13 @@ ActiveRecord::Schema.define(version: 20171009025631) do
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+  end
+
+  create_table "product_statuses", force: :cascade do |t|
+    t.string   "name",        limit: 255
+    t.text     "description", limit: 65535
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
   end
 
   create_table "product_sub_types", force: :cascade do |t|

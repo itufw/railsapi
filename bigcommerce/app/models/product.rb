@@ -255,6 +255,10 @@ class Product < ActiveRecord::Base
       where(retail_ws: 'WS').send(group_by_transform_column).average('calculated_price * 1.29')
   end
 
+  def self.product_supply(group_by_transform_column)
+    send(group_by_transform_column).sum(:monthly_supply)
+  end
+
   def self.retail_products
     where("retail_ws != 'WS'")
   end
