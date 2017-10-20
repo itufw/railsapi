@@ -226,6 +226,9 @@
         $('.allocation-products').html('');
       });
     }
+    if (/Staff Sample/i.test($('input[name=customer]').val())){
+      $('#order_discount_rate').val(100);
+    };
   });
 
   // Product Search
