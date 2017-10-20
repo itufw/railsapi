@@ -8,6 +8,9 @@
   <%= f.radio_button :current, '1', checked: !@product.current.to_i.zero? %> Current
   <%= f.radio_button :current, '0', checked: @product.current.to_i.zero? %> No
   <br/>
+  <%= f.radio_button :display, '1', checked: !@product.display.to_i.zero? %> Display
+  <%= f.radio_button :display, '0', checked: @product.display.to_i.zero? %> No
+  <br/>
   <%= f.label :search_for_similar_product, class: 'margin-from-top label-new' %>
   <%= autocomplete_field_tag 'product_search', '', autocomplete_product_name_product_index_path, placeholder: 'Search Products', id: 'product_search',size: 30 %>
   <br/>

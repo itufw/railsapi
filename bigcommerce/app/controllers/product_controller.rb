@@ -443,7 +443,8 @@ def product_params
    :product_size_id, :product_no_ws_id, :name_no_ws, :name_no_vintage,\
    :product_no_vintage_id, :case_size, :product_package_type_id, :retail_ws,\
    :vintage, :name_no_winery_no_vintage, :price_id, :product_sub_type_id,\
-   :blend_type, :order_1, :order_2, :combined_order, :producer_region_id, :current)
+   :blend_type, :order_1, :order_2, :combined_order, :producer_region_id,\
+   :current, :display)
 end
 
 def warehouse_params
