@@ -4,6 +4,7 @@
 <div align="center" style="margin-top: 50px;">
 	<%= form_tag({:action => "xero_sync"}, {:method => "get"}) do %>
 		<%= submit_tag "Xero Sync!", class: 'btn btn-primary' %>
+		<%= submit_tag "BC Sync!", class: 'btn btn-success' %>
 	<% end %>
 </div>
 
@@ -37,20 +38,6 @@
 
    		<%= submit_tag "Update", class: 'btn btn-primary' %>
 	<% end %>
-</div>
-
-<div align="center" style="margin-top: 50px;">
-	<% @staffs = Staff.active_sales_staff.order(:staff_order) %>
-	<table>
-	<tbody class="sortable">  <!-- sortable target -->
-	    <% sortable_fetch(@staffs) do |staff, id_tag| %>  <!-- RailsSortable helper -->
-	      <tr id="<%= id_tag %>">
-	        <td><%= staff.nickname %></td>
-	        <td><%= staff.staff_order %></td>
-	      </tr>
-	    <% end %>
-	  </tbody>
-	</table>
 </div>
 
 <script>
