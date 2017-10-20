@@ -42,7 +42,7 @@ wb.add_worksheet(name: "Stock Control", page_setup: setup) do |sheet|
       products = @product_hash.select {|key, value| product_ids.include?key}.values()
       next if products.blank?
 
-      products.sort! { |a, b| [a[:order_total], a[:luc]] <=> [b[:order_total], b[:luc]]}
+      products.sort! { |a, b| [a[:order_total], a[:name]] <=> [b[:order_total], b[:name]]}
 
 
       sheet.add_row(

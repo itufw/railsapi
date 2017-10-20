@@ -84,16 +84,36 @@ class AdminController < ApplicationController
     # end
 
     def xero_sync
-        start_time = Time.now.utc
-        Revision.xero.update_end_time
-        xero = XeroController.new
-        xero.update_xero_contacts
-        xero.update_xero_invoices
+      begin
+        if params[:commit].to_s.include?'Xero'
+          start_time = Time.now.utc
+          Revision.xero.update_end_time
+          xero = XeroController.new
+          xero.update_xero_contacts
+          xero.update_xero_invoices
 
-        system 'rake xero_invoice_sync:sync'
-        flash[:success] = 'Sync is Done!'
-        Revision.xero.end_update(start_time, Time.now)
-        redirect_to controller: 'admin', action: 'index'
+          system 'rake xero_invoice_sync:sync'
+          flash[:success] = 'Xero Sync Successed!'
+          Revision.xero.end_update(start_time, Time.now)
+        else
+          Revision.bigcommerce.start_update
+    			start_time = Time.now
+          admin = AdminController.new
+          admin.update_customers
+          admin.update_products
+          admin.update_orders
+          xero = XeroController.new
+          xero.update_xero_contacts
+          xero.update_xero_invoices
+          Revision.bigcommerce.end_update(start_time, Time.now)
+
+          flash[:success] = 'Sync Successed!'
+        end
+      rescue Exception => ex
+        ReminderMailer.error_warning(ex.class, ex.message, ex.backtrace).deliver_now
+      end
+
+      redirect_to request.referrer
     end
 
     def password_update

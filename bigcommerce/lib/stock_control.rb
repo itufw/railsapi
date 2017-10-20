@@ -2,8 +2,9 @@ module StockControl
 
   def sales_rate_update
     standard_term = SaleRateTerm.standard_term
-    products = Product.where(retail_ws: 'WS')
-    products.each{|product| sales_rate_update_product(product, standard_term)}
+    # products = Product.where(retail_ws: 'WS')
+    products = Product.where(retail_ws: 'WS').group(:product_no_vintage_id)
+    products.each{|product| sales_rate_update_product_no_vintage(product, standard_term)}
 
     StaffGroupItem.where(item_model: 'SaleRateTerm').map(&:staff_group).uniq.each do |staff_group|
       product_ids = staff_group.products(staff_group.id).map(&:item_id)
@@ -14,7 +15,54 @@ module StockControl
     end
   end
 
+  def sales_rate_update_product_no_vintage(product, terms)
+    if product.product_no_vintage_id.to_i==0
+      sales_rate_update_product(product, terms)
+      return
+    end
+
+    # Sale Rate based on no vintage products
+    product_sales = OrderProduct.where(product_id: Product.where(product_no_vintage_id: product.product_no_vintage_id).map(&:id)).valid_orders
+
+    monthly_supply = 0
+    # only calculate weight for month with sales
+    weight = 0
+
+    terms.each do |term|
+      next unless term.term.between?(1, 4)
+
+      sales = product_sales.select{ |x| x.created_at.between?(Date.today-term.days_until.day, Date.today-term.days_from.day) }.map(&:qty).sum
+
+      monthly_supply += (sales * 30 / (term.days_until - term.days_from).to_f) * term.weight if (term.days_until - term.days_from)>0
+      weight += term.weight unless sales==0
+
+      product.send("sale_term_#{term.term}=", sales.to_i)
+    end
+
+    unless monthly_supply.zero?
+      products = Product.where(product_no_vintage_id: product.product_no_vintage_id)
+      inventory = products.sum(:inventory)
+      # include allocated product into monthly supply calculation
+      allocated = OrderProduct.joins(:order).select('SUM(order_products.qty) as qty')
+        .where('orders.status_id': 1, product_id: products.map(&:id)).first.qty.to_i
+
+      inventory += allocated
+
+      product.monthly_supply = inventory * weight / monthly_supply.to_f
+    end
+    product.save
+
+    Product.where(product_no_vintage_id: product.product_no_vintage_id)
+     .update_all(sale_term_1: product.sale_term_1, sale_term_2: product.sale_term_2,
+       sale_term_3: product.sale_term_3, sale_term_4: product.sale_term_4,
+       monthly_supply: product.monthly_supply)
+  end
+
+
   def sales_rate_update_product(product, terms)
+    # Sale Rate based on no vintage products
+    # product_sales = OrderProduct.where(product_id: Product.where(product_no_vintage_id: product.product_no_vintage_id).map(&:id)).valid_orders
+    # Sale Rate Based on Individual Product
     product_sales = product.order_products.valid_orders
     monthly_supply = 0
     # only calculate weight for month with sales
