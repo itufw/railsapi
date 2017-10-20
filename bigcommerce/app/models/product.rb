@@ -31,6 +31,8 @@ class Product < ActiveRecord::Base
 
   scoped_search on: %i[id name portfolio_region]
 
+  after_validation :product_status_update, on:[:update], if: ->(obj){ obj.monthly_supply_changed? and obj.monthly_supply<=5}
+
   self.per_page = 30
 
   def scrape
@@ -308,5 +310,12 @@ class Product < ActiveRecord::Base
 
   def bigcommerce_inventory_overwrite
     Bigcommerce::Product.update(self.id, inventory_level: self.inventory)
+  end
+
+  def product_status_update
+    return if self.producer_country_id.to_i.zero?
+
+    status_id = ProductStatus.status_update(self.producer_country.short_name, self.monthly_supply)
+    self.product_no_ws.update_attributes(product_status_id: status_id)
   end
 end

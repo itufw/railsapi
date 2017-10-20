@@ -21,8 +21,13 @@
 
 
 
-<% product_array_above = product_array.select{|x| x[:product_qty].to_i>3}.sort_by { |k| k[:section].to_i } %>
-<% product_array_reminder = product_array.select{|x| x[:product_qty].to_i<=3}.sort_by { |k| k[:section].to_i }%>
+<%
+   product_array_above = product_array.select{|x| x[:product_qty].to_i>3}
+      .sort { |a, b| [a[:section].to_i, a[:column].to_s, a[:row].to_i, a[:product_country]] <=> [b[:section].to_i, b[:column].to_s, b[:row].to_i, b[:product_country]] }
+
+   product_array_reminder = product_array.select{|x| x[:product_qty].to_i<=3}
+      .sort { |a, b| [a[:section].to_i, a[:column].to_s, a[:row].to_i, a[:product_country]] <=> [b[:section].to_i, b[:column].to_s, b[:row].to_i, b[:product_country]] }
+%>
 
 
 <div class="container">
