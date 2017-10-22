@@ -18,7 +18,7 @@ class ReminderMailer < ActionMailer::Base
   end
 
   def stock_control_reminder
-    xlsx = render_to_string formats: [:xlsx], template: "admin/export_stock_control", locals: {countries: ProducerCountry.product_country, product_hash: stock_calculation()}
+    xlsx = render_to_string formats: [:xlsx], template: "admin/export_stock_control", locals: {countries: ProducerCountry.product_country, product_hash: stock_calculation(), portfolio_list: portfolio_products()}
     attachments["Stock Control #{Date.today.to_s}.xlsx"] = {mime_type: Mime::XLSX, content: Base64.encode64(xlsx), encoding: 'base64'}
 
     # sales = []
@@ -40,10 +40,6 @@ class ReminderMailer < ActionMailer::Base
     @order = Order.find(order_id)
     @customer = @order.customer
     @staff = @order.staff
-
-    # TODO
-    # Change it after new sales joined
-    @staff = Staff.find(45) if @staff.nickname=='Tasso'
 
     customer_address = %("#{@customer.actual_name}" <#{email_address}>)
     subject = "Untapped Fine Wines Order #{@order.id} – #{@customer.actual_name}"

@@ -3,6 +3,8 @@ wb = xlsx_package.workbook
 
 @countries = countries if @countries.nil? && countries.present?
 @product_hash = product_hash if @product_hash.nil? && product_hash.present?
+@portfolio_list = portfolio_list if @portfolio_list.nil? && portfolio_list.present?
+
 
   setup = {orientation: :portrait, scale: 75}
 
