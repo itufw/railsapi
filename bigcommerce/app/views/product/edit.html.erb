@@ -36,7 +36,8 @@
   <%= f.number_field :vintage, placeholder: 'Product Vintage Year' %>
   <%= f.label :product_name_no_winery_no_vintage, class: 'margin-from-top label-new' %>
   <%= f.text_field :name_no_winery_no_vintage, size: 50 %><br/>
-
+  <%= f.label :product_name_no_winery, class: 'margin-from-top label-new' %>
+  <%= f.text_field :name_no_winery, size: 50 %><br/>
 
   <%= f.label :producer, class: 'margin-from-top label-new' %>
   <%= f.collection_select :producer_id, Producer.all.order(:name), :id, :name, {class: "form-control quarter-size"} %><br/>
