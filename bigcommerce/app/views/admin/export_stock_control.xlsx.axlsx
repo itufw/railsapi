@@ -6,7 +6,7 @@ wb = xlsx_package.workbook
 @portfolio_list = portfolio_list if @portfolio_list.nil? && portfolio_list.present?
 
 
-  setup = {orientation: :portrait, scale: 75}
+  setup = {orientation: :portrait, scale: 65}
 
 
   winery_hash = {bg_color: '000000', fg_color: 'FFFFFF'}
