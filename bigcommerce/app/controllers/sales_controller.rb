@@ -4,6 +4,7 @@ require 'display_helper'
 require 'models_filter'
 require 'product_variations'
 require 'sales_helper.rb'
+require 'product_helper.rb'
 
 class SalesController < ApplicationController
   before_action :confirm_logged_in
@@ -14,6 +15,7 @@ class SalesController < ApplicationController
   include ModelsFilter
   include ProductVariations
   include SalesHelper
+  include ProductHelper
 
   # Displays this week's and last week's total order sales
   # Also displays total order sales for this week divided by staff
@@ -160,6 +162,12 @@ class SalesController < ApplicationController
   end
 
   def product_dashboard
+    # Product Count Updator
+    @count_selected = []
+    @staff_group = params[:group]
+    product_selection(params[:selected_product], @staff_group.to_i) if params[:commit]=='Update' && @staff_group && params[:selected_product]
+    @count_selected = StaffGroupItem.productNoWs(@staff_group.to_i).map(&:item_id) if @staff_group
+
     get_current_end_date(params)
     set_num_columns(params)
     # this sum function is then queried on the OrderProduct model
