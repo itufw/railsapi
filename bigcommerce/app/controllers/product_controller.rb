@@ -319,6 +319,8 @@ class ProductController < ApplicationController
       @group_list = StaffGroup.staff_groups(session[:user_id])
     else
       @product_list = (params[:pending_products].nil?) ? StaffGroupItem.productNoWs(session[:default_group]).map(&:item_id) : params[:pending_products]
+      @product_list = ProductNoWs.where(id: @product_list).order(:column).map(&:id)
+
       @product = ProductNoWs.find(@product_list.first)
       @product_list = @product_list.reject{|x| x.to_s==@product.id.to_s}
 

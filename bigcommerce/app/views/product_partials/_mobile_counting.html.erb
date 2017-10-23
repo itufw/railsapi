@@ -32,8 +32,8 @@
         <%= product_form.hidden_field :id %>
         <li class="value-one">
           <b>Location</b>
-          <%= product_form.text_field :row, size: 6, placeholder: 'row'%>
-          <%= product_form.text_field :column, size: 6, placeholder:'column'%>
+          <%= product_form.text_field :column, size: 6, placeholder:'Column'%>
+          <%= product_form.number_field :row, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Row'}%>
           <%= product_form.text_field :area, size: 6, placeholder:'area'%>
         </li>
       <li class="value-one">
