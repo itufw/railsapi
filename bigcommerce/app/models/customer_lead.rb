@@ -103,7 +103,8 @@ class CustomerLead < ActiveRecord::Base
       staff_id: self.staff_id, cust_type_id: self.cust_type_id || 2, cust_group_id: self.cust_group_id || 0,\
       cust_style_id: self.cust_style_id, address: self.address,\
       lat: self.latitude, lng: self.longitude, tolerance_day: 30,\
-      street: self.street, city: self.city, postcode: self.postalcode, country: self.country})
+      street: self.street, city: self.city, state: self.state,\
+      postcode: self.postalcode, country: self.country})
     bc_customer = customer.create_in_bigcommerce
     lead_link_customer(self, bc_customer.id)
 

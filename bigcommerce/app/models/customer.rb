@@ -61,8 +61,8 @@ class Customer < ActiveRecord::Base
 		unless self.street.nil?
 			customer_address = Bigcommerce::CustomerAddress.create(
 			  bigc_customer.id,
-			  first_name: self.firstname,
-			  last_name: self.lastname,
+			  first_name: splited_name[0],
+			  last_name: (splited_name[1..splited_name.length].join(' ')=="") ? "UFW" : splited_name[1..splited_name.length].join(' '),
 			  phone: self.phone,
 			  street_1: self.street,
 			  city: self.city,

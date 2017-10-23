@@ -158,7 +158,8 @@
     <td class="ProductTotal" align="right"><%= f.text_field :total_inc_tax, readonly: true%></td>
   </tr>
 </table>
-<p style="color:red; float: right;">* Monthly Supply</p>
+<p style="color:red; float: right;">* Monthly Supply</p><br/>
+<p style="color:red; float: right;" class="submit-reminder"></p>
 
 <%= f.hidden_field :modified_wet %>
 
@@ -245,8 +246,8 @@
     $('.product-table tbody.product-list').append([
       '<tr id="tr_'+ data.item.id +'">',
         '<td><input size="5" readonly="readonly" class="product-id" type="text" value="'+ data.item.id +'" name="order[products['+ product_count +']][product_id]" id="order_products_'+ product_count +'__product_id"></td>',
-        '<td>'+ data.item.label +'</td>',
-        '<td class="product-inventory">'+ data.item.inventory +' |  <i style="color:'+ color +';">'+ data.item.monthly_supply +'</i> </td>',
+        '<td>'+ data.item.label +'|  <i style="color:'+ color +';">'+ data.item.monthly_supply +'</i> </td>',
+        '<td class="product-inventory">'+ data.item.inventory +'</td>',
         '<td><input size="5" readonly="readonly" class="product-luc" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_luc]" id="order_products_'+ product_count +'__price_luc"></td>',
         '<td><input size="3" class="product-qty" type="text" value="0" name="order[products['+ product_count +']][qty]" id="order_products_'+ product_count +'__qty"></td>',
         '<td><input size="2" class="product-discount" type="text" value="0" name="order[products['+ product_count +']][discount]" id="order_products_'+ product_count +'__discount"  placeholder="Discount"> %</td>',
@@ -358,6 +359,25 @@
         inventory_flag = false;
       }
     });
+    var submit_reminder = "";
+    if (!customer_flag){
+      submit_reminder +=  'Missing Customer!\r\n';
+    }
+    if (!product_flag){
+      submit_reminder += 'No Products!\r\n';
+    }
+    if (!shipping_address_flag){
+      submit_reminder += 'Enter Correct Suburb and postcode!\r\n';
+    }
+    if (!inventory_flag){
+      submit_reminder += 'Not Enough Inventory!\r\n';
+    }
+    if (!table_flag){
+      submit_reminder += 'Check the Table for Blank/Error Column!\r\n';
+    }
+
+    $('.submit-reminder').html(submit_reminder);
+
     if (customer_flag && product_flag && shipping_address_flag && inventory_flag && table_flag){
       $('button.active').show();
       $('button.disabled').hide();
