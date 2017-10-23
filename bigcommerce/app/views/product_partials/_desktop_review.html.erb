@@ -57,10 +57,10 @@
       <td><%= warehouse.text_field :count_sample, size: 5%></td>
       <td><%= warehouse.text_field :count_total, size: 5, readonly: true%></td>
       <td><%= warehouse_count.difference%></td>
-      <td><%= warehouse.text_field :count_dm, size: 5 if warehouse_count.current_dm>0%></td>
-      <td><%= warehouse.text_field :count_vc, size: 5 if warehouse_count.current_vc>0%></td>
-      <td><%= warehouse.text_field :count_retail, size: 5 if warehouse_count.current_retail>0%></td>
-      <td><%= warehouse.text_field :count_ws, size: 5 if warehouse_count.current_ws>0%></td>
+      <td><%= warehouse.text_field :count_dm, size: 5, class: "stock-modification" if warehouse_count.current_dm>0%></td>
+      <td><%= warehouse.text_field :count_vc, size: 5, class: 'stock-modification' if warehouse_count.current_vc>0%></td>
+      <td><%= warehouse.text_field :count_retail, size: 5, class: 'stock-modification' if warehouse_count.current_retail>0%></td>
+      <td><%= warehouse.text_field :count_ws, size: 5, defualt: 0, class: 'stock-modification' %></td>
       <td><%= warehouse_count.count_date.strftime('%d/%m %H:%M')%></td>
       <td><%= warehouse_count.creator.nickname %></td>
       <td></td>
@@ -72,9 +72,33 @@
       <td style='color: red;'><%= OrderProduct.on_order(products.map(&:id)).map(&:qty).sum%></td>
       <td style='color: red;'><%= OrderProduct.allocation_products(products.map(&:id)).map(&:qty).sum%></td>
       <td style='color: red;'><%= products.sum(:inventory)%></td>
+      <td colspan="5"></td>
+      <td style="color: orange;" class="different-now"></td>
+      <td colspan="2">Recommend:</td>
+      <td class="rec-retail"><%= (warehouse_count.current_stock + warehouse_count.difference.to_i)*0.1 %></td>
+      <td class="rec-ws"><%= warehouse_count.current_stock - (warehouse_count.current_stock + warehouse_count.difference.to_i)*0.1 %></td>
+      <td><a class="btn btn-primary optimise">Optimise</a></td>
     </tr>
     <% end %>
   <% end %>
 </table>
   <center>  <%= submit_tag "Confirm!",class: 'btn btn-primary'%></center>
 <% end %>
+
+<script type="text/javascript">
+  $(document).on('input', '.stock-modification', function(){
+    var different = 0;
+    var stock_change = $(this).parent().parent().find('.stock-modification');
+    for(var i = 0; i < stock_change.length; i++){
+      different += parseInt(stock_change.val());
+    }
+
+    $(this).parent().parent().next("tr").find('.different-now').html(different);
+  });
+
+  $(document).on('click', '.optimise', function(){
+    var retail = parseInt($(this).parent().find('.rec-retail').html());
+    var ws = parseInt($(this).parent().find('.rec-retail').html());
+
+  });
+</script>
