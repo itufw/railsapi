@@ -67,7 +67,7 @@ class Customer < ActiveRecord::Base
 			  street_1: self.street,
 			  city: self.city,
 			  state: self.state,
-			  zip: self.postcode,
+			  zip: self.postcode.to_i,
 			  country: self.country
 			)
 		end
