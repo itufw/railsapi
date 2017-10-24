@@ -185,8 +185,8 @@
         <td><%= cust_contact.contact.name%></td>
         <td><%= cust_contact.position %></td>
         <td><%= cust_contact.title %></td>
-        <td><input class="form-control" type="text" name="contact_signed['<%= cust_contact.contact_id %>'][phone]" placeholder="Phone"></td>
-        <td><input class="form-control" type="text" name="contact_signed['<%= cust_contact.contact_id %>'][email]" placeholder="Email"></td>
+        <td><input class="form-control" type="text" name="contact_signed['<%= cust_contact.contact_id %>'][phone]" placeholder="Phone" value="<%= cust_contact.phone%>"></td>
+        <td><input class="form-control" type="text" name="contact_signed['<%= cust_contact.contact_id %>'][email]" placeholder="Email" value="<%= cust_contact.email%>"></td>
         <th>
             <input type="checkbox" name="contact_signed['<%= cust_contact.contact_id%>'][director]" value="<%= cust_contact.contact_id%>" class="contact_signed_director" style="display: inline-block;">
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
