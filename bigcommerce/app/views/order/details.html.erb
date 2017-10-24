@@ -6,7 +6,23 @@
   <%= link_to '<i class="glyphicon glyphicon-print" title="Print Invoice!"></i>'.html_safe, action: 'generate_invoice', order_id: @order_id%>
   <%= link_to '<i class="glyphicon glyphicon-hand-right" title="History!"></i>'.html_safe, action: 'order_history', order_id: @order_id%>
   <%= link_to '<i class="glyphicon glyphicon-envelope" title="Send Email!"></i>'.html_safe, action: 'order_email', order_id: @order_id%>
+  <i class="glyphicon glyphicon-briefcase pod-section" title="Pod!"></i>
 </center>
+<center class="Pod-uploader" style="display: none;">
+  <%= link_to '<i class="glyphicon glyphicon-check"></i></a>'.html_safe, @order.first.proof_of_delivery.to_s unless @order.first.proof_of_delivery.file.nil?%>
+  <%= form_for @order.first, :url => {:controller => "order", :action => "pod_uploader"} do |f| %>
+    <%= f.hidden_field :id %>
+    <%= f.file_field :proof_of_delivery %>
+    <%= f.submit 'Upload!'%>
+  <% end %>
+</center>
+
+<script type="text/javascript">
+  $('.pod-section').click(function(){
+    $('.Pod-uploader').toggle();
+  });
+</script>
+
 
 <%= render "partials/order", orders: @order, display_class: "none", product_ids: nil %>
 

@@ -224,6 +224,12 @@ class OrderController < ApplicationController
     redirect_to request.referrer
   end
 
+  def pod_uploader
+    Order.find(params[:order][:id]).update_attributes(order_params)
+    flash[:success] = 'POD Uploaded'
+    redirect_to request.referrer
+  end
+
 
   private
   def order_params
@@ -234,7 +240,7 @@ class OrderController < ApplicationController
                                   :customer_notes, :staff_notes, :address, :modified_wet,\
                                   :billing_address, :delivery_instruction, :street,\
                                   :city, :state, :postcode, :country, :customer_purchase_order,\
-                                  :track_number, :ship_name, :street_2)
+                                  :track_number, :ship_name, :street_2, :proof_of_delivery)
   end
 
   def products_params
