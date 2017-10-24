@@ -29,7 +29,7 @@
 
 	<% @product_ids.each do |id| %>
 	<tr>
-		<td><%= id %></td>
+		<td class="product-id"><%= id %></td>
 		<td>
 			<%= check_box 'selected_product', id, {checked: (@count_selected.include?id)? true : false}, '1', '0' if @transform_column=="product_no_ws_id" && (@inventory_h[id].to_i + @pending_stock_h[id].to_i)>0 && (@product_ids.count<50 || @pending_stock_h[id].to_i>0) %>
 			<%= link_to @product_name_h[id], controller: 'product', action: 'summary', product_id: id, product_name: @product_name_h[id], transform_column: @transform_column, total_stock: @inventory_h[id].to_i, pending_stock: @pending_stock_h[id].to_i %>
