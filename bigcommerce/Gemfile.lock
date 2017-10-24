@@ -6,6 +6,14 @@ GIT
       railties (>= 3.2, < 5.0)
 
 GIT
+  remote: git://github.com/sponee/carrierwave-dropbox.git
+  revision: 12def609b719fbfd8c382d9388fec9fc5b9fc82d
+  specs:
+    carrierwave-dropbox (2.1.0)
+      carrierwave (~> 0.10)
+      dropbox-sdk-v2 (~> 0.0.3)
+
+GIT
   remote: https://github.com/hinammehra/xeroizer.git
   revision: 4f09bf28f1d4904fb2f876989f81b5f57c2a5c39
   specs:
@@ -101,9 +109,6 @@ GEM
       json (>= 1.7)
       mime-types (>= 1.16)
       mimemagic (>= 0.3.0)
-    carrierwave-dropbox (1.2.1)
-      carrierwave (~> 0.9)
-      dropbox-sdk (~> 1.6)
     chronic (0.10.2)
     coffee-rails (4.1.1)
       coffee-script (>= 2.2.0)
@@ -118,8 +123,10 @@ GEM
     debug_inspector (0.0.2)
     declarative (0.0.9)
     declarative-option (0.1.0)
-    dropbox-sdk (1.6.5)
-      json
+    domain_name (0.5.20170404)
+      unf (>= 0.0.5, < 1.0.0)
+    dropbox-sdk-v2 (0.0.3)
+      http (~> 2.0)
     erubis (2.7.0)
     execjs (2.7.0)
     faraday (0.13.1)
@@ -158,11 +165,21 @@ GEM
       signet (~> 0.7)
     hashie (3.5.6)
     htmlentities (4.3.4)
+    http (2.2.2)
+      addressable (~> 2.3)
+      http-cookie (~> 1.0)
+      http-form_data (~> 1.0.1)
+      http_parser.rb (~> 0.6.0)
+    http-cookie (1.0.3)
+      domain_name (~> 0.5)
+    http-form_data (1.0.3)
+    http_parser.rb (0.6.0)
     httparty (0.14.0)
       multi_xml (>= 0.5.2)
     httpclient (2.8.3)
     hurley (0.2)
-    i18n (0.8.1)
+    i18n (0.9.0)
+      concurrent-ruby (~> 1.0)
     jbuilder (2.6.1)
       activesupport (>= 3.0.0, < 5.1)
       multi_json (~> 1.2)
@@ -189,7 +206,7 @@ GEM
     mimemagic (0.3.2)
     mini_magick (4.6.1)
     mini_portile2 (2.1.0)
-    minitest (5.10.1)
+    minitest (5.10.3)
     momentjs-rails (2.17.1)
       railties (>= 3.1)
     multi_json (1.12.1)
@@ -293,6 +310,10 @@ GEM
     uglifier (3.0.4)
       execjs (>= 0.3.0, < 3)
     underscore-rails (1.8.3)
+    unf (0.1.4)
+      unf_ext
+    unf_ext (0.0.7.4)
+    unf_ext (0.0.7.4-x86-mingw32)
     uuidtools (2.1.5)
     web-console (2.3.0)
       activemodel (>= 4.0)
@@ -323,7 +344,7 @@ DEPENDENCIES
   browser
   byebug
   carrierwave
-  carrierwave-dropbox
+  carrierwave-dropbox!
   coffee-rails (~> 4.1.0)
   combine_pdf
   filterrific

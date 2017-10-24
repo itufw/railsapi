@@ -16,7 +16,7 @@ class CreditController < ApplicationController
   end
 
   def save_credit_app
-    if credit_params[:id].nil?
+    if credit_params[:id].to_s==""
       credit_app = CustomerCreditApp.new(credit_params)
     else
       credit_app = CustomerCreditApp.find(credit_params[:id])
