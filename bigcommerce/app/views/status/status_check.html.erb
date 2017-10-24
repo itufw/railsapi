@@ -34,13 +34,8 @@
 <% else %>
   <%= form_tag({:controller => "order", :action => "order_confirmation"}, {:method => "get"}) do %>
     <%= hidden_field_tag :status_name, @status_name%>
-    <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
-
-    <% case @status_name %>
-    <% when 'Approval'%>
-      <%= hidden_field_tag :status_id, 3%>
-      <%= submit_tag 'Check', class: 'btn btn-primary'%>
-    <% when 'Courier' %>
+    
+    <% if @status_name=='Courier'%>
       <!-- Label Stock in Status helper -->
       <% label_stock = fastway_stock_level() %>
       <% unless label_stock.nil?%>
@@ -51,7 +46,15 @@
           <% end %>
         </p>
       <% end %>
+    <% end %>
 
+    <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
+
+    <% case @status_name %>
+    <% when 'Approval'%>
+      <%= hidden_field_tag :status_id, 3%>
+      <%= submit_tag 'Check', class: 'btn btn-primary'%>
+    <% when 'Courier' %>
       <%= hidden_field_tag :status_id, 9%>
       <%= submit_tag 'Select Courier', class: 'btn btn-primary'%>
       <script type="text/javascript">
