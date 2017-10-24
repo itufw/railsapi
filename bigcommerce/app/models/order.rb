@@ -3,6 +3,7 @@ require 'bigcommerce_connection.rb'
 
 class Order < ActiveRecord::Base
   include CleanData
+
   belongs_to :customer
   delegate :staff, to: :customer, allow_nil: true
   belongs_to :status
@@ -19,6 +20,8 @@ class Order < ActiveRecord::Base
   has_many :products, through: :order_products
   has_many :order_histories
   # has_many :products, through: :order_products
+
+  mount_uploader :proof_of_delivery, ProofOfDeliveryUploader
 
   belongs_to :order_history
   belongs_to :xero_invoice
