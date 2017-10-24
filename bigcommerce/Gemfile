@@ -116,7 +116,7 @@ gem 'httparty'
 
 # FILE Stored
 gem 'carrierwave'
-gem 'carrierwave-dropbox'
+gem 'carrierwave-dropbox', github: 'sponee/carrierwave-dropbox'
 
 # Browser Detactor
 gem "browser"
