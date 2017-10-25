@@ -7,9 +7,9 @@ class ProductStatus < ActiveRecord::Base
       return nil if monthly_supply > 4
 
       if monthly_supply<2
-        return where('name Like "%Allocation Needed%"').first.id
+        return where('name Like "%All.N%"').first.id
       elsif monthly_supply<3
-        return where('name Like "%Exist%"').first.id
+        return where('name Like "%Exi%"').first.id
       else
         return where('name Like "%Ask%"').first.id
       end
@@ -18,9 +18,9 @@ class ProductStatus < ActiveRecord::Base
       return nil if monthly_supply > 5
 
       if monthly_supply<3
-        return where('name Like "%Allocation Needed%"').first.id
+        return where('name Like "%All.N%"').first.id
       elsif monthly_supply<4
-        return where('name Like "%Exist%"').first.id
+        return where('name Like "%Exi%"').first.id
       else
         return where('name Like "%Ask%"').first.id
       end
@@ -29,9 +29,9 @@ class ProductStatus < ActiveRecord::Base
       return nil if monthly_supply > 6
 
       if monthly_supply<4
-        return where('name Like "%Allocation Needed%"').first.id
+        return where('name Like "%All.N%"').first.id
       elsif monthly_supply<5
-        return where('name Like "%Exist%"').first.id
+        return where('name Like "%Exi%"').first.id
       else
         return where('name Like "%Ask%"').first.id
       end

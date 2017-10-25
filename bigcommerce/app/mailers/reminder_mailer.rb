@@ -185,14 +185,16 @@ class ReminderMailer < ActionMailer::Base
       end
 
       pod = FastwayTrace.pod_available(invoice.invoice_number).first
-      unless pod.nil?
+      if !pod.nil?
         item = FastwayConsignmentItem.filter_order(invoice.invoice_number).first
-        attachments["invoice\##{invoice.invoice_number}-pod.pdf"] = WickedPdf.new.pdf_from_string(
+        attachments["#{invoice.invoice_number}-pod.pdf"] = WickedPdf.new.pdf_from_string(
           render_to_string(
               :template => 'pdf/proof_of_delivery.pdf',
               :locals => {order: Order.find(invoice.invoice_number), item: item }
               )
           )
+      elsif !order.proof_of_delivery.file.nil?
+        attachments[order.proof_of_delivery.file.filename.to_s] = open(order.proof_of_delivery.to_s).read
       end
     end
   end
