@@ -87,7 +87,7 @@
 						<td><%= i.amount_paid %></td>
 						<td><%= i.amount_credited %></td>
 						<td><%= i.amount_due %></td>
-						<% pod_avaiablity = !FastwayTrace.pod_available(i.invoice_number).blank? %>
+						<% pod_avaiablity = (!FastwayTrace.pod_available(i.invoice_number).blank? || !i.order.proof_of_delivery.file.nil?)%>
 						<td style="color: <%= pod_avaiablity ? 'green' : 'red'%>;"><%= pod_avaiablity ? 'POD Available' : 'Unavailable' %></td>
 					</tr>
 					<% end%>

@@ -8,7 +8,7 @@ class XeroInvoice < ActiveRecord::Base
 
     self.primary_key = 'xero_invoice_id'
 
-    belongs_to :order
+    belongs_to :order, foreign_key: :invoice_number
     belongs_to :xero_contact
     has_many :xero_invoice_line_items
     has_many :xero_payments
