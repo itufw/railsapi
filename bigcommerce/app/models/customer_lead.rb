@@ -98,7 +98,14 @@ class CustomerLead < ActiveRecord::Base
 
   def convert_to_customer
     return unless self.customer_id.nil?
-    customer = Customer.new({firstname: self.firstname, lastname: self.lastname,\
+
+    # Big Commerce Customer must has a first and last name
+    splited_name = self.actual_name.split()
+    lastname_suffix = (splited_name[1..splited_name.length].join(' ')=="") ? "UFW" : splited_name[1..splited_name.length].join(' ')
+    first_name = self.firstname.to_s=="" ? self.firstname : splited_name[0]
+    last_name = self.lastname.to_s=="" ? self.lastname : lastname_suffix
+
+    customer = Customer.new({firstname: first_name, lastname: last_name,\
       company: self.company, email: self.email, phone: self.phone, actual_name: self.actual_name,\
       staff_id: self.staff_id, cust_type_id: self.cust_type_id || 2, cust_group_id: self.cust_group_id || 0,\
       cust_style_id: self.cust_style_id, address: self.address,\

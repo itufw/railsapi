@@ -46,10 +46,10 @@ class Customer < ActiveRecord::Base
 		# property :tax_exempt_category
 		# property :accepts_marketing
 		customer_api = Bigcommerce::Customer
-		splited_name = self.actual_name.split()
+
 		bigc_customer = customer_api.create(
-			first_name: splited_name[0],
-			last_name: (splited_name[1..splited_name.length].join(' ')=="") ? "UFW" : splited_name[1..splited_name.length].join(' '),
+			first_name: self.firstname,
+			last_name: self.lastname,
 			email: (self.email.to_s=="") ? (self.actual_name.split().join('_')+"@untappedwines.com") : self.email,
 			store_credit: self.store_credit || 0,
 			customer_group_id: self.cust_type_id || 2,
@@ -61,8 +61,8 @@ class Customer < ActiveRecord::Base
 		unless self.street.nil?
 			customer_address = Bigcommerce::CustomerAddress.create(
 			  bigc_customer.id,
-			  first_name: splited_name[0],
-			  last_name: (splited_name[1..splited_name.length].join(' ')=="") ? "UFW" : splited_name[1..splited_name.length].join(' '),
+			  first_name: self.firstname,
+			  last_name: self.lastname,
 			  phone: self.phone,
 			  street_1: self.street,
 			  city: self.city,
