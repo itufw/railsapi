@@ -145,7 +145,7 @@
         'QTY:<input min="0" max="9999" inputmod="numeric" pattern="[0-9]*" class="product-qty" type="number" value="0" name="order[products['+ product_count +']][qty]" id="order_products_'+ product_count +'__qty">',
         '<br/>',
         'Discount:<input size="3" class="product-discount" type="text" value="0" name="order[products['+ product_count +']][discount]" id="order_products_'+ product_count +'__discount"  placeholder="Discount">%  ',
-        'Price<input size="8" inputmod="text" class="product-price" type="tel" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_discounted]" id="order_products_'+ product_count +'__price_discounted">',
+        'Price<input size="8" inputmod="text" class="product-price" type="number" step="0.01" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_discounted]" id="order_products_'+ product_count +'__price_discounted">',
       '</li>',
      '</div>'].join(''));
 
