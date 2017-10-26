@@ -11,7 +11,7 @@ class OrderProduct < ActiveRecord::Base
 	after_validation :product_display_check, on:[:update], if: ->(obj){ obj.stock_current_changed?}
 
 	def import_from_bigcommerce(order, op)
-		price = (order.customer.customer_type_id==2) ? op.base_price.to_f * 1.29 : op.price_inc_tax
+		price = (order.customer.cust_type_id==2) ? op.base_price.to_f * 1.29 : op.price_inc_tax
 
 		attributes = {'order_id': order.id, 'product_id': op.product_id, 'price_luc': price,\
 			'base_price': op.base_price, 'qty': op.quantity, 'discount': 0, 'price_discounted': price,\
