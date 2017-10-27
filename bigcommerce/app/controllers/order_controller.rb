@@ -138,6 +138,10 @@ class OrderController < ApplicationController
     send_data print_invoices([params[:order_id]]).to_pdf, filename: "#{params[:order_id]}.pdf", type: :pdf
   end
 
+  def generate_picking_slip
+    send_data print_picking_slip([params[:order_id]]).to_pdf, filename: "#{params[:order_id]}-PickingSlip.pdf", type: :pdf
+  end
+
   def update_order
     # Wrap this in a lib later
     wet = TaxPercentage.wet_percentage * 0.01
