@@ -338,10 +338,16 @@ class ProductController < ApplicationController
           current_dm: @product_dm.nil? ? -1 : @product_dm.inventory,\
           current_vc: @product_vc.nil? ? -1 : @product_vc.inventory,\
           current_retail: @product_retail.nil? ? -1 : @product_retail.inventory,\
-          current_ws: @product_ws.nil? ? -1 : @product_ws.inventory,\
-          )
+          current_ws: @product_ws.nil? ? -1 : @product_ws.inventory)
       else
         @warehouse_examining = WarehouseExamining.duplicated(@product.id).first
+        @warehouse_examining.assign_attributes(current_stock: @products.map(&:inventory).sum,\
+        allocation: OrderProduct.allocation_products(@products.map(&:id)).map(&:qty).sum,\
+        on_order: OrderProduct.on_order(@products.map(&:id)).map(&:qty).sum,\
+        current_dm: @product_dm.nil? ? -1 : @product_dm.inventory,\
+        current_vc: @product_vc.nil? ? -1 : @product_vc.inventory,\
+        current_retail: @product_retail.nil? ? -1 : @product_retail.inventory,\
+        current_ws: @product_ws.nil? ? -1 : @product_ws.inventory)
       end
 
       @product.case_size = @product_ws.case_size if !@product_ws.nil? && @product.case_size.to_i==0
