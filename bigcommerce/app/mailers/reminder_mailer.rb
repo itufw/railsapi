@@ -31,7 +31,7 @@ class ReminderMailer < ActionMailer::Base
     # managers.push(%("Luke" <lvoortman@untappedwines.com>))
     # managers.push(%("Lucia" <lgaldona@untappedwines.com>))
 
-    mail(from: 'Untapped CMS <it@untappedwines.com>', to: 'Lucia <lgaldona@untappedwines.com>', bcc: 'William Liu <it@untappedwines.com>', subject: "Stock Control #{Date.today.to_s}")
+    mail(from: 'Untapped CMS <it@untappedwines.com>', to: ['Lucia <lgaldona@untappedwines.com>', 'SalesTeam <salesteam@untappedwines.com>'], bcc: 'William Liu <it@untappedwines.com>', subject: "Stock Control #{Date.today.to_s}")
 
     # mail(from: 'Untapped CMS <it@untappedwines.com>', to: sales, cc: managers, bcc: 'William Liu <it@untappedwines.com>', subject: "Stock Control #{Date.today.to_s}")
   end

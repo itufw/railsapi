@@ -196,10 +196,11 @@ module AccountsHelper
         email_content.receive_address = @checked_send_email_to_self ? email_content.send_address : @xero_contact.email
         email_content.email_type = params[:commit]
         unless @checked_send_email_to_self
-            luke_email = Staff.find(9).email
+            # luke_email = Staff.find(9).email
             staff = Staff.find(Customer.find(customer_id).staff_id)
-            email_content.cc = luke_email +";"+staff.email.to_s
-            email_content.cc += '; candice@untappedwines.com' if staff.id == 6
+            # email_content.cc = luke_email +";"+staff.email.to_s
+            lucia_email = Staff.find(25).email
+            email_content.cc = lucia_email +";"+staff.email.to_s
         end
         # set default_email_content, this function is located in helpers-> accounts_helper
         email_content.content, email_content.content_second, @email_title = default_email_content(params[:commit], cn_op)
