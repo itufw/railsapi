@@ -175,7 +175,8 @@ class AdminController < ApplicationController
       when 'Shipment'
         send_data export_shipment(Date.parse(params[:date][:start_date]), Date.parse(params[:date][:end_date])), filename: "ship-#{Date.parse(params[:date][:end_date])}.csv" and return
       when 'ScotPac'
-        send_data export_orders(12, (Date.today - 8.years), Date.today), filename: "ScotPac-#{Date.parse(params[:date][:end_date])}.csv" and return
+        redirect_to action: 'scotpac' and return
+        # send_data export_orders(12, (Date.today - 8.years), Date.today), filename: "ScotPac-#{Date.parse(params[:date][:end_date])}.csv" and return
       end
       redirect_to :back
     end
@@ -192,6 +193,20 @@ class AdminController < ApplicationController
         format.html
         format.xlsx {
           response.headers['Content-Disposition'] = "attachment; filename=Stock Control #{Date.today.to_s}.xlsx"
+        }
+      end
+    end
+
+    def scotpac
+      @manual_verify = excel_order(12, (Date.today - 8.years), Date.today)
+      @cust_ref = excel_customer((Date.today - 8.years), Date.today)
+      @contacts = excel_receivables()
+      @shipping = excel_shipping((Date.today - 8.years), Date.today)
+
+      respond_to do |format|
+        format.html
+        format.xlsx {
+          response.headers['Content-Disposition'] = "attachment; filename=Scot Pac #{Date.today.to_s}.xlsx"
         }
       end
     end
