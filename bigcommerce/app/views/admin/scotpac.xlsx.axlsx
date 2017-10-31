@@ -1,0 +1,84 @@
+require 'axlsx'
+wb = xlsx_package.workbook
+
+# BigC_ManualVerif_Orders
+wb.add_worksheet(name: "BigC_ManualVerif_Orders") do |sheet|
+  attributes = @manual_verify.first.attributes.keys
+  attributes.delete('id')
+
+  sheet.add_row(attributes)
+
+  @manual_verify.each do |order|
+    sheet.add_row(attributes.map { |attr| order.send(attr) })
+  end
+end
+
+#CustRef
+wb.add_worksheet(name: "CustRef") do |sheet|
+  attributes = @cust_ref.first.attributes.keys
+  attributes.delete('id')
+
+  sheet.add_row(attributes)
+
+  @cust_ref.each do |customer|
+    sheet.add_row(attributes.map { |attr| customer.send(attr) })
+  end
+end
+
+#XeroReceivables
+wb.add_worksheet(name: "XeroReceivables") do |sheet|
+  sheet.add_row(['Aged Receivables Detail'])
+  sheet.add_row(['Untapped Fine Wines'])
+  sheet.add_row(['As at ' + Date.today.to_s])
+
+  sheet.add_row(
+    ['Invoice Date', 'Due Date', 'Invoice Number', 'Invoice Reference',
+     'Current', '< 1 Month', '1 Month', '2 Months', '3 Months', 'Older'
+     ])
+  @contacts.each do |contact|
+    #total = {'Current': 0, '0': 0, '1': 0, '2': 0, '3': 0, 'Older': 0}
+    total = [0, 0, 0, 0, 0, 0]
+
+    sheet.add_row()
+    sheet.add_row([contact.name])
+
+    contact.xero_invoices.has_amount_due.order(:date).each do |invoice|
+      month_diff = (Date.today.year * 12 + Date.today.month) - (invoice.due_date.year * 12 + invoice.due_date.month)
+      due_amount = [0, 0, 0, 0, 0, 0]
+
+      if month_diff < 0
+        due_amount[0] = invoice.amount_due
+      elsif month_diff < 1
+        due_amount[1] = invoice.amount_due
+      elsif month_diff < 2
+        due_amount[2] = invoice.amount_due
+      elsif month_diff < 3
+        due_amount[3] = invoice.amount_due
+      elsif month_diff < 4
+        due_amount[4] = invoice.amount_due
+      else
+        due_amount[5] = invoice.amount_due
+      end
+      total = total.zip(due_amount).map{|i| i.sum}
+
+      sheet.add_row(
+       [invoice.date.strftime('%d-%^b-%y'), invoice.due_date.strftime('%d-%^b-%y'),
+        invoice.invoice_number, invoice.reference, due_amount].flatten
+      )
+    end
+
+    sheet.add_row(['Total ' + contact.name, nil, nil, nil, total].flatten)
+  end
+end
+
+#Shipping
+wb.add_worksheet(name: "Shipping") do |sheet|
+  attributes = @shipping.first.attributes.keys
+  attributes.delete('id')
+
+  sheet.add_row(attributes)
+
+  @shipping.each do |order|
+    sheet.add_row(attributes.map { |attr| order.send(attr) })
+  end
+end

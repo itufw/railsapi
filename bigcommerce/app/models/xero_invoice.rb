@@ -204,7 +204,7 @@ class XeroInvoice < ActiveRecord::Base
       end
 
     def self.has_amount_due
-        where('xero_invoices.amount_due > 0')
+        where('xero_invoices.amount_due > 0 AND xero_invoices.status LIKE "AUTHORISED"')
       end
     def self.order_by_due_date
       order(:due_date)
