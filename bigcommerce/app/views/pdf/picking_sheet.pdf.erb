@@ -35,7 +35,6 @@
       <tr>
     		<th>Product Name</th>
         <th>Country</th>
-        <th>Section</th>
         <th>Position</th>
     		<th>Quantity</th>
     		<th>Dozen</th>
@@ -46,7 +45,6 @@
         <tr>
           <td><%= product[:product_name] %></td>
           <td><%= product[:product_country] %></td>
-          <td><%= product[:section].to_s %></td>
           <td><%= product[:column].to_s + ' ' + product[:row].to_s%></td>
           <td><%= product[:product_qty] %></td>
           <td><%= product[:product_dozen] %></td>
@@ -61,7 +59,6 @@
   <tr>
     <th>Product Name</th>
     <th>Country</th>
-    <th>Section</th>
     <th>Position</th>
     <th>Quantity</th>
     <th>Dozen</th>
@@ -72,7 +69,6 @@
     <tr>
       <td><%= product[:product_name] %></td>
       <td><%= product[:product_country] %></td>
-      <td><%= product[:section].to_s %></td>
       <td><%= product[:column].to_s + ' ' + product[:row].to_s%></td>
       <td><%= product[:product_qty] %></td>
       <td><%= product[:product_dozen] %></td>

@@ -286,7 +286,8 @@ class ProductController < ApplicationController
     # Warehouse Counting
     else
       pending_products = params[:pending_products].split()
-      pending_products.append(warehouse_params[:product_no_ws_id]) unless params[:latter_count].nil?
+      later_count = params[:later].split()
+      later_count.append(warehouse_params[:product_no_ws_id]) unless params[:latter_count].nil?
 
       if params[:commit]=='Save'
         if WarehouseExamining.duplicated(warehouse_params[:product_no_ws_id]).blank?
@@ -303,11 +304,14 @@ class ProductController < ApplicationController
 
       # if no more pending products to be Counted
       # return to dashboard
-      if pending_products.blank?
+      if pending_products.blank? && later_count.blank?
         flash[:success] = 'Counted all selected product, please review it!'
         redirect_to controller: 'sales', action: 'sales_dashboard' and return
+      elsif pending_products.blank?
+        pending_products = later_count
+        later_count = []
       end
-      redirect_to action: 'warehouse', pending_products: pending_products and return
+      redirect_to action: 'warehouse', pending_products: pending_products, later_count: later_count and return
     end
   end
 
@@ -320,9 +324,10 @@ class ProductController < ApplicationController
     else
       @product_list = (params[:pending_products].nil?) ? StaffGroupItem.productNoWs(session[:default_group]).map(&:item_id) : params[:pending_products]
       @product_list = ProductNoWs.where(id: @product_list).order(:column).map(&:id)
-
       @product = ProductNoWs.find(@product_list.first)
       @product_list = @product_list.reject{|x| x.to_s==@product.id.to_s}
+
+      @waitting_list = params[:later_count]
 
       @products = @product.products
       @product_dm = @products.select{|x| x.name.include?'DM'}.first
