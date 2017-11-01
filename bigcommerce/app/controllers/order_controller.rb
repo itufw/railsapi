@@ -165,7 +165,7 @@ class OrderController < ApplicationController
       product_id = product_params['product_id'].split('-').first
       # if product comes from allocated Order
       if product_params['product_id'].split('-').count>1
-        allocated_product = OrderProduct.joins(:order).where('orders.customer_id': order.customer_id, 'orders.status_id': 1, product_id: product_id, qty: (1..200)).first
+        allocated_product = OrderProduct.joins(:order).where('orders.customer_id': order.customer_id, 'orders.status_id': 1, product_id: product_id, qty: (1..500)).first
 
         allocated_product.assign_attributes(qty: allocated_product.qty - product_params[:qty].to_i,\
          stock_previous: allocated_product.qty, stock_current: allocated_product.qty - product_params[:qty].to_i,\
