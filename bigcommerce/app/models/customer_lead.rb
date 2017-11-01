@@ -108,7 +108,7 @@ class CustomerLead < ActiveRecord::Base
     customer = Customer.new({firstname: first_name, lastname: last_name,\
       company: self.company, email: self.email, phone: self.phone, actual_name: self.actual_name,\
       staff_id: self.staff_id, cust_type_id: self.cust_type_id || 2, cust_group_id: self.cust_group_id || 0,\
-      cust_style_id: self.cust_style_id, address: self.address,\
+      cust_style_id: self.cust_style_id.to_i.zero? ? 2 : self.cust_style_id, address: self.address,\
       lat: self.latitude, lng: self.longitude, tolerance_day: 30,\
       street: self.street, city: self.city, state: self.state,\
       postcode: self.postalcode, country: self.country})
