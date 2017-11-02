@@ -201,7 +201,7 @@ class AdminController < ApplicationController
       @manual_verify = excel_order(12, (Date.today - 8.years), Date.today)
       @cust_ref = excel_customer((Date.today - 8.years), Date.today)
       @contacts = excel_receivables()
-      @shipping = excel_shipping((Date.today - 8.years), Date.today)
+      @shipping = excel_shipping((Date.today - 1.month), Date.today)
 
       respond_to do |format|
         format.html
