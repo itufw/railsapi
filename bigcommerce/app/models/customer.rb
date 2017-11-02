@@ -58,7 +58,7 @@ class Customer < ActiveRecord::Base
 		self.id = bigc_customer.id
 		self.save
 
-		unless self.street.nil?
+		unless self.street.to_s==""
 			customer_address = Bigcommerce::CustomerAddress.create(
 			  bigc_customer.id,
 			  first_name: self.firstname,
