@@ -64,8 +64,8 @@
                 <% if user_full_right(session[:authority])%>
                   <li><%= link_to "Warehouse", controller: "product", action: "warehouse" %></li>
                   <li><%= link_to "Review", controller: "product", action: "review" %></li>
-                  <li><%= link_to 'Location Update', controller: 'product', action: 'location'%></li>
                 <% end %>
+                <li><%= link_to 'Location Update', controller: 'product', action: 'location'%></li>
               </ul>
             </li>
 
