@@ -223,6 +223,7 @@ class OrderController < ApplicationController
 
   # Send out the confirmation Email
   def send_email
+    # ReminderMailer.order_confirmation(params[:order_id], params[:email_address], session[:user_id])
     ReminderMailer.order_confirmation(params[:order_id], params[:email_address], session[:user_id]).deliver_now
     flash[:success] = 'Email Sent!'
     redirect_to request.referrer

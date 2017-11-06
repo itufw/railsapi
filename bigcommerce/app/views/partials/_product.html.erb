@@ -1,14 +1,16 @@
 <%= render "partials/form_paginate", objects: @product_ids %>
 
-<table class = "table table-striped table-bordered table-hover table-responsive">
-	<tr>
-		<th>ID</th>
-		<th>Product Name <%= render "partials/sort_arrows", order: 0 %></th>
-		<th>Price ( Ex GST ) <%= render "partials/sort_arrows", order: 1 %></th>
-		<th>Stock <%= render "partials/sort_arrows", order: 2 %></th>
-		<th>Pending Stock</th>
-		<th>Total Stock</th>
-	</tr>
+<table class = "table table-striped table-bordered table-hover table-responsive" id="product-table">
+	<thead>
+		<tr>
+			<th>ID</th>
+			<th>Product Name <%= render "partials/sort_arrows", order: 0 %></th>
+			<th>Price ( Ex GST ) <%= render "partials/sort_arrows", order: 1 %></th>
+			<th>Stock <%= render "partials/sort_arrows", order: 2 %></th>
+			<th>Pending Stock</th>
+			<th>Total Stock</th>
+		</tr>
+	</thead>
 
 
 	<% @product_ids.each do |id| %>
@@ -46,6 +48,10 @@
 			<% end %>
 			<td clas = "num" ><%= @pending_stock_h[id].to_i + @stock_h[id].to_i %></td>
 		</tr>
+		<tr>
+			<% pppp = cccccc%>
+			<td colspan="6">To be Developed</td>
+		</tr>
 
 	<% end %>
 
@@ -56,17 +62,13 @@
 </span>
 
 <script type="text/javascript">
-// Flag for product Selection
-// Do Not Use
+	$("#product-table tr:odd").addClass("odd");
+	$("#product-table tr:not(.odd)").hide();
+	$("#product-table tr:first-child").show();
+	$("#product-table tr.odd").click(function () {
+	    var trToToggle = $(this).next("tr");
+	    $("#product-table tbody tr:not(.odd)").not(trToToggle).hide();
 
-  // var flags = $('.count-select');
-	// var checkboxes = $('input[id*=selected_product]');
-	//
-	// $('.count-select').click(function(){
-	// 	var link = "/fetch_product_selected?product_no_ws_id=" + $(this).attr('product')
-	// 	$.ajax({
-	// 			type: 'GET',
-	// 			url: link
-	// 	});
-	// });
+	    $(trToToggle).toggle();
+	});
 </script>
