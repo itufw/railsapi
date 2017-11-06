@@ -53,8 +53,8 @@ wb.add_worksheet(name: "Stock Control", page_setup: setup) do |sheet|
       )
       products.each do |product|
         sheet.add_row(
-          [product[:ws_id], product[:name], product[:case_size], '%.2f' % product[:rrp],
-           '%.2f' % product[:luc], product[:allocated], product[:inventory],
+          [product[:ws_id], product[:name], product[:case_size], '%.2f' % product[:rrp].to_f,
+           '%.2f' % product[:luc].to_f, product[:allocated], product[:inventory].to_i,
             product[:term_1], product[:monthly_supply], product[:status]],
           style: [nil, (eval product[:name_color].to_s), (1..4).map {|x| nil}, (product[:current].to_i.zero?)? highlight_font : nil, bordered_cell, bordered_cell, bordered_cell].flatten
         )
