@@ -1,6 +1,7 @@
 require 'calendar_helper.rb'
 require 'models_filter.rb'
 require 'fuzzystringmatch'
+require 'application_helper.rb'
 
 class CalendarController < ApplicationController
   skip_before_action :verify_authenticity_token
@@ -10,6 +11,7 @@ class CalendarController < ApplicationController
 
   include CalendarHelper
   include ModelsFilter
+  include ApplicationHelper
 
   def redirect
     uri = Rails.env.development? ? 'http://localhost:3000/callback' : 'http://cms.untappedwines.com.au/callback'

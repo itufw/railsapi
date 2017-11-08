@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171027030807) do
+ActiveRecord::Schema.define(version: 20171108052455) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -716,6 +716,7 @@ ActiveRecord::Schema.define(version: 20171027030807) do
     t.string   "street_2",                limit: 255
     t.string   "ship_name",               limit: 255
     t.string   "proof_of_delivery",       limit: 255
+    t.integer  "scot_pac_load",           limit: 4
   end
 
   add_index "orders", ["customer_id"], name: "index_orders_on_customer_id", using: :btree
