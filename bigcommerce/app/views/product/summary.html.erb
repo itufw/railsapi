@@ -36,7 +36,13 @@
 			<% @products.each do |product| %>
 			<tr>
 				<td><%= link_to product.id, controller: 'product', action: 'summary', pending_stock: 0, product_id: product.id, product_name: product.name, total_stock: product.inventory, transform_column: 'product_id' %></td>
-				<td><%= link_to product.name, controller: 'product', action: 'summary', pending_stock: 0, product_id: product.id, product_name: product.name, total_stock: product.inventory, transform_column: 'product_id' %></td>
+				<td>
+					<%= link_to product.name, controller: 'product', action: 'summary', pending_stock: 0, product_id: product.id, product_name: product.name, total_stock: product.inventory, transform_column: 'product_id' %>
+					<% if user_full_right%>
+						<br/>
+						<%= 'Sales after 30th: ' + Order.joins(:order_products).valid_order.where("order_products.product_id = #{product.id} AND date_created > '2017-10-29'").sum('order_products.qty').to_s %>
+					<% end %>
+				</td>
 				<td>
 					<%= product_rights ? text_field_tag("product[#{product.id}]", product.inventory, placeholder: 'Inventory', class: 'form-control')  : product.inventory %>
 				</td>
