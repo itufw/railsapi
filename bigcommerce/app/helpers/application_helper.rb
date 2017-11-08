@@ -187,7 +187,7 @@ module ApplicationHelper
     end
   end
 
-  def user_full_right(_authority)
+  def user_full_right(_authority=nil)
     return true if %w[Admin Management Accounts].include? session[:authority]
     false
   end
