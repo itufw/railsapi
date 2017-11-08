@@ -125,11 +125,12 @@ class Customer < ActiveRecord::Base
 
 			cust =  "('#{c.id}', '#{firstname}', '#{lastname}', '#{company}',\
 			'#{email}', '#{phone}', '#{c.store_credit}', '#{c.registration_ip_address}',\
-			'#{notes}', '#{date_created}', '#{date_modified}', '#{time}', '#{time}', '#{c.customer_group_id}', '#{unallocated_staff_id}')"
+			'#{notes}', '#{date_created}', '#{date_modified}', '#{time}', '#{time}',\
+			'#{c.customer_group_id}', '#{unallocated_staff_id}', '#{firstname.to_s + lastname.to_s}')"
 
 			sql = "INSERT INTO customers(id, firstname, lastname, company, email, phone,\
 			store_credit, registration_ip_address, notes, date_created, date_modified,\
-			created_at, updated_at, cust_type_id, staff_id) VALUES #{cust}"
+			created_at, updated_at, cust_type_id, staff_id, actual_name) VALUES #{cust}"
 
 		else
 
