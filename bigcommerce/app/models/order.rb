@@ -31,6 +31,7 @@ class Order < ActiveRecord::Base
   after_validation :recovery_order, on: [:update], if: ->(obj){ obj.status_id_changed? and obj.status_id_was == 5}
   after_validation :bigcommerce_status_update, on: [:update], if: ->(obj){obj.status_id_changed? and obj.source=='bigcommerce' and [2,3,4,5,6,7,8,9,10,11,12,13,26].include?obj.status_id and obj.last_updated_by!=34}
   after_validation :update_notes, on: [:update], if: ->(obj){obj.source=='bigcommerce' and (obj.staff_notes_changed? or obj.customer_notes_changed?)}
+  after_validation :order_shipped, on: [:update], if: ->(obj){obj.status_id==2}
 
   scoped_search on: [:id, :customer_purchase_order, :track_number], validator: ->(value){!value.nil?}
 
@@ -404,6 +405,10 @@ class Order < ActiveRecord::Base
   end
 
   private
+  def order_shipped
+    sql = "Update orders SET date_shipped = '#{Time.now.to_s(:db)}' WHERE id = #{self.id}"
+    ActiveRecord::Base.connection.execute(sql)
+  end
 
   def bigcommerce_status_update
     # Ignore lagacy datas
