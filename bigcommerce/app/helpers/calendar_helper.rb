@@ -2,11 +2,6 @@ require 'customer_helper.rb'
 module CalendarHelper
   include CustomerHelper
 
-  def user_full_right(_authority)
-    return true if %w[Admin Management Accounts].include? session[:authority]
-    false
-  end
-
   def sales_last_order(params)
     return 'Last_Order' if ((params["filter_selector"].nil?) || ("".eql?params["filter_selector"]) ||  ("Last_Order".eql?params["filter_selector"]))
     'Sales'

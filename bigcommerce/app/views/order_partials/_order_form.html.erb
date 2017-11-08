@@ -6,13 +6,14 @@
           <table id="customer_table">
             <tr>
               <th>Customer</th>
-              <% if @order.customer_id.nil? || @order.customer_id == ""%>
-                <td class="customer_autocomplete">
+              <td class="customer_autocomplete">
+                <% if @order.customer_id.nil? || @order.customer_id == ""%>
                   <%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 30 %>
-                </td>
-              <% else %>
-                <td><input type="text" name="customer" id="<%= @order.customer_id %>" value="<%= Customer.find(@order.customer_id).actual_name%>" readonly="readonly" size="30px"></td>
-              <% end %>
+                <% else %>
+                  <input type="text" name="customer" id="<%= @order.customer_id %>" value="<%= Customer.find(@order.customer_id).actual_name%>" readonly="readonly" size="30px">
+                  <%= '<i class="glyphicon glyphicon-remove remove" title="remove"></i>'.html_safe if @order.xero_invoice_id.nil? && user_full_right%>
+                <% end %>
+              </td>
               <td><input type="checkbox" id="customer_purchase_order" style="display: inline-block;"> Customer Puchase ID</td>
             </tr>
             <tr style="display: none;" class="customer-purchase-order-tr"></tr>
@@ -218,18 +219,18 @@
           type: 'GET',
           url: link
       });
-
-      $('.remove').click(function () {
-        $('.customer_autocomplete').html('<%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 15 %>');
-        $('#order_customer_id').val('');
-        $('.last-order-product').remove();
-        $('.last-order-td').remove();
-        $('.allocation-products').html('');
-      });
     }
     if (/Staff Sample/i.test($('input[name=customer]').val())){
       $('#order_discount_rate').val(100);
     };
+  });
+
+  $(document).on('click', '.remove', function(){
+    $('.customer_autocomplete').html('<%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 15 %>');
+    $('#order_customer_id').val('');
+    $('.last-order-product').remove();
+    $('.last-order-td').remove();
+    $('.allocation-products').html('');
   });
 
   // Product Search
