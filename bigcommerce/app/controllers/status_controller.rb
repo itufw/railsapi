@@ -42,6 +42,8 @@ class StatusController < ApplicationController
     elsif @status_name == 'Courier'
       status_ids = Status.where("alt_name LIKE '%#{@status_name}%'").map(&:id)
       @orders = Order.statuses_filter(status_ids).courier_not_confirmed.send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
+    elsif @status_name == 'ScotPac'
+      @orders = Order.joins(:customer).where('customers.cust_type_id = 2 AND status_id = 12 AND scot_pac_load IS NULL AND xero_invoice_id IS NOT NULL').paginate(per_page: @per_page, page: params[:page])
     else
       status_ids = Status.where("alt_name LIKE '%#{@status_name}%'").map(&:id)
       @orders = Order.statuses_filter(status_ids).send(order_function, direction).paginate(per_page: @per_page, page: params[:page])

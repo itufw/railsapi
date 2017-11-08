@@ -1,6 +1,6 @@
 <%= title @status_name + " Checklist" %>
 <h3><%= @status_name + " Checklist" %></h3>
-<% if ["Picking", "Ready", "Shipped", 'Print'].include? @status_name%>
+<% if ["Picking", "Ready", "Shipped", 'Print', 'ScotPac'].include? @status_name%>
   <%= form_tag({:controller => "status", :action => "status_update"}, {:method => "get"}) do %>
     <%= hidden_field_tag "order['id']", (@orders.blank?) ? 100 : @orders.first.id %>
     <%= render "partials/order_status", orders: @orders, display_class: "none", product_ids: nil%>
@@ -21,6 +21,11 @@
           $(this).find('.multi-select input').attr('checked', false);
         });
       </script>
+    <% when 'ScotPac'%>
+      <%= submit_tag 'Export Excel', class: 'btn btn-primary'%>
+      <%= submit_tag 'Print Invoices', class: 'btn btn-primary'%>
+      <%= submit_tag 'Print PoD', class: 'btn btn-primary'%>
+      <%= submit_tag 'Exported!', class: 'btn btn-primary'%>
     <% else %>
       <%= submit_tag 'Ready', class: 'btn btn-primary'%>
     <% end %>
@@ -34,7 +39,7 @@
 <% else %>
   <%= form_tag({:controller => "order", :action => "order_confirmation"}, {:method => "get"}) do %>
     <%= hidden_field_tag :status_name, @status_name%>
-    
+
     <% if @status_name=='Courier'%>
       <!-- Label Stock in Status helper -->
       <% label_stock = fastway_stock_level() %>
