@@ -10,12 +10,14 @@
 			<th>Review Date</th>
 		<% end %>
 	</tr>
+	<% total_qty = order_products.sum(:qty) %>
 
-	<% order_products.select{|x| x.display > 0}.each do |op| %>
+	<% order_products.each do |op| %>
+		<% next if op.display.zero? && !total_qty.zero? %>
 	<tr>
 		<td><%= link_to op.product.name, controller: 'customer', action: 'summary_with_product', product_id: op.product.id, product_name: op.product.name, customer_id: cust_id, customer_name: cust_name %></td>
 		<td class="num"><%= op.product.calculated_price * 1.29 %></td>
-		<td class="num"><%= op.qty %></td>
+		<td class="num"><%= total_qty.zero? ? op.stock_previous : op.qty %></td>
 		<td class="num"><%= op.discount %>%</td>
 		<td class="num"><%= display_num(op.price_discounted) %></td>
 		<td class="num"><%= display_num(op.price_discounted * op.qty)%></td>
