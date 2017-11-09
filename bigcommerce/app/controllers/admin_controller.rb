@@ -197,6 +197,16 @@ class AdminController < ApplicationController
       end
     end
 
+    def scotpac_export
+      @orders = Order.where(id: params[:selected_orders])
+      respond_to do |format|
+        format.html
+        format.xlsx {
+          response.headers['Content-Disposition'] = "attachment; filename=Scot Pac #{Date.today.to_s}.xlsx"
+        }
+      end
+    end
+
     def scotpac
       @manual_verify = excel_order(12, (Date.today - 8.years), Date.today)
       @cust_ref = excel_customer((Date.today - 8.years), Date.today)
