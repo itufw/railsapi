@@ -74,7 +74,7 @@ class StatusController < ApplicationController
       redirect_to controller: 'admin', action: 'scotpac_export', format: 'xlsx', selected_orders: result and return
     when 'scotpac_loaded'
       flash[:success] = 'Orders are Loaded!'
-      redirect_to controller: 'status', action: 'status_check', status_name: 'ScotPac' and return
+      redirect_to request.referrer and return
     end
     redirect_to controller: 'order', action: 'all' and return
   end
