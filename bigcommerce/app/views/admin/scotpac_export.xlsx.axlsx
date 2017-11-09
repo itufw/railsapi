@@ -1,0 +1,11 @@
+require 'axlsx'
+wb = xlsx_package.workbook
+
+# BigC_ManualVerif_Orders
+wb.add_worksheet(name: "BigC_ManualVerif_Orders") do |sheet|
+  sheet.add_row(['invoice', 'CustID', 'Date', 'Value', nil, 'CustName'])
+
+  @orders.each do |order|
+    sheet.add_row([order.id, order.customer_id, order.date_created, order.total_inc_tax, nil, order.customer.actual_name])
+  end
+end

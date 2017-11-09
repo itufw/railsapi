@@ -43,17 +43,21 @@ class StatusController < ApplicationController
       status_ids = Status.where("alt_name LIKE '%#{@status_name}%'").map(&:id)
       @orders = Order.statuses_filter(status_ids).courier_not_confirmed.send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
     elsif @status_name == 'ScotPac'
-      @orders = Order.joins(:customer).where('customers.cust_type_id = 2 AND status_id = 12 AND scot_pac_load IS NULL AND xero_invoice_id IS NOT NULL').paginate(per_page: @per_page, page: params[:page])
+      @orders = Order.joins(:customer, :xero_invoice).where('customers.cust_type_id = 2 AND status_id = 12 AND scot_pac_load IS NULL AND orders.xero_invoice_id IS NOT NULL AND xero_invoices.amount_due > 0').paginate(per_page: @per_page, page: params[:page])
     else
       status_ids = Status.where("alt_name LIKE '%#{@status_name}%'").map(&:id)
       @orders = Order.statuses_filter(status_ids).send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
     end
+
+    @orders = [] if @orders.nil?
   end
 
   def status_update
     #  In lib/order_status
     status, result = order_status_handler(params, order_params, session[:user_id])
     case status
+    when 'print_pod'
+      send_data result.to_pdf, filename: "Pod_#{session[:username]}_#{Date.today.to_s}.pdf" and return
     when 'print_picking_sheet'
       send_data result, filename: "picking_sheet_#{session[:username]}_#{Date.today.to_s}.pdf" and return
     when 'print_invoice'
@@ -66,6 +70,11 @@ class StatusController < ApplicationController
       redirect_to controller: 'order', action: 'order_confirmation', order_id: result.first, selected_orders: result, status_id: params[:status_id] and return
     when 'Next'
       redirect_to controller: 'order', action: 'order_confirmation', order_id: result.first, selected_orders: result, status_id: params[:status_id] and return
+    when 'export_scotpac'
+      redirect_to controller: 'admin', action: 'scotpac_export', format: 'xlsx', selected_orders: result and return
+    when 'scotpac_loaded'
+      flash[:success] = 'Orders are Loaded!'
+      redirect_to controller: 'status', action: 'status_check', status_name: 'ScotPac' and return
     end
     redirect_to controller: 'order', action: 'all' and return
   end

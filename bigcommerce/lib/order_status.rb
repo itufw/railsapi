@@ -1,5 +1,7 @@
 require 'fastway.rb'
+require 'fastway_api.rb'
 module OrderStatus
+  include FastwayApi
 
   def order_status_handler(params, order_params, user_id)
     selected_orders = params[:selected_orders] || []
@@ -22,6 +24,14 @@ module OrderStatus
     elsif "Print Picking Sheets" == params[:commit] && !selected_orders.blank?
       pdf = print_shipping_sheet(selected_orders)
       return ['print_picking_sheet', pdf]
+    elsif "Print PoD" == params[:commit] && !selected_orders.blank?
+      pdf = print_pod(selected_orders)
+      return ['print_pod', pdf]
+    elsif 'Export Excel' == params[:commit] && !selected_orders.blank?
+      return ['export_scotpac', selected_orders]
+    elsif 'Exported!' == params[:commit] && !selected_orders.blank?
+      Order.where(id: selected_orders).update_all(scot_pac_load: 1)
+      return ['scotpac_loaded', selected_orders]
     end
 
     case params[:commit]
@@ -155,5 +165,27 @@ module OrderStatus
           )
       )
     picking_sheet
+  end
+
+  def print_pod(selected_orders)
+    orders = Order.where(id: selected_orders)
+    order_pods = CombinePDF.new
+
+    orders.each do |order|
+      if !order.proof_of_delivery.file.nil?
+        order_pods << CombinePDF.parse(open(order.proof_of_delivery.to_s).read)
+      elsif FastwayTrace.pod_available(order.id).first
+        item = FastwayConsignmentItem.filter_order(order.id).first
+        pod = WickedPdf.new.pdf_from_string(
+          render_to_string(
+              :template => 'pdf/proof_of_delivery.pdf',
+              :locals => {order: Order.find(order.id), item: item }
+              )
+          )
+        order_pods << CombinePDF.parse(pod)
+      end
+    end
+
+    order_pods
   end
 end
