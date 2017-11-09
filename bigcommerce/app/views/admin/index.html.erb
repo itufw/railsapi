@@ -20,7 +20,7 @@
 		<%= submit_tag 'Shipment', value: 'Shipment', class: 'btn btn-danger' %>
 	<% end %>
 		<!-- link_to 'ScotPac', {controller: "admin", action: "scotpac", format: 'xlsx'}, class: 'btn btn-warning'  -->
-		<%= link_to '<button class="btn btn-warning">ScotPac</button>'.html_safe, controller: 'status', action: 'status_check', status_name: 'ScotPac' %>
+		<%= link_to '<button class="btn btn-warning">ScotPac</button>'.html_safe, controller: 'status', action: 'status_check', status_name: 'ScotPac' if user_accountant %>
 		<%= link_to "Stock Control", {controller: "admin", action: "export_stock_control", format: 'xlsx'}, class: "btn btn-primary" %>
 </div>
 
