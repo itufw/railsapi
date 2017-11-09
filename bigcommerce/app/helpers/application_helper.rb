@@ -192,6 +192,11 @@ module ApplicationHelper
     false
   end
 
+  def user_accountant(authority=nil)
+    return true if (%w[Accounts].include? session[:authority]) || 36==session[:user_id]
+    false
+  end
+
   def it_working(staff_id)
     return true if staff_id == 36
     false
