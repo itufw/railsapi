@@ -138,6 +138,10 @@ class OrderController < ApplicationController
     send_data print_invoices([params[:order_id]]).to_pdf, filename: "#{params[:order_id]}.pdf", type: :pdf
   end
 
+  def generate_picking_slip
+    send_data print_picking_slip([params[:order_id]]).to_pdf, filename: "#{params[:order_id]}-PickingSlip.pdf", type: :pdf
+  end
+
   def update_order
     # Wrap this in a lib later
     wet = TaxPercentage.wet_percentage * 0.01
@@ -161,7 +165,7 @@ class OrderController < ApplicationController
       product_id = product_params['product_id'].split('-').first
       # if product comes from allocated Order
       if product_params['product_id'].split('-').count>1
-        allocated_product = OrderProduct.joins(:order).where('orders.customer_id': order.customer_id, 'orders.status_id': 1, product_id: product_id, qty: (1..200)).first
+        allocated_product = OrderProduct.joins(:order).where('orders.customer_id': order.customer_id, 'orders.status_id': 1, product_id: product_id, qty: (1..500)).first
 
         allocated_product.assign_attributes(qty: allocated_product.qty - product_params[:qty].to_i,\
          stock_previous: allocated_product.qty, stock_current: allocated_product.qty - product_params[:qty].to_i,\
@@ -219,8 +223,15 @@ class OrderController < ApplicationController
 
   # Send out the confirmation Email
   def send_email
+    # ReminderMailer.order_confirmation(params[:order_id], params[:email_address], session[:user_id])
     ReminderMailer.order_confirmation(params[:order_id], params[:email_address], session[:user_id]).deliver_now
     flash[:success] = 'Email Sent!'
+    redirect_to request.referrer
+  end
+
+  def pod_uploader
+    Order.find(params[:order][:id]).update_attributes(order_params)
+    flash[:success] = 'POD Uploaded'
     redirect_to request.referrer
   end
 
@@ -234,7 +245,7 @@ class OrderController < ApplicationController
                                   :customer_notes, :staff_notes, :address, :modified_wet,\
                                   :billing_address, :delivery_instruction, :street,\
                                   :city, :state, :postcode, :country, :customer_purchase_order,\
-                                  :track_number, :ship_name, :street_2)
+                                  :track_number, :ship_name, :street_2, :proof_of_delivery)
   end
 
   def products_params

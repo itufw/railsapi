@@ -8,7 +8,7 @@ class XeroInvoice < ActiveRecord::Base
 
     self.primary_key = 'xero_invoice_id'
 
-    belongs_to :order
+    belongs_to :order, foreign_key: :invoice_number
     belongs_to :xero_contact
     has_many :xero_invoice_line_items
     has_many :xero_payments
@@ -204,7 +204,7 @@ class XeroInvoice < ActiveRecord::Base
       end
 
     def self.has_amount_due
-        where('xero_invoices.amount_due > 0')
+        where('xero_invoices.amount_due > 0 AND xero_invoices.status LIKE "AUTHORISED"')
       end
     def self.order_by_due_date
       order(:due_date)

@@ -35,6 +35,9 @@
               <% @over_due_invoices.map(&:invoice_number).each do |invoice| %>
                 <% (FastwayTrace.pod_available(invoice).count>0) ? available.append(invoice) : unavailable.append(invoice)%>
               <% end %>
+              <% staff_pods = Order.where('id IN (?) AND proof_of_delivery IS NOT NULL', unavailable).map(&:id).map(&:to_s)%>
+              <% available += staff_pods %>
+              <% unavailable -= staff_pods %>
               <p style="color: green;">POD Available: <%= available.join(', ') %></p>
               <p style="color: red;">POD Unavailable: <%= unavailable.join(', ') %></p>
             <%=render "reminder_mailer_partials/reminder_table", over_due_invoices: @over_due_invoices, xero_contact: @xero_contact%>

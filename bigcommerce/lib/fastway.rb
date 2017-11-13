@@ -161,9 +161,7 @@ class Fastway
     order.save
     parcel_color = result['result']['services'].select{|x| x.values().include? 'Parcel'}.first['labelcolour_pretty_array']
 
-    # TODO!!!
-    # !!!Temporary!!!
-    return 1 if (parcel_color.map(&:upcase).include? 'ORANGE')
+    return 18 if (parcel_color.map(&:upcase).include? 'ORANGE')
     return 18 if (parcel_color.map(&:upcase).include? 'GREEN') || (parcel_color.map(&:upcase).include? 'GREY')
     # Red 6
     return 1765 if (parcel_color.map(&:upcase).include? 'RED') || (parcel_color.map(&:upcase).include? 'RED')

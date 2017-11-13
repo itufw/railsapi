@@ -14,11 +14,11 @@ class ReminderMailer < ActionMailer::Base
     @error_class = error_class
     @error_message = error_message
     @backtrace = backtrace.join("\n")
-    mail(from: 'Untapped IT <it@untappedwines.com>', to: 'William Liu <it@untappedwines.com>', cc: 'Luke Voortman <lvoortman@untappedwines.com>', subject: "Sync Error")
+    mail(from: 'Untapped IT <it@untappedwines.com>', to: 'William Liu <it@untappedwines.com>', cc: 'Lucia <lgaldona@untappedwines.com>', subject: "Sync Error")
   end
 
   def stock_control_reminder
-    xlsx = render_to_string formats: [:xlsx], template: "admin/export_stock_control", locals: {countries: ProducerCountry.product_country, product_hash: stock_calculation()}
+    xlsx = render_to_string formats: [:xlsx], template: "admin/export_stock_control", locals: {countries: ProducerCountry.product_country, product_hash: stock_calculation(), portfolio_list: portfolio_products()}
     attachments["Stock Control #{Date.today.to_s}.xlsx"] = {mime_type: Mime::XLSX, content: Base64.encode64(xlsx), encoding: 'base64'}
 
     # sales = []
@@ -31,7 +31,7 @@ class ReminderMailer < ActionMailer::Base
     # managers.push(%("Luke" <lvoortman@untappedwines.com>))
     # managers.push(%("Lucia" <lgaldona@untappedwines.com>))
 
-    mail(from: 'Untapped CMS <it@untappedwines.com>', to: 'Lucia <lgaldona@untappedwines.com>', bcc: 'William Liu <it@untappedwines.com>', subject: "Stock Control #{Date.today.to_s}")
+    mail(from: 'Untapped CMS <it@untappedwines.com>', to: ['Lucia <lgaldona@untappedwines.com>', 'SalesTeam <salesteam@untappedwines.com>'], bcc: 'William Liu <it@untappedwines.com>', subject: "Stock Control #{Date.today.to_s}")
 
     # mail(from: 'Untapped CMS <it@untappedwines.com>', to: sales, cc: managers, bcc: 'William Liu <it@untappedwines.com>', subject: "Stock Control #{Date.today.to_s}")
   end
@@ -40,10 +40,6 @@ class ReminderMailer < ActionMailer::Base
     @order = Order.find(order_id)
     @customer = @order.customer
     @staff = @order.staff
-
-    # TODO
-    # Change it after new sales joined
-    @staff = Staff.find(45) if @staff.nickname=='Tasso'
 
     customer_address = %("#{@customer.actual_name}" <#{email_address}>)
     subject = "Untapped Fine Wines Order #{@order.id} – #{@customer.actual_name}"
@@ -189,14 +185,16 @@ class ReminderMailer < ActionMailer::Base
       end
 
       pod = FastwayTrace.pod_available(invoice.invoice_number).first
-      unless pod.nil?
+      if !pod.nil?
         item = FastwayConsignmentItem.filter_order(invoice.invoice_number).first
-        attachments["invoice\##{invoice.invoice_number}-pod.pdf"] = WickedPdf.new.pdf_from_string(
+        attachments["#{invoice.invoice_number}-pod.pdf"] = WickedPdf.new.pdf_from_string(
           render_to_string(
               :template => 'pdf/proof_of_delivery.pdf',
               :locals => {order: Order.find(invoice.invoice_number), item: item }
               )
           )
+      elsif !order.proof_of_delivery.file.nil?
+        attachments[order.proof_of_delivery.file.filename.to_s] = open(order.proof_of_delivery.to_s).read
       end
     end
   end

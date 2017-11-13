@@ -3,6 +3,7 @@
 
 <%= form_for @warehouse_examining, :url => {controller: 'product', action: "update"}  do |f| %>
 <%= hidden_field_tag :pending_products, @product_list, multiple: true%>
+<%= hidden_field_tag :later, @waitting_list, multiple: true%>
 <%= f.hidden_field :product_name%>
 <%= f.hidden_field :product_no_ws_id%>
 <%= f.hidden_field :current_ws%>
@@ -32,8 +33,8 @@
         <%= product_form.hidden_field :id %>
         <li class="value-one">
           <b>Location</b>
-          <%= product_form.text_field :row, size: 6, placeholder: 'row'%>
-          <%= product_form.text_field :column, size: 6, placeholder:'column'%>
+          <%= product_form.text_field :column, size: 6, placeholder:'Column'%>
+          <%= product_form.number_field :row, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Row'}%>
           <%= product_form.text_field :area, size: 6, placeholder:'area'%>
         </li>
       <li class="value-one">
@@ -50,22 +51,10 @@
       </li>
     </ul>
     <ul>
-      <% unless @product_ws.nil?%>
-        <li class="value-one"><b>WS</b><%= f.number_field :count_ws, {min: 0, max: 99999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'WS', class: 'distribuetd', value: @product_ws.inventory} %></li>
-      <% end %>
-      <% unless @product_retail.nil?%>
-        <li class="value-one"><b>Retail</b><%= f.number_field :count_retail, {min: 0, max: 99999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'retail', class: 'distribuetd', value: @product_retail.inventory} %></li>
-      <% end %>
-      <% unless @product_dm.nil?%>
-        <li class="value-one"><b>DM</b><%= f.number_field :count_dm, {min: 0, max: 99999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'dm', class: 'distribuetd', value: @product_dm.inventory} %></li>
-      <% end %>
-      <% unless @product_vc.nil?%>
-        <li class="value-one"><b>VC</b><%= f.number_field :count_vc, {min: 0, max: 99999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'vc', class: 'distribuetd', value: @product_vc.inventory} %></li>
-      <% end %>
       <li class="value-one">
         <b>Difference:       <i class="difference">0</i></b>
         <div class="col-md-2 col-xs-4" style="float: right; ">
-          <input type="checkbox" name="latter_count" id="ios-checkbox" class="ios-toggle"/>
+          <input type="checkbox" name="latter_count" id="ios-checkbox" class="ios-toggle" checked />
           <label for="ios-checkbox" class="checkbox-label" data-off="Now" data-on="Yes" style="margin-left: 10px;"></label>
         </div>
         Remaining:<i class="remain-stock">0</i>

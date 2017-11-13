@@ -21,6 +21,7 @@
 			</span>
 			<button class = "btn btn-primary"><%= link_to "Reset", action: "product_dashboard" %></button>
 			<%= submit_tag "Update", class: 'btn btn-primary' if [9,36].include?session[:user_id]%>
+			<%= collection_select(nil, :group, StaffGroup.staff_groups(session[:user_id]), :id, :group_name, {:include_blank => 'Select Group', :selected => @staff_group.to_i}, {:class => 'form-control'}) %>
 		</div>
 	</div>
 

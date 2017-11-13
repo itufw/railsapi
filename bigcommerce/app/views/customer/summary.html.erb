@@ -11,7 +11,8 @@
 			var link = "/credit_list?customer_id=<%= @customer.id%>"
 			$.ajax({
 					type: 'GET',
-					url: link
+					url: link,
+					format: 'js'
 			});
 		}
 	});

@@ -84,6 +84,12 @@ class ProductController < ApplicationController
   end
 
   def allocate
+    unless params[:selected_product].nil? || params[:selected_product].blank?
+      params[:product_id] = params[:selected_product].delete_at(0)
+      params[:product_name], params[:total_stock] = product_name_inventory_after_transform(params[:product_id], params[:transform_column])
+      @selected_product = params[:selected_product]
+    end
+
     params[:direction] = params[:direction] || -1
     params[:order_col] = params[:order_col] || 'Last Quarter'
 
@@ -124,6 +130,12 @@ class ProductController < ApplicationController
   end
 
   def allocate_products
+    if params[:commit]=='Skip'
+      redirect_to controller: 'product', action: 'allocate', transform_column: params[:transform_column], selected_product: params[:selected_product].split() and return
+    end
+    # transform_column=product_no_ws_id&selected_product%5B%5D=861&selected_product%5B%5D=40&selected_product%5B%5D=1271
+
+
     # Revision Date Conveter
     # From {"(1i)"=>"2017", "(2i)"=>"10", "(3i)"=>"8"} to Date
     revision_date = Date.parse params[:revision_date].values().join('-')
@@ -153,6 +165,10 @@ class ProductController < ApplicationController
       # Bulk Allocated
       # Product id IS WS Product ID
       Customer.where(id: allocated.keys()).map{|x| x.allocate_products(product_id, allocated[x.id.to_s].to_i, revision_date, session[:user_id]) }
+    end
+
+    if params[:commit]=='Allocate and Next'
+      redirect_to controller: 'product', action: 'allocate', transform_column: params[:transform_column], selected_product: params[:selected_product].split() and return
     end
 
     redirect_to action: 'summary', pending_stock: allocated.values().map(&:to_i).sum, transform_column: params[:transform_column], product_name: params[:product_name], product_id: params[:product_id], total_stock: products.sum(:inventory)
@@ -270,7 +286,8 @@ class ProductController < ApplicationController
     # Warehouse Counting
     else
       pending_products = params[:pending_products].split()
-      pending_products.append(warehouse_params[:product_no_ws_id]) unless params[:latter_count].nil?
+      later_count = params[:later].split()
+      later_count.append(warehouse_params[:product_no_ws_id]) unless params[:latter_count].nil?
 
       if params[:commit]=='Save'
         if WarehouseExamining.duplicated(warehouse_params[:product_no_ws_id]).blank?
@@ -287,11 +304,14 @@ class ProductController < ApplicationController
 
       # if no more pending products to be Counted
       # return to dashboard
-      if pending_products.blank?
+      if pending_products.blank? && later_count.blank?
         flash[:success] = 'Counted all selected product, please review it!'
         redirect_to controller: 'sales', action: 'sales_dashboard' and return
+      elsif pending_products.blank?
+        pending_products = later_count
+        later_count = []
       end
-      redirect_to action: 'warehouse', pending_products: pending_products and return
+      redirect_to action: 'warehouse', pending_products: pending_products, later_count: later_count and return
     end
   end
 
@@ -303,8 +323,11 @@ class ProductController < ApplicationController
       @group_list = StaffGroup.staff_groups(session[:user_id])
     else
       @product_list = (params[:pending_products].nil?) ? StaffGroupItem.productNoWs(session[:default_group]).map(&:item_id) : params[:pending_products]
+      @product_list = ProductNoWs.where(id: @product_list).order(:column).map(&:id)
       @product = ProductNoWs.find(@product_list.first)
       @product_list = @product_list.reject{|x| x.to_s==@product.id.to_s}
+
+      @waitting_list = params[:later_count]
 
       @products = @product.products
       @product_dm = @products.select{|x| x.name.include?'DM'}.first
@@ -320,10 +343,16 @@ class ProductController < ApplicationController
           current_dm: @product_dm.nil? ? -1 : @product_dm.inventory,\
           current_vc: @product_vc.nil? ? -1 : @product_vc.inventory,\
           current_retail: @product_retail.nil? ? -1 : @product_retail.inventory,\
-          current_ws: @product_ws.nil? ? -1 : @product_ws.inventory,\
-          )
+          current_ws: @product_ws.nil? ? -1 : @product_ws.inventory)
       else
         @warehouse_examining = WarehouseExamining.duplicated(@product.id).first
+        @warehouse_examining.assign_attributes(current_stock: @products.map(&:inventory).sum,\
+        allocation: OrderProduct.allocation_products(@products.map(&:id)).map(&:qty).sum,\
+        on_order: OrderProduct.on_order(@products.map(&:id)).map(&:qty).sum,\
+        current_dm: @product_dm.nil? ? -1 : @product_dm.inventory,\
+        current_vc: @product_vc.nil? ? -1 : @product_vc.inventory,\
+        current_retail: @product_retail.nil? ? -1 : @product_retail.inventory,\
+        current_ws: @product_ws.nil? ? -1 : @product_ws.inventory)
       end
 
       @product.case_size = @product_ws.case_size if !@product_ws.nil? && @product.case_size.to_i==0
@@ -393,7 +422,7 @@ class ProductController < ApplicationController
   def fetch_product_winery
     if params[:producer_id]
       products = Producer.find(params[:producer_id]).products.where('inventory > 0')
-      @product_no_ws = ProductNoWs.where(id: products.map(&:product_no_ws_id).uniq)
+      @product_no_ws = ProductNoWs.where(id: products.map(&:product_no_ws_id).uniq).order(:name)
       @producer = params[:producer_id]
     else
       @product_no_ws = ProductNoWs.where(id: params[:product_no_ws_id])
@@ -427,7 +456,8 @@ def product_params
    :product_size_id, :product_no_ws_id, :name_no_ws, :name_no_vintage,\
    :product_no_vintage_id, :case_size, :product_package_type_id, :retail_ws,\
    :vintage, :name_no_winery_no_vintage, :price_id, :product_sub_type_id,\
-   :blend_type, :order_1, :order_2, :combined_order, :producer_region_id, :current)
+   :blend_type, :order_1, :order_2, :combined_order, :producer_region_id,\
+   :current, :display, :name_no_winery)
 end
 
 def warehouse_params

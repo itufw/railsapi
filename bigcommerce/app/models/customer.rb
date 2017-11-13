@@ -46,10 +46,10 @@ class Customer < ActiveRecord::Base
 		# property :tax_exempt_category
 		# property :accepts_marketing
 		customer_api = Bigcommerce::Customer
-		splited_name = self.actual_name.split()
+
 		bigc_customer = customer_api.create(
-			first_name: splited_name[0],
-			last_name: (splited_name[1..splited_name.length].join(' ')=="") ? "UFW" : splited_name[1..splited_name.length].join(' '),
+			first_name: self.firstname,
+			last_name: self.lastname,
 			email: (self.email.to_s=="") ? (self.actual_name.split().join('_')+"@untappedwines.com") : self.email,
 			store_credit: self.store_credit || 0,
 			customer_group_id: self.cust_type_id || 2,
@@ -58,7 +58,7 @@ class Customer < ActiveRecord::Base
 		self.id = bigc_customer.id
 		self.save
 
-		unless self.street.nil?
+		unless self.street.to_s==""
 			customer_address = Bigcommerce::CustomerAddress.create(
 			  bigc_customer.id,
 			  first_name: self.firstname,
@@ -67,7 +67,7 @@ class Customer < ActiveRecord::Base
 			  street_1: self.street,
 			  city: self.city,
 			  state: self.state,
-			  zip: self.postcode,
+			  zip: self.postcode.to_i,
 			  country: self.country
 			)
 		end
@@ -125,11 +125,12 @@ class Customer < ActiveRecord::Base
 
 			cust =  "('#{c.id}', '#{firstname}', '#{lastname}', '#{company}',\
 			'#{email}', '#{phone}', '#{c.store_credit}', '#{c.registration_ip_address}',\
-			'#{notes}', '#{date_created}', '#{date_modified}', '#{time}', '#{time}', '#{c.customer_group_id}', '#{unallocated_staff_id}')"
+			'#{notes}', '#{date_created}', '#{date_modified}', '#{time}', '#{time}',\
+			'#{c.customer_group_id}', '#{unallocated_staff_id}', '#{firstname.to_s + ' ' + lastname.to_s}')"
 
 			sql = "INSERT INTO customers(id, firstname, lastname, company, email, phone,\
 			store_credit, registration_ip_address, notes, date_created, date_modified,\
-			created_at, updated_at, cust_type_id, staff_id) VALUES #{cust}"
+			created_at, updated_at, cust_type_id, staff_id, actual_name) VALUES #{cust}"
 
 		else
 

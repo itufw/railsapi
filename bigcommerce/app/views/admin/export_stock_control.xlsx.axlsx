@@ -3,8 +3,11 @@ wb = xlsx_package.workbook
 
 @countries = countries if @countries.nil? && countries.present?
 @product_hash = product_hash if @product_hash.nil? && product_hash.present?
+@portfolio_list = portfolio_list if @portfolio_list.nil? && portfolio_list.present?
 
-wb.add_worksheet(name: "Stock Control") do |sheet|
+
+  setup = {orientation: :portrait, scale: 65}
+
 
   winery_hash = {bg_color: '000000', fg_color: 'FFFFFF'}
   bond_hash = {b: true}
@@ -25,6 +28,7 @@ wb.add_worksheet(name: "Stock Control") do |sheet|
   bordered_cell = wb.styles.add_style bond_hash.merge({border: { style: :thin, color: '000000', edges: [:left, :right, :bottom, :top]}})
   title_cell = wb.styles.add_style bond_hash.merge({sz: 18})
 
+wb.add_worksheet(name: "Stock Control", page_setup: setup) do |sheet|
   sheet.add_row(
     [nil, 'Stock Control'],
     style: [nil, title_cell]
@@ -36,26 +40,54 @@ wb.add_worksheet(name: "Stock Control") do |sheet|
     sheet.add_row([nil, country.name], style: country_cell)
     country.producers.each do |producer|
       next if producer.id==21
+      product_ids = producer.products.group('product_no_ws_id').map(&:product_no_ws_id)
+      products = @product_hash.select {|key, value| product_ids.include?key}.values()
+      next if products.blank?
+
+      products.sort! { |a, b| [a[:order_total], a[:name]] <=> [b[:order_total], b[:name]]}
+
 
       sheet.add_row(
         [nil, producer.name, 'Case', 'RRP', 'LUC', 'Aloc.', 'Bot.', '30 D.S.', 'Supply'],
         style: [nil, (1..8).map { |x| black_cell }].flatten
       )
-
-      product_ids = producer.products.group('product_no_ws_id').map(&:product_no_ws_id)
-      products = @product_hash.select {|key, value| product_ids.include?key}.sort_by {|key, value| value[:luc]}
-      products.each do |key, product|
+      products.each do |product|
         sheet.add_row(
-          [product[:ws_id], product[:name], product[:case_size], product[:rrp], product[:luc], product[:allocated], product[:inventory], product[:term_1], product[:monthly_supply]],
-          style: [nil, (eval product[:name_color].to_s), (1..4).map {|x| nil}, (product[:current].to_i.zero?)? highlight_font : nil, bordered_cell, bordered_cell].flatten
+          [product[:ws_id], product[:name], product[:case_size], '%.2f' % product[:rrp].to_f,
+           '%.2f' % product[:luc].to_f, product[:allocated], product[:inventory].to_i,
+            product[:term_1], product[:monthly_supply], product[:status]],
+          style: [nil, (eval product[:name_color].to_s), (1..4).map {|x| nil}, (product[:current].to_i.zero?)? highlight_font : nil, bordered_cell, bordered_cell, bordered_cell].flatten
         )
       end
     end
+    sheet.add_page_break('A' + (sheet.rows.last.index + 2).to_s)
   end
-
-  sheet.add_row(
-    [nil, '4+ months supply', 'Waiting for container or stock for retail'],
-    style: [nil, orange_cell, highlight_font]
-  )
   sheet.column_info[3].hidden = true
+end
+
+# For Winery Portfolio
+wb.add_worksheet(name: "Product Ref") do |sheet|
+  sheet.add_row(
+    ['id', 'Country', 'Winery', 'Name', 'Name without Winery', 'Name without Winery And Vintage', 'Portfolio Name', 'Vol.', 'Case', 'Wholesale', 'LUC'],
+    style: [nil, (1..10).map { |x| black_cell }].flatten
+  )
+  @portfolio_list.each do |product|
+    sheet.add_row([product[:id], product[:country], product[:winery], product[:name],
+     product[:name_no_winery], product[:name_no_winery_no_vintage], product[:portfolio_name],
+     product[:vol], product[:case], '%.2f' % product[:wholesale], '%.2f' % product[:luc]
+    ])
+  end
+end
+
+# For Portfolio List
+wb.add_worksheet(name: 'Product List') do |sheet|
+  sheet.add_row(
+    ['id', 'Variety', 'Type', 'Name without WS', 'Region', 'LUC'],
+    style: [nil, (1..5).map { |x| black_cell }].flatten
+  )
+  @portfolio_list.each do |product|
+    sheet.add_row([product[:id], product[:variety], product[:sub_type],
+     product[:name], product[:region], '%.2f' % product[:luc]
+    ])
+  end
 end

@@ -84,27 +84,37 @@ class AdminController < ApplicationController
     # end
 
     def xero_sync
-        start_time = Time.now.utc
-        Revision.xero.update_end_time
-        xero = XeroController.new
-        xero.update_xero_contacts
-        xero.update_xero_invoices
+      begin
+        if params[:commit].to_s.include?'Xero'
+          start_time = Time.now.utc
+          Revision.xero.update_end_time
+          xero = XeroController.new
+          xero.update_xero_contacts
+          xero.update_xero_invoices
 
-        system 'rake xero_invoice_sync:sync'
-        flash[:success] = 'Sync is Done!'
-        Revision.xero.end_update(start_time, Time.now)
-        redirect_to controller: 'admin', action: 'index'
+          system 'rake xero_invoice_sync:sync'
+          flash[:success] = 'Xero Sync Successed!'
+          Revision.xero.end_update(start_time, Time.now)
+        else
+          Revision.bigcommerce.start_update
+    			start_time = Time.now
+          admin = AdminController.new
+          admin.update_customers
+          admin.update_products
+          admin.update_orders
+          xero = XeroController.new
+          xero.update_xero_contacts
+          xero.update_xero_invoices
+          Revision.bigcommerce.end_update(start_time, Time.now)
+
+          flash[:success] = 'Sync Successed!'
+        end
+      rescue Exception => ex
+        ReminderMailer.error_warning(ex.class, ex.message, ex.backtrace).deliver_now
+      end
+
+      redirect_to request.referrer
     end
-
-
-    def xero_sync_temp
-        Revision.xero.update_end_time(Time.now.utc)
-
-        system 'rake xero_invoice_sync:sync'
-        flash[:success] = 'Sync is Done! (Temporary!)'
-        redirect_to controller: 'admin', action: 'index'
-    end
-
 
     def password_update
         current_user = Staff.find(session[:user_id])
@@ -165,7 +175,8 @@ class AdminController < ApplicationController
       when 'Shipment'
         send_data export_shipment(Date.parse(params[:date][:start_date]), Date.parse(params[:date][:end_date])), filename: "ship-#{Date.parse(params[:date][:end_date])}.csv" and return
       when 'ScotPac'
-        send_data export_orders(12, (Date.today - 8.years), Date.today), filename: "ScotPac-#{Date.parse(params[:date][:end_date])}.csv" and return
+        redirect_to action: 'scotpac' and return
+        # send_data export_orders(12, (Date.today - 8.years), Date.today), filename: "ScotPac-#{Date.parse(params[:date][:end_date])}.csv" and return
       end
       redirect_to :back
     end
@@ -176,10 +187,36 @@ class AdminController < ApplicationController
       # Function in lib stock control
       @product_hash = stock_calculation()
 
+      @portfolio_list = portfolio_products()
+
       respond_to do |format|
         format.html
         format.xlsx {
           response.headers['Content-Disposition'] = "attachment; filename=Stock Control #{Date.today.to_s}.xlsx"
+        }
+      end
+    end
+
+    def scotpac_export
+      @orders = Order.where(id: params[:selected_orders])
+      respond_to do |format|
+        format.html
+        format.xlsx {
+          response.headers['Content-Disposition'] = "attachment; filename=Scot Pac #{Date.today.to_s}.xlsx"
+        }
+      end
+    end
+
+    def scotpac
+      @manual_verify = excel_order(12, (Date.today - 8.years), Date.today)
+      @cust_ref = excel_customer((Date.today - 8.years), Date.today)
+      @contacts = excel_receivables()
+      @shipping = excel_shipping((Date.today - 1.month), Date.today)
+
+      respond_to do |format|
+        format.html
+        format.xlsx {
+          response.headers['Content-Disposition'] = "attachment; filename=Scot Pac #{Date.today.to_s}.xlsx"
         }
       end
     end

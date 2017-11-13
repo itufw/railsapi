@@ -1,0 +1,15 @@
+<button name="commit" value="Order" class="btn btn-danger pod-section">PoD</button>
+<div class="pod-uploader" style="display: none">
+  <%= link_to '<button class="btn btn-success">Download!</button>'.html_safe, order.proof_of_delivery.to_s unless order.proof_of_delivery.file.nil?%>
+  <%= form_for order, :url => {:controller => "order", :action => "pod_uploader"} do |f| %>
+    <%= f.hidden_field :id %>
+    <%= f.file_field :proof_of_delivery %>
+    <%= f.submit 'Upload!'%>
+  <% end %>
+</div>
+
+<script type="text/javascript">
+  $('.pod-section').click(function(){
+    $('.pod-uploader').toggle();
+  });
+</script>

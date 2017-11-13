@@ -153,7 +153,7 @@
           <div class="col-md-4"><%= @order.qty %></div>
           <div class="col-md-4">
             <%= label(:dozen, '12 Pack') %>
-            <%= text_field_tag('dozen', (@order.qty.to_f/12).to_i, placeholder: '12 pack', class: 'form-control') %>
+            <%= text_field_tag('dozen', (@order.qty.to_f/12).to_i + ((((@order.qty % 12).to_f/6) + 0.9)/2).to_i, placeholder: '12 pack', class: 'form-control') %>
           </div>
         </div>
         <div class="row">
@@ -161,7 +161,7 @@
           <div class="col-md-4"><%= (@order.qty.to_f/12).round(1) %></div>
           <div class="col-md-4">
             <%= label(:half_dozen, '6 Pack') %>
-            <%= text_field_tag('half-dozen', (((@order.qty % 12).to_f/6) + 0.9).to_i, placeholder: '6 pack', class: 'form-control') %>
+            <%= text_field_tag('half-dozen', (((@order.qty % 12).to_f/6) + 0.9).to_i%2, placeholder: '6 pack', class: 'form-control') %>
           </div>
         </div>
         <div class="row">
@@ -218,7 +218,7 @@
           <%= label(:courier, 'Courier Status: ')%>
           <%= f.collection_select :courier_status_id, CourierStatus.all, :id, :name, {}, {class: "courier-selection", style: 'width: 80px'} %>
         </div>
-        <% if [36, 26, 9].include?session[:user_id]%>
+        <% if [36, 26, 9, 25].include?session[:user_id]%>
         <div class="col-xs-3">
           <%= label(:account, 'Account Status: ')%>
           <%= f.collection_select :account_status, CustomerAccountType.account_status, :name, :name, {}, {class: "account-selection", style: 'width: 80px'} %>

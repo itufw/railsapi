@@ -30,16 +30,18 @@ module ProductVariations
       return price_h
     end
 
-    def get_data_after_transformation(transform_column, product_transformed_ids)
+    def get_data_after_transformation(transform_column, product_transformed_ids, customer_id = nil)
         #products = Product.filter_by_ids(product_ids)
         #price_h = product_price(transform_column, products)
         products = get_products_after_transformation(transform_column, product_transformed_ids)
         price_h = products.product_price('group_by_' + transform_column)
         product_name_h = product_name(transform_column, product_transformed_ids)
         inventory_h =  products.product_inventory('group_by_' + transform_column)
-        pending_stock_h = pending_stock(transform_column, products)
+        monthly_supply_h = products.product_supply('group_by_' + transform_column)
+
+        pending_stock_h = pending_stock(transform_column, products, customer_id)
         #products.pending_stock('group_by_' + transform_column)
-        return price_h, product_name_h, inventory_h, pending_stock_h
+        return price_h, product_name_h, inventory_h, pending_stock_h, monthly_supply_h
     end
 
     # returns a hash like {transform_column_id => product_stock} for the
@@ -74,9 +76,10 @@ module ProductVariations
 
 
 
-    def pending_stock(transform_column, products)
+    def pending_stock(transform_column, products, customer_id = nil)
         #transform_column = transform_column == "product_id" ? "id" : transform_column
-    	pending_stock_h = OrderProduct.product_filter(products.pluck("id")).product_pending_stock('group_by_' + transform_column)
+    	return pending_stock_h = OrderProduct.product_filter(products.pluck("id")).product_pending_stock('group_by_' + transform_column) if customer_id.nil?
+      pending_stock_h = OrderProduct.order_customer_filter(customer_id).product_filter(products.pluck("id")).product_pending_stock('group_by_' + transform_column)
     end
 
     def product_name(transform_column, product_ids)

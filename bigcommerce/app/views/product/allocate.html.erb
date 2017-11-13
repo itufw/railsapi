@@ -52,8 +52,16 @@
 			<td colspan="2"><%= date_select(:revision_date, '', default: 2.months.from_now) %></td>
 		</tr>
 		<tr>
-			<td colspan="2" style="strip: 0px; border: 0px;" align="center"><%= submit_tag "Allocate", class: 'btn btn-primary', disabled: true%></td>
-			<td colspan="2" style="strip: 0px; border: 0px;" align="center"><%= submit_tag "Bulk Allocate", class: 'btn btn-warning'%></td>
+      <% if @selected_product.nil? || @selected_product.blank? %>
+        <td colspan="2" style="strip: 0px; border: 0px;" align="center"><%= submit_tag "Allocate", class: 'btn btn-primary', disabled: true%></td>
+        <td colspan="2" style="strip: 0px; border: 0px;" align="center"><%= submit_tag "Bulk Allocate", class: 'btn btn-warning'%></td>
+      <% else %>
+        <td style="strip: 0px; border: 0px;" align="center"><%= submit_tag "Allocate", class: 'btn btn-primary', disabled: true%></td>
+        <td style="strip: 0px; border: 0px;" align="center"><%= submit_tag "Bulk Allocate", class: 'btn btn-warning'%></td>
+        <%= hidden_field_tag 'selected_product', @selected_product %>
+        <td style="strip: 0px; border: 0px;" align="center"><%= submit_tag "Skip", class: 'btn btn-info'%></td>
+        <td style="strip: 0px; border: 0px;" align="center"><%= submit_tag "Allocate and Next", class: 'btn btn-danger'%></td>
+      <% end %>
 		</tr>
 	</table>
 </div>

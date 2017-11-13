@@ -31,22 +31,36 @@ module ProductHelper
     total_stock / monthly_average
   end
 
-  def product_selection(params)
+  def product_selection(params, default_group = nil)
+    default_group = session[:default_group] if default_group.nil?
+
     selected = params.select{|key, value| value=='1'}.keys()
     unselected = params.select{|key, value| value=='0'}.keys()
 
     # Delete All unselected items
     # staffGroupItems_unselected
-    staffGroupItems_unselected = StaffGroupItem.productNoWs(session[:default_group], unselected)
+    staffGroupItems_unselected = StaffGroupItem.productNoWs(default_group, unselected)
     staffGroupItems_unselected.delete_all unless staffGroupItems_unselected.blank?
 
     # Find the existing Products
-    staffGroupItems = StaffGroupItem.productNoWs(session[:default_group], selected)
+    staffGroupItems = StaffGroupItem.productNoWs(default_group, selected)
     # Insert New Products
     (selected - staffGroupItems.map(&:item_id)).each do |product_id|
-      StaffGroupItem.new(staff_group_id: session[:default_group], item_id: product_id,\
+      StaffGroupItem.new(staff_group_id: default_group, item_id: product_id,\
         item_model: 'ProductNoWs').save
     end
-    flash[:success] = "Updated Group #{StaffGroup.find(session[:default_group]).group_name}"
+    flash[:success] = "Updated Group #{StaffGroup.find(default_group).group_name}"
   end
+
+  def product_name_inventory_after_transform(product_id, transform_column)
+    if transform_column.to_s=='product_no_ws_id'
+      product = ProductNoWs.find(product_id)
+      inventory = product.products.sum(:inventory)
+      return product.name, inventory
+    end
+    product = Product.find(product_id)
+    inventory = product.inventory
+    return product.name, inventory
+  end
+
 end

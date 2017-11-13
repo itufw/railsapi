@@ -6,13 +6,14 @@
           <table id="customer_table">
             <tr>
               <th>Customer</th>
-              <% if @order.customer_id.nil? || @order.customer_id == ""%>
-                <td class="customer_autocomplete">
+              <td class="customer_autocomplete">
+                <% if @order.customer_id.nil? || @order.customer_id == ""%>
                   <%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 30 %>
-                </td>
-              <% else %>
-                <td><input type="text" name="customer" id="<%= @order.customer_id %>" value="<%= Customer.find(@order.customer_id).actual_name%>" readonly="readonly" size="30px"></td>
-              <% end %>
+                <% else %>
+                  <input type="text" name="customer" id="<%= @order.customer_id %>" value="<%= Customer.find(@order.customer_id).actual_name%>" readonly="readonly" size="30px">
+                  <%= '<i class="glyphicon glyphicon-remove remove" title="remove"></i>'.html_safe if @order.xero_invoice_id.nil? && user_full_right%>
+                <% end %>
+              </td>
               <td><input type="checkbox" id="customer_purchase_order" style="display: inline-block;"> Customer Puchase ID</td>
             </tr>
             <tr style="display: none;" class="customer-purchase-order-tr"></tr>
@@ -158,7 +159,8 @@
     <td class="ProductTotal" align="right"><%= f.text_field :total_inc_tax, readonly: true%></td>
   </tr>
 </table>
-<p style="color:red; float: right;">* Monthly Supply</p>
+<p style="color:red; float: right;">* Monthly Supply</p><br/>
+<p style="color:red; float: right;" class="submit-reminder"></p>
 
 <%= f.hidden_field :modified_wet %>
 
@@ -217,31 +219,41 @@
           type: 'GET',
           url: link
       });
-
-      $('.remove').click(function () {
-        $('.customer_autocomplete').html('<%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 15 %>');
-        $('#order_customer_id').val('');
-        $('.last-order-product').remove();
-        $('.last-order-td').remove();
-        $('.allocation-products').html('');
-      });
     }
+    if (/Staff Sample/i.test($('input[name=customer]').val())){
+      $('#order_discount_rate').val(100);
+    };
+  });
+
+  $(document).on('click', '.remove', function(){
+    $('.customer_autocomplete').html('<%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 15 %>');
+    $('#order_customer_id').val('');
+    $('.last-order-product').remove();
+    $('.last-order-td').remove();
+    $('.allocation-products').html('');
   });
 
   // Product Search
   $(document).on('railsAutocomplete.select', '#product_search, #product_ws_search',function(event, data){
     product_count += 1;
+    var color = 'black';
+
+    if (parseInt(data.item.monthly_supply)<3){
+      color = 'red';
+    }else if (parseInt(data.item.monthly_supply)<6){
+      color = 'orange';
+    };
 
     $('.product-table tbody.product-list').append([
       '<tr id="tr_'+ data.item.id +'">',
         '<td><input size="5" readonly="readonly" class="product-id" type="text" value="'+ data.item.id +'" name="order[products['+ product_count +']][product_id]" id="order_products_'+ product_count +'__product_id"></td>',
-        '<td>'+ data.item.label +'</td>',
+        '<td>'+ data.item.label +'|  <i style="color:'+ color +';">'+ data.item.monthly_supply +'</i> </td>',
         '<td class="product-inventory">'+ data.item.inventory +'</td>',
         '<td><input size="5" readonly="readonly" class="product-luc" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_luc]" id="order_products_'+ product_count +'__price_luc"></td>',
         '<td><input size="3" class="product-qty" type="text" value="0" name="order[products['+ product_count +']][qty]" id="order_products_'+ product_count +'__qty"></td>',
         '<td><input size="2" class="product-discount" type="text" value="0" name="order[products['+ product_count +']][discount]" id="order_products_'+ product_count +'__discount"  placeholder="Discount"> %</td>',
         '<td><input size="5" class="product-price" type="text" value="'+ data.item.price +'" name="order[products['+ product_count +']][price_discounted]" id="order_products_'+ product_count +'__price_discounted"></td>',
-        '<td class="product-total">0  <p style="color:red;">'+ data.item.monthly_supply +'</p></td>',
+        '<td class="product-total">0</td>',
         '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
       '</tr>'
       ].join(''));
@@ -348,6 +360,25 @@
         inventory_flag = false;
       }
     });
+    var submit_reminder = "";
+    if (!customer_flag){
+      submit_reminder +=  'Missing Customer!\r\n';
+    }
+    if (!product_flag){
+      submit_reminder += 'No Products!\r\n';
+    }
+    if (!shipping_address_flag){
+      submit_reminder += 'Enter Correct Suburb and postcode!\r\n';
+    }
+    if (!inventory_flag){
+      submit_reminder += 'Not Enough Inventory!\r\n';
+    }
+    if (!table_flag){
+      submit_reminder += 'Check the Table for Blank/Error Column!\r\n';
+    }
+
+    $('.submit-reminder').html(submit_reminder);
+
     if (customer_flag && product_flag && shipping_address_flag && inventory_flag && table_flag){
       $('button.active').show();
       $('button.disabled').hide();

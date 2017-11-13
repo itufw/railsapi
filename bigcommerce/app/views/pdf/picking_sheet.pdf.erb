@@ -8,18 +8,34 @@
 <% product_array = [] %>
 <% products.each do |product| %>
   <% orders = order_products.select{|x| x.product_id == product.id} %>
+  <% product_NW = product.product_no_ws %>
+  <% row = product_NW.row %>
+  <% column = product_NW.column %>
+  <% section = warehouse_section(column, row)%>
   <% product_hash = {product_name: product.name, product_country: product.producer_country.nil? ? '' : product.producer_country.name,
-      product_qty: orders.map{|x| x.qty }.sum, product_dozen: orders.map{ |x| x.qty/12 }.sum, product_remainder: orders.map{ |x| x.qty%12 }.sum}%>
+      product_qty: orders.map{|x| x.qty }.sum, product_dozen: orders.map{ |x| x.qty/12 }.sum, product_remainder: orders.map{ |x| x.qty%12 }.sum,
+      row: row, column: column, section: section.to_s }%>
   <% product_array.append(product_hash) %>
 <% end %>
-<% product_array_above = product_array.select{|x| x[:product_qty].to_i>3}.sort_by { |k| k[:product_country] } %>
-<% product_array_reminder = product_array.select{|x| x[:product_qty].to_i<=3}.sort_by { |k| k[:product_country] }%>
+
+
+
+
+<%
+   product_array_above = product_array.select{|x| x[:product_qty].to_i>3}
+      .sort { |a, b| [a[:section].to_i, a[:column].to_s, a[:row].to_i, a[:product_country]] <=> [b[:section].to_i, b[:column].to_s, b[:row].to_i, b[:product_country]] }
+
+   product_array_reminder = product_array.select{|x| x[:product_qty].to_i<=3}
+      .sort { |a, b| [a[:section].to_i, a[:column].to_s, a[:row].to_i, a[:product_country]] <=> [b[:section].to_i, b[:column].to_s, b[:row].to_i, b[:product_country]] }
+%>
+
 
 <div class="container">
     <table class = "table table-striped table-bordered table-hover table-responsive">
       <tr>
     		<th>Product Name</th>
         <th>Country</th>
+        <th>Position</th>
     		<th>Quantity</th>
     		<th>Dozen</th>
     		<th>Remainder</th>
@@ -29,6 +45,7 @@
         <tr>
           <td><%= product[:product_name] %></td>
           <td><%= product[:product_country] %></td>
+          <td><%= product[:column].to_s + ' ' + product[:row].to_s%></td>
           <td><%= product[:product_qty] %></td>
           <td><%= product[:product_dozen] %></td>
           <td><%= product[:product_remainder] %></td>
@@ -42,6 +59,7 @@
   <tr>
     <th>Product Name</th>
     <th>Country</th>
+    <th>Position</th>
     <th>Quantity</th>
     <th>Dozen</th>
     <th>Remainder</th>
@@ -51,6 +69,7 @@
     <tr>
       <td><%= product[:product_name] %></td>
       <td><%= product[:product_country] %></td>
+      <td><%= product[:column].to_s + ' ' + product[:row].to_s%></td>
       <td><%= product[:product_qty] %></td>
       <td><%= product[:product_dozen] %></td>
       <td><%= product[:product_remainder] %></td>

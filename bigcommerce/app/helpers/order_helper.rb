@@ -65,8 +65,7 @@ module OrderHelper
       product_id = product_params['product_id'].split('-').first
       # if product comes from allocated Order
       if product_params['product_id'].split('-').count>1
-        allocated_product = OrderProduct.joins(:order).where('orders.customer_id': order.customer_id, 'orders.status_id': 1, product_id: product_id, qty: (1..200)).first
-
+        allocated_product = OrderProduct.joins(:order).where('orders.customer_id': order.customer_id, 'orders.status_id': 1, product_id: product_id, qty: (1..500)).first
 
         allocated_product.assign_attributes(qty: allocated_product.qty - product_params[:qty].to_i,\
          stock_previous: allocated_product.qty, stock_current: allocated_product.qty - product_params[:qty].to_i,\
@@ -77,21 +76,17 @@ module OrderHelper
         allocated_order = Order.where(customer_id: order.customer_id, status_id: 1).first
         allocated_order.update(qty: allocated_order.qty - product_params[:qty].to_i)
       end
-
-
       product = OrderProduct.new(product_params.permit(:price_luc, :qty, :discount, :price_discounted))
-      product_attributes = {'product_id': product_id,'order_id': order.id, 'qty_shipped': 0,\
-          'order_discount': order.discount_rate, 'price_handling': handling_fee, 'stock_previous': 0,\
-          'display': 1, 'damaged': 0, 'created_by': session[:user_id], 'updated_by': session[:user_id]}
-      product.assign_attributes(product_attributes)
-
-      product.base_price = product.price_luc / (1 + wet)
-      product.price_inc_tax = product.price_discounted * (1 + gst)
-      product.price_wet = (product.price_discounted / (1 + wet) - handling_fee) * wet
-      product.price_gst = product.price_discounted * gst
-      product.stock_current = product.qty
-      product.stock_incremental = product.qty
-
+      product_attributes = {'product_id': product_id, 'order_id': order.id, 'qty_shipped': 0,\
+        'base_price': product.price_luc / (1 + wet), 'stock_previous': 0, 'stock_current': product.qty,\
+        'stock_incremental': product.qty, 'display': 1, 'damaged': 0, 'created_by': session[:user_id],\
+        'order_discount': order.discount_rate, 'price_handling': handling_fee,\
+        'price_inc_tax': product.price_discounted * (1 + gst),\
+        'price_wet': (product.price_discounted / (1 + wet) - handling_fee) * wet,\
+        'price_gst': product.price_discounted * gst, 'updated_by': session[:user_id],\
+        'updated_at': Time.now.to_s(:db)}
+      product.update_attributes(product_attributes)
+      
       product.save
     end
 

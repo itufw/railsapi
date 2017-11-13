@@ -1,5 +1,5 @@
 <%= form_tag({:controller => 'product', :action => 'warehouse_review'}, {:method => "get"}) do %>
-<table class="reference-table" style="text-align: center; min-width: 10px;">
+<table class="reference-table table table-striped table-bordered table-hover table-responsive" style="text-align: center; min-width: 10px;">
   <thead>
     <tr>
       <th colspan="2"></th>
@@ -51,22 +51,53 @@
       <td><%= warehouse_count.on_order %></td>
       <td><%= warehouse_count.allocation %></td>
       <td><%= warehouse_count.current_stock %></td>
-      <td><%= warehouse.text_field :count_size, size: 5%></td>
-      <td><%= warehouse.text_field :count_pack, size: 5%></td>
-      <td><%= warehouse.text_field :count_loose, size: 5%></td>
-      <td><%= warehouse.text_field :count_sample, size: 5%></td>
-      <td><%= warehouse.text_field :count_total, size: 5, readonly: true%></td>
-      <td><%= warehouse_count.difference%></td>
-      <td><%= warehouse.text_field :count_dm, size: 5 if warehouse_count.current_dm>0%></td>
-      <td><%= warehouse.text_field :count_vc, size: 5 if warehouse_count.current_vc>0%></td>
-      <td><%= warehouse.text_field :count_retail, size: 5 if warehouse_count.current_retail>0%></td>
-      <td><%= warehouse.text_field :count_ws, size: 5 if warehouse_count.current_ws>0%></td>
+      <td><%= warehouse_count.count_size %></td>
+      <td><%= warehouse_count.count_pack %></td>
+      <td><%= warehouse_count.count_loose %></td>
+      <td><%= warehouse_count.count_sample %></td>
+      <td><%= warehouse_count.count_total %></td>
+      <td style="color:red;"><%= warehouse_count.difference%></td>
+      <td><%= warehouse.text_field :count_dm, size: 5, class: "stock-modification" if warehouse_count.current_dm>0%></td>
+      <td><%= warehouse.text_field :count_vc, size: 5, class: 'stock-modification' if warehouse_count.current_vc>0%></td>
+      <td><%= warehouse.text_field :count_retail, size: 5, class: 'stock-modification' if warehouse_count.current_retail>0%></td>
+      <td><%= warehouse.text_field :count_ws, size: 5, defualt: 0, class: 'stock-modification' %></td>
       <td><%= warehouse_count.count_date.strftime('%d/%m %H:%M')%></td>
       <td><%= warehouse_count.creator.nickname %></td>
       <td></td>
+    </tr>
+    <tr>
+      <% products = Product.where(product_no_ws_id: warehouse_count.product_no_ws_id) %>
+      <td colspan="5"></td>
+      <td style="color: orange;">Now:</td>
+      <td style='color: red;'><%= OrderProduct.on_order(products.map(&:id)).map(&:qty).sum%></td>
+      <td style='color: red;'><%= OrderProduct.allocation_products(products.map(&:id)).map(&:qty).sum%></td>
+      <td style='color: red;'><%= products.sum(:inventory)%></td>
+      <td colspan="5"></td>
+      <td style="color: orange;" class="different-now"></td>
+      <td colspan="2">Recommend:</td>
+      <td class="rec-retail"><%= (warehouse_count.count_total*0.1).to_i %></td>
+      <td class="rec-ws"><%= warehouse_count.count_total - (warehouse_count.count_total*0.1).to_i %></td>
+      <!-- <td><a class="btn btn-primary optimise">Optimise</a></td> -->
     </tr>
     <% end %>
   <% end %>
 </table>
   <center>  <%= submit_tag "Confirm!",class: 'btn btn-primary'%></center>
 <% end %>
+
+<script type="text/javascript">
+  $(document).on('input', '.stock-modification', function(){
+    var different = 0;
+    var stock_change = $(this).parent().parent().find('.stock-modification');
+    for(var i = 0; i < stock_change.length; i++){
+      different += parseInt(stock_change.val());
+    }
+
+    $(this).parent().parent().next("tr").find('.different-now').html(different);
+  });
+
+  $(document).on('click', '.optimise', function(){
+    var retail = parseInt($(this).parent().find('.rec-retail').html());
+    var ws = parseInt($(this).parent().find('.rec-retail').html());
+  });
+</script>

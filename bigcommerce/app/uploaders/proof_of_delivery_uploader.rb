@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-class CreditAppUploader < CarrierWave::Uploader::Base
+class ProofOfDeliveryUploader < CarrierWave::Uploader::Base
 
   # Include RMagick or MiniMagick support:
   # include CarrierWave::RMagick
@@ -13,7 +13,7 @@ class CreditAppUploader < CarrierWave::Uploader::Base
   # Override the directory where uploaded files will be stored.
   # This is a sensible default for uploaders that are meant to be mounted:
   def store_dir
-    "/CreditApplication/#{model.trading_name}"
+    "/POD/#{model.id}"
   end
 
   # Provide a default URL as a default if there hasn't been a file uploaded:
@@ -45,7 +45,7 @@ class CreditAppUploader < CarrierWave::Uploader::Base
   # Override the filename of the uploaded files:
   # Avoid using model.id or version_name here, see uploader/store.rb for details.
   def filename
-    "#{model.trading_name}-Credit Application-#{Date.today.to_s}.#{file.extension}" if original_filename
+    "#{model.id}-POD.#{file.extension}" if original_filename
   end
 
 end

@@ -187,8 +187,13 @@ module ApplicationHelper
     end
   end
 
-  def user_full_right(_authority)
+  def user_full_right(_authority=nil)
     return true if %w[Admin Management Accounts].include? session[:authority]
+    false
+  end
+
+  def user_accountant(authority=nil)
+    return true if (%w[Accounts].include? session[:authority]) || 36==session[:user_id]
     false
   end
 
@@ -209,5 +214,29 @@ module ApplicationHelper
   def current_user_sales?(_authority)
     return true if %w['Sales Executive'].include? session[:authority]
     false
+  end
+
+  def warehouse_section(column, row)
+    return nil if (column.to_s=='') || (row.to_i==0)
+    row = row.to_i
+
+    case column
+    when 'A', 'B', 'C'
+      return 1 if (1..5).include?row
+      return 2 if (6..10).include?row
+      return 3
+    when 'D', 'E', 'F'
+      return 4 if (1..5).include?row
+      return 5 if (6..10).include?row
+      return 6
+    when 'G', 'H', 'I'
+      return 7 if (1..5).include?row
+      return 8 if (6..10).include?row
+      return 9
+    else
+      return 10 if (1..5).include?row
+      return 11 if (6..10).include?row
+      return 12
+    end
   end
 end
