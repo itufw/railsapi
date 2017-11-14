@@ -3,7 +3,7 @@ wb = xlsx_package.workbook
 
 # BigC_ManualVerif_Orders
 wb.add_worksheet(name: "BigC_ManualVerif_Orders") do |sheet|
-  sheet.add_row(['Total:', @orders.sum(:total_inc_tax).round(2), 'Invoices:', @orders.count])
+  sheet.add_row(['Total:', @orders.sum(:total_inc_tax).round(3), 'Invoices:', @orders.count])
   sheet.add_row(['invoice', 'CustID', 'Date', 'Value', nil, 'Customer Name',
    'Tracking', 'Courier', nil, 'CustType', 'Owner'])
 
