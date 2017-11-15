@@ -65,7 +65,7 @@ wb.add_worksheet(name: "Stock Control", page_setup: setup) do |sheet|
 
   sheet.add_row([nil, 'Discount'], style: country_cell)
   Promotion.all.each do |promotion|
-    sheet.add_row([nil, promotion.name, promotion.description, nil, promotion.rate.to_s+"%"])
+    sheet.add_row([nil, promotion.description, promotion.name, nil, promotion.rate.to_s+"%"])
   end
 
   sheet.column_info[3].hidden = true
