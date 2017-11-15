@@ -66,6 +66,7 @@
                   <li><%= link_to "Review", controller: "product", action: "review" %></li>
                 <% end %>
                 <li><%= link_to 'Location Update', controller: 'product', action: 'location'%></li>
+                <li><%= link_to "Stock Control", {controller: "admin", action: "export_stock_control", format: 'xlsx'} %></li>
               </ul>
             </li>
 
