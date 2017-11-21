@@ -42,12 +42,23 @@
 
     <% if @status_name=='Courier'%>
       <!-- Label Stock in Status helper -->
+      <!--
       <% label_stock = fastway_stock_level() %>
       <% unless label_stock.nil?%>
         <p>
           Label Stock:
           <% label_stock.each do |label|%>
-            <i><%= label['Colour'].to_s + ':' %> <i style="color:red;"><%= label['AvailableStock'].to_s + ' | ' %></i> </i>
+            <i><%= label['Colour'] + ':' %> <i style="color:red;"><%= label['AvailableStock'].to_s + ' | ' %></i> </i>
+          <% end %>
+        </p>
+      <% end %>
+    -->
+      <% unless @stock_status.nil?%>
+        <p>
+          Label Stock:
+          <% @stock_status.each do |label|%>
+            <i><%= label['Colour'] + ':' %> 
+              <i style="<%= label['AvailableStock']<=label['Required']? 'color:red' : 'color:blue;'%>"><%= label['AvailableStock'].to_s + ' (' + label['Required'].to_s + ')' + ' | ' %></i> </i>
           <% end %>
         </p>
       <% end %>
