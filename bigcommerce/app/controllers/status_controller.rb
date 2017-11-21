@@ -58,7 +58,6 @@ class StatusController < ApplicationController
     @orders = [] if @orders.nil?
   end
 
-
   # vchar - get stock labels status to see if the number of labels is sufficient for all the
   # current all orders pending for delivery
   def stock_label_status orders
