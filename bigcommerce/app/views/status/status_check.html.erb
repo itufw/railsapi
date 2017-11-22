@@ -59,7 +59,12 @@
           <% @stock_status.each do |label|%>
             <i><%= label['Colour'] + ':' %> 
               <i style="<%= label['AvailableStock']<=label['Required']? 'color:red' : 'color:blue;'%>"><%= label['AvailableStock'].to_s + ' (' + label['Required'].to_s + ')' + ' | ' %></i> </i>
-          <% end %>
+          <% end %><br/><br/>
+          <strong>Status:</strong>
+            <ul>
+              <li>- <strong>x(y)</strong> where  <strong>x</strong> is the available stock level of each label colour and  <strong>y</strong> is the number required for current orders. </li>
+              <li>- If it is shown in <i style="color:blue;">blue colour</i>, the stock is sufficient or <i style="color:red;">red</i> if it is otherwise.</li>
+            </ul>
         </p>
       <% end %>
     <% end %>

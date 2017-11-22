@@ -129,8 +129,14 @@ class StatusController < ApplicationController
   end
 
   # TO BE IMPLEMENTED
-  # vchar - initialise any labels which are not appearing in the stock lists
+  # vchar - initialise a label colour to 0 when it is not appearing in the stock lists
   def set_empty_label_to_zero 
+    @stock_status.append({"Colour"=>"RED6", "AvailableStock"=>0}) if not @stock_status.any? {|label| label['Colour'] == 'RED6'}
+    @stock_status.append({"Colour"=>"Red_Multi2", "AvailableStock"=>0}) if not @stock_status.any? {|label| label['Colour'] == 'Red_Multi2'}
+    @stock_status.append({"Colour"=>"RED", "AvailableStock"=>0}) if not @stock_status.any? {|label| label['Colour'] == 'RED'}
+    @stock_status.append({"Colour"=>"BROWN", "AvailableStock"=>0}) if not @stock_status.any? {|label| label['Colour'] == 'BROWN'}
+    @stock_status.append({"Colour"=>"BROWN_MULTI2", "AvailableStock"=>0}) if not @stock_status.any? {|label| label['Colour'] == 'BROWN_MULTI2'}
+    @stock_status.append({"Colour"=>"LRG-FLAT-RATE-PARCEL", "AvailableStock"=>0}) if not @stock_status.any? {|label| label['Colour'] == 'LRG-FLAT-RATE-PARCEL'}
   end
 
   def status_update
