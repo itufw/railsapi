@@ -56,9 +56,9 @@
       <% unless @stock_status.nil?%>
         <p>
           Label Stock:
-          <% @stock_status.each do |label|%>
+          <% @stock_status.each_with_index do |label, i|%>
             <i><%= label['Colour'] + ':' %> 
-              <i style="<%= label['AvailableStock']<=label['Required']? 'color:red' : 'color:blue;'%>"><%= label['AvailableStock'].to_s + ' (' + label['Required'].to_s + ')' + ' | ' %></i> </i>
+              <i style="<%= label['AvailableStock']<=label['Required']? 'color:red' : 'color:blue;'%>"><%= label['AvailableStock'].to_s + ' (' + label['Required'].to_s + ')'%><%= ' | ' unless i == @stock_status.size - 1 %></i> </i>
           <% end %><br/><br/>
           <strong>Status:</strong>
             <ul>

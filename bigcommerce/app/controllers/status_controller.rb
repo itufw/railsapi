@@ -128,7 +128,6 @@ class StatusController < ApplicationController
     labels  # return the number of labels of each color
   end
 
-  # TO BE IMPLEMENTED
   # vchar - initialise a label colour to 0 when it is not appearing in the stock lists
   def set_empty_label_to_zero 
     @stock_status.append({"Colour"=>"RED6", "AvailableStock"=>0}) if not @stock_status.any? {|label| label['Colour'] == 'RED6'}
