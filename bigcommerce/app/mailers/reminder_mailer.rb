@@ -14,7 +14,7 @@ class ReminderMailer < ActionMailer::Base
     @error_class = error_class
     @error_message = error_message
     @backtrace = backtrace.join("\n")
-    mail(from: 'Untapped IT <it@untappedwines.com>', to: 'William Liu <it@untappedwines.com>', cc: 'Lucia <lgaldona@untappedwines.com>', subject: "Sync Error")
+    mail(from: 'Untapped IT <it@untappedwines.com>', to: 'Veasna Char <it@untappedwines.com>', cc: 'Lucia <lgaldona@untappedwines.com>', subject: "Sync Error")
   end
 
   def stock_control_reminder
