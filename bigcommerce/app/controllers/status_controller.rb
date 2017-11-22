@@ -129,23 +129,8 @@ class StatusController < ApplicationController
   end
 
   # TO BE IMPLEMENTED
-  # vchar - initialise null label colour which is out of stock
+  # vchar - initialise any labels which are not appearing in the stock lists
   def set_empty_label_to_zero 
-    #   if not @stock_status.any? {|label| label['Colour'] == 'RED6'}
-    #     when 
-    #       label['AvailableStock'] = 0 if label['AvailableStock'].nil?
-    #     when 'Red_Multi2'
-    #       label['AvailableStock'] = 0 if label['AvailableStock'].nil?
-    #     when 'RED'
-    #       label['AvailableStock'] = 0 if label['AvailableStock'].nil?
-    #     when 'BROWN'
-    #       label['AvailableStock'] = 0 if label['AvailableStock'].nil?
-    #     when 'BROWN_MULTI2'
-    #       label['AvailableStock'] = 0 if label['AvailableStock'].nil?
-    #     when 'LRG-FLAT-RATE-PARCEL'
-    #       label['AvailableStock'] = 0 if label['AvailableStock'].nil?
-    #   end
-    # end
   end
 
   def status_update
