@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "erudite-cyclist-162204",
+  "private_key_id": "af28275bc26a0a072dacea1c412a2014db1cb18f",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCEGsRE3W0TGUjA\n4Hq1rAZxVB5HzMmDdjh26QIip+dpKviBq92ERjTSifXziQGmuzdAMLbQO0tXt1ff\nvIJavIjyi7w7duk4eLNcXYdh034BG+40vEpq/+X1HADRpkkppfqX07ZQ69Rutywu\n2X7PEb7evCOjUKSImItW64hhfCOrAbzjXGz2j8oh8gLqwqq0XDhk2Jd0+Pw2uAyD\nC7CCNZBncQTDjjpvdPnGHJlZZTFx4SQOybuXPO2y+uTMo2eaXp/UR4qTIhFOxykG\nXlKClA2dKNAokNTY7jIXqSHUVOFOaAWkyAt/1dUp6Q17IwapIr+XnJM3URDNEqjj\nso50eIkDAgMBAAECggEACbPwy1R7X0LxwqW6Q/9V0DUeR3L7/Uy0BDSqreKPO+MM\n5aYhJ+Bp0mnEeuK+EE6bIq4+GNIbspGkDqoV5ckID5vCQGV3gJvwI843oP1ohkRU\ng3ytxDYpE1u/MHOtcM9HT9q1y81gIp52ZeqFRq6slxRShpUbWj0Tq73lz0mchQ7W\nNC4Ncz08SLVxjuuinlcSQVYiKjlABbxomppR+28AVi1ZGUPx78YMy+UmJmBjKIJ6\nv3aBwQheGX0mAtEYQNgfrcVTu7Rkbv3m2rClQEYwZp9Pl5PhLgXpgWAGDcPpm1VU\nfBSvVwDNcUZrPGk95w9bW8cJk4s0fRz0ZBNXLRCGYQKBgQC5A57SFRX7vzQPKFXR\nxR5eehSawGRqBkk9OTkYfHqrEkWe7hS/9hyNl+iL9yw7HuOGROQUxmQh2z05cenH\nfXDxcOFrDpkQvu9Biq/8/oD1hmzInAga1GvO1/c8TgQhyxC1WcZhr02+C9jdpBc4\nXErTtKS2r8xnwXAe1aeHQCYIdQKBgQC2ykik5T9JwEtMJqSWCDYeZQW/VbvOh+1j\nOzORYIODVC+7xASE3sar+zb23AZV9nNsar1hfXilSEXX8c+2usEmcBEUGmA8VFMl\nslY5YvX/y1usIkgvugROWqFgY0fN5CXB0OwJxc1qsfX+a83yyeeT0dKE3+4Wf+v6\nnqELAxHclwKBgDgRjc8Szs+1OTyit6dTuoldK+NeDNBIyWdBcTkneDFh3zFz61vl\nZO/QKoxIQuJD0SX+uLRHD09nVp2TFQr8y/6Pe/Dqwp5djrppIj5kjoZZz5vYFWi0\nGVvc/TMMXZo0JQMgistNyhyfEIDS2qqc5ZxU8Vnf2u1SpPzjONr3KM+FAoGALqi6\nHGVsX04XqmuezbFw5xdQfUPMOe8WmKLvCegCCg7+VEa4BJa9Tf9FS4RklaLgWcdx\naiZWGpK1SWcvZ2yKi15F7cTB1gSMaO359pIdS1tEnk7t8EjieoHF+c298X+QZ8YF\nyoTUZ6zfpz8rhhMl6uS/gS2MH/Atc370itQQxicCgYBm2DBEitsfuhQ1WVZqSYZa\nzN/sZX7IvubAPC9mijWFmrmVbTCFy+mhIkRIkjTlTfPPSlZ9ZTKxPhVSgzqiO2Dv\nmbIGSmTdbOgOue7E9tNhO5DzOKhzUrZibfbNfyABj6+oxDVyjQXinHY9mrvGlbnz\nr4xrquR2/ilOEuoEYq2Z3Q==\n-----END PRIVATE KEY-----\n",
+  "client_email": "calendar@erudite-cyclist-162204.iam.gserviceaccount.com",
+  "client_id": "100454995510668915165",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/calendar%40erudite-cyclist-162204.iam.gserviceaccount.com"
+}

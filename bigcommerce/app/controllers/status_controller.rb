@@ -20,6 +20,9 @@ class StatusController < ApplicationController
   include ApplicationHelper
   include OrderHelper
 
+  PACK_06 = 6
+  PACK_12 = 12
+
   def pending
     @status_id, @status_name = get_id_and_name(params)
     staff_id, @staff = staff_filter(params)
@@ -42,6 +45,7 @@ class StatusController < ApplicationController
     elsif @status_name == 'Courier'
       status_ids = Status.where("alt_name LIKE '%#{@status_name}%'").map(&:id)
       @orders = Order.statuses_filter(status_ids).courier_not_confirmed.send(order_function, direction).paginate(per_page: @per_page, page: params[:page])
+      stock_label_status @orders
     elsif @status_name == 'ScotPac'
       @orders = Order.joins(:customer, :xero_invoice)
         .where('customers.cust_type_id = 2 AND status_id = 12 AND scot_pac_load IS NULL AND xero_invoices.amount_due > 0 AND (account_type NOT LIKE "COD" OR account_type IS NULL)')
@@ -52,6 +56,86 @@ class StatusController < ApplicationController
     end
 
     @orders = [] if @orders.nil?
+  end
+
+  # vchar - get stock labels status to see if the number of labels is sufficient for all the
+  # current all orders pending for delivery
+  def stock_label_status orders
+    required_labels = labels_of_orders orders
+
+    @stock_status = fastway_stock_level()
+    
+    set_empty_label_to_zero()
+
+    @stock_status.each do |label|
+      case label['Colour']
+        when 'RED6'
+          label['Required'] = required_labels[:reds]
+        when 'Red_Multi2'
+          label['Required'] = required_labels[:redm]
+        when 'RED'
+          label['Required'] = required_labels[:redt]
+        when 'BROWN'
+          label['Required'] = required_labels[:brwt]
+        when 'BROWN_MULTI2'
+          label['Required'] = required_labels[:brwm]
+        when 'LRG-FLAT-RATE-PARCEL'
+          label['Required'] = required_labels[:prcl]
+        else
+          label['Required'] = 0
+      end
+    end
+    @stock_status
+  end
+
+  # vchar - get total number of each label for all orders
+  def labels_of_orders orders
+    labels = {}
+
+    # initialise a label colour 
+    labels[:reds] = 0     # red 6
+    labels[:redt] = 0     # red 12
+    labels[:redm] = 0     # red multi
+    labels[:brwt] = 0     # brown 12
+    labels[:brwm] = 0     # brown multi
+    # labels[:gryt] = 0     # grey 12
+    # labels[:grym] = 0     # grey multi
+    labels[:prcl] = 0     # parcel
+
+    orders.each do |order|
+      colour = Fastway.new.label_colour order
+
+      # get order quantity
+      qty = order.qty
+
+      # get labels
+      case colour
+        when :red
+          if qty > PACK_06
+            labels[:redm] += ((qty - PACK_12) / PACK_12.to_f).ceil if qty > PACK_12
+            labels[:redt] += 1  
+          else
+            labels[:reds] += 1
+          end
+        when :brown
+          labels[:brwm] = ((qty - PACK_12) / PACK_12.to_f).ceil if qty > 12
+          labels[:brwt] += 1
+        else
+          labels[:prcl] += (qty / PACK_12.to_f).ceil
+      end
+    end
+
+    labels  # return the number of labels of each color
+  end
+
+  # vchar - initialise a label colour to 0 when it is not appearing in the stock lists
+  def set_empty_label_to_zero 
+    @stock_status.append({"Colour"=>"RED6", "AvailableStock"=>0}) if not @stock_status.any? {|label| label['Colour'] == 'RED6'}
+    @stock_status.append({"Colour"=>"Red_Multi2", "AvailableStock"=>0}) if not @stock_status.any? {|label| label['Colour'] == 'Red_Multi2'}
+    @stock_status.append({"Colour"=>"RED", "AvailableStock"=>0}) if not @stock_status.any? {|label| label['Colour'] == 'RED'}
+    @stock_status.append({"Colour"=>"BROWN", "AvailableStock"=>0}) if not @stock_status.any? {|label| label['Colour'] == 'BROWN'}
+    @stock_status.append({"Colour"=>"BROWN_MULTI2", "AvailableStock"=>0}) if not @stock_status.any? {|label| label['Colour'] == 'BROWN_MULTI2'}
+    @stock_status.append({"Colour"=>"LRG-FLAT-RATE-PARCEL", "AvailableStock"=>0}) if not @stock_status.any? {|label| label['Colour'] == 'LRG-FLAT-RATE-PARCEL'}
   end
 
   def status_update

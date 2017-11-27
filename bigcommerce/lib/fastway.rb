@@ -168,6 +168,17 @@ class Fastway
     1
   end
 
+  # vchar - get label color of an order
+  def label_colour order
+    data = eta(order.city, order.postcode, 5)
+    parcel_color = data['result']['services'].select{|x| x.values().include? 'Parcel'}.first['labelcolour_pretty_array'] 
+    
+    return :red if (parcel_color.map(&:upcase).include? 'RED')
+    return :brown if (parcel_color.map(&:upcase).include? 'BROWN')
+    # return :grey if parcel_color.map(&:upcase).include? 'GREY'
+    return :parcel
+  end
+
   def psc(suburb, postcode, weight)
     # RFCode - The RFCode of the pickup franchise (eg SYD, NPE, AUK). See the List Regional Franchises method for a more comprehensive list.
     # Suburb - The destination suburb (eg Homebush, Newcastle, Bunbury)
