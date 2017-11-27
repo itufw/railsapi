@@ -85,7 +85,7 @@ Rails.application.configure do
     port:                 587,
     domain:               'untappedwines.com',
     user_name:            'untappedfinewinesacc@gmail.com',
-    password:             'ufwimporter2011',
+    password:             'ufwimporter2017!',
     authentication:       'plain',
     enable_starttls_auto: true  }
 end
