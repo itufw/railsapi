@@ -81,6 +81,8 @@ class StatusController < ApplicationController
           label['Required'] = required_labels[:brwm]
         when 'LRG-FLAT-RATE-PARCEL'
           label['Required'] = required_labels[:prcl]
+        when 'INVALID'
+          label['Required'] = required_labels[:invl]
         else
           label['Required'] = 0
       end
@@ -101,6 +103,7 @@ class StatusController < ApplicationController
     # labels[:gryt] = 0     # grey 12
     # labels[:grym] = 0     # grey multi
     labels[:prcl] = 0     # parcel
+    labels[:invl] = 0     # invalid label colour of the invalid address (no match city and postcode)
 
     orders.each do |order|
       colour = Fastway.new.label_colour order
@@ -120,6 +123,8 @@ class StatusController < ApplicationController
         when :brown
           labels[:brwm] = ((qty - PACK_12) / PACK_12.to_f).ceil if qty > 12
           labels[:brwt] += 1
+        when :invalid
+          labels[:invl] += (qty / PACK_12.to_f).ceil
         else
           labels[:prcl] += (qty / PACK_12.to_f).ceil
       end
@@ -136,6 +141,7 @@ class StatusController < ApplicationController
     @stock_status.append({"Colour"=>"BROWN", "AvailableStock"=>0}) if not @stock_status.any? {|label| label['Colour'] == 'BROWN'}
     @stock_status.append({"Colour"=>"BROWN_MULTI2", "AvailableStock"=>0}) if not @stock_status.any? {|label| label['Colour'] == 'BROWN_MULTI2'}
     @stock_status.append({"Colour"=>"LRG-FLAT-RATE-PARCEL", "AvailableStock"=>0}) if not @stock_status.any? {|label| label['Colour'] == 'LRG-FLAT-RATE-PARCEL'}
+    @stock_status.append({"Colour"=>"INVALID", "AvailableStock"=>0})
   end
 
   def status_update

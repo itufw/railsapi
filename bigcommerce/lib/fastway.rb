@@ -170,7 +170,10 @@ class Fastway
 
   # vchar - get label color of an order
   def label_colour order
-    data = eta(order.city, order.postcode, 5)
+    data = eta(order.city.strip, order.postcode, 5)
+
+    # return invalid colour if no match of city and postcode
+    return :invalid if data['result'].nil?
     parcel_color = data['result']['services'].select{|x| x.values().include? 'Parcel'}.first['labelcolour_pretty_array'] 
     
     return :red if (parcel_color.map(&:upcase).include? 'RED')
