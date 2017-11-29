@@ -26,6 +26,8 @@ module ActivityHelper
              'Accounting'
            when 'Sales Executive'
              'Sales'
+           when 'Management'
+             'Sales'
            else
              'Operations'
            end
