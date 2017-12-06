@@ -16,7 +16,7 @@
 	<tr>
 		<th>Start Date - End Date</th>
 		<% @dates_paired.each do |week_num, date_pair| %>
-			<th> <%= date_format_orders(date_pair[0]) %> - <%= date_format_orders(date_pair[1].prev_day) %></th>
+			<th><%= date_format_orders(date_pair[0]) %> - <%= date_format_orders(date_pair[1]) %></th>
 		<% end %>
 		<th><%= @avg_sum ? "Average" : "Total"%></th>
 	</tr>

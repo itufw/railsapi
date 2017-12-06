@@ -111,7 +111,7 @@ module DatesHelper
       # That periods start ( Monday - end_date or 1st - end_date) will be one period
       # num_periods - 1 will be other complete periods
       # like Monday - Sunday or 1st - 30th/31st
-      all_dates.push(end_date.next_day)
+      all_dates.push(end_date.end_of_day)
       all_dates.push(end_date.send(beginning_function))
       return (all_dates + get_last_periods_date(num_periods - 1, end_date.send(beginning_function), last_function)).sort
     end
