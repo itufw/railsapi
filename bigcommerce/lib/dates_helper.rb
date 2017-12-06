@@ -98,6 +98,7 @@ module DatesHelper
   def periods_from_end_date(num_periods, end_date, period_type)
     all_dates = []
     beginning_function, last_function = period_date_functions(period_type)
+    puts "logging ..."
     if end_date.send(beginning_function) == end_date
       # It is the start of the week (Monday) or start of the month
       # This end date won't be included in the calculations or in the final table
@@ -111,7 +112,7 @@ module DatesHelper
       # That periods start ( Monday - end_date or 1st - end_date) will be one period
       # num_periods - 1 will be other complete periods
       # like Monday - Sunday or 1st - 30th/31st
-      all_dates.push(end_date.end_of_day)
+      all_dates.push(end_date)
       all_dates.push(end_date.send(beginning_function))
       return (all_dates + get_last_periods_date(num_periods - 1, end_date.send(beginning_function), last_function)).sort
     end
@@ -145,9 +146,11 @@ module DatesHelper
     return paired_dates_a
   end
 
-  # Convert date to week number
+  # Convert date to week number, 
+  # %U - the week starts with Sunday
+  # %W - the week starts with Monday
   def convert_to_week_num(date)
-    return date.strftime('%U').to_i
+    return date.strftime('%W').to_i
   end
 
   def convert_to_month_num(date)
@@ -177,17 +180,17 @@ module DatesHelper
     return selected_period, period_types
   end
 
-  def num_days_for_periods(period_type)
-    if period_type == "weekly"
-      return 7
-    elsif period_type == "monthly"
-      return 30
-    elsif period_type == "quarterly"
-      return 65
-    else
-      return 1
-    end
-  end
+  # def num_days_for_periods(period_type)
+  #   if period_type == "weekly"
+  #     return 7
+  #   elsif period_type == "monthly"
+  #     return 30
+  #   elsif period_type == "quarterly"
+  #     return 65
+  #   else
+  #     return 1
+  #   end
+  # end
 
   def flatten_date_array(hash)
     %w(1 2 3).map { |e| hash["date(#{e}i)"].to_i }

@@ -4,11 +4,11 @@ module SalesControllerHelper
   # non-zero orders totals
   def sum_orders(start_date, end_date, group_by_date_function, sum_function, staff_id)
     if (:new_customer).eql? sum_function
-      return Customer.create_date_filter(start_date, end_date.end_of_day).send(group_by_date_function).filter_by_staff(staff_id).count_id
+      return Customer.create_date_filter(start_date, end_date).send(group_by_date_function).filter_by_staff(staff_id).count_id
     elsif (:contact_note).eql? sum_function
-      return Task.valid_task.start_date_filter(start_date, end_date.end_of_day).send(group_by_date_function).filter_by_responses(staff_id).count_id
+      return Task.valid_task.start_date_filter(start_date, end_date).send(group_by_date_function).filter_by_responses(staff_id).count_id
     elsif (:avg_bottle_price).eql? sum_function
-      orders = Order.date_filter(start_date, end_date.end_of_day).valid_order.staff_filter(staff_id).send(group_by_date_function)
+      orders = Order.date_filter(start_date, end_date).valid_order.staff_filter(staff_id).send(group_by_date_function)
       bottles = orders.send("sum_qty")
       price = orders.send("sum_total")
       gst = TaxPercentage.gst_percentage * 0.01
@@ -18,7 +18,7 @@ module SalesControllerHelper
       end
       return avg_bottle_price
     else
-      return Order.date_filter(start_date, end_date.end_of_day).valid_order.customer_staff_filter(staff_id).send(group_by_date_function).send(sum_function)
+      return Order.date_filter(start_date, end_date).valid_order.customer_staff_filter(staff_id).send(group_by_date_function).send(sum_function)
     end
   end
 
