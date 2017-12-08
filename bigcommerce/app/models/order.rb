@@ -119,8 +119,16 @@ class Order < ActiveRecord::Base
     all
   end
 
+  # DEPRECATED due to coincident correctness
+  # filter orders by customer_staff relationship
   def self.customer_staff_filter(staff_id)
     return includes(:customer).where('customers.staff_id = ?', staff_id).references(:customers) unless staff_id.nil?
+    all
+  end
+
+  # filter orders by order_staff relationship
+  def self.order_staff_filter(staff_id)
+    return where('staff_id = ?', staff_id).references(:customers) unless staff_id.nil?
     all
   end
 
