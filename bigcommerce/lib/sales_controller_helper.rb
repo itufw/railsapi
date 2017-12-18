@@ -19,10 +19,10 @@ module SalesControllerHelper
       return avg_bottle_price
     else
       # filter orders of a certain period filter orders by customer_staff relationship
-      # return Order.date_filter(start_date, end_date).valid_order.customer_staff_filter(staff_id).send(group_by_date_function).send(sum_function)
+      return Order.date_filter(start_date, end_date).valid_order.customer_staff_filter(staff_id).send(group_by_date_function).send(sum_function)
 
       # filter orders of a certain period filter orders by order_staff relationship
-      return Order.date_filter(start_date, end_date).valid_order.order_staff_filter(staff_id).send(group_by_date_function).send(sum_function)
+      # return Order.date_filter(start_date, end_date).valid_order.order_staff_filter(staff_id).send(group_by_date_function).send(sum_function)
     end
   end
 
