@@ -95,15 +95,13 @@ module StockControl
 
   def stock_calculation
     product_hash = {}
-    products_no_ws = ProductNoWs.joins(:products)
-     .select('product_no_ws.*, products.case_size as case_size, products.calculated_price AS price,
+    products_no_ws = ProductNoWs.joins(:products).select('product_no_ws.*, products.case_size as case_size, products.calculated_price AS price,
        products.retail_ws AS retail_ws, products.name as product_name, products.inventory as inventory,
        products.id as product_id, products.name_no_winery as name_no_winery,
        products.sale_term_1, products.monthly_supply, products.current,
        order_1, order_2')
 
-    allocated_products = OrderProduct.joins(:order).select('product_id, SUM(order_products.qty) as qty')
-      .where('orders.status_id': 1).group('product_id')
+    allocated_products = OrderProduct.joins(:order).select('product_id, SUM(order_products.qty) as qty').where('orders.status_id': 1).group('product_id')
 
     products_no_ws.each do |p|
       # Separate Perth Stock
@@ -151,7 +149,14 @@ module StockControl
       end
     end
 
-    product_hash.select{|key, value| value[:inventory]>0 }
+    # DEPRECATED due to coincident correctness
+    # It does not show inventory items whose stock level falls below 0 due to 
+    # stock allocation - reserved for customer but not sold yet.
+    # product_hash.select{|key, value| value[:inventory] > 0 || value[:allocated] != nil}
+
+    # filter to get all the inventory items whose stock levels are greater than 0 with consideration 
+    # of stock allocation.
+    product_hash.select{|key, value| !(value[:inventory] == 0 && value[:allocated].nil?)}
   end
 
   def portfolio_products
