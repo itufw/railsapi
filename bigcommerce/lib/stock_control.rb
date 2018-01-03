@@ -135,6 +135,8 @@ module StockControl
       product_hash[p.id] = product
     end
 
+
+
     # color defination in axlsx file
     product_hash.select{|key, value| value[:inventory]>=120 }.each do |id, product|
       next if product[:luc].nil?
@@ -156,7 +158,8 @@ module StockControl
 
     # filter to get all the inventory items whose stock levels are greater than 0 with consideration 
     # of stock allocation.
-    product_hash.select{|key, value| !(value[:inventory] == 0 && value[:allocated].nil?)}
+    # product_hash.select{|key, value| !(value[:inventory] == 0 && value[:allocated].nil?)}
+    product_hash
   end
 
   def portfolio_products
