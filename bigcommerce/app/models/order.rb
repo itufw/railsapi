@@ -146,7 +146,7 @@ class Order < ActiveRecord::Base
     if !start_date.nil? && !end_date.nil?
       if !start_date.to_s.empty? && !end_date.to_s.empty?
         start_time = Time.parse(start_date.to_s)
-        end_time = Time.parse(end_date.to_s)
+        end_time = Time.parse(end_date.to_s).at_end_of_day  # to include all time of the end_time
 
         return where('orders.date_created >= ? and orders.date_created <= ?', start_time.strftime('%Y-%m-%d %H:%M:%S'), end_time.strftime('%Y-%m-%d %H:%M:%S'))
         end
