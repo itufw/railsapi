@@ -60,7 +60,7 @@
           <%
           unless event.description.nil? && event.summary.nil?
             pattern = event.summary.downcase unless event.summary.nil?
-            pattern = event.description.split("\n").first.downcase unless event.description.nil?
+            pattern = event.description.split("\n").to_s.first.downcase unless event.description.nil?
             pattern.slice! ' tasting'
             pattern = pattern.split('-').first
 
