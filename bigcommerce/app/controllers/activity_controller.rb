@@ -147,6 +147,12 @@ class ActivityController < ApplicationController
     end
   end
 
+  def autocomplete_beer_name
+    products = Product.search_for(params[:term]).where('product_sub_type_id = 59').order('name ASC').all
+    render :json => products.map { |product| {:id => product.id, :label => product.name,
+      :value => product.name, :price => product.calculated_price.round(4), :inventory => product.inventory}}
+  end
+
   def autocomplete_product_name
     products = Product.search_for(params[:term]).where('inventory > 0').order('name_no_vintage ASC, vintage DESC').all
     render :json => products.map { |product| {:id => product.id, :label => product.name,
@@ -154,10 +160,49 @@ class ActivityController < ApplicationController
   end
 
   def autocomplete_product_ws
-    products = Product.search_for(params[:term]).where("inventory > 0 AND name LIKE '%WS' AND current=1").order('name_no_vintage ASC, vintage DESC').all
+    #products = Product.search_for(params[:term]).where("inventory > 0 AND name LIKE '%WS' AND current=1").order('name_no_vintage ASC, vintage DESC').all
+    products = Product.search_for(params[:term]).where("name LIKE '%WS' AND current=1").order('name_no_vintage ASC, vintage DESC').all
     render :json => products.map { |product| {:id => product.id, :label => product.name,
       :value => product.name, :price => (product.calculated_price * (1.29)).round(4),
       :inventory => product.inventory, :monthly_supply => product.monthly_supply}}
+  end
+
+  # add allocated products to the autocomplete list
+  def with_allocated products
+    product_hash = {}
+    allocated_products = OrderProduct.joins(:order).select('product_id, SUM(order_products.qty) as qty').where('orders.status_id': 1).group('product_id')
+
+    products.each do |p|
+      # Separate Perth Stock
+      # next if p.product_name.include?'Perth'
+
+      # initialise the hash
+      product = (product_hash[p.id].nil?) ? {inventory: 0} : product_hash[p.id]
+      product[:order_total] = 0 unless product[:order_total].to_i!=0
+
+
+      product[:name] = p.name_no_winery unless p.name_no_winery.nil?
+      product[:inventory] += p.inventory
+      product[:case_size] = p.case_size
+      product[:order_total] = (p.order_1.to_i + p.order_2.to_f*0.1).to_f unless p.order_1.to_i==0
+
+      allocated = allocated_products.detect{|x| x.product_id==p.product_id}
+      product[:allocated] = 0 if !allocated.nil? && product[:allocated].nil?
+      product[:allocated] += allocated.qty unless allocated.nil?
+      product[:status] = p.product_status.name unless p.product_status.nil?
+
+      if (p.retail_ws=='R')&&(!p.product_name.include?'DM')
+        product[:rrp] = (p.price * 1.1).round(2)
+      elsif p.product_name.include?'WS'
+        product = product.merge({ws_id: p.product_id, luc: (p.price * 1.29).round(2),
+          current: p.current})
+
+        product[:term_1] = p.sale_term_1 unless p.sale_term_1.nil? || p.sale_term_1.zero?
+        product[:monthly_supply] = p.monthly_supply.round(0) unless p.monthly_supply.nil? || p.monthly_supply.round(0).zero?
+      end
+
+      product_hash[p.id] = product
+    end
   end
 
   # -----------private --------------------
