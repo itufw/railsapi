@@ -265,7 +265,9 @@
 
     //shipping_cost = parseFloat($('#order_shipping_cost').val())
 
-    $('#order_shipping_cost').val((qty*shipping_rate).toFixed(4));
+    var shipping_cost = qty*shipping_rate;
+
+    $('#order_shipping_cost').val(shipping_cost.toFixed(4));
     $('#order_gst').val((total*(1-order_discount)/11 + (shipping_cost)* gst).toFixed(4));
     $('#order_discount_amount').val(discount.toFixed(4));
     $('#order_total_inc_tax').val(((total *( 1 - order_discount) + shipping_cost*gst)).toFixed(4));
