@@ -33,6 +33,9 @@
             $('.order_form').html('<%=j render 'order_partials/beer_order_form', f: f %>');
             $('.order_form').attr('value', 'Beer');
             $('.title').html('New Beer Order');
+
+            // generate the autocomplete list of beers only
+            $('.product_autocomplete').html('<%= autocomplete_field_tag 'product', '', autocomplete_beer_name_activity_index_path, placeholder: 'Search Beers', id_element: '#product_id', id: 'product_search'%>');
           }
         }
       });
