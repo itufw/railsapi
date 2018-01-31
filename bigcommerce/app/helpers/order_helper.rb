@@ -31,10 +31,18 @@ module OrderHelper
     [staff, status, orders, search_text, order_id]
   end
 
+  # display orders of each staff in a certain period of time
   def order_display_(params, orders)
     order_function, direction = sort_order(params, :order_by_id, 'DESC')
     per_page = params[:per_page] || Order.per_page
+
+    # DEPRECATED as it does not fit the purpose.
     orders = orders.where('orders.customer_id != 0').include_all.send(order_function, direction).paginate(per_page: per_page, page: params[:page])
+
+    # turn this on causes errors on pagination when the Order page is loading
+    # filter all orders of a staff for a certain period
+    # orders = orders.includes(:status).where('statuses.valid_order = 1').references(:statuses).includes(:customer).where('customers.Staff_id=5').references(:customers).include_all.send(order_function, direction).paginate(per_page: per_page, page: params[:page])
+    # orders = orders.includes(:status).where('statuses.valid_order = 1').references(:statuses).includes(:customer).where('customers.Staff_id=?', @staffs).include_all.send(order_function, direction).paginate(per_page: per_page, page: params[:page])
     [per_page, orders]
   end
 
