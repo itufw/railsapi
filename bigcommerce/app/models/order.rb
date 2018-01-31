@@ -139,14 +139,14 @@ class Order < ActiveRecord::Base
 
   # Returns orders whose date created is between the start date and end date
   # If you want today's orders
-  # Then start date should be Today's date and end date should be Tomorrow's date
+  # Then start date should be Today's date and end date should also be today -- Tomorrow's date --
   # Since date_created is stored as datetime in the database, these start and end dates are
   # converted into datetime values, with 00:00:00 as the time factor.
   def self.date_filter(start_date, end_date)
     if !start_date.nil? && !end_date.nil?
       if !start_date.to_s.empty? && !end_date.to_s.empty?
-        start_time = Time.parse(start_date.to_s)
-        end_time = Time.parse(end_date.to_s).at_end_of_day  # to include all time of the end_time
+        start_time = Time.parse(start_date.to_s).at_beginning_of_day  # start from time 00:00:00
+        end_time = Time.parse(end_date.to_s).at_end_of_day            # conclude at time 23:59:59
 
         return where('orders.date_created >= ? and orders.date_created <= ?', start_time.strftime('%Y-%m-%d %H:%M:%S'), end_time.strftime('%Y-%m-%d %H:%M:%S'))
         end
@@ -212,7 +212,12 @@ class Order < ActiveRecord::Base
   end
 
   def self.group_by_week_created_and_staff_id
-    includes(:customer).group(['customers.staff_id', 'WEEK(orders.date_created)'])
+    # DEPRECATED as the week start Sunday by default
+    # Ref: https://www.w3resource.com/mysql/date-and-time-functions/mysql-week-function.php
+    # includes(:customer).group(['customers.staff_id', 'WEEK(orders.date_created)'])
+
+    # Start each week on Monday
+    includes(:customer).group(['customers.staff_id', 'WEEK(orders.date_created, 1)'])
   end
 
   def self.group_by_month_created_and_staff_id
