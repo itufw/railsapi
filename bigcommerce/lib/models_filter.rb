@@ -18,6 +18,9 @@ module ModelsFilter
     if order_id_text.to_s != ''
       orders = Order.search_for(order_id_text)
     else
+      # date_filter in order.rb model
+      # customer_filter in order.rb model
+      # staff_filter in order.rb model
       orders = Order.date_filter(params[:start_date], params[:end_date]).customer_filter(customer_ids).staff_filter(staff_id).status_filter(status_id)
     end
     return staff, status, orders, search_text, order_id_text, staff_id
