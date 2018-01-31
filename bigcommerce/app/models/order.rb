@@ -119,8 +119,16 @@ class Order < ActiveRecord::Base
     all
   end
 
+  # DEPRECATED due to coincident correctness
+  # filter orders by customer_staff relationship
   def self.customer_staff_filter(staff_id)
     return includes(:customer).where('customers.staff_id = ?', staff_id).references(:customers) unless staff_id.nil?
+    all
+  end
+
+  # filter orders by order_staff relationship
+  def self.order_staff_filter(staff_id)
+    return where('staff_id = ?', staff_id).references(:customers) unless staff_id.nil?
     all
   end
 
@@ -138,7 +146,7 @@ class Order < ActiveRecord::Base
     if !start_date.nil? && !end_date.nil?
       if !start_date.to_s.empty? && !end_date.to_s.empty?
         start_time = Time.parse(start_date.to_s)
-        end_time = Time.parse(end_date.to_s)
+        end_time = Time.parse(end_date.to_s).at_end_of_day  # to include all time of the end_time
 
         return where('orders.date_created >= ? and orders.date_created <= ?', start_time.strftime('%Y-%m-%d %H:%M:%S'), end_time.strftime('%Y-%m-%d %H:%M:%S'))
         end

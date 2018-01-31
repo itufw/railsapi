@@ -41,7 +41,13 @@ wb.add_worksheet(name: "Stock Control", page_setup: setup) do |sheet|
     country.producers.each do |producer|
       next if producer.id==21
       product_ids = producer.products.group('product_no_ws_id').map(&:product_no_ws_id)
-      products = @product_hash.select {|key, value| product_ids.include?key}.values()
+
+      # filter to get all the inventory items whose stock levels are greater than 0 with consideration 
+      # of stock allocation.
+      product_hash = @product_hash.select{|key, value| !(value[:inventory] == 0 && value[:allocated].nil?)}
+      products = product_hash.select {|key, value| product_ids.include?key}.values()
+
+      #products = @product_hash.select {|key, value| product_ids.include?key}.values()
       next if products.blank?
 
       products.sort! { |a, b| [a[:order_total], a[:name]] <=> [b[:order_total], b[:name]]}
@@ -56,6 +62,55 @@ wb.add_worksheet(name: "Stock Control", page_setup: setup) do |sheet|
           [product[:ws_id], product[:name], product[:case_size], '%.2f' % product[:rrp].to_f,
            '%.2f' % product[:luc].to_f, product[:allocated], product[:inventory].to_i,
             product[:term_1], product[:monthly_supply], product[:status]],
+          style: [nil, (eval product[:name_color].to_s), (1..4).map {|x| nil}, (product[:current].to_i.zero?)? highlight_font : nil, bordered_cell, bordered_cell, bordered_cell].flatten
+        )
+      end
+    end
+    sheet.add_page_break('A' + (sheet.rows.last.index + 2).to_s)
+  end
+  sheet.column_info[3].hidden = true
+end
+
+# sold-out products report
+# Note: this is basically another part of the stock report
+wb.add_worksheet(name: "Sold-out Products HISTORICAL", page_setup: setup) do |sheet|
+  sheet.add_row(
+    [nil, 'Sold-out Products'],
+    style: [nil, title_cell]
+  )
+  sheet.merge_cells "B1:E1"
+  sheet.add_row([nil, Date.today.strftime('%d/%m/%Y')])
+
+  @countries.each do |country|
+    sheet.add_row([nil, country.name], style: country_cell)
+    country.producers.each do |producer|
+      next if producer.id==21
+      product_ids = producer.products.group('product_no_ws_id').map(&:product_no_ws_id)
+      
+      # filter to get all sold-out products
+      product_hash = @product_hash.select{|key, value| (value[:inventory] == 0 && value[:allocated].nil?)}
+      products = product_hash.select {|key, value| product_ids.include?key}.values()
+
+      # products = @product_hash.select {|key, value| product_ids.include?key}.values()
+      next if products.blank?
+
+      products.sort! { |a, b| [a[:order_total], a[:name]] <=> [b[:order_total], b[:name]]}
+
+
+      sheet.add_row(
+        [nil, producer.name, 'Case', 'RRP', 'LUC', 'Aloc.', 'Bot.', 
+        # fields removed from the report 
+        # '30 D.S.', 'Supply'
+        ],
+        style: [nil, (1..8).map { |x| black_cell }].flatten
+      )
+      products.each do |product|
+        sheet.add_row(
+          [product[:ws_id], product[:name], product[:case_size], '%.2f' % product[:rrp].to_f,
+           '%.2f' % product[:luc].to_f, product[:allocated], product[:inventory].to_i,
+            # fields removed from the report 
+            # product[:term_1], product[:monthly_supply], product[:status]
+            ],
           style: [nil, (eval product[:name_color].to_s), (1..4).map {|x| nil}, (product[:current].to_i.zero?)? highlight_font : nil, bordered_cell, bordered_cell, bordered_cell].flatten
         )
       end

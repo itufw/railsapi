@@ -12,6 +12,7 @@
 /config/privatekey.pem
 /config/tokens.yaml
 /config/initializers/carrierwave.rb
+config/privatekey.pem
 
 # Ignore all logfiles and tempfiles.
 /log/*
