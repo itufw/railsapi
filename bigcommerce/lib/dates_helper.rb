@@ -74,9 +74,14 @@ module DatesHelper
 
   # Make a hash like {date => [date, date]}
   # Need this to make partial views more flexible
+  # i.e. This is the first hash element returned in the hash dates_map
+  # -> Mon, 22 Jan 2018=>[Mon, 22 Jan 2018, Mon, 22 Jan 2018 23:59:59 UTC +00:00]
   def make_daily_dates_map(dates_a)
     dates_map = {}
-    dates_a.each {|d| dates_map[d] = [d, d.next_day]}
+    # dates_a.each {|d| dates_map[d] = [d, d.next_day]}
+
+    # get whole day of a date from time 00:00:00 to 23:59:59
+    dates_a.each {|d| dates_map[d] = [d.at_beginning_of_day, d.at_end_of_day]}
     return dates_map
   end
 
@@ -98,7 +103,7 @@ module DatesHelper
   def periods_from_end_date(num_periods, end_date, period_type)
     all_dates = []
     beginning_function, last_function = period_date_functions(period_type)
-    puts "logging ..."
+    
     if end_date.send(beginning_function) == end_date
       # It is the start of the week (Monday) or start of the month
       # This end date won't be included in the calculations or in the final table
