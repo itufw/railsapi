@@ -267,6 +267,9 @@
 
     var shipping_cost = qty*shipping_rate;
 
+    // temporarily setting shipping_cost to 0 as it is included in each bottle's sale price
+    shipping_cost = 0.0
+    
     $('#order_shipping_cost').val(shipping_cost.toFixed(4));
     $('#order_gst').val((total*(1-order_discount)/11 + (shipping_cost)* gst).toFixed(4));
     $('#order_discount_amount').val(discount.toFixed(4));
@@ -297,6 +300,7 @@
   $(document).on('input', '#order_discount_rate, #order_shipping_cost', function(){
     update_subtotal();
   });
+  $(document).on('input','#order_shipping_cost',)
   $(document).on('click', '.remove_row', function(){
     $(this).parent().parent().remove();
   });
