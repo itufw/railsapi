@@ -111,44 +111,22 @@ module OrderStatus
     ['Next', selected_orders]
   end
 
+  # select an invoice based on the type of an order i.e. retail sale of beer,
+  # wholesale of wine, etc.
   def print_single_invoice(order)
     customer = order.customer
 
     if order.is_beer_order(order)
       if customer.cust_type_id == 1
-        template = 'pdf/rs_beer_order_invoice.pdf'
-        # order_invoice = WickedPdf.new.pdf_from_string(
-        #   render_to_string(
-        #       :template => 'pdf/rs_beer_order_invoice.pdf',
-        #       :locals => {order: order, customer: customer}
-        #       )
-        #   )
+        template = 'pdf/rs_beer_order_invoice.pdf'  # retail wines
       else
-        template = 'pdf/ws_beer_order_invoice.pdf'
-        # order_invoice = WickedPdf.new.pdf_from_string(
-        #   render_to_string(
-        #       :template => 'pdf/ws_beer_order_invoice.pdf',
-        #       :locals => {order: order, customer: customer}
-        #       )
-        #   )
+        template = 'pdf/ws_beer_order_invoice.pdf'  # wholesale beers
       end
     else
       if customer.cust_type_id == 1
-        template = 'pdf/retail_order_invoice.pdf'
-        # order_invoice = WickedPdf.new.pdf_from_string(
-        #   render_to_string(
-        #       :template => 'pdf/retail_order_invoice.pdf',
-        #       :locals => {order: order, customer: customer}
-        #       )
-        #   )
+        template = 'pdf/retail_order_invoice.pdf'   # retail wines
       else
-        template = 'pdf/order_invoice.pdf'
-        # order_invoice = WickedPdf.new.pdf_from_string(
-        #   render_to_string(
-        #       :template => 'pdf/order_invoice.pdf',
-        #       :locals => {order: order, customer: customer}
-        #       )
-        #   )
+        template = 'pdf/order_invoice.pdf'          # wholesale wines
       end
     end
 
