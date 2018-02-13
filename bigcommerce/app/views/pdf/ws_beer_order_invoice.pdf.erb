@@ -1,0 +1,475 @@
+<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+
+<div class="Invoice">
+  <div id="heading">
+    <div id="Logo">
+      <%= wicked_pdf_image_tag 'logo dark.jpg' %>
+    </div>
+    <table id="invoiceDets">
+      <tr>
+        <td colspan="2">
+          <h1 style="margin-bottom: 0px; font-size: 18px">
+            <b>TAX INVOICE</b>
+          </h1>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <b>Invoice No</b>
+        </td>
+        <td>
+          <b><%= order.id %></b>
+        </td>
+      </tr>
+      <tr>
+        <td>Date</td>
+        <td id="dateRef" class="term_date"><%= order.created_at.strftime("%e/%m/%Y") %></td>
+      </tr>
+      <tr>
+        <td>ABN</td>
+        <td>78 095 444 036</td>
+      </tr>
+    </table>
+    <div id="UFW">
+      <h1 style="margin-bottom: 0px;padding-right: 5px;">Untapped Fine Wines</h1><br/>
+      www.untappedwines.com<br/>
+      Unit 3, 225 Ingles St<br/>
+      Port Melbourne, Victoria 3207<br/>
+      <span style="font-size: .8em;">Ph: (03) 9676 9663<br/>
+        Fx: (03) 9676 9665</span><br/>
+      <span style="font-size: .8em;" id="licenseNo">
+        <i>Liquor License: 33762538</i>
+      </span><br/>
+    </div>
+
+    <table id="terms">
+      <tr>
+        <td>Terms</td>
+        <td><%= customer.tolerance_day%>
+          days</td>
+      </tr>
+      <tr>
+        <td>Due Date</td>
+        <td id="dueDate" class="dueDates"><%= (order.created_at + customer.tolerance_day.days).strftime("%e/%m/%Y") %></td>
+      </tr>
+    </table>
+  </div>
+
+  <div id="customerDetails">
+    <i>Bill To:</i><br/>
+    <h3 style="margin-bottom: 0px;padding-right: 5px;"><%= (customer.company.to_s=="") ? customer.actual_name : customer.company%></h3>
+    <%= customer.street%><br/>
+    <% unless customer.street_2=="" %>
+      <%= customer.street_2%><br/>
+    <% end %>
+    <%= customer.city%>,
+    <%= customer.state%>
+    <%= customer.postcode%><br/>
+    <%= customer.country%><br/>
+  </div>
+
+  <% if customer.cust_group_id.to_i==17 || order.customer_purchase_order.to_s!=''%>
+    <div style="float:right;">
+      <%if customer.cust_group_id.to_i==17 %>
+        <h3 style="margin-bottom: 0px;padding-right: 5px;">Coles Liquor Reference</h3>
+        Untapped Fine Wines 965586<br/>
+      <% end %>
+      <%if order.customer_purchase_order.to_s!='' %>
+        <h3 style="margin-bottom: 0px;padding-right: 5px;">Customer Purchase Order</h3>
+        <%= order.customer_purchase_order %><br/>
+      <% end %>
+    </div>
+  <% end %>
+
+
+    <div id="products">
+      <% products = order.order_products.select{ |x| x.display == 1}%>
+      <% wine_club = (products.select{|x| x.product.name.downcase.include?'wine club'}.count > 0) %>
+      <table class="InvoiceTable">
+        <tr>
+          <th class="ProductQuantity">Qty</th>
+          <th class="ProductDetails">Product Name</th>
+          <th class="ProductCost" id="price" align="right">Price</th>
+
+          <th class="ProductTotal" align="right" id="amt" style="width:15px;">Total</th>
+          <th></th>
+        </tr>
+        <% products.each do |item| %>
+        <tr>
+          <td class="ProductQuantity"><%= item.qty.to_i%></td>
+            <td class="ProductDetails"><%= item.product.name %></td>
+            <% if [2427, 2582, 2341, 2579].include?item.product_id%>
+              <td class="ProductCost" id="price" align="right">$<%= '%.2f' % (item.price_luc) %></td>
+              <td class="ProductTotal" align="right" id="amt" style="width:15px;">$<%= '%.2f' % (item.qty * item.price_discounted) %></td>
+            <% else %>
+              <td class="ProductCost" id="price" align="right">$<%= '%.2f' % (item.price_discounted) %></td>
+              <td class="ProductTotal" align="right" id="amt" style="width:15px;">$<%= '%.2f' % (item.qty * item.price_discounted) %></td>
+            <% end %>
+          <td></td>
+        </tr>
+        <% end %>
+        <tr style="border-bottom:1px solid black">
+          <td colspan="100%"></td>
+        </tr>
+        <tr>
+          <td rowspan="7"></td>
+          <td colspan="2" class="ProductCost" align="right">Subtotal (ex. GST)</td>
+          <td class="ProductTotal" align="right">$<%= '%.2f' % order.subtotal %></td>
+          <td></td>
+        </tr>
+        <% if !wine_club && order.discount_rate!=0 %>
+        <tr>
+          <td colspan="2" class="ProductCost" align="right">Discount Rate</td>
+          <td class="ProductTotal" align="right"><%= '%.0f' % (order.discount_rate) %>%</td>
+          <td></td>
+        </tr>
+        <% end %>
+        <tr>
+          <td colspan="2" class="ProductCost" align="right">Shipping</td>
+          <td class="ProductTotal" align="right">$<%= '%.2f' % (order.shipping_cost) %></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td colspan="2" class="ProductCost" align="right">GST</td>
+          <td class="ProductTotal" align="right">$<%= '%.2f' % (order.gst) %></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td colspan="2" class="ProductCost" align="right">
+            <h3>Grand Total:</h3>
+          </td>
+          <td class="ProductTotal" align="right">
+            <h3>$<%= '%.2f' % order.total_inc_tax %></h3>
+          </td>
+          <td></td>
+        </tr>
+      </table>
+    </div>
+
+  <div class="InvoiceComments" style="%%GLOBAL_HideComments%%; margin-top: -75px; font-size: 0.8em;width: 350px; text-align: justify;">
+    <div class="InvoiceHeading" style="font-size: .9em;">Comments</div>
+    <% order.customer_notes.split(/\n/).each do |note| %>
+    <%= note%><br/>
+    <% end %>
+  </div>
+  <br/><br/><br/><br/>
+  <div style=" position: fixed; bottom: 0; width: 100%;">
+    <div id="bankDetails" style="font-size: .8em;">
+      <b style="font-size: 1em;">Banking Details</b>
+      <table>
+        <tr>
+          <td style="font-size: .7em;">
+            BSB:
+          </td>
+          <td style="font-size: .7em; border-right:1px solid black; padding-right:4px;">
+            013 606
+          </td>
+          <td style="font-size: .7em;">
+            Account Number:
+          </td>
+          <td style="font-size: .7em;border-right:1px solid black; padding-right:4px;">
+            2762 95364
+          </td>
+          <td style="font-size: .7em;">
+            Please include invoice number in description
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+<style>
+  .InvoiceTotal.InvoiceTotalRow {
+    background-color: lightgrey;
+
+  }
+
+  body {
+    margin-top: -400px;
+  }
+
+  .InvoiceTotalRow td {
+    margin-right: 10px;
+  }
+
+  .Invoice {
+    border: none;
+    font-size: 14px;
+    margin-top: -10px;
+  }
+
+  .Invoice h1 {
+    font-size: 1.25em;
+    float: right;
+  }
+
+  #invoiceDets {
+    float: right;
+    clear: right;
+    margin-right: 17px;
+    margin-right: 9px;
+  }
+
+  #invoiceDets td {
+    text-align: right;
+    padding-right: 13px;
+  }
+
+  #UFW {
+    float: left;
+    clear: left;
+    margin-top: 14px;
+  }
+
+  #terms {
+    float: right;
+    clear: right;
+    margin-top: 20px;
+    margin-right: -8px;
+  }
+
+  #terms td {
+    text-align: right;
+    padding-right: 30px;
+  }
+
+  .Invoice img {
+    width: 200px;
+    float: left;
+  }
+
+  #customerDetails {
+    float: left;
+    clear: left;
+    margin-top: 22px;
+  }
+
+  #products {
+    padding-top: 385px;
+  }
+
+  .Invoice .ProductSku {
+    display: none;
+  }
+
+  #enquiries {
+    margin-top: 51px;
+    margin-bottom: 20px;
+    line-height: 16px;
+  }
+
+  #signBoxes {
+    float: right;
+    margin-top: -113px;
+  }
+
+  #signBoxes table {
+    border-collapse: collapse;
+    /*width: 150px;*/
+  }
+
+  #signBoxes table td {
+    border: 1px solid black;
+    width: 80px;
+  }
+
+  #signBoxes table th {
+    width: 100px;
+  }
+
+  #table2 {
+    height: 50px;
+  }
+
+  #products thead {
+    background-color: lightgrey;
+
+  }
+  /*/
+  ///////////////*/
+
+  .PackingSlipItemListCustomer td.ProductBinNumber,
+  .PackingSlipItemListCustomer td.ProductSku {
+    display: none;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+    margin: 10px;
+  }
+
+  body,
+  td,
+  th {
+    font-family: Calibri serif, serif;
+    font-size: 12px;
+  }
+
+  #Logo {
+    margin-bottom: 10px;
+  }
+
+  h1,
+  h1 a {
+    color: #000;
+    text-decoration: none;
+  }
+
+  .PackingSlip {
+    padding: 5px;
+  }
+
+  .InvoiceTitle,
+  .PackingSlipTitle {
+    font-size: 15px;
+    font-weight: bold;
+    background: #000;
+    color: #fff;
+    padding: 5px;
+    margin-bottom: 10px;
+  }
+
+  .StoreAddress {
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .InvoiceHeading,
+  .PackingSlipHeading {
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .AddressRow,
+  .CustomerDetails,
+  .InvoiceDetails,
+  .InvoiceItems,
+  .PackingSlipDetails,
+  .PackingSlipItems {
+    margin-bottom: 10px;
+  }
+
+  .InvoiceTable,
+  .PackingSlipTable {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .InvoiceTable th,
+  .PackingSlipTable th {
+    font-weight: bold;
+    padding: 5px;
+    text-align: left;
+  }
+
+  .InvoiceTable td,
+  .PackingSlipTable td {
+    padding: 5px;
+    vertical-align: top;
+    text-align: left;
+  }
+
+  .InvoiceTotalRow td,
+  .InvoiceTotals td,
+  td.ProductCost,
+  td.ProductQuantity,
+  td.ProductTotal,
+  th.ProductCost,
+  th.ProductQuantity,
+  th.ProductTotal {
+    text-align: right;
+  }
+
+  .AddressRow,
+  .InvoiceDetails,
+  .PackingSlipDetails {
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .BillingAddress,
+  .InvoiceDetailsLeft,
+  .InvoiceDetailsRight,
+  .PackingSlipDetailsLeft,
+  .PackingSlipDetailsRight,
+  .ShippingAddress {
+    float: left;
+    width: 48%;
+  }
+
+  .InvoiceItems,
+  .PackingSlipItems {
+    border-top: 1px solid #000;
+    padding-top: 10px;
+  }
+
+  .InvoiceItemList {
+    border-bottom: 1px solid #000;
+  }
+
+  .InvoiceItemDivider td {
+    padding-top: 10px;
+    border-top: 1px solid #000;
+  }
+
+  .ConfigurableProductRow,
+  .DetailRow {
+    clear: left;
+    margin-top: 6px;
+    padding-left: 140px;
+  }
+
+  .ConfigurableProductRow .Label,
+  .DetailRow .Label {
+    margin: 0 0 6px -140px;
+    float: left;
+    width: 130px;
+    padding-top: 1px;
+    display: inline;
+    position: relative;
+
+  }
+
+  .ConfigurableProductRow .Value,
+  .DetailRow .Value {
+    display: inline;
+  }
+
+  .InvoiceDetails .DetailRow .Label,
+  .PackingSlipDetails .DetailRow .Label {
+    font-weight: bold;
+  }
+
+  .ConfigurableProductRow {
+    font-size: 11px;
+    margin-left: 10px;
+  }
+
+  .InvoiceTotals .InvoiceTotal td {
+    font-weight: bold;
+  }
+
+  .InvoiceTotals {
+    psoition: relative;
+    right: -100px;
+  }
+
+  .ProductQuantity {
+    width: 50px;
+  }
+
+  .ProductCost,
+  .ProductTotal {
+    width: 150px;
+  }
+
+  .PageBreak {
+    page-break-after: always;
+  }
+
+  .ProductPreOrder {
+    font-size: 11px;
+  }
+</style>
