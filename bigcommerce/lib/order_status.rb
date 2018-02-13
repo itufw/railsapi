@@ -113,21 +113,51 @@ module OrderStatus
 
   def print_single_invoice(order)
     customer = order.customer
-    if customer.cust_type_id == 1
-      order_invoice = WickedPdf.new.pdf_from_string(
-        render_to_string(
-            :template => 'pdf/retail_order_invoice.pdf',
-            :locals => {order: order, customer: customer}
-            )
-        )
+
+    if order.is_beer_order(order)
+      if customer.cust_type_id == 1
+        template = 'pdf/rs_beer_order_invoice.pdf'
+        # order_invoice = WickedPdf.new.pdf_from_string(
+        #   render_to_string(
+        #       :template => 'pdf/rs_beer_order_invoice.pdf',
+        #       :locals => {order: order, customer: customer}
+        #       )
+        #   )
+      else
+        template = 'pdf/ws_beer_order_invoice.pdf'
+        # order_invoice = WickedPdf.new.pdf_from_string(
+        #   render_to_string(
+        #       :template => 'pdf/ws_beer_order_invoice.pdf',
+        #       :locals => {order: order, customer: customer}
+        #       )
+        #   )
+      end
     else
-      order_invoice = WickedPdf.new.pdf_from_string(
-        render_to_string(
-            :template => 'pdf/order_invoice.pdf',
-            :locals => {order: order, customer: customer}
-            )
-        )
+      if customer.cust_type_id == 1
+        template = 'pdf/retail_order_invoice.pdf'
+        # order_invoice = WickedPdf.new.pdf_from_string(
+        #   render_to_string(
+        #       :template => 'pdf/retail_order_invoice.pdf',
+        #       :locals => {order: order, customer: customer}
+        #       )
+        #   )
+      else
+        template = 'pdf/order_invoice.pdf'
+        # order_invoice = WickedPdf.new.pdf_from_string(
+        #   render_to_string(
+        #       :template => 'pdf/order_invoice.pdf',
+        #       :locals => {order: order, customer: customer}
+        #       )
+        #   )
+      end
     end
+
+    order_invoice = WickedPdf.new.pdf_from_string(
+      render_to_string(
+          :template => template,
+          :locals => {order: order, customer: customer}
+          )
+      )
 
     order_invoice
   end
