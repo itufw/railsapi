@@ -80,6 +80,17 @@ class Order < ActiveRecord::Base
     self
   end
 
+  # check if it is a beer order based on the first product of an order
+  # this is not practical but is designed based around the existing design.
+  # true  - a beer order
+  # false - a wine order
+  def is_beer_order(order_id)
+    product_type = OrderProduct.joins(:product).where(order_products: {order_id: order_id}).pluck(:product_type_id).first
+
+    # if product_type = 6 (a beer type) return true
+    return product_type == 6
+  end
+
   ############## FILTER FUNCTIONS ############
 
   def self.order_filter(order_id)
