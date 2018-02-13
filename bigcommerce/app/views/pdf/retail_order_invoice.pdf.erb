@@ -5,10 +5,14 @@
     <div id="Logo">
       <%= wicked_pdf_image_tag 'logo dark.jpg' %>
     </div>
-    <h1 style="margin-bottom: 0px;">
-      <b>TAX INVOICE</b>
-    </h1>
     <table id="invoiceDets">
+      <tr>
+        <td colspan="2">
+          <h1 style="margin-bottom: 0px; font-size: 18px">
+            <b>TAX INVOICE</b>
+          </h1>
+        </td>
+      </tr>
       <tr>
         <td>
           <b>Invoice No</b>
@@ -109,8 +113,8 @@
         </tr>
         <tr>
           <td rowspan="7"></td>
-          <td colspan="2" class="ProductCost" align="right">Subtotal</td>
-          <td class="ProductTotal" align="right">$<%= '%.2f' % order.subtotal %></td>
+          <td colspan="2" class="ProductCost" align="right">Subtotal (inc. GST)</td>
+          <td class="ProductTotal" align="right">$<%= '%.2f' % (order.subtotal + order.gst) %></td>
           <td></td>
         </tr>
         <% if !wine_club && order.discount_rate!=0 %>
