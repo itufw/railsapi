@@ -4,7 +4,11 @@
 		<% unless ((current_user.id != id) && (current_user.user_type.in?(["Sales Executive"])))%>
 			<td><%= link_to nickname, controller: 'sales', action: 'customer_dashboard', staff_id: id, staff_nickname: nickname %></td>
 		<% else %>
-			<td><%= nickname %></td>
+			<% if ((current_user.id == 44) && (id == 35) && (current_user.user_type.in?(["Sales Executive"])))%> 
+				<td><%= link_to nickname, controller: 'sales', action: 'customer_dashboard', staff_id: id, staff_nickname: nickname %></td>
+			<% else %>
+				<td><%= nickname %></td>
+			<% end %>
 		<% end %>
 
 		<% sums_dates_h = give_sum_date_h(id, sums_dates_staffs_h) %>
