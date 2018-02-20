@@ -22,6 +22,11 @@ module ApplicationHelper
     date.to_date.strftime('%a %d/%m/%y')
   end
 
+  # Displays a date in the form 'Day of the week, Day/Month/Year'
+  def short_date(date)
+    date.to_date.strftime('%d-%m-%Y')
+  end
+
   # Displays date in the form Day/Month/Year
   def date_format_orders(date)
     date.to_date.strftime('%d/%m/%y') unless date.nil?
