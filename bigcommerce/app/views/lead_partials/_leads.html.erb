@@ -6,6 +6,7 @@
 		<th>Name <%= render "partials/sort_arrows", order: 'order_by_name' %></th>
 		<th>Type</th>
 		<th>Channel <%= render "partials/sort_arrows", order: 'order_by_style' %></th>
+		<th>Date Created</th>
 		<th>Address</th>
 	</tr>
 
@@ -15,6 +16,7 @@
 		<td><%= link_to l.actual_name, controller: 'lead', action: 'summary', lead_id: l.id%></td>
 		<td><%= lead_type_name(l) %></td>
 		<td><%= customer_style_name(l) %></td>
+		<td><%= short_date(l.created_at) %></td>
 		<td><%= lead_address(l)%></td>
 	</tr>
 	<% end %>
