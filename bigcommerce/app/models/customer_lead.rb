@@ -86,6 +86,11 @@ class CustomerLead < ActiveRecord::Base
     includes(:staff).order('staffs.nickname ' + direction)
   end
 
+  # order by created_at field
+  def self.order_by_date(direction)
+    order('created_at ' + direction)
+  end
+
   def self.not_customer
     where(customer_id: [nil, 0])
   end
