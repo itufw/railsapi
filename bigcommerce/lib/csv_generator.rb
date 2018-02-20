@@ -14,11 +14,11 @@ module CsvGenerator
   def excel_customer(_start_date, _end_date)
     sql = 'customers.id AS  "Customer ID", customers.firstname AS  "First Name",
            customers.lastname AS  "Last Name", company AS  "Company", customers.email AS  "Email",
-           phone AS "Phone", note AS  "Notes", store_credit AS  "Store Credit",
-           name AS  "Customer Group", staffs.nickname AS "Owner", date_created AS  "Date Joined",
-           address AS "Address", description AS  "Required", customers.state AS "State",
+           phone AS "Phone", note AS  "Notes", store_credit AS  "Store Credit", cust_types.name AS 
+           "Customer Type", cust_styles.name AS  "Customer Group", staffs.nickname AS "Owner", date_created AS  
+           "Date Joined", address AS "Address", description AS  "Required", customers.state AS "State",
            postcode AS "Postcode", actual_name AS "Name"'
-    customers = Customer.joins(:cust_style, :staff).select(sql)
+    customers = Customer.joins(:cust_style, :staff, :cust_type).select(sql)
     customers
   end
 
