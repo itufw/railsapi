@@ -29,8 +29,8 @@ module CsvGenerator
     "" AS "Tax Total", ROUND(shipping_cost, 2) AS "Shipping Cost", "" AS "Shipping Cost(ex tax)",
     "" AS "Ship Method", "" AS "Handling Cost", ROUND(orders.total_inc_tax, 2) AS "Order Total",
     "" AS "Order Total(ex tax)", staffs.nickname AS "Payment Method", orders.qty AS "Total Quantity",
-    orders.items_shipped AS "Total Shipped", Date(orders.date_shipped) AS "Date Shipped", 
-    cust_types.name AS "Customer Type"'
+    orders.items_shipped AS "Total Bottles Shipped", Date(orders.date_shipped) AS "Date Shipped", 
+    cust_types.name AS "Customer Type", wet AS "WET", gst AS "GST"'
 
     if bigc_status == ''
       orders = Order.joins(:staff, :status).joins(:customer => :cust_type).select(sql)
