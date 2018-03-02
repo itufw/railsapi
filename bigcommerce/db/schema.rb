@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180302023223) do
+ActiveRecord::Schema.define(version: 20180302030458) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -676,6 +676,11 @@ ActiveRecord::Schema.define(version: 20180302023223) do
 
   add_index "order_shippings", ["address_id"], name: "index_order_shippings_on_address_id", using: :btree
   add_index "order_shippings", ["order_id"], name: "index_order_shippings_on_order_id", using: :btree
+
+  create_table "order_types", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "orders", force: :cascade do |t|
     t.integer  "customer_id",             limit: 4,                              null: false
