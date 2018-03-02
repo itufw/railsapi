@@ -678,8 +678,10 @@ ActiveRecord::Schema.define(version: 20180302030458) do
   add_index "order_shippings", ["order_id"], name: "index_order_shippings_on_order_id", using: :btree
 
   create_table "order_types", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.string   "name",        limit: 3
+    t.text     "description", limit: 255
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
   end
 
   create_table "orders", force: :cascade do |t|
