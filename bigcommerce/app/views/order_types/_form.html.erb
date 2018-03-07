@@ -12,12 +12,14 @@
   <% end %>
 
   <div class="field">
-    <%= f.label :name %><br>
+    <%= f.label :name %>
     <%= f.text_field :name %>
+    <span id="name_error" class="invalid_input"></span>
   </div>
   <div class="field">
-    <%= f.label :description %><br>
+    <%= f.label :description %>
     <%= f.text_field :description %>
+    <span id="description_error" class="invalid_input"></span>
   </div>
   <div class="actions">
     <%= f.submit %>
