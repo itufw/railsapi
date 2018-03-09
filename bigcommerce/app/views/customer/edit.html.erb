@@ -82,9 +82,13 @@
 
   <div class="col-md-4">
     <%= f.label :staff, class: 'margin-from-top label-new' %>
+    <!-- Allow Angelica to update the staff reps of each customer -->
+    <% if Staff.find(session[:user_id]).id ==  26 %>
     <!-- Disable according to Lucia's request -->
-    <%#= f.collection_select :staff_id, Staff.sales_list.order_by_order, :id, :nickname, {selected: @customer.staff_id}, {class: "form-control quarter-size"} %>
+    <%= f.collection_select :staff_id, Staff.sales_list.order_by_order, :id, :nickname, {selected: @customer.staff_id}, {class: "form-control quarter-size"} %>
+    <% else %>
     <%= f.label @customer.staff.nickname, class: 'form-control quarter-size label-new' %>
+    <% end %>
   </div>
   <div class="col-md-4">
     <%= f.label :channel, class: 'margin-from-top label-new' %>
