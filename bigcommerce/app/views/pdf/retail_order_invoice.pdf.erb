@@ -118,7 +118,7 @@
         <tr>
           <!-- <td rowspan="7"></td> -->
           <td colspan="5" class="ProductCost" align="right">Subtotal (inc. GST)</td>
-          <td class="ProductTotal" align="right">$<%= '%.2f' % (order.subtotal + order.gst) %></td>
+          <td class="ProductTotal" align="right">$<%= '%.2f' % (order.subtotal) %></td>
           <td></td>
         </tr>
         <% if !wine_club && order.discount_rate!=0 %>
@@ -128,7 +128,7 @@
             <td></td>
           </tr>
           <tr>
-            <td colspan="5" class="ProductCost" align="right">Discount Amount (inc. GST)</td>
+            <td colspan="5" class="ProductCost" align="right">Discount Amount</td>
             <td class="ProductTotal" align="right">$<%= '%.2f' % (order.discount_amount) %></td>
             <td></td>
           </tr>
