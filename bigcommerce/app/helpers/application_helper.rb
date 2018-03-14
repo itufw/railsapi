@@ -49,6 +49,9 @@ module ApplicationHelper
   # Return the latest shipping status
   def shipping_status(order)
     if order.track_number.nil? || order.track_number==""
+      # return civic if courier status is 2 even tracking info is not provided
+      return 'CIVIC' if order.courier_status_id==2
+      
       records = FastwayTrace.where(id: FastwayTrace.track_order(order.id).group('LabelNumber').maximum('id').values())
     elsif order.courier_status_id == 4
       records = FastwayTrace.where(id: FastwayTrace.where('LabelNumber IN (?)', order.track_number.split(';')).group('LabelNumber').maximum('id').values())
