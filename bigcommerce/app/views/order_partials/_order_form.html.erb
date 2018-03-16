@@ -283,6 +283,8 @@
     var total = 0;
     var discount = 0;
     var wet = 0;
+    var e = 0.00001;
+
     $('.product-list tr').each(function(){
       total += (parseFloat($(this).find('.product-total').html()) || 0);
       discount += (parseFloat($(this).find('.product-luc').val()) - parseFloat($(this).find('.product-price').val())) *  parseInt($(this).find('.product-qty').val());
@@ -298,7 +300,11 @@
 
     $('#order_gst').val(((total*(1 - order_discount) + shipping_cost)*0.1).toFixed(4));
     $('#order_discount_amount').val(discount.toFixed(4));
-    $('#order_wet').val(((total-discount) / 1.29 * 0.29).toFixed(4));
+    if ($('#order_discount_rate').val() <= e) {
+      $('#order_wet').val(((total) / 1.29 * 0.29).toFixed(4));
+    } else {
+      $('#order_wet').val(((total-discount) / 1.29 * 0.29).toFixed(4));
+    }
     $('#order_total_inc_tax').val(((total *( 1 - order_discount) + shipping_cost) * 1.1).toFixed(4));
     return total;
   }
