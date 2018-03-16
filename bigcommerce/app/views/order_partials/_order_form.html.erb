@@ -289,7 +289,6 @@
       wet += ((parseFloat($(this).find('.product-price').val()) - 1.82) * parseInt($(this).find('.product-qty').val() * 0.29));
     });
     $('#order_subtotal').val(total.toFixed(4));
-    $('#order_wet').val((total / 1.29 * 0.29).toFixed(4));
     // Modified Wet
     $('#order_modified_wet').val(wet);
 
@@ -299,6 +298,7 @@
 
     $('#order_gst').val(((total*(1 - order_discount) + shipping_cost)*0.1).toFixed(4));
     $('#order_discount_amount').val(discount.toFixed(4));
+    $('#order_wet').val(((total-discount) / 1.29 * 0.29).toFixed(4));
     $('#order_total_inc_tax').val(((total *( 1 - order_discount) + shipping_cost) * 1.1).toFixed(4));
     return total;
   }
