@@ -117,7 +117,7 @@
           <td class="ProductTotal" align="right">$<%= '%.2f' % order.subtotal %></td>
           <td></td>
         </tr>
-        <% if !wine_club && order.discount_rate!=0 %>
+        <% if !wine_club %>
         <tr>
           <td colspan="2" class="ProductCost" align="right">Discount Rate</td>
           <td class="ProductTotal" align="right"><%= '%.0f' % (order.discount_rate) %>%</td>
