@@ -240,7 +240,7 @@
     order_discount = parseFloat($('#order_discount_rate').val()) * 0.01
     discount += (total * order_discount)
     shipping_cost = parseFloat($('#order_shipping_cost').val())
-
+    if (isNaN(shipping_cost)) shipping_cost = 0;
     $('#order_gst').val((total*(1-order_discount)/11 + (shipping_cost)* gst).toFixed(4));
     $('#order_discount_amount').val(discount.toFixed(4));
     $('#order_total_inc_tax').val(((total *( 1 - order_discount) + shipping_cost + shipping_cost*gst)).toFixed(4));
