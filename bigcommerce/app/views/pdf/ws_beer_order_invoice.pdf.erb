@@ -123,6 +123,11 @@
           <td class="ProductTotal" align="right"><%= '%.0f' % (order.discount_rate) %>%</td>
           <td></td>
         </tr>
+        <tr>
+          <td colspan="2" class="ProductCost" align="right">Discount Amount</td>
+          <td class="ProductTotal" align="right"><%= '%.2f' % (order.discount_amount) %></td>
+          <td></td>
+        </tr>
         <% end %>
         <tr>
           <td colspan="2" class="ProductCost" align="right">Shipping</td>
