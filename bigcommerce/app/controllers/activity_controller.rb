@@ -164,7 +164,7 @@ class ActivityController < ApplicationController
   # select only whole sale products for autocomplete list
   def autocomplete_product_ws
     #products = Product.search_for(params[:term]).where("inventory > 0 AND name LIKE '%WS' AND current=1").order('name_no_vintage ASC, vintage DESC').all
-    products = Product.search_for(params[:term]).where("name LIKE '%WS' AND current=1").order('name_no_vintage ASC, vintage DESC').all
+    products = Product.search_for(params[:term]).where("(name LIKE '%WS' OR name LIKE '%VC') AND current=1").order('name_no_vintage ASC, vintage DESC').all
     render :json => products.map { |product| {:id => product.id, :label => product.name,
       :value => product.name, :price => (product.calculated_price * (1.29)).round(4),
       :inventory => product.inventory, :monthly_supply => product.monthly_supply}}
