@@ -4,7 +4,7 @@
 		<% unless ((current_user.id != id) && (current_user.user_type.in?(["Sales Executive"])))%>
 			<td><%= link_to nickname, controller: 'sales', action: 'customer_dashboard', staff_id: id, staff_nickname: nickname %></td>
 		<% else %>
-			<% if ((current_user.id == 54) && (id.in?([5, 50])) && (current_user.user_type.in?(["Sales Executive"])))%> 
+			<% if (((current_user.id == 44) && (id == 35) || (current_user.id == 54) && (id.in?([5,50])) ) && (current_user.user_type.in?(["Sales Executive"])))%> 
 				<td><%= link_to nickname, controller: 'sales', action: 'customer_dashboard', staff_id: id, staff_nickname: nickname %></td>
 			<% else %>
 				<td><%= nickname %></td>
