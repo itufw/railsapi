@@ -183,7 +183,7 @@ class OrderController < ApplicationController
 
         next if product.nil?
 
-        product.assign_attributes(product_params.permit(:price_luc, :qty, :discount, :price_discounted))
+        product.assign_attributes(product_params.permit(:product_id, :price_luc, :qty, :discount, :price_discounted))
         product_attributes = {'display': (product.qty == 0) ? 0 : 1, 'stock_previous': product.stock_current,\
           'stock_current': product.qty, 'stock_incremental': product.qty - product.stock_current,\
           'order_discount': order.discount_rate, 'price_handling': handling_fee,\
@@ -193,7 +193,7 @@ class OrderController < ApplicationController
           'updated_at': Time.now.to_s(:db)}
       else
         # insert
-        product = OrderProduct.new(product_params.permit(:price_luc, :qty, :discount, :price_discounted))
+        product = OrderProduct.new(product_params.permit(:product_id, :price_luc, :qty, :discount, :price_discounted))
         product_attributes = {'product_id': product_id, 'order_id': order.id, 'qty_shipped': 0,\
           'base_price': product.price_luc / (1 + wet), 'stock_previous': 0, 'stock_current': product.qty,\
           'stock_incremental': product.qty, 'display': 1, 'damaged': 0, 'created_by': session[:user_id],\
@@ -207,8 +207,8 @@ class OrderController < ApplicationController
       products_container.append(product)
     end
 
-    order.save
-    products_container.map(&:save)
+    order.save    # to save the order
+    products_container.map(&:save)    # to save all the products at once loop to the order_products table
 
     order.customer.update_attributes(customer_params) unless customer_params.nil?
 
@@ -257,3 +257,4 @@ class OrderController < ApplicationController
      :postcode, :country, :street_2, :company)
   end
 end
+# ----------------------------------------------------------------------------------------------------------------
