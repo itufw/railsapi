@@ -151,7 +151,8 @@ class ActivityController < ApplicationController
   def autocomplete_beer_name
     products = Product.search_for(params[:term]).where('product_sub_type_id = 59').order('name ASC').all
     render :json => products.map { |product| {:id => product.id, :label => product.name,
-      :value => product.name, :price => product.calculated_price.round(4), :inventory => product.inventory}}
+      :value => product.name, :price => (product.name.end_with?'WS') ? product.calculated_price.round(4) : product.calculated_price.round(4)*1.1, 
+      :inventory => product.inventory}}
   end
 
   # select only retail products for autocomplete list
