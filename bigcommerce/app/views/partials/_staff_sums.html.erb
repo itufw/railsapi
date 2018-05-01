@@ -1,15 +1,28 @@
 <% unless ((current_user.user_type.in?(["Sales Executive"])) && ("No".eql? display_all)) %>
 	<% staffs.each do |id, nickname| %>
 	<tr>
-		<% unless ((current_user.id != id) && (current_user.user_type.in?(["Sales Executive"])))%>
-			<td><%= link_to nickname, controller: 'sales', action: 'customer_dashboard', staff_id: id, staff_nickname: nickname %></td>
-		<% else %>
-			<% if (((current_user.id == 44) && (id == 35) || (current_user.id == 54) && (id.in?([5,50])) ) && (current_user.user_type.in?(["Sales Executive"])))%> 
+		<%
+			prefix = ""
+
+			if (current_user.id == 44) && (id == 35)
+				prefix = current_user.nickname
+			elsif ((current_user.id == 54) && (id.in?([5,50])))
+				prefix = current_user.nickname
+			end 
+
+
+			unless ((current_user.id != id) && (current_user.user_type.in?(["Sales Executive"])))
+		%>
 				<td><%= link_to nickname, controller: 'sales', action: 'customer_dashboard', staff_id: id, staff_nickname: nickname %></td>
-			<% else %>
-				<td><%= nickname %></td>
-			<% end %>
-		<% end %>
+		<%  else  
+				if prefix.blank? %>
+					<td><%= nickname %></td>
+				<% else 
+					prefix += " - " + nickname %>
+					<td><%= link_to prefix, controller: 'sales', action: 'customer_dashboard', staff_id: id, staff_nickname: nickname %></td>	
+				<% end
+			end  
+		%>
 
 		<% sums_dates_h = give_sum_date_h(id, sums_dates_staffs_h) %>
 		<%= render "partials/daily_sums", sums_dates_h: sums_dates_h, dates: dates, staff_nickname: nickname, staff_id: id, dates_map: dates_map %>
