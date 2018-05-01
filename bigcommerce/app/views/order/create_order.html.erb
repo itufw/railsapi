@@ -1,44 +1,52 @@
 <%= title 'New Order' %>
 <%= form_for @order, :url => {:controller => "order", :action => "save_order"}  do |f| %>
 
-  <% if browser.device.mobile?%>
-      <div class="order_form" value="WS">
-        <%= render 'order_partials/order_form_mobile', f: f%>
-      </div>
-  <% else %>
+<% if browser.device.mobile?%>
+<div class="order_form" value="WS">
+  <%= render 'order_partials/order_form_mobile', f: f%>
+</div>
+<% else %>
+
+<div id="selector" class="btn-group" style="float: right; margin-top: -35px; margin-right: 450px;">
   <h3 class="title">New Order</h3>
+  <label type="button" class="btn btn-default order-type" value="WS">WS</label>
+  <label type="button" class="btn btn-default order-type" value="Retail">Retail</label>
+  <label type="button" class="btn btn-default order-type" value="WSBeer">WS Beer</label>
+  <label type="button" class="btn btn-default order-type" value="RetailBeer">Retail Beer</label>
+</div>
 
-    <div id="selector" class="btn-group" style="float: right; margin-top: -35px; margin-right: 450px;">
-      <label type="button" class="btn btn-default order-type" value="WS">WS</label>
-      <label type="button" class="btn btn-default order-type" value="Retail">Retail</label>
-      <label type="button" class="btn btn-default order-type" value="Beer">Beer</label>
-    </div>
+<div class="order_form" value="WS">
+  <%= render 'order_partials/order_form', f: f%>
+</div>
 
-    <div class="order_form" value="WS">
-      <%= render 'order_partials/order_form', f: f%>
-    </div>
+<script>
+  $('.order-type').click(function(){
+    if($(this).attr('value') != $('.order_form').attr('value')){
+      if ($(this).attr('value') == 'WS'){
+        $('.order_form').html('<%=j render 'order_partials/order_form', f: f %>');
+        $('.order_form').attr('value', 'WS');
+        $('.title').html('New Order');
+      }else if ($(this).attr('value') == 'Retail'){
+        $('.order_form').html('<%=j render 'order_partials/retail_order_form', f: f %>');
+        $('.order_form').attr('value', 'Retail');
+        $('.title').html('New Retail Order');
+      }else if ($(this).attr('value') == 'WSBeer'){
+        $('.order_form').html('<%=j render 'order_partials/beer_order_form', f: f %>');
+        $('.order_form').attr('value', 'WSBeer');
+        $('.title').html('New WS Beer Order');
 
-    <script>
-      $('.order-type').click(function(){
-        if($(this).attr('value') != $('.order_form').attr('value')){
-          if ($(this).attr('value') == 'WS'){
-            $('.order_form').html('<%=j render 'order_partials/order_form', f: f %>');
-            $('.order_form').attr('value', 'WS');
-            $('.title').html('New Order');
-          }else if ($(this).attr('value') == 'Retail'){
-            $('.order_form').html('<%=j render 'order_partials/retail_order_form', f: f %>');
-            $('.order_form').attr('value', 'Retail');
-            $('.title').html('New Retail Order');
-          }else{
-            $('.order_form').html('<%=j render 'order_partials/beer_order_form', f: f %>');
-            $('.order_form').attr('value', 'Beer');
-            $('.title').html('New Beer Order');
+        // generate the autocomplete list of beers only
+        $('.product_autocomplete').html('<%= autocomplete_field_tag 'product', '', autocomplete_beer_ws_activity_index_path, placeholder: 'Search WS Beers', id_element: '#product_id', id: 'product_search'%>');
+      }else{
+        $('.order_form').html('<%=j render 'order_partials/retail_beer_order_form', f: f %>');
+        $('.order_form').attr('value', 'RetailBeer');
+        $('.title').html('New Retail Beer Order');
 
-            // generate the autocomplete list of beers only
-            $('.product_autocomplete').html('<%= autocomplete_field_tag 'product', '', autocomplete_beer_name_activity_index_path, placeholder: 'Search Beers', id_element: '#product_id', id: 'product_search'%>');
-          }
-        }
-      });
-    </script>
-  <% end %>
+        // generate the autocomplete list of beers only
+        $('.product_autocomplete').html('<%= autocomplete_field_tag 'product', '', autocomplete_beer_name_activity_index_path, placeholder: 'Search Retail Beers', id_element: '#product_id', id: 'product_search'%>');
+      }
+    }
+  });
+</script>
+<% end %>
 <% end %>
