@@ -116,17 +116,21 @@ module OrderStatus
   def print_single_invoice(order)
     customer = order.customer
 
-    if order.is_beer_order(order)
+    if is_beer_order(order)
       if customer.cust_type_id == 1
-        template = 'pdf/rs_beer_order_invoice.pdf'  # retail wines
-      else
+        template = 'pdf/rs_beer_order_invoice.pdf'  # retail beers
+      elsif customer.cust_type_id == 2
         template = 'pdf/ws_beer_order_invoice.pdf'  # wholesale beers
+      else
+        template = 'pdf/rs_beer_order_invoice.pdf'  # retail beers
       end
     else
       if customer.cust_type_id == 1
         template = 'pdf/retail_order_invoice.pdf'   # retail wines
-      else
+      elsif customer.cust_type_id == 2
         template = 'pdf/order_invoice.pdf'          # wholesale wines
+      else
+        template = 'pdf/retail_order_invoice.pdf'   # retail wines
       end
     end
 
