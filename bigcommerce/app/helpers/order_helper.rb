@@ -11,6 +11,18 @@ module OrderHelper
     end
   end
 
+
+  # check if it is a beer order based on the first product of an order
+  # this is not practical but is designed based around the existing design.
+  # true  - a beer order
+  # false - a wine order
+  def is_beer_order(order_id)
+    product_type = OrderProduct.joins(:product).where(order_products: {order_id: order_id}).pluck(:product_type_id).first
+
+    # if product_type = 6 (a beer type) return true
+    return (product_type == 6)
+  end
+
   def product_qty(product_ids, order_id)
     Order.order_filter_(order_id).order_product_filter(product_ids).sum_order_product_qty
   end
