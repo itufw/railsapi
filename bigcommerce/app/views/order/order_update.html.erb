@@ -6,19 +6,19 @@
 <%= form_for @order, url: {controller: "order", action: "update_order"}, method: :POST  do |f| %>
   <%= f.hidden_field :id %>
   <% if is_beer_order(@order.id) %>
-  <% 	if @order.customer.cust_type_id == 1 %>
+  <% 	  if @order.customer.cust_type_id == 1 %>
   <%=  		render 'order_partials/retail_beer_order_form', f: f %>
-  <% 	elsif @order.customer.cust_type_id == 2 %>
+  <% 	  elsif @order.customer.cust_type_id == 2 %>
   <%= 		render 'order_partials/beer_order_form', f: f %>
-  <% 	else %>
+  <% 	  else %>
   <%= 		render 'order_partials/retail_beer_order_form', f: f %>
   <%  	end %>
   <%  else %>
-  <% 	if @order.customer.cust_type_id == 1 %>
+  <% 	  if @order.customer.cust_type_id == 1 %>
   <%=  		render 'order_partials/retail_order_form', f: f %>
-  <% 	elsif @order.customer.cust_type_id == 2 %>
+  <% 	  elsif @order.customer.cust_type_id == 2 %>
   <%= 		render 'order_partials/order_form', f: f %>
-  <% 	else %>
+  <% 	  else %>
   <%= 		render 'order_partials/retail_order_form', f: f %>
   <%  	end %>
   <% end %>
@@ -31,9 +31,9 @@
 <% end %>
 
    <!--  
-customer = order.customer
+    customer = order.customer
 
-   if order.is_beer_order(order)
+    if order.is_beer_order(order)
       if customer.cust_type_id == 1
         template = 'pdf/rs_beer_order_invoice.pdf'  # retail wines
       else

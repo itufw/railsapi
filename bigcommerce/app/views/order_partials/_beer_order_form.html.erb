@@ -1,4 +1,5 @@
 <%= f.text_field :customer_id %>
+<h1> ws beers</h1>
 <div class="row">
   <div class="col-md-8">
     <div class="row">
@@ -24,7 +25,7 @@
           <tr>
             <th>Product</th>
             <td class="product_autocomplete">
-              <%= autocomplete_field_tag 'product', '', autocomplete_beer_ws_activity_index_path, placeholder: 'Search Product', id_element: '#product_id', id: 'retail_product_search'%>
+              <%= autocomplete_field_tag 'product', '', autocomplete_beer_ws_activity_index_path, placeholder: 'Search WS Beers', id_element: '#product_id', id: 'retail_product_search'%>
             </td>
           </tr>
         </table>
@@ -32,7 +33,7 @@
         <script type="text/javascript">
 
           // generate the autocomplete list of beers only
-          $('.product_autocomplete').html('<%= autocomplete_field_tag 'product', '', autocomplete_beer_ws_activity_index_path, placeholder: 'Search WS Beers', id_element: '#product_id', id: 'product_search'%>');
+          $('.product_autocomplete').html('<%= autocomplete_field_tag 'product', '', autocomplete_beer_ws_activity_index_path, placeholder: 'Search WS Beers', id_element: '#product_id', id: 'retail_product_search'%>');
 
           $('input#customer_purchase_order').change(function(){
             if (this.checked){
@@ -199,7 +200,17 @@
     product_count += 1;
 
     $('.product-table tbody.product-list').append([
-      
+      '<tr id="tr_'+ data.item.id +'">',
+        '<td><input size="5" readonly="readonly" class="product-id" type="text" value="'+ data.item.id +'" name="order[products['+ product_count +']][product_id]" id="order_products_'+ product_count +'__product_id"></td>',
+        '<td>'+ data.item.label +'</td>',
+        '<td class="product-inventory">'+ data.item.inventory +'</td>',
+        '<td><input size="5" readonly="readonly" class="product-luc" type="text" value="'+ parseFloat(data.item.price) + '" name="order[products['+ product_count +']][price_luc]" id="order_products_'+ product_count +'__price_luc"></td>',
+        '<td><input size="3" class="product-qty" type="text" value="0" name="order[products['+ product_count +']][qty]" id="order_products_'+ product_count +'__qty"></td>',
+        '<td><input size="2" class="product-discount" type="text" value="0" name="order[products['+ product_count +']][discount]" id="order_products_'+ product_count +'__discount"  placeholder="Discount"> %</td>',
+        '<td><input size="5" class="product-price" type="text" value="'+ parseFloat(data.item.price) +'" name="order[products['+ product_count +']][price_discounted]" id="order_products_'+ product_count +'__price_discounted"></td>',
+        '<td class="product-total">0</td>',
+        '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
+      '</tr>'
       ].join(''));
   });
 
