@@ -30,6 +30,10 @@
         </table>
 
         <script type="text/javascript">
+
+          // generate the autocomplete list of beers only
+          $('.product_autocomplete').html('<%= autocomplete_field_tag 'product', '', autocomplete_beer_ws_activity_index_path, placeholder: 'Search WS Beers', id_element: '#product_id', id: 'product_search'%>');
+
           $('input#customer_purchase_order').change(function(){
             if (this.checked){
               $('.customer-purchase-order-tr').html('<td colspan="3"><input placeholder="Customer Purchase Order" type="text" name="order[customer_purchase_order]" id="order_customer_purchase_order"></td>');
