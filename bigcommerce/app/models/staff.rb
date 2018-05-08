@@ -33,6 +33,11 @@ class Staff < ActiveRecord::Base
       where(active: 1, sales_list_right: 1)
     end
 
+    def self.get_staffs arr_ids
+        # find(arr_id)
+        select('id, nickname').where(:id => arr_ids)
+    end
+
     def self.calendar_list(staff_id = nil)
       where(active: 1, calendar_right: 1) if staff_id.nil?
       where('active = 1 AND (calendar_right = 1 OR id = ?)', staff_id)
