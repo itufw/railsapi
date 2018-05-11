@@ -38,17 +38,21 @@
 	<% 
 		if current_user.id == 54
 			arr_ids = [5,50]	# list of additional staff ids to be displayed on the weekly report
-			get_staffs = Staff.get_staffs(arr_ids)
+		elsif current_user.id == 55
+			arr_ids = [35,44]
+		end
+		
+		get_staffs = Staff.get_staffs(arr_ids)
 
-			get_staffs.each do |staff|
+		get_staffs.each do |staff|
 	%>
-				<tr>
-					<td><%= link_to current_user.nickname + " - " + staff.nickname, controller: 'sales', action: 'customer_dashboard', staff_id: staff.id, staff_nickname: staff.nickname %></td>
-					<% sums_dates_h = give_sum_date_h(staff.id, sums_dates_staffs_h) %>
-					<%= render "partials/daily_sums", sums_dates_h: sums_dates_h, dates: dates, staff_nickname: staff.nickname, staff_id: staff.id, dates_map: dates_map %>
-				</tr>
-			<% end %>
-	<% end %>
+			<tr>
+				<td><%= link_to current_user.nickname + " - " + staff.nickname, controller: 'sales', action: 'customer_dashboard', staff_id: staff.id, staff_nickname: staff.nickname %></td>
+				<% sums_dates_h = give_sum_date_h(staff.id, sums_dates_staffs_h) %>
+				<%= render "partials/daily_sums", sums_dates_h: sums_dates_h, dates: dates, staff_nickname: staff.nickname, staff_id: staff.id, dates_map: dates_map %>
+			</tr>
+		<% end %>
+
 <% end %>
 
 <tr class="blank-row"></tr>
