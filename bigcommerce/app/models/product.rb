@@ -261,8 +261,9 @@ class Product < ActiveRecord::Base
     send(group_by_transform_column).sum(:monthly_supply)
   end
 
+  # show only retail wines (no beer)
   def self.retail_products
-    where("retail_ws != 'WS'")
+    where("retail_ws != 'WS' AND product_sub_type_id != 59")
   end
 
   def self.product_inventory(group_by_transform_column)
