@@ -6,9 +6,10 @@
 
 <script type="text/javascript">
   var validateAddressSearch = function() {
-    let search = document.getElementById("search").value;
-    if (search.length < 5) {
+    let search = document.getElementById("search");
+    if (search.value.length < 5) {
       alert("Please fill in an appropriate address to begin your search");
+      search.style["border-color"] = "red";
       return false;
     }
   }  
@@ -17,15 +18,25 @@
     let message = "";
     let isValid = true;
 
-    let street = document.getElementById("customer_lead_address").value;
-    let name = document.getElementById("customer_lead_actual_name").value;
-    if (street.length < 12) {
+    let street = document.getElementById("customer_lead_address");
+    let name = document.getElementById("customer_lead_actual_name");
+    let mobile = document.getElementById("customer_lead_mobile_phone");
+
+    if (street.value.length < 12) {
         message += "+ Please fill in an appropriate address by using the Google Address textbox.\n";
+        street.style["border-color"] = "red";
         isValid = false;
     }
     
-    if (name.length < 3) {
+    if (name.value.length < 3) {
       message += "+ Please customer nickname or company name with a minimum of 3 characters.\n";
+      name.style["border-color"] = "red";
+      isValid = false;
+    }
+
+    if (mobile.value.length < 9) {
+      message += "+ Please provide a correct mobile phone number.\n";
+      mobile.style["border-color"] = "red";
       isValid = false;
     }
 
@@ -34,6 +45,7 @@
       return isValid;
     }
   }
+
 </script>
 
 <div class="row">
