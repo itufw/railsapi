@@ -25,7 +25,7 @@
     <%= f.text_field :address, placeholder: 'Address', size: 100, readonly: true  %>
     <br/>
     <div class="customer_leads_field">
-      <%= f.text_field :email, placeholder: 'Email', maxlength: 100 %>
+      <%= f.text_field :email, placeholder: 'Email', maxlength: 100%>
       <br/>
         <% unless spot.nil? %>
         <a href="<%= spot.website%>"><%= f.label :website%>:<%= f.text_field :website, placeholder: 'website', maxlength:40 %></a>
