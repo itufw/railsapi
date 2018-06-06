@@ -39,7 +39,12 @@
 		if current_user.id == 54
 			arr_ids = [5,50]	# list of additional staff ids to be displayed on the weekly report
 		elsif current_user.id == 55
-			arr_ids = [35,44]
+			# 35 Sam
+			# 44 Candice
+			# 45 Adam
+			# 19 Stacey
+			# 18 Wylie
+			arr_ids = [35,44,45,19,18]
 		end
 		
 		get_staffs = Staff.get_staffs(arr_ids)
