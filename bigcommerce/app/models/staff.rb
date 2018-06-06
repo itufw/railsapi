@@ -21,8 +21,9 @@ class Staff < ActiveRecord::Base
     # Create a new user
     # Staff.create(name: , email: , password: , password_confirmation: )
 
+    # get active sale staffs and Lucia (id = 8)
     def self.active_sales_staff
-        where('active = 1 and user_type LIKE "Sales%"')
+        where('(active = 1 and user_type LIKE "Sales%") or id = 8')
     end
 
     def self.active_sales_staff_plus(staff_id)
