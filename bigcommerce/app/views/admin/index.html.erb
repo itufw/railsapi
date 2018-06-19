@@ -41,6 +41,17 @@
 	<% end %>
 </div>
 
+<div align="center" style="margin-top: 50px;" >
+	<%= form_tag({:action => "export_sale_report"}, {:method => "get"}) do %>
+		<div style="width: 120px;">
+			<%= date_field( 'date', "end_date", value: Date.today, class: "form-control" ) %>
+		</div>
+		<div style="width: 120px;">
+			<%= submit_tag "Sale Report", :format => "xlsx", :class => "btn btn-primary form-control" %>
+		</div>
+	<% end %>
+</div>
+
 <script>
   $(".sortable").railsSortable();
 </script>
