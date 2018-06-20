@@ -76,6 +76,7 @@
   <div class="row">
     <div class="col-md-6 col-md-offset-3 allocation-products">
       <% if !@order.customer.nil? %>
+        <!-- orders' status_id = 1 : allocation -->
         <% allocation_order = Order.where(customer_id: @order.customer_id, status_id: 1).first %>
         <%= render 'order_partials/allocation_order', order: allocation_order unless allocation_order.nil?%>
       <% end %>
