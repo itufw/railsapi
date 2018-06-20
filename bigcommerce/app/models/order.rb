@@ -119,7 +119,12 @@ class Order < ActiveRecord::Base
     all
   end
 
-  # DEPRECATED due to coincident correctness
+  # filter orders by multiple customer_staffs relationship order by customer staffs
+  def self.customer_staffs_filter(staff_ids)
+    return includes(:customer).where('customers.staff_id = (?)', staff_ids).references(:customers).order('customers.staff_id') unless staff_ids.nil?
+    all
+  end
+
   # filter orders by customer_staff relationship
   def self.customer_staff_filter(staff_id)
     return includes(:customer).where('customers.staff_id = ?', staff_id).references(:customers) unless staff_id.nil?
@@ -236,8 +241,9 @@ class Order < ActiveRecord::Base
     group(['staff_id', 'DATE(orders.date_created)'])
   end
 
+  # Start the week on Monday
   def self.group_by_week_created_and_order_staff_id
-    group(['staff_id', 'WEEK(orders.date_created)'])
+    group(['staff_id', 'WEEK(orders.date_created, 1)'])
   end
 
   def self.group_by_month_created_and_order_staff_id
@@ -269,7 +275,7 @@ class Order < ActiveRecord::Base
 
   def self.group_by_week_created_and_customer_id
     includes(:customer).group(['customers.id',\
-                               'WEEK(orders.date_created)']).references(:customers)
+                               'WEEK(orders.date_created, 1)']).references(:customers)
  end
 
   def self.group_by_month_created_and_customer_id
