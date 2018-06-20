@@ -10,18 +10,22 @@
 
 <div align="center" style="margin-top: 50px;">
 	<%= form_tag({action: 'download_csv'}, {method: 'get'}) do%>
-		<%= date_field( 'date', "start_date", value: (Date.today - 30.days)) %>
-		<%= date_field( 'date', "end_date", value: Date.today) %>
-		<%= collection_select(nil, :status, Status.bigcommerce_status, :id, :status, {include_blank: 'Select Status'}) %>
-		<br/>
-		<%= submit_tag 'Customer', value: 'Customer', class: 'btn btn-success' %>
-		<%= submit_tag 'Order Products', value: 'Order Products', class: 'btn btn-default' %>
-		<%= submit_tag 'Orders', value: 'Orders', class: 'btn btn-info' %>
-		<%= submit_tag 'Shipment', value: 'Shipment', class: 'btn btn-danger' %>
+		<div style="margin-bottom: 12px;">
+			<%= date_field( 'date', "start_date", value: (Date.today - 30.days)) %>
+			<%= date_field( 'date', "end_date", value: Date.today) %>
+			<%= collection_select(nil, :status, Status.bigcommerce_status, :id, :status, {include_blank: 'Select Status'}) %>
+		</div>
+		<div style="margin-bottom: 12px;">
+			<%= submit_tag 'Customer', value: 'Customer', class: 'btn btn-success' %>
+			<%= submit_tag 'Order Products', value: 'Order Products', class: 'btn btn-default' %>
+			<%= submit_tag 'Orders', value: 'Orders', class: 'btn btn-info' %>
+			<%= submit_tag 'Shipment', value: 'Shipment', class: 'btn btn-danger' %>
+		</div>
 	<% end %>
 		<%= link_to 'ScotPac-old', {controller: "admin", action: "scotpac", format: 'xlsx'}, class: 'btn btn-warning'  %>
 		<%= link_to '<button class="btn btn-warning">ScotPac</button>'.html_safe, controller: 'status', action: 'status_check', status_name: 'ScotPac' if user_accountant %>
 		<%= link_to "Stock Control", {controller: "admin", action: "export_stock_control", format: 'xlsx'}, class: "btn btn-primary" %>
+		<%= link_to "Sale Report", {controller: "admin", action: "export_sale_report", format: 'xlsx'}, class: "btn btn-primary" %>
 </div>
 
 <div style="margin-top: 50px;">
@@ -42,14 +46,15 @@
 </div>
 
 <div align="center" style="margin-top: 50px;" >
-	<%= form_tag({:action => "export_sale_report"}, {:method => "get"}) do %>
+	<!-- <%#= form_tag({:action => "export_sale_report"}, {:method => "post"}) do %>
 		<div style="width: 120px;">
-			<%= date_field( 'date', "end_date", value: Date.today, class: "form-control" ) %>
+			<%#= date_field( 'date', "end_date", value: Date.today, class: "form-control" ) %>
 		</div>
 		<div style="width: 120px;">
-			<%= submit_tag "Sale Report", :format => "xlsx", :class => "btn btn-primary form-control" %>
+			<%#= submit_tag "Sale Report", value: 'SaleReport', :class => "btn btn-primary form-control" %>
 		</div>
-	<% end %>
+	<%# end %> -->
+
 </div>
 
 <script>
