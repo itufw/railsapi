@@ -32,9 +32,7 @@
 
 	<tr class = "blank-row"><td colspan="20"></td><tr>
 
-	<tr>
-		<%= render "partials/staff_sums", sums_dates_staffs_h: @staff_sum_by_periods, staffs: @staff_nicknames, dates: @dates_paired.keys, dates_map: @dates_paired, current_user: @current_user, display_all: @display_all  %>
-	</tr>
+	<%= render "partials/staff_sums", sums_dates_staffs_h: @staff_sum_by_periods, staffs: @staff_nicknames, dates: @dates_paired.keys, dates_map: @dates_paired, current_user: @current_user, display_all: @display_all  %>
 
 	<tr>
 		<%= render "sales_partials/cust_group_sums", sums_dates_h: @cust_group_sum, dates: @dates_paired.keys, dates_map: @dates_paired, cust_group_name: @cust_group_name, staff_nickname: nil, staff_id: nil %>
