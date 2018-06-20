@@ -7,6 +7,7 @@ class AdminController < ApplicationController
 
     include CsvGenerator
     include StockControl
+    include DatesHelper
 
     # CustType
     # CustGroup
@@ -195,6 +196,55 @@ class AdminController < ApplicationController
           response.headers['Content-Disposition'] = "attachment; filename=Stock Control #{Date.today.to_s}.xlsx"
         }
       end
+    end
+
+    def export_sale_report
+
+      end_date = Date.today
+      selected_period = "weekly"
+      num_periods = 13
+
+      group_staffs = {
+        :gavin => [10],
+        :mat => [54, 50, 5],
+        :amy => [55, 44, 35]
+      }
+
+      # periods_from_end_date is defined in Dates Helper
+      # returns an array of all dates - sorted
+      # For example num_periods = 3, end_date = 20th oct and "monthly" as period_type returns
+      # {
+      #   23=>[Mon, 04 Jun 2018, Mon, 11 Jun 2018], 
+      #   24=>[Mon, 11 Jun 2018, Mon, 18 Jun 2018], 
+      #   25=>[Mon, 18 Jun 2018, Wed, 20 Jun 2018]
+      # }
+      # 20th Oct is the last date in the array and not 19th oct because
+      # we want to calculate orders including 19th Oct, for that we need to give the next day
+      dates = periods_from_end_date(num_periods, end_date, selected_period)
+
+      # returns a hash like {week_num/month_num => [start_date, end_date]}
+      # i.e. { 20=>[Mon, 14 May 2018, Mon, 21 May 2018] }
+      dates_paired = pair_dates(dates, selected_period)
+
+      # should return - group_by_week_created
+      group_by_function = (period_date_functions(selected_period)[2] + "_and_customer_id").to_sym
+
+      sum_orders = Order.date_filter(dates[0], dates[-1]).valid_order.customer_staffs_filter(group_staffs[:gavin]).send(group_by_function).sum_total
+      # @staff_sum_by_periods = sum_orders(@dates[0], @dates[-1], (date_function + group_by_date_function_staff).to_sym, sum_function, staff_id)
+      # def sum_orders(start_date, end_date, group_by_date_function, sum_function, staff_id)
+      # return Order.date_filter(start_date, end_date).valid_order.customer_staff_filter(staff_id).send(group_by_date_function).send(sum_function)
+
+      render xlsx: "export_sale_report", filename: "Sale Report #{Date.today.to_s}.xlsx"
+      # respond_to do |format|
+      #   # format.xlsx
+      #   format.html
+      #   format.xlsx {
+      #     response.headers['Content-Disposition'] = "attachment; filename=Sale Report #{Date.today.to_s}.xlsx"
+      #   }
+      # end
+
+
+      logger.info "exporting sale report ..."
     end
 
     def scotpac_export
