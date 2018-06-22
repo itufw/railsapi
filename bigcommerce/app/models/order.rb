@@ -121,7 +121,7 @@ class Order < ActiveRecord::Base
 
   # filter orders by multiple customer_staffs relationship order by customer staffs
   def self.customer_staffs_filter(staff_ids)
-    return includes(:customer).where('customers.staff_id = (?)', staff_ids).references(:customers).order('customers.staff_id') unless staff_ids.nil?
+    return includes(:customer).where('customers.staff_id IN (?)', staff_ids).references(:customers).order('customers.staff_id') unless staff_ids.nil?
     all
   end
 
