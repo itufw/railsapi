@@ -121,7 +121,7 @@ class Order < ActiveRecord::Base
 
   # filter orders by multiple customer_staffs relationship order by customer staffs
   def self.customer_staffs_filter(staff_ids)
-    return includes(:customer).where('customers.staff_id IN (?)', staff_ids).references(:customers).order('customers.staff_id') unless staff_ids.nil?
+    return includes(:customer).where('customers.staff_id IN (?)', staff_ids).references(:customers) unless staff_ids.nil?
     all
   end
 
@@ -351,12 +351,19 @@ class Order < ActiveRecord::Base
     order('orders.date_created ' + direction)
   end
 
-  def self.order_by_customer(direction)
+  def self.order_by_customer(direction = 'asc')
     includes(:customer).order('customers.actual_name ' + direction)
   end
 
-  def self.order_by_staff(direction)
+  def self.order_by_staff(direction = 'asc')
     includes(:staff).order('staffs.nickname ' + direction)
+  end
+
+  def self.order_by_staff_customer(staff_direction = 'asc', customer_direction = 'asc')
+    includes(:customer).order(
+      'customers.staff_id ' + staff_direction + 
+      ', customers.actual_name ' + customer_direction
+    )
   end
 
   def self.order_by_status(direction)
