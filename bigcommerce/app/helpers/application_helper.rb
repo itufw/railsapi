@@ -1,4 +1,5 @@
 module ApplicationHelper
+
   # Sets Title of a page
   def title(page_title)
     content_for(:title) { page_title }
@@ -105,6 +106,8 @@ module ApplicationHelper
     end
   end
 
+  # if key exists in hash, turn hash[key] value
+  # Otherwise returns 0
   def exists_in_h_int(hash, key)
     if hash.key? key
       hash[key]
