@@ -202,13 +202,14 @@ class AdminController < ApplicationController
 
       end_date = Date.today
       selected_period = "weekly"
-      num_periods = 13
+      num_periods = 14 # display 13 plus a current week
 
       group_staffs = {
         :gavin => [10],
         :mat => [54, 50, 5],
         :amy => [55, 44, 35]
       }
+
 
       # periods_from_end_date is defined in Dates Helper
       # returns an array of all dates - sorted
@@ -229,22 +230,13 @@ class AdminController < ApplicationController
       # should return - group_by_week_created
       group_by_function = (period_date_functions(selected_period)[2] + "_and_customer_id").to_sym
 
-      sum_orders = Order.date_filter(dates[0], dates[-1]).valid_order.customer_staffs_filter(group_staffs[:gavin]).send(group_by_function).sum_total
-      # @staff_sum_by_periods = sum_orders(@dates[0], @dates[-1], (date_function + group_by_date_function_staff).to_sym, sum_function, staff_id)
-      # def sum_orders(start_date, end_date, group_by_date_function, sum_function, staff_id)
-      # return Order.date_filter(start_date, end_date).valid_order.customer_staff_filter(staff_id).send(group_by_date_function).send(sum_function)
+      sum_orders = Order.date_filter(dates[0], dates[-1]).valid_order.customer_staffs_filter(group_staffs[:mat]).order_by_staff_customer.send(group_by_function).sum_total
+      
+      # Order.sales(staff_ids, start_date, end_date, staff_direction = 'ASC', customer_direction = 'ASC')
+      # sum_orders = Order.sales(group_staffs[:mat], dates[0], dates[-1])
 
+      @weekly_data = [dates_paired, sum_orders]
       render xlsx: "export_sale_report", filename: "Sale Report #{Date.today.to_s}.xlsx"
-      # respond_to do |format|
-      #   # format.xlsx
-      #   format.html
-      #   format.xlsx {
-      #     response.headers['Content-Disposition'] = "attachment; filename=Sale Report #{Date.today.to_s}.xlsx"
-      #   }
-      # end
-
-
-      logger.info "exporting sale report ..."
     end
 
     def scotpac_export
