@@ -6,33 +6,50 @@ wb.add_worksheet(name: 'Sale Report') do |sheet|
 
   # table header
   sheet.add_row(
-	['Region', 'Customer', 'Pay', '3 mth', '6 mth'] + @weekly_data[0].map {|x,y| y[0].strftime("%d/%m")} + ['Average', 'Total']
+	['Region', 'Customer', 'Overdue', '3 mth', '6 mth'] + @weekly_data[0].map {|x,y| y[0].strftime("%d/%m")} + ['Average', 'Total']
   )
 
   # weekly sum
   sheet.merge_cells 'D1:E1'
   sheet.add_row([nil, nil, nil, 'Rankings'] )
 
-  # table data
+  # organise data
 
   weekth_beg = @weekly_data[0].first[0].to_i
   data_size = @weekly_data[0].size
   data = @weekly_data[1]
-  weekly_sum = Array.new(data_size)
+  h_customers = {}
 
+  # initialise an array of weekly sum sizes the number of weeks with 0 as default value
+  weekly_sum = Array.new(data_size, 0)		
+
+  # restructure the receiving data
   data.each do |key, value| 
-  	weekly_amt = Array.new(data_size)
-  	weekly_amt[ key[1] - weekth_beg ] = value
+    # add a customer record to the h_customers if it has not been added
+    h_customers[ key[0] ] = Array.new(data_size, 0.00) unless h_customers.key? key[0]  
+    
+    h_customers[ key[0] ] [ key[1] - weekth_beg ] = value
 
-  	weekly_sum[ key[1] - weekth_beg ] = 0 if weekly_sum[ key[1] - weekth_beg ].nil? and not weekly_amt[ key[1] - weekth_beg ].nil?
-  	weekly_sum[ key[1] - weekth_beg ] += value
+  end
+
+  # add customer data to an excel sheet
+  h_customers.each do |key, value|
+
+    # get sum of individual customer
+    customer_sum = value.reduce(:+)
+
+    # get avg of individual customer
+    customer_avg = customer_sum / value.size
 
     sheet.add_row(
-      ['Region', key[0], 'Pay', '3 mth', '6 mth'] + weekly_amt + ['Average', 'Total']
+      ['Region', key, '-', '-', '-'] + value + [customer_avg, customer_sum]
     )
+
+    # compute weekly sum
+    # weekly_sum.each_with_index { |val, ind| weekly_sum[ind] = val.to_f + value[ind].to_f}
   end
 
   # sum row
   sheet.add_row(['','','','', 'Sum'] + weekly_sum )
-  
+
 end
