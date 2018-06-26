@@ -1,4 +1,5 @@
 <%= f.text_field :customer_id %>
+<h1> retails wines</h1>
 <div class="row">
   <div class="col-md-8">
     <div class="row">
@@ -24,12 +25,15 @@
           <tr>
             <th>Product</th>
             <td class="product_autocomplete">
-              <%= autocomplete_field_tag 'product', '', autocomplete_product_retail_activity_index_path, placeholder: 'Search Product', id_element: '#product_id', id: 'retail_product_search'%>
+              <%= autocomplete_field_tag 'product', '', autocomplete_product_retail_activity_index_path, placeholder: 'Search Retail Wines', id_element: '#product_id', id: 'retail_product_search'%>
             </td>
           </tr>
         </table>
 
         <script type="text/javascript">
+
+          $('.product_autocomplete').html('<%= autocomplete_field_tag 'product', '', autocomplete_product_retail_activity_index_path, placeholder: 'Search Retail Wines Product', id_element: '#product_id', id: 'retail_product_search'%>');
+
           $('input#customer_purchase_order').change(function(){
             if (this.checked){
               $('.customer-purchase-order-tr').html('<td colspan="3"><input placeholder="Customer Purchase Order" type="text" name="order[customer_purchase_order]" id="order_customer_purchase_order"></td>');
@@ -240,10 +244,10 @@
     order_discount = parseFloat($('#order_discount_rate').val()) * 0.01
     discount += (total * order_discount)
     shipping_cost = parseFloat($('#order_shipping_cost').val())
-
+    if (isNaN(shipping_cost)) shipping_cost = 0;
     $('#order_gst').val((total*(1-order_discount)/11 + (shipping_cost)* gst).toFixed(4));
     $('#order_discount_amount').val(discount.toFixed(4));
-    $('#order_total_inc_tax').val(((total *( 1 - order_discount) + shipping_cost*gst)).toFixed(4));
+    $('#order_total_inc_tax').val(((total *( 1 - order_discount) + shipping_cost + shipping_cost*gst)).toFixed(4));
     return total;
   }
 

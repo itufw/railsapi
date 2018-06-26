@@ -111,23 +111,47 @@ module OrderStatus
     ['Next', selected_orders]
   end
 
+  # check if it is a beer order based on the first product of an order
+  # this is not practical but is designed based around the existing design.
+  # true  - a beer order
+  # false - a wine order
+  # this is a duplicate method as on the order_helper
+  def is_beer_order(order_id)
+    product_type = OrderProduct.joins(:product).where(order_products: {order_id: order_id}).pluck(:product_type_id).first
+
+    # if product_type = 6 (a beer type) return true
+    return (product_type == 6)
+  end
+
+  # select an invoice based on the type of an order i.e. retail sale of beer,
+  # wholesale of wine, etc.
   def print_single_invoice(order)
     customer = order.customer
-    if customer.cust_type_id == 1
-      order_invoice = WickedPdf.new.pdf_from_string(
-        render_to_string(
-            :template => 'pdf/retail_order_invoice.pdf',
-            :locals => {order: order, customer: customer}
-            )
-        )
+
+    if is_beer_order(order)
+      if customer.cust_type_id == 1
+        template = 'pdf/rs_beer_order_invoice.pdf'  # retail beers
+      elsif customer.cust_type_id == 2
+        template = 'pdf/ws_beer_order_invoice.pdf'  # wholesale beers
+      else
+        template = 'pdf/rs_beer_order_invoice.pdf'  # retail beers
+      end
     else
-      order_invoice = WickedPdf.new.pdf_from_string(
-        render_to_string(
-            :template => 'pdf/order_invoice.pdf',
-            :locals => {order: order, customer: customer}
-            )
-        )
+      if customer.cust_type_id == 1
+        template = 'pdf/retail_order_invoice.pdf'   # retail wines
+      elsif customer.cust_type_id == 2
+        template = 'pdf/order_invoice.pdf'          # wholesale wines
+      else
+        template = 'pdf/retail_order_invoice.pdf'   # retail wines
+      end
     end
+
+    order_invoice = WickedPdf.new.pdf_from_string(
+      render_to_string(
+          :template => template,
+          :locals => {order: order, customer: customer}
+          )
+      )
 
     order_invoice
   end

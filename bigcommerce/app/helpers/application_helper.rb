@@ -1,4 +1,5 @@
 module ApplicationHelper
+
   # Sets Title of a page
   def title(page_title)
     content_for(:title) { page_title }
@@ -20,6 +21,11 @@ module ApplicationHelper
   # Displays a date in the form 'Day of the week, Day/Month/Year'
   def date_format(date)
     date.to_date.strftime('%a %d/%m/%y')
+  end
+
+  # Displays a date in the form 'Day of the week, Day/Month/Year'
+  def short_date(date)
+    date.to_date.strftime('%d-%m-%Y')
   end
 
   # Displays date in the form Day/Month/Year
@@ -44,6 +50,9 @@ module ApplicationHelper
   # Return the latest shipping status
   def shipping_status(order)
     if order.track_number.nil? || order.track_number==""
+      # return civic if courier status is 2 even tracking info is not provided
+      return 'CIVIC' if order.courier_status_id==2
+      
       records = FastwayTrace.where(id: FastwayTrace.track_order(order.id).group('LabelNumber').maximum('id').values())
     elsif order.courier_status_id == 4
       records = FastwayTrace.where(id: FastwayTrace.where('LabelNumber IN (?)', order.track_number.split(';')).group('LabelNumber').maximum('id').values())
@@ -97,6 +106,8 @@ module ApplicationHelper
     end
   end
 
+  # if key exists in hash, turn hash[key] value
+  # Otherwise returns 0
   def exists_in_h_int(hash, key)
     if hash.key? key
       hash[key]

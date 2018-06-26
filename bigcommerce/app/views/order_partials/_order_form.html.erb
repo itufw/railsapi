@@ -1,4 +1,5 @@
 <%= f.text_field :customer_id %>
+<h1> ws wines</h1>
   <div class="row">
     <div class="col-md-8">
       <div class="row">
@@ -25,7 +26,7 @@
             <tr>
               <th>Product</th>
               <td class="product_autocomplete">
-                <%= autocomplete_field_tag 'product', '', autocomplete_product_ws_activity_index_path, placeholder: 'Search WS Product', id_element: '#product_id', id: 'product_ws_search', size: 40%>
+                <%= autocomplete_field_tag 'product', '', autocomplete_product_ws_activity_index_path, placeholder: 'Search WS Wines', id_element: '#product_id', id: 'product_ws_search', size: 40%>
               </td>
               <!-- No WS products -->
               <td><input type="checkbox" id="ws" class="ws_checkbox" style="display: inline-block;" checked>Only WS</td>
@@ -75,6 +76,7 @@
   <div class="row">
     <div class="col-md-6 col-md-offset-3 allocation-products">
       <% if !@order.customer.nil? %>
+        <!-- orders' status_id = 1 : allocation -->
         <% allocation_order = Order.where(customer_id: @order.customer_id, status_id: 1).first %>
         <%= render 'order_partials/allocation_order', order: allocation_order unless allocation_order.nil?%>
       <% end %>
@@ -283,13 +285,14 @@
     var total = 0;
     var discount = 0;
     var wet = 0;
+    var e = 0.00001;
+
     $('.product-list tr').each(function(){
       total += (parseFloat($(this).find('.product-total').html()) || 0);
       discount += (parseFloat($(this).find('.product-luc').val()) - parseFloat($(this).find('.product-price').val())) *  parseInt($(this).find('.product-qty').val());
       wet += ((parseFloat($(this).find('.product-price').val()) - 1.82) * parseInt($(this).find('.product-qty').val() * 0.29));
     });
     $('#order_subtotal').val(total.toFixed(4));
-    $('#order_wet').val((total / 1.29 * 0.29).toFixed(4));
     // Modified Wet
     $('#order_modified_wet').val(wet);
 
@@ -299,6 +302,11 @@
 
     $('#order_gst').val(((total*(1 - order_discount) + shipping_cost)*0.1).toFixed(4));
     $('#order_discount_amount').val(discount.toFixed(4));
+    if ($('#order_discount_rate').val() <= e) {
+      $('#order_wet').val(((total) / 1.29 * 0.29).toFixed(4));
+    } else {
+      $('#order_wet').val(((total-discount) / 1.29 * 0.29).toFixed(4));
+    }
     $('#order_total_inc_tax').val(((total *( 1 - order_discount) + shipping_cost) * 1.1).toFixed(4));
     return total;
   }

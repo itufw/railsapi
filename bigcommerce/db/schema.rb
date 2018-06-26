@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171108052455) do
+ActiveRecord::Schema.define(version: 20180302032318) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -364,6 +364,15 @@ ActiveRecord::Schema.define(version: 20171108052455) do
   add_index "customer_leads", ["cust_type_id"], name: "index_customer_leads_on_cust_type_id", using: :btree
   add_index "customer_leads", ["staff_id"], name: "index_customer_leads_on_staff_id", using: :btree
 
+  create_table "customer_regions", force: :cascade do |t|
+    t.string   "region",     limit: 36, null: false
+    t.integer  "sub_of",     limit: 4
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
+  end
+
+  add_index "customer_regions", ["region"], name: "region", unique: true, using: :btree
+
   create_table "customer_states", force: :cascade do |t|
     t.string   "state",      limit: 255
     t.string   "state_full", limit: 255
@@ -668,6 +677,13 @@ ActiveRecord::Schema.define(version: 20171108052455) do
   add_index "order_shippings", ["address_id"], name: "index_order_shippings_on_address_id", using: :btree
   add_index "order_shippings", ["order_id"], name: "index_order_shippings_on_order_id", using: :btree
 
+  create_table "order_types", force: :cascade do |t|
+    t.string   "name",        limit: 3
+    t.string   "description", limit: 120
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
   create_table "orders", force: :cascade do |t|
     t.integer  "customer_id",             limit: 4,                              null: false
     t.integer  "status_id",               limit: 4
@@ -717,6 +733,7 @@ ActiveRecord::Schema.define(version: 20171108052455) do
     t.string   "ship_name",               limit: 255
     t.string   "proof_of_delivery",       limit: 255
     t.integer  "scot_pac_load",           limit: 4
+    t.string   "type",                    limit: 3
   end
 
   add_index "orders", ["customer_id"], name: "index_orders_on_customer_id", using: :btree
@@ -928,11 +945,13 @@ ActiveRecord::Schema.define(version: 20171108052455) do
   end
 
   create_table "promotions", force: :cascade do |t|
-    t.string   "name",       limit: 255
+    t.string   "name",        limit: 255
     t.datetime "date_start"
     t.datetime "date_end"
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.integer  "rate",        limit: 4
+    t.text     "description", limit: 65535
   end
 
   create_table "revisions", force: :cascade do |t|

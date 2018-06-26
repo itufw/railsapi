@@ -11,6 +11,18 @@ module OrderHelper
     end
   end
 
+
+  # check if it is a beer order based on the first product of an order
+  # this is not practical but is designed based around the existing design.
+  # true  - a beer order
+  # false - a wine order
+  def is_beer_order(order_id)
+    product_type = OrderProduct.joins(:product).where(order_products: {order_id: order_id}).pluck(:product_type_id).first
+
+    # if product_type = 6 (a beer type) return true
+    return (product_type == 6)
+  end
+
   def product_qty(product_ids, order_id)
     Order.order_filter_(order_id).order_product_filter(product_ids).sum_order_product_qty
   end
@@ -31,10 +43,18 @@ module OrderHelper
     [staff, status, orders, search_text, order_id]
   end
 
+  # display orders of each staff in a certain period of time
   def order_display_(params, orders)
     order_function, direction = sort_order(params, :order_by_id, 'DESC')
     per_page = params[:per_page] || Order.per_page
+
+    # DEPRECATED as it does not fit the purpose.
     orders = orders.where('orders.customer_id != 0').include_all.send(order_function, direction).paginate(per_page: per_page, page: params[:page])
+
+    # turn this on causes errors on pagination when the Order page is loading
+    # filter all orders of a staff for a certain period
+    # orders = orders.includes(:status).where('statuses.valid_order = 1').references(:statuses).includes(:customer).where('customers.Staff_id=5').references(:customers).include_all.send(order_function, direction).paginate(per_page: per_page, page: params[:page])
+    # orders = orders.includes(:status).where('statuses.valid_order = 1').references(:statuses).includes(:customer).where('customers.Staff_id=?', @staffs).include_all.send(order_function, direction).paginate(per_page: per_page, page: params[:page])
     [per_page, orders]
   end
 

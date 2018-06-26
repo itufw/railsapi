@@ -95,11 +95,10 @@ module StockControl
 
   def stock_calculation
     product_hash = {}
-    products_no_ws = ProductNoWs.joins(:products).select('product_no_ws.*, products.case_size as case_size, products.calculated_price AS price,
-       products.retail_ws AS retail_ws, products.name as product_name, products.inventory as inventory,
-       products.id as product_id, products.name_no_winery as name_no_winery,
-       products.sale_term_1, products.monthly_supply, products.current,
-       order_1, order_2')
+    products_no_ws = ProductNoWs.joins(:products).select('product_no_ws.*, products.case_size as case_size, 
+      products.calculated_price AS price, products.retail_ws AS retail_ws, products.name as product_name, 
+      products.inventory as inventory, products.id as product_id, products.name_no_winery as name_no_winery,
+      products.sale_term_1, products.monthly_supply, products.current, order_1, order_2')
 
     allocated_products = OrderProduct.joins(:order).select('product_id, SUM(order_products.qty) as qty').where('orders.status_id': 1).group('product_id')
 
@@ -125,9 +124,12 @@ module StockControl
       if (p.retail_ws=='R')&&(!p.product_name.include?'DM')
         product[:rrp] = (p.price * 1.1).round(2)
       elsif p.product_name.include?'WS'
-        product = product.merge({ws_id: p.product_id, luc: (p.price * 1.29).round(2),
-          current: p.current})
-
+        # no WET for beer, in this particular case, all Volcanica products
+        p.price = p.price * 1.29 unless p.product_name.include?'Volcanica'
+        
+        product = product.merge({ws_id: p.product_id, luc: p.price.round(2), current: p.current})
+        # product = product.merge({ws_id: p.product_id, luc: (p.price * 1.29).round(2), current: p.current})
+        
         product[:term_1] = p.sale_term_1 unless p.sale_term_1.nil? || p.sale_term_1.zero?
         product[:monthly_supply] = p.monthly_supply.round(0) unless p.monthly_supply.nil? || p.monthly_supply.round(0).zero?
       end

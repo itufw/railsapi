@@ -21,8 +21,9 @@ class Staff < ActiveRecord::Base
     # Create a new user
     # Staff.create(name: , email: , password: , password_confirmation: )
 
+    # get active sale staffs and Lucia (id = 8)
     def self.active_sales_staff
-        where('active = 1 and user_type LIKE "Sales%"')
+        where('(active = 1 and user_type LIKE "Sales%") or id = 8')
     end
 
     def self.active_sales_staff_plus(staff_id)
@@ -31,6 +32,11 @@ class Staff < ActiveRecord::Base
 
     def self.sales_list
       where(active: 1, sales_list_right: 1)
+    end
+
+    def self.get_staffs arr_ids
+        # find(arr_id)
+        select('id, nickname').where(:id => arr_ids)
     end
 
     def self.calendar_list(staff_id = nil)

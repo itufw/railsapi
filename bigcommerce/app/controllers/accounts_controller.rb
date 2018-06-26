@@ -98,6 +98,7 @@ class AccountsController < ApplicationController
         @email_content = get_email_content(params, session[:user_id], customer_id, selected_invoices, @cn_op)
     end
 
+    # send overdue reminder email to customer's via account receivable.
     def send_reminder
       if ("Do Not Send".eql? params[:commit])
         if (!(params[:multiple_customer_id].nil?) && !(params[:multiple_customer_id].split().blank?))

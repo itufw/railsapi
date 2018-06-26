@@ -49,6 +49,19 @@
 	font-size: 115%;
 }
 
+.invalid_input {
+	color: red;
+}
+
+.text_input {
+	margin-top: 2px;
+	height: 28px;
+	border: 1px solid #5E6E66;
+	font-size: 16px;
+	padding: 1px;
+	width: 100%;
+}
+
 /*.caret {
 	border-top: 6px dashed;
 	border-left: 6px solid transparent;

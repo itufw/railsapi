@@ -7,6 +7,7 @@ class AdminController < ApplicationController
 
     include CsvGenerator
     include StockControl
+    include DatesHelper
 
     # CustType
     # CustGroup
@@ -195,6 +196,47 @@ class AdminController < ApplicationController
           response.headers['Content-Disposition'] = "attachment; filename=Stock Control #{Date.today.to_s}.xlsx"
         }
       end
+    end
+
+    def export_sale_report
+
+      end_date = Date.today
+      selected_period = "weekly"
+      num_periods = 14 # display 13 plus a current week
+
+      group_staffs = {
+        :gavin => [10],
+        :mat => [54, 50, 5],
+        :amy => [55, 44, 35]
+      }
+
+
+      # periods_from_end_date is defined in Dates Helper
+      # returns an array of all dates - sorted
+      # For example num_periods = 3, end_date = 20th oct and "monthly" as period_type returns
+      # {
+      #   23=>[Mon, 04 Jun 2018, Mon, 11 Jun 2018], 
+      #   24=>[Mon, 11 Jun 2018, Mon, 18 Jun 2018], 
+      #   25=>[Mon, 18 Jun 2018, Wed, 20 Jun 2018]
+      # }
+      # 20th Oct is the last date in the array and not 19th oct because
+      # we want to calculate orders including 19th Oct, for that we need to give the next day
+      dates = periods_from_end_date(num_periods, end_date, selected_period)
+
+      # returns a hash like {week_num/month_num => [start_date, end_date]}
+      # i.e. { 20=>[Mon, 14 May 2018, Mon, 21 May 2018] }
+      dates_paired = pair_dates(dates, selected_period)
+
+      # should return - group_by_week_created
+      group_by_function = (period_date_functions(selected_period)[2] + "_and_customer_id").to_sym
+
+      sum_orders = Order.date_filter(dates[0], dates[-1]).valid_order.customer_staffs_filter(group_staffs[:mat]).order_by_staff_customer.send(group_by_function).sum_total
+      
+      # Order.sales(staff_ids, start_date, end_date, staff_direction = 'ASC', customer_direction = 'ASC')
+      # sum_orders = Order.sales(group_staffs[:mat], dates[0], dates[-1])
+
+      @weekly_data = [dates_paired, sum_orders]
+      render xlsx: "export_sale_report", filename: "Sale Report #{Date.today.to_s}.xlsx"
     end
 
     def scotpac_export

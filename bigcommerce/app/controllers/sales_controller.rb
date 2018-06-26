@@ -17,12 +17,13 @@ class SalesController < ApplicationController
   include SalesHelper
   include ProductHelper
 
-  # Displays this week's and last week's total order sales
-  # Also displays total order sales for this week divided by staff
+  # Display total amount of sales of each day of previous two weeks and current week.
+  # Plus the total amount of sales of the current week of each staff
   def sales_dashboard
-    # Date selected by user , default is today's date
+    # default the start date to the current date if no date is supplied
     date_given = return_date_given(params)
 
+    # get date of each week
     @dates_this_week = this_week(date_given)
     @dates_last_week = last_week(@dates_this_week[0])
     @dates_last_two_week = last_week(@dates_last_week[0])
@@ -36,17 +37,20 @@ class SalesController < ApplicationController
 
     # Order.date_filter(@dates_this_week[0], @dates_this_week[-1].next_day).valid_order.staff_filter(nil).send(:group_by_date_created).send(sum_function)
 
+    # get whole day of each date of the week as a pair of datetime
+    # i.e. Mon, 22 Jan 2018=>[Mon, 22 Jan 2018, Mon, 22 Jan 2018 23:59:59 UTC +00:00]
     @dates_paired_this_week = make_daily_dates_map(@dates_this_week)
     @dates_paired_last_week = make_daily_dates_map(@dates_last_week)
     @dates_paired_last_two_week = make_daily_dates_map(@dates_last_two_week)
 
     # returns a hashmap like { [staff_id, date] => order_totals }
-
     staff_id, @staff_nicknames = display_reports_for_sales_dashboard(session[:user_id])
 
+    # get sale amount of each staff by date
     @staff_sum_this_week = sum_orders(@dates_this_week[0], @dates_this_week[-1], :group_by_date_created_and_staff_id, sum_function, staff_id)
+
     # @staff_nicknames = Staff.active_sales_staff.nickname.to_h
-    @staff_sum_this_week
+    # @staff_sum_this_week
 
     vc_group_number = 17
     @cust_group_sum_this_week, @cust_group_name = cust_group_sales(vc_group_number, @dates_this_week[0], @dates_this_week[-1], 'Vintage Cellars', sum_function)

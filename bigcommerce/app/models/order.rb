@@ -119,7 +119,12 @@ class Order < ActiveRecord::Base
     all
   end
 
-  # DEPRECATED due to coincident correctness
+  # filter orders by multiple customer_staffs relationship order by customer staffs
+  def self.customer_staffs_filter(staff_ids)
+    return includes(:customer).where('customers.staff_id IN (?)', staff_ids).references(:customers) unless staff_ids.nil?
+    all
+  end
+
   # filter orders by customer_staff relationship
   def self.customer_staff_filter(staff_id)
     return includes(:customer).where('customers.staff_id = ?', staff_id).references(:customers) unless staff_id.nil?
@@ -139,14 +144,14 @@ class Order < ActiveRecord::Base
 
   # Returns orders whose date created is between the start date and end date
   # If you want today's orders
-  # Then start date should be Today's date and end date should be Tomorrow's date
+  # Then start date should be Today's date and end date should also be today -- Tomorrow's date --
   # Since date_created is stored as datetime in the database, these start and end dates are
   # converted into datetime values, with 00:00:00 as the time factor.
   def self.date_filter(start_date, end_date)
     if !start_date.nil? && !end_date.nil?
       if !start_date.to_s.empty? && !end_date.to_s.empty?
-        start_time = Time.parse(start_date.to_s)
-        end_time = Time.parse(end_date.to_s).at_end_of_day  # to include all time of the end_time
+        start_time = Time.parse(start_date.to_s).at_beginning_of_day  # start from time 00:00:00
+        end_time = Time.parse(end_date.to_s).at_end_of_day            # conclude at time 23:59:59
 
         return where('orders.date_created >= ? and orders.date_created <= ?', start_time.strftime('%Y-%m-%d %H:%M:%S'), end_time.strftime('%Y-%m-%d %H:%M:%S'))
         end
@@ -212,7 +217,12 @@ class Order < ActiveRecord::Base
   end
 
   def self.group_by_week_created_and_staff_id
-    includes(:customer).group(['customers.staff_id', 'WEEK(orders.date_created)'])
+    # DEPRECATED as the week start Sunday by default
+    # Ref: https://www.w3resource.com/mysql/date-and-time-functions/mysql-week-function.php
+    # includes(:customer).group(['customers.staff_id', 'WEEK(orders.date_created)'])
+
+    # Start each week on Monday
+    includes(:customer).group(['customers.staff_id', 'WEEK(orders.date_created, 1)'])
   end
 
   def self.group_by_month_created_and_staff_id
@@ -231,8 +241,9 @@ class Order < ActiveRecord::Base
     group(['staff_id', 'DATE(orders.date_created)'])
   end
 
+  # Start the week on Monday
   def self.group_by_week_created_and_order_staff_id
-    group(['staff_id', 'WEEK(orders.date_created)'])
+    group(['staff_id', 'WEEK(orders.date_created, 1)'])
   end
 
   def self.group_by_month_created_and_order_staff_id
@@ -264,7 +275,7 @@ class Order < ActiveRecord::Base
 
   def self.group_by_week_created_and_customer_id
     includes(:customer).group(['customers.id',\
-                               'WEEK(orders.date_created)']).references(:customers)
+                               'WEEK(orders.date_created, 1)']).references(:customers)
  end
 
   def self.group_by_month_created_and_customer_id
@@ -340,12 +351,19 @@ class Order < ActiveRecord::Base
     order('orders.date_created ' + direction)
   end
 
-  def self.order_by_customer(direction)
+  def self.order_by_customer(direction = 'asc')
     includes(:customer).order('customers.actual_name ' + direction)
   end
 
-  def self.order_by_staff(direction)
+  def self.order_by_staff(direction = 'asc')
     includes(:staff).order('staffs.nickname ' + direction)
+  end
+
+  def self.order_by_staff_customer(staff_direction = 'asc', customer_direction = 'asc')
+    includes(:customer).order(
+      'customers.staff_id ' + staff_direction + 
+      ', customers.actual_name ' + customer_direction
+    )
   end
 
   def self.order_by_status(direction)

@@ -5,10 +5,14 @@
     <div id="Logo">
       <%= wicked_pdf_image_tag 'logo dark.jpg' %>
     </div>
-    <h1 style="margin-bottom: 0px;">
-      <b>TAX INVOICE</b>
-    </h1>
     <table id="invoiceDets">
+      <tr>
+        <td colspan="2">
+          <h1 style="margin-bottom: 0px; font-size: 18px">
+            <b>TAX INVOICE</b>
+          </h1>
+        </td>
+      </tr>
       <tr>
         <td>
           <b>Invoice No</b>
@@ -85,22 +89,26 @@
         <tr>
           <th class="ProductQuantity">Qty</th>
           <th class="ProductDetails">Product Name</th>
-          <th class="ProductCost" id="price" align="right">Price</th>
-
-          <th class="ProductTotal" align="right" id="amt" style="width:15px;">Total</th>
+          <th style="text-align: right;"  id="price" align="right">Price</th>
+          <th style="text-align: right;"  id="discount" align="right">Discount</th>
+          <th style="text-align: right;"  id="discounted_price" align="right">Discounted Price</th>
+          <th class="ProductTotal" align="right" id="amt">Total</th>
           <th></th>
         </tr>
         <% products.each do |item| %>
         <tr>
           <td class="ProductQuantity"><%= item.qty.to_i%></td>
-            <td class="ProductDetails"><%= item.product.name %></td>
-            <% if [2427, 2582, 2341, 2579].include?item.product_id%>
-              <td class="ProductCost" id="price" align="right">$<%= '%.2f' % (item.price_luc) %></td>
-              <td class="ProductTotal" align="right" id="amt" style="width:15px;">$<%= '%.2f' % (item.qty * item.price_discounted) %></td>
-            <% else %>
-              <td class="ProductCost" id="price" align="right">$<%= '%.2f' % (item.price_discounted) %></td>
-              <td class="ProductTotal" align="right" id="amt" style="width:15px;">$<%= '%.2f' % (item.qty * item.price_discounted) %></td>
-            <% end %>
+          <td class="ProductDetails"><%= item.product.name %></td>
+          <!-- wine club orders -->
+          <% if [2427, 2582, 2341, 2579].include?item.product_id%>
+            <td class="ProductCost" id="price" align="right">$<%= '%.2f' % (item.price_luc) %></td>
+            <td class="ProductTotal" align="right" id="amt" style="width:15px;">$<%= '%.2f' % (item.qty * item.price_discounted) %></td>
+          <% else %>
+            <td style="text-align: right;" id="price" align="right">$<%= '%.2f' % (item.price_luc) %></td>
+            <td style="text-align: right;" align="right"><%= '%.0f' % item.discount %>%</td>
+            <td style="text-align: right;" align="right">$<%= '%.2f' % (item.price_discounted) %></td>
+            <td class="ProductTotal" align="right" id="amt">$<%= '%.2f' % (item.qty * item.price_discounted) %></td>
+          <% end %>
           <td></td>
         </tr>
         <% end %>
@@ -108,30 +116,35 @@
           <td colspan="100%"></td>
         </tr>
         <tr>
-          <td rowspan="7"></td>
-          <td colspan="2" class="ProductCost" align="right">Subtotal</td>
-          <td class="ProductTotal" align="right">$<%= '%.2f' % order.subtotal %></td>
+          <!-- <td rowspan="7"></td> -->
+          <td colspan="5" class="ProductCost" align="right">Subtotal (inc. GST)</td>
+          <td class="ProductTotal" align="right">$<%= '%.2f' % (order.subtotal) %></td>
           <td></td>
         </tr>
-        <% if !wine_club && order.discount_rate!=0 %>
-        <tr>
-          <td colspan="2" class="ProductCost" align="right">Discount Rate</td>
-          <td class="ProductTotal" align="right"><%= '%.0f' % (order.discount_rate) %>%</td>
-          <td></td>
-        </tr>
+        <% if !wine_club %>
+          <tr>
+            <td colspan="5" class="ProductCost" align="right">Discount Rate</td>
+            <td class="ProductTotal" align="right"><%= '%.0f' % (order.discount_rate) %>%</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td colspan="5" class="ProductCost" align="right">Discount Amount</td>
+            <td class="ProductTotal" align="right">$<%= '%.2f' % (order.discount_amount) %></td>
+            <td></td>
+          </tr>
         <% end %>
         <tr>
-          <td colspan="2" class="ProductCost" align="right">Shipping</td>
+          <td colspan="5" class="ProductCost" align="right">Shipping</td>
           <td class="ProductTotal" align="right">$<%= '%.2f' % (order.shipping_cost) %></td>
           <td></td>
         </tr>
         <tr>
-          <td colspan="2" class="ProductCost" align="right">GST</td>
+          <td colspan="5" class="ProductCost" align="right">GST</td>
           <td class="ProductTotal" align="right">$<%= '%.2f' % (order.gst) %></td>
           <td></td>
         </tr>
         <tr>
-          <td colspan="2" class="ProductCost" align="right">
+          <td colspan="5" class="ProductCost" align="right">
             <h3>Grand Total:</h3>
           </td>
           <td class="ProductTotal" align="right">

@@ -19,7 +19,10 @@ default: &default
 
 development:
   <<: *default
-  database: operation
+  database: dev
+  username: dev
+  password: 123123123
+  host: 192.168.1.114
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".

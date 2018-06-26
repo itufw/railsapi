@@ -14,11 +14,11 @@ module CsvGenerator
   def excel_customer(_start_date, _end_date)
     sql = 'customers.id AS  "Customer ID", customers.firstname AS  "First Name",
            customers.lastname AS  "Last Name", company AS  "Company", customers.email AS  "Email",
-           phone AS "Phone", note AS  "Notes", store_credit AS  "Store Credit",
-           name AS  "Customer Group", staffs.nickname AS "Owner", date_created AS  "Date Joined",
-           address AS "Address", description AS  "Required", customers.state AS "State",
+           phone AS "Phone", note AS  "Notes", store_credit AS  "Store Credit", cust_types.name AS 
+           "Customer Type", cust_styles.name AS  "Customer Group", staffs.nickname AS "Owner", date_created AS  
+           "Date Joined", address AS "Address", description AS  "Required", customers.state AS "State",
            postcode AS "Postcode", actual_name AS "Name"'
-    customers = Customer.joins(:cust_style, :staff).select(sql)
+    customers = Customer.joins(:cust_style, :staff, :cust_type).select(sql)
     customers
   end
 
@@ -29,10 +29,11 @@ module CsvGenerator
     "" AS "Tax Total", ROUND(shipping_cost, 2) AS "Shipping Cost", "" AS "Shipping Cost(ex tax)",
     "" AS "Ship Method", "" AS "Handling Cost", ROUND(orders.total_inc_tax, 2) AS "Order Total",
     "" AS "Order Total(ex tax)", staffs.nickname AS "Payment Method", orders.qty AS "Total Quantity",
-    orders.items_shipped AS "Total Shipped", Date(orders.date_shipped) AS "Date Shipped"'
+    IF(orders.status_id=5, 0, orders.qty) AS "Total Bottles Shipped", Date(orders.date_shipped) AS "Date Shipped", 
+    cust_types.name AS "Customer Type", wet AS "WET", gst AS "GST"'
 
     if bigc_status == ''
-      orders = Order.joins(:staff, :customer, :status).select(sql)
+      orders = Order.joins(:staff, :status).joins(:customer => :cust_type).select(sql)
                     .where("orders.date_created > '#{start_date}' AND orders.date_created < '#{end_date}'")
                     .order('orders.id DESC')
     else

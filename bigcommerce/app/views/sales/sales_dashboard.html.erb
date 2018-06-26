@@ -4,15 +4,15 @@
 
 <div style="margin-right: 50px;margin-top: -40px;">
 
-<%= form_tag({:action => "sales_dashboard"}, {:method => "get"}) do %>
-   <%= render "partials/dashboard_filter" %>
-   <div style="float:right;">
-	Start Date:   <%= date_field( "selected_date", "selected_date", value: @dates_this_week.first ) %>
-  <% unless ( (@current_user.user_type.in?(["Sales Executive"])) && ("Yes".eql? @display_all)) %>
-   <%= submit_tag "Change", class: 'btn btn-primary' %>
-  <% end %>
-   </div>
-<% end %>
+	<%= form_tag({:action => "sales_dashboard"}, {:method => "get"}) do %>
+	<%= render "partials/dashboard_filter" %>
+	<div style="float:right;">
+		Start Date:   <%= date_field( "selected_date", "selected_date", value: @dates_this_week.first ) %>
+		<% unless ( (@current_user.user_type.in?(["Sales Executive"])) && ("Yes".eql? @display_all)) %>
+		<%= submit_tag "Change", class: 'btn btn-primary' %>
+		<% end %>
+	</div>
+	<% end %>
 </div>
 
 <!-- <br/> -->
@@ -21,7 +21,7 @@
 	<tr>
 		<th></th>
 		<% @dates_this_week.each do |day| %>
-			<th> <%= date_format(day) %></th>
+		<th> <%= date_format(day) %></th>
 		<% end %>
 		<th><%= @avg_sum ? "Average" : "Total" %></th>
 	</tr>
@@ -33,24 +33,24 @@
 	<tr>
 		<td>This Week</td>
 		<%= render "partials/daily_sums", sums_dates_h: @sum_this_week, dates: @dates_this_week, dates_map: @dates_paired_this_week, staff_nickname: nil, staff_id: nil %>
-	<tr>
+	</tr>
 
 	<tr class = "italics">
 		<td>Last Week</td>
 		<%= render "partials/daily_sums", sums_dates_h: @sum_last_week, dates: @dates_last_week, dates_map: @dates_paired_last_week, staff_nickname: nil, staff_id: nil %>
-	<tr>
+	</tr>
 
-  <tr class = "italics">
-  	<td>Week Before</td>
-  	<%= render "partials/daily_sums", sums_dates_h: @sum_last_two_week, dates: @dates_last_two_week, dates_map: @dates_paired_last_two_week, staff_nickname: nil, staff_id: nil %>
-  <tr>
-	<tr class = "blank-row"><td colspan="9"></td><tr>
+	<tr class = "italics">
+		<td>Week Before</td>
+		<%= render "partials/daily_sums", sums_dates_h: @sum_last_two_week, dates: @dates_last_two_week, dates_map: @dates_paired_last_two_week, staff_nickname: nil, staff_id: nil %>
+	</tr>
+	<tr class = "blank-row"><td colspan="9"></td></tr>
 
 	<tr>
 		<%= render "partials/staff_sums", sums_dates_staffs_h: @staff_sum_this_week, staffs: @staff_nicknames, dates: @dates_this_week, dates_map: @dates_paired_this_week, current_user: @current_user, display_all: @display_all %>
 	</tr>
 
-  <tr>
-    <%= render "sales_partials/cust_group_sums", sums_dates_h: @cust_group_sum_this_week, dates: @dates_this_week, dates_map: @dates_paired_this_week, cust_group_name: @cust_group_name, staff_nickname: nil, staff_id: nil %>
-  </tr>
+	<tr>
+		<%= render "sales_partials/cust_group_sums", sums_dates_h: @cust_group_sum_this_week, dates: @dates_this_week, dates_map: @dates_paired_this_week, cust_group_name: @cust_group_name, staff_nickname: nil, staff_id: nil %>
+	</tr>
 </table>

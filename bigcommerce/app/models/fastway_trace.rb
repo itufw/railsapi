@@ -1,7 +1,8 @@
 class FastwayTrace < ActiveRecord::Base
   belongs_to :item, class_name: 'fastway_consignment_item', foreign_key: 'LabelNumber', primary_key: 'LabelNumber'
   delegate :consignment, to: :item
-
+  attr_accessor :RealDateTime
+  
   def self.exists?(label_number, description, status_description)
     where(LabelNumber: label_number, Description: description, StatusDescription: status_description)
   end

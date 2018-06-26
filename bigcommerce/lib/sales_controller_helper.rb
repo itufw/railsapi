@@ -38,11 +38,18 @@ module SalesControllerHelper
     end
   end
 
+  # available reporting options of the weekly sale summary report
   def order_sum_param(selected)
-    sum_params_h = {"Order Totals" => :sum_total, "Bottles" => :sum_qty,\
-     "Number of Orders" => :count_orders, "Avg. Order Total" => :avg_order_total,\
-      "Avg. Bottles" => :avg_order_qty, "Avg. Bottle Price exGST" => :avg_bottle_price,\
-      "New Customer" => :new_customer, "Contact Note" => :contact_note }
+    sum_params_h = {
+      "Order Totals" => :sum_total, 
+      "Bottles" => :sum_qty,
+      "Number of Orders" => :count_orders, 
+      "Avg. Order Total" => :avg_order_total,
+      "Avg. Bottles" => :avg_order_qty, 
+      "Avg. Bottle Price exGST" => :avg_bottle_price,
+      "New Customer" => :new_customer, 
+      "Contact Note" => :contact_note 
+    }
 
     if selected.nil?
       return sum_params_h["Order Totals"], "Order Totals", sum_params_h.keys

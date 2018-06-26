@@ -1,11 +1,28 @@
 <% unless ((current_user.user_type.in?(["Sales Executive"])) && ("No".eql? display_all)) %>
 	<% staffs.each do |id, nickname| %>
 	<tr>
-		<% unless ((current_user.id != id) && (current_user.user_type.in?(["Sales Executive"])))%>
-			<td><%= link_to nickname, controller: 'sales', action: 'customer_dashboard', staff_id: id, staff_nickname: nickname %></td>
-		<% else %>
-			<td><%= nickname %></td>
-		<% end %>
+		<%
+			prefix = ""
+
+			if (current_user.id == 44) && (id == 35)
+				prefix = current_user.nickname
+			elsif ((current_user.id == 54) && (id.in?([5,50])))
+				prefix = current_user.nickname
+			end 
+
+
+			unless ((current_user.id != id) && (current_user.user_type.in?(["Sales Executive"])))
+		%>
+				<td><%= link_to nickname, controller: 'sales', action: 'customer_dashboard', staff_id: id, staff_nickname: nickname %></td>
+		<%  else  
+				if prefix.blank? %>
+					<td><%= nickname %></td>
+				<% else 
+					prefix += " - " + nickname %>
+					<td><%= link_to prefix, controller: 'sales', action: 'customer_dashboard', staff_id: id, staff_nickname: nickname %></td>	
+				<% end
+			end  
+		%>
 
 		<% sums_dates_h = give_sum_date_h(id, sums_dates_staffs_h) %>
 		<%= render "partials/daily_sums", sums_dates_h: sums_dates_h, dates: dates, staff_nickname: nickname, staff_id: id, dates_map: dates_map %>
@@ -17,6 +34,30 @@
 		<% sums_dates_h = give_sum_date_h(current_user.id, sums_dates_staffs_h) %>
 		<%= render "partials/daily_sums", sums_dates_h: sums_dates_h, dates: dates, staff_nickname: current_user.nickname, staff_id: current_user.id, dates_map: dates_map %>
 	</tr>
+
+	<% 
+		if current_user.id == 54
+			arr_ids = [5,50]	# list of additional staff ids to be displayed on the weekly report
+		elsif current_user.id == 55
+			# 35 Sam
+			# 44 Candice
+			# 45 Adam
+			# 19 Stacey
+			# 18 Wylie
+			arr_ids = [35,44,45,19,18]
+		end
+		
+		get_staffs = Staff.get_staffs(arr_ids)
+
+		get_staffs.each do |staff|
+	%>
+			<tr>
+				<td><%= link_to current_user.nickname + " - " + staff.nickname, controller: 'sales', action: 'customer_dashboard', staff_id: staff.id, staff_nickname: staff.nickname %></td>
+				<% sums_dates_h = give_sum_date_h(staff.id, sums_dates_staffs_h) %>
+				<%= render "partials/daily_sums", sums_dates_h: sums_dates_h, dates: dates, staff_nickname: staff.nickname, staff_id: staff.id, dates_map: dates_map %>
+			</tr>
+		<% end %>
+
 <% end %>
 
 <tr class="blank-row"></tr>

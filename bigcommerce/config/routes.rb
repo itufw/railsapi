@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :order_types
   mount Bootsy::Engine => '/bootsy', as: 'bootsy'
 
   root 'sales#sales_dashboard'
@@ -64,6 +65,7 @@ Rails.application.routes.draw do
   resources :activity do
     get :autocomplete_product_name, on: :collection
     get :autocomplete_beer_name, on: :collection
+    get :autocomplete_beer_ws, on: :collection
     get :autocomplete_product_ws, on: :collection
     get :autocomplete_product_retail, on: :collection
     get :autocomplete_product_no_ws_name, on: :collection
