@@ -1,0 +1,38 @@
+require 'axlsx'
+wb = xlsx_package.workbook
+
+
+wb.add_worksheet(name: 'Sale Report') do |sheet|
+
+  # table header
+  sheet.add_row(
+	['Region', 'Customer', 'Pay', '3 mth', '6 mth'] + @weekly_data[0].map {|x,y| y[0].strftime("%d/%m")} + ['Average', 'Total']
+  )
+
+  # weekly sum
+  sheet.merge_cells 'D1:E1'
+  sheet.add_row([nil, nil, nil, 'Rankings'] )
+
+  # table data
+
+  weekth_beg = @weekly_data[0].first[0].to_i
+  data_size = @weekly_data[0].size
+  data = @weekly_data[1]
+  weekly_sum = Array.new(data_size)
+
+  data.each do |key, value| 
+  	weekly_amt = Array.new(data_size)
+  	weekly_amt[ key[1] - weekth_beg ] = value
+
+  	weekly_sum[ key[1] - weekth_beg ] = 0 if weekly_sum[ key[1] - weekth_beg ].nil? and not weekly_amt[ key[1] - weekth_beg ].nil?
+  	weekly_sum[ key[1] - weekth_beg ] += value
+
+    sheet.add_row(
+      ['Region', key[0], 'Pay', '3 mth', '6 mth'] + weekly_amt + ['Average', 'Total']
+    )
+  end
+
+  # sum row
+  sheet.add_row(['','','','', 'Sum'] + weekly_sum )
+  
+end
