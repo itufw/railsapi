@@ -54,8 +54,8 @@ wb.add_worksheet(name: 'Sale Report') do |sheet|
 
         # compute ranking
         rank = 10 - 100*(customer_sum / reported_period_sale)
-        
-        sheet.add_row([key, '-', '%.1f' % rank] + value.map!{|val| '%.2f' % val} + ['%.2f' % customer_avg, '%.2f' % customer_sum])
+
+        sheet.add_row([key, '-', '%.1f' % rank] + value.map!{|val| val == 0 ? nil : '%.2f' % val} + ['%.2f' % customer_avg, '%.2f' % customer_sum])
     end
 
 
