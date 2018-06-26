@@ -4,52 +4,59 @@ wb = xlsx_package.workbook
 
 wb.add_worksheet(name: 'Sale Report') do |sheet|
 
-  # table header
-  sheet.add_row(
-	['Region', 'Customer', 'Overdue', '3 mth', '6 mth'] + @weekly_data[0].map {|x,y| y[0].strftime("%d/%m")} + ['Average', 'Total']
-  )
+    # table header
+    sheet.add_row(['Customer', 'Overdue', 'Ranks'] + @weekly_data[0].map {|x,y| y[0].strftime("%d/%m")} + ['Average', 'Total'])
 
-  # weekly sum
-  sheet.merge_cells 'D1:E1'
-  sheet.add_row([nil, nil, nil, 'Rankings'] )
+    # weekly sum
+    # sheet.merge_cells 'D1:E1'
+    # sheet.add_row([nil, nil, nil, 'Rankings'] )
 
-  # organise data
+    # organise data
 
-  weekth_beg = @weekly_data[0].first[0].to_i
-  data_size = @weekly_data[0].size
-  data = @weekly_data[1]
-  h_customers = {}
+    weekth_beg = @weekly_data[0].first[0].to_i
+    data_size = @weekly_data[0].size
+    data = @weekly_data[1]
+    h_customers = {}
 
-  # initialise an array of weekly sum sizes the number of weeks with 0 as default value
-  weekly_sum = Array.new(data_size, 0)		
+    # initialise an array of weekly sum sizes the number of weeks with 0 as default value
+    weekly_sum = Array.new(data_size, 0)		
 
-  # restructure the receiving data
-  data.each do |key, value| 
-    # add a customer record to the h_customers if it has not been added
-    h_customers[ key[0] ] = Array.new(data_size, 0.00) unless h_customers.key? key[0]  
-    
-    h_customers[ key[0] ] [ key[1] - weekth_beg ] = value
-
-  end
-
-  # add customer data to an excel sheet
-  h_customers.each do |key, value|
-
-    # get sum of individual customer
-    customer_sum = value.reduce(:+)
-
-    # get avg of individual customer
-    customer_avg = customer_sum / value.size
-
-    sheet.add_row(
-      ['Region', key, '-', '-', '-'] + value + [customer_avg, customer_sum]
-    )
+    # restructure the receiving data
+    data.each do |key, value| 
+        # add a customer record to the h_customers if it has not been added
+        h_customers[ key[0] ] = Array.new(data_size, 0.00) unless h_customers.key? key[0]  
+        
+        h_customers[ key[0] ] [ key[1] - weekth_beg ] = value
+    end
 
     # compute weekly sum
-    # weekly_sum.each_with_index { |val, ind| weekly_sum[ind] = val.to_f + value[ind].to_f}
-  end
+    h_customers.each do |key, value|  
+        weekly_sum.each_with_index { |val, ind| weekly_sum[ind] = val.to_f + value[ind].to_f}
+    end
 
-  # sum row
-  sheet.add_row(['','','','', 'Sum'] + weekly_sum )
+    # get total sale over the reported period
+    reported_period_sale = weekly_sum.reduce(:+)
+
+    # get average sale over the reported period
+    reported_period_avg = reported_period_sale / weekly_sum.size
+
+    # add weekly sum to the report header with total
+    sheet.add_row(['','', 'Sum'] + weekly_sum.map!{|val| '%.2f' % val} + ['%.2f' % reported_period_avg, '%.2f' % reported_period_sale])
+
+    # add customer data to an excel sheet
+    h_customers.each do |key, value|
+
+        # get sum of individual customer
+        customer_sum = value.reduce(:+)
+
+        # get avg of individual customer
+        customer_avg = customer_sum / value.size
+
+        # compute ranking
+        rank = 10 - 100*(customer_sum / reported_period_sale)
+        
+        sheet.add_row([key, '-', '%.1f' % rank] + value.map!{|val| '%.2f' % val} + ['%.2f' % customer_avg, '%.2f' % customer_sum])
+    end
+
 
 end
