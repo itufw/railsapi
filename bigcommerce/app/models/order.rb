@@ -274,8 +274,7 @@ class Order < ActiveRecord::Base
   # end
 
   def self.group_by_week_created_and_customer_id
-    includes(:customer).group(['customers.id',\
-                               'WEEK(orders.date_created, 1)']).references(:customers)
+    includes(:customer).group(['customers.actual_name', 'WEEK(orders.date_created, 1)']).references(:customers)
  end
 
   def self.group_by_month_created_and_customer_id
