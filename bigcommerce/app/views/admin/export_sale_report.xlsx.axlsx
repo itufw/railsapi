@@ -1,23 +1,11 @@
 require 'axlsx'
 wb = xlsx_package.workbook
 
+def get_thead data
+    ['Ranks'] + data[0].map {|x,y| y[0].strftime("%d/%m/%y")} + ['Average', 'Total']
+end
 
-wb.add_worksheet(name: 'Sale Report') do |sheet|
-
-    # table header
-    sheet.add_row(['Customer', 'Overdue', 'Ranks'] + 
-        @weekly_data[0].map {|x,y| y[0].strftime("%d/%m/%y")} + ['Average', 'Total']
-    )
-
-    # weekly sum
-    # sheet.merge_cells 'D1:E1'
-    # sheet.add_row([nil, nil, nil, 'Rankings'] )
-
-    # organise data
-
-
-    # period_num_beg = @weekly_data[0][0][0].kind_of?(Array) ? @weekly_data[0][0][0][0] : @weekly_data[0][0][0]
-
+def map_position data
     # map position of each periodic data to an array index for excel spreadsheet
     i = -1               # initial array position
 
@@ -25,65 +13,131 @@ wb.add_worksheet(name: 'Sale Report') do |sheet|
     # ie. position_map = {12=>0, 1=>1, 2=>2, 3=>3, 4=>4, 5=>5}
     position_map = {}   
 
-    if @weekly_data.first.first[0].kind_of?(Array)
-        @weekly_data.first.each {|x| position_map[x.first.first]=(i+=1)}
+    if data.first.first[0].kind_of?(Array)
+        data.first.each {|x| position_map[x.first.first]=(i+=1)}
     else
-        @weekly_data.first.each {|x| position_map[x.first]=(i+=1)} 
+        data.first.each {|x| position_map[x.first]=(i+=1)} 
     end
 
-    # get the number of columns to be fitted into the excel spreadsheet
-    data_size = @weekly_data[0].size
-    data = @weekly_data[1]
-    h_customers = {}
+    position_map
+end
 
-    # initialise an array of weekly sum sizes the number of weeks with 0 as default value
-    weekly_sum = Array.new(data_size, 0)		
+
+def restructure_data data_src, map_pos
+    # get the number of columns to be fitted into the excel spreadsheet
+    data = data_src[1]
+    h_customers = {}       
 
     # restructure the receiving data into 
     # ie. "Canvas Club"=>[0.0, 0.0, 831.136, 0.0, 0.0, 211.283, 0.0, 0.0, 277.045]
     data.each do |key, value| 
         # add a customer record to the h_customers if it has not been added
-        h_customers[ key[0] ] = Array.new(data_size, 0.0) unless h_customers.key? key[0]  
+        h_customers[ key[0] ] = Array.new(data_src[0].size, 0.0) unless h_customers.key? key[0]  
         
-        h_customers[ key[0] ] [ position_map[ key[1] ] ] = value
-    end
+        h_customers[ key[0] ] [ map_pos[ key[1] ] ] = value
+    end 
+
+    h_customers
+end
+
+def periodic_sum restructured_data
+    # initialise an array of weekly sum sizes the number of weeks with 0 as default value
+    weekly_sum = Array.new(restructured_data.first[1].size, 0) 
 
     # compute weekly sum
-    h_customers.each do |key, value|  
+    restructured_data.each do |key, value|  
         weekly_sum.each_with_index { 
             |val, ind| weekly_sum[ind] = val.to_f + value[ind].to_f
         }
     end
 
     # get total sale over the reported period
-    reported_period_sale = weekly_sum.reduce(:+)
+    prd_sale = weekly_sum.reduce(:+)
 
     # get average sale over the reported period
-    reported_period_avg = reported_period_sale / weekly_sum.size
+    prd_avg = prd_sale / weekly_sum.size
 
-    # add weekly sum to the report header with total
-    sheet.add_row(
-        ['','', 'Sum'] + weekly_sum.map!{|val| '%.2f' % val} + 
-        ['%.2f' % reported_period_avg, '%.2f' % reported_period_sale]
+    weekly_sum.map!{|v| '%.2f' % v} + ['%.2f' % prd_avg, '%.2f' % prd_sale]
+end
+
+
+def merge_all w_data, m_data, q_data, w_p_sum, m_p_sum, q_p_sum
+    
+    merged_data = {}
+
+    q_data.map do |key,value| 
+
+        if w_data[key].nil?
+            m_w_data = Array.new(17, nil)
+        else
+            # get sum of individual customer
+            w_cust_sum = w_data[key].reduce(:+) 
+
+            # get avg of individual customer
+            w_cust_avg = w_cust_sum / w_data[key].size
+
+            # compute ranking
+            w_cust_rnk = w_cust_sum / w_p_sum
+
+            m_w_data = [ w_cust_rnk ] + w_data[ key ] + [ w_cust_avg, w_cust_sum ]
+        end
+
+        if m_data[key].nil?
+            m_m_data = Array.new(9, nil)
+        else
+            m_cust_sum = m_data[key].reduce(:+)
+            m_cust_avg = m_cust_sum / m_data[key].size
+            m_cust_rnk = m_cust_sum / m_p_sum
+            m_m_data = [ m_cust_rnk ] + m_data[ key ] + [ m_cust_avg, m_cust_sum ]
+        end
+
+        q_cust_sum = value.reduce(:+)
+        q_cust_avg = q_cust_sum / value.size
+        q_cust_rnk = q_cust_sum / q_p_sum
+        m_q_data = [ q_cust_rnk ] + value + [ q_cust_avg, q_cust_sum ]
+
+        merged_data[ key ] = m_w_data + m_m_data + m_q_data
+    end
+
+    merged_data
+end
+
+wb.add_worksheet(name: 'Sale Report') do |sheet|
+
+    # table header
+    sheet.add_row(['Customer', 'Overdue'] + get_thead(@weekly_data) + 
+        get_thead(@monthly_data) + get_thead(@quarterly_data)
     )
 
+    # organise data
+
+    map_quarterly = map_position @quarterly_data
+    map_monthly = map_position @monthly_data
+    map_weekly = map_position @weekly_data
+
+    h_quarterly_data = restructure_data @quarterly_data, map_quarterly
+    h_monthly_data = restructure_data @monthly_data, map_monthly
+    h_weekly_data = restructure_data @weekly_data, map_weekly
+
+    sum_quarterly_sale = periodic_sum h_quarterly_data
+    sum_monthly_sale = periodic_sum h_monthly_data
+    sum_weekly_sale = periodic_sum h_weekly_data
+
+    # add weekly sum to the report header with total
+    sheet.add_row(['','', 'Sum'] + sum_weekly_sale + [''] + 
+        sum_monthly_sale + [''] + sum_quarterly_sale
+    )
+
+
+    # add all sale figure to the excel sheet
+    all_data = merge_all h_weekly_data, h_monthly_data, h_quarterly_data, sum_weekly_sale.last.to_f, sum_monthly_sale.last.to_f, sum_quarterly_sale.last.to_f
+
     # add customer data to an excel sheet
-    h_customers.each do |key, value|
+    all_data.each do |key, value|
 
-        # get sum of individual customer
-        customer_sum = value.reduce(:+)
-
-        # get avg of individual customer
-        customer_avg = customer_sum / value.size
-
-        # compute ranking
-        rank = 10 - 100*(customer_sum / reported_period_sale)
-
-        sheet.add_row([key, '-', '%.1f' % rank] + 
-            value.map!{|val| val == 0 ? nil : '%.2f' % val} + 
-            ['%.2f' % customer_avg, '%.2f' % customer_sum]
-        )
+        sheet.add_row([key, '-'] + value.map!{|val| (val == 0 || val.nil?) ? nil : '%.2f' % val})
     end
 
 
 end
+
