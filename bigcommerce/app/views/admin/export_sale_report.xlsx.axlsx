@@ -13,7 +13,23 @@ wb.add_worksheet(name: 'Sale Report') do |sheet|
 
     # organise data
 
-    weekth_beg = @weekly_data[0].first[0].to_i
+
+    # period_num_beg = @weekly_data.first.first[0].kind_of?(Array) ? @weekly_data.first.first.first[0] : @weekly_data.first.first[0]
+
+    # map position of each periodic data to an array index for excel spreadsheet
+    i = -1               # initial array position
+
+    # will store mapping positions and use it to position data index
+    # ie. position_map = {12=>0, 1=>1, 2=>2, 3=>3, 4=>4, 5=>5}
+    position_map = {}   
+
+    if @weekly_data.first.first[0].kind_of?(Array)
+        @weekly_data.first.each {|x| position_map[x.first.first]=(i+=1)}
+    else
+        @weekly_data.first.each {|x| position_map[x.first]=(i+=1)} 
+    end
+
+    # get the number of columns to be fitted into the excel spreadsheet
     data_size = @weekly_data[0].size
     data = @weekly_data[1]
     h_customers = {}
@@ -21,12 +37,13 @@ wb.add_worksheet(name: 'Sale Report') do |sheet|
     # initialise an array of weekly sum sizes the number of weeks with 0 as default value
     weekly_sum = Array.new(data_size, 0)		
 
-    # restructure the receiving data
+    # restructure the receiving data into 
+    # ie. "Canvas Club"=>[0.0, 0.0, 831.136, 0.0, 0.0, 211.283, 0.0, 0.0, 277.045]
     data.each do |key, value| 
         # add a customer record to the h_customers if it has not been added
         h_customers[ key[0] ] = Array.new(data_size, 0.00) unless h_customers.key? key[0]  
         
-        h_customers[ key[0] ] [ key[1] - weekth_beg ] = value
+        h_customers[ key[0] ] [ position_map[ key[1] ] ] = value
     end
 
     # compute weekly sum
