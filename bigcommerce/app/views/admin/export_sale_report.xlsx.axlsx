@@ -5,7 +5,7 @@ wb = xlsx_package.workbook
 wb.add_worksheet(name: 'Sale Report') do |sheet|
 
     # table header
-    sheet.add_row(['Customer', 'Overdue', 'Ranks'] + @weekly_data[0].map {|x,y| y[0].strftime("%d/%m")} + ['Average', 'Total'])
+    sheet.add_row(['Customer', 'Overdue', 'Ranks'] + @weekly_data[0].map {|x,y| y[0].strftime("%d/%m/%y")} + ['Average', 'Total'])
 
     # weekly sum
     # sheet.merge_cells 'D1:E1'
