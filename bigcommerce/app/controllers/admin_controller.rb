@@ -199,44 +199,77 @@ class AdminController < ApplicationController
     end
 
     def export_sale_report
+      to_date = Date.today - 5.weeks
 
-      end_date = Date.today
-      selected_period = "weekly"
-      num_periods = 14 # display 13 plus a current week
+      quarterly = "quarterly"
+      num_quarter = 6
 
-      group_staffs = {
+      monthly = "monthly"
+      num_month = 6
+
+      weekly = "weekly"
+      num_weeks = 14
+
+      staffs = {
         :gavin => [10],
         :mat => [54, 50, 5],
         :amy => [55, 44, 35]
       }
 
+      @quarterly_data = get_periodic_sales quarterly, num_quarter, to_date, staffs[:mat]
+      @monthly_data = get_periodic_sales monthly, num_month, to_date, staffs[:mat]
+      @weekly_data = get_periodic_sales weekly, num_weeks, to_date, staffs[:mat]
+
+      render xlsx: "export_sale_report", filename: "Sale Report #{Date.today.to_s}.xlsx"
+    end
+
+
+
+    # this function return weekly sale figures of staffs 
+    # in a number of week to a specified date
+    # params: 
+    # => freq_count : a number of week to be reported, take an int
+    # => to_date    : report up to a specified date, accept a date
+    # => staffs     : report sale figures of a group of staffs, accept an array
+    # 
+    # return an array of hash
+    # => date_paired        : return a set of date pairs of each week
+    #                       : ie.{ 20=>[Mon, 14 May 2018, Mon, 21 May 2018] } 
+    # => periodic_sum_orders  : return a set of sale figures of each customer
+    #                       : of each reporting week.
+    #                       : ie. {['Canvas Bar', 12] => 463.2}
+    def get_periodic_sales frequency, freq_count, to_date, staffs
+      # frequency = "weekly"
 
       # periods_from_end_date is defined in Dates Helper
       # returns an array of all dates - sorted
-      # For example num_periods = 3, end_date = 20th oct and "monthly" as period_type returns
+      # For example freq_count = 3, to_date = 20th oct and "monthly" as period_type returns
       # {
       #   23=>[Mon, 04 Jun 2018, Mon, 11 Jun 2018], 
       #   24=>[Mon, 11 Jun 2018, Mon, 18 Jun 2018], 
       #   25=>[Mon, 18 Jun 2018, Wed, 20 Jun 2018]
       # }
       # 20th Oct is the last date in the array and not 19th oct because
-      # we want to calculate orders including 19th Oct, for that we need to give the next day
-      dates = periods_from_end_date(num_periods, end_date, selected_period)
+      # we want to calculate orders including 19th Oct
+      dates = periods_from_end_date(freq_count, to_date, frequency)
 
-      # returns a hash like {week_num/month_num => [start_date, end_date]}
+      # returns a hash like {week_num/month_num => [start_date, to_date]}
       # i.e. { 20=>[Mon, 14 May 2018, Mon, 21 May 2018] }
-      dates_paired = pair_dates(dates, selected_period)
+      dates_paired = pair_dates(dates, frequency)
 
-      # should return - group_by_week_created
-      group_by_function = (period_date_functions(selected_period)[2] + "_and_customer_id").to_sym
+      # should return - group_by_week_created for weekly period
+      #               - group_by_month_created for monthly period
+      #               - group_by_quarter_created for quarterly period
+      group_by_function = (period_date_functions(frequency)[2] + "_and_customer_id").to_sym
 
-      sum_orders = Order.date_filter(dates[0], dates[-1]).valid_order.customer_staffs_filter(group_staffs[:mat]).order_by_staff_customer.send(group_by_function).sum_total
-      
-      # Order.sales(staff_ids, start_date, end_date, staff_direction = 'ASC', customer_direction = 'ASC')
-      # sum_orders = Order.sales(group_staffs[:mat], dates[0], dates[-1])
+      periodic_sum_orders = Order.date_filter(dates[0], dates[-1])
+                               .valid_order
+                               .customer_staffs_filter(staffs)
+                               .order_by_staff_customer
+                               .send(group_by_function)
+                               .sum_total
 
-      @weekly_data = [dates_paired, sum_orders]
-      render xlsx: "export_sale_report", filename: "Sale Report #{Date.today.to_s}.xlsx"
+      [dates_paired, periodic_sum_orders]
     end
 
     def scotpac_export
