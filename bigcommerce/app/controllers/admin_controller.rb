@@ -1,7 +1,7 @@
 require 'csv_import.rb'
 require 'csv_generator.rb'
 require 'stock_control.rb'
-
+# require 'zip'
 class AdminController < ApplicationController
     before_action :confirm_logged_in
 
@@ -199,16 +199,16 @@ class AdminController < ApplicationController
     end
 
     def export_sale_report
-      to_date = Date.today - 5.weeks
+      to_date = Date.today
 
       quarterly = "quarterly"
-      num_quarter = 6
+      num_quarter = 4         # max 4
 
       monthly = "monthly"
-      num_month = 6
+      num_month = 6           # max 12
 
       weekly = "weekly"
-      num_weeks = 14
+      num_weeks = 14          # max 52
 
       staffs = {
         :gavin => [10],
@@ -216,13 +216,74 @@ class AdminController < ApplicationController
         :amy => [55, 44, 35]
       }
 
-      @quarterly_data = get_periodic_sales quarterly, num_quarter, to_date, staffs[:mat]
-      @monthly_data = get_periodic_sales monthly, num_month, to_date, staffs[:mat]
-      @weekly_data = get_periodic_sales weekly, num_weeks, to_date, staffs[:mat]
 
-      render xlsx: "export_sale_report", filename: "Sale Report #{Date.today.to_s}.xlsx"
+      @quarterly_data = get_periodic_sales quarterly, num_quarter, to_date, staffs[:amy]
+      @monthly_data = get_periodic_sales monthly, num_month, to_date, staffs[:amy]
+      @weekly_data = get_periodic_sales weekly, num_weeks, to_date, staffs[:amy]
+
+      @quarterly_lines = get_projection_data quarterly, num_quarter, to_date, staffs[:amy], :count_product_lines
+      @quarterly_qty = get_projection_data quarterly, num_quarter, to_date, staffs[:amy], :sum_qty
+      @quarterly_avg_luc = get_projection_data quarterly, num_quarter, to_date, staffs[:amy], :avg_luc
+
+
+
+      logger.info "=========================================================="
+      logger.info @quarterly_avg_luc
+      logger.info "=========================================================="
+      # render xlsx: "export_sale_report", filename: "Sale Report #{Date.today.to_s}.xlsx"
+      # compressed_fs = Zip::OutputStream.write_buffer do |out|
+      #   staffs.each do |key, staff| 
+      #     @quarterly_data = get_periodic_sales quarterly, num_quarter, to_date, staff
+      #     @monthly_data = get_periodic_sales monthly, num_month, to_date, staff
+      #     @weekly_data = get_periodic_sales weekly, num_weeks, to_date, staff
+      #     report = render_to_string :xlsx => "export_sale_report", :filename => "#{key}'s sale report as of #{Date.today.to_s}.xlsx", layout: false
+      #     out.put_next_entry "Sale reports as of #{Date.today.to_s}.xlsx"
+      #     out.print report
+      #   end
+      # end
+      # compressed_fs.rewind
+      # send_data compressed_fs.read, :filename => 'Sale reports.zip', :type => "application/zip"
+
+      # Ref: https://viblo.asia/p/export-multiple-excel-and-zip-files-in-rails-DljMborlGVZn
+      # Ref: https://github.com/rubyzip/rubyzip
+      # Ref: https://stackoverflow.com/questions/25518439/how-can-i-download-multiple-xlsx-files-using-axlsx-gem
     end
 
+    def get_projection_data frequency, freq_count, to_date, staffs, agg_func
+      dates = periods_from_end_date(freq_count, to_date, frequency)
+
+      # returns a hash like {week_num/month_num => [start_date, to_date]}
+      # i.e. { 20=>[Mon, 14 May 2018, Mon, 21 May 2018] }
+      dates_paired = pair_dates(dates, frequency)
+
+      # should return - group_by_week_created for weekly period
+      #               - group_by_month_created for monthly period
+      #               - group_by_quarter_created for quarterly period
+      group_by_function = (period_date_functions(frequency)[2] + "_and_customer_id").to_sym
+
+      # periodic_sum_orders = Order.select('customers.actual_name')
+      #                         .count_products_by_name_no_vintage
+      #                         .date_filter(dates[0], dates[-1])
+      #                         .valid_order
+      #                         .customer_staffs_filter(staffs)
+      #                         .order_by_staff_customer
+      #                         .group_by_quarter_created_and_customer_id
+                              # .send(group_by_function)
+                              # .count_products_by_name_no_vintage
+                              # .avg_luc
+                              # .sum_qty
+
+      periodic_sum_orders = Order.date_filter(dates[0], dates[-1])
+                              .valid_order
+                              .customer_staffs_filter(staffs)
+                              .order_by_staff_customer
+                              .group_by_quarter_created_and_customer_id
+                              .send(agg_func)
+                              # .sum_qty
+                              # .avg_luc
+                              # .count_products_by_name_no_vintage
+      [dates_paired, periodic_sum_orders]
+    end
 
 
     # this function return weekly sale figures of staffs 
@@ -263,11 +324,11 @@ class AdminController < ApplicationController
       group_by_function = (period_date_functions(frequency)[2] + "_and_customer_id").to_sym
 
       periodic_sum_orders = Order.date_filter(dates[0], dates[-1])
-                               .valid_order
-                               .customer_staffs_filter(staffs)
-                               .order_by_staff_customer
-                               .send(group_by_function)
-                               .sum_total
+                              .valid_order
+                              .customer_staffs_filter(staffs)
+                              .order_by_staff_customer
+                              .send(group_by_function)
+                              .sum_total
 
       [dates_paired, periodic_sum_orders]
     end
