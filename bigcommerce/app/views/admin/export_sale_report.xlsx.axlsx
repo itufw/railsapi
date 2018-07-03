@@ -1,6 +1,34 @@
 require 'axlsx'
 wb = xlsx_package.workbook
 
+
+def get_gthead sheet, style
+    overdue = "Overdue"
+
+    sheet.merge_cells "D1:S1"
+    weekly = "Weekly"
+
+    sheet.merge_cells "U1:AB1"
+    month = "Monthly"
+
+    sheet.merge_cells "AD1:AI1"
+    quarter = "Quarterly"
+
+    sheet.merge_cells "AK1:AO1"
+    line = "Lines"
+
+    sheet.merge_cells "AP1:AT1"
+    bottle = "Bottles"
+
+    sheet.merge_cells "AU1:AY1"
+    avg = "Average LUC"
+
+    sheet.merge_cells "AZ1:BD1"
+    revenue = "Revenue"
+
+    sheet.add_row(['', overdue, '', weekly, '', 'month', '', 'quarter', '', line, bottle, avg, revenue],  style: style)
+end
+
 def get_thead data, required_extra
     columns = []
     if required_extra
@@ -109,13 +137,44 @@ def merge_all w_data, m_data, q_data, w_p_sum, m_p_sum, q_p_sum, q_lines, q_qty,
         m_projection_data = [0.0] + q_lines[ key ] + [0.0] + q_qty[ key ] + [0.0] + q_avg_luc[ key ]
 
         # merge all data
-        merged_data[ key ] = m_w_data + m_m_data + m_q_data + m_projection_data + m_q_data[0..3]
+        merged_data[ key ] = m_w_data + m_m_data + m_q_data + m_projection_data + m_q_data[0..4]
     end
 
     merged_data
 end
 
 wb.add_worksheet(name: 'Sale Report') do |sheet|
+    blue = {bg_color: '0B3861', fg_color: 'FFFFFF'}
+    light_blue = {bg_color: '0489B1', fg_color: 'FFFFFF'}
+    green = {bg_color: '4B610B', fg_color: 'FFFFFF'}
+    light_green = {bg_color: '86B404', fg_color: 'FFFFFF'}
+    orange = {bg_color: 'B45F04', fg_color: 'FFFFFF'}
+    light_orange = {bg_color: 'FE9A2E', fg_color: 'FFFFFF'}
+    black_text = {fg_color: '000000'}
+    bold_text = {b: true}
+    center_text = {
+                    :alignment => { 
+                        :horizontal => :center,
+                        :vertical => :center ,
+                        :wrap_text => true
+                    }
+                }
+    head_text_size = {sz: 16}
+    body_text_size = {sz: 12}
+
+    blue_cell = wb.styles.add_style blue
+    light_blue_cell = wb.styles.add_style light_blue
+    green_cell = wb.styles.add_style green
+    light_green_cell = wb.styles.add_style light_green
+    orange_cell = wb.styles.add_style orange
+    light_orange_cell = wb.styles.add_style light_orange
+
+    group_header = wb.styles.add_style blue.merge(head_text_size)
+
+
+
+    # table group header
+    get_gthead sheet, group_header
 
     # table header
     sheet.add_row(['Customer', 'Overdue'] + get_thead(@weekly_data, true) + 
