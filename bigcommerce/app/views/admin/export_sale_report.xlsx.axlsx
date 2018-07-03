@@ -2,31 +2,28 @@ require 'axlsx'
 wb = xlsx_package.workbook
 
 
-def get_gthead sheet, style
-    overdue = "Overdue"
+def get_gthead sheet, style_a, style_b
 
-    sheet.merge_cells "D1:S1"
-    weekly = "Weekly"
-
-    sheet.merge_cells "U1:AB1"
-    month = "Monthly"
-
-    sheet.merge_cells "AD1:AI1"
-    quarter = "Quarterly"
-
-    sheet.merge_cells "AK1:AO1"
-    line = "Lines"
-
-    sheet.merge_cells "AP1:AT1"
-    bottle = "Bottles"
-
-    sheet.merge_cells "AU1:AY1"
-    avg = "Average LUC"
-
-    sheet.merge_cells "AZ1:BD1"
-    revenue = "Revenue"
-
-    sheet.add_row(['', overdue, '', weekly, '', 'month', '', 'quarter', '', line, bottle, avg, revenue],  style: style)
+    sheet.add_row(
+        [
+            '', '', '', '', '', '', '', '', '', '', 'Weekly', '', '', '', '', '', '', '', '', 
+            '', '', '', '', 'Month', '', '', '', '',
+            '', '', '', 'Quarter', '', '', '',
+            '', '', '', 'Line', '', '',
+            '', '', 'Bottle', '', '',
+            '', '', 'Average', '', '',
+            '', '', 'Revenue', '', ''
+        ], 
+        style: [
+            nil, nil, nil, (0..15).map { |x| style_a }, 
+            nil, (0..7).map { |x| style_a },
+            nil, (0..5).map { |x| style_a },
+            nil, (0..4).map { |x| style_a },
+            (0..4).map { |x| style_b },
+            (0..4).map { |x| style_a },
+            (0..4).map { |x| style_b }
+        ].flatten
+    )
 end
 
 def get_thead data, required_extra
@@ -150,6 +147,7 @@ wb.add_worksheet(name: 'Sale Report') do |sheet|
     light_green = {bg_color: '86B404', fg_color: 'FFFFFF'}
     orange = {bg_color: 'B45F04', fg_color: 'FFFFFF'}
     light_orange = {bg_color: 'FE9A2E', fg_color: 'FFFFFF'}
+    overlay = {bg_color: 'F8ECE0', fg_color: '000000'}
     black_text = {fg_color: '000000'}
     bold_text = {b: true}
     center_text = {
@@ -159,8 +157,8 @@ wb.add_worksheet(name: 'Sale Report') do |sheet|
                         :wrap_text => true
                     }
                 }
-    head_text_size = {sz: 16}
-    body_text_size = {sz: 12}
+    head_text_size = {sz: 15}
+    thead_text_size = {sz: 12}
 
     blue_cell = wb.styles.add_style blue
     light_blue_cell = wb.styles.add_style light_blue
@@ -169,20 +167,32 @@ wb.add_worksheet(name: 'Sale Report') do |sheet|
     orange_cell = wb.styles.add_style orange
     light_orange_cell = wb.styles.add_style light_orange
 
-    group_header = wb.styles.add_style blue.merge(head_text_size)
+    group_header_a = wb.styles.add_style blue.merge(head_text_size).merge(center_text)
+    group_header_b = wb.styles.add_style light_blue.merge(head_text_size).merge(center_text)
 
+    thead_style = wb.styles.add_style light_green.merge(thead_text_size).merge(center_text)
 
+    sum_head_style = wb.styles.add_style blue.merge(thead_text_size).merge(center_text)
 
     # table group header
-    get_gthead sheet, group_header
+    get_gthead sheet, group_header_a, group_header_b
 
     # table header
-    sheet.add_row(['Customer', 'Overdue'] + get_thead(@weekly_data, true) + 
+    sheet.add_row(['', ''] + get_thead(@weekly_data, true) + 
         get_thead(@monthly_data, true) + get_thead(@quarterly_data, true) + [''] +
         get_thead(@quarterly_lines, false)[0..4] + ['Target'] + 
         get_thead(@quarterly_qty, false)[0..4] + ['Target'] + 
         get_thead(@quarterly_avg_luc, false)[0..4] + ['Target'] +
-        get_thead(@quarterly_data, false)[0..4] + ['Target']
+        get_thead(@quarterly_data, false)[0..4] + ['Target'],
+        style: [
+            nil, nil, nil, (0..15).map { |x| thead_style }, 
+            nil, (0..7).map { |x| thead_style },
+            nil, (0..5).map { |x| thead_style },
+            nil, (0..4).map { |x| thead_style },
+            (0..15).map { |x| thead_style },
+            (0..15).map { |x| thead_style },
+            (0..15).map { |x| thead_style }
+        ].flatten
     )
 
     # organise data
@@ -214,11 +224,12 @@ wb.add_worksheet(name: 'Sale Report') do |sheet|
     sum_quarterly_avg_luc = periodic_sum h_quarterly_avg_luc
 
     # add weekly sum to the report header with total
-    sheet.add_row(['','', 'Sum'] + sum_weekly_sale + [''] + 
+    sheet.add_row(['Customer','Overdue', 'Sum =>'] + sum_weekly_sale + [''] + 
         sum_monthly_sale + [''] + sum_quarterly_sale + [''] +
         sum_quarterly_lines[0..3] + [''] + sum_quarterly_qty[0..3] +
         [''] + sum_quarterly_avg_luc[0..3] + [''] +
-        sum_quarterly_sale[0..3] + ['']
+        sum_quarterly_sale[0..3] + [''],
+        style: sum_head_style
     )
 
 
@@ -227,7 +238,6 @@ wb.add_worksheet(name: 'Sale Report') do |sheet|
 
     # add customer data to an excel sheet
     all_data.each do |key, value|
-
         sheet.add_row([key, '-'] + value.map!{|val| (val == 0 || val.nil?) ? nil : '%.2f' % val})
     end
 
