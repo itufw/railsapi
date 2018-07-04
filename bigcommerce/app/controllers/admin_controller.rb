@@ -225,11 +225,6 @@ class AdminController < ApplicationController
       @quarterly_qty = get_projection_data quarterly, num_quarter, to_date, staffs[:amy], :sum_qty
       @quarterly_avg_luc = get_projection_data quarterly, num_quarter, to_date, staffs[:amy], :avg_luc
 
-
-
-      logger.info "=========================================================="
-      logger.info @quarterly_avg_luc
-      logger.info "=========================================================="
       # render xlsx: "export_sale_report", filename: "Sale Report #{Date.today.to_s}.xlsx"
       # compressed_fs = Zip::OutputStream.write_buffer do |out|
       #   staffs.each do |key, staff| 
@@ -261,27 +256,12 @@ class AdminController < ApplicationController
       #               - group_by_quarter_created for quarterly period
       group_by_function = (period_date_functions(frequency)[2] + "_and_customer_id").to_sym
 
-      # periodic_sum_orders = Order.select('customers.actual_name')
-      #                         .count_products_by_name_no_vintage
-      #                         .date_filter(dates[0], dates[-1])
-      #                         .valid_order
-      #                         .customer_staffs_filter(staffs)
-      #                         .order_by_staff_customer
-      #                         .group_by_quarter_created_and_customer_id
-                              # .send(group_by_function)
-                              # .count_products_by_name_no_vintage
-                              # .avg_luc
-                              # .sum_qty
-
       periodic_sum_orders = Order.date_filter(dates[0], dates[-1])
                               .valid_order
                               .customer_staffs_filter(staffs)
                               .order_by_staff_customer
                               .group_by_quarter_created_and_customer_id
                               .send(agg_func)
-                              # .sum_qty
-                              # .avg_luc
-                              # .count_products_by_name_no_vintage
       [dates_paired, periodic_sum_orders]
     end
 
