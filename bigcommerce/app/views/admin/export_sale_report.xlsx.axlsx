@@ -147,7 +147,8 @@ wb.add_worksheet(name: 'Sale Report') do |sheet|
     light_green = {bg_color: '86B404', fg_color: 'FFFFFF'}
     orange = {bg_color: 'B45F04', fg_color: 'FFFFFF'}
     light_orange = {bg_color: 'FE9A2E', fg_color: 'FFFFFF'}
-    overlay = {bg_color: 'F8ECE0', fg_color: '000000'}
+    row_odd = {bg_color: 'F8ECE0', fg_color: '000000'}
+    row_even = {bg_color: 'FFFFFF', fg_color: '000000'}
     black_text = {fg_color: '000000'}
     bold_text = {b: true}
     center_text = {
@@ -157,8 +158,22 @@ wb.add_worksheet(name: 'Sale Report') do |sheet|
                         :wrap_text => true
                     }
                 }
+    
     head_text_size = {sz: 15}
     thead_text_size = {sz: 12}
+
+    cell_border_sm = {
+        border: { 
+            style: :thin, color: 'FBEFEF', edges: [:left, :right]
+        }
+    }
+
+    cell_border_md_top = {
+        border: { 
+            style: :thick, color: '61380B', edges: [:top]
+        }
+    }
+
 
     blue_cell = wb.styles.add_style blue
     light_blue_cell = wb.styles.add_style light_blue
@@ -166,6 +181,10 @@ wb.add_worksheet(name: 'Sale Report') do |sheet|
     light_green_cell = wb.styles.add_style light_green
     orange_cell = wb.styles.add_style orange
     light_orange_cell = wb.styles.add_style light_orange
+    row_odd = wb.styles.add_style row_odd.merge(cell_border_sm)
+    row_even = wb.styles.add_style row_even.merge(cell_border_sm)
+
+    cell_border_md_top = wb.styles.add_style cell_border_md_top
 
     group_header_a = wb.styles.add_style blue.merge(head_text_size).merge(center_text)
     group_header_b = wb.styles.add_style light_blue.merge(head_text_size).merge(center_text)
@@ -229,7 +248,17 @@ wb.add_worksheet(name: 'Sale Report') do |sheet|
         sum_quarterly_lines[0..3] + [''] + sum_quarterly_qty[0..3] +
         [''] + sum_quarterly_avg_luc[0..3] + [''] +
         sum_quarterly_sale[0..3] + [''],
-        style: sum_head_style
+        style: [
+            sum_head_style, sum_head_style, nil, 
+            (0..15).map { |x| sum_head_style }, 
+            nil, (0..7).map { |x| sum_head_style },
+            nil, (0..5).map { |x| sum_head_style },
+            nil, (0..4).map { |x| sum_head_style },
+            (0..4).map { |x| sum_head_style },
+            (0..4).map { |x| sum_head_style },
+            (0..4).map { |x| sum_head_style }
+        ].flatten
+    
     )
 
 
@@ -237,10 +266,27 @@ wb.add_worksheet(name: 'Sale Report') do |sheet|
     all_data = merge_all h_weekly_data, h_monthly_data, h_quarterly_data, sum_weekly_sale.last.to_f, sum_monthly_sale.last.to_f, sum_quarterly_sale.last.to_f, h_quarterly_lines, h_quarterly_qty, h_quarterly_avg_luc
 
     # add customer data to an excel sheet
+    i = 0
+    toggle_color = false
     all_data.each do |key, value|
-        sheet.add_row([key, '-'] + value.map!{|val| (val == 0 || val.nil?) ? nil : '%.2f' % val})
+        toggle_color = !toggle_color
+        sheet.add_row(
+            [key, '-'] + value.map!{|val| (val == 0 || val.nil?) ? nil : '%.2f' % val} + [''], 
+            style: [
+                nil, nil, nil, 
+                (0..15).map { |x| toggle_color ? row_odd : row_even }, 
+                nil, (0..7).map { |x| toggle_color ? row_odd : row_even },
+                nil, (0..5).map { |x| toggle_color ? row_odd : row_even },
+                nil, (0..4).map { |x| toggle_color ? row_odd : row_even },
+                (0..4).map { |x| toggle_color ? row_odd : row_even },
+                (0..4).map { |x| toggle_color ? row_odd : row_even },
+                (0..4).map { |x| toggle_color ? row_odd : row_even }
+            ].flatten
+        )
     end
 
+    sheet.add_row((0..55).map{|x| nil}, style: [nil,nil,nil, (0..52).map { |x| !toggle_color ? row_odd : row_even }].flatten)
+    sheet.add_row((0..55).map{|x| nil}, style: cell_border_md_top)
 
 end
 
