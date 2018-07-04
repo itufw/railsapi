@@ -7,11 +7,11 @@ def get_gthead sheet, style_a, style_b
     sheet.add_row(
         [
             '', '', '', '', '', '', '', '', '', '', 'Weekly', '', '', '', '', '', '', '', '', 
-            '', '', '', '', 'Month', '', '', '', '',
-            '', '', '', 'Quarter', '', '', '',
-            '', '', '', 'Line', '', '',
-            '', '', 'Bottle', '', '',
-            '', '', 'Average', '', '',
+            '', '', '', '', 'Monthly', '', '', '', '',
+            '', '', '', 'Quarterly', '', '', '',
+            '', '', '', 'Lines', '', '',
+            '', '', 'Bottles', '', '',
+            '', '', 'Avg LUC', '', '',
             '', '', 'Revenue', '', ''
         ], 
         style: [
@@ -73,22 +73,22 @@ end
 
 def periodic_sum restructured_data
     # initialise an array of weekly sum sizes the number of weeks with 0 as default value
-    weekly_sum = Array.new(restructured_data.first[1].size, 0) 
+    periodic_sum = Array.new(restructured_data.first[1].size, 0) 
 
     # compute weekly sum
     restructured_data.each do |key, value|  
-        weekly_sum.each_with_index { 
-            |val, ind| weekly_sum[ind] = val.to_f + value[ind].to_f
+        periodic_sum.each_with_index { 
+            |val, ind| periodic_sum[ind] = val.to_f + value[ind].to_f
         }
     end
 
     # get total sale over the reported period
-    prd_sale = weekly_sum.reduce(:+)
+    prd_sale = periodic_sum.reduce(:+)
 
     # get average sale over the reported period
-    prd_avg = prd_sale / weekly_sum.size
+    prd_avg = prd_sale / periodic_sum.size
 
-    weekly_sum.map!{|v| '%.2f' % v} + ['%.2f' % prd_avg, '%.2f' % prd_sale]
+    periodic_sum.map!{|v| '%.2f' % v} + ['%.2f' % prd_avg, '%.2f' % prd_sale]
 end
 
 
@@ -243,11 +243,14 @@ wb.add_worksheet(name: 'Sale Report') do |sheet|
     sum_quarterly_avg_luc = periodic_sum h_quarterly_avg_luc
 
     # add weekly sum to the report header with total
-    sheet.add_row(['Customer','Overdue', 'Sum =>'] + sum_weekly_sale + [''] + 
-        sum_monthly_sale + [''] + sum_quarterly_sale + [''] +
-        sum_quarterly_lines[0..3] + [''] + sum_quarterly_qty[0..3] +
-        [''] + sum_quarterly_avg_luc[0..3] + [''] +
-        sum_quarterly_sale[0..3] + [''],
+    sheet.add_row(['Customer','Overdue', 'Sum =>'] + 
+        sum_weekly_sale.map { |x| x.to_i } + [''] + 
+        sum_monthly_sale.map { |x| x.to_i } + [''] + 
+        sum_quarterly_sale.map { |x| x.to_i } + [''] +
+        sum_quarterly_lines[0..3].map { |x| x.to_i } + [''] + 
+        sum_quarterly_qty[0..3].map { |x| x.to_i } + [''] + 
+        sum_quarterly_avg_luc[0..3].map { |x| x.to_i } + [''] +
+        sum_quarterly_sale[0..3].map { |x| x.to_i } + [''],
         style: [
             sum_head_style, sum_head_style, nil, 
             (0..15).map { |x| sum_head_style }, 
@@ -288,5 +291,8 @@ wb.add_worksheet(name: 'Sale Report') do |sheet|
     sheet.add_row((0..55).map{|x| nil}, style: [nil,nil,nil, (0..52).map { |x| !toggle_color ? row_odd : row_even }].flatten)
     sheet.add_row((0..55).map{|x| nil}, style: cell_border_md_top)
 
+    sheet.column_info[18].hidden = true
+    sheet.column_info[27].hidden = true
+    sheet.column_info[34].hidden = true
 end
 
