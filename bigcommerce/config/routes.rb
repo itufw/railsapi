@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :projections
   resources :order_types
   mount Bootsy::Engine => '/bootsy', as: 'bootsy'
 

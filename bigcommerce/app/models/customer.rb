@@ -9,6 +9,7 @@ class Customer < ActiveRecord::Base
 	has_many :contacts
 	has_many :cust_contacts
 	has_many :customer_credit_apps
+	has_many :projections
 	belongs_to :cust_type
 	belongs_to :cust_group
 	belongs_to :cust_style

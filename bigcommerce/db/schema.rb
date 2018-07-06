@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180302032318) do
+ActiveRecord::Schema.define(version: 20180706002327) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -942,6 +942,22 @@ ActiveRecord::Schema.define(version: 20180302032318) do
     t.integer  "sale_term_3",               limit: 4
     t.integer  "sale_term_4",               limit: 4
     t.decimal  "monthly_supply",                          precision: 6, scale: 2
+  end
+
+  create_table "projections", force: :cascade do |t|
+    t.integer  "customer_id",     limit: 4,   null: false
+    t.string   "customer_name",   limit: 120
+    t.integer  "q_lines",         limit: 1
+    t.integer  "q_bottles",       limit: 2
+    t.float    "q_avgluc",        limit: 24
+    t.string   "quarter",         limit: 6
+    t.boolean  "recent"
+    t.integer  "created_by_id",   limit: 4,   null: false
+    t.string   "created_by_name", limit: 50
+    t.string   "sale_rep_name",   limit: 50
+    t.integer  "sale_rep_id",     limit: 4
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
   end
 
   create_table "promotions", force: :cascade do |t|
