@@ -26,41 +26,41 @@
     <% end %>
   </div>
   <div class="field">
-    <%= f.label :q_lines %><br>
+    <%= f.label :lines %><br>
     <%= f.number_field :q_lines %>
   </div>
   <div class="field">
-    <%= f.label :q_bottles %><br>
+    <%= f.label :bottles %><br>
     <%= f.number_field :q_bottles %>
   </div>
   <div class="field">
-    <%= f.label :q_avgluc %><br>
+    <%= f.label :avg_luc %><br>
     <%= f.text_field :q_avgluc %>
   </div>
   <div class="field">
     <%= f.label :quarter %><br>
     <%= f.text_field :quarter, value: Time.now.strftime('%m%Y') %>
   </div>
-  <div class="field">
+<!--  <div class="field">
     <%= f.label :recent %><br>
-    <%= f.text_field :recent, value: true %>
+    <%= f.hidden_field :recent, value: true %>
   </div>
   <div class="field">
     <%= f.label :sale_rep_id %><br>
-    <%= f.number_field :sale_rep_id, value: 55 %>
-  </div>
+    <%= f.hidden_field :sale_rep_id, value: 55 %>
+  </div> -->
   <div class="field">
     <%= f.label :sale_rep_name %><br> 
     <%= f.text_field :sale_rep_name, value: 'Amy' %>
   </div>
-  <div class="field">
+<!--   <div class="field">
     <%= f.label :created_by_id %><br>
-    <%= f.number_field :created_by_id, value: session[:user_id], readonly: true  %>
+    <%= f.hidden_field :created_by_id, value: session[:user_id], readonly: true  %>
   </div>
   <div class="field">
     <%= f.label :created_by %><br>
-    <%= f.text_field :created_by_name, value: session[:username], readonly: true %>
-  </div>
+    <%= f.hidden_field :created_by_name, value: session[:username], readonly: true %>
+  </div> -->
   <div class="actions">
     <%= f.submit %>
   </div>
