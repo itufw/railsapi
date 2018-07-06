@@ -1,8 +1,9 @@
 <p id="notice"><%= notice %></p>
 
-<h1>Listing Projection Data</h1>
+<h1 style="text-align: center;">Projection Data</h1>
 
-<table>
+<%= link_to 'New Projection', new_projection_path, class: "btn btn-primary " %>
+<table class="table table-striped mt-0">
   <thead>
     <tr>
       <th>Customer</th>
@@ -31,7 +32,3 @@
     <% end %>
   </tbody>
 </table>
-
-<br>
-
-<%= link_to 'New Projection', new_projection_path %>
