@@ -69,6 +69,6 @@ class ProjectionsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def projection_params
-      params.require(:projection).permit(:customer_id, :customer_name, :q_lines, :q_bottles, :q_avgluc, :quarter, :recent, :sale_rep_id, :sale_name_name, :created_by, :created_by_id)
+      params.require(:projection).permit(:customer_id, :customer_name, :q_lines, :q_bottles, :q_avgluc, :quarter, :recent, :sale_rep_id, :sale_rep_name, :created_by_name, :created_by_id)
     end
 end
