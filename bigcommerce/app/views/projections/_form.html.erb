@@ -1,0 +1,81 @@
+<%= form_for(@projection) do |f| %>
+  <% if @projection.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@projection.errors.count, "error") %> prohibited this projection from being saved:</h2>
+
+      <ul>
+      <% @projection.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :customer_id %><br>
+    <%= f.number_field :customer_id, readonly: true %>
+  </div>
+  <div class="field">
+    <%= f.label :customer_name %><br>
+
+    <% if @projection.customer_id.blank?%>
+      <%= f.hidden_field :customer_name %>
+      <%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 23 %>
+    <% else %>
+      <%= f.text_field :customer_name, readonly: true %>
+    <% end %>
+  </div>
+  <div class="field">
+    <%= f.label :q_lines %><br>
+    <%= f.number_field :q_lines %>
+  </div>
+  <div class="field">
+    <%= f.label :q_bottles %><br>
+    <%= f.number_field :q_bottles %>
+  </div>
+  <div class="field">
+    <%= f.label :q_avgluc %><br>
+    <%= f.text_field :q_avgluc %>
+  </div>
+  <div class="field">
+    <%= f.label :quarter %><br>
+    <%= f.text_field :quarter, value: Time.now.strftime('%m%Y') %>
+  </div>
+  <div class="field">
+    <%= f.label :recent %><br>
+    <%= f.text_field :recent, value: true %>
+  </div>
+  <div class="field">
+    <%= f.label :sale_rep_id %><br>
+    <%= f.number_field :sale_rep_id, value: 55 %>
+  </div>
+  <div class="field">
+    <%= f.label :sale_rep_name %><br> 
+    <%= f.text_field :sale_rep_name, value: 'Amy' %>
+  </div>
+  <div class="field">
+    <%= f.label :created_by_id %><br>
+    <%= f.number_field :created_by_id, value: session[:user_id], readonly: true  %>
+  </div>
+  <div class="field">
+    <%= f.label :created_by %><br>
+    <%= f.text_field :created_by_name, value: session[:username], readonly: true %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    // if ($('#projection_customer_name').val == nil)
+  });
+
+  // search a customer and populate its id and name onto the customer ID and customer Name textboxes
+  $(document).on('railsAutocomplete.select', '#customer_search', function(event, data){
+    console.log(data);
+    console.log(data.item.id);
+    $('#projection_customer_id').val(data.item.id);
+    $('#projection_customer_name').val(data.item.value);
+  });
+</script>

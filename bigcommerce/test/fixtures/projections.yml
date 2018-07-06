@@ -1,0 +1,27 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  customer_id: 1
+  customer_name: MyString
+  q_lines: 1
+  q_bottles: 1
+  q_avgluc: 1.5
+  quarter: MyString
+  recent: 
+  sale_rep_id: 1
+  sale_name_name: MyString
+  created_by: MyString
+  created_by_id: 1
+
+two:
+  customer_id: 1
+  customer_name: MyString
+  q_lines: 1
+  q_bottles: 1
+  q_avgluc: 1.5
+  quarter: MyString
+  recent: 
+  sale_rep_id: 1
+  sale_name_name: MyString
+  created_by: MyString
+  created_by_id: 1
