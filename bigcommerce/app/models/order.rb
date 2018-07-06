@@ -308,6 +308,10 @@ class Order < ActiveRecord::Base
   #   group('orders.id')
   # end
 
+  def self.group_by_customerid
+    group('orders.customer_id')
+  end
+
   def self.group_by_product_id
     includes(:order_products).group('order_products.product_id').references(:order_products)
   end
