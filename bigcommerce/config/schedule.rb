@@ -46,6 +46,11 @@ every '0 8 * * 1' do
 	rake 'updates:send_stock_control'
 end
 
+# Email sale reports to the team on every Sunday's midnight
+every :tuesday, at: '4:15pm' do
+	rake 'updates:send_sale_report'
+end
+
 # Refresh the Signature Pictures of Fastway
 every 1.day, :at => '10:45 pm' do
 	rake 'updates:wake_signatures'
