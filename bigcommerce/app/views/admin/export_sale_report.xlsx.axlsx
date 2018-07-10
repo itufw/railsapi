@@ -1,4 +1,5 @@
 require 'axlsx'
+
 wb = xlsx_package.workbook
 
 
@@ -146,6 +147,15 @@ def merge_all w_data, m_data, q_data, w_p_sum, m_p_sum, q_p_sum, q_lines, q_qty,
 end
 
 wb.add_worksheet(name: 'Sale Report') do |sheet|
+
+    @quarterly_data, 
+    @monthly_data, 
+    @weekly_data, 
+    @quarterly_lines, 
+    @quarterly_qty, 
+    @quarterly_avg_luc, 
+    @projecting_data = projection_data if @quarterly_data.nil?
+
     blue = {bg_color: '0B3861', fg_color: 'FFFFFF'}
     light_blue = {bg_color: '0489B1', fg_color: 'FFFFFF'}
     green = {bg_color: '4B610B', fg_color: 'FFFFFF'}
