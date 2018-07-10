@@ -218,13 +218,16 @@ class AdminController < ApplicationController
       }
 
 
-      @quarterly_data = get_periodic_sales quarterly, num_quarter, to_date, staffs[:amy]
-      @monthly_data = get_periodic_sales monthly, num_month, to_date, staffs[:amy]
-      @weekly_data = get_periodic_sales weekly, num_weeks, to_date, staffs[:amy]
 
-      @quarterly_lines = get_projection_data quarterly, num_quarter, to_date, staffs[:amy], :count_product_lines
-      @quarterly_qty = get_projection_data quarterly, num_quarter, to_date, staffs[:amy], :sum_qty
-      @quarterly_avg_luc = get_projection_data quarterly, num_quarter, to_date, staffs[:amy], :avg_luc
+      @quarterly_data = get_periodic_sales quarterly, num_quarter, to_date, staffs[:gavin]
+      @monthly_data = get_periodic_sales monthly, num_month, to_date, staffs[:gavin]
+      @weekly_data = get_periodic_sales weekly, num_weeks, to_date, staffs[:gavin]
+
+      @quarterly_lines = get_projection_data quarterly, num_quarter, to_date, staffs[:gavin], :count_product_lines
+      @quarterly_qty = get_projection_data quarterly, num_quarter, to_date, staffs[:gavin], :sum_qty
+      @quarterly_avg_luc = get_projection_data quarterly, num_quarter, to_date, staffs[:gavin], :avg_luc
+
+      @projecting_data = get_projecting_data staffs[:gavin]
 
       # render xlsx: "export_sale_report", filename: "Sale Report #{Date.today.to_s}.xlsx"
       # compressed_fs = Zip::OutputStream.write_buffer do |out|
@@ -264,6 +267,21 @@ class AdminController < ApplicationController
                               .group_by_quarter_created_and_customer_id
                               .send(agg_func)
       [dates_paired, periodic_sum_orders]
+    end
+
+    # get projecting data of each sale rep from projections table 
+    # return a hash of customers with respective projection data
+    # ie. {
+    #       "Alma Restaurant"=>[9, 240, 24.0, 5760.0], 
+    #       "Arcadia Gastronomique"=>[1, 24, 18.0, 432.0]
+    #     }
+    def get_projecting_data staffs
+      data = Projection.projecting_data staffs
+      h_data = {}
+      data.map{
+        |key| h_data[key.customer_name] = [key.q_lines, key.q_bottles, key.q_avgluc, key.q_bottles * key.q_avgluc]
+      }
+      h_data
     end
 
 

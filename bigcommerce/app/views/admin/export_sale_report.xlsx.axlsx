@@ -92,7 +92,7 @@ def periodic_sum restructured_data
 end
 
 
-def merge_all w_data, m_data, q_data, w_p_sum, m_p_sum, q_p_sum, q_lines, q_qty, q_avg_luc
+def merge_all w_data, m_data, q_data, w_p_sum, m_p_sum, q_p_sum, q_lines, q_qty, q_avg_luc, projecting_data
     
     merged_data = {}
 
@@ -131,10 +131,15 @@ def merge_all w_data, m_data, q_data, w_p_sum, m_p_sum, q_p_sum, q_lines, q_qty,
         m_q_data = [ q_cust_rnk ] + value + [ q_cust_avg, q_cust_sum ]
 
         # add projection data
-        m_projection_data = [0.0] + q_lines[ key ] + [0.0] + q_qty[ key ] + [0.0] + q_avg_luc[ key ]
+        data = [ 0.0, 0.0, 0.0, 0.0 ] 
+    
+        data = projecting_data[ key ] unless projecting_data[ key ].nil?
+        
+        m_projection_data = [0.0] + q_lines[ key ] + [data[0]] + q_qty[ key ] + 
+                            [data[1]] + q_avg_luc[ key ] +[data[2]]
 
         # merge all data
-        merged_data[ key ] = m_w_data + m_m_data + m_q_data + m_projection_data + m_q_data[0..4]
+        merged_data[ key ] = m_w_data + m_m_data + m_q_data + m_projection_data + m_q_data[1..4] + [data[3]]
     end
 
     merged_data
@@ -238,6 +243,8 @@ wb.add_worksheet(name: 'Sale Report') do |sheet|
     h_quarterly_qty = restructure_data @quarterly_qty, map_quarterly_qty
     h_quarterly_avg_luc = restructure_data @quarterly_avg_luc, map_quarterly_avg_luc
 
+    h_projecting_data = @projecting_data
+
     sum_quarterly_lines = periodic_sum h_quarterly_lines
     sum_quarterly_qty = periodic_sum h_quarterly_qty
     sum_quarterly_avg_luc = periodic_sum h_quarterly_avg_luc
@@ -266,7 +273,10 @@ wb.add_worksheet(name: 'Sale Report') do |sheet|
 
 
     # add all sale figure to the excel sheet
-    all_data = merge_all h_weekly_data, h_monthly_data, h_quarterly_data, sum_weekly_sale.last.to_f, sum_monthly_sale.last.to_f, sum_quarterly_sale.last.to_f, h_quarterly_lines, h_quarterly_qty, h_quarterly_avg_luc
+    all_data = merge_all h_weekly_data, h_monthly_data, h_quarterly_data, 
+        sum_weekly_sale.last.to_f, sum_monthly_sale.last.to_f, 
+        sum_quarterly_sale.last.to_f, h_quarterly_lines, h_quarterly_qty, 
+        h_quarterly_avg_luc, h_projecting_data
 
     # add customer data to an excel sheet
     i = 0
