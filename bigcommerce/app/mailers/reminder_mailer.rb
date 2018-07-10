@@ -3,10 +3,11 @@ class ReminderMailer < ActionMailer::Base
   require 'wicked_pdf'
   require 'order_status.rb'
   require 'stock_control.rb'
+  require 'sale_report.rb'
 
   include OrderStatus
   include StockControl
-
+  include SaleReport
   default from: 'accounts@untappedwines.com'
   layout "mailer"
 
@@ -18,7 +19,12 @@ class ReminderMailer < ActionMailer::Base
   end
 
   def stock_control_reminder
-    xlsx = render_to_string formats: [:xlsx], template: "admin/export_stock_control", locals: {countries: ProducerCountry.product_country, product_hash: stock_calculation(), portfolio_list: portfolio_products()}
+    xlsx = render_to_string formats: [:xlsx], template: "admin/export_stock_control", locals: {
+      countries: ProducerCountry.product_country, 
+      product_hash: stock_calculation(), 
+      portfolio_list: portfolio_products()
+    }
+
     attachments["Stock Control #{Date.today.to_s}.xlsx"] = {mime_type: Mime::XLSX, content: Base64.encode64(xlsx), encoding: 'base64'}
 
     # sales = []
@@ -34,6 +40,23 @@ class ReminderMailer < ActionMailer::Base
     mail(from: 'Untapped CMS <it@untappedwines.com>', to: ['Lucia <lgaldona@untappedwines.com>', 'SalesTeam <salesteam@untappedwines.com>'], bcc: 'Veasna Char <it@untappedwines.com>', subject: "Stock Control #{Date.today.to_s}")
 
     # mail(from: 'Untapped CMS <it@untappedwines.com>', to: sales, cc: managers, bcc: 'Veasna Char<it@untappedwines.com>', subject: "Stock Control #{Date.today.to_s}")
+  end
+
+  # email sale report to specified recipients
+  def send_sale_report
+
+    # get the reported staff list from lib/sale_report => staffs()
+    staffs().each do |nickname, ids|
+    # nickname = "amy"
+    # ids = [55, 44, 35]
+      xlsx = render_to_string formats: [:xlsx], template: "admin/export_sale_report", locals: {
+        projection_data: genereate_sale_report_data(ids)
+      } 
+      
+      attachments["#{nickname.capitalize}'s sale report as of #{Date.today.to_s}.xlsx"] = {mime_type: Mime::XLSX, content: Base64.encode64(xlsx), encoding: 'base64'}
+    end
+    mail(from: 'Untapped CMS <it@untappedwines.com>', to: ['IT <it@untappedwines.com>'], bcc: 'Veasna Char <it@untappedwines.com>', subject: "Sale report as of #{Date.today.to_s}")
+    
   end
 
   def order_confirmation(order_id, email_address, user_id)
