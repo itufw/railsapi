@@ -35,8 +35,11 @@ class Staff < ActiveRecord::Base
     end
 
     def self.get_staffs arr_ids
-        # find(arr_id)
         select('id, nickname').where(:id => arr_ids)
+    end
+
+    def self.get_staffs_report_to staff_id
+        select('id, nickname, report_to').where(:report_to => staff_id)
     end
 
     def self.calendar_list(staff_id = nil)
