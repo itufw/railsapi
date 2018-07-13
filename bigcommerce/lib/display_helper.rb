@@ -1,5 +1,19 @@
 module DisplayHelper
 
+  # get a list of staff to be dislpayed on the sale report
+  # return
+  # [
+  #   nil, 
+  #   {
+  #     5=>"Harry", 
+  #     54=>"Mat", 
+  #     44=>"Candice", 
+  #     55=>"Amy", 
+  #     50=>"Ben", 
+  #     ...
+  #   }
+  # ]
+  ### TO BE DEPRECATED
   def display_reports_for_sales_dashboard(staff_id)
   	# display all staffs
   	if reports_access_open(staff_id) == 1
@@ -12,11 +26,17 @@ module DisplayHelper
     end
   end
 
+  # def get_reporting_staffs(viewer_id)
+  #   if Staff.report_viewable(viewer_id)
+  # end
+
+  ### TO BE DEPRECATED
   def reports_access_open(staff_id)
     display_val = (Staff.display_report(staff_id)).to_i
     return display_val
   end
 
+  ### TO BE DEPRECATED as duplicate the one in applicaton_helper.rb
   def allow_to_update(staff_id)
     return Staff.can_update(staff_id).to_i == 1
   end
