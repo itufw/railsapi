@@ -55,7 +55,7 @@ class ReminderMailer < ActionMailer::Base
       
       attachments["#{nickname.capitalize}'s sale report as of #{Date.today.to_s}.xlsx"] = {mime_type: Mime::XLSX, content: Base64.encode64(xlsx), encoding: 'base64'}
     end
-    mail(from: 'Untapped CMS <it@untappedwines.com>', to: ['IT <it@untappedwines.com>'], bcc: 'Veasna Char <it@untappedwines.com>', subject: "Sale report as of #{Date.today.to_s}")
+    mail(from: 'Untapped CMS <it@untappedwines.com>', to: ['Lucia <lgaldona@untappedwines.com>'], bcc: 'Veasna Char <it@untappedwines.com>', subject: "Sale report as of #{Date.today.to_s}")
     
   end
 
