@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180706002327) do
+ActiveRecord::Schema.define(version: 20180711002437) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -1066,6 +1066,7 @@ ActiveRecord::Schema.define(version: 20180706002327) do
     t.integer  "pick_up_id",       limit: 4
     t.integer  "sales_list_right", limit: 4
     t.integer  "calendar_right",   limit: 4
+    t.integer  "report_to",        limit: 4
   end
 
   add_index "staffs", ["active"], name: "index_staffs_on_active", using: :btree
