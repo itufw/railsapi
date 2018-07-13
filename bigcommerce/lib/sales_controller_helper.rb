@@ -19,6 +19,11 @@ module SalesControllerHelper
       return avg_bottle_price
     else
       # filter orders of a certain period filter orders by customer_staff relationship
+      # it returns data, ie. as the following
+      #   {
+      #     [2, 2, 2018]=>#<BigDecimal:7f9648781cd0,'0.0',9(18)>, 
+      #     [5, 2, 2018]=>#<BigDecimal:7f9648781230,'0.70702663E4',18(18)>, 
+      #   }
       return Order.date_filter(start_date, end_date).valid_order.customer_staff_filter(staff_id).send(group_by_date_function).send(sum_function)
 
       # filter orders of a certain period filter orders by order_staff relationship
