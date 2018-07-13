@@ -4,13 +4,14 @@
 		<%
 			prefix = ""
 
+			# add prefixes to mark a sale rep can access the prefixed sale reps
 			if (current_user.id == 44) && (id == 35)
 				prefix = current_user.nickname
 			elsif ((current_user.id == 54) && (id.in?([5,50])))
 				prefix = current_user.nickname
 			end 
 
-
+			# show the sale reps' nickname column
 			unless ((current_user.id != id) && (current_user.user_type.in?(["Sales Executive"])))
 		%>
 				<td><%= link_to nickname, controller: 'sales', action: 'customer_dashboard', staff_id: id, staff_nickname: nickname %></td>
@@ -18,6 +19,7 @@
 				if prefix.blank? %>
 					<td><%= nickname %></td>
 				<% else 
+					# allow a sale rep to access the other sale reps' sale 
 					prefix += " - " + nickname %>
 					<td><%= link_to prefix, controller: 'sales', action: 'customer_dashboard', staff_id: id, staff_nickname: nickname %></td>	
 				<% end
