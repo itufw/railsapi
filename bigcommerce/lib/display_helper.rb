@@ -26,10 +26,6 @@ module DisplayHelper
     end
   end
 
-  # def get_reporting_staffs(viewer_id)
-  #   if Staff.report_viewable(viewer_id)
-  # end
-
   ### TO BE DEPRECATED
   def reports_access_open(staff_id)
     display_val = (Staff.display_report(staff_id)).to_i
