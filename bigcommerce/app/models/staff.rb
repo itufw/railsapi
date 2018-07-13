@@ -30,16 +30,18 @@ class Staff < ActiveRecord::Base
         where('(active = 1 and user_type LIKE "Sales%") OR (id = ?)', staff_id)
     end
 
+    ### TO BE DEPRECATED
     def self.sales_list
       where(active: 1, sales_list_right: 1)
     end
 
+    ### TO BE DEPRECATED
     def self.get_staffs arr_ids
         select('id, nickname').where(:id => arr_ids)
     end
 
-    def self.get_staffs_report_to staff_id
-        select('id, nickname, report_to').where(:report_to => staff_id)
+    def self.get_staffs_report_to
+        select('id, nickname, report_to').sales_list.order_by_order
     end
 
     def self.calendar_list(staff_id = nil)
@@ -73,16 +75,25 @@ class Staff < ActiveRecord::Base
       where('staffs.email IN (?)', emails)
     end
 
+    ### TO BE DEPRECATED
     def self.nickname
         pluck('id, nickname')
     end
 
+    ### TO BE DEPRECATED
     def self.id_nickname_hash(staff_id)
         Staff.where(id: staff_id).pluck('id,nickname').to_h
     end
 
+    ### TO BE DEPRECATED
     def self.display_report(staff_id)
         find(staff_id).display_report
+    end
+
+    # return true (1) if the current staff can view the current report
+    # otherwise return false (0)
+    def report_viewable
+       display_report.to_i
     end
 
     def self.can_update(staff_id)
