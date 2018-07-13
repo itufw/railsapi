@@ -1,76 +1,36 @@
-<% unless ((current_user.user_type.in?(["Sales Executive"])) && ("No".eql? display_all)) %>
-    <% staffs.each do |id, nickname| %>
+<%  get_staffs = Staff.get_staffs_report_to
+
+    # limit access to the sale report
+    if (((current_user.user_type.in?(["Sales Executive"])) && 
+        ("No".eql? display_all)) || (not current_user.report_viewable))
+
+        get_staffs = get_staffs.select{|s| s if current_user.id == s.report_to}
+    end    
+    
+    merged_sum_dates_h = merged_sale_by_report_to get_staffs, sums_dates_staffs_h
+    merged_sum_dates_h.each do |staff, value|
+%>
     <tr>
-        <%
-            prefix = ""
-
-            # add prefixes to mark a sale rep can access the prefixed sale reps
-            if (current_user.id == 44) && (id == 35)
-                prefix = current_user.nickname
-            elsif ((current_user.id == 54) && (id.in?([5,50])))
-                prefix = current_user.nickname
-            end 
-
-            # show the sale reps' nickname column
-            unless ((current_user.id != id) && (current_user.user_type.in?(["Sales Executive"])))
+        <td>
+            <%= 
+                link_to staff[1], controller: 'sales', action: 'customer_dashboard', 
+                staff_id: staff[0], staff_nickname: staff[1] 
+            %>
+        </td>
+        <% sums_dates_h = merged_sum_dates_h[staff] %>
+        <%= 
+            render "partials/daily_sums", sums_dates_h: sums_dates_h, dates: dates,
+            staff_nickname: staff[1], staff_id: staff[0], dates_map: dates_map
         %>
-                <td><%= link_to nickname, controller: 'sales', action: 'customer_dashboard', staff_id: id, staff_nickname: nickname %></td>
-        <%  else  
-                if prefix.blank? %>
-                    <td><%= nickname %></td>
-                <% else 
-                    # allow a sale rep to access the other sale reps' sale 
-                    prefix += " - " + nickname %>
-                    <td><%= link_to prefix, controller: 'sales', action: 'customer_dashboard', staff_id: id, staff_nickname: nickname %></td>   
-                <% end
-            end  
-        %>
-
-        <% sums_dates_h = give_sum_date_h(id, sums_dates_staffs_h) %>
-        <%= render "partials/daily_sums", sums_dates_h: sums_dates_h, dates: dates, staff_nickname: nickname, staff_id: id, dates_map: dates_map %>
     </tr>
-    <% end %>
-<% else %>
-
-    <% 
-        
-        get_staffs = Staff.get_staffs_report_to(current_user.id)
-        groups = get_staffs.select{|staff| staff if staff.id == staff.report_to}
-
-        # merged_staffs = get_staffs.group_by(&:report_to)
-        merged_sum_dates_h = {}
-        groups.each do |group|
-            merged_sum_dates_h[[group.id, group.nickname]] = {}
-            get_staffs.each do |staff|
-                continue unless group.id == staff.report_to
-
-                sums_dates_h = give_sum_date_h(staff.id, sums_dates_staffs_h) 
-
-                # merged_sum_dates_h[group.nickname] = sums_dates_h
-
-                sums_dates_h.each do |key, value|
-                    if  merged_sum_dates_h[[group.id, group.nickname]].has_key? key
-                        merged_sum_dates_h[[group.id, group.nickname]][key] += value
-                    else 
-                        merged_sum_dates_h[[group.id, group.nickname]][key] = value
-                    end
-                end
-            end
-        end
-
-        merged_sum_dates_h.each do |staff, value|
-    %>
-            <tr>
-                <td><%= link_to staff[1], controller: 'sales', action: 'customer_dashboard', staff_id: staff[0], staff_nickname: staff[1] %></td>
-                <%# sums_dates_h = give_sum_date_h(staff.id, sums_dates_staffs_h) %>
-                <% sums_dates_h = merged_sum_dates_h[staff] %>
-                <%= render "partials/daily_sums", sums_dates_h: sums_dates_h, dates: dates, staff_nickname: staff[1], staff_id: staff[0], dates_map: dates_map %>
-            </tr>
-        <% end %>
 
 <% end %>
 
 <tr class="blank-row"></tr>
 <tr>
-    <%= render "partials/staff_sums_total", sums_dates_h: sums_dates_staffs_h, dates: dates, staffs: staffs %>
+    <%= 
+        render "partials/staff_sums_total", sums_dates_h: sums_dates_staffs_h,
+        dates: dates, staffs: staffs 
+    %>
 </tr>
+    
