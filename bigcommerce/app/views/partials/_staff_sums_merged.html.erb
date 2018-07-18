@@ -15,7 +15,9 @@
             <!-- shows staff's nickname column -->
             <%= 
                 link_to staff[1], controller: 'sales', action: 'customer_dashboard',
-                staff_id: staff[0], staff_nickname: staff[1], dates_map: dates_map
+                staff_id: staff[0], staff_nickname: staff[1], dates_map: dates_map,
+                period_type: params[:period_type], num_period: params[:num_period],
+                sum_param: params[:sum_param], selected_date: params[:selected_date]
             %>
         </td>
         <% sums_dates_h = merged_sum_dates_h[staff] %>
