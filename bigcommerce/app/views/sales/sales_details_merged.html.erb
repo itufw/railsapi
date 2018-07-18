@@ -4,7 +4,7 @@
 
 <div style="margin-top: 50px;">
 
-<%= form_tag({:action => "sales_dashboard_detailed"}, {:method => "get"}) do %>
+<%= form_tag({:action => "sales_details_merged"}, {:method => "get"}) do %>
     <%= render "partials/detailed_dashboard_date_filter" %>
     <div class="col-xs-6 col-xs-offset-7" style="margin-top: 20px;">
         <%= submit_tag "Submit", class: 'btn btn-primary' %>
