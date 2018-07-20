@@ -151,9 +151,10 @@ module SaleReport
       # i.e. { 20=>[Mon, 14 May 2018, Mon, 21 May 2018] }
       dates_paired = pair_dates(dates, frequency)
 
-      # should return - group_by_week_created for weekly period
-      #               - group_by_month_created for monthly period
-      #               - group_by_quarter_created for quarterly period
+      # should return - group_by_week_created_and_customer_actual_name for weekly period
+      #               - group_by_month_created_and_customer_actual_name for monthly period
+      #               - group_by_quarter_created_and_customer_actual_name for quarterly period
+      #               - group_by_year_created_and_customer_actual_name for quarterly period
       group_by_function = (period_date_functions(frequency)[2] + "_and_customer_actual_name").to_sym
 
       periodic_sum_orders = Order.date_filter(dates[0], dates[-1])
