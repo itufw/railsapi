@@ -127,7 +127,7 @@ class SalesController < ApplicationController
 
     group_by_date_function_staff = @order_owner ? '_and_order_staff_id' : '_and_staff_id'
 
-    @staff_sum_by_periods = sum_orders(@dates[0], @dates[-1], (date_function + group_by_date_function_staff).to_sym, sum_function, staff_id)
+    @staff_sum_by_periods = staffs_aggregate(@dates[0], @dates[-1], (date_function + group_by_date_function_staff).to_sym, sum_function, staff_id)
 
     # Vintage Cellars
     vc_group_number = 17
@@ -182,7 +182,9 @@ class SalesController < ApplicationController
 
     date_function = (period_date_functions(@selected_period)[2] + '_and_customer_id').to_sym
 
-    @customer_sum_h = sum_orders(@dates[0], @dates[-1], date_function, sum_function, params[:staff_id])
+    @customer_sum_h = staffs_aggregate(@dates[0], @dates[-1], date_function, sum_function, params[:staff_id])
+    
+    log "customer_sum_h", @customer_sum_h
 
     @customers = Customer.filter_by_ids(@customer_sum_h.keys.map { |k| k[0] })
   end
