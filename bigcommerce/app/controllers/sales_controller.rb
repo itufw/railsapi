@@ -184,8 +184,6 @@ class SalesController < ApplicationController
 
     @customer_sum_h = staffs_aggregate(@dates[0], @dates[-1], date_function, sum_function, params[:staff_id])
     
-    log "customer_sum_h", @customer_sum_h
-
     @customers = Customer.filter_by_ids(@customer_sum_h.keys.map { |k| k[0] })
   end
 
