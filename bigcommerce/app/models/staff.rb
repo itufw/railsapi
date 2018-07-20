@@ -40,10 +40,6 @@ class Staff < ActiveRecord::Base
         select('id, nickname').where(:id => arr_ids)
     end
 
-    def self.get_staffs_report_to
-        select('id, nickname, report_to').sales_list.order_by_order
-    end
-
     def self.calendar_list(staff_id = nil)
       where(active: 1, calendar_right: 1) if staff_id.nil?
       where('active = 1 AND (calendar_right = 1 OR id = ?)', staff_id)
@@ -110,5 +106,24 @@ class Staff < ActiveRecord::Base
 
     def name
       nickname
+    end
+
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+    #                                                                                       #
+    #                                                                                       #
+    #                                      NEWLY ADDED                                      #
+    #                                         VCHAR                                         #
+    #                                                                                       #
+    #                                                                                       #
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+    # returns a collection of active record objects of staff, ie.
+    # [
+    #   #<Staff id: 5, nickname: "Harry", report_to: 5>, 
+    #   #<Staff id: 44, nickname: "Candice", report_to: 44>,
+    #   ...
+    # ]
+    def self.get_staffs_report_to
+        select('id, nickname, report_to').sales_list.order_by_order
     end
 end
