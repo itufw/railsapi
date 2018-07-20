@@ -273,30 +273,56 @@ class Order < ActiveRecord::Base
   #                                      'QUARTER(orders.date_created)', 'YEAR(orders.date_created)']).references(:order_products)
   # end
 
-  # get weekly sale figures of each staff and return them
+  # return weekly sale figure by customer id
   def self.group_by_week_created_and_customer_id
+    includes(:customer)
+    .group(['customers.id', 'WEEK(orders.date_created, 1)', 'YEAR(orders.date_created)'])
+    .references(:customers)
+  end
+
+  # return monthly sale figure by customer id
+  def self.group_by_month_created_and_customer_id
+    includes(:customer)
+    .group(['customers.id', 'MONTH(orders.date_created)', 'YEAR(orders.date_created)'])
+    .references(:customers)
+  end
+
+  # return quarterly sale figure by customer id
+  def self.group_by_quarter_created_and_customer_id
+    includes(:customer)
+    .group(['customers.id', 'QUARTER(orders.date_created)', 'YEAR(orders.date_created)'])
+    .references(:customers)
+  end
+
+  # return yearly sale figure by customer id
+  def self.group_by_year_created_and_customer_id
+    includes(:customer).group(['customers.id', 'YEAR(orders.date_created)']).references(:customers)
+  end
+
+  # return weekly sale figure by customer actual name
+  def self.group_by_week_created_and_customer_actual_name
     includes(:customer)
     .group(['customers.actual_name', 'WEEK(orders.date_created, 1)', 'YEAR(orders.date_created)'])
     .references(:customers)
   end
 
-  # get monthly sale figures of each staff and return them
-  def self.group_by_month_created_and_customer_id
+  # return monthly sale figure by customer actual name
+  def self.group_by_month_created_and_customer_actual_name
     includes(:customer)
     .group(['customers.actual_name', 'MONTH(orders.date_created)', 'YEAR(orders.date_created)'])
     .references(:customers)
   end
 
-  # get quaterly sale figures of each staff and return them
-  def self.group_by_quarter_created_and_customer_id
+  # return quarterly sale figure by customer actual name
+  def self.group_by_quarter_created_and_customer_actual_name
     includes(:customer)
     .group(['customers.actual_name', 'QUARTER(orders.date_created)', 'YEAR(orders.date_created)'])
     .references(:customers)
   end
 
-  def self.group_by_year_created_and_customer_id
-    includes(:customer).group(['customers.id',\
-                               'YEAR(orders.date_created)']).references(:customers)
+  # return yearly sale figure by customer actual name
+  def self.group_by_year_created_and_customer_actual_name
+    includes(:customer).group(['customers.actual_name','YEAR(orders.date_created)']).references(:customers)
   end
 
   def self.group_by_cust_name_order_id

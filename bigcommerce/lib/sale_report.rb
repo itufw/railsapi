@@ -93,7 +93,7 @@ module SaleReport
                               .valid_order
                               .customer_staffs_filter(staffs)
                               .order_by_staff_customer
-                              .group_by_quarter_created_and_customer_id
+                              .group_by_quarter_created_and_customer_actual_name
                               .send(agg_func)
       [dates_paired, periodic_sum_orders]
     end
@@ -154,7 +154,7 @@ module SaleReport
       # should return - group_by_week_created for weekly period
       #               - group_by_month_created for monthly period
       #               - group_by_quarter_created for quarterly period
-      group_by_function = (period_date_functions(frequency)[2] + "_and_customer_id").to_sym
+      group_by_function = (period_date_functions(frequency)[2] + "_and_customer_actual_name").to_sym
 
       periodic_sum_orders = Order.date_filter(dates[0], dates[-1])
                               .valid_order
