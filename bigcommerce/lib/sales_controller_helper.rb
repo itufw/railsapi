@@ -14,7 +14,7 @@ module SalesControllerHelper
       gst = TaxPercentage.gst_percentage * 0.01
       avg_bottle_price = {}
       bottles.keys().each do |date|
-        avg_bottle_price[date] = price[date]/ (bottles[date]*(1+gst))
+        avg_bottle_price[date] = (price[date]/ (bottles[date]*(1+gst))).round(2)
       end
       return avg_bottle_price
     else
@@ -28,35 +28,6 @@ module SalesControllerHelper
 
       # filter orders of a certain period filter orders by order_staff relationship
       # return Order.date_filter(start_date, end_date).valid_order.order_staff_filter(staff_id).send(group_by_date_function).send(sum_function)
-    end
-  end
-
-  # This function aggregates sale orders of active sale reps (staff.report_to) and
-  # returns a hash with dates (and sometime staff ids) as keys and aggregated figures as values
-  # 
-  def staffs_aggregate(start_date, end_date, group_by_date_function, sum_function, staff_ids)
-    if (:new_customer).eql? sum_function
-      return Customer.create_date_filter(start_date, end_date).send(group_by_date_function).filter_by_staff(staff_ids).count_id
-    elsif (:contact_note).eql? sum_function
-      return Task.valid_task.start_date_filter(start_date, end_date).send(group_by_date_function).filter_by_responses(staff_ids).count_id
-    elsif (:avg_bottle_price).eql? sum_function
-      orders = Order.date_filter(start_date, end_date).valid_order.staff_filter(staff_ids).send(group_by_date_function)
-      bottles = orders.send("sum_qty")
-      price = orders.send("sum_total")
-      gst = TaxPercentage.gst_percentage * 0.01
-      avg_bottle_price = {}
-      bottles.keys().each do |date|
-        avg_bottle_price[date] = price[date]/ (bottles[date]*(1+gst))
-      end
-      return avg_bottle_price
-    else
-      # filter orders of a certain period filter orders by customer_staff relationship
-      # it returns data, ie. as the following
-      #   {
-      #     [2, 2, 2018]=>#<BigDecimal:7f9648781cd0,'0.0',9(18)>, 
-      #     [5, 2, 2018]=>#<BigDecimal:7f9648781230,'0.70702663E4',18(18)>, 
-      #   }
-      return Order.date_filter(start_date, end_date).valid_order.customer_staffs_filter(staff_ids).send(group_by_date_function).send(sum_function)
     end
   end
 
