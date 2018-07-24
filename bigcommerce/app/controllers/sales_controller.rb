@@ -127,7 +127,7 @@ class SalesController < ApplicationController
 
     group_by_date_function_staff = @order_owner ? '_and_order_staff_id' : '_and_staff_id'
 
-    @staff_sum_by_periods = staffs_aggregate(@dates[0], @dates[-1], (date_function + group_by_date_function_staff).to_sym, sum_function, staff_id)
+    @staff_sum_by_periods = sum_orders(@dates[0], @dates[-1], (date_function + group_by_date_function_staff).to_sym, sum_function, staff_id)
 
     # Vintage Cellars
     vc_group_number = 17
@@ -177,15 +177,37 @@ class SalesController < ApplicationController
     get_current_end_date(params)
     set_num_columns(params)
     date_pairs
+    @customer_sum_h = {}
 
     sum_function, @param_val, @sum_params = order_sum_param(params[:sum_param])
 
     date_function = (period_date_functions(@selected_period)[2] + '_and_customer_id').to_sym
 
-    @customer_sum_h = staffs_aggregate(@dates[0], @dates[-1], date_function, sum_function, params[:staff_id])
-    
+    if params[:merged]
+      get_staffs = Staff.get_staffs_by_report_to(params[:staff_id])
+      get_staffs.each {|staff| 
+        @customer_sum_h.merge!(sum_orders(@dates[0], @dates[-1], date_function, sum_function, staff))
+      }
+    else
+      @customer_sum_h = sum_orders(@dates[0], @dates[-1], date_function, sum_function, params[:staff_id])
+    end
+
     @customers = Customer.filter_by_ids(@customer_sum_h.keys.map { |k| k[0] })
   end
+
+  # def customer_dashboard
+  #   get_current_end_date(params)
+  #   set_num_columns(params)
+  #   date_pairs
+
+  #   sum_function, @param_val, @sum_params = order_sum_param(params[:sum_param])
+
+  #   date_function = (period_date_functions(@selected_period)[2] + '_and_customer_id').to_sym
+
+  #   @customer_sum_h = sum_orders(@dates[0], @dates[-1], date_function, sum_function, params[:staff_id])
+    
+  #   @customers = Customer.filter_by_ids(@customer_sum_h.keys.map { |k| k[0] })
+  # end
 
   def transform_products(params)
     @transform_column = params[:transform_column] || 'product_no_vintage_id'
