@@ -126,4 +126,9 @@ class Staff < ActiveRecord::Base
     def self.get_staffs_report_to
         select('id, nickname, report_to').sales_list.order_by_order
     end
+
+
+    def self.get_staffs_by_report_to staff_id
+        select('id, nickname, report_to').sales_list.order_by_order.where(report_to: staff_id)
+    end
 end
