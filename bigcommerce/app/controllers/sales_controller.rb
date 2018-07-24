@@ -162,10 +162,7 @@ class SalesController < ApplicationController
     group_by_date_function_staff = @order_owner ? '_and_order_staff_id' : '_and_staff_id'
 
     @staff_sum_by_periods = sum_orders(@dates[0], @dates[-1], (date_function + group_by_date_function_staff).to_sym, sum_function, staff_id)
-    log "sum_function", sum_function
-    log "param_val", @param_val
-    log "sum_params", @sum_params
-    log "group by", (date_function + group_by_date_function_staff).to_sym
+    
     # Vintage Cellars
     vc_group_number = 17
     @cust_group_sum, @cust_group_name = cust_group_sales(vc_group_number, @dates[0], @dates[-1], 'Vintage Cellars', sum_function, @dates_paired)
