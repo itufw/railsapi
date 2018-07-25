@@ -66,3 +66,6 @@ bower.json
 
 # Ignore Byebug command history file.
 # .byebug_history
+
+# ignore database configuration update
+config/database.yml
