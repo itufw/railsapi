@@ -1,4 +1,11 @@
 module ApplicationHelper
+  def log desc, data
+    logger.info ""
+    logger.info "--------------------------- : " + desc + " : --------------------------- BEGINS"
+    logger.info data
+    logger.info "=========================== : " + desc + " : =========================== ENDS"
+    logger.info ""
+  end
 
   # Sets Title of a page
   def title(page_title)
