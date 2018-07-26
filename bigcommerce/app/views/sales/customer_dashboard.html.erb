@@ -4,9 +4,10 @@
 
 <div style="margin-top: 50px;">
 	<%= form_tag({:action => "customer_dashboard"}, {:method => "get"}) do %>
-		<%= render "partials/detailed_dashboard_date_filter" %>
+	<%= render "partials/detailed_dashboard_date_filter" %>
 	    <%= hidden_field_tag :staff_id, params[:staff_id] %>
    		<%= hidden_field_tag :staff_nickname, params[:staff_nickname] %>
+   		<%= hidden_field_tag :merged, params[:merged] %>
 		<div class="col-xs-4 col-xs-offset-8">
 			<%= submit_tag 'submit', class: 'btn btn-primary'%>
 		</div>

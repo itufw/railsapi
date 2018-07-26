@@ -57,6 +57,41 @@ module SalesHelper
     return dates_total_h
   end
 
+  # merge all sale orders by staff.report_to this function accepts
+  # - staffs              : a list of staffs to be reported
+  # - sums_dates_staffs_h : a hash of sale figures of each staff in a given period
+  # it returns
+  # {
+  #   [54, "Mat"]=>{[2, 2018]=>#<BigDecimal:7f8443be24d0,'0.242885044E5',18(27)>, 
+  #   [3, 2018]=>#<BigDecimal:7f8443be2430,'0.130371127E5',18(27)>,
+  #   ...
+  # }
+  def merged_sale_by_report_to staffs, sums_dates_staffs_h
+    groups = staffs.select{|staff| staff if staff.id == staff.report_to}
+
+    merged_sum_dates_h = {}
+
+    groups.each do |group|
+        merged_sum_dates_h[[group.id, group.nickname]] = {}
+        staffs.each do |staff|
+            next unless group.id == staff.report_to
+
+            sums_dates_h = give_sum_date_h(staff.id, sums_dates_staffs_h) 
+
+            sums_dates_h.each do |key, value|
+                if  merged_sum_dates_h[[group.id, group.nickname]].has_key? key
+                    merged_sum_dates_h[[group.id, group.nickname]][key] += value
+                else 
+                    merged_sum_dates_h[[group.id, group.nickname]][key] = value
+                end
+            end
+        end
+    end
+
+    merged_sum_dates_h
+  end
+
+
   def staff_is_active(staff_id, staffs)
     if staffs.keys.include? staff_id
       return 1
@@ -217,5 +252,4 @@ module SalesHelper
       end
     end
   end
-
 end

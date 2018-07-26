@@ -1,0 +1,42 @@
+<%  get_staffs = Staff.get_staffs_report_to
+
+    # limit access to the sale report
+    if (((current_user.user_type.in?(["Sales Executive"])) && 
+        ("No".eql? display_all)) || (not current_user.report_viewable))
+
+        get_staffs = get_staffs.select{|s| s if current_user.id == s.report_to}
+    end    
+    
+    merged_sum_dates_h = merged_sale_by_report_to get_staffs, sums_dates_staffs_h
+    merged_sum_dates_h.each do |staff, value|
+%>
+    <tr>
+        <td>
+            <!-- shows staff's nickname column -->
+            <%= 
+                link_to staff[1], controller: 'sales', action: 'customer_dashboard',
+                staff_id: staff[0], staff_nickname: staff[1], dates_map: dates_map,
+                period_type: params[:period_type], num_period: params[:num_period],
+                sum_param: params[:sum_param], selected_date: params[:selected_date],
+                merged: true 
+            %>
+        </td>
+        <% sums_dates_h = merged_sum_dates_h[staff] %>
+
+        <!-- shows staff's sum columns -->
+        <%= 
+            render "partials/daily_sums", sums_dates_h: sums_dates_h, dates: dates,
+            staff_nickname: staff[1], staff_id: staff[0], dates_map: dates_map
+        %>
+    </tr>
+
+<% end %>
+
+<tr class="blank-row"></tr>
+<tr>
+    <%= 
+        render "partials/staff_sums_total", sums_dates_h: sums_dates_staffs_h,
+        dates: dates, staffs: staffs 
+    %>
+</tr>
+

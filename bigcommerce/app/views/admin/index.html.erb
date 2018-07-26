@@ -25,7 +25,7 @@
 		<%= link_to 'ScotPac-old', {controller: "admin", action: "scotpac", format: 'xlsx'}, class: 'btn btn-warning'  %>
 		<%= link_to '<button class="btn btn-warning">ScotPac</button>'.html_safe, controller: 'status', action: 'status_check', status_name: 'ScotPac' if user_accountant %>
 		<%= link_to "Stock Control", {controller: "admin", action: "export_stock_control", format: 'xlsx'}, class: "btn btn-primary" %>
-		<%= link_to "Sale Report", {controller: "admin", action: "export_sale_report", format: 'xlsx'}, class: "btn btn-primary" %>
+		<%#= link_to "Sale Report", {controller: "admin", action: "export_sale_report", format: 'xlsx'}, class: "btn btn-primary" %>
 </div>
 
 <div style="margin-top: 50px;">

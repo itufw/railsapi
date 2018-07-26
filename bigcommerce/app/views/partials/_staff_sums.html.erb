@@ -4,22 +4,38 @@
 		<%
 			prefix = ""
 
+			# add prefixes to mark a sale rep can access the prefixed sale reps
 			if (current_user.id == 44) && (id == 35)
 				prefix = current_user.nickname
 			elsif ((current_user.id == 54) && (id.in?([5,50])))
 				prefix = current_user.nickname
 			end 
 
-
+			# show the sale reps' nickname column
 			unless ((current_user.id != id) && (current_user.user_type.in?(["Sales Executive"])))
 		%>
-				<td><%= link_to nickname, controller: 'sales', action: 'customer_dashboard', staff_id: id, staff_nickname: nickname %></td>
+				<td>
+					<%= 
+						link_to nickname, controller: 'sales', action: 'customer_dashboard', 
+						staff_id: id, staff_nickname: nickname,
+                		period_type: params[:period_type], num_period: params[:num_period],
+                		sum_param: params[:sum_param], selected_date: params[:selected_date] 
+                	%>                		
+                </td>
 		<%  else  
 				if prefix.blank? %>
 					<td><%= nickname %></td>
 				<% else 
+					# allow a sale rep to access the other sale reps' sale 
 					prefix += " - " + nickname %>
-					<td><%= link_to prefix, controller: 'sales', action: 'customer_dashboard', staff_id: id, staff_nickname: nickname %></td>	
+					<td>
+						<%= 
+							link_to prefix, controller: 'sales', action: 'customer_dashboard', 
+							staff_id: id, staff_nickname: nickname,
+			                period_type: params[:period_type], num_period: params[:num_period],
+			                sum_param: params[:sum_param], selected_date: params[:selected_date] 
+                		%>
+                	</td>	
 				<% end
 			end  
 		%>
@@ -30,7 +46,14 @@
 	<% end %>
 <% else %>
 	<tr>
-		<td><%= link_to current_user.nickname, controller: 'sales', action: 'customer_dashboard', staff_id: current_user.id, staff_nickname: current_user.nickname %></td>
+		<td>
+			<%= 
+				link_to current_user.nickname, controller: 'sales', action: 'customer_dashboard', 
+				staff_id: current_user.id, staff_nickname: current_user.nickname,
+                period_type: params[:period_type], num_period: params[:num_period],
+                sum_param: params[:sum_param], selected_date: params[:selected_date]
+            %>
+        </td>
 		<% sums_dates_h = give_sum_date_h(current_user.id, sums_dates_staffs_h) %>
 		<%= render "partials/daily_sums", sums_dates_h: sums_dates_h, dates: dates, staff_nickname: current_user.nickname, staff_id: current_user.id, dates_map: dates_map %>
 	</tr>

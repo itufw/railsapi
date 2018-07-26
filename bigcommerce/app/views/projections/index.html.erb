@@ -1,0 +1,34 @@
+<p id="notice"><%= notice %></p>
+
+<h1 style="text-align: center;">Projection Data</h1>
+
+<%= link_to 'New Projection', new_projection_path, class: "btn btn-primary " %>
+<table class="table table-striped mt-0">
+  <thead>
+    <tr>
+      <th>Customer</th>
+      <th>Lines</th>
+      <th>Bottles</th>
+      <th>Avg LUC</th>
+      <th>Recent</th>
+      <th>Sale Rep</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @projections.each do |projection| %>
+      <tr>
+        <td><%= projection.customer_name %></td>
+        <td><%= projection.q_lines %></td>
+        <td><%= projection.q_bottles %></td>
+        <td><%= projection.q_avgluc %></td>
+        <td><%= projection.recent %></td>
+        <td><%= projection.sale_rep_name %></td>
+        <td><%= link_to 'Show', projection %></td>
+        <td><%= link_to 'Edit', edit_projection_path(projection) %></td>
+        <td><%= link_to 'Destroy', projection, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

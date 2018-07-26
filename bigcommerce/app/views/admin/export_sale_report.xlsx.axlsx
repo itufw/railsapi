@@ -1,38 +1,318 @@
 require 'axlsx'
+
 wb = xlsx_package.workbook
 
 
-wb.add_worksheet(name: 'Sale Report') do |sheet|
-
-  # table header
-  sheet.add_row(
-	['Region', 'Customer', 'Pay', '3 mth', '6 mth'] + @weekly_data[0].map {|x,y| y[0].strftime("%d/%m")} + ['Average', 'Total']
-  )
-
-  # weekly sum
-  sheet.merge_cells 'D1:E1'
-  sheet.add_row([nil, nil, nil, 'Rankings'] )
-
-  # table data
-
-  weekth_beg = @weekly_data[0].first[0].to_i
-  data_size = @weekly_data[0].size
-  data = @weekly_data[1]
-  weekly_sum = Array.new(data_size)
-
-  data.each do |key, value| 
-  	weekly_amt = Array.new(data_size)
-  	weekly_amt[ key[1] - weekth_beg ] = value
-
-  	weekly_sum[ key[1] - weekth_beg ] = 0 if weekly_sum[ key[1] - weekth_beg ].nil? and not weekly_amt[ key[1] - weekth_beg ].nil?
-  	weekly_sum[ key[1] - weekth_beg ] += value
+def get_gthead sheet, style_a, style_b
 
     sheet.add_row(
-      ['Region', key[0], 'Pay', '3 mth', '6 mth'] + weekly_amt + ['Average', 'Total']
+        [
+            '', '', '', '', '', '', '', '', '', '', 'Weekly', '', '', '', '', '', '', '', '', 
+            '', '', '', '', 'Monthly', '', '', '', '',
+            '', '', '', 'Quarterly', '', '', '',
+            '', '', '', 'Lines', '', '',
+            '', '', 'Bottles', '', '',
+            '', '', 'Avg LUC', '', '',
+            '', '', 'Revenue', '', ''
+        ], 
+        style: [
+            nil, nil, nil, (0..15).map { |x| style_a }, 
+            nil, (0..7).map { |x| style_a },
+            nil, (0..5).map { |x| style_a },
+            nil, (0..4).map { |x| style_a },
+            (0..4).map { |x| style_b },
+            (0..4).map { |x| style_a },
+            (0..4).map { |x| style_b }
+        ].flatten
     )
-  end
-
-  # sum row
-  sheet.add_row(['','','','', 'Sum'] + weekly_sum )
-  
 end
+
+def get_thead data, required_extra
+    columns = []
+    if required_extra
+        columns = [''] + data[0].map {|x,y| y[0].strftime("%d/%m/%y")} + ['Average', 'Total']
+    else
+        columns = data[0].map {|x,y| y[0].strftime("%d/%m/%y")}
+    end
+    columns
+end
+
+def map_position data
+    # map position of each periodic data to an array index for excel spreadsheet
+    i = -1               # initial array position
+
+    # will store mapping positions and use it to position data index
+    # ie. position_map = {12=>0, 1=>1, 2=>2, 3=>3, 4=>4, 5=>5}
+    position_map = {}   
+
+    if data.first.first[0].kind_of?(Array)
+        data.first.each {|x| position_map[x.first.first]=(i+=1)}
+    else
+        data.first.each {|x| position_map[x.first]=(i+=1)} 
+    end
+
+    position_map
+end
+
+
+def restructure_data data_src, map_pos
+    # get the number of columns to be fitted into the excel spreadsheet
+    data = data_src[1]
+    h_customers = {}       
+
+    # restructure the receiving data into 
+    # ie. "Canvas Club"=>[0.0, 0.0, 831.136, 0.0, 0.0, 211.283, 0.0, 0.0, 277.045]
+    data.each do |key, value| 
+        # add a customer record to the h_customers if it has not been added
+        h_customers[ key[0] ] = Array.new(data_src[0].size, 0.0) unless h_customers.key? key[0]  
+        
+        h_customers[ key[0] ] [ map_pos[ key[1] ] ] = value
+    end 
+
+    h_customers
+end
+
+def periodic_sum restructured_data
+    # initialise an array of weekly sum sizes the number of weeks with 0 as default value
+    periodic_sum = Array.new(restructured_data.first[1].size, 0) 
+
+    # compute weekly sum
+    restructured_data.each do |key, value|  
+        periodic_sum.each_with_index { 
+            |val, ind| periodic_sum[ind] = val.to_f + value[ind].to_f
+        }
+    end
+
+    # get total sale over the reported period
+    prd_sale = periodic_sum.reduce(:+)
+
+    # get average sale over the reported period
+    prd_avg = prd_sale / periodic_sum.size
+
+    periodic_sum.map!{|v| '%.2f' % v} + ['%.2f' % prd_avg, '%.2f' % prd_sale]
+end
+
+
+def merge_all w_data, m_data, q_data, w_p_sum, m_p_sum, q_p_sum, q_lines, q_qty, q_avg_luc, projecting_data
+    
+    merged_data = {}
+
+    q_data.map do |key,value| 
+
+        if w_data[key].nil?
+            m_w_data = Array.new(17, nil)
+        else
+            # get sum of individual customer
+            w_cust_sum = w_data[key].reduce(:+) 
+
+            # get avg of individual customer
+            w_cust_avg = w_cust_sum / w_data[key].size
+
+            # compute ranking
+            w_cust_rnk = 0.0
+            # w_cust_rnk = w_cust_sum / w_p_sum
+
+            m_w_data = [ w_cust_rnk ] + w_data[ key ] + [ w_cust_avg, w_cust_sum ]
+        end
+
+        if m_data[key].nil?
+            m_m_data = Array.new(9, nil)
+        else
+            m_cust_sum = m_data[key].reduce(:+)
+            m_cust_avg = m_cust_sum / m_data[key].size
+            m_cust_rnk = 0.0
+            # m_cust_rnk = m_cust_sum / m_p_sum
+            m_m_data = [ m_cust_rnk ] + m_data[ key ] + [ m_cust_avg, m_cust_sum ]
+        end
+
+        q_cust_sum = value.reduce(:+)
+        q_cust_avg = q_cust_sum / value.size
+        q_cust_rnk = 0.0
+        # q_cust_rnk = q_cust_sum / q_p_sum
+        m_q_data = [ q_cust_rnk ] + value + [ q_cust_avg, q_cust_sum ]
+
+        # add projection data
+        data = [ 0.0, 0.0, 0.0, 0.0 ] 
+    
+        data = projecting_data[ key ] unless projecting_data[ key ].nil?
+        
+        m_projection_data = [0.0] + q_lines[ key ] + [data[0]] + q_qty[ key ] + 
+                            [data[1]] + q_avg_luc[ key ] +[data[2]]
+
+        # merge all data
+        merged_data[ key ] = m_w_data + m_m_data + m_q_data + m_projection_data + m_q_data[1..4] + [data[3]]
+    end
+
+    merged_data
+end
+
+wb.add_worksheet(name: 'Sale Report') do |sheet|
+
+    @quarterly_data, 
+    @monthly_data, 
+    @weekly_data, 
+    @quarterly_lines, 
+    @quarterly_qty, 
+    @quarterly_avg_luc, 
+    @projecting_data = projection_data if @quarterly_data.nil?
+
+    blue = {bg_color: '0B3861', fg_color: 'FFFFFF'}
+    light_blue = {bg_color: '0489B1', fg_color: 'FFFFFF'}
+    green = {bg_color: '4B610B', fg_color: 'FFFFFF'}
+    light_green = {bg_color: '86B404', fg_color: 'FFFFFF'}
+    orange = {bg_color: 'B45F04', fg_color: 'FFFFFF'}
+    light_orange = {bg_color: 'FE9A2E', fg_color: 'FFFFFF'}
+    row_odd = {bg_color: 'F8ECE0', fg_color: '000000'}
+    row_even = {bg_color: 'FFFFFF', fg_color: '000000'}
+    black_text = {fg_color: '000000'}
+    bold_text = {b: true}
+    center_text = {
+                    :alignment => { 
+                        :horizontal => :center,
+                        :vertical => :center ,
+                        :wrap_text => true
+                    }
+                }
+    
+    head_text_size = {sz: 15}
+    thead_text_size = {sz: 12}
+
+    cell_border_sm = {
+        border: { 
+            style: :thin, color: 'FBEFEF', edges: [:left, :right]
+        }
+    }
+
+    cell_border_md_top = {
+        border: { 
+            style: :thick, color: '61380B', edges: [:top]
+        }
+    }
+
+
+    blue_cell = wb.styles.add_style blue
+    light_blue_cell = wb.styles.add_style light_blue
+    green_cell = wb.styles.add_style green
+    light_green_cell = wb.styles.add_style light_green
+    orange_cell = wb.styles.add_style orange
+    light_orange_cell = wb.styles.add_style light_orange
+    row_odd = wb.styles.add_style row_odd.merge(cell_border_sm)
+    row_even = wb.styles.add_style row_even.merge(cell_border_sm)
+
+    cell_border_md_top = wb.styles.add_style cell_border_md_top
+
+    group_header_a = wb.styles.add_style blue.merge(head_text_size).merge(center_text)
+    group_header_b = wb.styles.add_style light_blue.merge(head_text_size).merge(center_text)
+
+    thead_style = wb.styles.add_style light_green.merge(thead_text_size).merge(center_text)
+
+    sum_head_style = wb.styles.add_style blue.merge(thead_text_size).merge(center_text)
+
+    # table group header
+    get_gthead sheet, group_header_a, group_header_b
+
+    # table header
+    sheet.add_row(['', ''] + get_thead(@weekly_data, true) + 
+        get_thead(@monthly_data, true) + get_thead(@quarterly_data, true) + [''] +
+        get_thead(@quarterly_lines, false)[0..4] + ['Target'] + 
+        get_thead(@quarterly_qty, false)[0..4] + ['Target'] + 
+        get_thead(@quarterly_avg_luc, false)[0..4] + ['Target'] +
+        get_thead(@quarterly_data, false)[0..4] + ['Target'],
+        style: [
+            nil, nil, nil, (0..15).map { |x| thead_style }, 
+            nil, (0..7).map { |x| thead_style },
+            nil, (0..5).map { |x| thead_style },
+            nil, (0..4).map { |x| thead_style },
+            (0..15).map { |x| thead_style },
+            (0..15).map { |x| thead_style },
+            (0..15).map { |x| thead_style }
+        ].flatten
+    )
+
+    # organise data
+
+    map_quarterly = map_position @quarterly_data
+    map_monthly = map_position @monthly_data
+    map_weekly = map_position @weekly_data
+
+    h_quarterly_data = restructure_data @quarterly_data, map_quarterly
+    h_monthly_data = restructure_data @monthly_data, map_monthly
+    h_weekly_data = restructure_data @weekly_data, map_weekly
+
+    sum_quarterly_sale = periodic_sum h_quarterly_data
+    sum_monthly_sale = periodic_sum h_monthly_data
+    sum_weekly_sale = periodic_sum h_weekly_data
+
+    # organise projection data
+
+    map_quarterly_lines = map_position @quarterly_lines
+    map_quarterly_qty = map_position @quarterly_qty
+    map_quarterly_avg_luc = map_position @quarterly_avg_luc
+
+    h_quarterly_lines = restructure_data @quarterly_lines, map_quarterly_lines
+    h_quarterly_qty = restructure_data @quarterly_qty, map_quarterly_qty
+    h_quarterly_avg_luc = restructure_data @quarterly_avg_luc, map_quarterly_avg_luc
+
+    h_projecting_data = @projecting_data
+
+    sum_quarterly_lines = periodic_sum h_quarterly_lines
+    sum_quarterly_qty = periodic_sum h_quarterly_qty
+    sum_quarterly_avg_luc = periodic_sum h_quarterly_avg_luc
+
+    # add weekly sum to the report header with total
+    sheet.add_row(['Customer','Overdue', 'Sum =>'] + 
+        sum_weekly_sale.map { |x| x.to_i } + [''] + 
+        sum_monthly_sale.map { |x| x.to_i } + [''] + 
+        sum_quarterly_sale.map { |x| x.to_i } + [''] +
+        sum_quarterly_lines[0..3].map { |x| x.to_i } + [''] + 
+        sum_quarterly_qty[0..3].map { |x| x.to_i } + [''] + 
+        sum_quarterly_avg_luc[0..3].map { |x| x.to_i } + [''] +
+        sum_quarterly_sale[0..3].map { |x| x.to_i } + [''],
+        style: [
+            sum_head_style, sum_head_style, nil, 
+            (0..15).map { |x| sum_head_style }, 
+            nil, (0..7).map { |x| sum_head_style },
+            nil, (0..5).map { |x| sum_head_style },
+            nil, (0..4).map { |x| sum_head_style },
+            (0..4).map { |x| sum_head_style },
+            (0..4).map { |x| sum_head_style },
+            (0..4).map { |x| sum_head_style }
+        ].flatten
+    
+    )
+
+
+    # add all sale figure to the excel sheet
+    all_data = merge_all h_weekly_data, h_monthly_data, h_quarterly_data, 
+        sum_weekly_sale.last.to_f, sum_monthly_sale.last.to_f, 
+        sum_quarterly_sale.last.to_f, h_quarterly_lines, h_quarterly_qty, 
+        h_quarterly_avg_luc, h_projecting_data
+
+    # add customer data to an excel sheet
+    i = 0
+    toggle_color = false
+    all_data.each do |key, value|
+        toggle_color = !toggle_color
+        sheet.add_row(
+            [key, '-'] + value.map!{|val| (val == 0 || val.nil?) ? nil : '%.2f' % val} + [''], 
+            style: [
+                nil, nil, nil, 
+                (0..15).map { |x| toggle_color ? row_odd : row_even }, 
+                nil, (0..7).map { |x| toggle_color ? row_odd : row_even },
+                nil, (0..5).map { |x| toggle_color ? row_odd : row_even },
+                nil, (0..4).map { |x| toggle_color ? row_odd : row_even },
+                (0..4).map { |x| toggle_color ? row_odd : row_even },
+                (0..4).map { |x| toggle_color ? row_odd : row_even },
+                (0..4).map { |x| toggle_color ? row_odd : row_even }
+            ].flatten
+        )
+    end
+
+    sheet.add_row((0..55).map{|x| nil}, style: [nil,nil,nil, (0..52).map { |x| !toggle_color ? row_odd : row_even }].flatten)
+    sheet.add_row((0..55).map{|x| nil}, style: cell_border_md_top)
+
+    sheet.column_info[18].hidden = true
+    sheet.column_info[27].hidden = true
+    sheet.column_info[34].hidden = true
+end
+

@@ -18,6 +18,19 @@
 # end
 
 # Learn more: http://github.com/javan/whenever
+
+# Cron syntax:
+# ============
+#
+# * * * * * *
+# | | | | | |
+# | | | | | +-- Year              (range: 1900-3000)
+# | | | | +---- Day of the Week   (range: 1-7, 1 standing for Monday)
+# | | | +------ Month of the Year (range: 1-12)
+# | | +-------- Day of the Month  (range: 1-31)
+# | +---------- Hour              (range: 0-23, 1 in our example)
+# +------------ Minute            (range: 0-59, 10 in our example)
+
 require "active_support/all"
 
 Time.zone = "Melbourne"
@@ -44,6 +57,11 @@ end
 # Send Stock Control Email to the team
 every '0 8 * * 1' do
 	rake 'updates:send_stock_control'
+end
+
+# Email sale reports to the team on every Sunday's midnight
+every '12 23 * * 7' do
+	rake 'updates:send_sale_report'
 end
 
 # Refresh the Signature Pictures of Fastway

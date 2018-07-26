@@ -1,7 +1,9 @@
 require 'csv_import.rb'
 require 'csv_generator.rb'
 require 'stock_control.rb'
-
+require 'sale_report.rb'
+require 'dates_helper'
+# require 'zip'
 class AdminController < ApplicationController
     before_action :confirm_logged_in
 
@@ -200,43 +202,31 @@ class AdminController < ApplicationController
 
     def export_sale_report
 
-      end_date = Date.today
-      selected_period = "weekly"
-      num_periods = 14 # display 13 plus a current week
+      @quarterly_data, 
+      @monthly_data, 
+      @weekly_data, 
+      @quarterly_lines, 
+      @quarterly_qty, 
+      @quarterly_avg_luc, 
+      @projecting_data = genereate_sale_report_data staffs[:amy]
 
-      group_staffs = {
-        :gavin => [10],
-        :mat => [54, 50, 5],
-        :amy => [55, 44, 35]
-      }
+      # render xlsx: "export_sale_report", filename: "Sale Report #{Date.today.to_s}.xlsx"
+      # compressed_fs = Zip::OutputStream.write_buffer do |out|
+      #   staffs.each do |key, staff| 
+      #     @quarterly_data = get_periodic_sales quarterly, num_quarter, to_date, staff
+      #     @monthly_data = get_periodic_sales monthly, num_month, to_date, staff
+      #     @weekly_data = get_periodic_sales weekly, num_weeks, to_date, staff
+      #     report = render_to_string :xlsx => "export_sale_report", :filename => "#{key}'s sale report as of #{Date.today.to_s}.xlsx", layout: false
+      #     out.put_next_entry "Sale reports as of #{Date.today.to_s}.xlsx"
+      #     out.print report
+      #   end
+      # end
+      # compressed_fs.rewind
+      # send_data compressed_fs.read, :filename => 'Sale reports.zip', :type => "application/zip"
 
-
-      # periods_from_end_date is defined in Dates Helper
-      # returns an array of all dates - sorted
-      # For example num_periods = 3, end_date = 20th oct and "monthly" as period_type returns
-      # {
-      #   23=>[Mon, 04 Jun 2018, Mon, 11 Jun 2018], 
-      #   24=>[Mon, 11 Jun 2018, Mon, 18 Jun 2018], 
-      #   25=>[Mon, 18 Jun 2018, Wed, 20 Jun 2018]
-      # }
-      # 20th Oct is the last date in the array and not 19th oct because
-      # we want to calculate orders including 19th Oct, for that we need to give the next day
-      dates = periods_from_end_date(num_periods, end_date, selected_period)
-
-      # returns a hash like {week_num/month_num => [start_date, end_date]}
-      # i.e. { 20=>[Mon, 14 May 2018, Mon, 21 May 2018] }
-      dates_paired = pair_dates(dates, selected_period)
-
-      # should return - group_by_week_created
-      group_by_function = (period_date_functions(selected_period)[2] + "_and_customer_id").to_sym
-
-      sum_orders = Order.date_filter(dates[0], dates[-1]).valid_order.customer_staffs_filter(group_staffs[:mat]).order_by_staff_customer.send(group_by_function).sum_total
-      
-      # Order.sales(staff_ids, start_date, end_date, staff_direction = 'ASC', customer_direction = 'ASC')
-      # sum_orders = Order.sales(group_staffs[:mat], dates[0], dates[-1])
-
-      @weekly_data = [dates_paired, sum_orders]
-      render xlsx: "export_sale_report", filename: "Sale Report #{Date.today.to_s}.xlsx"
+      # Ref: https://viblo.asia/p/export-multiple-excel-and-zip-files-in-rails-DljMborlGVZn
+      # Ref: https://github.com/rubyzip/rubyzip
+      # Ref: https://stackoverflow.com/questions/25518439/how-can-i-download-multiple-xlsx-files-using-axlsx-gem
     end
 
     def scotpac_export

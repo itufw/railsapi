@@ -273,25 +273,66 @@ class Order < ActiveRecord::Base
   #                                      'QUARTER(orders.date_created)', 'YEAR(orders.date_created)']).references(:order_products)
   # end
 
+  # return weekly sale figure by customer id
   def self.group_by_week_created_and_customer_id
-    includes(:customer).group(['customers.id',\
-                               'WEEK(orders.date_created, 1)']).references(:customers)
- end
+    includes(:customer)
+    .group(['customers.id', 'WEEK(orders.date_created, 1)', 'YEAR(orders.date_created)'])
+    .references(:customers)
+  end
 
+  # return monthly sale figure by customer id
   def self.group_by_month_created_and_customer_id
-    includes(:customer).group(['customers.id',\
-                               'MONTH(orders.date_created)', 'YEAR(orders.date_created)']).references(:customers)
+    includes(:customer)
+    .group(['customers.id', 'MONTH(orders.date_created)', 'YEAR(orders.date_created)'])
+    .references(:customers)
   end
 
+  # return quarterly sale figure by customer id
   def self.group_by_quarter_created_and_customer_id
-    includes(:customer).group(['customers.id',\
-                               'QUARTER(orders.date_created)', 'YEAR(orders.date_created)']).references(:customers)
+    includes(:customer)
+    .group(['customers.id', 'QUARTER(orders.date_created)', 'YEAR(orders.date_created)'])
+    .references(:customers)
   end
 
+  # return yearly sale figure by customer id
   def self.group_by_year_created_and_customer_id
-    includes(:customer).group(['customers.id',\
-                               'YEAR(orders.date_created)']).references(:customers)
+    includes(:customer).group(['customers.id', 'YEAR(orders.date_created)']).references(:customers)
   end
+
+  # return weekly sale figure by customer actual name
+  def self.group_by_week_created_and_customer_actual_name
+    includes(:customer)
+    .group(['customers.actual_name', 'WEEK(orders.date_created, 1)', 'YEAR(orders.date_created)'])
+    .references(:customers)
+  end
+
+  # return monthly sale figure by customer actual name
+  def self.group_by_month_created_and_customer_actual_name
+    includes(:customer)
+    .group(['customers.actual_name', 'MONTH(orders.date_created)', 'YEAR(orders.date_created)'])
+    .references(:customers)
+  end
+
+  # return quarterly sale figure by customer actual name
+  def self.group_by_quarter_created_and_customer_actual_name
+    includes(:customer)
+    .group(['customers.actual_name', 'QUARTER(orders.date_created)', 'YEAR(orders.date_created)'])
+    .references(:customers)
+  end
+
+  # return yearly sale figure by customer actual name
+  def self.group_by_year_created_and_customer_actual_name
+    includes(:customer).group(['customers.actual_name','YEAR(orders.date_created)']).references(:customers)
+  end
+
+  def self.group_by_cust_name_order_id
+    includes(:customer)
+    .group('customers.actual_name', 'orders.id')
+  end
+
+  # def self.group_by_orderid
+  #   group('orders.id')
+  # end
 
   def self.group_by_customerid
     group('orders.customer_id')
@@ -309,6 +350,13 @@ class Order < ActiveRecord::Base
   # 	includes(:products).group('products.product_no_ws_id').references(:products)
   # end
 
+  # get quaterly sale figures of each staff and return them
+  # def self.group_by_quarter_created_and_customer_id
+  #   includes(:customer)
+  #   .group(['customers.actual_name', 'QUARTER(orders.date_created)', 'YEAR(orders.date_created)'])
+  #   .references(:customers)
+  # end
+
   ########## SUMMATION FUNCTIONS ############
 
   def self.count_order_id_from_order_products
@@ -319,10 +367,22 @@ class Order < ActiveRecord::Base
     count('orders.id')
   end
 
+  # count products of each order by its product name without year
+  # ie. Anarkia Tannat 2016 and Anarkia Tannat 2017 are of the same product
+  def self.count_product_lines
+    includes(:order_products => :product).count('products.name_no_vintage', :distinct => true)
+  end
+
+  # average product prices of each order
+  def self.avg_luc
+    includes(:order_products).average('order_products.price_luc')
+  end
+
   def self.sum_total
     sum('orders.total_inc_tax')
   end
 
+  # total number of bottles per order
   def self.sum_qty
     sum('orders.qty')
   end
@@ -335,16 +395,14 @@ class Order < ActiveRecord::Base
     average('orders.qty')
   end
 
-  def self.avg_luc
-    # TO DO
-  end
-
   def self.sum_order_product_qty
     includes(:order_products).sum('order_products.qty')
   end
 
   def self.avg_bottle_price
   end
+
+
   ######### ORDER BY FUNCTIONS ############
 
   def self.order_by_id(direction)
@@ -426,6 +484,9 @@ class Order < ActiveRecord::Base
     self.order_products.each {|o| order_total += (o.qty * o.price_inc_tax)}
     return order_total
   end
+
+  # sum ordered quantity
+  # def self.sum_qty
 
   def display_ship_address
     self.ship_name.to_s + ' ' + self.street.to_s + ' ' + self.street_2.to_s + ' ' + self.city.to_s + ' ' + self.postcode.to_s + ' ' + self.country.to_s

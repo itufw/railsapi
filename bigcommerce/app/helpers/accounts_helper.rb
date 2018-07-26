@@ -197,7 +197,7 @@ module AccountsHelper
         email_content.email_type = params[:commit]
         unless @checked_send_email_to_self
             # luke_email = Staff.find(9).email
-            staff = Staff.find(Customer.find(customer_id).staff_id)
+            staff = Staff.find Staff.find(Customer.find(customer_id).staff_id).report_to
             # email_content.cc = luke_email +";"+staff.email.to_s
             lucia_email = Staff.find(25).email
             email_content.cc = lucia_email +";"+staff.email.to_s

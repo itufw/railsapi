@@ -1,0 +1,60 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Customer:</strong>
+  <%= @projection.customer_id %>
+</p>
+
+<p>
+  <strong>Customer name:</strong>
+  <%= @projection.customer_name %>
+</p>
+
+<p>
+  <strong>Lines:</strong>
+  <%= @projection.q_lines %>
+</p>
+
+<p>
+  <strong>Bottles:</strong>
+  <%= @projection.q_bottles %>
+</p>
+
+<p>
+  <strong>Avg LUC:</strong>
+  <%= @projection.q_avgluc %>
+</p>
+
+<p>
+  <strong>Quarter:</strong>
+  <%= @projection.quarter %>
+</p>
+
+<p>
+  <strong>Recent:</strong>
+  <%= @projection.recent %>
+</p>
+
+<p>
+  <strong>Sale rep:</strong>
+  <%= @projection.sale_rep_id %>
+</p>
+
+<p>
+  <strong>Sale Rep name:</strong>
+  <%= @projection.sale_rep_name %>
+</p>
+
+<p>
+  <strong>Created by:</strong>
+  <%= @projection.created_by_name %>
+</p>
+
+<p>
+  <strong>Created by:</strong>
+  <%= @projection.created_by_id %>
+</p>
+
+<%= link_to 'Edit', edit_projection_path(@projection) %> |
+<%= link_to 'Back', projections_path %> | 
+<%= link_to 'New Projection', new_projection_path %>

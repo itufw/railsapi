@@ -103,6 +103,41 @@ class SalesController < ApplicationController
     @dates_paired = pair_dates(@dates, @selected_period)
   end
 
+  def sales_details_merged
+    get_current_end_date(params)
+    set_num_columns(params)
+    date_pairs
+
+    # order_sum_param takes into account what the user wants to calculate - Bottles or Order Totals
+    # order_sum_param is defined in Sales Controller Helper
+    # Sum function returns :sum_qty or :sum_total
+    # These functions are defined in the Order model
+    sum_function, @param_val, @sum_params = order_sum_param(params[:sum_param])
+
+    # sum_orders returns a hash like {date/week_num/month_num => sum} depending on the date_type
+    # defined in Sales Controller Helper
+
+    # date_type returns group_by_week_created or group_by_month_created
+    date_function = period_date_functions(@selected_period)[2]
+    @sums_by_periods = sum_orders(@dates[0], @dates[-1], date_function.to_sym, sum_function, nil)
+    staff_id, @staff_nicknames = display_reports_for_sales_dashboard(session[:user_id])
+
+
+    @order_owner =  (params[:order_owner].to_s == 'order_owner') ? true : false
+
+    group_by_date_function_staff = @order_owner ? '_and_order_staff_id' : '_and_staff_id'
+
+    @staff_sum_by_periods = sum_orders(@dates[0], @dates[-1], (date_function + group_by_date_function_staff).to_sym, sum_function, staff_id)
+
+    # Vintage Cellars
+    vc_group_number = 17
+    @cust_group_sum, @cust_group_name = cust_group_sales(vc_group_number, @dates[0], @dates[-1], 'Vintage Cellars', sum_function, @dates_paired)
+
+    @current_user = Staff.find(session[:user_id])
+    @display_all = params[:display_all] || 'No'
+    @avg_sum = sum_function.to_s.start_with? 'avg'
+  end
+
   def sales_dashboard_detailed
     get_current_end_date(params)
     set_num_columns(params)
@@ -127,7 +162,7 @@ class SalesController < ApplicationController
     group_by_date_function_staff = @order_owner ? '_and_order_staff_id' : '_and_staff_id'
 
     @staff_sum_by_periods = sum_orders(@dates[0], @dates[-1], (date_function + group_by_date_function_staff).to_sym, sum_function, staff_id)
-
+    
     # Vintage Cellars
     vc_group_number = 17
     @cust_group_sum, @cust_group_name = cust_group_sales(vc_group_number, @dates[0], @dates[-1], 'Vintage Cellars', sum_function, @dates_paired)
@@ -138,16 +173,34 @@ class SalesController < ApplicationController
     @avg_sum = sum_function.to_s.start_with? 'avg'
   end
 
+  # generates data for sales details (merged) reports according to reporting 
+  # options and returns data as intance variables
+  # -  @customer_sum_h  : a set of hash
+  #    [{[44, 1, 2017]=>5, [44, 1, 2018]=>6, [44, 2, 2017]=>9, ...}]
+  # -  @customers       : a set of customer active records
   def customer_dashboard
     get_current_end_date(params)
     set_num_columns(params)
     date_pairs
+    @customer_sum_h = {}
+    group_by_suffix = "_and_customer_id"    # group by staff or customer, default customer
 
     sum_function, @param_val, @sum_params = order_sum_param(params[:sum_param])
 
-    date_function = (period_date_functions(@selected_period)[2] + '_and_customer_id').to_sym
+    # group by staff if 
+    group_by_suffix = "_and_staff_id" if [:new_customer, :contact_note].include? sum_function
 
-    @customer_sum_h = sum_orders(@dates[0], @dates[-1], date_function, sum_function, params[:staff_id])
+    date_function = (period_date_functions(@selected_period)[2] + group_by_suffix).to_sym
+
+    # select appropriate data for a currently viewing report
+    if params[:merged]
+      get_staffs = Staff.get_staffs_by_report_to(params[:staff_id])
+      get_staffs.each {|staff| 
+        @customer_sum_h.merge!(sum_orders(@dates[0], @dates[-1], date_function, sum_function, staff))
+      }
+    else
+      @customer_sum_h = sum_orders(@dates[0], @dates[-1], date_function, sum_function, params[:staff_id])
+    end
 
     @customers = Customer.filter_by_ids(@customer_sum_h.keys.map { |k| k[0] })
   end
