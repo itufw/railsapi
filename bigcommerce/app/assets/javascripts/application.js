@@ -12,6 +12,8 @@
 //
 //= require_tree
 //= require bootstrap
+// require jquery3
+//= require popper
 //= require bootsy
 //= require moment
 //= require bootstrap-datetimepicker

@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.2.4'
+gem 'rails', '~> 4.2.4'
 # Use mysql as the database for Active Record
 gem 'mysql2', '~> 0.3.18'
 
@@ -84,8 +84,7 @@ gem 'combine_pdf'
 
 gem 'bootsy'
 
-gem 'momentjs-rails', '>= 2.9.0'
-
+gem 'momentjs-rails', '>= 2.10.5'
 gem 'bootstrap3-datetimepicker-rails', '~> 4.17.47'
 
 gem 'google-api-client', require: 'google/apis/calendar_v3'
@@ -99,11 +98,18 @@ gem 'google_places'
 gem 'googleauth'
 # convert street address to latitude and longitude
 gem 'geokit-rails'
+
+# NOTE: Geocoder's default IP address lookup has changed from FreeGeoIP.net to IPInfo.io. 
+# If you explicitly specify :freegeoip in your configuration you must choose a different 
+# IP lookup before FreeGeoIP is discontinued on July 1, 2018. If you do not explicitly 
+# specify :freegeoip you do not need to change anything.
 gem 'geocoder'
+
 # bootstrap-slider-rails -> used in map component
 gem 'bootstrap-slider-rails'
 # live search gem
-gem 'filterrific'
+gem 'filterrific', '~>4.0'
+
 gem 'rails-jquery-autocomplete'
 # fuzzy match
 gem 'fuzzy-string-match'
@@ -126,3 +132,9 @@ gem 'rubyzip', '>= 1.0.0'
 gem 'axlsx', '= 2.0.1'
 gem 'axlsx_rails'
 gem 'axlsx_styler'
+
+###################
+# newly added gems#
+###################
+gem 'font-awesome-sass', '~> 5.0.6'
+gem 'bootstrap', '~> 4.1.2'

@@ -19,6 +19,9 @@
  *= require simple_calendar
  *= require rateit
  */
+ 
+@import "font-awesome-sprockets";
+@import "font-awesome";
 
 @media print {
   a[href]:after {
