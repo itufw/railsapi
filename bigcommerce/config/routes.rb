@@ -30,6 +30,9 @@ Rails.application.routes.draw do
   get '/fetch_add_item', to: 'admin#fetch_add_item', as: 'fetch_add_item'
   get '/fetch_remove_item', to: 'admin#fetch_remove_item', as: 'fetch_remove_item'
 
+  get '/new_lead', to: 'lead#new'
+  post '/new_lead', to: 'lead#create_lead'
+  
   get '/fetch_lead', to: 'lead#fetch_lead', as: 'fetch_lead'
   get '/fetch_product_details', to: 'product#fetch_product_details', as: 'fetch_product_details'
   get '/verify_abn', to: 'credit#verify_abn', as: 'verify_abn'

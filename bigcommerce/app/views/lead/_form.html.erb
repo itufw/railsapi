@@ -1,0 +1,317 @@
+<%= form_for customer_lead, :url => {:controller => "activity", :action => "update"} do |form| %>
+
+
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <% if customer_lead.errors.any? %>
+      <div id="error_explanation" class="card border-danger">
+        <h5 class="card-header bg-danger text-white"><%= pluralize(customer_lead.errors.count, "error") %> prohibited this customer_lead from being saved:</h5>
+
+        <ul>
+          <% customer_lead.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+      <% end %>    
+    </div>
+  </div>
+
+  <!-- Personal Details -->
+  <div class="row text-center g-mb-18 g-mt-18">
+    <div class="col-md-12">
+      <div class="alert alert-primary">Personal Details</div>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <div class="col-md-6">
+      <div class="form-group row">
+        <%= form.label :firstname, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <%= form.text_field :firstname, id: :customer_lead_firstname, class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <%= form.label :lastname, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <%= form.text_field :lastname, id: :customer_lead_lastname, class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <%= form.label :nickname, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <%= form.text_field :actual_name, id: :customer_lead_actual_name, class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <%= form.label :company, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <%= form.text_field :company, id: :customer_lead_company, class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <%= form.label :emails, class: "col-form-label col-md-4" %>
+        <div class="input-group col-md-8">
+          <div class="input-group-prepend">
+            <div class="input-group-text"><i class="fa fa-envelope"></i></div>
+          </div>
+          <%= form.text_field :email, id: :customer_lead_email, class: "form-control" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="form-group row">
+        <%= form.label :phone, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <div class="input-group-text"><i class="fa fa-mobile"></i></div>
+            </div>
+            <%= form.text_field :mobile_phone, id: :customer_lead_mobile_phone, class: "form-control" %>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <%= form.label ' ', class: "col-form-label col-md-4" %>
+        <div class="input-group col-md-8">
+          <div class="input-group-prepend">
+            <div class="input-group-text"><i class="fa fa-phone"></i></div>
+          </div>
+          <%= form.text_field :phone, id: :customer_lead_phone, class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <%= form.label :type, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <%= form.collection_select :cust_type_id, CustType.all, :id, :name, {:include_blank => "Select a customer type"}, {:class => "form-control col-md-12"} %>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <%= form.label :group, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <%= form.collection_select :cust_group_id, CustGroup.all, :id, :name, {:include_blank => "Select a customer group"}, {:class => "form-control col-md-12"} %>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <%= form.label :style, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <%= form.collection_select :cust_style_id, CustStyle.all, :id, :name, {:include_blank => "Select a customer style"}, {:class => "form-control col-md-12"} %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Personal Details -->
+
+  <!-- Address Details -->
+  <div class="row text-center g-mb-18 g-mt-18">
+    <div class="col-md-12">
+      <div class="alert alert-primary">Address Details</div>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <div class="col-md-6">
+
+      <div class="form-group row">
+        <%= form.label :street, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <%= form.text_field :street, id: :customer_lead_street, class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <%= form.label :city, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <%= form.text_field :city, id: :customer_lead_city, class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <%= form.label :state, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <%= form.text_field :state, id: :customer_lead_state, class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <%= form.label :postalcode, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <%= form.text_field :postalcode, id: :customer_lead_postalcode, class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <%= form.label :country, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <%= form.text_field :country, id: :customer_lead_country, class: "form-control" %>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="col-md-6">
+      <div class="form-group row">
+        <%= form.label :position, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <div class="row">
+            <div class="input-group col g-pr-3">
+              <div class="input-group-prepend">
+                <div class="input-group-text">Lat</i></div>
+              </div>
+              <%= form.text_field :latitude, id: :customer_lead_latitude, readonly: true, class: "form-control" %>
+            </div>
+            <div class="input-group col g-pl-3">
+              <div class="input-group-prepend">
+                <div class="input-group-text">Lng</i></div>
+              </div>
+              <%= form.text_field :longitude, id: :customer_lead_longitude, readonly: true, class: "form-control" %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <%= form.label :address, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <%= form.text_field :address, id: :customer_lead_address, readonly: true, class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <%= form.label :website, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <%= form.text_field :website, id: :customer_lead_website, class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <%= form.label :google_place_id, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <%= form.text_field :google_place_id, id: :customer_lead_google_place_id, readonly: true, class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <%= form.label :region, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <%= form.text_field :region, id: :customer_lead_region, class: "form-control" %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Address Details -->
+
+  <!-- Other Details -->
+  <div class="row text-center g-mb-18 g-mt-18">
+    <div class="col-md-12">
+      <div class="alert alert-primary">Address Details</div>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <div class="col-md-6">
+      <div class="form-group row">
+        <%= form.label :representative, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <%= form.collection_select :staff_id, Staff.get_sale_reps, :id, :nickname, {:include_blank => "Select a sale rep."}, {:class => "form-control col-md-12"} %>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <%= form.label :date, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <div class="row">
+            <div class="input-group col g-pr-3">
+              <div class="input-group-prepend">
+                <div class="input-group-text">@</i></div>
+              </div>
+              <%= form.text_field :date_created, id: :customer_lead_date_created, readonly: true, class: "form-control" %>
+            </div>
+            <div class="input-group col g-pl-3">
+              <div class="input-group-prepend">
+                <div class="input-group-text"><i class="hs-admin-pencil"></i></div>
+              </div>
+              <%= form.text_field :date_modified, id: :customer_lead_date_modified, readonly: true,  class: "form-control" %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <%= form.label :customer_id, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <div class="row">
+            <div class="input-group col g-pr-3">
+              <div class="input-group-prepend">
+                <div class="input-group-text">#</i></div>
+              </div>
+              <%= form.text_field :customer_id, id: :customer_lead_customer_id, readonly: true, class: "form-control" %>
+            </div>
+            <div class="input-group col g-pl-3">
+              <div class="input-group-prepend">
+                <div class="input-group-text">@</i></div>
+              </div>
+              <%= form.text_field :turn_customer_date, id: :customer_lead_turn_customer_date, readonly: true, class: "form-control" %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <%= form.label :perferred_time, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <%= form.text_field :perferred_contact_time, id: :customer_lead_perferred_contact_time, class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <%= form.label :salesforce_lead_id, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <%= form.text_field :salesforce_lead_id, id: :customer_lead_salesforce_lead_id, readonly: true,   class: "form-control" %>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="col-md-6">
+      <div class="form-group row">
+        <%= form.label :profile_image, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <%= form.text_field :img, id: :customer_lead_img, class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <%= form.label :featured_image, class: "col-form-label col-md-4" %>
+        <div class="col-md-8">
+          <%= form.text_field :featured_image, id: :customer_lead_featured_image, class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <div class="col">
+          <%= form.text_area :useful_information, id: :customer_lead_useful_information, placeholder: "About customer",rows: 5, class: "form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-4 g-mt-5" %>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  <!-- End Other Details -->
+
+  <div class="form-group text-center">
+    <%= form.submit :Save, class: "btn btn-primary col-md-2 col-xl-2" %>
+  </div>
+</div>
+<% end %>

@@ -131,4 +131,9 @@ class Staff < ActiveRecord::Base
     def self.get_staffs_by_report_to staff_id
         select('id, nickname, report_to').sales_list.order_by_order.where(report_to: staff_id)
     end
+
+    # get active sale executives list
+    def self.get_sale_reps
+        select(:id, :nickname).where(active: 1).where(user_type: "Sales Executive")
+    end
 end

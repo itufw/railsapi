@@ -22,6 +22,10 @@ class LeadController < ApplicationController
     redirect_to request.referrer
   end
 
+  def new 
+    @customer_lead = CustomerLead.new
+  end
+
   def create_leads
     customer_name = params['customer_name']
     staff_id = params['staff_id']
