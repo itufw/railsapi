@@ -20,9 +20,10 @@
               <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-              <li><%= link_to "Weekly", controller: "sales", action: "sales_dashboard" %></li>
-              <li><%= link_to "Detailed", controller: "sales", action: "sales_dashboard_detailed" %></li>
-              <li><%= link_to "Merged Sales", controller: "sales", action: "sales_details_merged" %></li>
+              <li><%= link_to "Weekly", controller: "sales", action: "sales_dashboard", type: "detail" %></li>
+              <li><%= link_to "Weekly merged", controller: "sales", action: "sales_dashboard", type: "merged" %></li>
+              <li><%= link_to "Detailed", controller: "sales", action: "sales_details_merged" %></li>
+              <li><%= link_to "Merged Sales", controller: "sales", action: "sales_details_merged", type: "merged" %></li>
               <% if Staff.find(session[:user_id]).user_type.in?(["Sales Executive"]) %>
               <li><%= link_to "Weekly All Staff", controller: "sales", action: "sales_dashboard", display_all: "Yes" %></li>
               <% end %>
