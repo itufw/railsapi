@@ -26,7 +26,7 @@ class AccessController < ApplicationController
       session[:default_group] = staffGroup.id unless staffGroup.nil?
 
       flash[:success] = "You are now logged in."
-      redirect_to controller: 'sales', action: 'sales_dashboard'
+      redirect_to controller: 'sales', action: 'sales_dashboard', type: 'merged'
     else
       flash[:error] = "Invalid username/password combination"
       redirect_to action: 'login'
