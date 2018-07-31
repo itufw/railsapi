@@ -4,138 +4,129 @@
   <link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
   <%= favicon_link_tag 'logo.ico' %>
   <title><%= content_for?(:title) ? content_for(:title) : "Untapped" %></title>
-  <%= stylesheet_link_tag    'vendor',      media: 'all', debug: false %>
+  <%#= stylesheet_link_tag    'vendor',      media: 'all', debug: false %>
   <%= stylesheet_link_tag    'application', media: 'all' %>
-  <%= javascript_include_tag 'vendor', debug: false %>
+  <%#= javascript_include_tag 'vendor', debug: false %>
   <%= javascript_include_tag 'application' %>
 </head>
 <body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#"></a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-  <nav class="navbar navbar-default">
-    <div class="container-fluid" align="center">
-      <div class="collapse navbar-collapse">
-        <ul class="nav navbar-nav">
-          <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Sales Summaries
-              <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-              <li><%= link_to "Weekly", controller: "sales", action: "sales_dashboard" %></li>
-              <li><%= link_to "Detailed", controller: "sales", action: "sales_dashboard_detailed" %></li>
-              <li><%= link_to "Merged Sales", controller: "sales", action: "sales_details_merged" %></li>
-              <% if Staff.find(session[:user_id]).user_type.in?(["Sales Executive"]) %>
-              <li><%= link_to "Weekly All Staff", controller: "sales", action: "sales_dashboard", display_all: "Yes" %></li>
-              <% end %>
-              <li><%= link_to "New Customers", controller: "customer", action: "new_customers" %></li>
-              <li><%= link_to "Map", controller: "calendar", action: "map" %></li>
-            </ul>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="nav nav-tabs mr-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link text-white dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Sales Summaries</a>
+          <div class="dropdown-menu">
+            <%= link_to "Weekly", {controller: "sales", action: "sales_dashboard"}, class: "dropdown-item" %>
+            <%= link_to "Detailed", {controller: "sales", action: "sales_dashboard_detailed"}, class: "dropdown-item" %>
+            <%= link_to "Merged Sales", {controller: "sales", action: "sales_details_merged"}, class: "dropdown-item" %>
+            <% if Staff.find(session[:user_id]).user_type.in?(["Sales Executive"]) %>
+            <%= link_to "Weekly All Staff", {controller: "sales", action: "sales_dashboard", display_all: "Yes"}, class: "dropdown-item" %>
+            <% end %>
+            <%= link_to "New Customers", {controller: "customer", action: "new_customers"}, class: "dropdown-item" %>
+            <%= link_to "Map", {controller: "calendar", action: "map"}, class: "dropdown-item" %>
+          </div>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link text-white dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Orders</a>
+          <div class="dropdown-menu">
+            <%= link_to "Orders", {controller: "order", action: "all"}, class: "dropdown-item" %>
+            <%= link_to "New Order", {controller: "order", action: "create_order"}, class: "dropdown-item" %>
+            <%= link_to "Pending Orders", {controller: "status", action: "pending", status_id: 1, status_name: "Pending"}, class: "dropdown-item" %>
+          </div>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link text-white dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Customers</a>
+          <div class="dropdown-menu">
+            <%= link_to "Customers", {controller: "customer", action: "all"}, class: "dropdown-item" %>
+            <%= link_to "Leads", {controller: "lead", action: "all_leads"}, class: "dropdown-item" %>
+            <%= link_to "Contacts", {controller: "contact", action: "all_contacts"}, class: "dropdown-item" %>
+            <%= link_to "Zomato Customers", {controller: "customer", action: "zomato"}, class: "dropdown-item" %>
+            <%= link_to "Customer Map", {controller: "customer", action: "near_by"}, class: "dropdown-item" %>
+          </div>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link text-white dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Products</a>
+          <div class="dropdown-menu">
+            <%= link_to "All", {controller: "product", action: "all"}, class: "dropdown-item" %>
+            <%= link_to "Detailed Dashboard", {controller: "sales", action: "product_dashboard"}, class: "dropdown-item" %>
+            <% if user_full_right(session[:authority])%>
+            <%= link_to "Warehouse", {controller: "product", action: "warehouse"}, class: "dropdown-item" %>
+            <%= link_to "Review", {controller: "product", action: "review"}, class: "dropdown-item" %>
+            <% end %>
+            <%= link_to 'Location Update', {controller: 'product', action: 'location'}, class: "dropdown-item"%>
+          </div>
+        </li>
+
+        <% if user_full_right(session[:authority]) %>
+          <li class="nav-item dropdown">
+            <a class="nav-link text-white dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Accounting</a>
+            <div class="dropdown-menu">
+              <%= link_to "Accounts Receivable", {controller: "accounts", action: "contacts"}, class: "dropdown-item" %>
+              <%= link_to "Different Orders", {controller: "accounts", action: "different_orders"}, class: "dropdown-item" %>
+              <%= link_to "Order Status", {controller: "accounts", action: "account_status"}, class: "dropdown-item" %>
+            </div>
           </li>
 
-          <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Orders
-              <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-              <li><%= link_to "Orders", controller: "order", action: "all" %></li>
-              <li><%= link_to "New Order", controller: "order", action: "create_order" %></li>
-              <li><%= link_to "Pending Orders", controller: "status", action: "pending", status_id: 1, status_name: "Pending" %></li>
-            </ul>
+          <li class="nav-item">
+            <%= link_to "Admin", {controller: "admin", action: "index"}, :class => "nav-link text-white" %>
           </li>
+        <% end%>
 
-          <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Customers
-              <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-              <li><%= link_to "Customers", controller: "customer", action: "all" %></li>
-              <li><%= link_to "Leads", controller: "lead", action: "all_leads" %></li>
-              <li><%= link_to "Contacts", controller: "contact", action: "all_contacts" %></li>
-              <li><%= link_to "Zomato Customers", controller: "customer", action: "zomato" %></li>
-              <li><%= link_to "Customer Map", controller: "customer", action: "near_by" %></li>
-            </ul>
-          </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link text-white dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Event</a>
+          <div class="dropdown-menu">
+            <%= link_to "My Note", {controller: "task", action: "staff_task"}, class: "dropdown-item" %>
+            <%= link_to "Add Note", {controller: 'activity', action: 'add_note'}, class: "dropdown-item" %>
+            <%= link_to "Add Task", {controller: 'activity', action: 'add_activity'}, class: "dropdown-item" %>
+            <%= link_to "Calendar", {controller: "calendar", action: "local_calendar"}, class: "dropdown-item" %>
+            <%= link_to "Events Check", {controller: "calendar", action: "event_check_offline"}, class: "dropdown-item" %>
+          </div>
+        </li>
+      </ul>
+      <ul class="nav nav-tabs ml-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><%= "Hi," + "  " + session[:username] %></span></a>
+          <div class="dropdown-menu">
+            <%= link_to 'My Group', {controller: 'admin', action: 'group_list'}, class: "dropdown-item" %>
+            <%= link_to "Password Update", {controller: "admin", action: "admin"}, class: "dropdown-item" %>
+            <%= link_to "My Note", {controller: "task", action: "staff_task"}, class: "dropdown-item" %>
+            <% if it_working(session[:user_id])%>
+              <div class="dropdown-divider"></div>
+              In case you need it
+              <%= link_to "My Note", {controller: "task", action: "staff_task"}, class: "dropdown-item" %>
+              <%= link_to "Add Note", {controller: "task", action: "add_task"}, class: "dropdown-item" %>
+              <div class="dropdown-divider"></div>
+              Activity down there
+              <%= link_to "Add Note", {controller: 'activity', action: 'add_note'}, class: "dropdown-item" %>
+              <%= link_to "Add Task", {controller: 'activity', action: 'add_activity'}, class: "dropdown-item" %>
+              <div class="dropdown-divider"></div>
+              Generate Order
+              <%= link_to "Orders Mobile", {controller: 'order', action: 'create_order_testing'}, class: "dropdown-item" %>
+            <% end %>
+          </div>
+        </li>
+        
+        <li class="nav-item">
+          <%= link_to "Logout", {controller: "access", action: "logout"}, :class => "nav-link" %>
+        </li>
+      </ul>
+    </div>
+  </nav>
 
-          <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Products
-              <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-              <li><%= link_to "All", controller: "product", action: "all" %></li>
-              <li><%= link_to "Detailed Dashboard", controller: "sales", action: "product_dashboard" %></li>
-              <% if user_full_right(session[:authority])%>
-              <li><%= link_to "Warehouse", controller: "product", action: "warehouse" %></li>
-              <li><%= link_to "Review", controller: "product", action: "review" %></li>
-              <% end %>
-              <li><%= link_to 'Location Update', controller: 'product', action: 'location'%></li>
-            </ul>
-          </li>
-
-          <% if user_full_right(session[:authority]) %>
-          <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Accounting
-              <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-              <li><%= link_to "Accounts Receivable", controller: "accounts", action: "contacts" %></li>
-              <li><%= link_to "Different Orders", controller: "accounts", action: "different_orders" %></li>
-              <li><%= link_to "Order Status", controller: "accounts", action: "account_status" %></li>
-            </ul>
-          </li>
-          <li><%= link_to "Admin", controller: "admin", action: "index" %></li>
-          <% end%>
-
-          <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Event
-              <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-              <li><%= link_to "My Note", controller: "task", action: "staff_task" %></li>
-              <li><%= link_to "Add Note", controller: 'activity', action: 'add_note'%></li>
-              <li><%= link_to "Add Task", controller: 'activity', action: 'add_activity'%></li>
-              <li><%= link_to "Calendar", controller: "calendar", action: "local_calendar" %></li>
-              <li><%= link_to "Events Check", controller: "calendar", action: "event_check_offline" %></li>
-                <!-- if user_full_right(session[:authority])
-                if Rails.env.development?
-                <li> link_to "Sync", controller: "calendar", action: "event_censor" </li>
-                 else
-                <li>< link_to "Sync", "http://cms.untappedwines.com.au/redirect"</li>
-                 end
-                 end  -->
-               </ul>
-             </li>
-           </ul>
-           <ul class="nav navbar-nav navbar-right">
-            <li class="dropdown">
-              <a class="" data-toggle="dropdown" href="#"><%= "Hi," + "  " + session[:username] %>
-                <span class="caret"></span>
-              </a>
-              <ul class="dropdown-menu">
-                <li><%= link_to 'My Group', controller: 'admin', action: 'group_list'%></li>
-                <li><%= link_to "Password Update", controller: "admin", action: "admin" %></li>
-                <li><%= link_to "My Note", controller: "task", action: "staff_task" %></li>
-                <% if it_working(session[:user_id])%>
-                <li>In case you need it</li>
-                <li><%= link_to "My Note", controller: "task", action: "staff_task" %></li>
-                <li><%= link_to "Add Note", controller: "task", action: "add_task" %></li>
-                <li>Activity down there</li>
-                <li><%= link_to "Add Note", controller: 'activity', action: 'add_note'%></li>
-                <li><%= link_to "Add Task", controller: 'activity', action: 'add_activity'%></li>
-                <li>Generate Order</li>
-                <li><%= link_to "Orders Mobile", controller: 'order', action: 'create_order_testing'%></li>
-                <% end %>
-              </ul>
-            </li>
-            <li><%= link_to session[:authority]%></li>
-            <li><%= link_to "Logout", controller: "access", action: "logout" %></li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-    <% flash.each do |key, value| %>
-    <center><%= content_tag :div, value, class: "flash #{key}" %></center>
-    <% end %>
-    <%= debug(params) if Rails.env.development? %>
+  <% flash.each do |key, value| %>
+  <center><%= content_tag :div, value, class: "flash #{key}" %></center>
+  <% end %>
+  <%= debug(params) if Rails.env.development? %>
+  <div class="container">
     <%= yield %>
-
-  </body>
-  </html>
+  </div>
+</body>
+</html>
