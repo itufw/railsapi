@@ -12,16 +12,30 @@
  *
  *= require_tree .
  *= require_self
- *= require bootstrap
+ * require bootstrap
  *= require bootsy
  *= require bootstrap-datetimepicker
  *= require bootstrap-slider
  *= require simple_calendar
  *= require rateit
  */
- 
+
+@import "bootstrap";
 @import "font-awesome-sprockets";
 @import "font-awesome";
+
+.mr-auto {
+	.nav-link{
+		background-color: #0B4C5F !important;
+	}	
+}
+
+.ml-auto {
+	.nav-link {
+		background-color: rgba(0,0,0,0) !important;
+		color: #6E6E6E !important;
+	}	
+}
 
 @media print {
   a[href]:after {

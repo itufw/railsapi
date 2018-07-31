@@ -11,9 +11,9 @@
 // about supported directives.
 //
 //= require_tree
-//= require bootstrap
-// require jquery3
+//= require jquery3
 //= require popper
+//= require bootstrap
 //= require bootsy
 //= require moment
 //= require bootstrap-datetimepicker
