@@ -137,4 +137,4 @@ gem 'axlsx_styler'
 # newly added gems#
 ###################
 gem 'font-awesome-sass', '~> 5.0.6'
-gem 'bootstrap', '~> 4.1.2'
+gem 'bootstrap', '~> 4.1.3'
