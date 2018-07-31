@@ -21,9 +21,10 @@
         <li class="nav-item dropdown">
           <a class="nav-link text-white dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Sales Summaries</a>
           <div class="dropdown-menu">
-            <%= link_to "Weekly", {controller: "sales", action: "sales_dashboard"}, class: "dropdown-item" %>
-            <%= link_to "Detailed", {controller: "sales", action: "sales_dashboard_detailed"}, class: "dropdown-item" %>
-            <%= link_to "Merged Sales", {controller: "sales", action: "sales_details_merged"}, class: "dropdown-item" %>
+            <%= link_to "Weekly", {controller: "sales", action: "sales_dashboard", type: "detail" }, class: "dropdown-item" %>
+            <%= link_to "Weekly merged", {controller: "sales", action: "sales_dashboard", type: "merged" }, class: "dropdown-item" %>
+            <%= link_to "Detailed", {controller: "sales", action: "sales_details_merged"}, class: "dropdown-item" %>
+            <%= link_to "Merged Sales", {controller: "sales", action: "sales_details_merged", type: "merged" }, class: "dropdown-item" %>
             <% if Staff.find(session[:user_id]).user_type.in?(["Sales Executive"]) %>
             <%= link_to "Weekly All Staff", {controller: "sales", action: "sales_dashboard", display_all: "Yes"}, class: "dropdown-item" %>
             <% end %>

@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   resources :order_types
   mount Bootsy::Engine => '/bootsy', as: 'bootsy'
 
-  root 'sales#sales_dashboard'
+  root 'sales#sales_dashboard', type: 'merged'
   # post 'admin/update'
 
   get 'add_task', to: 'task#add_task'
