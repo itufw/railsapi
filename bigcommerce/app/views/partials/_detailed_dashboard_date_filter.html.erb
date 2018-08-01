@@ -1,21 +1,41 @@
-<div class="row">
-	<div class="col-xs-2 col-xs-offset-1" style="float: left;">
-		<%= select_tag "period_type", options_for_select(@period_types.collect{ |p| [p.capitalize, p]}, selected: @selected_period), class:"form-control"%>
-	</div>
-	<div class="col-xs-2" style="float: left;">
-		<%= text_field_tag('num_period', @num_periods, placeholder: 'Number of Periods', class: 'input-mini') %>
-	   	<!-- <%= select_tag "num_period", options_for_select(@periods.collect{ |p| [p, p]}, selected: @num_periods), include_blank: "Number of Periods", class:'form-control' %> -->
-	</div>
-	<div class="col-xs-2">
-	<%= select_tag "sum_param", options_for_select(@sum_params.collect{ |p| [p, p]}, selected: @param_val), class:"form-control", :onchange => "this.form.submit();"%>
-	</div>
-	<div class="col-xs-3" style="float: left;margin-top: 2px;">
-	   	End Date:   <%= date_field( "selected_date", "selected_date", value: @end_date) %>
-	</div>
-	<div class="col-xs-3">
-		<%= radio_button_tag(:order_owner, "customer_owner", !@order_owner) %> Customer
-		<span style="margin-left: 50px;">
-		<%= radio_button_tag(:order_owner, "order_owner", @order_owner) %> Order
-		</span>
+<div class="col-sm p-1">
+	<%= select_tag "period_type", options_for_select(
+			@period_types.collect{ |p| [p.capitalize, p]}, 
+			selected: @selected_period
+		), 
+		class: 'form-control' 
+	%>
+</div>
+<div class="col-sm p-1">
+	<%= text_field_tag('num_period', @num_periods, 
+	placeholder: 'Number of Periods', class: 'form-control') %>
+</div>
+<div class="col-sm p-1">
+	<%= select_tag "sum_param", options_for_select(
+			@sum_params.collect{ |p| [p, p]}, 
+			selected: @param_val
+		), 
+		class:"form-control", :onchange => "this.form.submit();"
+	%>
+</div>
+<div class="col-sm-6 col-md-4 col-lg-3 p-1">
+	<div class="input-group">
+	  <div class="input-group-prepend">
+	    <span class="input-group-text">To date</span>
+	  </div>
+	  <%= date_field( "selected_date", "selected_date", value: @end_date, class: "form-control") %>
+	</div>	
+</div>
+<div class="col-sm p-1">
+	<div class="form-check form-check-inline">
+	  	<%= radio_button_tag(:order_owner, "customer_owner", !@order_owner, class: "form-check-input") %>
+	  	<%= label_tag :order_owner, :customer, class: "form-check-label" %>
 	</div>
 </div>
+<div class="col-sm p-1">
+	<div class="form-check form-check-inline">
+		<%= radio_button_tag(:order_owner, "order_owner", @order_owner, class: "form-check-input") %>
+		<%= label_tag :order, nil, class: "form-check-label" %>
+	</div>
+</div>
+

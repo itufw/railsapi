@@ -1,19 +1,26 @@
 <%= title "Detailed Sales Dashboard" %>
 
-<h3>Detailed Sales <%= "Merged" if params[:type] == "merged" %></h3>
-
-<div style="margin-top: 50px;">
-
-<%= form_tag({:action => "sales_details_merged"}, {:method => "get"} ) do %>
-    <%= hidden_field_tag :type , params[:type] %>
-    <%= render "partials/detailed_dashboard_date_filter" %>
-    <div class="col-xs-6 col-xs-offset-7" style="margin-top: 20px;">
-        <%= submit_tag "Submit", class: 'btn btn-primary' %>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header text-center h3 text-secondary">
+                Detailed Sales <%= "Merged" if params[:type] == "merged" %>
+            </div>
+            <div class="card-body">
+                <%= form_tag({:action => "sales_details_merged"}, {:method => "get", :class => "form-inline justify-content-center"} ) do %>
+                    <%= hidden_field_tag :type , params[:type] %>
+                    <%= render "partials/detailed_dashboard_date_filter" %>
+                    <div class="col-sm p-1">
+                        <%= submit_tag :submit, class: 'btn btn-primary' %>
+                    </div>
+                <% end %>
+            </div>
+        </div>
     </div>
-<% end %>
 </div>
-<br/><br/>
-<table class = "table table-striped table-bordered table-hover table-responsive">
+
+
+<table class = "table table-striped table-bordered table-hover table-responsive w-100 d-block d-table">
     <tr>
         <th>Start Date - End Date</th>
         <% @dates_paired.each do |week_num, date_pair| %>
