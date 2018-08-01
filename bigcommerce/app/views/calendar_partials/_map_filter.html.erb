@@ -1,117 +1,156 @@
-<div class="col-md-4">
-  <div class="row">
-    <div class="col-md-4">
-      <div id="sales_menu">
-        <a class="btn btn-default">Sales Executive</a>
-      </div>
-      <div id="sales_rep">
+<div class="row">
+  <div class="col-12">
+    <div class="row">
+      <div class="col-md">
+        <span class="btn btn-outline-primary mb-3">Sale Executives</span>
         <% @staff.each do |person| %>
-        <li>
-          <%= check_box_tag 'selected_staff[]', person.id, (@staff_selected.include? person.id.to_s) %>
-          <%= person.nickname %>
-          &nbsp;&nbsp;
-        </li>
+          <div class="form-check">
+            <%= check_box_tag 'selected_staff[]', person.id, 
+              (@staff_selected.include? person.id.to_s), 
+              class: "form-check-input" 
+            %>
+            <%= label_tag :nickname, person.nickname, class: "form-check-label" %>
+          </div>
         <% end %>
       </div>
-    </div>
-    <div class="col-md-4">
-      <div id="cust_type_menu">
-        <a class="btn btn-default">Customer Type</a>
-      </div>
-      <div id="cust_type">
+      <div class="col-md">
+        <span class="btn btn-outline-primary mb-3">Customer Types</span>
         <% @customer_type.each do |cust| %>
-        <li>
-          <%= check_box_tag 'selected_cust_style[]', cust.id,  (@customer_style_selected.include? cust.id.to_s)%>
-          <%= cust.name %>
-          &nbsp;&nbsp;
-        </li>
+          <div class="form-check">
+            <%= check_box_tag 'selected_cust_style[]', cust.id,  
+              (@customer_style_selected.include? cust.id.to_s)
+            %>
+            <%= cust.name %>
+          </div>
         <% end %>
+      </div>
+      <div class="col-md-5">
+        <div class="row">
+          <div id="selector" class="btn-group col-12 mb-3">
+            <button type="button" class="btn btn-outline-primary <%= 'active' if @active_sales %>" style="width: 150px" value="Sales">
+              Sales
+            </button>
+            <button type="button" class="btn btn-outline-primary <%= 'active' unless @active_sales %>" value="Last_Order">
+              Last Order Date
+            </button>
+            <%= hidden_field_tag "filter_selector" %>
+          </div>
+
+          <div id="sales_slider" class="col-12">
+            <% @colour_guide.each do |colour|%>
+              <div class="row">
+                <div class="col-1">
+                    <%= check_box_tag 'selected_colour[]', colour, (@colour_selected.include? colour) %>
+                </div>
+                <div class="col-1">
+                  <svg width="15" height="15" id="svg_<%= colour %>">
+                    <rect width="15" height="15" style="fill:<%= colour %>;" id="cube_<%= colour %>"/>
+                  </svg>
+                </div>
+                <div class="col">
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">$</span>
+                    </div>
+                    <%= text_field_tag "order_range_#{colour}_min",
+                      @colour_range_sales[colour].min, 
+                      placeholder: 'Sale Starts From',
+                      class: "form-control"
+                    %>
+                  </div>
+                </div> 
+                <div class="col-1">
+                  to
+                </div>
+                <div class="col">
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">$</span>
+                    </div>
+                    <%= text_field_tag "order_range_#{colour}_max",
+                      @colour_range_sales[colour].max,
+                      placeholder: 'Sale Limit',
+                      class: "form-control"
+                    %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+
+          <div id="last_order_slider" class="col-12">
+            <% @colour_guide.each do |colour|%>
+              <div class="row">
+                <div class="col-1">
+                  <%= check_box_tag 'selected_order_colour[]', colour, 
+                    (@order_colour_selected.include? colour) %>
+                </div>
+                <div class="col-1">
+                  <svg width="15" height="15" id="svg_<%= colour %>">
+                    <rect width="15" height="15" style="fill:<%= colour %>;" id="cube_<%= colour %>"/>
+                  </svg>
+                </div>
+                <div class="col">
+                  <% unless colour.eql? @colour_guide.last %>
+                      <input id="slider-date-<%= colour%>"/>
+                      <%= hidden_field_tag "date_range_#{colour}" %>
+                  <% else %>
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">Over</span>
+                      </div>
+                      <%= text_field_tag "date_range_#{colour}", @max_date, 
+                        placeholder: 'Last Order Date before', 
+                        class: "input-mini", style: "width: 140px" %>
+                      <div class="input-group-append">
+                        <span class="input-group-text">days</span>
+                      </div>
+                    </div>  
+                  <% end %>
+                </div>
+              </div>     
+            <% end %>
+          </div>
+
+          <div id="order_perior" class="col-12">
+            <div class='input-group date mb-1 mt-3' id='start_timepicker'>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text", style = "height: 36px">
+                    <%= label(:start_date, "From", class: "pt-2")%>
+                  </span>
+                </div>
+                <%= text_field_tag 'start_time',"", 
+                  placeholder: 'Start Timepicker', 
+                  class: 'input-mini', style: "width: 200px; height: 36px" %>
+                <span class="input-group-addon">
+                  <span class="far fa-calendar-alt h3 p-1"></span>
+                </span>
+              </div>
+            </div>
+            
+            <div class='input-group date mb-1' id='due_timepicker'>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text", style = "height: 36px">
+                    <%= label(:end_date, "To", class: "pt-2")%>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  </span>
+                </div>
+                <%= text_field_tag 'due_time',"", 
+                  placeholder: 'Due Date Timepicker', 
+                  class: 'input-mini', style: "width: 200px; height: 36px" %>
+                <span class="input-group-addon">
+                  <span class="far fa-calendar-alt h3 p-1"></span>
+                </span>
+              </div>
+            </div>
+            <%= submit_tag "Search", class: 'btn btn-primary' %>
+            <%= link_to "Reset", {controller: "calendar", action: "map"}, class: "btn btn-primary" %>
+            </div>
+        </div>
       </div>
     </div>
   </div>
-
-  <br/><br/>
-  <div id="selector" class="btn-group">
-    <button type="button" class="btn btn-default <%= 'active' if @active_sales %>" value="Sales">Sales</button>
-    <button type="button" class="btn btn-default <%= 'active' unless @active_sales %>" value="Last_Order">Last Order Date</button>
-    <%= hidden_field_tag "filter_selector" %>
-  </div>
-
-  <div id="sales_slider">
-    <table>
-      <% @colour_guide.each do |colour|%>
-      <tr>
-        <td>
-          <%= check_box_tag 'selected_colour[]', colour, (@colour_selected.include? colour) %>
-        </td>
-        <td>
-          <svg width="15" height="15" id="svg_<%= colour %>">
-            <rect width="15" height="15" style="fill:<%= colour %>;" id="cube_<%= colour %>"/>
-          </svg>
-        </td>
-        <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-        <td>
-          <!-- <input id="slider-<%= colour%>"/> -->
-          <!-- <%= hidden_field_tag "order_range_#{colour}" %> -->
-          $<%= text_field_tag "order_range_#{colour}_min",@colour_range_sales[colour].min , placeholder: 'Sale Starts From', :size => 3%>
-          TO $<%= text_field_tag "order_range_#{colour}_max",@colour_range_sales[colour].max, placeholder: 'Sale Limit', :size => 3 %>
-        </td>
-      </tr>
-      <% end %>
-    </table>
-  </div>
-
-  <div id="last_order_slider">
-    <table>
-      <% @colour_guide.each do |colour|%>
-      <tr>
-        <td>
-          <%= check_box_tag 'selected_order_colour[]', colour, (@order_colour_selected.include? colour) %>
-        </td>
-        <td>
-          <svg width="15" height="15" id="svg_<%= colour %>">
-            <rect width="15" height="15" style="fill:<%= colour %>;" id="cube_<%= colour %>"/>
-          </svg>
-        </td>
-        <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-        <% unless colour.eql? @colour_guide.last %>
-        <td>
-          <input id="slider-date-<%= colour%>"/>
-          <%= hidden_field_tag "date_range_#{colour}" %>
-        </td>
-      <% else %>
-        <td>
-          <%= label(:last_order_date, "Over ")%>
-          <%= text_field_tag "date_range_#{colour}", @max_date, placeholder: 'Last Order Date before' %>
-          Days
-        </td>
-        <% end %>
-      </tr>
-      <% end %>
-    </table>
-  </div>
-
-  <div id="order_perior">
-    <%= label(:start_date, "Orders From")%>
-    <div class='input-group date' id='start_timepicker'>
-      <%= text_field_tag('start_time',"", placeholder: 'Start Timepicker', class: 'form-control') %>
-      <span class="input-group-addon">
-        <span class="glyphicon glyphicon-calendar"></span>
-      </span>
-    </div>
-    <%= label(:end_date, "To")%>
-    <div class='input-group date' id='due_timepicker'>
-      <%= text_field_tag('due_time',"", placeholder: 'Due Date Timepicker', class: 'form-control') %>
-      <span class="input-group-addon">
-        <span class="glyphicon glyphicon-calendar"></span>
-      </span>
-    </div>
-  </div>
-
-  <br/><br/>
-  <%= submit_tag "Search", class: 'btn btn-primary' %>
-  <%= link_to "Reset", {controller: "calendar", action: "map"}, class: "btn btn-primary" %>
-
 </div>
 
 <!-- Time Picker -->
@@ -134,15 +173,15 @@
 
 <!-- basic Filters and order amount -->
 <script>
-  $("#sales_rep").hide();
-  $("#sales_menu").click(function () {
-    $("#sales_rep").toggle();
-  });
+  // $("#sales_rep").hide();
+  // $("#sales_menu").click(function () {
+  //   $("#sales_rep").toggle();
+  // });
 
-  $("#cust_type").hide();
-  $("#cust_type_menu").click(function () {
-    $("#cust_type").toggle();
-  });
+  // $("#cust_type").hide();
+  // $("#cust_type_menu").click(function () {
+  //   $("#cust_type").toggle();
+  // });
 
   if ($('#selector button.active').val() == "Sales") {
     $("#sales_slider").show();
@@ -170,82 +209,28 @@
   });
 
   var date_gap = 15
-  var colour_guide = [
-    "lightgreen",
-    "green",
-    "gold",
-    "coral",
-    "red",
-    "maroon"
-  ]
+  var colour_guide = [ "lightgreen", "green", "gold", "coral", "red", "maroon" ]
+
   for (i = 0; i < colour_guide.length - 2; i++) {
     $("#slider-date-" + colour_guide[i]).slider({
-      value: [
-        date_gap * i,
-        date_gap * (i + 1)
-      ],
+      value: [ date_gap * i, date_gap * (i + 1) ],
       min: 0,
       max: 90,
       step: 6,
-      ticks: [
-        0,
-        15,
-        30,
-        45,
-        60,
-        75
-      ],
-      ticks_positions: [
-        0,
-        20,
-        40,
-        60,
-        80,
-        100
-      ],
-      ticks_labels: [
-        '0 day',
-        '15',
-        '30',
-        '45',
-        '60',
-        '75'
-      ]
+      ticks: [ 0, 15, 30, 45, 60, 75 ],
+      ticks_positions: [ 0, 20, 40, 60, 80, 100 ],
+      ticks_labels: [ '0', '15', '30', '45', '60', '75 (days)' ]
     });
   };
-  // parseInt(<%=@max_date%>)
+
   $("#slider-date-" + colour_guide[colour_guide.length - 2]).slider({
-    value: [
-      date_gap * 4,
-      parseInt(<%=@max_date%>)
-    ],
+    value: [ date_gap * 4, parseInt(<%=@max_date%>) ],
     min: 0,
     max: 90,
     step: 6,
-    ticks: [
-      0,
-      15,
-      30,
-      45,
-      60,
-      parseInt(<%=@max_date%>)
-    ],
-    ticks_positions: [
-      0,
-      20,
-      40,
-      60,
-      80,
-      100
-    ],
-    ticks_labels: [
-      '0 day',
-      '15',
-      '30',
-      '45',
-      '60',
-      '<%=@max_date%>'
-    ]
+    ticks: [ 0, 15, 30, 45, 60, parseInt(<%=@max_date%>) ],
+    ticks_positions: [ 0, 20, 40, 60, 80, 100 ],
+    ticks_labels: [ '0', '15', '30', '45', '60', '<%=@max_date%> (days)' ]
   });
 
   $("#slider-date-red").on('change', function () {
@@ -264,35 +249,16 @@
     $("input#date_range_lightgreen").attr('value', $(this).val());
   });
 
-  sales_gap = [
-    0,
-    500,
-    1500,
-    3000,
-    5000,
-    10000,
-    10000
-  ]
+  sales_gap = [ 0, 500, 1500, 3000, 5000, 10000, 10000 ]
+
   for (i = 0; i < colour_guide.length; i++) {
     $("#slider-" + colour_guide[i]).slider({
-      value: [
-        sales_gap * i,
-        sales_gap * (i + 1)
-      ],
+      value: [ sales_gap * i, sales_gap * (i + 1) ],
       min: 0,
       max: 100000,
       step: 5,
-      ticks: [
-        0, 500, 1500, 3000, 5000
-      ],
-      ticks_positions: [
-        0,
-        20,
-        40,
-        60,
-        80,
-        100
-      ],
+      ticks: [ 0, 500, 1500, 3000, 5000 ],
+      ticks_positions: [ 0, 20, 40, 60, 80, 100 ],
       ticks_labels: ['$0', '$500', '$1500', '$3000', '$5000']
     });
   }

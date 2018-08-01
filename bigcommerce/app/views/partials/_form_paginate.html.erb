@@ -1,23 +1,38 @@
 <% if objects.count >= @per_page.to_i %>
+	<script type="text/javascript">
+		function load(selected){
+			window.location.search = window.location.search + '&per_page=' + selected.val();
+		};
+	</script>
 
-<script type="text/javascript">
-	function load(selected){
-		window.location.search = window.location.search + '&per_page=' + selected.val();
-	};
-</script>
-
-<div class="form-group">
-
-	<div class="col-xs-3 col-xs-offset-7">
-		<%= will_paginate objects, :inner_window => 1, :outer_window => 1 %>  |
+	<!-- start pagination -->
+	<div class="row" style="display: inline-block;">
+		<div class="col w-100">
+			<center>
+			<table>
+				<tr>
+					<td align="right">
+				  		<%= will_paginate objects, 
+							renderer: WillPaginate::ActionView::BootstrapLinkRenderer, 
+							previous_label: '&laquo;', next_label: '&raquo;' %>
+					</td>
+					<td>
+					  	<div class="input-group pb-3">
+					    	<div class="input-group-append">
+					      		<span class="input-group-text" style="height: 35px">
+					      			Per page
+					      		</span>
+				      			<%= select_tag :per_page, 
+				      				options_for_select([15,30,50,100], @per_page.to_i), 
+				      				:onchange => "load($(this).find('option:selected'))", 
+				      				:class => "form-control", style: "height: 35px"
+				      			%>
+					    	</div>
+					  	</div>
+					</td>
+				</tr>
+			</table>
+		</div>
 	</div>
-
-	<div class="col-xs-2" style="margin-top: 20px;margin-left: -45px;">
-		<span style="float: left;">Per Page</span>
-		<span style="float: left;margin-left: 10px;margin-top: -5px;">
-		<%= select_tag :per_page, options_for_select([15,30,50,100], @per_page.to_i), :onchange => "load($(this).find('option:selected'))", :class => "form-control" %>
-		</span>
-	</div>
-</div>
-
+	<!-- end pagination -->
 <% end %>
