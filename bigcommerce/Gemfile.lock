@@ -343,6 +343,8 @@ GEM
       chronic (>= 0.6.3)
     wicked_pdf (1.1.0)
     will_paginate (3.1.6)
+    will_paginate-bootstrap4 (0.2.2)
+      will_paginate (~> 3.0, >= 3.0.0)
     wkhtmltopdf-binary (0.12.4)
 
 PLATFORMS
@@ -403,6 +405,7 @@ DEPENDENCIES
   whenever
   wicked_pdf
   will_paginate (~> 3.1.0)
+  will_paginate-bootstrap4
   wkhtmltopdf-binary
   xeroizer!
 
