@@ -1,11 +1,39 @@
 <% if user_full_right(session[:authority]) %>
-  <div class="col-xs-4"><%= link_to label(:status, 'Approve'), controller: 'status', action: 'status_check', status_name: 'Approve'%></div>
-  <div class="col-xs-4"><%= link_to label(:status, 'Picking'), controller: 'status', action: 'status_check', status_name: 'Picking'%></div>
-  <div class="col-xs-4"><%= link_to label(:status, 'Ready'), controller: 'status', action: 'status_check', status_name: 'Ready'%></div>
-  <div class="col-xs-4"><%= link_to label(:status, 'Courier'), controller: 'status', action: 'status_check', status_name: 'Courier'%></div>
-  <div class="col-xs-4"><%= link_to label(:status, 'Shipped'), controller: 'status', action: 'status_check', status_name: 'Shipped'%></div>
-  <div class="col-xs-4"><%= link_to label(:status, 'Delivered'), controller: 'status', action: 'status_check', status_name: 'Delivered'%></div>
-  <div class="col-xs-4"><%= link_to label(:status, "Problem"), controller: 'status', action: 'status_check', status_name: 'Problem' %><%= '(' + Order.problem_status_filter.count.to_s + ')'%></div>
-  <div class="col-xs-4"><%= label(:status, 'Print', onclick: "this.parentElement.parentElement.parentElement.parentElement.submit()")%></div>
-  <div class="col-xs-4"><%= link_to label(:status, "Delayed"), controller: 'order', action: 'all', status: {'id'=> 2 }, delay: true, order_id_search: '', staff: {'id' => ''}, search: '', start_date: '', end_date: '' %></div>
+    <div class="row justify-content-center">
+        <div class="col">
+            <%= link_to label(:status, 'Approve'), controller: 'status', action: 'status_check', status_name: 'Approve'%>
+        </div>
+
+        <div class="col">
+            <%= link_to label(:status, 'Picking'), controller: 'status', action: 'status_check', status_name: 'Picking'%>
+        </div>
+
+        <div class="col">
+            <%= link_to label(:status, 'Ready'), controller: 'status', action: 'status_check', status_name: 'Ready'%>
+        </div>
+
+        <div class="col">
+            <%= link_to label(:status, 'Courier'), controller: 'status', action: 'status_check', status_name: 'Courier'%>
+        </div>
+
+        <div class="col">
+            <%= link_to label(:status, 'Shipped'), controller: 'status', action: 'status_check', status_name: 'Shipped'%>
+        </div>
+
+        <div class="col">
+            <%= link_to label(:status, 'Delivered'), controller: 'status', action: 'status_check', status_name: 'Delivered'%>
+        </div>
+
+        <div class="col">
+            <%= label(:status, 'Print', onclick: "this.parentElement.parentElement.parentElement.parentElement.submit()")%>
+        </div>
+
+        <div class="col">
+            <%= link_to label(:status, "Delayed"), controller: 'order', action: 'all', status: {'id'=> 2 }, delay: true, order_id_search: '', staff: {'id' => ''}, search: '', start_date: '', end_date: '' %>
+        </div>
+        
+        <div class="col">
+            <%= link_to label(:status, "Problem(" + Order.problem_status_filter.count.to_s + ")"), {controller: 'status', action: 'status_check', status_name: 'Problem'}, class: "text-danger" %>
+        </div>
+    </div> 
 <% end %>
