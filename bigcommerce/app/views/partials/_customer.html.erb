@@ -1,7 +1,6 @@
 <%= render "partials/form_paginate", objects: customers %>
 
-
-<table class = "table table-striped table-bordered table-hover table-responsive">
+<table class = "table table-striped table-bordered table-hover table-responsive w-100 d-block d-table">
 	<tr>
 		<th>Sales Rep <%= render "partials/sort_arrows", order: 'order_by_staff' %></th>
 		<th>Name <%= render "partials/sort_arrows", order: 'order_by_name' %></th>
@@ -12,21 +11,22 @@
 	</tr>
 
 	<% customers.each do |c| %>
-	<tr>
-		<%= render "partials/staff_update_form", customer: c, staff: c.staff, can_update_staff: allow_to_update(session[:user_id]) %>
+		<tr>
+			<%= render "partials/staff_update_form", customer: c, staff: c.staff, 
+				can_update_staff: allow_to_update(session[:user_id]) %>
 
-		<% cust_name = customer_name(c) %>
-		<td><%= link_to cust_name, controller: 'customer', action: 'summary', customer_id: c.id, customer_name: cust_name %></td>
+			<% cust_name = customer_name(c) %>
+			<td><%= link_to cust_name, controller: 'customer', action: 'summary', 
+				customer_id: c.id, customer_name: cust_name %></td>
 
-		<td><%= customer_type_name(c) %></td>
-		<td><%= customer_style_name(c) %></td>
-		<td class="num"><%= display_num(outstanding_customer(c.xero_contact))  %></td>
-		<td class="num"><%= display_num(overdue_customer(c.xero_contact)) %></td>
-	</tr>
+			<td><%= customer_type_name(c) %></td>
+			<td><%= customer_style_name(c) %></td>
+			<td class="num"><%= display_num(outstanding_customer(c.xero_contact))  %></td>
+			<td class="num"><%= display_num(overdue_customer(c.xero_contact)) %></td>
+		</tr>
 	<% end %>
-
 </table>
 
 <span style="float:right;">
-<%= paginate(customers) %>
+	<%= paginate(customers) %>
 </span>

@@ -1,22 +1,56 @@
 <%= title "New Customers" %>
-<h3>New Customers</h3>
 
-<center><%= link_to "View Incomplete Customers", action: 'incomplete_customers' %></center>
-<%= form_tag({:controller => "customer", :action => "new_customers"}, {:method => "get"}) do %>
-<center>
-<div>
-	Customer Created From:
-	<%= date_field( "start_date", "start_date", value: @start_date) %>
-	To:
-	<%= date_field( "end_date", "end_date", value: @end_date) %>
+<!-- start filter -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header text-center text-secondary">
+                <h3>
+                    New Customers List
+                </h3>
+                <p>
+                    <%= link_to "View Incomplete Customers", action: 'incomplete_customers' %>
+                </p>
+            </div>
+
+            <div class="card-body">
+                <%= form_tag({:controller => "customer", :action => "new_customers"}, 
+                    {:method => "get", :class => "form-inline justify-content-center"}) do %>
+                    <div class="col-lg-2 col-md-3 p-1">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">From</span>
+                            </div>
+                            <%= date_field( "start_date", "start_date", value: @start_date, class: "form-control") %>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 col-md-3 p-1">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">To</span>
+                            </div>
+                            <%= date_field( "end_date", "end_date", value: @end_date, class: "form-control") %>
+                        </div>
+                    </div>
+
+                    <%= render "partials/customer_filter" %>
+
+                    <div class="col-lg col-md p-1">
+                        <%= submit_tag "Filter", class: 'btn btn-primary' %>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+    </div>
 </div>
-</center>
+<!-- end filter -->
 
-<div class="form-group" style="margin-left:300px;margin-top:50px;">
+<!-- start table -->
+<div class="row">
+    <div class="col-12">
+        <%= render "partials/customer", customers: @customers %>
 
-	<%= render "partials/customer_filter" %>
-	<%= submit_tag "Filter", class: 'btn btn-primary' %>
-	<% end %>
+    </div>
 </div>
-
-<%= render "partials/customer", customers: @customers %>
+<!-- end table -->

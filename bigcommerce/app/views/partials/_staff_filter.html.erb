@@ -1,4 +1,4 @@
-
-    <div class="col-xs-2">
-      <%= collection_select(:staff, :id, Staff.sales_list.order_by_order, :id, :nickname, {:include_blank => 'All Staff'}, {:class => 'form-control'}) %>
-    </div>
+<div class="col-lg col-md p-1">
+    <%= collection_select(:staff, :id, Staff.sales_list.order_by_order, :id, :nickname, 
+        {:include_blank => 'All Staff'}, {:class => 'form-control'}) %>
+</div>
