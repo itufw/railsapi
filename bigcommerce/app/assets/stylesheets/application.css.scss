@@ -24,6 +24,12 @@
 @import "font-awesome-sprockets";
 @import "font-awesome";
 
+// make a div scrollable for long content
+.scrollable {
+  height: 450px;
+  overflow-y: scroll;
+}
+
 .mr-auto {
 	.nav-link{
 		background-color: #0B4C5F !important;

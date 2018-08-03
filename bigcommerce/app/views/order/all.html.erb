@@ -11,14 +11,14 @@
 						staff: {id: session[:user_id]} unless current_user_sales?(session[:authority]) 
 					%>
 
-					<%= link_to '<i class="fas fa-file-alt" title="Add New Orders" style="color: black;"></i>'.html_safe, action: 'create_order'%>
+					<%= link_to '<i class="fas fa-file-alt" title="Add New Orders" style="color: black;"></i>'.html_safe, action: 'create_order' %>
 				</p>
 		  	</div>
 	 	 	<div class="card-body">
+	 	 		<%= render 'order_partials/order_status_label' if user_full_right(session[:authority]) %>
+		  	</div>
+		  	<div class="card-footer text-muted">
 	 	 		<%= form_tag({:controller => "order", :action => "all"}, {:method => "get"}) do %>
-
-		 	 		<%= render 'order_partials/order_status_label' if user_full_right(session[:authority]) %>
-
 	 	 			<div class="row">
 						<%= render "partials/order_filter" %>
 						<%= hidden_field_tag :start_date, @start_date %>
@@ -30,7 +30,7 @@
 					  		<%= link_to "Reset", {controller: "order", action: "all"}, class: "btn btn-primary" %>
 					  	</div>
 					</div>
-		 	 	<% end %>
+		 	 	<% end %>		    
 		  	</div>
 		</div>
 	</div>

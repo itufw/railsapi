@@ -34,6 +34,7 @@
           </table>
           <!-- WS / All products -->
           <script type="text/javascript">
+            // check to search for whether only WS products or all
             $('input#ws').change(function(){
               if (this.checked){
                 $('.product_autocomplete').html('<%= autocomplete_field_tag 'product', '', autocomplete_product_ws_activity_index_path, placeholder: 'Search WS Product', id_element: '#product_id', id: 'product_ws_search'%>');

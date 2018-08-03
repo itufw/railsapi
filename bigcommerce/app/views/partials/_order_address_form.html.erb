@@ -1,28 +1,58 @@
-<table>
-  <tr>
-    <td class="ProductCost" align="right">Billing Address</td>
-    <td colspan="2">
+<div class="row">
+  <div class="col card border-white">
+    <div class="card-header">
+      <%= label_tag :billing_address %>
+    </div>
+    <div class="row card-body text-primary">
       <%= f.fields_for "customer", f.object.customer do |c|%>
-      <%= c.text_field :company, placeholder: 'Company'%>
-      <%= c.text_field :street, placeholder: 'Street'%>
-      <%= c.text_field :street_2, placeholder: 'Street 2'%>
-      <%= c.text_field :city, placeholder: 'City'%>
-      <%= c.text_field :state, placeholder: 'State'%>
-      <%= c.text_field :postcode, placeholder: 'Postcode'%>
-      <%= c.text_field :country, placeholder: 'Country'%>
+        <div class="col-4">
+          <%= c.text_field :company, placeholder: 'Company', class: 'form-control mb-1' %>
+        </div>
+        <div class="col-4">
+          <%= c.text_field :street, placeholder: 'Street', class: 'form-control mb-1' %>
+        </div>
+        <%= c.hidden_field :street_2, placeholder: 'Street 2', class: 'form-control mb-1' %>
+        <div class="col-4">
+          <%= c.text_field :city, placeholder: 'City', class: 'form-control mb-1' %>
+        </div>
+        <div class="col-4">
+          <%= c.text_field :state, placeholder: 'State', class: 'form-control mb-1' %>
+        </div>
+        <div class="col-4">
+          <%= c.text_field :postcode, placeholder: 'Postcode', class: 'form-control mb-1' %>
+        </div>
+        <div class="col-4">
+          <%= c.text_field :country, placeholder: 'Country', class: 'form-control mb-1' %>
+        </div>
       <% end %>
-    </td>
-  </tr>
-  <tr>
-    <td class="ProductCost" align="right">Shipping Address</td>
-    <td colspan="2">
-      <%= f.text_field :ship_name, placeholder: 'Recipient or Leave it Blank'%>
-      <%= f.text_field :street, placeholder: 'Street'%>
-      <%= f.text_field :street_2, placeholder: 'Street 2'%>
-      <%= f.text_field :city, placeholder: 'City'%>
-      <%= f.text_field :state, placeholder: 'State'%>
-      <%= f.text_field :postcode, placeholder: 'Postcode'%>
-      <%= f.text_field :country, placeholder: 'Country'%>
-    </td>
-  </tr>
-</table>
+    </div>
+  </div>
+</div> 
+<div class="row">
+  <div class="col card border-white mb-3">
+    <div class="card-header">
+      <%= label_tag :shipping_address %>
+    </div>
+    <div class="row card-body text-primary">
+      <div class="col-4">
+        <%= f.text_field :ship_name, placeholder: 'Recipient or Leave it Blank', class: 'form-control mb-1' %>
+      </div>
+      <div class="col-4">
+        <%= f.text_field :street, placeholder: 'Street', class: 'form-control mb-1' %>
+      </div>
+      <%= f.hidden_field :street_2, placeholder: 'Street 2', class: 'form-control mb-1' %>
+      <div class="col-4">
+        <%= f.text_field :city, placeholder: 'City', class: 'form-control mb-1' %>
+      </div>
+      <div class="col-4">
+        <%= f.text_field :state, placeholder: 'State', class: 'form-control mb-1' %>
+      </div>
+      <div class="col-4">
+        <%= f.text_field :postcode, placeholder: 'Postcode', class: 'form-control mb-1' %>
+      </div>
+      <div class="col-4">
+        <%= f.text_field :country, placeholder: 'Country', class: 'form-control mb-1' %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,8 +1,22 @@
 <% is_beer = is_beer_order(@order.id) %>
 <%= title @order.customer.cust_type.name + " " + (is_beer ? "Beers" : "Wines") + " Order #" + @order.id.to_s %>
-<h3><%= @order.customer.cust_type.name + " " + (is_beer ? "Beers" : "Wines") + " Order #" + @order.id.to_s %></h3>
-<% title_type = "" %>
-<center>Date: <i><%= @order.date_created.to_date.strftime('%d/%m/%Y')%></i> Due Date:<i><%= (@order.date_created.to_date + 30.days).strftime('%d/%m/%Y')%></i></center>
+
+<div class="row mb-3">
+  <div class="col-12">
+    <div class="card">
+        <div class="card-header text-center h3 text-secondary">
+          <%= @order.customer.cust_type.name + " " + (is_beer ? "Beers" : "Wines") + " Order #" + @order.id.to_s %>
+        </div>
+      <div class="card-body text-center">
+        Date: <i><%= @order.date_created.to_date.strftime('%d/%m/%Y')%></i> 
+        Due Date:<i><%= (@order.date_created.to_date + 30.days).strftime('%d/%m/%Y')%></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%# title_type = "" %>
+
 <%= form_for @order, url: {controller: "order", action: "update_order"}, method: :POST  do |f| %>
   <%= f.hidden_field :id %>
   <% if is_beer_order(@order.id) %>
@@ -22,26 +36,4 @@
   <%= 		render 'order_partials/retail_order_form', f: f %>
   <%  	end %>
   <% end %>
-
-  <%# if @order.wet.nil? %>
-  <%#= render 'order_partials/retail_order_form', f: f%>
-  <%# else %>
-  <%#= render 'order_partials/order_form', f: f%>
-  <%# end %>
 <% end %>
-
-   <!--  
-    customer = order.customer
-
-    if order.is_beer_order(order)
-      if customer.cust_type_id == 1
-        template = 'pdf/rs_beer_order_invoice.pdf'  # retail wines
-      else
-        template = 'pdf/ws_beer_order_invoice.pdf'  # wholesale beers
-      end
-    else
-      if customer.cust_type_id == 1
-        template = 'pdf/retail_order_invoice.pdf'   # retail wines
-      else
-        template = 'pdf/order_invoice.pdf'          # wholesale wines
-      end -->

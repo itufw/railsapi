@@ -10,7 +10,6 @@
 // Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
 // about supported directives.
 //
-//= require_tree
 //= require jquery3
 //= require popper
 //= require bootstrap
@@ -25,3 +24,4 @@
 //= require autocomplete-rails
 //= require rails_sortable
 //= require jquery.rateit
+//= require_tree
