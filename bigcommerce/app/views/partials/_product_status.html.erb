@@ -1,5 +1,4 @@
-<table class = "table table-striped table-bordered table-hover table-responsive products-view not-default" id = "products-view-table">
-
+<table class = "table table-striped table-bordered table-hover table-responsive products-view not-default w-100 d-block d-table" id = "products-view-table">
 	<tr>
 		<th>Product Name</th>
 		<th>Number of Orders</th>
@@ -10,17 +9,14 @@
 	</tr>
 
 	<% products.each do |p| %>
-
-	<tr>
-		<% v = p[1] %>
-		<td><%= link_to v[3], controller: 'status', action: 'summary_with_product', status_id: @status_id, status_name: @status_name, product_id: p[0], product_name: v[3], num_orders: v[0], qty: v[4], status_qty: v[1], total: v[2] %></td>
-		<td class="num"><%= number_with_delimiter(v[0]) %></td>
-		<td class="num"><%= number_with_delimiter(v[4]) %></td>
-		<td class="num"><%= number_with_delimiter(v[1]) %></td>
-		<td class="num"><%= number_with_delimiter(v[1] + v[4]) %></td>
-		<td class="num"><%= display_num(v[2]) %></td>
-	</tr>
-
+        <tr>
+            <% v = p[1] %>
+            <td><%= link_to v[3], controller: 'status', action: 'summary_with_product', status_id: @status_id, status_name: @status_name, product_id: p[0], product_name: v[3], num_orders: v[0], qty: v[4], status_qty: v[1], total: v[2] %></td>
+            <td class="num"><%= number_with_delimiter(v[0]) %></td>
+            <td class="num"><%= number_with_delimiter(v[4]) %></td>
+            <td class="num"><%= number_with_delimiter(v[1]) %></td>
+            <td class="num"><%= number_with_delimiter(v[1] + v[4]) %></td>
+            <td class="num"><%= display_num(v[2]) %></td>
+        </tr>
 	<% end %>
-
 </table>
