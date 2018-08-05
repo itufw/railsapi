@@ -1,4 +1,10 @@
 <td>
-  <%= link_to '<i class="glyphicon glyphicon-search" title="Find Nearby Customers"></i>'.html_safe, controller: "customer", action: "near_by", zomato_id: restaurant.id, latitude: restaurant.latitude, longitude: restaurant.longitude, search: restaurant.name%>
-  <%= link_to '<i class="glyphicon glyphicon-plus" title="Convert To A Lead"></i>'.html_safe, controller: "lead", action: "create_leads", search: restaurant.name + ' ' + restaurant.locality , staff_id: session[:user_id] %>
+    <%= link_to '<i class="fas fa-search" title="Find Nearby Customers"></i>'.html_safe, 
+        controller: "customer", action: "near_by", 
+        zomato_id: restaurant.id, latitude: restaurant.latitude, 
+        longitude: restaurant.longitude, search: restaurant.name %> &nbsp; 
+    <%= link_to '<i class="fas fa-user-plus" title="Convert to a lead"></i>'.html_safe, 
+        controller: "lead", action: "create_leads", 
+        search: restaurant.name + ' ' + restaurant.locality , 
+        staff_id: session[:user_id] %>
 </td>

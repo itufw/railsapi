@@ -1,0 +1,43 @@
+<!-- created by vchar on 20180805 -->
+<div class="row">
+    <% cuisines = ZomatoCuisine.active_cuisines%>
+    <div class="row">
+        <% cuisines.map(&:priority_group).uniq.sort.each do |priority| %>
+            <div class="col-6">
+                <div class="row">
+                    <% cuisines.select{ |x| x.priority_group == priority}.each do |cuisine| %>
+                        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+                            <div class="form-check">
+                                <%= check_box_tag 'selected_cuisine[]', cuisine.name, 
+                                    (@selected_cuisine.include? cuisine.name), 
+                                    class: "form-check-input priority priority-" + priority.to_s %>
+                                <label class="form-check-label">
+                                    <%= cuisine.name[0..12] %>
+                                </label>
+                            </div>
+                        </div>
+                    <% end %>
+                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+                        <div class="form-check">
+                            <%= check_box_tag :select_all, false, false, class: "form-check-input priority", for: "select_all" %>
+                            <label class="form-check-label">
+                                Select All
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% end %>
+    </div>
+</div>
+
+<script type="text/javascript">
+    // implement select all checkbox
+    $('input[for*=select_all]').click(function(){
+        checkboxes = $(this).parent().parent().parent().find('.priority');
+        flag = !checkboxes[0].checked;
+        for(var i = 0; i < checkboxes.length; i ++){
+            checkboxes[i].checked = flag;
+        }
+    });
+</script>
