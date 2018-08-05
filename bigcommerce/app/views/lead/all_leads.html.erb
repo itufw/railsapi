@@ -1,16 +1,33 @@
 <%= title "Leads" %>
-<h3>Leads</h3>
-<center><%= link_to "Create New Lead", action: 'create_leads' %></center>
-<center><%= link_to "Create a lead", new_lead_path %></center>
-<center><%= link_to "Link Lead to Customers", action: 'link_leads' %></center>
+<div class="row">
+	<div class="col-12">
+		<div class="card">
+		  	<div class="card-header text-center h3 text-secondary">
+				Leads
+				<p class="h5 mt-2">
+                    <%= link_to "Create new lead", {action: 'create_leads'},
+                        class: "btn btn-outline-primary text-info" %>
+                    <%= link_to "Create new lead", new_lead_path,
+                        class: "btn btn-outline-primary text-info" %>
+                    <%= link_to "Leads - customers", {action: 'link_leads'},
+                        class: "btn btn-outline-primary text-info" %>
+				</p>
+		  	</div>
+	 	 	<div class="card-body">
 
-<%= form_tag({:controller => "lead", :action => 'all_leads'}, {:method => "get"}) do %>
-
-<div class="form-group" style="margin-left:300px;margin-top:50px;">
-	<%= render "partials/customer_filter" %>
-	<%= submit_tag "Filter", class: 'btn btn-primary' %>
+            <%= form_tag({:controller => "lead", :action => 'all_leads'}, {:method => "get"}) do %>
+                <div class="row">
+                    <%= render "partials/customer_filter" %>
+                    <div class="col-1 p-1">
+                        <%= submit_tag "Filter", class: 'btn btn-primary' %>
+                    </div>
+                </div>
+            <% end %>
+        </div>
+    </div>
 </div>
+
 <%= render 'partials/paginate', objects: @leads%>
 <%= render "lead_partials/leads", leads: @leads %>
 
-<% end %>
+

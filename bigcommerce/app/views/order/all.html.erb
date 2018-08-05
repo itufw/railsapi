@@ -23,10 +23,10 @@
 						<%= render "partials/order_filter" %>
 						<%= hidden_field_tag :start_date, @start_date %>
 					  	<%= hidden_field_tag :end_date, @end_date %>
-					  	<div class="col p-1">
+					  	<div class="col-1 p-1">
 					  		<%= submit_tag "Filter", class: 'btn btn-primary' %>
 					  	</div>
-					  	<div class="col p-1">
+					  	<div class="col-1 p-1">
 					  		<%= link_to "Reset", {controller: "order", action: "all"}, class: "btn btn-primary" %>
 					  	</div>
 					</div>
