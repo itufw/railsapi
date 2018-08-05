@@ -1,25 +1,37 @@
-<div class="row">
-	<div class="col-xs-3 col-xs-offset-1">
-	  <%= text_field_tag('search', @search_text, placeholder: 'Search by product name', class: 'form-control') %>
-	</div>
-	<div class="col-xs-2">
-	    <%= collection_select(:producer_country, :id, (@products.nil?) ? ProducerCountry.all : ProducerCountry.producer_country_filter(@products.map(&:producer_country_id)), :id, :name, {:include_blank => 'All Countries'}, {:class => 'form-control'}) %>
-	</div>
-	<div class="col-xs-3">
-	    <%= collection_select(:product_sub_type, :id, (@products.nil?) ? ProductSubType.all : ProductSubType.product_sub_type_filter(@products.map(&:product_sub_type_id)), :id, :name, {:include_blank => 'All Varietals'}, {:class => 'form-control'}) %>
-	</div>
+<!-- edited by vchar on 20180805 -->
+<!-- Used in Products all page -->
+
+<div class="col-lg-2 col-md-4 p-1">
+    <%= text_field_tag('search', @search_text, placeholder: 'Search by product name', class: 'form-control') %>
 </div>
-<div class="row" style="margin-top: 20px;">
-	<div class="col-xs-5 col-xs-offset-4">
-		<%= radio_button_tag(:transform_column, "product_id", @checked_id) %> Products
-		<span style="margin-left: 50px;">
-		<%= radio_button_tag(:transform_column, "product_no_ws_id", @checked_no_ws) %>  Vintage
-		</span>
-		<span style="margin-left: 50px;">
-		<%= radio_button_tag(:transform_column, "product_no_vintage_id", @checked_no_vintage) %> Wine
-		</span>
-	</div>
-	<%= submit_tag "Submit", class: 'btn btn-primary' %>
-	<button class = "btn btn-primary"><%= link_to "Reset", action: "products" %></button>
-	<%= submit_tag "Update", class: 'btn btn-primary' if @checked_no_ws%>
+<div class="col-lg-2 col-md-4 p-1">
+    <%= collection_select(:producer_country, :id, (@products.nil?) ? ProducerCountry.all : ProducerCountry.producer_country_filter(@products.map(&:producer_country_id)), :id, :name, {:include_blank => 'All Countries'}, {:class => 'form-control'}) %>
 </div>
+<div class="col-lg-2 col-md-4 p-1">
+    <%= collection_select(:product_sub_type, :id, (@products.nil?) ? ProductSubType.all : ProductSubType.product_sub_type_filter(@products.map(&:product_sub_type_id)), :id, :name, {:include_blank => 'All Varietals'}, {:class => 'form-control'}) %>
+</div>
+<div class="col-lg-4 col-md-6 p-1">
+    <div class="form-check form-check-inline pt-2">
+        <%= radio_button_tag :transform_column, "product_id", @checked_id, class: "form-check-input" %>
+        <label class="form-check-label">Products</label>
+    </div>
+    <div class="form-check form-check-inline pt-2">
+        <%= radio_button_tag :transform_column, "product_no_ws_id", @checked_no_ws, class: "form-check-input" %>
+        <label class="form-check-label">Vintages</label>
+    </div>
+    <div class="form-check form-check-inline pt-2">
+        <%= radio_button_tag :transform_column, "product_no_vintage_id", @checked_no_vintage, class: "form-check-input" %>
+        <label class="form-check-label">Wines</label>
+    </div>
+</div>
+<div class="col-lg-1 col-md-3 p-1">
+    <%= submit_tag "Submit", class: 'btn btn-primary btn-block' %>
+</div>
+<div class="col-lg-1 col-md-3 p-1">
+    <button class = "btn btn-primary btn-block"><%= link_to "Reset", action: "products" %></button>
+</div>
+<%  if @checked_no_ws %>
+    <div class="col-1 col-mdp-1">
+        <%= submit_tag "Update", class: 'btn btn-primary'%>
+    </div>
+<% end %>

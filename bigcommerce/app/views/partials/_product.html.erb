@@ -1,6 +1,8 @@
+<!-- edited by vchar on 20180805 -->
+
 <%= render "partials/form_paginate", objects: @product_ids %>
 
-<table class = "table table-striped table-bordered table-hover table-responsive" id="product-table">
+<table class = "table table-striped table-bordered table-hover table-responsive w-100 d-block d-table" id="product-table">
 	<thead>
 		<tr>
 			<th>ID</th>
@@ -12,16 +14,17 @@
 		</tr>
 	</thead>
 
-
 	<% @product_ids.each do |id| %>
 		<tr>
 			<td><%= id %></td>
 
 			<td>
-				<%= check_box 'selected_product', id, {checked: (@count_selected.include?id)? true : false}, '1', '0' if @transform_column=="product_no_ws_id" && session[:default_group] %>
-				<%= link_to @name_h[id], controller: 'product', action: 'summary',\
-			   product_id: id, product_name: @name_h[id], transform_column: @transform_column,\
-			   total_stock: @pending_stock_h[id].to_i + @stock_h[id].to_i, pending_stock: @pending_stock_h[id].to_i %>
+                <%= check_box 'selected_product', id, {checked: (@count_selected.include?id)? true : false}, 
+                    '1', '0' if @transform_column=="product_no_ws_id" && session[:default_group] %>
+                <%= link_to @name_h[id], controller: 'product', action: 'summary', product_id: id, 
+                    product_name: @name_h[id], transform_column: @transform_column,
+                    total_stock: @pending_stock_h[id].to_i + @stock_h[id].to_i, 
+                    pending_stock: @pending_stock_h[id].to_i %>
 			</td>
 
 			<td class="num"><%= display_num(@price_h[id]) %></td>
@@ -34,19 +37,25 @@
 							product_ids = Product.products_with_same_no_ws_id(id).map{|x| x[:id]}
 						else
 							product_ids = id
-						end
+                    end
+
 					product_orders =  Order.status_filter("1").order_product_filter(product_ids).group_by_product_id
 				%>
-				<td><%= link_to @pending_stock_h[id].to_i, controller: 'status', action: 'summary_with_product',\
-				status_id: '1', status_name: 'Pending',\
-				product_id: id, product_name: @name_h[id],\
-				num_orders: product_orders.count_order_id_from_order_products.values.sum,\
-				qty: @stock_h[id], status_qty: @pending_stock_h[id], total: product_orders.sum_total.values.sum,\
-				transform_column:  @transform_column %></td>
+				<td>
+                    <%= link_to @pending_stock_h[id].to_i, controller: 'status', 
+                        action: 'summary_with_product', status_id: '1', 
+                        status_name: 'Pending', product_id: id, product_name: @name_h[id],
+				        num_orders: product_orders.count_order_id_from_order_products.values.sum,
+                        qty: @stock_h[id], status_qty: @pending_stock_h[id], 
+                        total: product_orders.sum_total.values.sum,
+				        transform_column:  @transform_column %>
+                    </td>
 			<% else %>
-				<td clas = "num" ><%= @pending_stock_h[id].to_i %></td>
+				<td clas = "num"><%= @pending_stock_h[id].to_i %></td>
 			<% end %>
-			<td clas = "num" ><%= @pending_stock_h[id].to_i + @stock_h[id].to_i %></td>
+			<td clas = "num">
+                <%= @pending_stock_h[id].to_i + @stock_h[id].to_i %>
+            </td>
 		</tr>
 		<tr>
 			<td colspan="6">To be Developed</td>

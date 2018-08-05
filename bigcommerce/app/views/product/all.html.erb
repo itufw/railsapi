@@ -1,13 +1,28 @@
+<!-- edited by vchar on 20180805 -->
+
 <%= title "Products" %>
-<h3>Products</h3>
-<%= form_tag({:action => "all"}, {:method => "get"}) do %>
-<div class="form-group container-fluid">
-	<%= render "partials/product_filter" %>
+
+<div class="row">
+	<div class="col-12">
+		<div class="card">
+		  	<div class="card-header text-center h3 text-secondary">
+				Products
+		  	</div>
+	 	 	<div class="card-body">
+                <!-- BEGIN: form filter -->
+                <%= form_tag({:action => "all"}, {:method => "get"}) do %>
+                    <div class="row">
+                        <%= render "partials/product_filter" %>
+                    </div>
+
+                    <% if @transform_column=='product_id' %>
+                        <center><%= submit_tag 'Incomplete Product', class: 'btn btn-link'%></center>
+                    <% end %>
+                <% end %>
+                <!-- END: form filter -->
+            </div>
+        </div>
+    </div>
 </div>
 
-<% if @transform_column=='product_id' %>
-	<center><%= submit_tag 'Incomplete Product', class: 'btn btn-link'%></center>
-<% end %>
-
 <%= render "partials/product", pending_stock_h: @pending_stock_h %>
-<% end %>
