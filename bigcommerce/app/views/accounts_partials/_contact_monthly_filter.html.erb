@@ -1,10 +1,25 @@
+<!-- edited by vchar on 20180805 -->
 
 <!-- monthly or 15 days displayed -->
-<div class="row" style="margin-top: 5px;">
-	<div class="col-xs-6 col-xs-offset-5">
-		<%= radio_button_tag(:monthly, "monthly", @checked_monthly, :onclick => "this.form.submit();") %> Monthly
-		<span style="margin-left: 50px;">
-		<%= radio_button_tag(:monthly, "daily", !@checked_monthly, :onclick => "this.form.submit();") %>  15 Days
-		</span>
-	</div>
+<div class="col form-check form-check-inline pt-2">
+    <%= radio_button_tag(:monthly, "monthly", @checked_monthly, 
+        :onclick => "this.form.submit();", class: "form-check-input") %> 
+    <label class="form-check-label">Monthly</label>
+</div>
+<div class="col form-check form-check-inline pt-2">
+    <%= radio_button_tag(:monthly, "daily", !@checked_monthly, 
+        :onclick => "this.form.submit();", class: "form-check-input") %>
+    <label class="form-check-label">15 Days</label>
+</div>
+
+<!-- invoice or due date displayed -->
+<div class="col form-check form-check-inline pt-2">
+    <%= radio_button_tag(:date_column, "invoice_date", !@checked_due_date, 
+        :onclick => "this.form.submit();", class: "form-check-input") %>
+    <label class="form-check-label">Invoice Date</label>
+</div>
+<div class="col form-check form-check-inline pt-2">	
+    <%= radio_button_tag(:date_column, "due_date", @checked_due_date, 
+        :onclick => "this.form.submit();", class: "form-check-input") %>
+    <label class="form-check-label">Due Date</label>
 </div>

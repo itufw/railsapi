@@ -1,26 +1,31 @@
-<div class="row" style="margin-top: 20px;">
-	<div class="col-md-4 col-md-offset-4">
-		<%= text_field_tag('search', @search_text, placeholder: 'Search for Customer Name', class: 'form-control') %>
-	</div>
-</div>
+<!-- edited by vchar on 20180805 -->
 
 <div class="row">
-	<div class="col-xs-6 col-xs-offset-3">
-		           Find Invoices Until:  <%= date_field( "end_date", "end_date", value: @end_date) %>
+	<div class="col p-1">
+        <%= text_field_tag('search', @search_text, 
+            placeholder: 'Search for Customer Name', class: 'form-control') %>
 	</div>
-		<%= submit_tag "Search", class: 'btn btn-primary' %>
-		<button class = "btn btn-primary"><%= link_to "Reset", controller: "accounts", action: "contacts" %></button>
-		<%= submit_tag "Send Reminder", class: 'btn btn-primary', id: "send_reminders"%>
+    <div class="col p-1">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Invoice to</span>
+            </div>
+            <%= date_field( "end_date", "end_date", value: @end_date, 
+                class: 'form-control') %>
+        </div>
+    </div>
+    <div class="col-1 p-1">
+        <%= submit_tag "Search", class: 'btn btn-primary' %>
+    </div>
+    <div class="col-1 p-1">
+        <%= link_to "Reset", { controller: "accounts", action: "contacts" },
+            class: "btn btn-warning" %>
+    </div>
+    <div class="col-1 p-1" id="send_reminders">
+        <%= submit_tag "Send Reminder", class: 'btn btn-primary' %>
+    </div>
 </div>
 
-<%= render "accounts_partials/contact_monthly_filter"%>
-
-<!-- invoice or due date displayed -->
-<div class="row" style="margin-top: 5px;">
-	<div class="col-xs-6 col-xs-offset-5">
-		<%= radio_button_tag(:date_column, "invoice_date", !@checked_due_date, :onclick => "this.form.submit();") %> Invoice Date
-		<span style="margin-left: 50px;">
-		<%= radio_button_tag(:date_column, "due_date", @checked_due_date, :onclick => "this.form.submit();") %>  Due Date
-		</span>
-	</div>
+<div class="row p-2">
+    <%= render "accounts_partials/contact_monthly_filter"%>
 </div>

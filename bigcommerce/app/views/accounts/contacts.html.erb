@@ -1,15 +1,26 @@
+<!-- edited by vchar on 20180805 -->
+
 <%= title "Contacts" %>
-<h3>Contacts</h3>
 
-<%= form_tag({:action => "contacts"}, {:method => "get"}) do %>
+<div class="row">
+	<div class="col-12">
+		<div class="card">
+		  	<div class="card-header text-center h3 text-secondary">
+				Account Receivable
+		  	</div>
+		  	<div class="card-body">
+                <%= form_tag({:action => "contacts"}, {:method => "get"}) do %>
 
-<div class="form-group container-center">
-	<%= render "accounts_partials/contact_filter" %>
+                    <div class="form-group container-center">
+                        <%= render "accounts_partials/contact_filter" %>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+    </div>
 </div>
 
 <%= render "accounts_partials/contact", contacts: @contacts, invoices: @invoices, date_column: @date_column %>
-
-<% end %>
 
 <script>
 	$("#send_reminders").hide();
