@@ -1,7 +1,20 @@
+<!-- edited by vchar on 20180805 -->
 <%= title 'Link Leads to Customers'%>
-<h3>Leads / Customers</h3>
-<center><%= link_to "All lead", action: 'all_leads' %></center>
+<div class="row">
+	<div class="col-12">
+		<div class="card">
+		  	<div class="card-header text-center h3 text-secondary">
+				Leads - customers
+		  	</div>
+	 	 	<div class="card-body text-center">
+                <%= link_to "All lead", {action: 'all_leads'}, 
+                    class: "btn btn-outline-primary text-info" %>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- BEGIN: leads - customers list -->
 <table class = "table table-striped table-bordered table-hover table-responsive">
     <tr>
       <th>Lead Name</th>
@@ -15,11 +28,8 @@
       <td><%= lead.address %></td>
       <td><%= link_to lead.customer_name, controller: 'customer', action:'summary', customer_id: lead.customer_id, customer_name: lead.customer_name%></td>
       <td><%= lead.customer_address%></td>
-      <td><%= link_to '<i class="glyphicon glyphicon-ok" title="Match" style="color: blue;"></i>'.html_safe, controller: 'lead', action: 'turn_customer', lead_id: lead.lead_id, customer_id: lead.customer_id%></td>
+      <td><%= link_to '<i class="far fa-thumbs-up" title="Match" style="color: blue;"></i>'.html_safe, controller: 'lead', action: 'turn_customer', lead_id: lead.lead_id, customer_id: lead.customer_id%></td>
     </tr>
     <% end %>
 </table>
-
-<script type="text/javascript">
-  // lead_link_customer(CustomerLead.find(lead.lead_id), lead.customer_id)
-</script>
+<!-- BEGIN: leads - customers list -->
