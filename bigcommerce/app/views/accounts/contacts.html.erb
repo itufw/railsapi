@@ -8,10 +8,10 @@
 		  	<div class="card-header text-center h3 text-secondary">
 				Account Receivable
 		  	</div>
-		  	<div class="card-body">
+		  	<div class="card-body text-center">
                 <%= form_tag({:action => "contacts"}, {:method => "get"}) do %>
 
-                    <div class="form-group container-center">
+                    <div class="form-check form-check-inline">
                         <%= render "accounts_partials/contact_filter" %>
                     </div>
                 <% end %>

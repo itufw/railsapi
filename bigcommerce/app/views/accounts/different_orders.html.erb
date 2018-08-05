@@ -1,47 +1,61 @@
-<%= title "Mismatch Orders" %>
-<h3>Orders</h3>
+<!-- edited by vchar on 20180805 -->
 
-<div class="form-group container-center">
-	<%= form_tag({:action => "different_orders"}, {:method => "get"}) do %>
-<div class="row" style="margin-top: 5px;">
-	<div class="col-xs-6 col-xs-offset-5">
-		<%= radio_button_tag(:unpaid, "unpaid", !@all, :onclick => "this.form.submit();") %> Unpaid Orders
-		<span style="margin-left: 50px;">
-		<%= radio_button_tag(:unpaid, "all", @all, :onclick => "this.form.submit();") %>  All Orders
-		</span>
-	</div>
+<%= title "Mismatch Orders" %>
+
+<div class="row">
+	<div class="col-12">
+		<div class="card">
+		  	<div class="card-header text-center h3 text-secondary">
+				Mismatched Orders
+		  	</div>
+		  	<div class="card-body text-center">
+                <div class="form-check form-check-inline">
+                    <%= form_tag({:action => "different_orders"}, {:method => "get"}) do %>
+                        <div class="form-check form-check-inline pt-2">
+                            <%= radio_button_tag(:unpaid, "unpaid", !@all, :onclick => "this.form.submit();") %>
+                            <label class="form-check-label">Unpaid Orders</label>
+                        </div>                
+                        <div class="form-check form-check-inline pt-2">
+                            <%= radio_button_tag(:unpaid, "all", @all, :onclick => "this.form.submit();") %>
+                            <label class="form-check-label">All Orders</label>
+                        </div>
+                    <%end%>               
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<%end%>
+    
+
 </div>
-<table class = "table table-striped table-bordered table-hover table-responsive">
+<table class = "table table-striped table-bordered table-hover table-responsive w-100 d-block d-table">
 	<tr>
 		<th> Order# </th>
-    <th> BigC Total </th>
-    <th> Xero Total </th>
-    <th> Xero Total - CN</th>
-    <th> Total Credit </th>
-    <th> BigC Bottle </th>
-    <th> Xero Bottle </th>
-    <th> Amount Due</th>
-    <th> Created At</th>
+        <th> BigC Total </th>
+        <th> Xero Total </th>
+        <th> Xero Total - CN</th>
+        <th> Total Credit </th>
+        <th> BigC Bottle </th>
+        <th> Xero Bottle </th>
+        <th> Amount Due</th>
+        <th> Created At</th>
 	</tr>
-  <% @orders.each do |order|%>
-  <% credit_note_allocation = @credit_note_allocation["#{order.id}"] || 0%>
-  <% xero_items_sum = @xero_line_items_sum["#{order.xero_invoice.xero_invoice_id}"] || 0%>
-  <% next if ((order.total_inc_tax == (order.xero_invoice.total - credit_note_allocation)) && (order.qty == xero_items_sum.round))%>
-  <% next if (!@all && (order.xero_invoice.amount_due == 0))%>
+    <% @orders.each do |order|%>
+        <% credit_note_allocation = @credit_note_allocation["#{order.id}"] || 0%>
+        <% xero_items_sum = @xero_line_items_sum["#{order.xero_invoice.xero_invoice_id}"] || 0%>
+        <% next if ((order.total_inc_tax == (order.xero_invoice.total - credit_note_allocation)) && (order.qty == xero_items_sum.round))%>
+        <% next if (!@all && (order.xero_invoice.amount_due == 0))%>
 
-	<tr>
-    <td class="num"><%= link_to order.id, controller: 'order', action: 'details', order_id: order.id%></td>
-    <td class="num"><%=order.total_inc_tax%></td>
-    <td class="num"><%=order.xero_invoice.total - credit_note_allocation%></td>
-    <td class="num"><%=order.xero_invoice.total%></td>
-    <td class="num"><%=credit_note_allocation%></td>
-    <td class="num"><%=order.qty%></td>
-    <td class="num"><%=xero_items_sum.round%></td>
-    <td class="num"><%=order.xero_invoice.amount_due%></td>
-    <td><%=date_format_orders(order.created_at)%></td>
-	</tr>
-  <% end %>
-
+        <tr>
+            <td class="num"><%= link_to order.id, controller: 'order', action: 'details', order_id: order.id%></td>
+            <td class="num"><%=order.total_inc_tax%></td>
+            <td class="num"><%=order.xero_invoice.total - credit_note_allocation%></td>
+            <td class="num"><%=order.xero_invoice.total%></td>
+            <td class="num"><%=credit_note_allocation%></td>
+            <td class="num"><%=order.qty%></td>
+            <td class="num"><%=xero_items_sum.round%></td>
+            <td class="num"><%=order.xero_invoice.amount_due%></td>
+            <td><%=date_format_orders(order.created_at)%></td>
+        </tr>
+    <% end %>
 </table>
