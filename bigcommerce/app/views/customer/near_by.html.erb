@@ -1,78 +1,97 @@
+<!-- edited by vchar on 20180805 -->
+
 <script src="//maps.google.com/maps/api/js?key=AIzaSyB1HFWQ1DigWTnXGn_ZaUOk-v8hgGF3moI"></script>
 <script src="//cdn.rawgit.com/mahnunchik/markerclustererplus/master/dist/markerclusterer.min.js"></script>
 
-
 <%= title "Customers Map"%>
-<h3>Customers Map</h3>
+
 <div class="row">
-  <%= form_tag({controller: "customer", action: 'near_by'}, {:method => "get"}) do %>
-    <div class="form-group" style="margin-left:300px;margin-top:50px;">
-    	<%= render "partials/zomato_filter" %>
-    	<%= submit_tag "Filter", class: 'btn btn-primary' %>
+	<div class="col-12">
+		<div class="card">
+		  	<div class="card-header text-center h3 text-secondary">
+				Customers Map
+				<p class="h5 mt-2">
+                    <%= link_to "View My Customers", {action: 'all', 
+                        staff: ({id: session[:user_id]} unless current_user_sales?(session[:authority]))}, 
+                        class: "btn btn-outline-primary text-info" %>
+				</p>
+		  	</div>
+	 	 	<div class="card-body">
+                <%= form_tag({controller: "customer", action: 'near_by'}, {:method => "get"}) do %>
+                    <div class="row">
+                        <%= render "partials/zomato_filter" %>
+                        <div class="col-1 p-1">
+                            <%= submit_tag "Filter", class: 'btn btn-primary' %>
+                        </div>
+                    </div>
+                <% end %>
+            </div>
+        </div>
     </div>
-  <% end %>
 </div>
 
-
-<div class="row">
-  <div class="col-md-5 col-md-offset-1">
-    <div id="customer_by_map" style='width: 500px; height: 500px;'></div>
+<div class="row mt-3">
+  <div class="col">
+    <div id="customer_by_map" style='height: 360px;'></div>
     <div class="map-geocode" style="display: none;"></div>
     <div class="map-distance" style="display: none;"></div>
   </div>
-  <div class="col-xs-6 all_customer_list">
+</div>
+
+<div class="row">
+  <div class="col all_customer_list">
   </div>
 </div>
 
 <script type="text/javascript">
-var customer_table = $('.all_customer_list');
+    var customer_table = $('.all_customer_list');
 
 
-google.maps.LatLng.prototype.distanceFrom = function(latlng) {
-  var lat = [this.lat(), latlng.lat()]
-  var lng = [this.lng(), latlng.lng()]
-  var R = 6378137;
-  var dLat = (lat[1]-lat[0]) * Math.PI / 180;
-  var dLng = (lng[1]-lng[0]) * Math.PI / 180;
-  var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-  Math.cos(lat[0] * Math.PI / 180 ) * Math.cos(lat[1] * Math.PI / 180 ) *
-  Math.sin(dLng/2) * Math.sin(dLng/2);
-  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  var d = R * c;
-  return Math.round(d);
-}
+    google.maps.LatLng.prototype.distanceFrom = function(latlng) {
+        var lat = [this.lat(), latlng.lat()]
+        var lng = [this.lng(), latlng.lng()]
+        var R = 6378137;
+        var dLat = (lat[1]-lat[0]) * Math.PI / 180;
+        var dLng = (lng[1]-lng[0]) * Math.PI / 180;
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat[0] * Math.PI / 180 ) * Math.cos(lat[1] * Math.PI / 180 ) *
+        Math.sin(dLng/2) * Math.sin(dLng/2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        var d = R * c;
+        return Math.round(d);
+    }
 
 
-var customer_markers = null;
-var lead_markers = null;
-var restaurant_markers = null;
-<% customer_markers, lead_markers, restaurant_markers =  marks_by_distance(@customers, @leads, @restaurants) %>
-  var handler = Gmaps.build('Google');
-  handler.buildMap({
-        internal: {
-            id: 'customer_by_map'
+    var customer_markers = null;
+    var lead_markers = null;
+    var restaurant_markers = null;
+    <% customer_markers, lead_markers, restaurant_markers =  marks_by_distance(@customers, @leads, @restaurants) %>
+    var handler = Gmaps.build('Google');
+    handler.buildMap({
+            internal: {
+                id: 'customer_by_map'
+            }
+        }, function () {
+        customer_markers = handler.addMarkers(<%=raw customer_markers.to_json%>);
+        lead_markers = handler.addMarkers(<%= raw lead_markers.to_json%>);
+        restaurant_markers = handler.addMarkers(<%= raw restaurant_markers.to_json%>);
+        console.log(customer_markers);
+        console.log(lead_markers);
+        console.log(restaurant_markers);
+        if (customer_markers.length==0){
+            handler.bounds.extendWith(lead_markers);
+        }else{
+            handler.bounds.extendWith(customer_markers);
         }
-    }, function () {
-      customer_markers = handler.addMarkers(<%=raw customer_markers.to_json%>);
-      lead_markers = handler.addMarkers(<%= raw lead_markers.to_json%>);
-      restaurant_markers = handler.addMarkers(<%= raw restaurant_markers.to_json%>);
-      console.log(customer_markers);
-      console.log(lead_markers);
-      console.log(restaurant_markers);
-      if (customer_markers.length==0){
-        handler.bounds.extendWith(lead_markers);
-      }else{
-        handler.bounds.extendWith(customer_markers);
-      }
-      handler.fitMapToBounds();
-  });
+        handler.fitMapToBounds();
+    });
 
-  google.maps.event.addListener(handler.getMap(), 'idle', function(event){
-    var old = $('.map-geocode').val();
-      $('.map-geocode').val(handler.getMap().getCenter().toString());
-      $('.map-distance').val(handler.getMap().getBounds().getNorthEast().distanceFrom(handler.getMap().getCenter())/1410);
+    google.maps.event.addListener(handler.getMap(), 'idle', function(event){
+        var old = $('.map-geocode').val();
+        $('.map-geocode').val(handler.getMap().getCenter().toString());
+        $('.map-distance').val(handler.getMap().getBounds().getNorthEast().distanceFrom(handler.getMap().getCenter())/1410);
 
-    if (old != $('.map-geocode').val())
-      $('.map-geocode').change();
-  });
+        if (old != $('.map-geocode').val())
+        $('.map-geocode').change();
+    });
 </script>
