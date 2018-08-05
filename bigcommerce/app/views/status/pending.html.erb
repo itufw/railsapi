@@ -1,16 +1,27 @@
 <%= title @status_name %>
 
-<%= render "partials/status_dropdown", path_name: 'pending' %>
-
 <div class="row">
 	<div class="col-12">
 		<div class="card">
 		  	<div class="card-header text-center h3 text-secondary">
-                Orders by status
+                Orders Status
+                <p class="text-center d-flex">
+                    <div id="selector" class="btn-group mx-auto">
+                        <button type="button" class="btn btn-outline-primary active" style="width: 150px" id="orders-view-button">
+                            Orders view
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" id="products-view-button">
+                            Products view
+                        </button>
+                    </div>
+                </p>
 		  	</div>
 	 	 	<div class="card-body">
                 <%= form_tag({:controller => "status", :action => "pending"}, {:method => "get"}) do %>
                     <div class="row">
+                        <div class="col p-1">
+                            <%= render "partials/status_dropdown", path_name: 'pending' %>
+                        </div>
                         <div class="col p-1">
                             <%= text_field_tag('search', @search_text, 
                                 placeholder: 'Search for Product or Customer Name', class: 'form-control') %>
@@ -38,51 +49,43 @@
 </div>
 
 <div class="row">
-    <div id="selector" class="btn-group col-12 mb-3">
-        <button type="button" class="btn btn-outline-primary active" style="width: 150px" id="orders-view-button">
-            Orders view
-        </button>
-        <button type="button" class="btn btn-outline-primary" id="products-view-button">
-            Products view
-        </button>
-    </div>
-
     <div id="orders-view" class="col-12">
-        <h3><%= @status_name %> Orders</h3>
+        <h3 class="mt-3"><%= @status_name %> Orders</h3>
         <%= render "status_partials/order_status", orders: @orders, 
-            display_class: "none", product_ids: nil, last_order_date: @last_order_date %>
+            display_class: "none", product_ids: nil, last_order_date: @last_order_date,
+            status_name: params[:status_name] %>
     </div>
     <div id="products-view" class="col-12">
-        <h3><%= @status_name %> Products</h3>
+        <h3 class="mt-3"><%= @status_name %> Products</h3>
         <%= render "partials/product_status", products: @products %>
     </div>
 </div>
 
 <script>
-$(document.body).ready(
-    function () {
-        var change = function () {
-            $("#products-view-button").click(function() {
-                $("#orders-view").hide();
-                $("#orders-view-button").removeClass("active");
-                $("#products-view").show();
-                $("#products-view-button").addClass("active");
-			});
+    $(document.body).ready(
+        function () {
+            var change = function () {
+                $("#products-view-button").click(function() {
+                    $("#orders-view").hide();
+                    $("#orders-view-button").removeClass("active");
+                    $("#products-view").show();
+                    $("#products-view-button").addClass("active");
+                });
 
-			$("#orders-view-button").click(function() {
-				$("#orders-view").show();
-				$("#orders-view-button").addClass("active");
+                $("#orders-view-button").click(function() {
+                    $("#orders-view").show();
+                    $("#orders-view-button").addClass("active");
 
-				$("#products-view").hide();
-				$("#products-view-button").removeClass("active");
-			});
-        };
-        change();  //call it when the page is loaded
-    },
+                    $("#products-view").hide();
+                    $("#products-view-button").removeClass("active");
+                });
+            };
+            change();  //call it when the page is loaded
+        },
 
-    (function() {
-        $("#products-view").hide();
-    })()
+        (function() {
+            $("#products-view").hide();
+        })()
 
-);
+    );
 </script>
