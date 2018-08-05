@@ -1,36 +1,46 @@
+<!-- edited by vchar on 20180805 -->
 <%= title "Detailed Products Dashboard" %>
 
-<h3>Products Sales</h3>
-<div class="form-group container-fluid">
-	<%= form_tag({:action => "product_dashboard"}, {:method => "get"}) do %>
-	<%= render "partials/extended_product_filter" %>
+<div class="row">
+	<div class="col-12">
+		<div class="card">
+		  	<div class="card-header text-center h3 text-secondary">
+				Products Sales
+		  	</div>
+	 	 	<div class="card-body">
+                <%= form_tag({:action => "product_dashboard"}, {:method => "get"}) do %>
+                    <%= render "partials/extended_product_filter" %>
+                    <%= render "partials/detailed_dashboard_date_filter" %>
+                    <%= render "sales_partials/dashboard_range_filter"%>
 
-	<br/>
-	<%= render "partials/detailed_dashboard_date_filter" %>
-	<%= render "sales_partials/dashboard_range_filter"%>
+                    <div class="row mt-2">
+                        <%= render "sales_partials/product_type_filter"%>
+                        <%= render "sales_partials/stats_or_details_filter"%>
 
-	<div class="row" style="margin-top: 20px;">
-		<%= render "sales_partials/product_type_filter"%>
-
-		<%= render "sales_partials/stats_or_details_filter"%>
-
-		<div class="col-md-4">
-			<span style="margin-left: 50px;">
-
-			<%= submit_tag "Submit", class: 'btn btn-primary' %>
-			</span>
-			<button class = "btn btn-primary"><%= link_to "Reset", action: "product_dashboard" %></button>
-			<%= submit_tag "Update", class: 'btn btn-primary' if [9,36].include?session[:user_id]%>
-			<%= collection_select(nil, :group, StaffGroup.staff_groups(session[:user_id]), :id, :group_name, {:include_blank => 'Select Group', :selected => @staff_group.to_i}, {:class => 'form-control'}) %>
-		</div>
-	</div>
-
+                        <div class="col-md col-sm-6">
+                            <%= submit_tag "Submit", class: 'btn btn-primary btn-block' %>
+                        </div>
+                        <div class="col-md col-sm-6">
+                            <%= link_to "Reset", {action: "product_dashboard"}, 
+                                class: "btn btn-primary btn-block" %>
+                        </div>
+                        
+                        <%#= submit_tag "Update", class: 'btn btn-primary' if [9,36].include?session[:user_id]%>
+                        <%#= collection_select(nil, :group, StaffGroup.staff_groups(session[:user_id]), 
+                            :id, :group_name, {:include_blank => 'Select Group', 
+                            :selected => @staff_group.to_i}, {:class => 'form-control'}) %>
+                    
+                    </div>
+                <% end %>
+            </div>
+        </div>
+    </div>
 </div>
-	<% if @checked_stats %>
-		<div>
-			<%= render "sales_partials/stats_view", sum_param: "Qty", supply_display_class: "" %>
-		</div>
-	<% else %>
-		<%= render "sales_partials/details_view" %>
-	<% end %>
+
+<% if @checked_stats %>
+    <div>
+        <%= render "sales_partials/stats_view", sum_param: "Qty", supply_display_class: "" %>
+    </div>
+<% else %>
+    <%= render "sales_partials/details_view" %>
 <% end %>

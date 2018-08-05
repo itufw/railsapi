@@ -1,8 +1,13 @@
-<div class="col-md-4">
-  <span style="margin-left: 50px;">
-  <%= radio_button_tag(:stats_column, "stats", @checked_stats) %> Stats
-  </span>
-  <span style="margin-left: 50px;">
-  <%= radio_button_tag(:stats_column, "details", !@checked_stats) %>  Details
-  </span>
+<!-- edited by vchar on 20180805 -->
+<div class="col p-2">
+    <div class="form-check form-check-inline">
+        <%= radio_button_tag(:stats_column, "stats", @checked_stats, class: "form-check-input") %>
+        <%= label_tag :stats, :stats, class: "form-check-label" %>
+    </div>  
+</div>
+<div class="col p-2">
+    <div class="form-check form-check-inline">
+        <%= radio_button_tag(:stats_column, "details", !@checked_stats, class: "form-check-input") %>
+        <%= label_tag :details, :details, class: "form-check-label" %>
+    </div>  
 </div>

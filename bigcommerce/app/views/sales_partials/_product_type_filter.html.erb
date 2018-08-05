@@ -1,11 +1,20 @@
-<div class="col-md-4">
-  <span style="margin-left: 50px;">
-  <%= radio_button_tag(:transform_column, "product_id", @checked_id) %> Products
-  </span>
-  <span style="margin-left: 50px;">
-  <%= radio_button_tag(:transform_column, "product_no_ws_id", @checked_no_ws) %>  Vintage
-  </span>
-  <span style="margin-left: 50px;">
-  <%= radio_button_tag(:transform_column, "product_no_vintage_id", @checked_no_vintage) %>  Wine
-  </span>
+<!-- edited by vchar on 20180805 -->
+
+<div class="col p-2">
+    <div class="form-check form-check-inline">
+        <%= radio_button_tag(:transform_column, "product_id", @checked_id, class: "form-check-input") %>
+        <%= label_tag :products, :products, class: "form-check-label" %>
+    </div>  
+</div>
+<div class="col p-2">
+    <div class="form-check form-check-inline">
+        <%= radio_button_tag(:transform_column, "product_no_ws_id", @checked_no_ws, class: "form-check-input") %>
+        <%= label_tag :vintage, :vintage, class: "form-check-label" %>
+    </div>    
+</div>
+<div class="col p-2">
+    <div class="form-check form-check-inline">
+        <%= radio_button_tag(:transform_column, "product_no_vintage_id", @checked_no_vintage, class: "form-check-input") %>
+        <%= label_tag :wine, :wine, class: "form-check-label" %>
+    </div>
 </div>

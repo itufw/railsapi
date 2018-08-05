@@ -1,30 +1,41 @@
+<!-- edited by vchar on 20180805 -->
 <div class="row">
-	<div class="col-md-3">
-	  <%= text_field_tag('search', @search_text, placeholder: 'Search for Product Name', class: 'form-control') %>
-	</div>
-
-	<div class="col-md-2">
-		<%= collection_select(:product_type, :id, ProductType.all, :id, :name, {:include_blank => 'Types'}, {:class => 'form-control'}) %>
-	</div>
-
-	<div class="col-md-2">
-    	<%= collection_select(:producer_country, :id, ProducerCountry.all, :id, :name, {:include_blank => 'Countries'}, {:class => 'form-control'}) %>
+    <div class="col p-1">
+    <%= text_field_tag('search', @search_text, 
+        placeholder: 'Search for Product Name', class: 'form-control') %>
     </div>
-    <%= render "partials/cust_style_filter" %>
+    <div class="col p-1">
+        <%= collection_select(:product_type, :id, ProductType.all, 
+            :id, :name, {:include_blank => 'Types'}, {:class => 'form-control'}) %>
+    </div>
+    <div class="col p-1">
+        <%= collection_select(:producer_country, :id, ProducerCountry.all, 
+            :id, :name, {:include_blank => 'Countries'}, {:class => 'form-control'}) %>
+    </div>
 </div>
-</div>
+
 <div class="row">
-	<div style="margin-left:100px;"><%= render "partials/staff_filter" %></div>
-	<div class="col-md-2" style="margin-left: 35px;">
-	    <%= collection_select(:product_sub_type, :id, @product_sub_types, :id, :name, {:include_blank => 'Varietals'}, {:class => 'form-control'}) %>
+    <%= render "partials/cust_style_filter" %>
+	<%= render "partials/staff_filter" %>
+
+	<div class="col p-1">
+        <%= collection_select(:product_sub_type, :id, @product_sub_types, :id, 
+            :name, {:include_blank => 'Varietals'}, {:class => 'form-control'}) %>
 	</div>
-	<div class="col-md-2">
-		<%= collection_select(:producer, :id, @producers, :id, :name, {:include_blank => 'Wineries'}, {:class => 'form-control'}) %>
+</div>
+
+<div class="row">
+	<div class="col p-1">
+        <%= collection_select(:producer, :id, @producers, :id, :name, 
+            {:include_blank => 'Wineries'}, {:class => 'form-control'}) %>
 	</div>
-	<div class="col-md-2">
-		<%= collection_select(:producer_region, :id, @producer_regions, :id, :name, {:include_blank => 'Regions'}, {:class => 'form-control'}) %>
+	<div class="col p-1">
+        <%= collection_select(:producer_region, :id, @producer_regions, :id, 
+            :name, {:include_blank => 'Regions'}, {:class => 'form-control'}) %>
 	</div>
-	<div class="col-md-2">
-		<%= collection_select(:product_lable, :id, ProductLable.all, :id, :name, {:include_blank => 'Lables', :selected => @selected_lable}, {:class => 'form-control'}) %>
+	<div class="col p-1">
+        <%= collection_select(:product_lable, :id, ProductLable.all, :id, :name, 
+            {:include_blank => 'Lables', :selected => @selected_lable}, 
+            {:class => 'form-control'}) %>
 	</div>
 </div>
