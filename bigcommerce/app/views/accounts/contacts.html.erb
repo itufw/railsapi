@@ -11,8 +11,11 @@
 		  	<div class="card-body text-center">
                 <%= form_tag({:action => "contacts"}, {:method => "get"}) do %>
 
-                    <div class="form-check form-check-inline">
+                    <div class="form-group">
                         <%= render "accounts_partials/contact_filter" %>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <%= render "accounts_partials/contact_monthly_filter"%>
                     </div>
                 <% end %>
             </div>
