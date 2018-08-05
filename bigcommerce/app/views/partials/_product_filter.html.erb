@@ -10,18 +10,20 @@
 <div class="col-lg-2 col-md-4 p-1">
     <%= collection_select(:product_sub_type, :id, (@products.nil?) ? ProductSubType.all : ProductSubType.product_sub_type_filter(@products.map(&:product_sub_type_id)), :id, :name, {:include_blank => 'All Varietals'}, {:class => 'form-control'}) %>
 </div>
-<div class="col-lg-4 col-md-6 p-1">
-    <div class="form-check form-check-inline pt-2">
-        <%= radio_button_tag :transform_column, "product_id", @checked_id, class: "form-check-input" %>
-        <label class="form-check-label">Products</label>
-    </div>
-    <div class="form-check form-check-inline pt-2">
-        <%= radio_button_tag :transform_column, "product_no_ws_id", @checked_no_ws, class: "form-check-input" %>
-        <label class="form-check-label">Vintages</label>
-    </div>
-    <div class="form-check form-check-inline pt-2">
-        <%= radio_button_tag :transform_column, "product_no_vintage_id", @checked_no_vintage, class: "form-check-input" %>
-        <label class="form-check-label">Wines</label>
+<div class="col-lg-4 col-md-6">
+    <div class="row p-2">
+        <div class="col form-check form-check-inline pt-2">
+            <%= radio_button_tag :transform_column, "product_id", @checked_id, class: "form-check-input" %>
+            <label class="form-check-label">Products</label>
+        </div>
+        <div class="col form-check form-check-inline pt-2">
+            <%= radio_button_tag :transform_column, "product_no_ws_id", @checked_no_ws, class: "form-check-input" %>
+            <label class="form-check-label">Vintages</label>
+        </div>
+        <div class="col form-check form-check-inline pt-2">
+            <%= radio_button_tag :transform_column, "product_no_vintage_id", @checked_no_vintage, class: "form-check-input" %>
+            <label class="form-check-label">Wines</label>
+        </div>
     </div>
 </div>
 <div class="col-lg-1 col-md-3 p-1">
