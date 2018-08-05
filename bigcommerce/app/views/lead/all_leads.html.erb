@@ -1,3 +1,4 @@
+<!-- edited by vchar on 20180805 -->
 <%= title "Leads" %>
 <div class="row">
 	<div class="col-12">
@@ -14,20 +15,25 @@
 				</p>
 		  	</div>
 	 	 	<div class="card-body">
-
-            <%= form_tag({:controller => "lead", :action => 'all_leads'}, {:method => "get"}) do %>
-                <div class="row">
-                    <%= render "partials/customer_filter" %>
-                    <div class="col-1 p-1">
-                        <%= submit_tag "Filter", class: 'btn btn-primary' %>
+                <!-- BEGIN: form filter -->
+                <%= form_tag({:controller => "lead", :action => 'all_leads'}, {:method => "get"}) do %>
+                    <div class="row">
+                        <%= render "partials/customer_filter" %>
+                        <div class="col-1 p-1">
+                            <%= submit_tag "Filter", class: 'btn btn-primary' %>
+                        </div>
                     </div>
-                </div>
-            <% end %>
+                <% end %>
+                <!-- END: form filter -->
+            </div>
         </div>
     </div>
 </div>
 
-<%= render 'partials/paginate', objects: @leads%>
+<!-- BEGIN: pagination -->
+<%= render 'partials/form_paginate', objects: @leads%>
+<!-- END: pagination -->
+
+<!-- BEGIN: leads list -->
 <%= render "lead_partials/leads", leads: @leads %>
-
-
+<!-- END: leads list -->

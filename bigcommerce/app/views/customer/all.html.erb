@@ -1,5 +1,5 @@
+<!-- edited by vchar on 20180805 -->
 <%= title "Customers" %>
-
 <div class="row">
 	<div class="col-12">
 		<div class="card">
@@ -14,6 +14,7 @@
 				</p>
 		  	</div>
 	 	 	<div class="card-body">
+                <!-- BEGIN: form filter -->
                 <%= form_tag({:controller => "customer", :action => customer_filter_path}, {:method => "get"}) do %>
                     <div class="row">
                         <%= render "partials/customer_filter" %>
@@ -22,12 +23,15 @@
                         </div>
                     </div>
                 <% end %>
+                <!-- END: form filter -->
             </div>
         </div>
     </div>
 </div>
 
+<!-- BEGIN: customers list -->
 <%= render "partials/customer", customers: @customers %>
+<!-- END: customers list -->
 
 <% unless @leads.nil? || @leads.blank? %>
 	<h3>Lead</h3>

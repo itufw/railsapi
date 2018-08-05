@@ -1,15 +1,36 @@
+<!-- edited by vchar on 20180805 -->
 <%= title "Contacts" %>
-<h3>Contacts</h3>
-<center><%= link_to "Create New Contact", action: 'create_contact' %></center>
-<center><%= link_to "View Incomplete Contacts", action: 'incomplete_contacts'  %></center>
+<div class="col-12">
+    <div class="card">
+        <div class="card-header text-center h3 text-secondary">
+            Contacts
+            <p class="h5 mt-2">
+                <%= link_to "Create a new contact", {action: 'create_contact'},
+                    class: "btn btn-outline-primary text-info" %>
+                <%= link_to "Incomplete contacts", {action: 'incomplete_contacts'},
+                    class: "btn btn-outline-primary text-info" %>
+            </p>
+        </div>
 
-<%= form_tag({:controller => "contact", :action => 'all_contacts'}, {:method => "get"}) do %>
+        <div class="card-body">
+            <!-- BEGIN: form filter -->
+            <%= form_tag({:controller => "contact", :action => 'all_contacts'}, {:method => "get"}) do %>
+                <div class="row">
+                    <%= render "partials/contact_filter" %>
+                    <div class="col-1 p-1">
+                        <%= submit_tag "Filter", class: 'btn btn-primary' %>
+                    </div>
+                </div>
+            <% end %>
+            <!-- END: form filter -->
+        </div>
+    </div>
+</div>  
 
-<div class="form-group" style="margin-left:300px;margin-top:50px;">
-	<%= render "partials/contact_filter" %>
-	<%= submit_tag "Filter", class: 'btn btn-primary' %>
-</div>
-<%= render 'partials/paginate', objects: @contacts %>
+<!-- BEGIN: pagination -->
+<%= render 'partials/form_paginate', objects: @contacts %>
+<!-- END: pagination -->
+
+<!-- BEGIN: contacts list -->
 <%= render "contact_partials/contact_list", contacts: @contacts %>
-
-<% end %>
+<!-- END: contacts list -->
