@@ -1,4 +1,5 @@
-<div class="col-lg col-md p-1">
+<!-- edited by vchar on 20180805 -->
+<div class="col p-1">
     <%= collection_select(:staff, :id, Staff.sales_list.order_by_order, :id, :nickname, 
         {:include_blank => 'All Staff'}, {:class => 'form-control'}) %>
 </div>
