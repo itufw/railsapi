@@ -22,7 +22,8 @@ development:
   database: 20180706
   username: dev
   password: 123123123
-  host: 192.168.1.114
+  host: 127.0.0.1
+  # database: operation
 
   # database: operation
 
