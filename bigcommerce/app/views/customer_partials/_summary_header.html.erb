@@ -1,65 +1,135 @@
+<!-- edited by vchar on 20180807 -->
+
 <% if (customer.cust_type_id == 1) || (customer.is_a? CustomerLead) %>
-  <div class="container-center">
     <div class="row">
-      <div class="col-xs-10">
-        <h5>Contact:</h5>
-        <p><%= customer.actual_name%></p>
-        <p>Number: <%= num_to_phone(customer.phone)%></p>
-        <p>Email: <%= mail_to(customer.email) unless customer.email.nil? %></p>
-      </div>
-    </div>
-  </div>
-<% else %>
-  <div class="container-center">
-    <div class= "row">
-      <div class="col-xs-6">
-        <% staff = customer.staff %>
-        <h5>Sales Rep.: <%= staff.nickname %></h5>
-        <p>
-           Ph: <a href="tel:<%=staff.contact_number%>"><%= num_to_phone(staff.contact_number) unless staff.contact_number.nil? %></a></br>
-           Email: <%= mail_to(staff.email) unless staff.email.nil? %>
-        </p>
-        <h5>Customer</h5>
-        <p>
-           Email : <%= mail_to(customer.email) unless customer.email.nil? %><br/>
-           Email for Sales: <%= mail_to(customer.email_for_sales) unless customer.email_for_sales.nil? %><br/>
-           Email for Accounts: <%= mail_to(customer.email_for_accounts) unless customer.email_for_accounts.nil? %><br/>
-           Ph: <%= customer.phone %>
-           <%#= num_to_phone(customer.phone)%>
-        </p>
-      </div>
-      <% XeroContactPerson.all_contact_people(customer.xero_contact_id).each do |person| %>
-        <div class="col-xs-6">
-          <h5><%= person.first_name+"  "+person.last_name %></h5>
-          <p>Email: <%= mail_to(person.email_address) unless person.email_address.nil? %></p>
+        <div class="col">
+            <h5>Contact:</h5>
+            <p><%= customer.actual_name%></p>
+            <p>Number: <%= num_to_phone(customer.phone)%></p>
+            <p>Email: <%= mail_to(customer.email) unless customer.email.nil? %></p>
         </div>
-      <% end %>
+    </div>
+<% else %>
+    <div class= "row">
+        <div class="col">
+            <% staff = customer.staff %>
+            <table class="table table-stripe">
+
+                <!-- BEGIN: Sale rep's details -->
+                <tr>
+                    <th>Salesperson</th>
+                    <th><%= staff.nickname %></th>
+                </tr>
+                <tr>
+                    <td>Phone</td>
+                    <td><%= link_to num_to_phone(staff.contact_number), 'tel:' + staff.contact_number unless staff.contact_number.nil? %></td>                    
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td><%= mail_to(staff.email) unless staff.email.nil? %></td>
+                </tr>
+                <!-- END: Sale rep's details -->
+
+        
+                <!-- BEGIN: Customer's details -->
+                <tr>
+                    <th colspan="2">Customer</th>
+                </tr>
+                <% unless customer.email.nil? %>
+                    <tr>
+                        <td>Primary Email</td>
+                        <td><%= mail_to(customer.email) %></td>
+                    </tr>
+                <% end %>
+                <% unless customer.email_for_sales.nil? %>
+                    <tr>
+                        <td>Sale Email</td>
+                        <td><%= mail_to(customer.email_for_sales) %></td>
+                    </tr>
+                <% end %>
+                <% unless customer.email_for_accounts.nil? %>
+                    <tr>
+                        <td>Account Email</td>
+                        <td><%= mail_to(customer.email_for_accounts) %></td>
+                    </tr>
+                <% end %>
+                <% unless customer.phone.nil? %>
+                    <tr>
+                        <td>Phone</td>
+                        <td><%= customer.phone %></td>
+                    </tr>
+                <% end %>
+                <!-- END: Customer's details -->
+                
+                <!-- BEGIN: Xero Contact's details -->
+                <tr>
+                    <th colspan="2">Xero Contact Person</th>
+                </tr>
+                <% XeroContactPerson.all_contact_people(customer.xero_contact_id).each do |person| %>
+                    <tr>
+                        <td>Name</td>
+                        <td><%= person.first_name + " " + person.last_name %></td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td><%= mail_to(person.email_address) unless person.email_address.nil? %></td>
+                    </tr>
+                <% end %>
+                <!-- END: Xero Contact's details -->
+
+                <!-- BEGIN: Contact's details -->
+                <tr>
+                    <th colspan="2">Contacts</th>
+                </tr>
+                <% customer.cust_contacts.each do |contact| %>
+                    <% person = contact.contact%>
+                    <tr>
+                        <td>
+                            <%= link_to person.name+": ", controller: 'contact', action: 'summary', 
+                                contact_id: person.id%>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <%= link_to '<i class="glyphicon glyphicon-remove" title="Delete"></i>'.html_safe, 
+                                { controller: 'customer', action: 'summary', customer_id: @customer.id, 
+                                customer_name: @customer.actual_name, method: 'delete_contact', 
+                                contact_id: person.id }, data: { confirm: "Do you want to delete contact 
+                                #{person.name} for #{customer.actual_name}?"}%>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><%= contact.title%></td>
+                    </tr>
+                    <tr>
+                        <td><%= label_tag :position, contact.position%></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <%= link_to num_to_phone(contact.phone), 'tel:' + contact.phone unless contact.phone.nil? %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <%= mail_to(contact.email) unless contact.email.nil? %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <% ['Receive Invoice', "Receive Statement", "Receive Portfolio", "Key Accountant", "Key Sales"].each do |tag|%>
+                              <%= tag + " | " if contact[tag.downcase.split().join('_')].to_i > 0%>
+                            <% end %>
+                        </td>
+                    </tr>
+                <% end %>
+
+                <!-- END: Contact's details -->
+            </table>
+        </div>
     </div>
     <h5>  Contacts:</h5>
       <div class= "row">
-          <% customer.cust_contacts.each do |contact| %>
-            <% person = contact.contact%>
-            <div class="col-xs-4">
-              <p>
-                <%= link_to person.name+": ", controller: 'contact', action: 'summary', contact_id: person.id%>
-                <%= link_to '<i class="glyphicon glyphicon-remove" title="Delete"></i>'.html_safe, {controller: 'customer', action: 'summary', customer_id: @customer.id, customer_name: @customer.actual_name, method: 'delete_contact', contact_id: person.id }, data: {confirm: "Do you want to delete contact #{person.name} for #{customer.actual_name}?"}%>
-              </p>
-              <p>
-                <%= contact.title%>
-                <br/>
-                <%= label_tag :position, contact.position%>
-                <br/>
-                  <a href="tel:<%=contact.phone%>"><%= num_to_phone(contact.phone) %></a>
-                <br/>
-                <%= mail_to(contact.email) unless contact.email.nil? %>
-              </p>
-              <h5>
-                <% ['Receive Invoice', "Receive Statement", "Receive Portfolio", "Key Accountant", "Key Sales"].each do |tag|%>
-                  <%= tag + " | " if contact[tag.downcase.split().join('_')].to_i > 0%>
-                <% end %>
-              </h5>
-            </div>
-        <% end %>
+          
       </div>
       <% contact_phone = Contact.filter_by_xero_contact_id(customer.xero_contact_id) %>
       <div class= "row">
