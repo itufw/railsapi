@@ -38,5 +38,11 @@ module ApiBigcommerce
     #     ENV[key.to_s] = value
     #   end if File.exists?(env_file)
     # end
+
+    
+    # console do
+    #   require "pry"
+    #   config.console = Pry
+    # end
   end
 end
