@@ -77,7 +77,7 @@ module CsvGenerator
   end
 
   def export_order_products(start_date, end_date)
-    sql = 'customers.company as "Co./Last Name", customers.firstname as "First Name",	
+    sql = 'IFNULL(NULLIF(customers.company,""), customers.lastname) as "Co./Last Name", customers.firstname as "First Name",	
       orders.street as "Address Line 1", orders.city as "Address Line 2", 
       concat(orders.state, " " , orders.postcode) as "Address Line 3", 
       orders.country as "Address Line 4", orders.id as "Invoice#", 
