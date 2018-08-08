@@ -84,7 +84,7 @@ module CsvGenerator
       Date(orders.date_created) as "Date", courier_statuses.description as "Ship via",
       product_id as "Item Number", order_products.qty as "Quantity",
       products.name as "Description", ROUND(price_luc,2) as "Inc-Tax Price",
-      ROUND(orders.total_inc_tax - orders.discount_amount * 1.1 - orders.shipping_cost * 1.1,2) as "Total",
+      IF(orders.total_inc_tax > 0, ROUND(orders.total_inc_tax - orders.discount_amount * 1.1 - orders.shipping_cost * 1.1,2), orders.total_inc_tax) as "Total",
       ROUND(orders.total_inc_tax, 2) as "Inc-Tax Total", orders.staff_notes as "Comment", 
       orders.date_shipped as "Shipping Date", orders.customer_notes as "Payment Notes", 
       orders.customer_id as "Card ID", product_sizes.name as "Format"'
@@ -92,6 +92,9 @@ module CsvGenerator
     # As discussed with Angelica, the following five fields are not included in the report
     # "" as "Tax Amount", ""  as "Inc-Tax Freight Amount", ""  as "Currency Code", 
     # "" as "Exchange Rate", customers.payment_method as "Payment Method", 
+
+    # update the total field as it is incorrect
+    # ROUND(orders.total_inc_tax - orders.discount_amount * 1.1 - orders.shipping_cost * 1.1,2) as "Total",
 
     order_products = OrderProduct.joins(:order => :customer, :product => :product_size).joins(:order => :courier_status).select(sql).where("orders.date_created > '#{start_date}' AND orders.date_created < '#{end_date}'")
     attributes = order_products.first.attributes.keys
