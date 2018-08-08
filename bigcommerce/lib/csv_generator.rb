@@ -77,14 +77,13 @@ module CsvGenerator
   end
 
   def export_order_products(start_date, end_date)
-    sql = 'IFNULL(NULLIF(customers.company,""), customers.lastname) as "Co./Last Name", customers.firstname as "First Name",	
-      orders.street as "Address Line 1", orders.city as "Address Line 2", 
-      concat(orders.state, " " , orders.postcode) as "Address Line 3", 
+    sql = 'IFNULL(NULLIF(customers.company,""), customers.lastname) as "Co./Last Name", 
+      customers.firstname as "First Name",	orders.street as "Address Line 1", 
+      orders.city as "Address Line 2", concat(orders.state, " " , orders.postcode) as "Address Line 3", 
       orders.country as "Address Line 4", orders.id as "Invoice#", 
       Date(orders.date_created) as "Date", courier_statuses.description as "Ship via",
       product_id as "Item Number", order_products.qty as "Quantity",
       products.name as "Description", ROUND(price_luc,2) as "Inc-Tax Price",
-      IF(orders.total_inc_tax > 0, ROUND(orders.total_inc_tax - orders.discount_amount * 1.1 - orders.shipping_cost * 1.1,2), orders.total_inc_tax) as "Total",
       ROUND(orders.total_inc_tax, 2) as "Inc-Tax Total", orders.staff_notes as "Comment", 
       orders.date_shipped as "Shipping Date", orders.customer_notes as "Payment Notes", 
       orders.customer_id as "Card ID", product_sizes.name as "Format"'
@@ -93,7 +92,7 @@ module CsvGenerator
     # "" as "Tax Amount", ""  as "Inc-Tax Freight Amount", ""  as "Currency Code", 
     # "" as "Exchange Rate", customers.payment_method as "Payment Method", 
 
-    # update the total field as it is incorrect
+    # The total is removed due to incorrectness and no usage
     # ROUND(orders.total_inc_tax - orders.discount_amount * 1.1 - orders.shipping_cost * 1.1,2) as "Total",
 
     order_products = OrderProduct.joins(:order => :customer, :product => :product_size).joins(:order => :courier_status).select(sql).where("orders.date_created > '#{start_date}' AND orders.date_created < '#{end_date}'")
