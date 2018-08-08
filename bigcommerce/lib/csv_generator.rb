@@ -24,13 +24,16 @@ module CsvGenerator
 
   def excel_order(bigc_status, start_date, end_date)
     sql = 'orders.id AS "Order ID", customer_id AS "Customer ID", actual_name AS "Customer Name",
-     customers.email AS "Customer Email", "" AS "Customer Phone", Date(orders.date_created) AS "Order Date",
-    statuses.bigcommerce_name AS "Order Status", "" AS "Subtotal(inc-Tax)", "" AS "Subtotal(ex-Tax)",
-    "" AS "Tax Total", ROUND(shipping_cost, 2) AS "Shipping Cost", "" AS "Shipping Cost(ex tax)",
-    "" AS "Ship Method", "" AS "Handling Cost", ROUND(orders.total_inc_tax, 2) AS "Order Total",
-    "" AS "Order Total(ex tax)", staffs.nickname AS "Payment Method", orders.qty AS "Total Quantity",
-    IF(orders.status_id=5, 0, orders.qty) AS "Total Bottles Shipped", Date(orders.date_shipped) AS "Date Shipped", 
-    cust_types.name AS "Customer Type", wet AS "WET", gst AS "GST"'
+          customers.email AS "Customer Email", customers.phone AS "Customer Phone", 
+          Date(orders.date_created) AS "Order Date", statuses.bigcommerce_name AS "Order Status", 
+          orders.state as "To State", orders.postcode as "To Postcode", "" AS "Subtotal(inc-Tax)", 
+          "" AS "Subtotal(ex-Tax)", "" AS "Tax Total", ROUND(shipping_cost, 2) AS "Shipping Cost", 
+          "" AS "Shipping Cost(ex tax)", "" AS "Ship Method", "" AS "Handling Cost", 
+          ROUND(orders.total_inc_tax, 2) AS "Order Total", "" AS "Order Total(ex tax)", 
+          staffs.nickname AS "Payment Method", orders.qty AS "Total Quantity",
+          IF(orders.status_id=5, 0, orders.qty) AS "Total Bottles Shipped", 
+          Date(orders.date_shipped) AS "Date Shipped", cust_types.name AS "Customer Type", 
+          wet AS "WET", gst AS "GST"'
 
     if bigc_status == ''
       orders = Order.joins(:staff, :status).joins(:customer => :cust_type).select(sql)
