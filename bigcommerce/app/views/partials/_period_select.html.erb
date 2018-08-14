@@ -1,1 +1,6 @@
-	<%= select_tag "period_type", options_for_select(@period_types.collect{ |p| [p.capitalize, p]}, selected: @selected_period), class:"form-control"%>
+<!-- edited by vchar on 20180814 -->
+
+<%= select_tag "period_type", options_for_select(
+    @period_types.collect{ |p| [p.capitalize, p]}, 
+    selected: @selected_period), class:"form-control"
+%>

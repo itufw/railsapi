@@ -1,0 +1,79 @@
+<div class="btn group activity-section" role="group" data-toggle="buttons" aria-label="activity_filter">
+    <%= radio_button_tag(:activity_filter, "staff", false) %>
+    <a class="" data-toggle="dropdown" href="#">Staff</a>
+    <ul class="dropdown-menu">
+        <% @activity.map(&:staff).uniq.each do |staff| %>
+            <li id="filter_staff_<%=staff.id%>">
+                <%= staff.nickname %>
+            </li>
+        <% end %>
+    </ul>
+
+
+    <%= radio_button_tag(:activity_filter, "subject", false) %>
+    <a class="" data-toggle="dropdown" href="#">Subject</a>
+    <ul class="dropdown-menu">
+        <% @subjects.each do |subject| %>
+            <li id="filter_subject_<%=subject.id%>">
+                <%= subject.subject %>
+            </li>
+        <% end %>
+    </ul>
+
+
+    <%= radio_button_tag(:activity_filter, "function", false) %>
+    <a class="" data-toggle="dropdown" href="#">Function</a>
+    <ul class="dropdown-menu">
+        <% @activity.map(&:function).uniq.each do |function| %>
+            <li id="filter_function_<%=function%>">
+                <%= function %>
+            </li>
+        <% end %>
+    </ul>
+
+    <%= radio_button_tag(:activity_filter, "method", false) %>
+    <a class="" data-toggle="dropdown" href="#">Method</a>
+    <ul class="dropdown-menu">
+        <% @activity.map(&:method).uniq.each do |method| %>
+            <li id="filter_method_<%=method%>">
+                <%= method %>
+            </li>
+        <% end %>
+    </ul>
+
+
+
+
+        <label class="btn btn-secondary">
+    <%#= radio_button_tag(:activity_filter, "subject", false) %>
+      <a class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" href="#">Subject</a>
+        <ul class="dropdown-menu">
+          <% @subjects.each do |subject| %>
+          <li id="filter_subject_<%=subject.id%>">
+            <%= subject.subject %>
+          </li>
+          <% end %>
+        </ul>
+    </label>
+    <label class="btn btn-secondary">
+    <%#= radio_button_tag(:activity_filter, "function", false) %>
+      <a class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" href="#">Function</a>
+        <ul class="dropdown-menu">
+          <% @activity.map(&:function).uniq.each do |function| %>
+          <li id="filter_function_<%=function%>">
+            <%= function %>
+          </li>
+          <% end %>
+        </ul>
+    </label>
+    <label class="btn btn-secondary">
+    <%#= radio_button_tag(:activity_filter, "method", false) %>
+      <a class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" href="#">Method</a>
+        <ul class="dropdown-menu">
+          <% @activity.map(&:method).uniq.each do |method| %>
+          <li id="filter_method_<%=method%>">
+            <%= method %>
+          </li>
+          <% end %>
+        </ul>
+    </label>

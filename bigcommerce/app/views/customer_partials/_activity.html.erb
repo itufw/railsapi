@@ -1,112 +1,139 @@
-<div class="btn group activity-section" role="group" data-toggle="buttons" aria-label="activity_filter">
-  <label class="btn btn-secondary">
-    <%= radio_button_tag(:activity_filter, "staff", false) %>
-    <li class="dropdown">
-      <a class="" data-toggle="dropdown" href="#">Staff</a>
-        <ul class="dropdown-menu">
-          <% @activity.map(&:staff).uniq.each do |staff| %>
-          <li id="filter_staff_<%=staff.id%>">
-            <%= staff.nickname %>
-            &nbsp;&nbsp;
-          </li>
-          <% end %>
-        </ul>
-    </li>
-  </label>
-  <label class="btn btn-secondary">
-    <%= radio_button_tag(:activity_filter, "subject", false) %>
-    <li class="dropdown">
-      <a class="" data-toggle="dropdown" href="#">Subject</a>
-        <ul class="dropdown-menu">
-          <% @subjects.each do |subject| %>
-          <li id="filter_subject_<%=subject.id%>">
-            <%= subject.subject %>
-            &nbsp;&nbsp;
-          </li>
-          <% end %>
-        </ul>
-    </li>
-  </label>
-  <label class="btn btn-secondary">
-    <%= radio_button_tag(:activity_filter, "function", false) %>
-    <li class="dropdown">
-      <a class="" data-toggle="dropdown" href="#">Function</a>
-        <ul class="dropdown-menu">
-          <% @activity.map(&:function).uniq.each do |function| %>
-          <li id="filter_function_<%=function%>">
-            <%= function %>
-            &nbsp;&nbsp;
-          </li>
-          <% end %>
-        </ul>
-    </li>
-  </label>
-  <label class="btn btn-secondary">
-    <%= radio_button_tag(:activity_filter, "method", false) %>
-    <li class="dropdown">
-      <a class="" data-toggle="dropdown" href="#">Method</a>
-        <ul class="dropdown-menu">
-          <% @activity.map(&:method).uniq.each do |method| %>
-          <li id="filter_method_<%=method%>">
-            <%= method %>
-            &nbsp;&nbsp;
-          </li>
-          <% end %>
-        </ul>
-    </li>
-  </label>
+<!-- edited by vchar on 20180814 -->
+
+<div class="row">
+
+    <!-- BEGIN: Task filters -->
+    <div class="col">
+        <div class="btn-group" role="group" aria-label="activity_filter">
+            <div class="btn-group" role="group">
+                <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" 
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Staff
+                </button>
+                <div class="dropdown-menu" aria-labelledby="activity_filter">
+                    <% @activity.map(&:staff).uniq.each do |staff| %>
+                        <button class="dropdown-item" type="button" id="filter_staff_<%=staff.id%>">
+                            <%= staff.nickname %>
+                        </button>              
+                    <% end %>
+               </div>
+            </div>
+            <div class="btn-group" role="group">
+                <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" 
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Subject
+                </button>
+                <div class="dropdown-menu" aria-labelledby="activity_filter">
+                    <% @subjects.each do |subject| %>
+                        <button class="dropdown-item" type="button" id="filter_subject_<%=subject.id%>">
+                            <%= subject.subject %>
+                        </button>              
+                    <% end %>
+               </div>
+            </div>
+            <div class="btn-group" role="group">
+                <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" 
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Function
+                </button>
+                <div class="dropdown-menu" aria-labelledby="activity_filter">
+                    <% @activity.map(&:function).uniq.each do |function| %>
+                        <button class="dropdown-item" type="button" id="filter_function_<%=function%>">
+                            <%= function %>
+                        </button>              
+                    <% end %>
+               </div>
+            </div>
+            <div class="btn-group" role="group">
+                <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" 
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Method
+                </button>
+                <div class="dropdown-menu" aria-labelledby="activity_filter">
+                    <% @activity.map(&:method).uniq.each do |method| %>
+                        <button class="dropdown-item" type="button" id="filter_method_<%=method%>">
+                            <%= method %>
+                        </button>              
+                    <% end %>
+               </div>
+            </div>
+        </div>
+    </div>
+    <!-- END: Task filters -->
+    
+    <!-- BEGIN: Task buttons -->
+    <div class="col">
+        <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+            <%= link_to "New Note", { controller: 'activity', action: 'add_note', 
+                customer_id: @customer_id, customer_search_text: @customer_name, 
+                lead_search_text: @lead_name, lead_id: @lead_id }, 
+                class: "btn btn-primary" %>
+
+            <%= link_to "New Task", { controller: 'activity', action: 'add_activity', 
+                customer_id: @customer_id, customer_search_text: @customer_name, 
+                lead_search_text: @lead_name, lead_id: @lead_id }, 
+                class: "btn btn-primary" %>
+
+            <%= link_to "Log a Call", { controller: 'activity', action: 'add_note', 
+                customer_id: @customer_id, customer_search_text: @customer_name, 
+                lead_search_text: @lead_name, lead_id: @lead_id, selected_method: 'Call' },
+                class: "btn btn-primary" %>
+        </div>
+    </div>
+    <!-- END: Task buttons -->
 </div>
 
-<div style="margin-top: -35px">
-  <button style="float: right;"><%= link_to "New Note", controller: 'activity', action: 'add_note', customer_id: @customer_id, customer_search_text: @customer_name, lead_search_text: @lead_name, lead_id: @lead_id %></button>
-  <button style="float: right;"><%= link_to "New Task", controller: 'activity', action: 'add_activity', customer_id: @customer_id, customer_search_text: @customer_name, lead_search_text: @lead_name, lead_id: @lead_id %></button>
-  <button style="float: right;"><%= link_to "Log a Call", controller: 'activity', action: 'add_note', customer_id: @customer_id, customer_search_text: @customer_name, lead_search_text: @lead_name, lead_id: @lead_id, selected_method: 'Call' %></button>
-</div>
+<div class="row">
+    <div class="col">
+        <!-- BEGIN: Display task activities -->
+        <%= render 'customer_partials/activity_table', table_name: 'Activity', 
+            activities: @activity.select { |x| x.expired == 0 } %>
 
-<%= render 'customer_partials/activity_table', table_name: 'Activity', activities: @activity.select { |x| x.expired == 0}%>
-<div class="expired_tasks">
-  <%= render 'customer_partials/activity_table', table_name: 'Expired Activity', activities: @activity.select { |x| x.expired == 1}%>
+        <%= render 'customer_partials/activity_table', table_name: 'Expired Activity', 
+            activities: @activity.select { |x| x.expired == 1}%>
+        <!-- END: Display task activities -->
+    </div>
 </div>
 
 <script>
-
-$('#activity_show').click(function(){
-  $('.activity-section').toggle();
-});
-
-
-$('.activity-bar').click(function(){
-  $('.activity_tr').show();
-});
+    // BEGIN: Toggle activities according to filters
+    $('#activity_show').click(function(){
+        $('.activity-section').toggle();
+    });
 
 
-<% @activity.map(&:staff).uniq.each do |staff| %>
-  $('#filter_staff_<%=staff.id%>').click(function(){
-    $('.activity_tr').hide();
-    $('.activity_tr.staff_<%= staff.id%>').show();
-  });
-<% end %>
+    $('.activity-bar').click(function(){
+        $('.activity_tr').show();
+    });
+    // END: Toggle activities according to filters
 
-<% @activity.map(&:function).uniq.each do |function| %>
-  $("#filter_function_<%=function%>").click(function(){
-    $('.activity_tr').hide();
-    $('.activity_tr.function_<%= function%>').show();
-  });
-<% end %>
+    // BEGIN: Filter actions
+    <% @activity.map(&:staff).uniq.each do |staff| %>
+        $('#filter_staff_<%=staff.id%>').click(function(){
+            $('.activity_tr').hide();
+            $('.activity_tr.staff_<%= staff.id%>').show();
+        });
+    <% end %>
 
-<% @activity.map(&:method).uniq.each do |method| %>
-  $("#filter_method_<%=method%>").click(function(){
-    $('.activity_tr').hide();
-    $('.activity_tr.method_<%= method%>').show();
-  });
-<% end %>
+    <% @subjects.each do |subject| %>
+        $("#filter_subject_<%=subject.id%>").click(function(){
+            $('.activity_tr').hide();
+            $('.activity_tr.subject_<%= subject.id%>').show();
+        });
+    <% end %>
 
+    <% @activity.map(&:function).uniq.each do |function| %>
+        $("#filter_function_<%=function%>").click(function(){
+            $('.activity_tr').hide();
+            $('.activity_tr.function_<%= function%>').show();
+        });
+    <% end %>
 
-<% @subjects.each do |subject| %>
-  $("#filter_subject_<%=subject.id%>").click(function(){
-    $('.activity_tr').hide();
-    $('.activity_tr.subject_<%= subject.id%>').show();
-  });
-<% end %>
-
+    <% @activity.map(&:method).uniq.each do |method| %>
+        $("#filter_method_<%=method%>").click(function(){
+            $('.activity_tr').hide();
+            $('.activity_tr.method_<%= method%>').show();
+        });
+    <% end %>
+    // END: Filter actions
 </script>

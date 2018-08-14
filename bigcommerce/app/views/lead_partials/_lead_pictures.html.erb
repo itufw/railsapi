@@ -1,7 +1,9 @@
+<!-- edited by vchar on 20180814 -->
+
 <% unless spot.nil?%>
-  <%= hidden_field_tag google: 'google'%>
-  <% unless spot.photos.blank? %>
-    <% url = "https://maps.googleapis.com/maps/api/place/photo?maxwidth="+size.to_s+"&photoreference=" + spot.photos.first.photo_reference + "&key=AIzaSyBvfTZH0XCVEJQTgR9QDYt18XIeV5MIkPI"%>
-    <%= image_tag "#{url}"%>
-  <% end %>
+    <%= hidden_field_tag google: 'google'%>
+    <% unless spot.photos.blank? %>
+        <% url = "https://maps.googleapis.com/maps/api/place/photo?maxwidth="+size.to_s+"&photoreference=" + spot.photos.first.photo_reference + "&key=AIzaSyBvfTZH0XCVEJQTgR9QDYt18XIeV5MIkPI"%>
+        <%= image_tag "#{url}"%>
+    <% end %>
 <% end %>
