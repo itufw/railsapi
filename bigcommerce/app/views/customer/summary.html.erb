@@ -1,4 +1,5 @@
 <!-- edited by vchar on 20180807 -->
+<!-- edited by vchar on 20180814 -->
 
 <%= title @customer_name %>
 
@@ -49,65 +50,68 @@
 	});
 </script>
 
-		<% xero_contact = @customer.xero_contact %>
-			<% unless xero_contact.nil?%>
-			<div style="float: right;margin-top:-60px;margin-right:200px;">
-				<p style="color: red"><%= display_num(overdue_customer(xero_contact)) %></p>
-				<p style="color: black"><%= display_num(outstanding_customer(xero_contact))%></p>
-			</div>
-		<%end%>
-
-<div class="row">
+<div class="row mb-3">
+	<!-- BEGIN: display customer summary header -->
 	<div class="col-5">
 		<%= render "customer_partials/summary_header", customer: @customer %>
 	</div>
+	<!-- END: display customer summary header -->
+
 
 	<div class="col-7">
-<!-- spot = GooglePlaces::Client.new('AIzaSyBvfTZH0XCVEJQTgR9QDYt18XIeV5MIkPI').spots_by_query(@customer.actual_name.to_s + ' ' + @customer.city.to_s).first if @customer.cust_type_id != 1 -->
-		<% spot = nil %>
-		<% if spot.nil? %>
-			<div class="col-md-6"></div>
-		<% else %>
-			<div class="col-md-6">
-				<%= render 'lead_partials/lead_pictures', spot: spot, size: 400%>
+		<!-- BEGIN: display overdue and outstanding amount -->
+		<div class="row">
+			<div class="col">
+				<% xero_contact = @customer.xero_contact %>
+				<% 
+					unless xero_contact.nil?
+					overdue = overdue_customer(xero_contact)
+					outstanding = outstanding_customer(xero_contact)
+				%>
+					<% unless overdue - Params::EPSILON < 0.00 %>
+						<span class="badge badge-danger my-2">Overdue amount: <%= display_num(overdue) %></span>
+					<% end %>
+					<% unless outstanding - Params::EPSILON < 0.00 %>
+						<span class="badge badge-primary my-2">Oustanding amount: <%= display_num(outstanding) %></span>
+
+					<% end %>
+				<%end%>
 			</div>
-		<% end %>
-		<div class="col-md-6">
-			<script src="//maps.google.com/maps/api/js?key=AIzaSyB1HFWQ1DigWTnXGn_ZaUOk-v8hgGF3moI"></script>
-			<script src="//cdn.rawgit.com/mahnunchik/markerclustererplus/master/dist/markerclusterer.min.js"></script>
-			<div id="map" style='height: 350px;'></div>
 		</div>
-	</div>
+		<!-- END: display overdue and outstanding amount -->
+
+		<!-- BEGIN: display customers map -->
+		<div class="row">
+			<!-- spot = GooglePlaces::Client.new('AIzaSyBvfTZH0XCVEJQTgR9QDYt18XIeV5MIkPI').spots_by_query(@customer.actual_name.to_s + ' ' + @customer.city.to_s).first if @customer.cust_type_id != 1 -->
+			<% spot = nil %>
+			<% unless spot.nil? %>
+				<div class="col">
+					<%= render 'lead_partials/lead_pictures', spot: spot, size: 400%>
+				</div>
+			<% end %>
+			<div class="col">
+				<script src="//maps.google.com/maps/api/js?key=AIzaSyB1HFWQ1DigWTnXGn_ZaUOk-v8hgGF3moI"></script>
+				<script src="//cdn.rawgit.com/mahnunchik/markerclustererplus/master/dist/markerclusterer.min.js"></script>
+				<div id="map" style='height: 360px;'></div>
+			</div>
+		</div>
+		<!-- END: display customers map -->
+	</div>	
 </div>
 
+<%= form_tag({:action => "summary" }, {:method => "get"}) do %>
+	<%= render 'customer_partials/activity'%>
+	<%= render "partials/overall_stats", sum_param: "$", supply_display_class: "none" %>
+	<%= hidden_field_tag :customer_id, @customer_id %>
+  	<%= hidden_field_tag :customer_name, @customer_name %>
+<% end %>
 
+<% unless @amount_due.nil?%>
+	<%= render 'accounts_partials/account_stats', customer: @customer, amount_due: @amount_due%>
+<% end %>
 
-<!-- container / white page -->
-<div id="container">
+<%= render "partials/order", orders: @orders, display_class: "none", product_ids: nil %>
 
-
-	<%= form_tag({:action => "summary" }, {:method => "get"}) do %>
-
-		<div class="customer_activity">
-			<%= render 'customer_partials/activity'%>
-		</div>
-
-		<div class="sales_stats" style="margin-top: 50px;">
-			<%= render "partials/overall_stats", sum_param: "$", supply_display_class: "none" %>
-			<%= hidden_field_tag :customer_id, @customer_id %>
-		  <%= hidden_field_tag :customer_name, @customer_name %>
-		</div>
-		<!-- End Form -->
-	<% end %>
-
-		<% unless @amount_due.nil?%>
-			<div class="account_stats" style="margin-top: 50px;">
-				<%= render 'accounts_partials/account_stats', customer: @customer, amount_due: @amount_due%>
-			</div>
-		<% end %>
-
-		<%= render "partials/order", orders: @orders, display_class: "none", product_ids: nil %>
-</div>
 <!-- Map -->
 <script type="text/javascript">
 	var handler = Gmaps.build('Google');

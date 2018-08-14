@@ -1,4 +1,6 @@
-<table class="table table-striped table-bordered table-hover table-responsive" style="margin-top: 10px;">
+<!-- edited by vchar on 20180814 -->
+
+<table class="table table-striped table-bordered table-hover table-responsive w-100 d-block d-table">
 	<tr class="info accounts-stats-bar">
 		<th style="color: red">Account Stats</th>
 		<th>Outstanding</th>
@@ -6,9 +8,9 @@
 		<th>
 			Current
 		</th>
-    <% today_date = Date.today%>
+    	<% today_date = Date.today%>
 		<% for i in 1..4 %>
-		  <th><%= (today_date - i.month).strftime("%B")%></th>
+		  	<th><%= (today_date - i.month).strftime("%B")%></th>
 		<% end %>
 		<th>
 			Older
@@ -19,7 +21,7 @@
 		<td class="num"><%= display_num(outstanding_customer(customer.xero_contact))  %></td>
 		<td class="num"><%= display_num(overdue_customer(customer.xero_contact)) %></td>
 		<% amount_due["invoice_date"].each do |amount| %>
-		<td><%= display_num(amount) %></td>
+			<td><%= display_num(amount) %></td>
 		<% end %>
 	</tr>
 	<tr class="accounts-stats-section">
@@ -27,7 +29,7 @@
 		<td class="num"><%= display_num(outstanding_customer(customer.xero_contact))  %></td>
 		<td class="num"><%= display_num(overdue_customer(customer.xero_contact)) %></td>
 		<% amount_due["due_date"].each do |amount| %>
-		<td><%= display_num(amount) %></td>
+			<td><%= display_num(amount) %></td>
 		<% end %>
 	</tr>
 </table>
