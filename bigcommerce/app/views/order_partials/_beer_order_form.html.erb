@@ -279,7 +279,7 @@
     $('#order_gst').val((total*(1-order_discount)*0.1 + (shipping_cost)* gst).toFixed(4));
     // $('#order_gst').val((total*0.1 + (shipping_cost)* gst).toFixed(4));
     $('#order_discount_amount').val(discount.toFixed(4));
-    $('#order_total_inc_tax').val(((total - discount)*1.1 + shipping_cost*gst).toFixed(4));
+    $('#order_total_inc_tax').val((total*(1- order_discount)*1.1 + shipping_cost*gst).toFixed(4));
     return total;
   }
 
