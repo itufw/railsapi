@@ -13,7 +13,7 @@
     <div class= "row">
         <div class="col">
             <% staff = customer.staff %>
-            <table class="table table-stripe">
+            <table class="table table-stripe table-sm">
 
                 <!-- BEGIN: Sale rep's details -->
                 <tr>
@@ -63,7 +63,7 @@
                 
                 <!-- BEGIN: Xero Contact's details -->
                 <tr>
-                    <th colspan="2">Xero Contact Person</th>
+                    <th colspan="2">Contact Person</th>
                 </tr>
                 <% XeroContactPerson.all_contact_people(customer.xero_contact_id).each do |person| %>
                     <tr>
@@ -79,49 +79,42 @@
 
                 <!-- BEGIN: Contact's details -->
                 <tr>
-                    <th colspan="2">Contacts</th>
+                    <th colspan="2">Other contacts</th>
                 </tr>
-                <% customer.cust_contacts.each do |contact| %>
-                    <% person = contact.contact%>
-                    <tr>
-                        <td>
-                            <%= link_to person.name+": ", controller: 'contact', action: 'summary', 
-                                contact_id: person.id%>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <%= link_to '<i class="glyphicon glyphicon-remove" title="Delete"></i>'.html_safe, 
-                                { controller: 'customer', action: 'summary', customer_id: @customer.id, 
-                                customer_name: @customer.actual_name, method: 'delete_contact', 
-                                contact_id: person.id }, data: { confirm: "Do you want to delete contact 
-                                #{person.name} for #{customer.actual_name}?"}%>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><%= contact.title%></td>
-                    </tr>
-                    <tr>
-                        <td><%= label_tag :position, contact.position%></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <%= link_to num_to_phone(contact.phone), 'tel:' + contact.phone unless contact.phone.nil? %>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <%= mail_to(contact.email) unless contact.email.nil? %>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <% ['Receive Invoice', "Receive Statement", "Receive Portfolio", "Key Accountant", "Key Sales"].each do |tag|%>
-                              <%= tag + " | " if contact[tag.downcase.split().join('_')].to_i > 0%>
-                            <% end %>
-                        </td>
-                    </tr>
-                <% end %>
+                <% left = true %>
+
+                <tr>
+                    <td colspan="2">
+                        <% customer.cust_contacts.each do |contact| %>
+                            <% person = contact.contact%>
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <span class="card-text">
+                                        <%= link_to '<i class="far fa-trash-alt" title="Delete"></i>'.html_safe, 
+                                            { controller: 'customer', action: 'summary', customer_id: @customer.id, 
+                                            customer_name: @customer.actual_name, method: 'delete_contact', 
+                                            contact_id: person.id }, data: { confirm: "Do you want to delete contact 
+                                            #{person.name} for #{customer.actual_name}?"}%>
+
+                                       <%= link_to person.name+": ", controller: 'contact', action: 'summary', 
+                                            contact_id: person.id%>
+                                    </span>
+                                    <span class="card-text">
+                                        <small class="text-muted">
+                                            <%= contact.title%>
+                                            <%= label_tag :position, contact.position%>
+                                            <%= link_to num_to_phone(contact.phone), 'tel:' + contact.phone unless contact.phone.nil? %>
+                                            <%= mail_to(contact.email) unless contact.email.nil? %>
+                                            <% ['Receive Invoice', "Receive Statement", "Receive Portfolio", "Key Accountant", "Key Sales"].each do |tag|%>
+                                                <%= tag + " | " if contact[tag.downcase.split().join('_')].to_i > 0%>
+                                            <% end %>
+                                        </small>
+                                    </span>
+                                </div>
+                            </div>
+                        <% end %>
+                    </td>
+                </tr>
 
                 <!-- END: Contact's details -->
             </table>
