@@ -1,13 +1,19 @@
 <!-- edited by vchar on 20180807 -->
-<!-- partially updated by vchar on 20180814 -->
+<!-- updated by vchar on 20180814 -->
 
 <% if (customer.cust_type_id == 1) || (customer.is_a? CustomerLead) %>
     <div class="row">
         <div class="col">
-            <h5>Contact:</h5>
-            <p><%= customer.actual_name%></p>
-            <p>Number: <%= num_to_phone(customer.phone)%></p>
-            <p>Email: <%= mail_to(customer.email) unless customer.email.nil? %></p>
+            <div class="card">
+                <div class="card-footer">
+                    Contact:
+                </div>
+                <div class="card-body">
+                    <%= customer.actual_name%><br/>
+                    <%= num_to_phone(customer.phone)%><br/>
+                    <%= mail_to(customer.email) unless customer.email.nil? %>
+                </div>
+            </div>
         </div>
     </div>
 <% else %>
@@ -64,7 +70,7 @@
                 
                 <!-- BEGIN: Xero Contact's details -->
                 <tr>
-                    <th colspan="2">Contact Person</th>
+                    <th colspan="2">Billing contact</th>
                 </tr>
                 <% XeroContactPerson.all_contact_people(customer.xero_contact_id).each do |person| %>
                     <tr>
@@ -80,7 +86,7 @@
 
                 <!-- BEGIN: Contact's details -->
                 <tr>
-                    <th>Contacts</th>
+                    <th>Other contacts</th>
 
                     <td>
                         <% customer.cust_contacts.each do |contact| %>
@@ -133,24 +139,20 @@
                     </td>                
                 </tr>
                 <!-- END: Contact's details -->
+                <% contact_phone = Contact.filter_by_xero_contact_id(customer.xero_contact_id) %>
+                <% unless contact_phone.size < 1 %>
+                    <tr>
+                        <th>Extra contacts:</th>
+                        <td>
+                            <% contact_phone.each do |contact| %>
+                                <% unless contact.number.nil? %>
+                                    <%= contact.name+": "%><%= contact.area_code unless contact.area_code.nil? %> <%= contact.number %>
+                                <% end %>
+                            <% end %>
+                        </td>
+                    </tr>
+                <% end %>
             </table>
         </div>
-
-        <div class="col">
-        </div>
     </div>
-    <h5>  Contacts:</h5>
-      <div class= "row">
-          
-      </div>
-      <% contact_phone = Contact.filter_by_xero_contact_id(customer.xero_contact_id) %>
-      <div class= "row">
-        <% contact_phone.each do |contact| %>
-          <div class="col-xs-4">
-            <h5><%= contact.name+": "%></h5>
-            <p>Ph: <%= contact.area_code unless contact.area_code.nil? %> <%= contact.number unless contact.number.nil? %></p>
-          </div>
-        <% end %>
-      </div>
-  </div>
 <% end %>
