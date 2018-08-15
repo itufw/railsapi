@@ -1,3 +1,5 @@
+<!-- edited by vchar on 20180815 -->
+
 <div class="col-12 append_role_<%= contact_role.customer_id%> append_customer">
     <div class="input-group mb-3">
         <div class="input-group-prepend">
@@ -23,26 +25,38 @@
 </div>
 
 <div class="col-6">
-    <%= collection_select(:role, 'role_' + @customer_count.to_s, ContactRole.all, :role, :role, {:include_blank => 'All Position', selected: contact_role.position }, { class: 'form-control form-control-sm mb-2' }) %>
-    <%= text_field_tag('title_' + @customer_count.to_s, contact_role.title, placeholder: 'Title', class: 'form-control form-control-sm mb-2') %>
-    <%= text_field_tag('phone_' + @customer_count.to_s, contact_role.phone, placeholder: 'Phone', class: 'form-control form-control-sm mb-2') %>
-    <%= text_field_tag('fax_' + @customer_count.to_s, contact_role.fax, placeholder: 'Fax', class: 'form-control form-control-sm mb-2') %>
-    <%= text_field_tag('email_' + @customer_count.to_s, contact_role.email, placeholder: 'Email', class: 'form-control form-control-sm mb-2') %>
+    <%= collection_select(:role, 'role_' + @customer_count.to_s, ContactRole.all, :role, 
+        :role, {:include_blank => 'All Position', selected: contact_role.position }, 
+        { class: 'form-control form-control-sm mb-2' }) %>
+    <%= text_field_tag('title_' + @customer_count.to_s, contact_role.title, 
+        placeholder: 'Title', class: 'form-control form-control-sm mb-2') %>
+    <%= text_field_tag('phone_' + @customer_count.to_s, contact_role.phone, 
+        placeholder: 'Phone', class: 'form-control form-control-sm mb-2') %>
+    <%= text_field_tag('fax_' + @customer_count.to_s, contact_role.fax, 
+        placeholder: 'Fax', class: 'form-control form-control-sm mb-2') %>
+    <%= text_field_tag('email_' + @customer_count.to_s, contact_role.email, 
+        placeholder: 'Email', class: 'form-control form-control-sm mb-2') %>
     <div class="input-group mb-3">
         <div class="input-group-prepend">
-            <span class="input-group-text form-control-sm" id="basic-addon1"><small>Contact status</small></span>
+            <span class="input-group-text form-control-sm" id="basic-addon1">
+                <small>Contact status</small>
+            </span>
         </div>
-        <%= text_field_tag('status_' + @customer_count.to_s, 'Active', class: 'form-control form-control-sm', readonly: true) %>
+        <%= text_field_tag('status_' + @customer_count.to_s, 'Active', 
+            class: 'form-control form-control-sm', readonly: true) %>
     </div>
 </div>
 
 <div class="col-6">
     <ul class="list-group">
-        <% ['Receive Invoice', "Receive Statement", "Receive Portfolio", "Key Accountant", "Key Sales"].each do |tag|%>
+        <% ['Receive Invoice', "Receive Statement", "Receive Portfolio", 
+                "Key Accountant", "Key Sales"].each do |tag|%>
             <% attr_tag = tag.downcase.split().join('_') %>
             <li class="list-group-item pb-1">
-                <%= radio_button_tag( attr_tag + '_' + @customer_count.to_s, 1, contact_role[attr_tag].to_i > 0) %> Yes &nbsp;
-                <%= radio_button_tag( attr_tag + '_' + @customer_count.to_s, 0, contact_role[attr_tag].to_i == 0) %> No &nbsp;&nbsp;&nbsp;
+                <%= radio_button_tag( attr_tag + '_' + @customer_count.to_s, 1, 
+                    contact_role[attr_tag].to_i > 0) %> Yes &nbsp;
+                <%= radio_button_tag( attr_tag + '_' + @customer_count.to_s, 0,
+                    contact_role[attr_tag].to_i == 0) %> No &nbsp;&nbsp;&nbsp;
                 <%= label(:invoice_receivable, tag)%>
             </li>
         <% end %>
@@ -50,18 +64,16 @@
 </div>
 
 
-
-
 <script type="text/javascript">
-$('.fa-trash-alt').click(function(){
-$(this).parent().find('input[name*=status]').val('Deleted');
-$(this).parent().find('.fa-plus').show();
-$(this).hide();
-});
+    $('.fa-trash-alt').click(function(){
+        $(this).parent().find('input[name*=status]').val('Deleted');
+        $(this).parent().find('.fa-plus').show();
+        $(this).hide();
+    });
 
-$('.fa-plus').click(function(){
-$(this).parent().find('input[name*=status]').val('Active');
-$(this).parent().find('.fa-trash-alt').show();
-$(this).hide();
-});
+    $('.fa-plus').click(function(){
+        $(this).parent().find('input[name*=status]').val('Active');
+        $(this).parent().find('.fa-trash-alt').show();
+        $(this).hide();
+    });
 </script>
