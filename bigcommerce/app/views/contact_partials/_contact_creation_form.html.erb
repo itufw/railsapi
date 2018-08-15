@@ -1,10 +1,28 @@
-  <div class="col-md-4 col-md-offset-4">
-    <%= f.text_field :name, placeholder: 'Contact Name', maxlength: 50 %>
-    <br/><br/>
-    <%= f.text_field :personal_number, placeholder: 'Personal Number', maxlength:45 %>
-    <br/><br/>
-    <%= f.text_field :preferred_contact_number, placeholder: 'Preferred Contact Number', maxlength: 45 %>
-    <br/><br/>
-    <%= f.text_field :time_unavailable, placeholder: 'Time Unavailable', maxlength: 45 %>
-    <br/><br/>
-  </div>
+<!-- edited by vchar on 20180815 -->
+
+
+<div class='form-group row'>
+    <%= f.label :contact_name, class: 'col-form-label col-4' %>
+    <div class="col-8">
+        <%= f.text_field :name, placeholder: 'Contact person\'s name', class: 'form-control' %>
+    </div>
+</div>
+<div class='form-group row'>
+    <%= f.label :no_contact_at, class: 'col-form-label col-4' %>
+    <div class="col-8">
+        <%= f.text_field :time_unavailable, placeholder: 'Unavailable time', class: 'form-control' %>
+    </div>
+</div>
+
+<div class='form-group row'>
+    <%= f.label :phone_number, class: 'col-form-label col-4' %>
+    <div class="col-8">
+        <%= f.text_field :personal_number, placeholder: 'Personal phone number', class: 'form-control' %>
+    </div>
+</div>
+<div class='form-group row'>
+    <%= f.label :alt_phone, class: 'col-form-label col-4' %>
+    <div class="col-8">
+        <%= f.text_field :preferred_contact_number, placeholder: 'Preferred contact number', class: 'form-control' %>
+    </div>
+</div>

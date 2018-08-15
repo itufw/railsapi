@@ -1,6 +1,6 @@
 <!-- edited by vchar on 20180805 -->
 <div class="col p-1">
     <%= collection_select(:role, :role, ContactRole.all, :role, :role, 
-        {:include_blank => 'All Position', selected: @contact_role }, 
+        {:include_blank => 'Select a position', selected: @contact_role }, 
         {:class => 'form-control'}) %>
 </div>

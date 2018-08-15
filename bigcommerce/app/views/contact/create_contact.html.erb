@@ -1,19 +1,34 @@
-<%= title "Create Contact"%>
-<h3>Create Contact</h3>
-<br/>
+<!-- edited by vchar on 20180815 -->
 
+<%= title "Add Contact"%>
 
-<div class="row">
-  <% @contact = Contact.new if @contact.nil? %>
-  <%= form_for @contact, url: {action: "create_contact"}, method: "POST", html: {class: "form-group", style: "padding-left: 50px;"} do |f| %>
-    <%= hidden_field_tag :customer_id, @customer_id%>
-    <%= render 'contact_partials/contact_creation_form', f: f %>
-    <%= render 'contact_partials/contact_customer_form'%>
-    <div class="col-md-4 col-md-offset-6 submit_button">
-      <%= f.submit "Create!", class: 'btn btn-primary' %>
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header text-center h3 text-secondary">
+                Add Contact
+            </div>
+            <div class="card-body">
+                <% @contact = Contact.new if @contact.nil? %>
+                <%= form_for @contact, url: {action: "create_contact"}, method: "POST" do |f| %>
+                    <div class="row">
+                        <div class="col">
+                            <%= hidden_field_tag :customer_id, @customer_id%>
+
+                            <%= render 'contact_partials/contact_customer_form', f: f %>
+
+                        </div>
+                    </div>
+                    <%= f.submit "Create!", class: 'btn btn-primary' %>
+                <% end %>
+            </div>
+        </div>
     </div>
-  <% end %>
 </div>
+
+
+
+
 
 <div class="col-md-4 col-md-offset-6">
   <p style="padding-left: 50px;"><%= link_to "Go Back to Contacts", action: 'all_contacts'%></p>
