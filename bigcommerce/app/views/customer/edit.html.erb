@@ -1,122 +1,211 @@
+<!-- edited by vchar on 20180815 -->
+
 <%= title "Edit #{@customer_name}"%>
-<h3>Edit <%= @customer_name %></h3>
-<br/>
-
-<div class="row">
-  <div class="col-md-4 col-md-offset-4">
-    <%= form_tag({:controller => "customer", :action => "edit"}, {:method => "get"}) do %>
-    <%= text_field_tag('search', @search_text, placeholder: 'Search from Google', class: 'form-control') %>
-    <%= hidden_field_tag :customer_id, @customer.id %>
-    <%= hidden_field_tag :customer_name, @customer.firstname.to_s + ' ' + @customer.lastname.to_s %>
-    <%= submit_tag "Search!", class: 'btn btn-primary' %>
-    <% end %>
-  </div>
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header text-center h3 text-secondary">
+                Edit <%= @customer_name %>
+            </div>
+            <div class="card-body">
+                <%= form_tag({:controller => "customer", :action => "edit"}, {:method => "get"}) do %>
+                    <%= hidden_field_tag :customer_id, @customer.id %>
+                    <%= hidden_field_tag :customer_name, 
+                        @customer.firstname.to_s + ' ' + @customer.lastname.to_s %>
+                    <div class="input-group">
+                        <%= text_field_tag('search', @search_text, 
+                            placeholder: 'Search a place on Google', class: 'form-control') %>
+                        <div class="input-group-append">
+                            <%= submit_tag "Search!", class: 'btn btn-primary' %>
+                        </div>
+                    </div>
+                <% end %>
+            </div>
+            <div class="card-footer">
+                <div class="row place_lists">
+                    <% unless @google_spots.nil?%>
+                        <% @google_spots.each do |spot|%>
+                            <div class="col-lg-3 col-md-4 col-sm-5">
+                                <span class="google-place" place-id = "<%= spot.place_id%>">
+                                    <%= spot.name %>
+                                </span>
+                            </div>
+                            <div class="col-lg-9 col-md-8 col-sm-7">
+                                <span class="google-place-address <%= spot.place_id%>">
+                                    <%= spot.formatted_address %>
+                                </span>
+                            </div>
+                        <% end %>
+                    <% end %>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div class="row place_lists">
-  <% unless @google_spots.nil?%>
-    <% @google_spots.each do |spot|%>
-    <div class="col-xs-2">
-      <p class="google-place" place-id = "<%= spot.place_id%>"><%= spot.name %></p>
-      <br/>
-      <p class="google-place-address <%= spot.place_id%>"><%= spot.formatted_address %></p>
+<%= form_for @customer, url: {action: "update"}, method: "POST" do |f| %>
+    <%= f.hidden_field :id %>
+    <div class="row">
+        <div class="col-6">
+            <!-- BEGIN: Customer Details -->
+            <div class="card border-light mb-3">
+                <div class="card-header">Customer Details</div>
+                <div class="card-body">
+                    <div class="form-group row">
+                        <%= f.label :first_name, class: 'form-label col-md-4' %>
+                        <%= f.text_field :firstname, class: 'form-control col-md-8' %>
+                    </div>
+                    <div class="form-group row">
+                        <%= f.label :last_name, class: 'form-label col-md-4' %>
+                        <%= f.text_field :lastname, class: 'form-control col-md-8' %>
+                    </div>
+                    <div class="form-group row">
+                        <%= f.label :actual_name, class: 'form-label col-md-4' %>
+                        <%= f.text_field :actual_name, class: 'form-control col-md-8' %>
+                    </div>
+                    <div class="form-group row">
+                        <%= f.label :phone, class: 'form-label col-md-4' %>
+                        <%= f.text_field :phone, class: 'form-control col-md-8' %>
+                    </div>
+                    <div class="form-group row">
+                        <%= f.label :email, class: 'form-label col-md-4' %>
+                        <%= f.text_field :email, class: 'form-control col-md-8' %>
+                    </div>
+                    <div class="form-group row">
+                        <%= f.label :salesperson, class: 'form-label col-md-4' %>
+                        <!-- Prevent users from changing salesperson of each customer, reuqested Lucia -->
+                        <!-- Allow Angelica to update the staff reps of each customer -->
+                        <% if Staff.find(session[:user_id]).id ==  26 %>
+                            <%= f.collection_select :staff_id, Staff.sales_list.order_by_order, :id, :nickname, 
+                                {selected: @customer.staff_id}, {class: "form-control col-md-8"} %>
+                        <% else %>
+                            <%= f.label @customer.staff.nickname, class: 'form-control col-md-8' %>
+                        <% end %>
+                    </div>
+                </div>
+            </div>
+            <!-- END: Customer Details -->
+        </div>
+        <div class="col-6">
+            <!-- BEGIN: Address Details -->
+            <div class="card border-light mb-3">
+                <div class="card-header">Address Details</div>
+                <div class="card-body">
+                    <div class="form-group row">
+                        <%= f.label :street, class: 'form-label col-md-4' %>
+                        <%= f.text_field :street, placeholder: 'Street', class: 'address form-control col-md-8'%>
+                    </div>
+                    <div class="form-group row">
+                        <%= f.label :street_2, class: 'form-label col-md-4' %>
+                        <%= f.text_field :street_2, placeholder: 'Street 2', class: 'address form-control col-md-8'%>
+                    </div>
+                    <div class="form-group row">
+                        <%= f.label :city, class: 'form-label col-md-4' %>
+                        <%= f.text_field :city, placeholder: 'City', class: 'address form-control col-md-8'%>
+                    </div>
+                    <div class="form-group row">
+                        <%= f.label :state, class: 'form-label col-md-4' %>
+                        <%= f.text_field :state, placeholder: 'State', class: 'address form-control col-md-8'%>
+                    </div>
+                    <div class="form-group row">
+                        <%= f.label :postcode, class: 'form-label col-md-4' %>
+                        <%= f.text_field :postcode, placeholder: 'Postcode', class: 'address form-control col-md-8'%>
+                    </div>
+                    <div class="form-group row">
+                        <%= f.label :country, class: 'form-label col-md-4' %>
+                        <%= f.text_field :country, placeholder: 'Country', class: 'address form-control col-md-8'%>
+                    </div>
+                </div>
+            </div>
+            <!-- END: Address Details -->
+        </div>
     </div>
-    <% end %>
-  <% end %>
-</div>
 
-<%= form_for @customer, url: {action: "update"}, method: "POST", html: {class: "form-group", style: "padding-left: 50px;"} do |f| %>
-
-  <%= f.hidden_field :id %>
-  <div class="row">
-    <div class="col-md-6">
-      <%= f.label :firstname, class: 'margin-from-top label-new' %>
-      <%= f.text_field :firstname, class: 'form-control quarter-size' %>
-      <%= f.label @customer.cust_type.name, class: 'form-control quarter-size label-new' %>
+    <!-- BEGIN: Full address -->
+    <div class="row mb-3">
+        <div class="col">
+            <div class="card border-light mb-3">
+                <div class="card-header">
+                    Full address
+                </div>
+            </div>
+            <%= f.text_field :address, class: 'form-control' %>
+        </div>
     </div>
-    <div class="col-md-6">
-      <%= f.label :lastname, class: 'margin-from-top label-new' %>
-      <%= f.text_field :lastname, class: 'form-control quarter-size' %>
+    <!-- END: Full address -->
+
+    <div class="row">
+        <div class="col-6">
+            <!-- BEGIN: Special instructions -->
+            <div class="card border-light">
+                <div class="card-header">Special instructions</div>
+                <div class="card-body">
+                    <div class="form-group row">
+                        <%= f.text_area :SpecialInstruction1, placeholder: 'Special instruction 1', rows:4, class: 'form-control mb-3' %>
+                        <%= f.text_area :SpecialInstruction2, placeholder: 'Special instruction 2', rows:4, class: 'form-control mb-3' %>
+                        <%= f.text_area :SpecialInstruction3, placeholder: 'Special instruction 3', rows:4, class: 'form-control mb-3' %>
+                    </div>
+                </div>
+            </div>
+            <!-- END: Special instructions -->
+        </div>
+
+        <div class="col-6">
+            <!-- BEGIN: Grouping details -->
+            <div class="card border-light">
+                <div class="card-header">Grouping details</div>
+                <div class="card-body">
+                    <div class="form-group row">
+                        <%= f.label :category, class: 'form-label col-md-4' %>
+                        <%= f.label @customer.cust_type.name, class: 'form-control col-md-8' %>
+                    </div>
+                    <div class="form-group row">
+                      <%= f.label :tolerant_days, class: 'form-label col-md-4' %>
+                      <%= f.number_field :tolerance_day, placeholder: 'Tolerant days', class: 'form-control col-md-8' %>
+                    </div>
+                    <div class="form-group row">
+                      <%= f.label :account_type, class: 'form-label col-md-4' %>
+                      <%= f.collection_select :account_type, CustomerAccountType.account_type, :name, :name, {include_blank: 'Based on Invoice Date'}, class: 'form-control col-md-8'%>
+                    </div>
+                    <div class="form-group row">
+                      <%= f.label :ship_via, class: 'form-label col-md-4'  %>
+                      <%= f.collection_select :default_courier, CustomerAccountType.default_courier, :name, :name, {}, class: 'form-control col-md-8' %>
+                    </div>
+                    <div class="form-group row">
+                      <%= f.label :pay_by, class: 'form-label col-md-4'  %>
+                      <%= f.text_field :payment_method, placeholder: 'Payment Method', class: 'form-control col-md-8' %>
+                    </div>
+                    <div class="form-group row">
+                        <%= f.label :channel, class: 'form-label col-md-4' %>
+                        <%= f.collection_select :cust_style_id, CustStyle.all, :id, :name, {:selected => @customer.cust_style_id, :include_blank => 'Not Assigned'}, {class: "form-control col-md-8"} %>
+                    </div>
+                    <div class="form-group row">
+                        <%= f.label :group, class: 'form-label col-md-4' %>
+                        <%= f.collection_select :cust_group_id, CustGroup.all, :id, :name, {:selected => @customer.cust_group_id, :include_blank => 'Not Assigned'}, {class: "form-control col-md-8"} %>
+                    </div>
+                </div>
+            </div>
+            <!-- END: Grouping details -->
+        </div>
     </div>
-  </div>
-
-    <%= f.label :actual_name, class: 'margin-from-top label-new' %>
-    <%= f.text_field :actual_name, class: 'form-control quarter-size' %>
-  <br/>
-
-  <%= f.label :address, class: 'margin-from-top label-new' %>
-  <%= f.text_field :street, placeholder: 'Street', class: 'address'%>
-  <%= f.text_field :street_2, placeholder: 'Street 2', class: 'address'%>
-  <%= f.text_field :city, placeholder: 'City', class: 'address'%>
-  <%= f.text_field :state, placeholder: 'State', class: 'address'%>
-  <%= f.text_field :postcode, placeholder: 'Postcode', class: 'address'%>
-  <%= f.text_field :country, placeholder: 'Country', class: 'address'%>
-  <%= f.text_field :address, class: 'form-control quarter-size' %>
-
-  <div class="row">
-    <div class="col-md-6">
-      <%= f.label :phone, class: 'margin-from-top label-new' %>
-      <%= f.text_field :phone, class: 'form-control quarter-size' %>
-    </div>
-    <div class="col-md-6">
-      <%= f.label :email, class: 'margin-from-top label-new' %>
-      <%= f.text_field :email, class: 'form-control quarter-size' %>
-    </div>
-  </div>
-
-  <%= f.label :special_instruction_for_fastway, class: 'margin-from-top label-new' %>
-  <%= f.text_field :SpecialInstruction1, placeholder: 'SpecialInstruction1'%>
-  <%= f.text_field :SpecialInstruction2, placeholder: 'SpecialInstruction2'%>
-  <%= f.text_field :SpecialInstruction3, placeholder: 'SpecialInstruction3'%>
-  <br/>
-
-  <%= f.label :tolerance_day, class: 'margin-from-top label-new'%>
-  <%= f.number_field :tolerance_day, placeholder: 'Tolerance Day'%>
-  <%= f.label :account_type, class: 'margin-from-top label-new' %>
-  <%= f.collection_select :account_type, CustomerAccountType.account_type, :name, :name, {include_blank: 'Based on Invoice Date'}%>
-  <%= f.label :default_courier, class: 'margin-from-top label-new' %>
-  <%= f.collection_select :default_courier, CustomerAccountType.default_courier, :name, :name %>
-  <%= f.label :payment_method, class: 'margin-from-top label-new' %>
-  <%= f.text_field :payment_method, placeholder: 'Payment Method'%>
-  <br/>
-
-  <div class="col-md-4">
-    <%= f.label :staff, class: 'margin-from-top label-new' %>
-    <!-- Allow Angelica to update the staff reps of each customer -->
-    <% if Staff.find(session[:user_id]).id ==  26 %>
-    <!-- Disable according to Lucia's request -->
-    <%= f.collection_select :staff_id, Staff.sales_list.order_by_order, :id, :nickname, {selected: @customer.staff_id}, {class: "form-control quarter-size"} %>
-    <% else %>
-    <%= f.label @customer.staff.nickname, class: 'form-control quarter-size label-new' %>
-    <% end %>
-  </div>
-  <div class="col-md-4">
-    <%= f.label :channel, class: 'margin-from-top label-new' %>
-    <%= f.collection_select :cust_style_id, CustStyle.all, :id, :name, {:selected => @customer.cust_style_id, :include_blank => 'Not Assigned'}, {class: "form-control quarter-size"} %>
-  </div>
-  <div class="col-md-4">
-    <%= f.label :group, class: 'margin-from-top label-new' %>
-    <%= f.collection_select :cust_group_id, CustGroup.all, :id, :name, {:selected => @customer.cust_group_id, :include_blank => 'Not Assigned'}, {class: "form-control quarter-size"} %>
-  </div>
-
-
-
-
-  <%= f.submit "Update", class: 'btn btn-primary' %>
+    <%= f.submit "Update", class: 'btn btn-primary' %>
+    <%= link_to "Show customer profile", { action: 'summary', customer_id: @customer_id, 
+        customer_name: @customer_name }, class: "btn btn-outline-primary" %></p>
 <% end %>
 
-<p style="padding-left: 50px;"><%= link_to "Go Back to Customer Profile", action: 'summary', customer_id: @customer_id, customer_name: @customer_name %></p>
 
 <!-- Google Places -->
 <script type="text/javascript">
-  $('.google-place').click(function(){
-    $('input#customer_address').val($('p.google-place-address.'+ $(this).attr('place-id')).text());
-  });
+    // BEGIN: update address field on an address clicked
+    $('.google-place').click(function(){
+        $('input#customer_address').val($('span.google-place-address.'+ $(this).attr('place-id')).text().trim());
+    });
+    // END: update address field on an address clicked
 
-  $(document).on('input', '.address', function(){
-    var street = $('#customer_street').val() + ' '+ $('#customer_street_2').val() + ' ';
-    var city = $('#customer_city').val() + ' '+ $('#customer_state').val() +' '+ $('#customer_postcode').val() +' '+ $('#customer_country').val();
+    $(document).on('input', '.address', function(){
+        var street = $('#customer_street').val() + ' '+ $('#customer_street_2').val() + ' ';
+        var city = $('#customer_city').val() + ' '+ $('#customer_state').val() +' '+ $('#customer_postcode').val() +' '+ $('#customer_country').val();
 
-    $('#customer_address').val(street + city);
-  });
+        $('#customer_address').val(street + city);
+    });
 </script>
