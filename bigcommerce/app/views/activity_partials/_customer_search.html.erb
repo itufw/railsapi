@@ -1,93 +1,155 @@
-<% relations = (activity.nil?) ? nil : activity.task_relations%>
+<!-- edited by vchar on 20180816 -->
+
+<% relations = (activity.nil?) ? nil : activity.task_relations %>
 <% customer_list = [@customer_id.to_i]  %>
-<% customer_list = customer_list + relations.uniq.compact.map(&:customer_id) unless relations.nil?%>
+<% customer_list = customer_list + relations.uniq.compact.map(&:customer_id) unless relations.nil? %>
 <% lead_list = [@lead_id.to_i] %>
 <% lead_list = lead_list + relations.uniq.compact.map(&:customer_lead_id) unless relations.nil? %>
-<div class="col-md-offset-1 col-md-4">
-  <table id="customer_table">
-    <tr>
-      <th>Customer</th>
-      <td>
-        <%= autocomplete_field_tag 'customer_name', '', autocomplete_customer_tag_name_calendar_index_path, placeholder: 'Search Customer', id: 'customer_search',size: 15 %>
-      </td>
-    </tr>
-      <% customers = Customer.filter_by_ids(customer_list)
-      customers.reject{|x| x.id==0}.each do|customer| %>
-    <tr id="tr_customer_<%=customer.id%>">
-      <td colspan="2"><%= text_field_tag 'customer '+customer.id.to_s, customer.actual_name, readonly: true %>
-        <i class="glyphicon glyphicon-remove remove" title="remove"></i>
-      </td>
-    </tr>
-    <%end
-        leads = CustomerLead.filter_by_ids(lead_list)
-    leads.each do|lead| %>
-    <tr id="tr_lead_<%=lead.id%>">
-      <td colspan="2"><%= text_field_tag 'lead '+lead.id.to_s, lead.actual_name + ', (Lead)', readonly: true %>
-        <i class="glyphicon glyphicon-remove remove" title="remove"></i>
-      </td>
-    </tr>
-    <% end %>
-  </table>
-  <div class="selected_customer" style="display: none;"></div>
+
+<div class="row">
+    <div class="col-6">
+        <table id="customer_table" class="table table-stripe table-responsive-md">
+            <tr>
+                <th>
+                    <span class='col-form-label'>Customer</span>
+                </th>
+                <td>
+                    <%= autocomplete_field_tag 'customer_name', '', 
+                        autocomplete_customer_tag_name_calendar_index_path, 
+                        placeholder: 'Search Customer', id: 'customer_search',
+                        class: "form-control form-control-sm" %>
+                </td>
+            </tr>
+            
+            <% customers = Customer.filter_by_ids(customer_list)
+            customers.reject{|x| x.id==0}.each do|customer| %>
+                <tr id="tr_customer_<%=customer.id%>">
+                    <td></td>
+                    <td>
+                        <div class="input-group">
+                            <%= text_field_tag 'customer '+customer.id.to_s, customer.actual_name, 
+                                readonly: true, class: "form-control form-control-sm" %>
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="basic-addon1">
+                                    <i class="far fa-trash-alt" title="remove"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            <% end %>
+        
+            <% leads = CustomerLead.filter_by_ids(lead_list) %>
+            <% leads.each do|lead| %>
+                <tr id="tr_lead_<%=lead.id%>">
+                    <td></td>
+                    <td>
+                        <%= text_field_tag 'lead '+lead.id.to_s, lead.actual_name + ', (Lead)', readonly: true %>
+                        <i class="far fa-trash-alt" title="remove"></i>
+                    </td>
+                </tr>
+            <% end %>
+        </table>
+        <div class="selected_customer" style="display: none;"></div>
+    </div>
+
+    <div class="col-6">
+        <table id="contact_table" class="table table-stripe table-responsive-md">
+            <tr>
+                <th>
+                    <span class='col-form-label'>Contact</span>
+                </th>
+                <td>
+                    <%= autocomplete_field_tag 'contact_name', '', 
+                        autocomplete_contact_name_activity_index_path, 
+                        placeholder: 'Search contact', id: 'contact_search',
+                        class: "form-control form-control-sm" %>
+                </td>
+                <td></td>
+            </tr>
+            <% unless relations.nil? %>
+                <% CustContact.filter_by_contacts(relations.pluck('contact_id')).each do |contact_role|%>
+                    <% contact = contact_role.contact %>
+                    <tr id="tr_contact_<%= contact.id %>" class="tr_customer_<%= contact_role.customer_id %>">
+                        <td></td>
+                        <td>
+                            <div class="input-group">
+                                <input type="text" name="contact <%= contact.id %>" id="contact_<%= contact.id %>" 
+                                    value="<%= contact.name%>" readonly="readonly" class="form-control form-control-sm" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="basic-addon2">
+                                        <i class="far fa-trash-alt" title="remove"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <%= contact_role.customer.actual_name + "|" + contact_role.position %>
+                        </td>
+                    </tr>
+                <% end %>
+            <% end %>
+        </table>
+    </div>
 </div>
 
-<div class="col-md-4">
-  <table id="contact_table">
-    <tr>
-      <th>Contact</th>
-      <td>
-        <%= autocomplete_field_tag 'contact_name', '', autocomplete_contact_name_activity_index_path, placeholder: 'Search contact', id: 'contact_search',size: 15 %>
-      </td>
-    </tr>
-    <% unless relations.nil? %>
-      <% CustContact.filter_by_contacts(relations.pluck('contact_id')).each do |contact_role|%>
-        <% contact = contact_role.contact %>
-        <tr id="tr_contact_<%= contact.id %>" class="tr_customer_<%= contact_role.customer_id %>">
-          <td colspan="2"><input type="text" name="contact <%= contact.id %>" id="contact_<%= contact.id %>" value="<%= contact.name%>" readonly="readonly"><i class="glyphicon glyphicon-remove remove" title="remove"></i></td>
-          <td><%= contact_role.customer.actual_name + "|" + contact_role.position %></td>
-        </tr>
-      <% end %>
-    <% end %>
-  </table>
-</div>
 
 <script>
 
-var contact_table = $('#contact_table');
+    var contact_table = $('#contact_table');
 
-  $('#customer_search').bind('railsAutocomplete.select', function (event, data) {
-    if ($('#tr_' + data.item.role.toLowerCase() + '_' + data.item.customer_id).length == 0) {
-      $('#customer_table').append([
-        '<tr id="tr_' + data.item.role.toLowerCase() + '_' + data.item.customer_id + '">',
-        '<td colspan="2"><input type="text" name="' + data.item.role.toLowerCase() + ' ' + data.item.customer_id + '" id="' + data.item.role.toLowerCase() + '_' + data.item.customer_id + '" value="' + data.item.name + '" readonly="readonly"><i class="glyphicon glyphicon-remove remove" title="remove"></i></td>',
-        '</tr>'
-      ].join(''));
-      $('.remove').click(function () {
-        if (data.item.role == "Customer") {
-          $('.tr_customer_' + data.item.customer_id).remove();
+    $('#customer_search').bind('railsAutocomplete.select', function (event, data) {
+        if ($('#tr_' + data.item.role.toLowerCase() + '_' + data.item.customer_id).length == 0) {
+            $('#customer_table').append([
+                '<tr id="tr_' + data.item.role.toLowerCase() + '_' + data.item.customer_id + '">',
+                    '<td></td>' + 
+                    '<td>' +
+                        '<div class="input-group">' + 
+                            '<input type="text" name="' + data.item.role.toLowerCase() + 
+                                ' ' + data.item.customer_id + '" id="' + 
+                                data.item.role.toLowerCase() + '_' + 
+                                data.item.customer_id + '" value="' + 
+                                data.item.name + '" readonly="true"' +
+                                'class: "form-control form-control-sm">' + 
+                            '<div class="input-group-append">' +
+                                '<span class="input-group-text" id="basic-addon1">' +
+                                '<i class="far fa-trash-alt" title="remove"></i>' + 
+                                '</span>' +
+                            '</div>' +
+                        '</div>' +
+                    '</td>', 
+                '</tr>'
+            ].join(''));
+              
+            $('.remove').click(function () {
+                if (data.item.role == "Customer") {
+                  $('.tr_customer_' + data.item.customer_id).remove();
+                }
+                $(this).parent().parent().remove();
+            });
+            
+            if (data.item.role == "Customer"){
+                $('.selected_customer').attr('customer_id', data.item.customer_id);
+                $('.selected_customer').change();
+            }
         }
-        $(this).parent().parent().remove();
+    });
+
+    $('#contact_search').bind('railsAutocomplete.select', function (event, data) {
+        if ($('#tr_contact_' + data.item.id).length == 0) {
+            contact_table.append([
+                '<tr id="tr_contact_' + data.item.id + '">',
+                    '<td><input type="checkbox" name="selected_contact[]" value= ' + 
+                    data.item.id +'></td>', '<td><input type="text" name="contact ' + 
+                    data.item.id + '" id="contact_' + data.item.id + '" value="' + 
+                    data.item.label.split("|")[0] +'" readonly="readonly"></td>',
+                    '<td>'+ data.item.label.split("|")[1] +'</td>',
+                '</tr>'
+            ].join(''));
+        }
       });
-      if (data.item.role == "Customer"){
-        $('.selected_customer').attr('customer_id', data.item.customer_id);
-        $('.selected_customer').change();
-      }
-    }
-  });
 
-  $('#contact_search').bind('railsAutocomplete.select', function (event, data) {
-    if ($('#tr_contact_' + data.item.id).length == 0) {
-      contact_table.append([
-        '<tr id="tr_contact_' + data.item.id + '">',
-          '<td><input type="checkbox" name="selected_contact[]" value= '+ data.item.id +'></td>',
-          '<td><input type="text" name="contact '+ data.item.id +'" id="contact_'+ data.item.id +'" value="'+ data.item.label.split("|")[0] +'" readonly="readonly"></td>',
-          '<td>'+ data.item.label.split("|")[1] +'</td>',
-        '</tr>'
-      ].join(''));
-    }
-  });
-
-  $('.remove').click(function () {
-    $(this).parent().parent().remove();
-  });
+    $('.remove').click(function () {
+        $(this).parent().parent().remove();
+    });
 </script>
