@@ -1,49 +1,49 @@
+<!-- edited by vchar on 20180816 -->
 
-<div class="row" style="margin-top: -50px;">
-  <%= render 'activity_partials/customer_search', activity: activity%>
-</div>
+<%= render 'activity_partials/customer_search', activity: activity%>
+
 <%= render 'activity_partials/note_table', f: f, activity: activity%>
 
 <%= render 'activity_partials/wine_note', activity: activity %>
 
 <div class="row">
-  <div class="col-md-4 col-md-offset-4 complete_form">
-    <%= button_tag(type: 'submit', class: 'btn btn-primary') do %>
-      <div> Edit </div>
-    <% end %>
-  </div>
-  <div class="col-md-4 col-md-offset-4 incomplete_form">
-    <p style="color: red" class="activity_reminder">Please Select Subject / Customer / Staff</p>
-    <button type="button" class="btn btn-secondary disabled" disabled>
-      <div>Save</div>
-    </button>
-  </div>
+    <div class="col-md-4 col-md-offset-4 complete_form">
+        <%= button_tag(type: 'submit', class: 'btn btn-primary') do %>
+            <div> Edit </div>
+        <% end %>
+    </div>
+    <div class="col-md-4 col-md-offset-4 incomplete_form">
+        <p style="color: red" class="activity_reminder">Please Select Subject / Customer / Staff</p>
+        <button type="button" class="btn btn-secondary disabled" disabled>
+            <div>Save</div>
+        </button>
+    </div>
 </div>
 <div class="row">
-  <%= render 'activity_partials/invoice_table'%>
+    <%= render 'activity_partials/invoice_table'%>
 </div>
 
 
 <script>
-var CompleteForm = function(){
-  if ((($('input[id*=customer ]').length > 1) || ($('tr[id*=tr_lead ]').length > 0)) && ($('textarea[id=task_description]').val() != "") && ($('#task_subject_1 option:selected').val()!="")){
-    $('.complete_form').show();
-    $('.incomplete_form').hide();
-  }else{
-    $('.complete_form').hide();
-    $('.incomplete_form').show();
-  };
-};
-CompleteForm();
+    var CompleteForm = function(){
+        if ((($('input[id*=customer ]').length > 1) || ($('tr[id*=tr_lead ]').length > 0)) && ($('textarea[id=task_description]').val() != "") && ($('#task_subject_1 option:selected').val()!="")){
+            $('.complete_form').show();
+            $('.incomplete_form').hide();
+        }else{
+            $('.complete_form').hide();
+            $('.incomplete_form').show();
+        };
+    };
+    CompleteForm();
 
-$(document).on('click', '.activity-customers, .remove_customer', function(){
-  CompleteForm();
-});
+    $(document).on('click', '.activity-customers, .remove_customer', function(){
+        CompleteForm();
+    });
 
-$(document).on('change', '#task_subject_1', function(){
-  CompleteForm();
-});
-$(document).on('input', '#task_description', function(){
-  CompleteForm();
-});
+    $(document).on('change', '#task_subject_1', function(){
+        CompleteForm();
+    });
+    $(document).on('input', '#task_description', function(){
+        CompleteForm();
+    });
 </script>
