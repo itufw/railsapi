@@ -1,4 +1,5 @@
 <!-- edited by vchar on 20180816 -->
+<!-- edited by vchar on 20180817 -->
 
 <% relations = (activity.nil?) ? nil : activity.task_relations %>
 <% customer_list = [@customer_id.to_i]  %>
@@ -11,7 +12,7 @@
         <table id="customer_table" class="table table-stripe table-responsive-md">
             <tr>
                 <th>
-                    <span class='col-form-label'>Customer</span>
+                    <span class='col-form-label'>Customers</span>
                 </th>
                 <td>
                     <%= autocomplete_field_tag 'customer_name', '', 
@@ -21,6 +22,7 @@
                 </td>
             </tr>
             
+            <!-- BEGIN: Load customers of the note -->
             <% customers = Customer.filter_by_ids(customer_list)
             customers.reject{|x| x.id==0}.each do|customer| %>
                 <tr id="tr_customer_<%=customer.id%>">
@@ -38,17 +40,27 @@
                     </td>
                 </tr>
             <% end %>
+            <!-- END: Load customers of the note -->
         
+            <!-- BEGIN: Load leads of the note -->
             <% leads = CustomerLead.filter_by_ids(lead_list) %>
             <% leads.each do|lead| %>
                 <tr id="tr_lead_<%=lead.id%>">
                     <td></td>
                     <td>
-                        <%= text_field_tag 'lead '+lead.id.to_s, lead.actual_name + ', (Lead)', readonly: true %>
-                        <i class="far fa-trash-alt" title="remove"></i>
+                        <div class="input-group">
+                            <%= text_field_tag 'lead '+lead.id.to_s, lead.actual_name + ', (Lead)', 
+                                readonly: true, class: "form-control form-control-sm" %>
+                            <div class="input-group-append">
+                                <span class="input-group-text">
+                                    <i class="far fa-trash-alt" title="remove"></i>
+                                </span>
+                            </div>
+                        </div>
                     </td>
                 </tr>
             <% end %>
+            <!-- END: Load leads of the note -->
         </table>
         <div class="selected_customer" style="display: none;"></div>
     </div>
@@ -57,7 +69,7 @@
         <table id="contact_table" class="table table-stripe table-responsive-md">
             <tr>
                 <th>
-                    <span class='col-form-label'>Contact</span>
+                    <span class='col-form-label'>Contacts</span>
                 </th>
                 <td>
                     <%= autocomplete_field_tag 'contact_name', '', 
@@ -96,8 +108,9 @@
 
 <script>
 
-    var contact_table = $('#contact_table');
+    // var contact_table = ;
 
+    // BEGIN: Adding customers from autocomplete box
     $('#customer_search').bind('railsAutocomplete.select', function (event, data) {
         if ($('#tr_' + data.item.role.toLowerCase() + '_' + data.item.customer_id).length == 0) {
             $('#customer_table').append([
@@ -110,10 +123,10 @@
                                 data.item.role.toLowerCase() + '_' + 
                                 data.item.customer_id + '" value="' + 
                                 data.item.name + '" readonly="true"' +
-                                'class: "form-control form-control-sm">' + 
+                                'class= "form-control form-control-sm">' + 
                             '<div class="input-group-append">' +
-                                '<span class="input-group-text" id="basic-addon1">' +
-                                '<i class="far fa-trash-alt" title="remove"></i>' + 
+                                '<span class="input-group-text">' +
+                                    '<i class="far fa-trash-alt" title="remove"></i>' + 
                                 '</span>' +
                             '</div>' +
                         '</div>' +
@@ -121,11 +134,11 @@
                 '</tr>'
             ].join(''));
               
-            $('.remove').click(function () {
+            $('.fa-trash-alt').click(function () {
                 if (data.item.role == "Customer") {
                   $('.tr_customer_' + data.item.customer_id).remove();
                 }
-                $(this).parent().parent().remove();
+                $(this).parent().parent().parent().parent().parent().remove();
             });
             
             if (data.item.role == "Customer"){
@@ -134,22 +147,39 @@
             }
         }
     });
+    // END: Adding customers from autocomplete box
 
+    // BEGIN: Adding contacts from autocomplete box
     $('#contact_search').bind('railsAutocomplete.select', function (event, data) {
         if ($('#tr_contact_' + data.item.id).length == 0) {
-            contact_table.append([
+            $('#contact_table').append([
                 '<tr id="tr_contact_' + data.item.id + '">',
-                    '<td><input type="checkbox" name="selected_contact[]" value= ' + 
-                    data.item.id +'></td>', '<td><input type="text" name="contact ' + 
-                    data.item.id + '" id="contact_' + data.item.id + '" value="' + 
-                    data.item.label.split("|")[0] +'" readonly="readonly"></td>',
+                    '<td>' +
+                        '<input type="checkbox" name="selected_contact[]" ' +
+                            'value= ' + data.item.id +'>' + 
+                    '</td>', 
+                    '<td>' + 
+                        '<div class="input-group">' +
+                            '<input type="text" name="contact ' + data.item.id + 
+                                '" id="contact_' + data.item.id + '" value="' + 
+                                data.item.label.split("|")[0] +'" readonly="readonly" ' + 
+                                'class="form-control form-control-sm" >' +
+                            '<div class="input-group-append">' +
+                                '<span class="input-group-text">' +
+                                    '<i class="far fa-trash-alt" title="remove"></i>' +
+                                '</span>' +
+                            '</div>' +
+                        '</div>' +
+                    '</td>',
                     '<td>'+ data.item.label.split("|")[1] +'</td>',
                 '</tr>'
             ].join(''));
+
+            $('.fa-trash-alt').click(function () {
+                $(this).parent().parent().parent().parent().parent().remove();
+            });
         }
       });
+    // END: Adding contacts from autocomplete box
 
-    $('.remove').click(function () {
-        $(this).parent().parent().remove();
-    });
 </script>
