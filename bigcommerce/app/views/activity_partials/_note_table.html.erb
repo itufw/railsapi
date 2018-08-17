@@ -1,66 +1,130 @@
-<div class="row">
-  <%
-    if activity.nil?
-      selected_function = default_function_type(session[:authority])
-      selected_subject = 0
-      selected_method = 'meeting'
-      selected_promotion = 0
-      selected_portfolio = 0
-    else
-      selected_function = activity.function
-      selected_subject = activity.subject_1
-      selected_method = activity.method
-      selected_promotion = activity.promotion_id
-      selected_portfolio = activity.portfolio_id
-    end
-  %>
-  <div class="col-xs-2 col-md-offset-1">
-    <%= label(:subject_1, "Subject:")%>
-    <%= f.collection_select :subject_1, @subjects, :id, :subject, {:prompt => "Select a Subject"}, {class: "subject_selection", style: 'width: 80px'} %>
-  </div>
-  <div class="col-xs-2">
-    <%= label(:function, "Function:")%>
-    <%= f.collection_select :function, @function, :function, :function, {:include_blank => "Select a Function"}, {class:"function_selection", style: 'width: 80px'} %>
-  </div>
-  <div class="col-xs-2">
-    <%= label(:method, "Method:")%>
-    <%= f.collection_select :method, TaskMethod.all, :method, :method, {:include_blank => "Select a Method"}, style: 'width: 80px' %>
-  </div>
-  <div class="col-xs-2">
-    <%= label(:promotion, "Promotion:")%>
-    <%= f.collection_select :promotion_id, Promotion.all, :id, :name, {:include_blank => "Select a Campaign"}, style: 'width: 80px' %>
-  </div>
-  <div class="col-xs-2">
-    <%= label(:portfolio, "Portfolio:")%>
-    <%= f.collection_select :portfolio_id, Portfolio.all, :id, :name, {:include_blank => "Select a Portfolio"}, style: 'width: 80px' %>
-  </div>
-</div>
+<!-- edited by vchar on 20180817 -->
 
 <div class="row">
-  <div class="col-md-6 col-md-offset-1">
-    <%= label(:note, "Note:")%>
-    <br/>
-    <%= f.text_area :description, :rows=>10, :cols=>60	%>
-  </div>
-  <div class="col-md-3">
-    <%= label(:end_date, "Date")%>
-    <div class='input-group date' id='due_timepicker'>
-      <%= f.text_field :start_date, placeholder: 'Timepicker', class: 'form-control' %>
-      <span class="input-group-addon">
-        <span class="glyphicon glyphicon-calendar"></span>
-      </span>
+    <div class="col-md-6 mb-3">
+        <%
+            if activity.nil?
+                  selected_function = default_function_type(session[:authority])
+                  selected_subject = 0
+                  selected_method = 'meeting'
+                  selected_promotion = 0
+                  selected_portfolio = 0
+            else
+                  selected_function = activity.function
+                  selected_subject = activity.subject_1
+                  selected_method = activity.method
+                  selected_promotion = activity.promotion_id
+                  selected_portfolio = activity.portfolio_id
+            end
+        %>
+
+        <div class="row">
+            <div class="col-lg-6 col-sm-6 mb-2">
+                <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">
+                            Subject
+                        </span>
+                    </div>
+                    <%= f.collection_select :subject_1, @subjects, :id, :subject, 
+                        {:prompt => "Select a Subject"}, {class: "subject_selection form-control"} %>
+                </div>
+            </div>
+            <div class="col-lg-6 col-sm-6 mb-2">
+                <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">
+                            Function
+                        </span>
+                    </div>
+                    <%= f.collection_select :function, @function, :function, :function, 
+                        {:include_blank => "Select a Function"}, {class: "function_selection form-control"} %>
+                </div>
+            </div>
+            <div class="col-lg-6 col-sm-6 mb-2">
+                <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">
+                            Method
+                        </span>
+                    </div>
+                    <%= f.collection_select :method, TaskMethod.all, :method, :method, 
+                        {:include_blank => "Select a Method"}, {class: "form-control"} %>
+                </div>
+            </div>
+            <div class="col-lg-6 col-sm-6 mb-2">
+                <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">
+                            Promotion
+                        </span>
+                    </div>
+                    <%= f.collection_select :promotion_id, Promotion.all, :id, :name, 
+                        {:include_blank => "Select a Campaign"}, {class: "form-control"} %>
+                </div>
+            </div>
+            <div class="col-lg-6 col-sm-6 mb-2">
+                <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">
+                            Portfolio
+                        </span>
+                    </div>
+                    <%= f.collection_select :portfolio_id, Portfolio.all, :id, :name, 
+                        {:include_blank => "Select a Portfolio"}, {class: "form-control"} %>
+                </div>
+            </div>
+
+            <!-- BEGIN: datepicker -->
+            <div class="col-lg-6 col-sm-6 mb-2">
+                <div class="input-group input-group-sm date" id='due_timepicker'>
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">
+                            Date
+                        </span>
+                    </div>
+                    <%= f.text_field :start_date, placeholder: 'Timepicker', class: 'form-control' %>
+                    <div class="input-group-append">
+                        <span class="input-group-addon input-group-text">
+                            <i class="far fa-calendar-alt"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <!-- END: datepicker -->
+        </div>
     </div>
-  </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="row">
+            <div class="col">
+                <%= f.text_area :description, placeholder: 'note', rows: 3, class: 'form-control text-monospace',
+                style: 'padding-top:10px; padding-bottom:25px; min-height:100%; width:100%; display:block' %>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-$(function () {
-    $('#due_timepicker').datetimepicker({
-      format: 'YYYY-MM-DD',
-      defaultDate: new Date(),
-      sideBySide: true
-    });
-});
+    // BEGIN: datepicker script
+    $(function () {
+        $('#due_timepicker').datetimepicker({
+            format: 'YYYY-MM-DD',
+            defaultDate: new Date(),
+            sideBySide: true
+        });  
 
+        // Dynamically expand textarea's height
+        function expand_height(control_id) {
+            document.getElementById(control_id).addEventListener('keyup', function() {
+                this.style.overflow = 'hidden';
+                this.style.height = 0;
+                this.style.height = this.scrollHeight + 'px';
+            }, false);
+        }
+
+        expand_height('task_description'); 
+    });
+    // END: datepicker script
 
 </script>
