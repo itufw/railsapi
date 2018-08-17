@@ -257,4 +257,11 @@ module ApplicationHelper
       return 12
     end
   end
+
+  # add by vchar
+
+  # trim a string into a certain length
+  def trim str, length
+    str.length >= length ? str[0..length-3] + "..." : str
+  end
 end
