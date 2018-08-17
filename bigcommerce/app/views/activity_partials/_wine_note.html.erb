@@ -1,175 +1,317 @@
-<div class="row">
-  <div class="col-md-2 col-md-offset-1">
-    <%= label(:wine, "Wine:")%>
-    <%= autocomplete_field_tag 'product', '', autocomplete_product_name_activity_index_path, placeholder: 'Search Product', id_element: '#product_id', id: 'product_search'%>
-  </div>
-  <div class="col-md-4">
-    <button type="button" class="btn btn-default" id="sample-20">Last 20 Samples</button>
-    <button type="button" class="btn btn-default load-samples">Load Samples</button>
-    <button type="button" class="btn btn-default save-as-sample">Save as Samples</button>
-  </div>
+<!-- edited by vchar on 20180817 -->
+
+<div class="row mb-3">
+    <div class="col">
+        <div class="input-group input-group-sm">
+            <div class="input-group-prepend">
+                <span class="input-group-text">
+                    Wine
+                </span>
+            </div>
+            <%= autocomplete_field_tag 'product', '', autocomplete_product_name_activity_index_path, 
+                placeholder: 'Search Product', id_element: '#product_id', id: 'product_search',
+                class: 'form-control' %>
+        </div>
+    </div>
+    <div class="col">
+        <div class="row px-3">
+            <button type="button" class="btn btn-default btn-sm col" id="sample-20">Last 20 Samples</button>
+            <button type="button" class="btn btn-default btn-sm load-samples col">Load Samples</button>
+            <button type="button" class="btn btn-default btn-sm save-as-sample col">Save as Samples</button>
+        </div>
+    </div>
 </div>
 
 <div class="row wine-list">
-  <% find_sample_products(session[:user_id]).each do |product|%>
-    <div class='col-xs-4 wine-list-product' id='<%= product.id%>'>
-      <a><%= product.name%></a>
-    </div>
-  <% end %>
+    <% find_sample_products(session[:user_id]).each do |product|%>
+        <div class='col-lg-4 col-sm-6 wine-list-product' id='<%= product.id%>'>
+            <a class="text-monospace"><small><%= trim(product.name, 36) %></small></a>
+        </div>
+    <% end %>
 </div>
 
 <div class="row">
-  <div class="col-md-10 col-md-offset-1">
-    <table class="table table-striped table-bordered table-hover table-responsive" style="margin-top: 0px;" id="product_table">
-      <tr style="width: 90%; padding: 5px" class="info">
-        <th>Product #</th>
-        <th>Wine</th>
-        <th>Price(LUC)</th>
-        <th>Discount</th>
-        <th>Price</th>
-        <th>Notes</th>
-        <th>Buy</th>
-        <th>Rating</th>
-        <th>Tasted</th>
-      </tr>
-      <% unless activity.nil?
-          begin
-            activity.product_notes.each do |p_note|
-      %>
-        <tr id="tr_<%=p_note.product_id%>">
-          <td><%= p_note.product_id%></td>
-          <td><%= text_field_tag 'product_name '+p_note.product_id.to_s, p_note.product_name, readonly:true %></td>
-          <td class="num"><%= text_field_tag 'price_luc '+p_note.product_id.to_s, "%.2f" %(p_note.price_luc), readonly: true%></td>
-          <td><%= text_field_tag 'discount '+p_note.product_id.to_s, 100 - (p_note.price * 100 / p_note.price_luc).to_i, placeholder: 'Discount', size: 3 %> %</td>
-          <td><%= text_field_tag 'price '+p_note.product_id.to_s,"%.2f" %(p_note.price), placeholder: 'Price', size: 5%></td>
-          <td><%= text_field_tag 'note '+p_note.product_id.to_s, p_note.note%></td>
-          <td><%= check_box_tag 'buy_wine[]', p_note.product_id.to_s, (p_note.intention == 1 ? true : false)%> </td>
-          <td>
-              <%= number_field_tag(:rating, nil, {min: 1, max:5, step:1, id: 'rate_'+p_note.product_id.to_s}) %>
-              <%=rateit(type:"span", backingfld: '#rate_'+p_note.product_id.to_s, max:5, min:1, step:1, resetable:'false')%>
-          </td>
-          <td><%= check_box_tag 'tasted[]', p_note.product_id.to_s, (p_note.tasted == 1 ? true : false)%></td>
-          <td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>
-        </tr>
-      <%
-            end
-          rescue
-          end
-      %>
-      <% end %>
-    </table>
-  </div>
+    <div class="col">
+        <table class="table table-striped table-bordered table-hover table-responsive w-100 d-block d-table table-sm mt-3" id="product_table">
+            <tr class="info">
+                <th>#</th>
+                <th>Wine</th>
+                <th>LUC</th>
+                <th>Discount</th>
+                <th>Price</th>
+                <th>Notes</th>
+                <th>Buy</th>
+                <th width="93px">Rating</th>
+                <th>Tasted</th>
+            </tr>
+            <!-- BEGIN: load existing data into the table -->
+            <% unless activity.nil? %>
+                <% begin %>
+                    <% activity.product_notes.each do |p_note|  %>
+                        <tr id="tr_<%=p_note.product_id%>">
+                            <td>
+                                <span class="form-control form-control-sm" readonly=true>
+                                    <%= p_note.product_id%>
+                                </span>
+                            </td>
+                            <td>
+                                <%= text_field_tag 'product_name ' + p_note.product_id.to_s, 
+                                    p_note.product_name, readonly:true, 
+                                    class: 'form-control form-control-sm' %>
+                            </td>
+                            <td class="num">
+                                <%= text_field_tag 'price_luc ' + p_note.product_id.to_s, 
+                                    "%.2f" %(p_note.price_luc), readonly: true, 
+                                    class: 'form-control form-control-sm' %>
+                            </td>
+                            <td>
+                                <div class="input-group input-group-sm">
+                                    <%= text_field_tag 'discount ' + p_note.product_id.to_s, 
+                                        100 - (p_note.price * 100 / p_note.price_luc).to_i, 
+                                        placeholder: 'Discount', class: 'form-control' %>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <%= text_field_tag 'price ' + p_note.product_id.to_s,
+                                    "%.2f" %(p_note.price), placeholder: 'Price', 
+                                    class: 'form-control form-control-sm' %>
+                            </td>
+                            <td>
+                                <%= text_field_tag 'note '+p_note.product_id.to_s, 
+                                    p_note.note, class: 'form-control form-control-sm' %>
+                            </td>
+                            <td>
+                                <%= check_box_tag 'buy_wine[]', p_note.product_id.to_s, 
+                                    (p_note.intention == 1 ? true : false), 
+                                    class: 'form-control form-control-sm' %>
+                            </td>
+                            <td>
+                                <%= number_field_tag(:rating, nil, {min: 0, max:5, 
+                                    step:1, id: 'rate_' + p_note.product_id.to_s, 
+                                    class: 'form-control form-control-sm'}) %>
+                                <%= rateit(type:"span", backingfld: '#rate_' + 
+                                    p_note.product_id.to_s, max:5, min:0, step:1, 
+                                    resetable:'false') %>
+                            </td>
+                            <td>
+                                <%= check_box_tag 'tasted[]', p_note.product_id.to_s, 
+                                    (p_note.tasted == 1 ? true : false), 
+                                    class: 'form-control form-control-sm' %>
+                            </td>
+                            <td>
+                                <i class="far fa-trash-alt remove_row" title="remove"></i>
+                            </td>
+                        </tr>
+                    <% end %>
+                <% rescue %>
+                <% end %>
+            <% end %>
+            <!-- END: load existing data into the table -->
+        </table>
+    </div>
 </div>
 <div class="row">
-  <div class="col-md-offset-1">
-    <%= label(:creator, "Creator:")%>
-    <%= session[:username] %>
-    <%= label(:create_date, "Create Date") %>
-    <%= Date.today%>
-  </div>
+    <div class="col text-center">
+        <%= label_tag :created_by, :created_by %>
+        <%= session[:username] %>
+        <%= label(:create_date, "Create Date") %>
+        <%= Date.today%>
+    </div>
 </div>
 
 <div class='hidden_samples'></div>
 
 <!-- Auto Complete Product Name -->
 <script type="text/javascript">
-  $('#product_search').bind('railsAutocomplete.select', function(event, data){
-    if($('#tr_' + data.item.id).length == 0){
-      $('#product_table').append([
-        '<tr id="tr_' + data.item.id + '">',
-            '<td>'+ data.item.id +'</td>',
-            '<td><input type="text" name="product_name ' + data.item.id + '" id="product_name_'+ data.item.id +'" value="'+ data.item.label +'" readonly="readonly"></td>',
-            '<td class="num"><input type="text" name="price_luc '+ data.item.id +'" id="price_luc_'+ data.item.id +'" value="'+ data.item.price +'" readonly="readonly"></td>',
-            '<td><input type="text" name="discount '+ data.item.id +'" id="discount_'+ data.item.id +'" value="0" placeholder="Discount" size="3"> %</td>',
-            '<td><input type="text" name="price '+ data.item.id +'" id="price_'+ data.item.id +'" value="'+ data.item.price +'" placeholder="Price" size="5"></td>',
-            '<td><input type="text" name="note '+ data.item.id +'" id="note_'+ data.item.id +'" value=""></td>',
-            '<td><input type="checkbox" name="buy_wine[]" id="buy_wine_'+ data.item.id +'" value="'+ data.item.id +'"></td>',
-            '<td><input type="number" name="rate '+ data.item.id +'" id="rate_'+ data.item.id +'" value="1" min="1" max="5" step="1"><span data-rateit-backingfld="#rate_'+ data.item.id +'" data-rateit-max="5" data-rateit-min="1" data-rateit-step="1" data-rateit-resetable="false" class="rateit"></span></td>',
-            '<td><input type="checkbox" name="tasted[]" id="tasted_'+ data.item.id +'" value="'+ data.item.id +'"></td>',
-            '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
-        '</tr>'
-        ].join(''));
+    // BEGIN: add products to table from the autocomplete list
+    $('#product_search').bind('railsAutocomplete.select', function(event, data){
+        if($('#tr_' + data.item.id).length == 0){
+            $('#product_table').append([
+                '<tr id="tr_' + data.item.id + '">',
+                    '<td>' +
+                        '<span class="form-control form-control-sm" readonly=true>' + 
+                            data.item.id +
+                        '</span>' +
+                    '</td>',
+                    '<td>' + 
+                        '<input type="text" name="product_name ' + data.item.id + 
+                            '" id="product_name_' + data.item.id + '" value="' + 
+                            data.item.label +'" readonly="readonly"' + 
+                            ' class="form-control form-control-sm">' + 
+                    '</td>',
+                    '<td class="num">' + 
+                        '<input type="text" name="price_luc '+ data.item.id +
+                            '" id="price_luc_' + data.item.id + '" value="' + 
+                            data.item.price + '" readonly="readonly"' + 
+                            ' class="form-control form-control-sm">' + 
+                    '</td>',
+                    '<td>' +
+                        '<div class="input-group input-group-sm">' +
+                            '<input type="text" name="discount ' + data.item.id + 
+                                '" id="discount_' + data.item.id + 
+                                '" value="0" placeholder="Discount"' +
+                                ' class="form-control">' + 
+                            '<div class="input-group-prepend">' +
+                                '<span class="input-group-text">%</span>' +
+                            '</div>' +
+                        '</div>' +
+                    '</td>',
+                    '<td>' + 
+                        '<input type="text" name="price ' + data.item.id + 
+                            '" id="price_' + data.item.id + '" value="' + 
+                            data.item.price + '" placeholder="Price"' + 
+                            ' class="form-control form-control-sm">' +
+                    '</td>',
+                    '<td>' + 
+                        '<input type="text" name="note ' + data.item.id +
+                            '" id="note_' + data.item.id + '" value=""' +
+                            ' class="form-control form-control-sm">' + 
+                    '</td>',
+                    '<td>' + 
+                        '<input type="checkbox" name="buy_wine[]" id="buy_wine_' + 
+                            data.item.id + '" value="' + data.item.id + 
+                            '" class="form-control form-control-sm">' + 
+                    '</td>',
+                    '<td>' + 
+                        '<input type="number" name="rate ' + data.item.id + 
+                            '" id="rate_' + data.item.id + '" value="1" min="0"' + 
+                            ' max="5" step="1" class="form-control form-control-sm" />' +
+                        '<span data-rateit-backingfld="#rate_' + data.item.id + 
+                            '" data-rateit-max="5" data-rateit-min="0"' + 
+                            ' data-rateit-step="1" data-rateit-resetable="false"' + 
+                            '></span>' +
+                    '</td>',
+                    '<td>' +
+                        '<input type="checkbox" name="tasted[]" id="tasted_' + 
+                            data.item.id + '" value="' + data.item.id + 
+                            '" class="form-control form-control-sm">' +
+                    '</td>',
+                    '<td>' + 
+                        '<i class="far fa-trash-alt remove_row" title="remove"></i>' +
+                    '</td>',
+                '</tr>'
+            ].join(''));
 
-        $('#price_'+ data.item.id).on('input',function(){
-          var d = $('#price_'+ data.item.id).val();
-          var c = data.item.price;
-          $('#discount_'+ data.item.id).val((100 - (d/c*100)).toFixed(0));
-        });
+            $('#price_' + data.item.id).on('input',function(){
+                var d = $('#price_'+ data.item.id).val();
+                var c = data.item.price;
+                $('#discount_'+ data.item.id).val((100 - (d/c*100)).toFixed(0));
+            });
 
-        $('#discount_'+ data.item.id).on('input',function(){
-          var d = $('#discount_'+ data.item.id).val();
-          var c = data.item.price;
-          $('#price_'+ data.item.id).val(((1-d*0.01)*c).toFixed(2));
-        });
+            $('#discount_'+ data.item.id).on('input',function(){
+                var d = $('#discount_'+ data.item.id).val();
+                var c = data.item.price;
+                $('#price_'+ data.item.id).val(((1-d*0.01)*c).toFixed(2));
+            });
 
-        $('.remove_row').click(function(){
-          $(this).parent().parent().remove();
-        });
-      }
-  });
+            $('.remove_row').click(function(){
+                $(this).parent().parent().remove();
+            });
+        }
+    });
+    // END: add products to table
 </script>
 
 <script>
-  $('.hidden_samples').hide();
-  $('.wine-list-product').hide();
-  $('#sample-20').click(function(){
-    $('.wine-list-product').toggle();
-  });
-
-  $('.remove_row').click(function(){
-    $(this).parent().parent().remove();
-  });
-
-  $('.save-as-sample').click(function(){
-    var sample_array = "";
-    $('#product_table tr[id *= "tr_"]').each(function(){
-      sample_array += this.id.toString();
+    $('.hidden_samples').hide();
+    $('.wine-list-product').hide();
+    $('#sample-20').click(function(){
+        $('.wine-list-product').toggle();
     });
-    $('.hidden_samples').val(sample_array);
-  });
 
-  $('.load-samples').click(function(){
-    <%
-    wet = TaxPercentage.wet_percentage * 0.01
+    $('.remove_row').click(function(){
+        $(this).parent().parent().remove();
+    });
 
-    Product.filter_by_ids(StaffDailySample.staff_samples(session[:user_id]).map(&:product_id).compact.uniq).each do |product|
-      next if product.nil?
-    %>
-    if($('#tr_<%=product.id%>').length == 0){
-      $('#product_table').append([
-        '<tr id="tr_<%=product.id%>">',
-            '<td><%= product.id%></td>',
-            '<td><%= text_field_tag 'product_name '+ product.id.to_s,product.name, readonly:true %></td>',
-            '<td class="num"><%= text_field_tag 'price_luc '+product.id.to_s, "%.2f" %(product.calculated_price * (1 + wet)), readonly: true%></td>',
-            '<td><%= text_field_tag 'discount '+product.id.to_s,  0, placeholder: 'Discount', size: 3 %> %</td>',
-            '<td><%= text_field_tag 'price '+product.id.to_s, "%.2f" %(product.calculated_price * (1 + wet)), placeholder: 'Price', size: 5%></td>',
-            '<td><%= text_field_tag 'note '+product.id.to_s, ''%></td>',
-            '<td><%= check_box_tag 'buy_wine[]', product.id.to_s%> </td>',
-            '<td>',
-              '<%= number_field_tag("rate "+product.id.to_s, 1, {min: 1, max:5, step:1, id: "rate_"+product.id.to_s}) %>',
-              '<%= rateit(type:"span", backingfld: "#rate_"+product.id.to_s, max:5, min:1, step:1, resetable:"false")%>',
-            '</td>',
-            '<td><i class="glyphicon glyphicon-remove remove_row" title="remove"></i></td>',
-        '</tr>'
-        ].join(''));
-
-        $('#price_<%= product.id %>').on('input',function(){
-          var d = $('#price_<%= product.id %>').val();
-          var c = '<%= product.calculated_price * (1 + wet)%>';
-          $('#discount_<%= product.id %>').val((100 - (d/c*100)).toFixed(0));
+    $('.save-as-sample').click(function(){
+        var sample_array = "";
+        $('#product_table tr[id *= "tr_"]').each(function(){
+            sample_array += this.id.toString();
         });
+        $('.hidden_samples').val(sample_array);
+    });
 
-        $('#discount_<%= product.id %>').on('input',function(){
-          var d = $('#discount_<%= product.id %>').val();
-          var c = '<%= product.calculated_price * (1 + wet)%>';
-          $('#price_<%= product.id %>').val(((1-d*0.01)*c).toFixed(2));
-        });
+    // BEGIN: load samples data into the table
+    $('.load-samples').click(function(){
+        <% wet = TaxPercentage.wet_percentage * 0.01 %>
+        <% Product.filter_by_ids(StaffDailySample.staff_samples(session[:user_id])
+            .map(&:product_id).compact.uniq).each do |product|
+            next if product.nil? %>
+
+            if($('#tr_<%=product.id%>').length == 0){
+                $('#product_table').append([
+                    '<tr id="tr_<%=product.id%>">',
+                        '<td>' +
+                            '<span class="form-control form-control-sm" readonly=true>' + 
+                                '<%= product.id%>' +
+                            '</span>' +
+                        '</td>',
+                        '<td><%= text_field_tag 'product_name ' + product.id.to_s,
+                                product.name, readonly:true,
+                                class: "form-control form-control-sm" %>' +
+                        '</td>',
+                        '<td class="num">' +
+                            '<%= text_field_tag 'price_luc ' + product.id.to_s, 
+                                "%.2f" %(product.calculated_price * (1 + wet)), 
+                                readonly: true, class: "form-control form-control-sm" %>' + 
+                        '</td>',
+                        '<td>' +
+                            '<div class="input-group input-group-sm">' +
+                                '<%= text_field_tag 'discount ' + product.id.to_s, 0, 
+                                    placeholder: 'Discount', 
+                                    class: "form-control" %>' +
+                                '<div class="input-group-append"' +
+                                    '<span class="input-group-text">%</span>' +
+                                '</div>'+
+                            '</div>' +
+                        '</td>',
+                        '<td>' +
+                            '<%= text_field_tag 'price ' + product.id.to_s, 
+                                "%.2f" %(product.calculated_price * (1 + wet)), 
+                                placeholder: 'Price', class: "form-control form-control-sm" %>' +
+                        '</td>',
+                        '<td>' + 
+                            '<%= text_field_tag 'note ' + product.id.to_s, '', 
+                                class: "form-control form-control-sm" %>' +
+                        '</td>',
+                        '<td><%= check_box_tag 'buy_wine[]', product.id.to_s, 
+                            class: "form-control form-control-sm"%>' + 
+                        '</td>',
+                        '<td>',
+                            '<%= number_field_tag("rate " + product.id.to_s, 1, 
+                                {min: 1, max:5, step:1, id: "rate_"+product.id.to_s, 
+                                class: "form-control form-control-sm"}) %>',
+                            '<%= rateit(type:"span", backingfld: "#rate_" + 
+                                product.id.to_s, max:5, min:1, step:1, resetable:"false")%>',
+                        '</td>',
+                        '<td><%= check_box_tag 'tasted[]', product.id.to_s,
+                                class: "form-control form-control-sm"%>' + 
+                        '</td>',
+                        '<td><i class="far fa-trash-alt remove_row" title="remove"></i></td>',
+                    '</tr>'
+                ].join(''));
+
+                $('#price_<%= product.id %>').on('input',function(){
+                    var d = $('#price_<%= product.id %>').val();
+                    var c = '<%= product.calculated_price * (1 + wet)%>';
+                    $('#discount_<%= product.id %>').val((100 - (d/c*100)).toFixed(0));
+                });
+
+                $('#discount_<%= product.id %>').on('input',function(){
+                    var d = $('#discount_<%= product.id %>').val();
+                    var c = '<%= product.calculated_price * (1 + wet)%>';
+                    $('#price_<%= product.id %>').val(((1-d*0.01)*c).toFixed(2));
+                });
 
 
-        $('.remove_row').click(function(){
-          $(this).parent().parent().remove();
-        });
-      }
-    <% end %>
-  });
+                $('.remove_row').click(function(){
+                    $(this).parent().parent().remove();
+                });
+            }
+        <% end %>
+    });
+    // END: load samples data into the table
 </script>
