@@ -8,8 +8,8 @@
 <% lead_list = lead_list + relations.uniq.compact.map(&:customer_lead_id) unless relations.nil? %>
 
 <div class="row">
-    <div class="col-6">
-        <table id="customer_table" class="table table-stripe table-responsive-md">
+    <div class="col-md-6">
+        <table id="customer_table" class="table table-stripe table-responsive-sm w-100 d-block d-table">
             <tr>
                 <th>
                     <span class='col-form-label'>Customers</span>
@@ -65,19 +65,18 @@
         <div class="selected_customer" style="display: none;"></div>
     </div>
 
-    <div class="col-6">
-        <table id="contact_table" class="table table-stripe table-responsive-md">
+    <div class="col-md-6">
+        <table id="contact_table" class="table table-stripe table-responsive-md w-100 d-block d-table">
             <tr>
                 <th>
                     <span class='col-form-label'>Contacts</span>
                 </th>
-                <td>
+                <td colspan="2">
                     <%= autocomplete_field_tag 'contact_name', '', 
                         autocomplete_contact_name_activity_index_path, 
                         placeholder: 'Search contact', id: 'contact_search',
                         class: "form-control form-control-sm" %>
                 </td>
-                <td></td>
             </tr>
             <% unless relations.nil? %>
                 <% CustContact.filter_by_contacts(relations.pluck('contact_id')).each do |contact_role|%>
