@@ -1,3 +1,5 @@
+<!-- edited by vchar on 20180821 -->
+
 <%= title "Orders" %>
 
 <div class="row">
@@ -18,18 +20,15 @@
 	 	 		<%= render 'order_partials/order_status_label' if user_full_right(session[:authority]) %>
 		  	</div>
 		  	<div class="card-footer text-muted">
-	 	 		<%= form_tag({:controller => "order", :action => "all"}, {:method => "get"}) do %>
-	 	 			<div class="row">
-						<%= render "partials/order_filter" %>
-						<%= hidden_field_tag :start_date, @start_date %>
-					  	<%= hidden_field_tag :end_date, @end_date %>
-					  	<div class="col-1 p-1">
-					  		<%= submit_tag "Filter", class: 'btn btn-primary' %>
-					  	</div>
-					  	<div class="col-1 p-1">
-					  		<%= link_to "Reset", {controller: "order", action: "all"}, class: "btn btn-primary" %>
-					  	</div>
-					</div>
+	 	 		<%= form_tag({:controller => "order", :action => "all"}, 
+	 	 			{:method => "get", class: "form-inline justify-content-center"}) do %>
+	 	 			
+					<%= render "partials/order_filter" %>
+					<%= hidden_field_tag :start_date, @start_date %>
+				  	<%= hidden_field_tag :end_date, @end_date %>
+			  		<%= submit_tag "filter", class: 'btn btn-primary mr-2' %>
+			  		<%= link_to "reset", {controller: "order", action: "all"}, class: "btn btn-primary" %>
+				
 		 	 	<% end %>		    
 		  	</div>
 		</div>

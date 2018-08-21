@@ -1,12 +1,8 @@
 <!-- edited by vchar on 20180814 -->
+<!-- edited by vchar on 20180821 -->
 
-<div class="col p-1">
-    <%= text_field_tag('order_id_search', @order_id, placeholder: 'Invoice ID or PO', class: 'form-control') %>
-</div>
-<div class="col p-1">
-    <%= text_field_tag('search', @search_text, placeholder: 'Search for Customer Name', class: 'form-control') %>
-</div>
+<%= text_field_tag('order_id_search', @order_id, placeholder: 'Invoice ID or PO', class: 'form-control mr-2') %>
+<%= text_field_tag('search', @search_text, placeholder: 'Search for Customer Name', class: 'form-control mr-2') %>
 <%= render "partials/staff_filter" %>
-<div class="col p-1">
-    <%= collection_select(:status, :id, Status.all, :id, :name, {:include_blank => 'All Statuses'}, {:class => 'form-control'}) %>
-</div>
+<%= collection_select(:status, :id, Status.all, :id, :name, {:include_blank => 'All Statuses'}, {:class => 'form-control mr-2'}) %>
+
