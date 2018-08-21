@@ -11,11 +11,11 @@
 		  	<div class="card-body">
 				<%= form_tag({:action => "sales_dashboard"}, {:method => "get", 
 					:class => "form-inline justify-content-center"}) do %>
-					<%= label_tag :group_by, nil, class: "control-label" %> 
+					<%= label_tag :group_by, nil, class: "control-label mr-2" %> 
 					<%= render "partials/dashboard_filter" %>
-					<%= label_tag :start_date, nil, class: "control-label" %> 
+					<%= label_tag :start_date, nil, class: "control-label mr-2" %> 
 					<%= date_field( "selected_date", "selected_date", 
-						value: @dates_this_week.first, class: "form-control" ) %>
+						value: @dates_this_week.first, class: "form-control mr-2" ) %>
 					<% unless ( (@current_user.user_type.in?(["Sales Executive"])) && 
 						("Yes".eql? @display_all)) %>
 						<%= submit_tag "Change", class: 'btn btn-primary' %>
