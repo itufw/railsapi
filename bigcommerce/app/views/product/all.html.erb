@@ -10,11 +10,11 @@
 		  	</div>
 	 	 	<div class="card-body">
                 <!-- BEGIN: form filter -->
-                <%= form_tag({:action => "all"}, {:method => "get"}) do %>
-                    <div class="row">
-                        <%= render "partials/product_filter" %>
-                    </div>
-
+                <%= form_tag({:action => "all"}, {:method => "get", 
+                    class: "form-inline justify-content-center"}) do %>
+                    
+                    <%= render "partials/product_filter" %>
+                
                     <% if @transform_column=='product_id' %>
                         <center><%= submit_tag 'Incomplete Product', class: 'btn btn-link'%></center>
                     <% end %>
