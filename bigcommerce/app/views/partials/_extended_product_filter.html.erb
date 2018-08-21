@@ -15,9 +15,12 @@
 </div>
 
 <div class="row">
-    <%= render "partials/cust_style_filter" %>
-	<%= render "partials/staff_filter" %>
-
+    <div class="col p-1">
+        <%= render "partials/cust_style_filter" %>
+    </div>
+    <div class="col p-1">
+    	<%= render "partials/staff_filter" %>
+    </div>
 	<div class="col p-1">
         <%= collection_select(:product_sub_type, :id, @product_sub_types, :id, 
             :name, {:include_blank => 'Varietals'}, {:class => 'form-control'}) %>
