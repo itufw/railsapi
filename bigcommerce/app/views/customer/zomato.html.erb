@@ -1,4 +1,6 @@
 <!-- edited by vchar on 20180805 -->
+<!-- edited by vchar on 20180821 -->
+
 <%= title 'Zomato Restaurant List'%>
 <div class="row">
 	<div class="col-12">
@@ -13,26 +15,22 @@
                         class: "btn btn-outline-primary text-info" %>
 				</p>
 		  	</div>
-            <%= form_tag({controller: "customer", action: 'zomato'}, {:method => "get"}) do %>
-    	 	 	<div class="card-body">
-                    <div class="row justify-content-center"">
-                        <%= render "partials/zomato_filter" %>
-                        <div class="col-1 p-1 mr-2">
-                            <%= label(:cuisine_selection, 'Select Cuisine', class: 'btn btn-primary')%>
-                        </div>
-                        <div class="col-1 p-1 ml-3">
-                            <%= submit_tag "Filter", class: 'btn btn-primary' %>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-footer cuisine-list" style="display: none;">
-                    <%= render "customer_partials/cuisines" %>
-                    <div class="row cuisine-list" style="display: none;">
-                        <div class="col-5 p-1">
-                            <%= text_field_tag('suburb', '', placeholder: 'Include Suburb', class: 'form-control') %>
-                        </div>
-                        <div class="col-1 p-1">
-                            <%= submit_tag "Include", class: 'btn btn-primary' %>
+            <div class="card-body">
+                <%= form_tag({controller: "customer", action: 'zomato'}, 
+                    {:method => "get", class: "form-inline justify-content-center"}) do %>
+    	 	 	
+                    <%= render "partials/zomato_filter" %>
+                    <%= label(:cuisine_selection, 'Select Cuisine', class: 'btn btn-primary mr-2')%>
+                    <%= submit_tag "Filter", class: 'btn btn-primary' %>
+                
+                    <div class="card-footer cuisine-list mt-3" style="display: none;">
+                        <%= render "customer_partials/cuisines" %>
+                        <div class="input-group mt-3">
+                            <%= text_field_tag('suburb', '', placeholder: 'Include suburb', 
+                                    class: 'form-control') %>
+                            <div class="input-group-append">
+                                <%= submit_tag "Include", class: 'btn btn-primary' %>
+                            </div>
                         </div>
                     </div>
                 </div>

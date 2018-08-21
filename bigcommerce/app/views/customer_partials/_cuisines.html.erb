@@ -1,34 +1,35 @@
 <!-- created by vchar on 20180805 -->
+<!-- created by vchar on 2018082 -->
+
 <div class="row">
     <% cuisines = ZomatoCuisine.active_cuisines%>
-    <div class="row">
-        <% cuisines.map(&:priority_group).uniq.sort.each do |priority| %>
-            <div class="col-6">
-                <div class="row">
-                    <% cuisines.select{ |x| x.priority_group == priority}.each do |cuisine| %>
-                        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
-                            <div class="form-check">
-                                <%= check_box_tag 'selected_cuisine[]', cuisine.name, 
-                                    (@selected_cuisine.include? cuisine.name), 
-                                    class: "form-check-input priority priority-" + priority.to_s %>
-                                <label class="form-check-label">
-                                    <%= cuisine.name[0..12] %>
-                                </label>
-                            </div>
-                        </div>
-                    <% end %>
+    
+    <% cuisines.map(&:priority_group).uniq.sort.each do |priority| %>
+        <div class="col-6">
+            <div class="row">
+                <% cuisines.select{ |x| x.priority_group == priority}.each do |cuisine| %>
                     <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
-                        <div class="form-check">
-                            <%= check_box_tag :select_all, false, false, class: "form-check-input priority", for: "select_all" %>
+                        <div class="form-check float-left">
+                            <%= check_box_tag 'selected_cuisine[]', cuisine.name, 
+                                (@selected_cuisine.include? cuisine.name), 
+                                class: "form-check-input priority priority-" + priority.to_s %>
                             <label class="form-check-label">
-                                Select All
+                                <%= cuisine.name[0..12] %>
                             </label>
                         </div>
                     </div>
+                <% end %>
+                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+                    <div class="form-check float-left">
+                        <%= check_box_tag :select_all, false, false, class: "form-check-input priority", for: "select_all" %>
+                        <label class="form-check-label">
+                            Select All
+                        </label>
+                    </div>
                 </div>
             </div>
-        <% end %>
-    </div>
+        </div>
+    <% end %>
 </div>
 
 <script type="text/javascript">
