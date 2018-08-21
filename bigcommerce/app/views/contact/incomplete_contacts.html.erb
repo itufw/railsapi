@@ -1,17 +1,35 @@
+<!-- edited by vchar on 20180821 -->
+
 <%= title "Incomplete Contacts" %>
-<h3>Incomplete Contacts</h3>
-<center><%= link_to "Create New Contact", action: 'create_contact' %></center>
-<center><%= link_to "View Completed Contacts", action: 'all_contacts'  %></center>
-
-<%= form_tag({:controller => "contact", :action => 'incomplete_contact'}, {:method => "get"}) do %>
-
-<div class="form-group" style="margin-left:300px;margin-top:50px;">
-  <div class="col-xs-4">
-     <%= text_field_tag('search', @search_text, placeholder: 'Enter Contact Name', class: 'form-control') %>
-  </div>
-  <%= submit_tag "Filter", class: 'btn btn-primary' %>
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header text-center h3 text-secondary">
+                Incomplete Contacts
+                <p class="h5 mt-2">
+                    <%= link_to "Create New Contact", { action: 'create_contact' },
+                        class: "btn btn-outline-primary text-info" %>
+                    <%= link_to "Completed Contacts", { action: 'all_contacts' },
+                        class: "btn btn-outline-primary text-info" %>
+                </p>
+            </div>
+            <div class="card-body">
+                <%= form_tag({:controller => "contact", :action => 'incomplete_contact'}, {:method => "get"}) do %>
+                    <div class="input-group">
+                        <%= text_field_tag('search', @search_text, placeholder: 'Enter Contact Name', class: 'form-control') %>
+                        <div class="input-group-append">
+                            <%= submit_tag "filter", class: 'btn btn-primary' %>
+                        </div>
+                    </div>
+                <% end %>
+            </div>
+        </div>
+    </div>
 </div>
-<%= render 'partials/paginate', objects: @contacts %>
-<%= render "contact_partials/incomplete_contact_list", contacts: @contacts %>
+<div class="row mb-3">
+    <div class="col-12">
+        <%= render 'partials/paginate', objects: @contacts %>
 
-<% end %>
+        <%= render 'contact_partials/incomplete_contact_list', contacts: @contacts %>
+    </div>
+</div>

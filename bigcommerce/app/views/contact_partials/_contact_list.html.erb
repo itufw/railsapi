@@ -1,5 +1,6 @@
 <!-- edited by vchar on 20180805 -->
-<table class = "table table-striped table-bordered table-hover table-responsive w-100 d-block d-table">
+
+<table class = "table table-striped table-bordered table-hover table-responsive w-100 d-block d-table mt-0">
 	<tr>
 		<th>Sales Rep</th>
 		<th>Contact</th>
@@ -11,15 +12,15 @@
 	</tr>
 
 	<% contacts.each do |c| %>
-			<tr>
-				<% customer = c.customer%>
-				<td><%= customer.staff.nickname %></td>
-				<td><%= link_to c.contact.name, controller: 'contact', action: 'summary', contact_id: c.contact.id%></td>
-				<td><%= link_to customer.actual_name, controller: 'customer', action: 'summary', customer_id: customer.id, customer_name: customer.actual_name%></td>
-				<td><%= c.position %></td>
-				<td><%= c.title %></td>
-				<td><%= c.phone %></td>
-				<td><%= c.email %></td>
-			</tr>
+		<tr>
+			<% customer = c.customer%>
+			<td><%= customer.staff.nickname %></td>
+			<td><%= link_to c.contact.name, controller: 'contact', action: 'summary', contact_id: c.contact.id%></td>
+			<td><%= link_to customer.actual_name, controller: 'customer', action: 'summary', customer_id: customer.id, customer_name: customer.actual_name%></td>
+			<td><%= c.position %></td>
+			<td><%= c.title %></td>
+			<td><%= c.phone %></td>
+			<td><%= c.email %></td>
+		</tr>
 	<% end %>
 </table>
