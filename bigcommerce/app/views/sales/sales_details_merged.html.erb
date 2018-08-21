@@ -13,9 +13,7 @@
                         {:method => "get", :class => "form-inline justify-content-center"} ) do %>
                     <%= hidden_field_tag :type , params[:type] %>
                     <%= render "partials/detailed_dashboard_date_filter" %>
-                    <div class="col-sm p-1">
-                        <%= submit_tag :submit, class: 'btn btn-primary' %>
-                    </div>
+                    <%= submit_tag :submit, class: 'btn btn-primary' %>
                 <% end %>
             </div>
         </div>
