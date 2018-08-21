@@ -16,12 +16,11 @@
 				</p>
 		  	</div>
 	 	 	<div class="card-body">
-                <%= form_tag({controller: "customer", action: 'near_by'}, {:method => "get"}) do %>
+                <%= form_tag({controller: "customer", action: 'near_by'}, {:method => "get", 
+                    :class => "form-inline justify-content-center"}) do %>
                     <div class="row">
                         <%= render "partials/zomato_filter" %>
-                        <div class="col-1 p-1">
-                            <%= submit_tag "Filter", class: 'btn btn-primary' %>
-                        </div>
+                        <%= submit_tag "Filter", class: 'btn btn-primary' %>
                     </div>
                 <% end %>
             </div>
