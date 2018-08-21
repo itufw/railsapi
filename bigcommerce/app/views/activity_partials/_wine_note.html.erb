@@ -212,7 +212,7 @@
             });
         }
     });
-    // END: add products to table
+    // END: add products to table from the autocomplete list
 </script>
 
 <script>
@@ -263,7 +263,7 @@
                                 '<%= text_field_tag 'discount ' + product.id.to_s, 0, 
                                     placeholder: 'Discount', 
                                     class: "form-control" %>' +
-                                '<div class="input-group-append"' +
+                                '<div class="input-group-append">' +
                                     '<span class="input-group-text">%</span>' +
                                 '</div>'+
                             '</div>' +
@@ -282,13 +282,13 @@
                         '</td>',
                         '<td>',
                             '<%= number_field_tag("rate " + product.id.to_s, 1, 
-                                {min: 1, max:5, step:1, id: "rate_"+product.id.to_s, 
+                                {min: 0, max:5, step:1, id: "rate_"+product.id.to_s, 
                                 class: "form-control form-control-sm"}) %>',
                             '<%= rateit(type:"span", backingfld: "#rate_" + 
-                                product.id.to_s, max:5, min:1, step:1, resetable:"false")%>',
+                                product.id.to_s, max:5, min:0, step:1, resetable:"false")%>',
                         '</td>',
                         '<td><%= check_box_tag 'tasted[]', product.id.to_s,
-                                class: "form-control form-control-sm"%>' + 
+                                class: "form-control form-control-sm" %>' + 
                         '</td>',
                         '<td><i class="far fa-trash-alt remove_row" title="remove"></i></td>',
                     '</tr>'
@@ -306,6 +306,7 @@
                     $('#price_<%= product.id %>').val(((1-d*0.01)*c).toFixed(2));
                 });
 
+                $('.rateit').removeClass('rateit');
 
                 $('.remove_row').click(function(){
                     $(this).parent().parent().remove();
