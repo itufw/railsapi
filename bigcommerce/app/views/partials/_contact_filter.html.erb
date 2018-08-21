@@ -1,8 +1,9 @@
 <!-- edited by vchar on 20180805 -->
-<div class="col p-1">
-   <%= text_field_tag('search', @search_text, 
-        placeholder: 'Enter Customer Name or Contact Name', 
-        class: 'form-control') %>
-</div> 
+<!-- edited by vchar on 20180821 -->
+
+<%= text_field_tag('search', @search_text, 
+    placeholder: 'Enter Customer Name or Contact Name', 
+    class: 'form-control mr-2') %>
+    
 <%= render "partials/contact_role_filter" %>
 <%= render 'partials/staff_filter' %>

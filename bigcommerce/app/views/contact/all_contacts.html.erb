@@ -16,13 +16,10 @@
 
         <div class="card-body">
             <!-- BEGIN: form filter -->
-            <%= form_tag({:controller => "contact", :action => 'all_contacts'}, {:method => "get"}) do %>
-                <div class="row">
-                    <%= render "partials/contact_filter" %>
-                    <div class="col-1 p-1">
-                        <%= submit_tag "filter", class: 'btn btn-primary' %>
-                    </div>
-                </div>
+            <%= form_tag({:controller => "contact", :action => 'all_contacts'}, 
+                {:method => "get", class: "form-inline justify-content-center"}) do %>
+                <%= render "partials/contact_filter" %>
+                <%= submit_tag "filter", class: 'btn btn-primary' %>
             <% end %>
             <!-- END: form filter -->
         </div>
