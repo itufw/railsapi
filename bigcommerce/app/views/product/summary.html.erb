@@ -12,7 +12,7 @@
 					<%= link_to 'Edit', { controller: 'product', action: 'edit' }, 
 						class: "btn btn-outline-primary text-info",
 						product_id: @product_id if @transform_column == 'product_id' %>
-					<%= link_to "Orders", { controller: 'order', action: 'for_product', 
+					<%= link_to "Orders of the product", { controller: 'order', action: 'for_product', 
 						product_id: @product_id, product_name: @product_name, 
 						transform_column: @transform_column },
 						class: "btn btn-outline-primary text-info" %>
