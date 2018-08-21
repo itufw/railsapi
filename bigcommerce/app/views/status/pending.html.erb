@@ -1,4 +1,5 @@
 <!-- edited by vchar on 20180815 -->
+<!-- edited by vchar on 20180821 -->
 
 <%= title @status_name %>
 
@@ -19,30 +20,22 @@
                 </p>
 		  	</div>
 	 	 	<div class="card-body">
-                <%= form_tag({:controller => "status", :action => "pending"}, {:method => "get"}) do %>
+                <%= form_tag({:controller => "status", :action => "pending"}, 
+                    {:method => "get", class: "form-inline justify-content-center"}) do %>
                     <div class="row">
-                        <div class="col p-1">
-                            <%= render "partials/status_dropdown", path_name: 'pending' %>
-                        </div>
-                        <div class="col p-1">
-                            <%= text_field_tag('search', @search_text, 
-                                placeholder: 'Search for Product or Customer Name', class: 'form-control') %>
-                        </div>
-                        <div class="col p-1">
-                            <%= collection_select(:producer_country, :id, ProducerCountry.all, :id, :name,
-                                {:include_blank => 'All Countries'}, {:class => 'form-control'}) %>
-                        </div>
-                        <div class="col p-1">
-                            <%= collection_select(:product_sub_type, :id, ProductSubType.all, :id, :name, 
-                                {:include_blank => 'All Varietals'}, {:class => 'form-control'}) %>
-                        </div>
+                        
+                        <%= render "partials/status_dropdown", path_name: 'pending' %>
+                        <%= text_field_tag('search', @search_text, 
+                            placeholder: 'Search for Product or Customer Name', class: 'form-control mr-2') %>
+                        <%= collection_select(:producer_country, :id, ProducerCountry.all, :id, :name,
+                            {:include_blank => 'All Countries'}, {:class => 'form-control mr-2'}) %>
+                        <%= collection_select(:product_sub_type, :id, ProductSubType.all, :id, :name, 
+                            {:include_blank => 'All Varietals'}, {:class => 'form-control mr-2'}) %>
                         <%= render "partials/staff_filter" %>
 
                         <%= hidden_field_tag :status_id, @status_id %>
                         <%= hidden_field_tag :status_name, @status_name %>
-                        <div class="col-1 p-1">
-                            <%= submit_tag "Filter", class: 'btn btn-primary' %>
-                        </div>
+                        <%= submit_tag "Filter", class: 'btn btn-primary' %>
                     </div>
                 <% end %>
             </div>

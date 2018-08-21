@@ -1,9 +1,15 @@
-<div class="dropdown">
-  <button class="btn btn-outline-primary form-control dropdown-toggle" type="button" data-toggle="dropdown">Change Status
-  <span class="caret"></span></button>
+<!-- edited by vchar on 20180821 -->
+
+<div class="dropdown mr-2">
+    <button class="btn btn-outline-primary form-control dropdown-toggle" type="button" data-toggle="dropdown">
+        Change Status
+        <span class="caret"></span>
+    </button>
     <ul class="dropdown-menu">
-      <% Status.all.sort.each do |s| %>
-          <li class="dropdown-item"><%= link_to s.name, action: path_name, status_id: s.id, status_name: s.name %></li>
-      <% end %>
+        <% Status.all.sort.each do |s| %>
+            <li class="dropdown-item">
+                <%= link_to s.name, action: path_name, status_id: s.id, status_name: s.name %>
+            </li>
+        <% end %>
     </ul>
 </div>
