@@ -1,3 +1,4 @@
-<br/>
-<%= link_to ("<span class='caret'></span>").html_safe, params.merge(order_col: order, direction: 1) %>
-<%= link_to ("<span class='dropup'><span class='caret'></span></span>").html_safe, params.merge(order_col: order, direction: -1) %>
+<!-- edited by vchar on 20180822 -->
+
+<%= link_to ('<i class="fas fa-caret-up"></i>').html_safe, params.merge(order_col: order, direction: 1) %>
+<%= link_to ('<i class="fas fa-caret-down"></i>').html_safe, params.merge(order_col: order, direction: -1) %>
