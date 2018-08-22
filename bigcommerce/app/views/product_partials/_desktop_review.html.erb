@@ -75,8 +75,8 @@
       <td colspan="5"></td>
       <td style="color: orange;" class="different-now"></td>
       <td colspan="2">Recommend:</td>
-      <td class="rec-retail"><%= (warehouse_count.count_total*0.1).to_i %></td>
-      <td class="rec-ws"><%= warehouse_count.count_total - (warehouse_count.count_total*0.1).to_i %></td>
+      <td class="rec-retail"><%= (warehouse_count.count_total*0.1).to_i unless warehouse_count.count_total.nil? %></td>
+      <td class="rec-ws"><%= warehouse_count.count_total - (warehouse_count.count_total*0.1).to_i unless warehouse_count.count_total.nil? %></td>
       <!-- <td><a class="btn btn-primary optimise">Optimise</a></td> -->
     </tr>
     <% end %>
