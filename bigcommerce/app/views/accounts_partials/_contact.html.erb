@@ -1,114 +1,186 @@
 <!-- edited by vchar on 20180805 -->
+<!-- edited by vchar on 20180822 -->
 
 <%= render "partials/form_paginate", objects: contacts %>
 
-<table class = "table table-striped table-bordered table-hover table-responsive w-100 d-block d-table">
+<table class = "table table-striped table-bordered table-hover table-responsive w-100 d-block d-table mt-0">
 	<tr>
-		<th id="contact_name_head">Name <%= render "partials/sort_arrows", order: 'order_by_name' %></th>
+		<th id="contact_name_head">
+			Name <%= render "partials/sort_arrows", order: 'order_by_name' %>
+		</th>
 		<th>Top Task</th>
 		<th>
-			<li class="dropdown">
+			<div class="dropdown">
 				<a class="" data-toggle="dropdown" href="#">Sales Rep
-					<span class="caret"></span></a>
-					<ul class="dropdown-menu">
-						<% @staff_pair.values.uniq.each do |staff_id, staff_name| %>
-						<li>
-							<% if ((!@selected_staff.nil?)&&(@selected_staff.include? staff_id.to_s)) %>
+					<i class="fas fa-caret-square-down"></i>
+				</a>
+				<ul class="dropdown-menu">
+					<% @staff_pair.values.uniq.each do |staff_id, staff_name| %>
+					<li class="dropdown-item">
+						<% if ((!@selected_staff.nil?)&&(@selected_staff.include? staff_id.to_s)) %>
 							<%= check_box_tag 'selected_staff[]', staff_id, true %>
-							<% else %>
+						<% else %>
 							<%= check_box_tag 'selected_staff[]', staff_id %>
-							<% end %>
-							<%= staff_name %>
-							&nbsp;&nbsp;
-						</li>
 						<% end %>
-					</ul>
-				</li>
+						<%= staff_name %>
+					</li>
+					<% end %>
+				</ul>
+			</div>
+		</th>
+		<th>
+			Outstanding <%= render "partials/sort_arrows", order: 'order_by_outstanding' %>
+		</th>
+		<th>
+			Overdue <%= render "partials/sort_arrows", order: 'order_by_overdue' %>
+		</th>
+		<% @date = [Date.today,Date.strptime("#{@end_date}", '%Y-%m-%d')].min %>
+		<% if ('monthly'.eql? @monthly) && (@date != Date.today) %>
+			<th>
+				<%= check_box_tag 'selected_months[]', "#{
+						(@date - 1.month).to_date.beginning_of_month
+					}|#{@date.to_date.end_of_month}",
+					class: "checkbox" %>
+				<label>
+					<%= @date.strftime("%B") %>
+					<%= render "partials/sort_arrows", 
+						order: "order_by_invoice|#{
+							(@date - 1.month).to_date.beginning_of_month
+					}|#{@date.to_date.end_of_month}" %>
+				</label>
 			</th>
-			<th>Outstanding <%= render "partials/sort_arrows", order: 'order_by_outstanding' %></th>
-			<th>Overdue <%= render "partials/sort_arrows", order: 'order_by_overdue' %></th>
-			<% @date = [Date.today,Date.strptime("#{@end_date}", '%Y-%m-%d')].min %>
-			<% if ('monthly'.eql? @monthly) && (@date != Date.today)%>
-			<th><%= @date.strftime("%B") %><%= render "partials/sort_arrows", order: "order_by_invoice|#{(@date - 1.month).to_date.beginning_of_month}|#{@date.to_date.end_of_month}" %>
-				<br/>
-				<%= check_box_tag 'selected_months[]', "#{(@date - 1.month).to_date.beginning_of_month}|#{@date.to_date.end_of_month}"%>
+		<% elsif %>
+			<th>
+				<%= check_box_tag('selected_months[]', "#{
+						@date.to_date.beginning_of_month
+					}|#{@date.to_date.end_of_month}",  
+					class: "checkbox") %>
+			  	<label>
+			  		Current 
+					<%= render "partials/sort_arrows", order: "order_by_invoice|#{
+							@date.to_date.beginning_of_month
+						}|#{@date.to_date.end_of_month}" %>
+				</label>
 			</th>
-			<% elsif%>
-			<th>Current<%= render "partials/sort_arrows", order: "order_by_invoice|#{@date.to_date.beginning_of_month}|#{@date.to_date.end_of_month}" %>
-				<br/>
-				<%= check_box_tag 'selected_months[]', "#{@date.to_date.beginning_of_month}|#{@date.to_date.end_of_month}" %>
+		<% else %>
+			<th>
+				<%= check_box_tag 'selected_months[]', 
+					"#{(@date - 15.days).to_date}|#{@date.to_date}",
+					class: "checkbox" %>
+				<label>
+					Current 
+					<%= render "partials/sort_arrows", order: "order_by_invoice|#{
+						(@date - 15.days).to_date}|#{@date.to_date}" %>
+				</label>
 			</th>
-			<% else %>
-			<th>Current<%= render "partials/sort_arrows", order: "order_by_invoice|#{(@date - 15.days).to_date}|#{@date.to_date}" %>
-				<br/>
-				<%= check_box_tag 'selected_months[]', "#{(@date - 15.days).to_date}|#{@date.to_date}" %>
-			</th>
-			<% end %>
+		<% end %>
 
-			<% for i in 1..4 %>
+		<% for i in 1..4 %>
 			<% if 'monthly'.eql? @monthly %>
-			<th> <%= (@date - i.month).strftime("%B")%><%= render "partials/sort_arrows", order: "order_by_invoice|#{(@date - i.month).to_date.beginning_of_month}|#{(@date-i.month).to_date.end_of_month}" %>
-				<br/>
-				<%= check_box_tag 'selected_months[]', "#{(@date - i.month).to_date.beginning_of_month}|#{(@date-i.month).to_date.end_of_month}" %>
-			</th>
+				<th>
+					<%= check_box_tag 'selected_months[]', 
+						"#{(@date - i.month).to_date.beginning_of_month}|#{
+							(@date-i.month).to_date.end_of_month}",
+						class: "checkbox" %>
+					<label>
+						<%= (@date - i.month).strftime("%B")%>
+						<%= render "partials/sort_arrows", order: "order_by_invoice|#{
+								(@date - i.month).to_date.beginning_of_month
+							}|#{(@date-i.month).to_date.end_of_month}" %>
+					</label>
+				</th>
 			<% else %>
-			<th><%= @date - (i*15).days %> - <%= @date - ((i+1)*15).days + 1.day %><%= render "partials/sort_arrows", order: "order_by_invoice|#{(@date - ((i+1)*15).days).to_date}|#{(@date - (i*15).days).to_date}" %>
-				<br/>
-				<%= check_box_tag 'selected_months[]', "#{(@date - ((i+1)*15).days).to_date}|#{(@date - (i*15).days).to_date}" %>
-			</th>
+				<th>
+					<%= check_box_tag 'selected_months[]', 
+						"#{(@date - ((i+1)*15).days).to_date}|#{
+						(@date - (i*15).days).to_date}" %>
+					<label>
+						<%= @date - (i*15).days %> - <%= @date - ((i+1)*15).days + 1.day %>
+						<%= render "partials/sort_arrows", order: "order_by_invoice|#{
+							(@date - ((i+1)*15).days).to_date}|#{(@date - (i*15).days).to_date}" %>
+					</label>
+				</th>
 			<% end %>
-			<% end %>
-			<th> Older
-				<br/>
-				<%= ('monthly'.eql? @monthly) ? (check_box_tag 'selected_months[]', "2000-01-01|#{(@date - 4.month).to_date.end_of_month}") : (check_box_tag 'selected_months[]', "2000-01-01|#{(@date - 60.days).to_date}") %>
-			</th>
-		</tr>
+		<% end %>
+		
+		<th> 
+			<%= ('monthly'.eql? @monthly) ? (check_box_tag 'selected_months[]', 
+				"2000-01-01|#{(@date - 4.month).to_date.end_of_month}") : (
+				check_box_tag 'selected_months[]', "2000-01-01|#{(@date - 60.days).to_date}") %>
+			Older
+		</th>
+	</tr>
 
-		<% total_invoices = XeroInvoice.where('status = "AUTHORISED"').has_amount_due.period_select(@end_date)%>
-		<% total_overpayments = XeroOverpayment.credit_above_zero%>
-		<% total_creditnote = XeroCreditNote.credit_above_zero%>
-		<tr>
-			<td>Total</td>
-			<td></td>
-			<td></td>
-			<td class="num"><%= display_num(total_invoices.map(&:amount_due).sum - total_overpayments.map(&:remaining_credit).sum - total_creditnote.map(&:remaining_credit).sum)%></td>
-			<td class="num"><%= display_num(total_invoices.select{|x| x.due_date < @end_date }.map(&:amount_due).sum)%></td>
-			<%= render 'accounts_partials/contact_monthly_due', invoices: total_invoices, overpayments: total_overpayments, credit_notes: total_creditnote%>
-		</tr>
-		<tr>
-			<td colspan="11"></td>
-		</tr>
+	<% total_invoices = XeroInvoice.where('status = "AUTHORISED"')
+		.has_amount_due.period_select(@end_date)%>
+	<% total_overpayments = XeroOverpayment.credit_above_zero%>
+	<% total_creditnote = XeroCreditNote.credit_above_zero%>
 
-		<% contacts.each do |c| %>
+	<tr>
+		<td>Total</td>
+		<td></td>
+		<td></td>
+		<td class="num">
+			<%= display_num(total_invoices.map(&:amount_due).sum - 
+				total_overpayments.map(&:remaining_credit).sum - 
+				total_creditnote.map(&:remaining_credit).sum) %>
+		</td>
+		<td class="num">
+			<%= display_num(total_invoices.select{
+					|x| x.due_date < @end_date 
+				}.map(&:amount_due).sum)%>
+		</td>
+		<%= render 'accounts_partials/contact_monthly_due', 
+			invoices: total_invoices, overpayments: total_overpayments, 
+			credit_notes: total_creditnote %>
+	</tr>
+	<tr>
+		<td colspan="11"></td>
+	</tr>
+
+	<% contacts.each do |c| %>
 		<tr>
 			<td>
-				<%= check_box_tag 'selected_contacts[]', c.skype_user_name, false, class: "contact_name_checkbox" if overdue_customer(c) > 0 %>
-				<%= link_to c.name, controller: 'accounts', action: 'contact_invoices', contact_id: c.xero_contact_id, end_date: @date, monthly: @monthly %>
+				<%= check_box_tag 'selected_contacts[]', c.skype_user_name, 
+					false, class: "contact_name_checkbox" if overdue_customer(c) > 0 %>
+				<%= link_to c.name, controller: 'accounts', action: 'contact_invoices', 
+					contact_id: c.xero_contact_id, end_date: @date, monthly: @monthly %>
 			</td>
-			<% top_task = Task.select("tasks.id, tasks.subject_1, tasks.end_date").customer_tasks(c.skype_user_name).is_task.active_tasks.order(:end_date).first %>
-			<% unless top_task.blank?%>
-			<% task_week = top_task.end_date.strftime("%U")
-			now_week = Time.now.strftime("%U")
-			if task_week == now_week %>
-			<td class="this_week">
-				<%  elsif task_week > now_week %>
-				<td class="next_week">
-					<%  else %>
-					<td class="last_week">
-						<%  end %>
-						<%= TaskSubject.find(top_task.subject_1).subject%>
-						<% else %>
-						<td>
-							<% end %>
-						</td>
-						<td><%= @staff_pair[c.id].last %></td>
-						<td class="num"><%#= (outstanding_customer(c) == 0)? "-" : display_num(outstanding_customer(c))  %></td>
-						<td class="num"><%= (overdue_customer(c) == 0)? "-" : display_num(overdue_customer(c)) %></td>
-						<%= render 'accounts_partials/contact_monthly_due', invoices: c.xero_invoices.has_amount_due.period_select(@end_date), overpayments: c.xero_overpayments.credit_above_zero, credit_notes: c.xero_credit_notes.credit_above_zero%>
-					</tr>
-					<% end %>
-				</table>
 
-				<span style="float:right;">
-					<%= paginate(contacts) %>
-				</span>
+			<% top_task = Task.select("tasks.id, tasks.subject_1, tasks.end_date")
+				.customer_tasks(c.skype_user_name)
+				.is_task.active_tasks.order(:end_date).first %>
+
+			<% unless top_task.blank? %>
+				<% task_week = top_task.end_date.strftime("%U") %>
+				<% now_week = Time.now.strftime("%U") %>
+				<% if task_week == now_week %>
+					<td class="this_week">
+				<%  elsif task_week > now_week %>
+					<td class="next_week">
+				<%  else %>
+					<td class="last_week">
+				<%  end %>
+
+				<%= TaskSubject.find(top_task.subject_1).subject%>
+			<% else %>
+				<td>
+			<% end %>
+			</td>
+
+			<td><%= @staff_pair[c.id].last %></td>
+			<td class="num">
+				<%#= (outstanding_customer(c) == 0)? "-" : display_num(outstanding_customer(c))  %>
+			</td>
+			<td class="num">
+				<%= (overdue_customer(c) == 0)? "-" : display_num(overdue_customer(c)) %>
+			</td>
+			<%= render 'accounts_partials/contact_monthly_due', 
+				invoices: c.xero_invoices.has_amount_due.period_select(@end_date), 
+				overpayments: c.xero_overpayments.credit_above_zero, 
+				credit_notes: c.xero_credit_notes.credit_above_zero %>
+		</tr>
+	<% end %>
+</table>
+
+<%= paginate(contacts) %>

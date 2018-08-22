@@ -9,14 +9,12 @@
 				Account Receivable
 		  	</div>
 		  	<div class="card-body text-center">
-                <%= form_tag({:action => "contacts"}, {:method => "get"}) do %>
+                <%= form_tag({:action => "contacts"}, {:method => "get", 
+                    class: "form-inline justify-content-center"}) do %>
 
-                    <div class="form-group">
-                        <%= render "accounts_partials/contact_filter" %>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <%= render "accounts_partials/contact_monthly_filter"%>
-                    </div>
+                    <%= render "accounts_partials/contact_filter" %>
+                    
+                    <%= render "accounts_partials/contact_monthly_filter"%>
                 <% end %>
             </div>
         </div>

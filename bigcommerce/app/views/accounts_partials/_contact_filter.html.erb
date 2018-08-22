@@ -1,27 +1,23 @@
 <!-- edited by vchar on 20180805 -->
+<!-- edited by vchar on 20180822 -->
 
-<div class="row">
-	<div class="col p-1">
-        <%= text_field_tag('search', @search_text, 
-            placeholder: 'Search for Customer Name', class: 'form-control') %>
-	</div>
-    <div class="col p-1">
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Invoice to</span>
-            </div>
-            <%= date_field( "end_date", "end_date", value: @end_date, 
-                class: 'form-control') %>
-        </div>
+
+<%= text_field_tag('search', @search_text, 
+    placeholder: 'Search for Customer Name', class: 'form-control mr-2') %>
+
+<div class="input-group">
+    <div class="input-group-prepend">
+        <span class="input-group-text">Invoice to</span>
     </div>
-    <div class="col-1 p-1">
-        <%= submit_tag "Search", class: 'btn btn-primary' %>
-    </div>
-    <div class="col-1 p-1">
-        <%= link_to "Reset", { controller: "accounts", action: "contacts" },
-            class: "btn btn-warning" %>
-    </div>
-    <div class="col-1 p-1" id="send_reminders">
-        <%= submit_tag "Send Reminder", class: 'btn btn-primary' %>
-    </div>
+    <%= date_field( "end_date", "end_date", value: @end_date, 
+        class: 'form-control mr-2') %>
+</div>
+
+<%= submit_tag "Search", class: 'btn btn-primary mr-2' %>
+
+<%= link_to "Reset", { controller: "accounts", action: "contacts" },
+    class: "btn btn-warning mr-2" %>
+
+<div id="send_reminders">
+        <%= submit_tag "Send Reminder", class: 'btn btn-primary mr-2' %>
 </div>
