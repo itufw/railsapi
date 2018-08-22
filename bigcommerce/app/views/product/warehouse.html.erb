@@ -1,21 +1,19 @@
+<!-- edited by vchar on 20180822 -->
+
 <%= title 'Warehouse'%>
 
 <% if @group_list.nil? %>
-   <%= render 'product_partials/mobile_counting' %>
-
+    <%= render 'product_partials/mobile_counting' %>
 <% else %>
-<meta content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0" name="viewport" />
-  <%= form_tag(controller: 'product', action: "warehouse") do |f| %>
-  <div class="counting-table block">
-    <ul>
-      <p>Select Group</p>
-      <li>
-        <%= collection_select(nil, :selected_group, @group_list, :id, :group_name, {class: 'form-control'})%>
-      </li>
-    </ul>
-    <ul style="align: center;">
-      <%= submit_tag 'Select', class: 'btn btn-success btn-lg'%>
-    </ul>
-  </div>
-  <% end %>
+    <meta content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0" name="viewport" />
+    <%= form_tag({ controller: 'product', action: "warehouse" }, 
+        :class => "form-inline justify-content-center") do |f| %>
+        <div class="input-group mr-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Select Group</span>
+            </div>
+            <%= collection_select(nil, :selected_group, @group_list, :id, :group_name, {class: 'form-control'})%>
+        </div>
+        <%= submit_tag 'submit', class: 'btn btn-success'%>
+    <% end %>
 <% end %>

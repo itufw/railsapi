@@ -1,96 +1,199 @@
+<!-- edited by vchar on 20180822 -->
 
-<meta content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0" name="viewport" />
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header text-center h3 text-secondary">
+                <%= @warehouse_examining.product_name %>
 
-<%= form_for @warehouse_examining, :url => {controller: 'product', action: "update"}  do |f| %>
-<%= hidden_field_tag :pending_products, @product_list, multiple: true%>
-<%= hidden_field_tag :later, @waitting_list, multiple: true%>
-<%= f.hidden_field :product_name%>
-<%= f.hidden_field :product_no_ws_id%>
-<%= f.hidden_field :current_ws%>
-<%= f.hidden_field :current_dm%>
-<%= f.hidden_field :current_vc%>
-<%= f.hidden_field :current_retail%>
-<%= f.hidden_field :count_size%>
+                <p class="h5 text-center">
+                    <span class="badge badge-info font-italic font-weight-light">
+                        Ready: <%= OrderProduct.ready(@products.map(&:id)).map(&:qty).sum%>
+                    </span>
+                    <span class="badge badge-info font-italic font-weight-light">
+                        On Order: <%= @warehouse_examining.on_order %>
+                    </span>
+                    <span class="badge badge-info font-italic font-weight-light">
+                        Allocation: <%= @warehouse_examining.allocation %>
+                    </span>
+                    <span class="badge badge-info font-italic font-weight-light">
+                        Stock: <%= @warehouse_examining.current_stock %>
+                    </span>
+                    <span class="badge badge-info font-italic font-weight-light">
+                        Total: <%= @warehouse_examining.current_total %>
+                    </span>
+                </p>
+            </div>
 
+            <div class="card-body">
 
-<!-- Mobile Version -->
-<!-- browser.device.mobile? -->
-  <div class="counting-table block">
-    <ul>
-      <p><%= @warehouse_examining.product_name %></p>
-      <p>
-        <b>Ready</b>:<i><%= OrderProduct.ready(@products.map(&:id)).map(&:qty).sum%></i>
-        <b>On Order</b>:<i><%= @warehouse_examining.on_order %></i>
-        <b>Allocation</b>:<i><%= @warehouse_examining.allocation %></i>
-        <b>Stock</b>:<i><%= @warehouse_examining.current_stock %></i>
-        <b>Total</b>:<i><%= @warehouse_examining.current_total %></i>
-      </p>
-      <%= f.hidden_field :allocation, readonly: true%>
-      <%= f.hidden_field :current_stock, readonly: true%>
-      <%= f.hidden_field :on_order, readonly: true%>
+                <%= form_for @warehouse_examining, :url => {controller: 'product', action: "update"}  do |f| %>
+                    <%= hidden_field_tag :pending_products, @product_list, multiple: true%>
+                    <%= hidden_field_tag :later, @waitting_list, multiple: true%>
+                    <%= f.hidden_field :product_name%>
+                    <%= f.hidden_field :product_no_ws_id%>
+                    <%= f.hidden_field :current_ws%>
+                    <%= f.hidden_field :current_dm%>
+                    <%= f.hidden_field :current_vc%>
+                    <%= f.hidden_field :current_retail%>
+                    <%= f.hidden_field :count_size%>
+                    <%= f.hidden_field :allocation, readonly: true%>
+                    <%= f.hidden_field :current_stock, readonly: true%>
+                    <%= f.hidden_field :on_order, readonly: true%>
 
-      <%= f.fields_for "product", @product do |product_form|%>
-        <%= product_form.hidden_field :id %>
-        <li class="value-one">
-          <b>Location</b>
-          <%= product_form.text_field :column, size: 6, placeholder:'Column'%>
-          <%= product_form.number_field :row, {min: 0, max: 9999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Row'}%>
-          <%= product_form.text_field :area, size: 6, placeholder:'area'%>
-        </li>
-      <li class="value-one">
-        <%= product_form.number_field :case_size, min: 0, max: 99999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Case Size' %>
-        <% end %>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <%= f.fields_for "product", @product do |product_form|%>
+                                    <%= product_form.hidden_field :id %>
+                                    <div class="card-header text-secondary h5">
+                                        Location
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="form-group mx-0 row border rounded">
+                                                    <label class="col-sm-5 col-form-label bg-light 
+                                                        border-right border-bottom text-truncate">
+                                                        Column
+                                                    </label>
+                                                    <div class="col-sm-7 border-bottom px-2">
+                                                        <%= product_form.text_field :column, size: 6, 
+                                                        placeholder:'column', class: 'form-control border-0' %>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group mx-0 row border rounded">
+                                                    <label class="col-sm-5 col-form-label bg-light 
+                                                        border-right border-bottom text-truncate">
+                                                        Row
+                                                    </label>
+                                                    <div class="col-sm-7 border-bottom px-2">
+                                                        <%= product_form.number_field :row, { min: 0, max: 9999, 
+                                                            inputmod: "numeric", pattern:"[0-9]*", placeholder: 'row',
+                                                            class: "form-control border-0" }%>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group mx-0 row border rounded">
+                                                    <label class="col-sm-5 col-form-label bg-light 
+                                                        border-right border-bottom text-truncate">
+                                                        Area
+                                                    </label>
+                                                    <div class="col-sm-7 border-bottom px-2">
+                                                        <%= product_form.text_field :area, size: 6, placeholder:'area',
+                                                            class: "form-control border-0" %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="form-group mx-0 row border rounded">
+                                                    <label class="col-sm-5 col-form-label bg-light 
+                                                        border-right border-bottom text-truncate">
+                                                        Case size
+                                                    </label>
+                                                    <div class="col-sm-7 border-bottom px-2">
+                                                        <%= product_form.number_field :case_size, min: 0, max: 99999, 
+                                                            inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Case Size',
+                                                            class: "form-control border-0" %>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group mx-0 row border rounded">
+                                                    <label class="col-sm-5 col-form-label bg-light 
+                                                        border-right border-bottom text-truncate">
+                                                        Packs
+                                                    </label>
+                                                    <div class="col-sm-7 border-bottom px-2">
+                                                        <%= f.number_field :count_pack, { min: 0, max: 999999999,
+                                                        inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Pack',
+                                                        class: "form-control border-0" } %>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group mx-0 row border rounded">
+                                                    <label class="col-sm-5 col-form-label bg-light 
+                                                        border-right border-bottom text-truncate">
+                                                        Looses
+                                                    </label>
+                                                    <div class="col-sm-7 border-bottom px-2">
+                                                        <%= f.number_field :count_loose, { min: 0, max: 9999999, 
+                                                            inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Loose',
+                                                            class: "form-control border-0" } %>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group mx-0 row border rounded">
+                                                    <label class="col-sm-5 col-form-label bg-light 
+                                                        border-right border-bottom text-truncate">
+                                                        Samples
+                                                    </label>
+                                                    <div class="col-sm-7 border-bottom px-2">
+                                                        <%= f.number_field :count_sample, { min: 0, max: 9999999, 
+                                                            inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Sample',
+                                                            class: "form-control border-0" } %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        Total in stock: <i class="count-total">0</i>
+                                    </div>
+                                <% end %>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header text-secondary h5">
+                                    <div class="row">
+                                        <div class="col">
+                                            Difference: <i class="difference">0</i>
+                                        </div>
+                                        <div class="col">
+                                            Remaining: <i class="remain-stock">0</i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="col p-0">
+                                        <input type="checkbox" name="latter_count" 
+                                            id="ios-checkbox" class="ios-toggle" checked />
+                                        <label for="ios-checkbox" class="checkbox-label" data-off="Now" 
+                                            data-on="Yes"></label>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <%= f.hidden_field :current_total, readonly: true%>
+                                    <%= f.hidden_field :count_total, class: 'count-total' %>
+                                    <%= f.hidden_field :difference, class: 'difference' %>
 
-        <%= f.number_field :count_pack, {min: 0, max: 999999999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Pack'} %>
-        <%= f.number_field :count_loose, {min: 0, max: 9999999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Loose'} %>
-        <%= f.number_field :count_sample, {min: 0, max: 9999999, inputmod: "numeric", pattern:"[0-9]*", placeholder: 'Sample'} %>
-      </li>
-
-      <li class="value-one">
-        <b>Stock</b> <i class="count-total">0</i>
-      </li>
-    </ul>
-    <ul>
-      <li class="value-one">
-        <b>Difference:       <i class="difference">0</i></b>
-        <div class="col-md-2 col-xs-4" style="float: right; ">
-          <input type="checkbox" name="latter_count" id="ios-checkbox" class="ios-toggle" checked />
-          <label for="ios-checkbox" class="checkbox-label" data-off="Now" data-on="Yes" style="margin-left: 10px;"></label>
+                                    <%= submit_tag 'Save', class: 'btn btn-success btn-lg'%>
+                                    <%= submit_tag 'Skip', class: 'btn btn-default btn-lg'%>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% end %>
+            </div>
         </div>
-        Remaining:<i class="remain-stock">0</i>
-        <%= f.hidden_field :current_total, readonly: true%>
-        <%= f.hidden_field :count_total, class: 'count-total' %>
-        <%= f.hidden_field :difference, class: 'difference' %>
-      </li>
-      <li>
-        <div style="align: center;">
-          <%= submit_tag 'Save', class: 'btn btn-success btn-lg'%>
-          <%= submit_tag 'Skip', class: 'btn btn-default btn-lg'%>
-        </div>
-      </li>
-    </ul>
-  </div>
-<% end %>
+    </div>
+</div>
 
 <script type="text/javascript">
-  $(document).on('input', '[type=number]', function () {
-    var caseSize = parseInt($('#warehouse_examining_product_case_size').val()) || 0;
-    var countPack = parseInt($('#warehouse_examining_count_pack').val()) || 0;
-    var countLoose = parseInt($('#warehouse_examining_count_loose').val()) || 0;
-    var countSample = parseInt($('#warehouse_examining_count_sample').val()) || 0;
+    $(document).on('input', '[type=number]', function () {
+        var caseSize = parseInt($('#warehouse_examining_product_case_size').val()) || 0;
+        var countPack = parseInt($('#warehouse_examining_count_pack').val()) || 0;
+        var countLoose = parseInt($('#warehouse_examining_count_loose').val()) || 0;
+        var countSample = parseInt($('#warehouse_examining_count_sample').val()) || 0;
 
-    var total = caseSize*countPack+countLoose+countSample;
+        var total = caseSize*countPack+countLoose+countSample;
 
-    var distributed = 0
-    $('input.distribuetd').each(function () {
-      distributed += (parseInt($(this).val()) || 0);
+        var distributed = 0
+        $('input.distribuetd').each(function () {
+            distributed += (parseInt($(this).val()) || 0);
+        });
+        var difference = total -  parseInt($('#warehouse_examining_current_total').val());
+
+        $('.count-total').val(total);
+        $('.difference').val(difference);
+        $('i.count-total').html(total);
+        $('i.difference').html(difference);
+        $('i.remain-stock').html(parseInt($('#warehouse_examining_current_stock').val())-distributed);
     });
-    var difference = total -  parseInt($('#warehouse_examining_current_total').val());
-
-    $('.count-total').val(total);
-    $('.difference').val(difference);
-    $('i.count-total').html(total);
-    $('i.difference').html(difference);
-    $('i.remain-stock').html(parseInt($('#warehouse_examining_current_stock').val())-distributed);
-  });
 </script>
