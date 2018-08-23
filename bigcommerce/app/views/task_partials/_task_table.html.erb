@@ -1,109 +1,142 @@
-<div class="col-md-12">
-    <!-- <table class="table table-hover table-responsive task_table" style="margin-top: 5px;" id = "task_table"> -->
-    <table class="table table-striped table-bordered table-hover table-responsive" style="margin-top: 5px;" id = "task_table">
-      <% @date_column = 'start_date' if @date_column.nil?%>
-      <%= render "task_partials/task_table_head_filter", date_column_name: @date_column.split('_').map{|x| x.first.upcase+x[1..x.length]}.join(' ')%>
-            <% @tasks.each do |task|%>
-            <%
-              customers, staffs = task_customer_staff(task.task_relations)
-              customers_filter = ('-'.eql?customers) ? ' ' : customers.map(&:id).map{|x| 'customer_'+x.to_s}.join(' ')
-              staffs_filter = ('-'.eql?staffs) ? ' ' : staffs.map(&:id).map{ |x| 'staff_'+x.to_s}.join(' ')
-              priority_filter = (task.is_task.nil? || task.is_task.zero?) ? ' ' : 'priority_'+task.priority.to_s
-            %>
+<!-- edited by vchar on 20180823 -->
 
-            <tr class="activity_record <%=priority_filter%> creator_<%=task.response_staff%> method_<%=task.method%> subject_<%=task.subject_1%> <%= customers_filter %> <%= staffs_filter %>">
-              <% if task.is_task==1 %>
-                <td class="<%=task_priority_display(task.priority).downcase%>" style="width: 20px;"><%= render "task_partials/priority_update_cell", task_id: task.id, priority: task.priority %></td>
-              <% else %>
+
+<table class="table table-striped table-bordered table-hover table-responsive" 
+    id = "task_table">
+    <% @date_column = 'start_date' if @date_column.nil?%>
+
+    <%= render "task_partials/task_table_head_filter", 
+    date_column_name: @date_column.split('_')
+    .map{|x| x.first.upcase+x[1..x.length]}.join(' ')%>
+
+    <% @tasks.each do |task|%>
+
+        <%
+            customers, staffs = task_customer_staff(task.task_relations)
+            customers_filter = ('-'.eql?customers) ? ' ' : customers.map(&:id).map{|x| 'customer_'+x.to_s}.join(' ')
+            staffs_filter = ('-'.eql?staffs) ? ' ' : staffs.map(&:id).map{ |x| 'staff_'+x.to_s}.join(' ')
+            priority_filter = (task.is_task.nil? || task.is_task.zero?) ? ' ' : 'priority_'+task.priority.to_s
+        %>
+
+        <tr class="activity_record <%=priority_filter%> creator_<%=task.response_staff%> 
+            method_<%=task.method%> subject_<%=task.subject_1%> 
+            <%= customers_filter %> <%= staffs_filter %>">
+            <% if task.is_task==1 %>
+                <td class="<%=task_priority_display(task.priority).downcase%>">
+                    <%= render "task_partials/priority_update_cell", 
+                        task_id: task.id, priority: task.priority %>
+                </td>
+            <% else %>
                 <td></td>
-              <% end %>
-
-              <% if ('-'.eql?customers) || (customers.blank?)%>
-                <td>-</td>
-                <td>-</td>
-              <% else %>
-              <td><%= Staff.filter_by_ids(customers.map(&:staff_id)).map(&:nickname).join('<br>').html_safe %></td>
-              <td>
-                  <% customers.each do |customer| %>
-                    <% if customer.is_a?(Customer) %>
-                      <p style="color: green"><%= link_to customer.actual_name, controller: 'customer', action: 'summary', customer_id: customer.id, customer_name: customer.actual_name %></p>
-                    <% else %>
-                      <p style="color: blue"><%= link_to customer.actual_name, controller: 'lead', action:'summary', lead_id: customer.id %></p>
-                    <% end %>
-                  <% end %>
-                <% end %>
-              </td>
-
-                <td><%= link_to task.summary.to_s + "\n" + task.description.to_s, controller: "activity", action: "activity_edit", note_id: task.id%></td>
-                <td><%=Staff.find(task.response_staff).nickname%></td>
-                <%
-                  # ['Created_date', 'start_date', 'end_date']
-                    case @date_column
-                    when 'start_date'
-                      task_date = task.start_date
-                    when 'end_date'
-                      task_date = task.end_date
-                    else
-                      task_date = task.created_at
-                    end
-                    task_week = task_date.strftime("%U")
-                    now_week = Time.now.strftime("%U")
-                    if task_week == now_week %>
-                      <td class="this_week">
-                <%  elsif task_week > now_week %>
-                      <td class="next_week">
-                <%  else %>
-                      <td class="last_week">
-                <%  end %>
-                  <%=date_format_orders(task_date)%>
-                </td>
-                <% is_task = (1==task.is_task)? "task" : "note"%>
-                <% is_task = 'event' unless task.google_event_id.nil?%>
-                <td class=<%=is_task%> ><%=is_task.upcase%></td>
-                <% begin %>
-                  <td class="hidden-columns"><%=task.function.byteslice(0,3) + "/" + TaskSubject.find(task.subject_1).subject%></td>
-                <% rescue %>
-                  <td></td>
-                <% end %>
-                <td class="hidden-columns"><%=task.method%></td>
-                <td class="hidden-columns">
-                    <% if '-'.eql? staffs%>
-                      <%= '-' %>
-                    <% else %>
-                      <% staffs.each do |staff| %>
-                        <%= staff.nickname %>
-                      <% end %>
-                    <% end %>
-                </td>
-
-                <td>
-                  <%=render "task_partials/control_icon", task: task%>
-                </td>
-
-            </tr>
-            <tr>
-              <td colspan="11">
-                <%= render "task_partials/task_hidding_row", task: task%>
-              </td>
-            </tr>
             <% end %>
-    </table>
-</div>
+
+            <% if ('-'.eql?customers) || (customers.blank?)%>
+                <td>-</td>
+                <td>-</td>
+            <% else %>
+                <td>
+                    <%= Staff.filter_by_ids(customers.map(&:staff_id))
+                        .map(&:nickname).join('<br>').html_safe %>
+                </td>
+                <td>
+                    <% customers.each do |customer| %>
+                        <% if customer.is_a?(Customer) %>
+                            <%= link_to customer.actual_name, controller: 'customer', 
+                                action: 'summary', customer_id: customer.id, 
+                                customer_name: customer.actual_name, class: 'text-success' %>
+                        <% else %>
+                            <%= link_to customer.actual_name, controller: 'lead', 
+                                action:'summary', lead_id: customer.id, class: 'text-primary' %>
+                        <% end %>
+                    <% end %>
+                </td>
+            <% end %>
+
+            <td>
+                <%= link_to task.summary.to_s + "\n" + task.description.to_s, 
+                controller: "activity", action: "activity_edit", note_id: task.id %>
+            </td>
+            <td>
+                <%=Staff.find(task.response_staff).nickname%>
+            </td>
+            
+            <%
+                # ['Created_date', 'start_date', 'end_date']
+                case @date_column
+                when 'start_date'
+                    task_date = task.start_date
+                when 'end_date'
+                    task_date = task.end_date
+                else
+                    task_date = task.created_at
+                end
+
+                task_week = task_date.strftime("%U")
+                now_week = Time.now.strftime("%U")
+            %>
+            
+            <% if task_week == now_week %>
+                <td class="this_week">
+            <%  elsif task_week > now_week %>
+                <td class="next_week">
+            <%  else %>
+                <td class="last_week">
+            <%  end %>
+                <%=date_format_orders(task_date)%>
+            </td>
+
+            <% is_task = (1==task.is_task)? "task" : "note"%>
+            <% is_task = 'event' unless task.google_event_id.nil?%>
+
+            <td class=<%=is_task%> ><%=is_task.upcase%></td>
+
+            <% begin %>
+                <td class="hidden-columns">
+                    <%=task.function.byteslice(0,3) + "/" + TaskSubject.find(task.subject_1).subject%>
+                </td>
+            <% rescue %>
+                <td></td>
+            <% end %>
+
+            <td class="hidden-columns"><%=task.method%></td>
+            <td class="hidden-columns">
+                <% if '-'.eql? staffs%>
+                    <%= '-' %>
+                <% else %>
+                    <% staffs.each do |staff| %>
+                        <%= staff.nickname %>
+                    <% end %>
+                <% end %>
+            </td>
+
+            <td style="min-width: 120px">
+                <%=render "task_partials/control_icon", task: task%>
+            </td>
+
+        </tr>
+        <tr>
+            <td colspan="11">
+                <%= render "task_partials/task_hidding_row", task: task%>
+            </td>
+        </tr>
+    <% end %>
+</table>
+
 
 <script>
-$("#task_table tr:odd").addClass("odd");
-$("#task_table tr:not(.odd)").hide();
-$("#task_table tr:first-child").show();
-$(".hidden-columns").hide();
+    $("#task_table tr:odd").addClass("odd");
+    $("#task_table tr:not(.odd)").hide();
+    $("#task_table tr:first-child").show();
+    $(".hidden-columns").hide();
 
-$(".expand-table").click(function(){
-  $(".hidden-columns").toggle();
-});
+    $(".expand-table").click(function(){
+        $(".hidden-columns").toggle();
+    });
 
-$("#task_table tbody tr.odd").click(function () {
-    var trToToggle = $(this).next("tr");
-    $("#task_table tbody tr:not(.odd)").not(trToToggle).hide();
-    $(trToToggle).toggle();
-    $(this).find(".arrow").toggleClass("up");
-});
+    $("#task_table tbody tr.odd").click(function () {
+        var trToToggle = $(this).next("tr");
+        $("#task_table tbody tr:not(.odd)").not(trToToggle).hide();
+        $(trToToggle).toggle();
+        $(this).find(".arrow").toggleClass("up");
+    });
 </script>

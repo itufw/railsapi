@@ -1,111 +1,121 @@
+<!-- edited by vchar on 20180823 -->
+
 <thead>
     <tr>
-      <% relations = TaskRelation.filter_by_task_ids(@tasks.map(&:id)) %>
-        <th id="priority_th">
-          <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Priority</a>
-              <ul class="dropdown-menu">
-                <%
-                  task_priorities = TaskPriority.where('id IN (?)',   @tasks.select{|x| x.is_task==1}.map(&:priority).uniq.compact)
-                  task_priorities.each do |priority| %>
-                <li>
-                  <a id="filter_priority_<%= priority.id%>"><%= priority.priority_level %></a>
-                  &nbsp;&nbsp;
-                </li>
-                <% end %>
-              </ul>
-          </li>
+        <% relations = TaskRelation.filter_by_task_ids(@tasks.map(&:id)) %>
+        <th id="priority_th" style="min-width: 128px">
+            <div class="dropdown">
+                <a class="" data-toggle="dropdown" href="#">Priority</a>
+                <ul class="dropdown-menu">
+                    <% task_priorities = TaskPriority.where('id IN (?)',
+                        @tasks.select{|x| x.is_task==1}.map(&:priority).uniq.compact) %>
+                    
+                    <% task_priorities.each do |priority| %>
+                        <li class="dropdown-list">
+                            <a id="filter_priority_<%= priority.id%>">
+                                <%= priority.priority_level %>
+                            </a>
+                        </li>
+                    <% end %>
+                </ul>
+            </div>
         </th>
         <%
-          customers = Customer.filter_by_ids(relations.map(&:customer_id).compact)
-          lead = CustomerLead.filter_by_ids(relations.map(&:customer_lead_id).compact)
-          mix_customer = []
-          mix_customer += customers unless customers.nil?
-          mix_customer += lead unless lead.nil?
+            customers = Customer.filter_by_ids(relations.map(&:customer_id).compact)
+            lead = CustomerLead.filter_by_ids(relations.map(&:customer_lead_id).compact)
+            mix_customer = []
+            mix_customer += customers unless customers.nil?
+            mix_customer += lead unless lead.nil?
         %>
         <th id="sales_rep">
-          <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Sales</a>
-              <ul class="dropdown-menu">
-                <% Staff.filter_by_ids(mix_customer.map(&:staff_id)).each do |staff|%>
-                <li>
-                  <a id="filter_staff_<%= staff.id%>"><%= staff.nickname %></a>
-                  &nbsp;&nbsp;
-                </li>
-                <% end %>
-              </ul>
-          </li>
+            <div class="dropdown">
+                <a class="" data-toggle="dropdown" href="#">Sales</a>
+                <ul class="dropdown-menu">
+                    <% Staff.filter_by_ids(mix_customer.map(&:staff_id)).each do |staff|%>
+                        <li class="dropdown-list">
+                            <a id="filter_staff_<%= staff.id%>">
+                                <%= staff.nickname %>
+                            </a>
+                        </li>
+                    <% end %>
+                </ul>
+            </div>
         </th>
+
         <th id="customer_th">
-          <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Customer</a>
-              <ul class="dropdown-menu">
-                <% mix_customer.each do |customer|%>
-                <li>
-                  <a id="filter_customer_<%= customer.id%>"><%= customer.actual_name %></a>
-                  &nbsp;&nbsp;
-                </li>
-                <% end %>
-              </ul>
-          </li>
+            <div class="dropdown">
+                <a class="" data-toggle="dropdown" href="#">Customer</a>
+                <ul class="dropdown-menu">
+                    <% mix_customer.each do |customer|%>
+                        <li class="dropdown-list">
+                            <a id="filter_customer_<%= customer.id%>">
+                                <%= customer.actual_name %>
+                            </a>
+                        </li>
+                    <% end %>
+                </ul>
+            </div>
         </th>
 
         <th>Description</th>
 
         <th id="created_by_th">
-          <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Creator</a>
-              <ul class="dropdown-menu">
-                <% Staff.filter_by_ids(@tasks.map(&:response_staff).uniq).each do |staff| %>
-                <li>
-                  <a id="filter_creator_<%= staff.id%>"><%= staff.nickname %></a>
-                  &nbsp;&nbsp;
-                </li>
-                <% end %>
-              </ul>
-          </li>
+            <div class="dropdown">
+                <a class="" data-toggle="dropdown" href="#">Creator</a>
+                <ul class="dropdown-menu">
+                    <% Staff.filter_by_ids(@tasks.map(&:response_staff).uniq).each do |staff| %>
+                        <li class="dropdown-list">
+                            <a id="filter_creator_<%= staff.id%>">
+                                <%= staff.nickname %>
+                            </a>
+                        </li>
+                    <% end %>
+                </ul>
+            </div>
         </th>
-        <th><%= date_column_name %></th>
-        <th><a class="show_all">Show All</a></th>
+
+        <th style="min-width: 120px"><%= date_column_name %></th>
+        <th style="min-width: 120px"><a class="show_all">Show All</a></th>
 
         <th id="function_th" class="hidden-columns">
-          <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Func/Sub</a>
-              <ul class="dropdown-menu">
-                <% TaskSubject.where('id IN (?)', @tasks.map(&:subject_1).uniq.compact).each do |subject| %>
-                <li>
-                  <a id="filter_subject_<%= subject.id%>"><%= subject.subject %></a>
-                  &nbsp;&nbsp;
-                </li>
-                <% end %>
-              </ul>
-          </li>
+            <li class="dropdown">
+                <a class="" data-toggle="dropdown" href="#">Func/Sub</a>
+                <ul class="dropdown-menu">
+                    <% TaskSubject.where('id IN (?)', @tasks.map(&:subject_1).uniq.compact).each do |subject| %>
+                        <li>
+                            <a id="filter_subject_<%= subject.id%>">
+                                <%= subject.subject %>
+                            </a>
+                        </li>
+                    <% end %>
+                </ul>
+            </li>
         </th>
         <th id="method_th" class="hidden-columns">
-          <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Method</a>
-              <ul class="dropdown-menu">
-                <% @tasks.map(&:method).uniq.each do |method| %>
-                <li>
-                  <a id="filter_method_<%= method%>"><%= method %></a>
-                  &nbsp;&nbsp;
-                </li>
-                <% end %>
-              </ul>
-          </li>
+            <li class="dropdown">
+                <a class="" data-toggle="dropdown" href="#">Method</a>
+                <ul class="dropdown-menu">
+                    <% @tasks.map(&:method).uniq.each do |method| %>
+                        <li>
+                            <a id="filter_method_<%= method%>"><%= method %></a>
+                            &nbsp;&nbsp;
+                        </li>
+                    <% end %>
+                </ul>
+            </li>
         </th>
         <th id="staff_th" class="hidden-columns">
-          <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Assigned</a>
-              <ul class="dropdown-menu">
-                <% Staff.filter_by_ids(relations.map(&:staff_id).compact).each do |staff|%>
-                <li>
-                  <a id="filter_staff_<%= staff.id%>"><%= staff.nickname %></a>
-                  &nbsp;&nbsp;
-                </li>
-                <% end %>
-              </ul>
-          </li>
+            <li class="dropdown">
+                <a class="" data-toggle="dropdown" href="#">Assigned</a>
+                <ul class="dropdown-menu">
+                    <% Staff.filter_by_ids(relations.map(&:staff_id).compact).each do |staff|%>
+                        <li>
+                            <a id="filter_staff_<%= staff.id%>"><%= staff.nickname %></a>
+                            &nbsp;&nbsp;
+                        </li>
+                    <% end %>
+                </ul>
+            </li>
         </th>
 
         <th><i class="glyphicon glyphicon-off expand-table" title="Expand!"></i></th>
@@ -114,12 +124,12 @@
 
 
 <script type="text/javascript">
-  $('li a[id*=filter_]').click(function(){
-    $('tr.activity_record').hide();
-    $('tr.activity_record.'+ this.id.split('filter_')[1]).show();
-  });
+    $('li a[id*=filter_]').click(function(){
+        $('tr.activity_record').hide();
+        $('tr.activity_record.'+ this.id.split('filter_')[1]).show();
+    });
 
-  $('a.show_all').click(function(){
-    $('tr.activity_record').show();
-  });
+    $('a.show_all').click(function(){
+        $('tr.activity_record').show();
+    });
 </script>
