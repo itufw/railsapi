@@ -1,21 +1,33 @@
+<!-- edited by vchar on 20180823 -->
+
 <%= title "#{@customer.xero_contact.name}" %>
-<h3><%= @customer.xero_contact.name%></h3>
-<center><%= link_to "Add New Contact", controller: 'contact', action: 'create_contact', customer_id: @customer.id, customer_name: @customer.actual_name %></center>
 
-<div style="margin-top: 50px;">
-    <%= render "customer_partials/summary_header", customer: @customer %>
-</div>
-
-<div style="margin-top: 50px;">
-    <%= render "accounts_partials/invoice_details", customer: @customer, amount_due: @amount_due%>
-</div>
-
-<% unless @tasks.blank?%>
-<div class="container">
-    <div class="row">
-        <div style="margin-top: -10px;">
-            <%= render "task_partials/task_table", display_all: "Yes"%>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header text-center h3 text-secondary">
+                <%= @customer.xero_contact.name %>
+                <p class="h5 mt-2">
+                    <%= link_to "Add New Contact", { controller: 'contact', 
+                        action: 'create_contact', customer_id: @customer.id, 
+                        customer_name: @customer.actual_name }, 
+                        class: 'btn btn-outline-info text-info' %>
+                </p>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-5">
+                        <%= render "customer_partials/summary_header", customer: @customer %>
+                    </div>
+                    <div class="col-lg-7">
+                        <%= render "accounts_partials/invoice_details", customer: @customer, amount_due: @amount_due%>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<% unless @tasks.blank?%>
+    <%= render "task_partials/task_table", display_all: "Yes"%>
 <% end %>
