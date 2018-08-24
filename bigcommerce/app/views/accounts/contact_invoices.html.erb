@@ -17,10 +17,12 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-lg-5">
-                        <%= render "customer_partials/summary_header", customer: @customer %>
+                        <%= render "customer_partials/summary_header", 
+                            customer: @customer %>
                     </div>
                     <div class="col-lg-7">
-                        <%= render "accounts_partials/invoice_details", customer: @customer, amount_due: @amount_due%>
+                        <%= render "accounts_partials/invoice_details", 
+                            customer: @customer, amount_due: @amount_due %>
                     </div>
                 </div>
             </div>

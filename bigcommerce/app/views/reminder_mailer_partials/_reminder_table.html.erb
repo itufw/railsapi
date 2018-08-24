@@ -1,21 +1,24 @@
-<br/>
-<table style="border-collapse: collapse">
-    <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+<table class="table table-hover" style="border-collapse: collapse">
+    <tr class="text-center">
+        <td colspan="7" style="border: 0"></td>
         <% if @missing_invoice %>
-        <td colspan="4" style="color: red; background-color: #bfbfbf; font-weight:bold" align="center">Total
-            <%= number_to_currency(over_due_invoices.sum(:amount_due) - @total_remaining_credit) %></td>
-    <% else %>
-        <td colspan="4" style="color: red; background-color: #bfbfbf; font-weight:bold" align="center">Total Overdue
-            <%= number_to_currency(over_due_invoices.sum(:amount_due) - @total_remaining_credit) %></td>
+            <td style="color: red; background-color: #bfbfbf; border: 0" align="center">
+                Total
+            </td>
+            <td>
+                <%= number_to_currency(over_due_invoices.sum(:amount_due) - @total_remaining_credit) %>
+            </td>
+        <% else %>
+            <td style="color: red; background-color: #bfbfbf; border: 0" align="center">
+                Total Overdue
+            </td>
+            <td>
+                <%= number_to_currency(over_due_invoices.sum(:amount_due) - @total_remaining_credit) %>
+            </td>
         <% end %>
     </tr>
-    <tr style="color: white; background-color: #043483; width: 90%; padding: 5px">
+    
+    <tr class="text-center" style="color: white; background-color: #043483; padding: 5px">
         <th>Date</th>
         <th>Invoice</th>
         <th>Due Date</th>
@@ -26,44 +29,60 @@
         <th>Due</th>
         <th>Running Balance</th>
     </tr>
+
     <% running_balance = 0 %>
     <% over_due_invoices.each do |invoice| %>
-    <tr align="center">
-        <td><%= invoice.date.to_date.strftime("%d/%-m/%y")%></td>
-        <td><%= invoice.invoice_number%></td>
-        <td><%= invoice.due_date.to_date.strftime("%d/%-m/%y")%></td>
-        <td style="border-right: 1px solid"><%= Date.today.mjd - invoice.due_date.to_date.mjd %>
-            days</td>
-        <td><%= number_to_currency(invoice.total) %></td>
-        <% unless invoice.amount_paid == 0%>
-          <td><%= number_to_currency(invoice.amount_paid) %></td>
-        <% else %>
-          <td>-</td>
-        <% end %>
-        <% unless invoice.amount_credited == 0%>
-          <td style="border-right: 1px solid"><%= number_to_currency(invoice.amount_credited) %></td>
-        <% else %>
-          <td style="border-right: 1px solid">-</td>
-        <% end %>
+        <tr align="center">
+            <td><%= invoice.date.to_date.strftime("%d/%-m/%y")%></td>
+            <td><%= invoice.invoice_number%></td>
+            <td><%= invoice.due_date.to_date.strftime("%d/%-m/%y")%></td>
+            <td style="border-right: 1px solid">
+                <%= Date.today.mjd - invoice.due_date.to_date.mjd %> days
+            </td>
+            <td><%= number_to_currency(invoice.total) %></td>
 
-        <td style="border-right: 1px solid"><%= number_to_currency(invoice.amount_due)%></td>
-          <% running_balance += invoice.amount_due %>
-        <td style="font-style: italic"><%= number_to_currency(running_balance) %></td>
-    </tr>
+            <% unless invoice.amount_paid == 0%>
+                <td><%= number_to_currency(invoice.amount_paid) %></td>
+            <% else %>
+                <td>-</td>
+            <% end %>
+
+            <% unless invoice.amount_credited == 0%>
+                <td style="border-right: 1px solid">
+                    <%= number_to_currency(invoice.amount_credited) %>
+                </td>
+            <% else %>
+                <td style="border-right: 1px solid">-</td>
+            <% end %>
+
+            <td style="border-right: 1px solid">
+                <%= number_to_currency(invoice.amount_due)%>
+            </td>
+
+            <% running_balance += invoice.amount_due %>
+            <td style="font-style: italic">
+                <%= number_to_currency(running_balance) %>
+            </td>
+        </tr>
     <% end %>
+
     <% @cn_op.each do |co| %>
-    <tr align="center">
-      <td><%= co[:date].to_date.strftime("%d/%-m/%y")%></td>
-      <td><%= co[:status] %></td>
-      <td>-</td>
-      <td style="border-right: 1px solid">-</td>
-      <td>-</td>
-      <td>-</td>
-      <td style="border-right: 1px solid">-<%= number_to_currency(co[:remaining_credit]) %></td>
-      <td style="border-right: 1px solid">-</td>
-        <% running_balance -= co[:remaining_credit] %>
-      <td style="font-style: italic"><%= number_to_currency(running_balance) %></td>
-    </tr>
+        <tr align="center">
+            <td><%= co[:date].to_date.strftime("%d/%-m/%y")%></td>
+            <td><%= co[:status] %></td>
+            <td>-</td>
+            <td style="border-right: 1px solid">-</td>
+            <td>-</td>
+            <td>-</td>
+            <td style="border-right: 1px solid">
+                -<%= number_to_currency(co[:remaining_credit]) %>
+            </td>
+            <td style="border-right: 1px solid">-</td>
+            
+            <% running_balance -= co[:remaining_credit] %>
+            <td style="font-style: italic">
+                <%= number_to_currency(running_balance) %>
+            </td>
+        </tr>
     <% end %>
 </table>
-<br/>

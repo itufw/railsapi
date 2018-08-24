@@ -1,3 +1,5 @@
+<!-- edited by vchar on 20180822 -->
+
 <%
   task_parent = (task.parent_task.nil? || Task.where(task.parent_task).blank?) ? nil : Task.find(task.parent_task)
   task_children = Task.task_children(task.id)

@@ -1,54 +1,119 @@
-<div class="container">
-    <div class="row">
-      <div class="col-md-8 col-md-offset-4">
-        <%= @email_title %>
-      </div>
+<!-- edited by vchar on 20180824 -->
 
-        <div class="col-md-8 col-md-offset-4">
-            <%= form_for @email_content, :url => {:controller => "accounts", :action => "send_reminder"}  do |email_content| %>
-            <%= hidden_field_tag :checked_send_email_to_self, @checked_send_email_to_self %>
-            <%= hidden_field_tag :email_subject, @email_title %>
-            <%= hidden_field_tag :cn_op, @cn_op %>
-            <%= hidden_field_tag :multiple_customer_id, @multiple_customer_id%>
 
-              <%= email_content.hidden_field(:email_type)%>
-              <%= email_content.hidden_field(:customer_id)%>
-              <%= email_content.hidden_field(:selected_invoices)%>
-              <%= email_content.hidden_field(:customer_id)%>
+<%= title "Email missed payment" %>
 
-              <%= label(:title, "Send to:")%>
-              <%= email_content.text_field :receive_address, :maxlength=>"100"	%>
-              <br/>
-              <%= label(:title, "CC:")%>
-              <%= email_content.text_field :cc, :maxlength=>"100"	%>
-              <br/>
-              <%= label(:title, "BCC:")%>
-              <%= email_content.text_field :bcc, :maxlength=>"100"	%>
-              <br/>
-              <%= label(:file_attachment, "Attach PoD:")%>
-              <%= email_content.file_field :attachment, :multiple => true %>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header text-center h3 text-secondary">
+                <%= @email_title %>
+            </div>
+            <%= form_for @email_content, :url => {:controller => "accounts", 
+                :action => "send_reminder"}  do |email_content| %>
 
-              <%= email_content.bootsy_area :content, editor_options: { link: false, html: false, image: false, lists: false, html: true, color: false}, :rows=>5, :cols=>60 %>
+                <%= hidden_field_tag :checked_send_email_to_self, @checked_send_email_to_self %>
+                <%= hidden_field_tag :email_subject, @email_title %>
+                <%= hidden_field_tag :cn_op, @cn_op %>
+                <%= hidden_field_tag :multiple_customer_id, @multiple_customer_id%>
 
-              <% available = []%>
-              <% unavailable = [] %>
-              <% @over_due_invoices.map(&:invoice_number).each do |invoice| %>
-                <% (FastwayTrace.pod_available(invoice).count>0) ? available.append(invoice) : unavailable.append(invoice)%>
-              <% end %>
-              <% staff_pods = Order.where('id IN (?) AND proof_of_delivery IS NOT NULL', unavailable).map(&:id).map(&:to_s)%>
-              <% available += staff_pods %>
-              <% unavailable -= staff_pods %>
-              <p style="color: green;">POD Available: <%= available.join(', ') %></p>
-              <p style="color: red;">POD Unavailable: <%= unavailable.join(', ') %></p>
-            <%=render "reminder_mailer_partials/reminder_table", over_due_invoices: @over_due_invoices, xero_contact: @xero_contact%>
+                <%= email_content.hidden_field(:email_type)%>
+                <%= email_content.hidden_field(:customer_id)%>
+                <%= email_content.hidden_field(:selected_invoices)%>
+                <%= email_content.hidden_field(:customer_id)%>
+                
+                <div class="card-body">
+                    <div class="form">
+                        <div class="form-group row">
+                            <%= label :title, "Send to:", class: "col-md-2 col-form-label" %>
+                            <div class="col-md-10">
+                                <%= email_content.text_field :receive_address, 
+                                    :maxlength=>"100", class: "form-control" %>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <%= label :title, "CC:", class: "col-md-2 col-form-label" %>
+                            <div class="col-md-10">
+                                <%= email_content.text_field :cc, :maxlength=>"100",
+                                    class: "form-control" %>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <%= label :title, "BCC:", class: "col-md-2 col-form-label" %>
+                            <div class="col-md-10">
+                                <%= email_content.text_field :bcc, :maxlength=>"100",
+                                    class: "form-control" %>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <%= label :file_attachment, "Attach PoD:", 
+                                    class: "col-md-2 col-form-label" %>
+                            <div class="col-md-10">
+                                <div class="custom-file">
+                                    <%= email_content.file_field :attachment, :multiple => true, 
+                                        class: "custom-file-input" %>
+                                    <%= label :file_attachment, "...", 
+                                        class: "custom-file-label" %>
+                                </div>
+                            </div> 
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-sm">
+                                <%= email_content.bootsy_area :content, 
+                                    editor_options: { link: false, html: false, 
+                                        image: false, lists: false, 
+                                        html: true, color: false 
+                                    }, :rows=>5, :cols=>60, class: "form-control" %>
+                            </div>
+                        </div>                
+                        <% available = []%>
+                        <% unavailable = [] %>
+                        <% @over_due_invoices.map(&:invoice_number).each do |invoice| %>
+                            <% (FastwayTrace.pod_available(invoice).count>0) ? 
+                                available.append(invoice) : unavailable.append(invoice)%>
+                        <% end %>
+                    
+                        <% staff_pods = Order.where('id IN (?) AND proof_of_delivery 
+                            IS NOT NULL', unavailable).map(&:id).map(&:to_s)%>
+                        <% available += staff_pods %>
+                        <% unavailable -= staff_pods %>
+                        <div class="row">
+                            <div class="col-sm">
+                                <% unless available.size < 1 %>
+                                    <span class="badge badge-success">
+                                        POD Available: <%= available.join(', ') %>
+                                    </span>
+                                <% end %>
+                                <% unless unavailable.size < 1 %>
+                                    <span class="badge badge-danger">
+                                        POD Unavailable: <%= unavailable.join(', ') %>
+                                    </span>
+                                <% end %>
+                            </div>
+                        </div>
 
-            <%= email_content.bootsy_area :content_second, editor_options: { link: false, html: false, image: false, lists: false, html: true, color: false}, :rows=>10, :cols=>60 %>
-            </br>
-              <%= button_tag(type: 'submit', class: "btn btn-primary") do %>
-                Send Email
-              <% end %>
-              <%= submit_tag "Do Not Send",class: 'btn btn-primary'%>
+                        <%= render "reminder_mailer_partials/reminder_table", 
+                            over_due_invoices: @over_due_invoices, 
+                            xero_contact: @xero_contact %>
+
+                        <div class="form-group row">
+                            <div class="col-sm">
+                                <%= email_content.bootsy_area :content_second, 
+                                    editor_options: { link: false, html: false, 
+                                        image: false, lists: false, html: true, 
+                                        color: false
+                                    }, :rows=>5, :cols=>60, class: "form-control" %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <%= submit_tag 'send email', class: 'btn btn-primary' %>
+                    <%= link_to "cancel", url_for(:back), class: 'btn btn-secondary text-white' %>
+                </div>    
             <% end %>
         </div>
     </div>
 </div>
+
+
