@@ -1,78 +1,92 @@
+<!-- edited by vchar on 20180828 -->
+
+
 <%= title "Calendar" %>
 
 <script src="//maps.google.com/maps/api/js?key=AIzaSyB1HFWQ1DigWTnXGn_ZaUOk-v8hgGF3moI"></script>
 <script src="//cdn.rawgit.com/mahnunchik/markerclustererplus/master/dist/markerclusterer.min.js"></script>
 
 
-<div class="container">
-  <div class="row">
-    <div class='col-md-6'>
-      <input type="checkbox" value="event" id="event_checkbox"/>
-      <lable for="event_checkbox">Event</lable>
-      <input type="checkbox" value="customer" id="customer_checkbox"/>
-      <lable for="customer_checkbox">Customer</lable>
-      <input type="checkbox" value="customer" id="lead_checkbox"/>
-      <lable for="lead_checkbox">Lead</lable>
-      <br/><br/>
-      <div id="customer_location" style='width: 500px; height: 500px;'></div>
-      <button type="button" class="btn btn-default" id="filter_on">Filter</button>
-      <div id = "calendar_map_filter">
-        <%=  render 'calendar_partials/calendar_map_filter' %>
-      </div>
+<div id="customer_location" style='height: 360px;' class="mb-3"></div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="row mb-3">
+            <div class="col-lg">
+                <div class="form-check form-check-inline">
+                    <input type="checkbox" class="form-check-input" value="event" id="event_checkbox" />
+                    <label for="" class="form-check-label" for="event_checkbox">Event</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input type="checkbox" class="form-check-input" value="customer" id="customer_checkbox" />
+                    <label for="" class="form-check-label" for="customer_checkbox">Customer</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input type="checkbox" class="form-check-input" value="customer" id="lead_checkbox" />
+                    <label for="" class="form-check-label" for="lead_checkbox">Lead</label>
+                </div>                
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                <ul id="selector" class="list-group">
+                    <% @staffs.each do |staff|%>
+                        <li class="list-group-item list-group-item-action list-group-item-warning staff-select">
+                            <%= link_to staff.nickname, fetch_calendar_path(
+                                calendar_staff_selected: staff.id, start_date: @start_date), 
+                                remote: true, staff_id: staff.id.to_s %>
+                        </li>
+                    <% end %>
+                </ul>
+            </div>
+            <div class="col-lg-8">
+                <div id = "calendar_map_filter">
+                    <%=  render 'calendar_partials/calendar_map_filter' %>
+                </div>
+            </div>
+        </div>
     </div>
+    <div class="col-lg-6">
+        <div class="btn group" role="group" data-toggle="buttons" aria-label="calendar_radio">
+            <label type="button" class="btn btn-default calendar_radio" date='monthly'>
+                <%= radio_button_tag(:calendar_radio, "monthly") %> Month
+            </label>
+            <label type="button" class="btn btn-default calendar_radio" date='weekly'>
+                <%= radio_button_tag(:calendar_radio, "weekly") %> Week
+            </label>
+        </div>
 
-    <!-- google map component -->
-    <div class='col-md-6'>
-      <div id="selector" class="btn-group">
-        <% @staffs.each do |staff|%>
-          <label type="button" class="btn btn-default staff-select"><%= link_to staff.nickname, fetch_calendar_path(calendar_staff_selected: staff.id, start_date: @start_date), remote: true, staff_id: staff.id.to_s %></label>
-        <% end %>
-      </div>
-      <br/>
-      <div class="btn group" role="group" data-toggle="buttons" aria-label="calendar_radio">
-        <label type="button" class="btn btn-default calendar_radio" date='monthly'><%= radio_button_tag(:calendar_radio, "monthly") %> Month</label>
-        <label type="button" class="btn btn-default calendar_radio" date='weekly'><%= radio_button_tag(:calendar_radio, "weekly") %> Week</label>
-      </div>
-
-      <div id="calendar_table"></div>
+        <div id="calendar_table"></div>
     </div>
-
-  </div>
 </div>
 
 <!-- staff calendar selector -->
 <script>
 
-var event_markers = null;
-var customer_markers = null;
-var lead_markers = null;
-<% events = get_events_details(session[:user_id], @start_date.beginning_of_month, @start_date.end_of_month) %>
+    var event_markers = null;
+    var customer_markers = null;
+    var lead_markers = null;
+    <% events = get_events_details(session[:user_id], @start_date.beginning_of_month, @start_date.end_of_month) %>
 
-var handler = Gmaps.build('Google');
-handler.buildMap({
-    internal: {
-        id: 'customer_location'
-    }
-}, function () {
-  event_markers = handler.addMarkers(<%=raw get_events_pins(events).to_json %>);
-  handler.bounds.extendWith(event_markers);
-  handler.fitMapToBounds();
-});
+    var handler = Gmaps.build('Google');
+    handler.buildMap({
+        internal: {
+            id: 'customer_location'
+        }
+    }, function () {
+        event_markers = handler.addMarkers(<%=raw get_events_pins(events).to_json %>);
+        handler.bounds.extendWith(event_markers);
+        handler.fitMapToBounds();
+    });
 
 
-var calendar_table = $('#calendar_table');
-var calendar_radio = $('div[aria-label=calendar_radio]');
-var event_checkbox = $('#event_checkbox');
-var customer_checkbox = $('#customer_checkbox');
-var lead_checkbox = $('#lead_checkbox');
-calendar_table.html("<%=j render 'calendar_partials/monthly_calendar', staff_id: session[:user_id], events: events%>");
+    var calendar_table = $('#calendar_table');
+    var calendar_radio = $('div[aria-label=calendar_radio]');
+    var event_checkbox = $('#event_checkbox');
+    var customer_checkbox = $('#customer_checkbox');
+    var lead_checkbox = $('#lead_checkbox');
+    calendar_table.html("<%=j render 'calendar_partials/monthly_calendar', staff_id: session[:user_id], events: events%>");
 
-$('#event_checkbox').attr('checked',true);
-
-  // hide filter
-$("#calendar_map_filter").hide();
-$("#filter_on").click(function(){
-  $("#calendar_map_filter").toggle();
-});
+    $('#event_checkbox').attr('checked',true);
 
 </script>
