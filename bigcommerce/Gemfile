@@ -114,7 +114,7 @@ gem 'rails-jquery-autocomplete'
 # fuzzy match
 gem 'fuzzy-string-match'
 # calendar gem
-gem 'simple_calendar'
+gem "simple_calendar", "~> 2.0"
 # product note rate it
 gem 'rails-rateit', '~> 1.0.22', github:'berikin/rails-rateit'
 
