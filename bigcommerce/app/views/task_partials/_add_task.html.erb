@@ -115,7 +115,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row mt-2">
                             <div class="col-md-6">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
@@ -123,7 +123,7 @@
                                     </div>
                                     <%= collection_select(:lead, :id, @leads, :id, 
                                         :actual_name, {:include_blank => 'Active Leads'}, 
-                                        {:class => 'lead_selection'}) %>
+                                        {:class => 'lead_selection form-control'}) %>
                                 </div>
                             </div>
                         </div>
@@ -210,14 +210,13 @@
         </div>
 
         <div class="col-md-12 text-center mt-3">
-                <%= f.text_area :description, :rows=>12, 
+                <%= f.text_area :description, :rows=>8, 
                     class: "form-control" %>   
                 <%= button_tag('Create task!', type: 'submit', 
                     id: 'create_button', class: "btn btn-primary mt-3") %>
         </div>
     </div>
 <% end %>
-
 
 <script>
     $(function () {
