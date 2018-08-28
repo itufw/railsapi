@@ -1,19 +1,29 @@
+<!-- edited by vchar on 20180825 -->
+
+
 <%= title "#{session[:username]}'s Tasks" %>
 
-<div class="container">
-	<div class="row">
-		<div class="col-md-12 col-md-offset-10">
-			<button class="btn btn-primary"><%= link_to "Add Note", controller: "activity", action: "add_note"%></button>
-			<button class="btn btn-primary"><%= link_to "Add Task", controller: "activity", action: "add_activity"%></button>
+<div class="row">
+    <div class="col-md">
+        <div class="card">
+            <div class="card-header text-center h3">
+                <%= "#{session[:username]}'s Tasks" %>
+				<p class="mt-2">
+					<%= link_to "Add Note", { controller: "activity", 
+						action: "add_note" }, class: "btn btn-outline-primary text-info" %>
+					<%= link_to "Add Task", { controller: "activity", 
+						action: "add_activity" }, class: "btn btn-outline-primary text-info" %>
+				</p>
+            </div>
+            <div class="card-body">
+				<%= form_tag({ :controller => "task", :action => "staff_task" }, 
+					{ :method => "get", class: "form-inline justify-content-center" }) do %>
+					<%= render 'task_partials/staff_table_filter' %>
+				<% end %>
+			</div>
 		</div>
 	</div>
-	<%= form_tag({:controller => "task", :action => "staff_task"}, {:method => "get"}) do %>
-		<%= render 'task_partials/staff_table_filter' %>
-
-	<div class="row" id="task_row">
-		<%= render "partials/form_paginate", objects: @tasks %>
-		<% end %>
-		<%= render "task_partials/task_table" unless @tasks.blank?%>
-	</div>
-
 </div>
+
+<%= render "partials/form_paginate", objects: @tasks %>
+<%= render "task_partials/task_table" unless @tasks.blank?%>

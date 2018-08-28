@@ -1,53 +1,96 @@
+<!-- edited by vchar on 20180825 -->
+
+
 <div class="row">
-	<div class="col-xs-2">
-
-		<%= label_tag :staff, 'Assigned:'%>
-		<% if user_full_right(session[:authority]) %>
-		 <%= collection_select(:staff, :assigned, Staff.active, :id, :nickname, {:include_blank => 'All', selected: @selected_assigned}, {:class => 'form-control'}) %>
-		<% else %>
-			<%= collection_select(:staff, :assigned, Staff.filter_by_id([session[:user_id]]), :id, :nickname, {:class => 'form-control'}) %>
-		<% end %>
-
-		<%= label_tag :status, 'Type:'%>
-		<%= select_tag "display_options", options_for_select(["Task", "Note","All","Expired All"], selected: @selected_display), class:"form-control" unless @selected_display.nil?%>
-
-	</div>
-	<div class="col-xs-2">
-		<%= label_tag :creator, 'Creator:'%>
-		<%= collection_select(:staff, :creator, Staff.active, :id, :nickname, {:include_blank => 'All', selected: @selected_creator}, {:class => 'form-control'}) %>
-	</div>
-
-	<div class="col-xs-3">
-		<%= label(:start_date, "Start")%>
-	  <div class='input-group date' id='start_timepicker', style='width: 200px'>
-	    <%= text_field_tag('start_date',"", placeholder: 'Start Timepicker', class: 'form-control') %>
-	    <span class="input-group-addon">
-	      <span class="glyphicon glyphicon-calendar"></span>
-	    </span>
-	  </div>
-	  <%= label(:end_date, "end")%>
-	  <div class='input-group date' id='due_timepicker', style='width: 200px'>
-	    <%= text_field_tag('end_date',"", placeholder: 'End Timepicker', class: 'form-control') %>
-	    <span class="input-group-addon" style="height: 26px">
-	      <span class="glyphicon glyphicon-calendar"></span>
-	    </span>
-	  </div>
-	</div>
-
-  <div class="col-xs-3">
-    <%= label(:filter, "Filter By Date:")%>
-    <div>
-      <%= radio_button_tag(:date_column, "create_date", @date_column=='create_date') %> Create
-      <span style="margin-left: 50px;">
-      <%= radio_button_tag(:date_column, "start_date", @date_column=='start_date') %>  Start
-      <span style="margin-left: 50px;">
-      <%= radio_button_tag(:date_column, "end_date", @date_column=='end_date') %>  Due
-      </span>
+	<div class="col-sm-6 col-md-4 col-lg-4 mb-2">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Assignee</span>
+        	</div>
+    		<% if user_full_right(session[:authority]) %>
+    		 <%= collection_select(:staff, :assigned, Staff.active, :id, :nickname, {:include_blank => 'All', selected: @selected_assigned}, {:class => 'form-control'}) %>
+    		<% else %>
+    			<%= collection_select(:staff, :assigned, Staff.filter_by_id([session[:user_id]]), :id, :nickname, {:class => 'form-control'}) %>
+    		<% end %>
+        </div>
     </div>
-    <%= submit_tag "Search", class: 'btn btn-primary' %>
-		<%= link_to 'Reset', controlloer: 'task', action: 'staff_task', class: 'btn btn-primary' %>
+    <div class="col-sm-6 col-md-4 col-lg-4 mb-2">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Type</span>
+            </div>
+            <%= select_tag "display_options", options_for_select(["Task", "Note","All","Expired All"], selected: @selected_display), class:"form-control" unless @selected_display.nil?%>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-4 col-lg-4 mb-2">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Creator</span>
+            </div>
+    		<%= collection_select(:staff, :creator, Staff.active, :id, :nickname, {:include_blank => 'All', selected: @selected_creator}, {:class => 'form-control'}) %>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-4 col-lg-4 mb-2">
+        <div class="input-group date" id='start_timepicker'>
+            <div class="input-group-prepend">
+                <span class="input-group-text">Start</span>
+            </div>
+            <%= text_field_tag('start_date',"", placeholder: 'Start Timepicker', class: 'form-control') %>
+            <div class="input-group-append">
+                <span class="input-group-text">
+                    <span class="input-group-addon">
+                        <span class="far fa-calendar-alt"></span>
+                    </span>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-4 col-lg-4 mb-2">
+        <div class="input-group date" id='due_timepicker'>
+            <div class="input-group-prepend">
+                <span class="input-group-text">End</span>
+            </div>
+            <%= text_field_tag('end_date',"", placeholder: 'End Timepicker', 
+                class: 'form-control') %>
+            <div class="input-group-append">
+                <span class="input-group-text">
+                    <span class="input-group-addon">
+                        <span class="far fa-calendar-alt"></span>
+                    </span>                
+                </span>
+            </div>
+    	</div>
+    </div>	  
+    <div class="col-sm-6 col-md-4 col-lg-4 mb-2">
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary btn-block dropdown-toggle" 
+                type="button" id="data_filter" data-toggle="dropdown" 
+                aria-haspopup="true" aria-expanded="false">
+                select a date filter  
+            </button>
+            <ul class="dropdown-menu btn-block" aria-labelledby="data_filter" role="menu">
+                <li class="dropdown-item">
+                    <%= radio_button_tag(:date_column, "create_date", 
+                    @date_column=='create_date') %> Date created
+                </li>
+                <li class="dropdown-item">
+                    <%= radio_button_tag(:date_column, "start_date", 
+                        @date_column=='start_date') %> Date started
+                </li>
+                <li class="dropdown-item">
+                    <%= radio_button_tag(:date_column, "end_date", 
+                        @date_column=='end_date') %> Date due
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
 
-  </div>
+<div class="row">
+    <div class="col">
+        <%= submit_tag "Search", class: 'btn btn-primary' %>
+		<%= link_to 'Reset', { controlloer: 'task', action: 'staff_task' }, class: 'btn btn-secondary' %>
+    </div>
 </div>
 
 
