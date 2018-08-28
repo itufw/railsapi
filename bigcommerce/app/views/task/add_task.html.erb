@@ -1,9 +1,20 @@
+<!-- edited by vchar on 20180824 -->
+
 <%= title "Add Note/Task" %>
-<div class="container">
-    <div class="row">
-        <div class="col-md-12 col-md-offset-10">
-            <button class="btn btn-primary"><%= link_to "My Task/Note", controller: "task", action: "staff_task"%></button>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header text-center h3 text-secondary">
+                Add Note/Task
+                <p class="h5 mt-2">
+                     <%= link_to "My Task/Note", { controller: "task", 
+                        action: "staff_task" }, 
+                        class: 'btn btn-outline-info text-info' %>
+                </p>
+            </div>
+            <div class="card-body">
+                <%= render "task_partials/add_task"%>
+            </div>
         </div>
     </div>
-    <%= render "task_partials/add_task"%>
 </div>
