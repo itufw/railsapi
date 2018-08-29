@@ -1,61 +1,89 @@
-  <table class="reference-table group-item-table table table-striped table-bordered table-hover table-responsive">
+<!-- edited by vchar on 20180825 -->
+
+
+<table class="reference-table group-item-table table table-striped table-bordered 
+    table-hover table-responsive w-100 d-block d-table">
     <thead>
-      <tr>
-        <th>
-          <%= autocomplete_field_tag 'product_name', '', autocomplete_product_no_ws_name_activity_index_path, placeholder: 'Product No WS', id: 'product_no_ws_search', model: 'ProductNoWs'%>
-        </th>
-        <th>
-          <%= autocomplete_field_tag 'staff_name', '', autocomplete_staff_nickname_activity_index_path, placeholder: 'Staff', id: 'staff_search', model: 'Staff' %>
-        </th>
-        <th>
-          <%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Customer', id: 'customer_search', model: 'Customer' %>
-        </th>
-      </tr>
-      <tr>
-        <th>
-          <%= autocomplete_field_tag 'product_names', '', autocomplete_product_name_activity_index_path, placeholder: 'Product', id: 'product_search', model: 'Product'%>
-        </th>
-        <th>
-          <%= autocomplete_field_tag 'sale_rate_term', '', autocomplete_sale_rate_term_name_activity_index_path, placeholder: 'Sale Rate Term', id: 'term_search', model: 'SaleRateTerm'%>
-        </th>
-      </tr>
-      <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Model</th>
-      </tr>
+        <tr>
+            <th>
+                <%= autocomplete_field_tag 'product_name', '', 
+                    autocomplete_product_no_ws_name_activity_index_path, 
+                    placeholder: 'Product No WS', id: 'product_no_ws_search', 
+                    model: 'ProductNoWs', class: 'form-control' %>
+            </th>
+            <th>
+                <%= autocomplete_field_tag 'staff_name', '', 
+                    autocomplete_staff_nickname_activity_index_path, 
+                    placeholder: 'Staff', id: 'staff_search', 
+                    model: 'Staff', class: 'form-control' %>
+            </th>
+            <th>
+                <%= autocomplete_field_tag 'name', '', 
+                    autocomplete_customer_actual_name_activity_index_path, 
+                    placeholder: 'Customer', id: 'customer_search', 
+                    model: 'Customer', class: 'form-control' %>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <%= autocomplete_field_tag 'product_names', '', 
+                    autocomplete_product_name_activity_index_path, 
+                    placeholder: 'Product', id: 'product_search', 
+                    model: 'Product', class: 'form-control' %>
+            </th>
+            <th>
+                <%= autocomplete_field_tag 'sale_rate_term', '', 
+                    autocomplete_sale_rate_term_name_activity_index_path, 
+                    placeholder: 'Sale Rate Term', id: 'term_search', 
+                    model: 'SaleRateTerm', class: 'form-control'%>
+            </th>
+        </tr>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Model</th>
+        </tr>
     </thead>
     <% group.items.each do |item| %>
-      <tr model="<%= item.item_model %>" item-id="<%= item.item_id%>">
-        <td><%= item.item_id %></td>
-        <td><%= item.item_model.constantize.find(item.item_id).name %></td>
-        <td><%= item.item_model%></td>
-        <td><i class="glyphicon glyphicon-remove item-modification" title="Remove from Group" style="color: black;" data-href="<%= fetch_remove_item_path%>?group_id=<%= group.id%>&item_model=<%= item.item_model%>&item_id=<%= item.item_id%>"></i></td>
-      </tr>
+        <tr model="<%= item.item_model %>" item-id="<%= item.item_id%>">
+            <td><%= item.item_id %></td>
+            <td><%= item.item_model.constantize.find(item.item_id).name %></td>
+            <td><%= item.item_model%></td>
+            <td><i class="far fa-trash-alt item-modification" 
+                    title="Remove from Group" 
+                    data-href="<%= fetch_remove_item_path%>?
+                        group_id=<%= group.id%>&
+                        item_model=<%= item.item_model%>&
+                        item_id=<%= item.item_id%>">
+                </i>
+            </td>
+        </tr>
     <% end %>
-  </table>
+</table>
 
 <script type="text/javascript">
-  $(document).on('railsAutocomplete.select', '#product_search, #staff_search, #customer_search, #product_no_ws_search, #term_search', function(event, data){
-    // No duplicated item in Staff Group Lists
-    if ($('.group-item-table').find('[model='+ $(this).attr('model') +'][item-id='+ data.item.id +']').length == 0){
-      $('.group-item-table').append([
-        '<tr model="'+ $(this).attr('model') +'" item-id="'+ data.item.id +'">',
-        '<td>' + data.item.id + '</td>',
-        '<td>' + data.item.value + '</td>',
-        '<td>' + $(this).attr('model') +'</td>',
-        '<td><i class="glyphicon glyphicon-ok item-modification" title="Add To Group" data-href="<%= fetch_add_item_path%>?group_id=<%= group.id%>&item_model='+$(this).attr('model') +'&item_id='+ data.item.id +'"></i></td>',
-        '</tr>'
-      ].join());
-    }
-  });
+    $(document).on('railsAutocomplete.select', 
+        '#product_search, #staff_search, #customer_search, #product_no_ws_search, #term_search', 
+        function(event, data){
+            // No duplicated item in Staff Group Lists
+            if ($('.group-item-table').find('[model='+ $(this).attr('model') +'][item-id='+ data.item.id +']').length == 0){
+                $('.group-item-table').append([
+                    '<tr model="'+ $(this).attr('model') +'" item-id="'+ data.item.id +'">',
+                    '<td>' + data.item.id + '</td>',
+                    '<td>' + data.item.value + '</td>',
+                    '<td>' + $(this).attr('model') +'</td>',
+                    '<td><i class="glyphicon glyphicon-ok item-modification" title="Add To Group" data-href="<%= fetch_add_item_path%>?group_id=<%= group.id%>&item_model='+$(this).attr('model') +'&item_id='+ data.item.id +'"></i></td>',
+                    '</tr>'
+                ].join());
+            }
+        });
 
-  $(document).on('click', '.item-modification', function(){
-    var link = $(this).data('href');
-    $.ajax({
-        type: 'GET',
-        url: link
+    $(document).on('click', '.item-modification', function(){
+        var link = $(this).data('href');
+        $.ajax({
+            type: 'GET',
+            url: link
+        });
+        $(this).remove();
     });
-    $(this).remove();
-  });
 </script>
