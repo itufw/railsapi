@@ -1,128 +1,215 @@
+<!-- edited by vchar on 20180828 -->
+
+
 <%= title "Event From Calendars" %>
+<div class="row mb-3">
+    <div class="col-md">
+        <div class="card">
+            <div class="card-header text-center h3">
+                Events Review
+            </div>
+            <div class="card-body">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Search events by customer</span>
+                    </div>
+                    <%= autocomplete_field_tag 'name', '', 
+                        autocomplete_customer_tag_name_calendar_index_path, 
+                        placeholder: 'Search Customer', id: 'event_check_search', 
+                        size: 15, class: 'form-control' %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <%= render 'partials/paginate', objects: @events %>
 
-<div class="row">
-  <div class="col-md-4">
-    <%= label(:search, "Search:")%>
-      <%= autocomplete_field_tag 'name', '', autocomplete_customer_tag_name_calendar_index_path, placeholder: 'Search Customer', id: 'event_check_search', size: 15 %>
-  </div>
-</div>
-
-
-<div class="row">
-  <div class="col-md-offset-1">
-    <table id="event-table" border = "1">
+<table id="event-table" class="table table-striped 
+    table-bordered table-hover table-responsive w-100 d-block d-table mt-0">
     <thead>
-      <tr>
-        <th>
-          <li class="dropdown">
-            <a class="" data-toggle="dropdown" href="#">Creator
-              <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <% @staffs.each do |staff| %>
-                <li class="staff-dropdown" id="staff-<%= staff.id%>">
-                  <%= link_to staff.nickname, controller: 'calendar', action: 'event_check_offline', selected_staff: staff.id %>
-                </li>
-                <% end %>
-              </ul>
-          </li>
-        </th>
-        <th>&nbsp;&nbsp;&nbsp;</th>
-        <th style="width: 300px">Summary</th>
-        <th>Time</th>
-        <th>&nbsp;&nbsp;&nbsp;</th>
-        <th>Customer</th>
-        <th>Method</th>
-        <th>Subjects</th>
-        <th>&nbsp;&nbsp;&nbsp;</th>
-      </tr>
-    </thead>
-      <% @events.each do |event|%>
-      	<%= form_tag({:action => "translate_events"}, {:method => "get"}) do %>
-        <%= hidden_field_tag :event_id , event.google_event_id %>
-        <%
-          response_staff = @staffs.select{|x| x.id == event.response_staff }
-        %>
-        <tr class="google-event-line  staff-event-<%= response_staff.first.id.to_s%>">
-          <td><%= response_staff.first.nickname %></td>
-          <td>&nbsp;&nbsp;&nbsp;</td>
-          <td>
-            <%= event.description.to_s %> <br/>
-            <%= event.location.to_s %> <br/>
-            <%= event.summary[0...200] unless event.summary.nil?%>
-          </td>
-
-          <td><%= event.start_date.strftime("%d/%m %H:%M")%> --
-              <%= event.end_date.strftime("%H:%M")%>
-          </td>
-
-          <td>&nbsp;&nbsp;&nbsp;</td>
-          <%
-          unless event.description.nil? && event.summary.nil?
-            pattern = event.summary.downcase unless event.summary.nil?
-            pattern = event.description.split("\n").to_s.first.downcase unless event.description.nil?
-            pattern.slice! ' tasting'
-            pattern = pattern.split('-').first
-
-            begin
-              customer_list = Customer.filter_by_staff(response_staff.first.id).search_for(pattern)
-            rescue
-              customer_list = []
-            end
-
-            begin
-              lead_list = CustomerLead.filter_by_staff(response_staff.first.id).not_customer.search_for(pattern)
-            rescue
-              lead_list = []
-            end
-
-            begin
-              unless event.location.nil?
-                pattern = event.location.downcase
-                customer_list += Customer.filter_by_staff(response_staff.first.id).search_for(pattern)
-                lead_list += CustomerLead.filter_by_staff(response_staff.first.id).not_customer.search_for(pattern)
-              end
-            rescue
-            end
-
-            lead_list = lead_list.each {|x| x.actual_name = x.actual_name.to_s + ', (Lead)'}
-            customer_list = (lead_list + customer_list).sort_by!  {|x| @jarow.getDistance(pattern, x.actual_name) }.reverse
-            selected_collection = (customer_list.blank?) ? nil : "#{customer_list.first.id}|#{customer_list.first.actual_name}"
-          %>
-            <td>
-              <%= collection_select :customer, :customer, customer_list, ->(ob) {"#{ob.id}|#{ob.actual_name}"}, :actual_name, {include_blank: "Select a Customer", selected: selected_collection }, :style => "width: 150px" %>
-            </td>
-          <%else%>
-            <td></td>
-          <%end%>
-          <td><%= collection_select :method, :method, @methods, :method, :method, {:include_blank => "Select a Method", :selected => "Meeting"}, :style => "width: 80px" %></td>
-          <td><%= collection_select :subject, :subject, @subjects, :id, :subject, {:include_blank => "Select a Subject", :selected => 2}, :style => "width: 80px" %></td>
-          <td>
-            <%= button_tag(type: 'submit', name: 'submit', class: "btn btn-default", value: 'confirm') do%>
-              <span class="glyphicon glyphicon-plus"></span>
-            <% end %>
-            <%= button_tag(type: 'submit', name: 'submit', class: "btn btn-default", value: 'reject') do%>
-              <span class="glyphicon glyphicon-remove"></span>
-            <% end %>
-            <%= link_to '<i class="glyphicon glyphicon-pencil" title="Create Lead"></i>'.html_safe, controller: "lead", action: "create_leads", customer_name: event.summary.to_s.split("\n").first.to_s + event.location.to_s, staff_id: response_staff.first.id%>
-          </td>
+        <tr>
+            <th>
+                <div class="dropdown">
+                    <a class="btn btn-outline-info text-info dropdown-toggle" 
+                        data-toggle="dropdown" href="#" aria-haspopup="true" 
+                        aria-expanded="false">Creator</a>
+                    <ul class="dropdown-menu">
+                        <% @staffs.each do |staff| %>
+                            <li class="dropdown-item staff-dropdown" id="staff-<%= staff.id%>">
+                                <%= link_to staff.nickname, controller: 'calendar', action: 'event_check_offline', selected_staff: staff.id %>
+                            </li>
+                        <% end %>
+                    </ul>
+                </div>
+            </th>
+            <th>Summary</th>
+            <th>Time</th>
+            <th style="min-width: 150px">Customer</th>
+            <th style="min-width: 120px">Method</th>
+            <th style="min-width: 120px">Subjects</th>
+            <th style="min-width: 180px"></th>
         </tr>
+    </thead>
+    <% @events.each do |event|%>
+        <%= form_tag({:action => "translate_events"}, {:method => "get"}) do %>
+            <%= hidden_field_tag :event_id , event.google_event_id %>
+            <% response_staff = @staffs.select{|x| x.id == event.response_staff } %>
+
+            <tr class="google-event-line staff-event-<%= response_staff.first.id.to_s%>">
+                <td><%= response_staff.first.nickname %></td>
+                <td>
+                    <% unless event.description.blank? %>
+                        <div class="card mb-2">
+                            <div class="card-body">
+                             <!--    <h5 class="card-title"></h5> -->
+                                <h6 class="card-subtitle mb-2 text-muted">Description</h6>
+                                <p class="card-text">
+                                    <%= event.description %>
+                                </p>
+                            </div>
+                        </div>
+                    <% end %>
+                    <% unless event.location.blank? %>
+                        <div class="card mb-2">
+                            <div class="card-body">
+                             <!--    <h5 class="card-title"></h5> -->
+                                <h6 class="card-subtitle mb-2 text-muted">Location</h6>
+                                <p class="card-text">
+                                    <%= event.location %>
+                                </p>
+                            </div>
+                        </div>
+                    <% end %>
+                    <% unless event.summary.blank? %>
+                        <div class="card">
+                            <div class="card-body">
+                             <!--    <h5 class="card-title"></h5> -->
+                                <h6 class="card-subtitle mb-2 text-muted">Summary</h6>
+                                <p class="card-text">
+                                    <%= event.summary[0...200] %>
+                                </p>
+                            </div>
+                        </div>
+                    <% end %>
+                </td>
+
+                <td>
+                    <span class="badge">on <%= event.start_date.strftime("%d/%m/%y") %></span>
+                    <span class="badge badge-light">
+                        <%= event.start_date.strftime("%H:%M")%> --
+                        <%= event.end_date.strftime("%H:%M")%>
+                    </span>
+                </td>
+                <%
+                    unless event.description.nil? && event.summary.nil?
+                        pattern = event.summary.downcase unless event.summary.nil?
+
+                        unless event.description.nil?
+                            pattern = event.description.split("\n").to_s.first.downcase 
+                        end
+
+                        pattern.slice! ' tasting'
+                        pattern = pattern.split('-').first
+
+                        begin
+                            customer_list = Customer
+                                            .filter_by_staff(response_staff.first.id)
+                                            .search_for(pattern)
+                        rescue
+                            customer_list = []
+                        end
+
+                        begin
+                            lead_list = CustomerLead
+                                        .filter_by_staff(response_staff.first.id)
+                                        .not_customer.search_for(pattern)
+                        rescue
+                            lead_list = []
+                        end
+
+                        begin
+                            unless event.location.nil?
+                                pattern = event.location.downcase
+                                customer_list += Customer
+                                                .filter_by_staff(response_staff.first.id)
+                                                .search_for(pattern)
+                                lead_list += CustomerLead
+                                            .filter_by_staff(response_staff.first.id)
+                                            .not_customer.search_for(pattern)
+                            end
+                        rescue
+                        end
+
+                        lead_list = lead_list.each {
+                                        |x| x.actual_name = x.actual_name.to_s + ', (Lead)'
+                                    }
+
+                        customer_list = (lead_list + customer_list).sort_by! {
+                                            |x| @jarow.getDistance(pattern, x.actual_name) 
+                                        }.reverse
+
+                        selected_collection = (customer_list.blank?) ? nil : 
+                            "#{customer_list.first.id}|#{customer_list.first.actual_name}"
+                    %>
+                    <td>
+                        <%= collection_select :customer, :customer, customer_list, 
+                            ->(ob) {"#{ob.id}|#{ob.actual_name}"}, :actual_name, { 
+                                include_blank: "Select a Customer", 
+                                selected: selected_collection 
+                            }, class: "form-control" %>
+                    </td>
+                <%else%>
+                    <td></td>
+                <%end%>
+
+                <td>
+                    <%= collection_select :method, :method, @methods, 
+                        :method, :method, { :include_blank => "Select a Method", 
+                        :selected => "Meeting" }, class: "form-control" %>
+                </td>
+                <td>
+                    <%= collection_select :subject, :subject, @subjects, 
+                        :id, :subject, { :include_blank => "Select a Subject", 
+                        :selected => 2 }, class: "form-control" %>
+                </td>
+                <td>
+                    <%= button_tag(type: 'submit', name: 'submit', 
+                        class: "btn btn-default", value: 'confirm') do%>
+                        <span class="fas fa-plus"></span>
+                    <% end %>
+                    <%= button_tag(type: 'submit', name: 'submit', 
+                        class: "btn btn-default", value: 'reject') do%>
+                    <span class="far fa-trash-alt"></span>
+                    <% end %>
+                    <%= link_to '<i class="fas fa-pencil-alt" 
+                        title="Create Lead"></i>'.html_safe, { 
+                            controller: "lead", action: "create_leads", 
+                            customer_name: event.summary.to_s.split("\n").first.to_s + 
+                            event.location.to_s, staff_id: response_staff.first.id 
+                        }, class: "btn btn-default" %>
+                </td>
+            </tr>
         <% end %>
-      <% end %>
-    </table>
-  </div>
-</div>
+    <% end %>
+</table>
 
 <script>
-<% @staffs.each do |staff| %>
-  $("#staff-<%= staff.id%>").click(function(){
-    $(".google-event-line").hide();
-    $(".staff-event-<%=staff.id%>").toggle();
-  });
-<% end %>
+    <% @staffs.each do |staff| %>
+    $("#staff-<%= staff.id%>").click(function(){
+        $(".google-event-line").hide();
+        $(".staff-event-<%=staff.id%>").toggle();
+    });
+    <% end %>
 
-$('#event_check_search').bind('railsAutocomplete.select', function(event, data){
-  $('select[id=customer_customer]').append($('<option value='+ data.item.customer_id + '|' + data.item.name.toString() +'>'+ data.item.name +'</option>'));
-});
+    $('#event_check_search').bind('railsAutocomplete.select', function(event, data){
+        $('select[id=customer_customer]').append(
+            $(
+                '<option value='+ data.item.customer_id + '|' + 
+                data.item.name.toString() +'>'+ data.item.name +'</option>'
+            )
+        );
+    });
 
 </script>
