@@ -60,12 +60,15 @@ module TimePeriodStats
             # group_by decides if it is product_id or customer_id, etc
             # do we want to see number of bottles sold, or order totals is decided by sum_by
             unless group_by.empty?
-                result_h[t.name] = (eval where_query).date_filter(t.start_date.to_s, t.end_date.to_s)\
-                                                     .send(group_by).send(sum_by)
+                result_h[t.name] = (eval where_query)
+                                    .date_filter(t.start_date.to_s, t.end_date.to_s)
+                                    .send(group_by).send(sum_by)
             end
         end
         result_h, sorted_bool = sort_by_time_period(result_h, time_period_sort_col, direction)
+        
         object_ids = result_h.values.reduce(&:merge).keys unless result_h.blank?
+        
         [result_h, object_ids, time_periods.pluck('name'), sorted_bool]
     end
 

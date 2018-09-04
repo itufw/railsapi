@@ -543,4 +543,25 @@ class Order < ActiveRecord::Base
 
     ActiveRecord::Base.connection.execute(sql)
   end
+
+  # # # # # # # # # #
+  #  added by vchar #
+  # # # # # # # # # #
+  
+  # Returns orders with valid status or marked as allocation (id = 1)
+  # this method is used to fix a coincicent correctness which causes 
+  # incorrect report of pending status page on the product summary page,
+  # more specifically, products allocated to customers who have never
+  # bought it before will not be shown in the report.
+  def self.valid_and_allocated_orders
+    includes(:status).where('statuses.valid_order = 1 OR status_id = 1').references(:statuses)
+  end
+
+  # this method is created in corresponding to the coincident correntness
+  # issue as commented above the valid_and_allocated_orders method.
+  # this method actually tries to sum all orders except allocated ones.
+  def self.sum_order_product_qty_except_allocated
+    includes(:order_products).where('status_id != 1').sum('order_products.qty')
+  end
+
 end

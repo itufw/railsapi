@@ -74,7 +74,7 @@ class ProductController < ApplicationController
 
     # top customers
     top_customers(params, product_ids, customers_filtered_ids)
-
+      
     # calculate the pending stock for each customer
     @customer_pendings, @customer_ids = \
       customer_pending_amount(product_ids, params, @customer_ids)
@@ -184,11 +184,24 @@ class ProductController < ApplicationController
   def top_customers(params, product_ids, customers_filtered_ids)
     # result_h has the form {time_period_name => {customer_id => stock_bought}}
     # and it is sorted according to order_col and direction
-    @top_customers_timeperiod_h, @customer_ids, @time_periods, already_sorted = top_objects(\
-      'Order.order_product_filter(%s).customer_filter(%s).valid_order' % \
-        [product_ids, customers_filtered_ids], :group_by_customerid, :sum_order_product_qty,\
-      params[:order_col], params[:direction]
+
+    # the following commented statement causes coincident correctness, therefore,
+    # they are disabled and replaced. Though, the update will further be investigated
+    # to ensure it produces correct and desirable result.
+    # @top_customers_timeperiod_h, @customer_ids, @time_periods, already_sorted = top_objects(\
+      # 'Order.order_product_filter(%s).customer_filter(%s).valid_order' % \
+        # [product_ids, customers_filtered_ids], :group_by_customerid, :sum_order_product_qty,\
+    #   params[:order_col], params[:direction]
+    # )
+    @top_customers_timeperiod_h, @customer_ids, @time_periods, already_sorted = top_objects(
+      'Order.order_product_filter(%s).customer_filter(%s).valid_and_allocated_orders' %
+        [product_ids, customers_filtered_ids], 
+      :group_by_customerid, 
+      :sum_order_product_qty_except_allocated,
+      params[:order_col], 
+      params[:direction]
     )
+
     if already_sorted
       @top_customers = get_id_activerecord_h(Customer.include_all.filter_by_ids(@customer_ids))
     else
