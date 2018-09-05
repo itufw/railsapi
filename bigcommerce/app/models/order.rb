@@ -561,7 +561,7 @@ class Order < ActiveRecord::Base
   # issue as commented above the valid_and_allocated_orders method.
   # this method actually tries to sum all orders except allocated ones.
   def self.sum_order_product_qty_except_allocated
-    includes(:order_products).where('status_id != 1').sum('order_products.qty')
+    includes(:order_products).sum('order_products.qty')
   end
 
 end

@@ -72,6 +72,8 @@ class ProductController < ApplicationController
     @overall_stats = \
       overall(params, product_ids, customers_filtered_ids, @total_stock)
 
+    byebug
+    
     # top customers
     top_customers(params, product_ids, customers_filtered_ids)
       
@@ -197,7 +199,7 @@ class ProductController < ApplicationController
       'Order.order_product_filter(%s).customer_filter(%s).valid_and_allocated_orders' %
         [product_ids, customers_filtered_ids], 
       :group_by_customerid, 
-      :sum_order_product_qty_except_allocated,
+      :sum_order_product_qty,
       params[:order_col], 
       params[:direction]
     )
