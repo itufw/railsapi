@@ -16,11 +16,33 @@
     <%= f.text_field :name %>
     <span id="name_error" class="invalid_input"></span>
   </div>
+  
   <div class="field">
     <%= f.label :description %>
     <%= f.text_field :description %>
     <span id="description_error" class="invalid_input"></span>
   </div>
+
+  <div class="field">
+    <%= f.label :item_price_factor %>
+    <%= f.text_field :item_price_factor %>
+  </div>
+
+  <div class="field">
+    <%= f.label :item_wet %>
+    <%= f.text_field :item_wet %>
+  </div>
+
+  <div class="field">
+    <%= f.label :item_gst %>
+    <%= f.text_field :item_gst %>
+  </div>
+
+  <div class="field">
+    <%= f.label :based_price_deduction %>
+    <%= f.text_field :based_price_deduction %>
+  </div>
+
   <div class="actions">
     <%= f.submit %>
   </div>
