@@ -72,8 +72,6 @@ class ProductController < ApplicationController
     @overall_stats = \
       overall(params, product_ids, customers_filtered_ids, @total_stock)
 
-    byebug
-    
     # top customers
     top_customers(params, product_ids, customers_filtered_ids)
       
