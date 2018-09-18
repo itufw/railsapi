@@ -9,8 +9,12 @@ class ActivityController < ApplicationController
   autocomplete :product, :retail, column_name: 'name', full: true, scopes: [:retail_products], extra_data: [:calculated_price, :inventory]
   autocomplete :product_no_ws, :name, full: true, extra_data: [:product_no_vintage_id]
   autocomplete :product_no_vintage, :name, full: true
+
+  # TO BE DEPRECATED
   autocomplete :customer, :actual_name, full: true, extra_data: [:address]
+  
   autocomplete :customer, :retail, column_name: 'actual_name', full: true, scopes: [:retail_customer]
+  autocomplete :customer, :wholesale, column_name: 'actual_name', full: true, scopes: [:wholesale_customer]
   autocomplete :customer_lead, :actual_name, full: true, scopes: :not_customer
   autocomplete :contact, :name, display_value: :display_position, scopes: :has_role
   autocomplete :staff, :nickname, extra_data: [:nickname]

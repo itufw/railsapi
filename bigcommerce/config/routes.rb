@@ -71,8 +71,12 @@ Rails.application.routes.draw do
     get :autocomplete_product_retail, on: :collection
     get :autocomplete_product_no_ws_name, on: :collection
     get :autocomplete_product_no_vintage_name, on: :collection
+    
+    # TO BE DEPRECATED
     get :autocomplete_customer_actual_name, on: :collection
+
     get :autocomplete_customer_retail, on: :collection
+    get :autocomplete_customer_wholesale, on: :collection
     get :autocomplete_contact_name, on: :collection
     get :autocomplete_customer_lead_actual_name, on: :collection
     get :autocomplete_staff_nickname, on: :collection

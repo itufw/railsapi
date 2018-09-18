@@ -9,7 +9,7 @@
               <th>Customer</th>
               <td class="customer_autocomplete">
                 <% if @order.customer_id.nil? || @order.customer_id == ""%>
-                  <%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 30 %>
+                  <%= autocomplete_field_tag 'name', '', autocomplete_customer_wholesale_activity_index_path, placeholder: 'Search Customer', id: 'customer_search', size: 30 %>
                 <% else %>
                   <input type="text" name="customer" id="<%= @order.customer_id %>" value="<%= Customer.find(@order.customer_id).actual_name%>" readonly="readonly" size="30px">
                   <%= '<i class="glyphicon glyphicon-remove remove" title="remove"></i>'.html_safe if @order.xero_invoice_id.nil? && user_full_right%>

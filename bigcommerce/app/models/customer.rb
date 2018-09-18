@@ -305,6 +305,16 @@ class Customer < ActiveRecord::Base
 		where(cust_type_id: 1)
 	end
 
+	#
+	#
+	#
+	def self.wholesale_customer
+		where.not(cust_type_id: 1)
+	end
+	#
+	#
+	#
+	
 	# def self.due_date_num_days(customer)
 	# 	if customer.end_of_month.nil?
 	# 		return customer.num_days
