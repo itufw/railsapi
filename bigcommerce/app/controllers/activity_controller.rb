@@ -11,7 +11,7 @@ class ActivityController < ApplicationController
   autocomplete :product_no_vintage, :name, full: true
 
   # TO BE DEPRECATED
-  autocomplete :customer, :actual_name, full: true, extra_data: [:address]
+  # autocomplete :customer, :actual_name, full: true, extra_data: [:address]
   
   autocomplete :customer, :retail, column_name: 'actual_name', full: true, scopes: [:retail_customer]
   autocomplete :customer, :wholesale, column_name: 'actual_name', full: true, scopes: [:wholesale_customer]
