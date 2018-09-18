@@ -186,7 +186,7 @@
       });
 
       $('.remove').click(function () {
-        $('.customer_autocomplete').html('<%= autocomplete_field_tag 'name', '', autocomplete_customer_actual_name_activity_index_path, placeholder: 'Search Customer', id: 'retail_customer_search', size: 15 %>');
+        $('.customer_autocomplete').html('<%= autocomplete_field_tag 'name', '', autocomplete_customer_retail_activity_index_path, placeholder: 'Search Customer', id: 'retail_customer_search', size: 15 %>');
         $('#order_customer_id').val('');
         $('.last-order-product-retail').remove();
         $('.last-order-td').remove();
