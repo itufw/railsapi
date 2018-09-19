@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180911061737) do
+ActiveRecord::Schema.define(version: 20180919032950) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -677,15 +677,25 @@ ActiveRecord::Schema.define(version: 20180911061737) do
   add_index "order_shippings", ["address_id"], name: "index_order_shippings_on_address_id", using: :btree
   add_index "order_shippings", ["order_id"], name: "index_order_shippings_on_order_id", using: :btree
 
+  create_table "order_type_customers", force: :cascade do |t|
+    t.integer  "order_type_id",    limit: 4, null: false
+    t.integer  "customer_type_id", limit: 4, null: false
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+  end
+
+  add_index "order_type_customers", ["order_type_id", "customer_type_id"], name: "index_order_type_customers_on_order_type_id_and_customer_type_id", unique: true, using: :btree
+
   create_table "order_types", force: :cascade do |t|
-    t.string   "name",                  limit: 3
-    t.string   "description",           limit: 120
-    t.datetime "created_at",                                                null: false
-    t.datetime "updated_at",                                                null: false
-    t.decimal  "item_price_factor",                 precision: 5, scale: 2
+    t.string   "name",                    limit: 3
+    t.string   "description",             limit: 120
+    t.datetime "created_at",                                                  null: false
+    t.datetime "updated_at",                                                  null: false
+    t.decimal  "item_price_factor",                   precision: 5, scale: 2
     t.boolean  "item_wet"
     t.boolean  "item_gst"
-    t.decimal  "based_price_deduction",             precision: 8, scale: 2
+    t.decimal  "based_price_deduction",               precision: 8, scale: 2
+    t.decimal  "hidden_wet_price_factor",             precision: 5, scale: 2
   end
 
   create_table "orders", force: :cascade do |t|

@@ -39,6 +39,7 @@
             <ul class="dropdown-menu">
               <li><%= link_to "Orders", controller: "order", action: "all" %></li>
               <li><%= link_to "New Order", controller: "order", action: "create_order" %></li>
+              <li><%= link_to "New order", controller: "order", action: "new_order" %></li>
               <li><%= link_to "Pending Orders", controller: "status", action: "pending", status_id: 1, status_name: "Pending" %></li>
             </ul>
           </li>
