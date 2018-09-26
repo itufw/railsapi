@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180919032950) do
+ActiveRecord::Schema.define(version: 20180921001018) do
 
   create_table "account_emails", force: :cascade do |t|
     t.string   "receive_address",   limit: 255
@@ -696,6 +696,8 @@ ActiveRecord::Schema.define(version: 20180919032950) do
     t.boolean  "item_gst"
     t.decimal  "based_price_deduction",               precision: 8, scale: 2
     t.decimal  "hidden_wet_price_factor",             precision: 5, scale: 2
+    t.string   "sale_type",               limit: 9
+    t.string   "product_type",            limit: 9
   end
 
   create_table "orders", force: :cascade do |t|
