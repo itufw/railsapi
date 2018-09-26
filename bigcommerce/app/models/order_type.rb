@@ -10,4 +10,8 @@ class OrderType < ActiveRecord::Base
         message: "accepts only word characters, dots, dashes and underscores."
     }
 	validates :description, length: {minimum: 5, maximum: 120}
+
+    def self.list
+        pluck :description, :id
+    end
 end
