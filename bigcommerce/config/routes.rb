@@ -67,23 +67,32 @@ Rails.application.routes.draw do
 
   resources :activity do
     get :autocomplete_product_name, on: :collection
+
+    # TO BE DEPRECATED
     get :autocomplete_beer_name, on: :collection
+
+    # TO BE DEPRECATED
     get :autocomplete_beer_ws, on: :collection
 
     # TO BE DEPRECATED
     get :autocomplete_product_ws, on: :collection
     
+    # TO BE DEPRECATED
+    get :autocomplete_product_retail, on: :collection
+
+    # TO BE DEPRECATED
+    get :autocomplete_product_wholesale, on: :collection
+
+    # new route to be a replacement of the deprecated routes above
     get :autocomplete_products, on: :collection
     
-    get :autocomplete_product_retail, on: :collection
-    get :autocomplete_product_wholesale, on: :collection
     
     get :autocomplete_product_no_ws_name, on: :collection
     get :autocomplete_product_no_vintage_name, on: :collection
     
 
     # TO BE DEPRECATED
-    # get :autocomplete_customer_actual_name, on: :collection
+    get :autocomplete_customer_actual_name, on: :collection
 
     get :autocomplete_customer_retail, on: :collection
     get :autocomplete_customer_wholesale, on: :collection
