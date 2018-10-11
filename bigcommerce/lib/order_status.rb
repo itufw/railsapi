@@ -192,14 +192,20 @@ module OrderStatus
   end
 
   def print_pod(selected_orders)
+    log "Print POD Selected Orders ", selected_orders 
     orders = Order.where(id: selected_orders)
     order_pods = CombinePDF.new
 
     orders.each do |order|
+      log "Print POD order ", order.id
+      log "Print POD order ", order.proof_of_delivery
       if !order.proof_of_delivery.file.nil?
+        log "Print POD order not null", order.proof_of_delivery
         order_pods << CombinePDF.parse(open(order.proof_of_delivery.to_s).read)
       elsif FastwayTrace.pod_available(order.id).first
         item = FastwayConsignmentItem.filter_order(order.id).first
+        log "Print POD fastway", order.id
+        log "Print POD fastway", item.inspect
         pod = WickedPdf.new.pdf_from_string(
           render_to_string(
               :template => 'pdf/proof_of_delivery.pdf',

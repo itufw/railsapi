@@ -228,19 +228,45 @@ class ActivityController < ApplicationController
 
   # select only whole sale products for autocomplete list
   def autocomplete_products
-    product_selection = "retail_wines"
-    duty_rate = 1
+    
+
+    search_query = "retail_wines"
+    price_factor = 1
+
+    order_type = order_type params[:order_type_id]
+
+    search_query = product_query order_type
+
+    price_factor = price_factor order_type
+
+
     products = Product.search_for(params[:term])
-                .send(product_selection)
+                .send(search_query)
                 .order('name_no_vintage ASC, vintage DESC').all
 
     render :json => products.map { |product| {
                 :id => product.id, 
                 :label => product.name,
                 :value => product.name, 
-                :price => (product.calculated_price * duty_rate).round(4),
+                :price => (product.calculated_price * price_factor).round(4),
                 :inventory => product.inventory, 
                 :monthly_supply => product.monthly_supply}}
+  end
+
+  def product_query order_type
+    order_type.sale_type + order_type.product_type.pluralize
+  end
+
+  # get price factor with WET and GST included if any
+  def price_factor order_type
+    wet = (order_type.item_wet ? Params::WET : 0.0)
+    gst = (order_type.item_gst ? Params::GST : 0.0)
+    1.0 + wet + gst
+  end
+
+  # get order type by id
+  def order_type id
+    OrderType.find id
   end
 
   # add allocated products to the autocomplete list

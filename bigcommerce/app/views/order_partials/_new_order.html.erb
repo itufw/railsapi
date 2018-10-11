@@ -1,7 +1,5 @@
 <%= form_for @order, :url => {:controller => "order", :action => "save_order"}  do |f| %>
-
     <%= f.text_field :customer_id %>
-<script type="text/javascript"> alert("<%=params[:order_type]%>")</script>
     <div class="row">
         <div class="col-md-8">
             <div class="row">
@@ -28,14 +26,15 @@
                         <tr>
                             <th>Product</th>
                             <td class="product_autocomplete">
-                              <%= autocomplete_field_tag 'product', '', autocomplete_products_activity_index_path, placeholder: 'Search Retail Wines', id_element: '#product_id', id: 'retail_product_search'%>
+                              <%= f.autocomplete_field 'product', autocomplete_products_activity_index_path,
+                                :fields => { :order_type_id => '1' } %>
                             </td>
                         </tr>
                     </table>
 
                     <script type="text/javascript">
 
-                        $('.product_autocomplete').html('<%= autocomplete_field_tag 'product', '', autocomplete_products_activity_index_path, placeholder: 'Search Retail Wines Product', id_element: '#product_id', id: 'retail_product_search'%>');
+                        // $('.product_autocomplete').html('<%= autocomplete_field_tag 'product', '', autocomplete_products_activity_index_path, { placeholder: 'Search Retail Wines Product', id_element: '#product_id', id: 'retail_product_search', :order_type_id => params[:order_type_id] }%>');
 
                         $('input#customer_purchase_order').change(function(){
                             if (this.checked){

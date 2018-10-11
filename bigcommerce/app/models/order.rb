@@ -3,7 +3,7 @@ require 'bigcommerce_connection.rb'
 
 class Order < ActiveRecord::Base
   include CleanData
-
+  attr_reader :product
   belongs_to :customer
   delegate :staff, to: :customer, allow_nil: true
   belongs_to :status

@@ -6,7 +6,8 @@
 <h2 id="order_title" style="text-transform:capitalize;">New Order</h2>
 
 <%= select_tag "order_type", options_for_select(
-    OrderType.all.collect{ |ot| [ot.description, ot.name]}),
+    # OrderType.all.collect{ |ot| [ot.description, ot.name]}),
+    OrderType.list),
     { class:"form-control", :onchange => "", 
         prompt: "Please select an order type" } %>
 
@@ -39,7 +40,8 @@
             $.ajax({
                 url: "<%= new_order_form_path %>",
                 data: {
-                    order_type: order_type
+                    order_type: order_type,
+                    order_type_id: this.value
                 },
                 dataType: "script"
             })

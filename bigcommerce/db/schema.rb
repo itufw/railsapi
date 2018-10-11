@@ -677,15 +677,6 @@ ActiveRecord::Schema.define(version: 20180921001018) do
   add_index "order_shippings", ["address_id"], name: "index_order_shippings_on_address_id", using: :btree
   add_index "order_shippings", ["order_id"], name: "index_order_shippings_on_order_id", using: :btree
 
-  create_table "order_type_customers", force: :cascade do |t|
-    t.integer  "order_type_id",    limit: 4, null: false
-    t.integer  "customer_type_id", limit: 4, null: false
-    t.datetime "created_at",                 null: false
-    t.datetime "updated_at",                 null: false
-  end
-
-  add_index "order_type_customers", ["order_type_id", "customer_type_id"], name: "index_order_type_customers_on_order_type_id_and_customer_type_id", unique: true, using: :btree
-
   create_table "order_types", force: :cascade do |t|
     t.string   "name",                    limit: 3
     t.string   "description",             limit: 120
