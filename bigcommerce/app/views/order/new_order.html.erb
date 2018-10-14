@@ -1,0 +1,54 @@
+<!-- 
+  -- Added by: vchar
+  -- On 20180919 
+  -->
+
+<h2 id="order_title" style="text-transform:capitalize;">New Order</h2>
+
+<%= select_tag "order_type", options_for_select(
+    OrderType.all.collect{ |ot| [ot.description, ot.name]}),
+    { class:"form-control", :onchange => "", 
+        prompt: "Please select an order type" } %>
+
+<!-- @order_types.each{|order_type| [order_type[3], order_type[2]]} -->
+<script type="text/javascript">
+    order_type = 'wholesale';
+    $(function() {
+        $('.order_form').hide();
+    });
+
+    // Update page header title
+    // Toggle displaying the order form
+    $('#order_type').on('change', function(){
+        if (!this.value) {
+            $('#order_title').text("New Order");
+            $('#order_form').hide();
+        } else {
+            $('#order_title').text(
+                'New ' + $('#order_type option:selected').text() + ' order'
+            );
+            $('#order_form').show();
+        }
+    });
+
+    // BEGIN: Load a new order form according to order type selction
+    $(document).ready(function() {
+        $('#order_type').on('change', function(){
+            // alert(this.value);
+
+            $.ajax({
+                url: "<%= new_order_form_path %>",
+                data: {
+                    order_type: order_type
+                },
+                dataType: "script"
+            })
+        });
+    })
+    // END: Load a new order form according to order type selction
+</script>
+
+<!-- BEGIN: Display new order form according to order type selction -->
+<div id="order_form">
+</div>
+<!-- END: Display new order form according to order type selction -->
