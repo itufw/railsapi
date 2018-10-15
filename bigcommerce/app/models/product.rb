@@ -261,9 +261,36 @@ class Product < ActiveRecord::Base
     send(group_by_transform_column).sum(:monthly_supply)
   end
 
+  # TO BE DEPRECATED
   # show only retail wines (no beer)
-  def self.retail_products
-    where("retail_ws != 'WS' AND product_sub_type_id != 59")
+  # def self.retail_products
+  #   where("retail_ws != 'WS' AND product_sub_type_id != 59")
+  # end
+
+  # Get only retail wines (no beers)
+  # Product sub type 59 is of beers
+  def self.retail_wines
+    where("product_sub_type_id != 59 AND retail_ws != 'WS'")
+  end
+
+  # Get only wholesale wines (no beers)
+  def self.wholesale_wines
+    where("product_sub_type_id != 59 AND retail_ws = 'WS'")
+  end
+
+  # Get only retail beers
+  def self.retail_beers
+    where("product_sub_type_id = 59 AND retail_ws = 'R'")
+  end
+
+  # Get only wholesale beers (no wines)
+  def self.wholesale_beers
+    where("product_sub_type_id = 59 AND retail_ws = 'WS'")
+  end
+
+  # Get only current products
+  def self.current
+    where("current = 1")
   end
 
   def self.product_inventory(group_by_transform_column)

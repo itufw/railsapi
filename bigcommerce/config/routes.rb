@@ -23,6 +23,8 @@ Rails.application.routes.draw do
   get '/event_censor', to:'calendar#event_censor'
   get '/calendar/local_calendar', to: 'calendar#local_calendar'
 
+  get "/new_order_form" => 'order#new_order_form', as: "new_order_form"
+  
   get '/fetch_order_detail', to: 'order#fetch_order_detail', as: 'fetch_order_detail'
   get '/fetch_last_products', to: 'status#fetch_last_products', as: 'fetch_last_products'
   get '/fetch_product_selected', to: 'product#fetch_product_selected', as: 'fetch_product_selected'
@@ -65,18 +67,36 @@ Rails.application.routes.draw do
 
   resources :activity do
     get :autocomplete_product_name, on: :collection
+
+    # TO BE DEPRECATED
     get :autocomplete_beer_name, on: :collection
+
+    # TO BE DEPRECATED
     get :autocomplete_beer_ws, on: :collection
+
+    # TO BE DEPRECATED
     get :autocomplete_product_ws, on: :collection
+    
+    # TO BE DEPRECATED
     get :autocomplete_product_retail, on: :collection
+
+    # TO BE DEPRECATED
+    get :autocomplete_product_wholesale, on: :collection
+
+    # new route to be a replacement of the deprecated routes above
+    get :autocomplete_products, on: :collection
+    
+    
     get :autocomplete_product_no_ws_name, on: :collection
     get :autocomplete_product_no_vintage_name, on: :collection
     
+
     # TO BE DEPRECATED
-    # get :autocomplete_customer_actual_name, on: :collection
+    get :autocomplete_customer_actual_name, on: :collection
 
     get :autocomplete_customer_retail, on: :collection
     get :autocomplete_customer_wholesale, on: :collection
+
     get :autocomplete_contact_name, on: :collection
     get :autocomplete_customer_lead_actual_name, on: :collection
     get :autocomplete_staff_nickname, on: :collection

@@ -5,16 +5,29 @@ class ActivityController < ApplicationController
   before_action :confirm_logged_in
 
   autocomplete :product, :name, full: true
+
+  # TO BE DEPRECATED
   autocomplete :product, :ws, full: true
-  autocomplete :product, :retail, column_name: 'name', full: true, scopes: [:retail_products], extra_data: [:calculated_price, :inventory]
-  autocomplete :product_no_ws, :name, full: true, extra_data: [:product_no_vintage_id]
+
+  autocomplete :product, :retail, column_name: 'name', full: true, 
+                scopes: [:retail_wines], 
+                extra_data: [:calculated_price, :inventory]
+  autocomplete :product, :wholesale, column_name: 'name', full: true, 
+                scopes: [:wholesale_wines], 
+                extra_data: [:calculated_price, :inventory]
+  
+  autocomplete :product_no_ws, :name, full: true, 
+                extra_data: [:product_no_vintage_id]
   autocomplete :product_no_vintage, :name, full: true
 
   # TO BE DEPRECATED
-  # autocomplete :customer, :actual_name, full: true, extra_data: [:address]
+  autocomplete :customer, :actual_name, full: true, extra_data: [:address]
   
-  autocomplete :customer, :retail, column_name: 'actual_name', full: true, scopes: [:retail_customer]
-  autocomplete :customer, :wholesale, column_name: 'actual_name', full: true, scopes: [:wholesale_customer]
+  autocomplete :customer, :retail, column_name: 'actual_name', 
+                full: true, scopes: [:retail_customer]
+  autocomplete :customer, :wholesale, column_name: 'actual_name', 
+                full: true, scopes: [:wholesale_customer]
+
   autocomplete :customer_lead, :actual_name, full: true, scopes: :not_customer
   autocomplete :contact, :name, display_value: :display_position, scopes: :has_role
   autocomplete :staff, :nickname, extra_data: [:nickname]
@@ -153,33 +166,81 @@ class ActivityController < ApplicationController
 
   # select only beers for autocomplete list
   def autocomplete_beer_name
-    products = Product.search_for(params[:term]).where('product_sub_type_id = 59 and retail_ws = "R"').order('name ASC').all
-    render :json => products.map { |product| {:id => product.id, :label => product.name,
-      :value => product.name, :price => product.calculated_price.round(4)*1.1, 
-      :inventory => product.inventory}}
+    products = Product.search_for(params[:term])
+                .where('product_sub_type_id = 59 and retail_ws = "R"')
+                .order('name ASC').all
+    render :json => products.map { |product| {
+                :id => product.id, 
+                :label => product.name,
+                :value => product.name, 
+                :price => product.calculated_price.round(4)*1.1, 
+                :inventory => product.inventory}}
   end
 
   # select only beers for autocomplete list
   def autocomplete_beer_ws
-    products = Product.search_for(params[:term]).where('product_sub_type_id = 59 and retail_ws = "WS"').order('name ASC').all
-    render :json => products.map { |product| {:id => product.id, :label => product.name,
-      :value => product.name, :price => product.calculated_price.round(4), :inventory => product.inventory}}
+    products = Product.search_for(params[:term])
+                .where('product_sub_type_id = 59 and retail_ws = "WS"')
+                .order('name ASC').all
+    render :json => products.map { |product| {
+                :id => product.id, 
+                :label => product.name,
+                :value => product.name, 
+                :price => product.calculated_price.round(4), 
+                :inventory => product.inventory
+              }
+            }
   end
 
   # select only retail products for autocomplete list
   def autocomplete_product_name
-    products = Product.search_for(params[:term]).where('inventory > 0 AND product_sub_type_id != 59').order('name_no_vintage ASC, vintage DESC').all
-    render :json => products.map { |product| {:id => product.id, :label => product.name,
-      :value => product.name, :price => product.calculated_price.round(4), :inventory => product.inventory}}
+    products = Product.search_for(params[:term])
+                .where('inventory > 0 AND product_sub_type_id != 59')
+                .order('name_no_vintage ASC, vintage DESC').all
+    render :json => products.map { |product| {
+                :id => product.id, 
+                :label => product.name,
+                :value => product.name, 
+                :price => product.calculated_price.round(4), 
+                :inventory => product.inventory
+              }
+            }
   end
 
+  # To BE DEPRECATED
   # select only whole sale products for autocomplete list
   def autocomplete_product_ws
-    #products = Product.search_for(params[:term]).where("inventory > 0 AND name LIKE '%WS' AND current=1").order('name_no_vintage ASC, vintage DESC').all
-    products = Product.search_for(params[:term]).where("(name LIKE '%WS' OR name LIKE '%VC') AND current=1 AND product_sub_type_id != 59").order('name_no_vintage ASC, vintage DESC').all
-    render :json => products.map { |product| {:id => product.id, :label => product.name,
-      :value => product.name, :price => (product.calculated_price * (1.29)).round(4),
-      :inventory => product.inventory, :monthly_supply => product.monthly_supply}}
+    # products = Product.search_for(params[:term])
+    #             .where("inventory > 0 AND name LIKE '%WS' AND current=1")
+    #             .order('name_no_vintage ASC, vintage DESC').all
+    products = Product.search_for(params[:term])
+                .where("(name LIKE '%WS' OR name LIKE '%VC') AND current=1 AND product_sub_type_id != 59")
+                .order('name_no_vintage ASC, vintage DESC').all
+    render :json => products.map { |product| {
+                :id => product.id, 
+                :label => product.name,
+                :value => product.name, 
+                :price => (product.calculated_price * (1.29)).round(4),
+                :inventory => product.inventory, 
+                :monthly_supply => product.monthly_supply}}
+  end
+
+
+  # select only whole sale products for autocomplete list
+  def autocomplete_products
+    product_selection = "retail_wines"
+    duty_rate = 1
+    products = Product.search_for(params[:term])
+                .send(product_selection)
+                .order('name_no_vintage ASC, vintage DESC').all
+
+    render :json => products.map { |product| {
+                :id => product.id, 
+                :label => product.name,
+                :value => product.name, 
+                :price => (product.calculated_price * duty_rate).round(4),
+                :inventory => product.inventory, 
+                :monthly_supply => product.monthly_supply}}
   end
 
   # add allocated products to the autocomplete list

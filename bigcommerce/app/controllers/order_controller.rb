@@ -106,6 +106,17 @@ class OrderController < ApplicationController
       send_data pdf, filename: "pod-#{order.id}.pdf", type: :pdf
   end
 
+  def new_order
+    # @order = Order.new(discount_rate: 0, shipping_cost: 0)
+  end
+
+  def new_order_form
+    @order = Order.new(discount_rate: 0, shipping_cost: 0)
+    respond_to do |format|
+      format.js
+    end
+  end
+
   def create_order
     @order = Order.new(discount_rate: 0, shipping_cost: 0)
   end
